@@ -413,7 +413,7 @@ int32 CF_QueueDirectoryFiles(CF_QueueDirFiles_t  *Ptr)
     if((dirp = OS_opendir(Ptr->SrcPath)) == NULL) /* directory is invalid */
     {
         CFE_EVS_SendEvent(CF_OPEN_DIR_ERR_EID,CFE_EVS_ERROR,
-            "Playback Dir Error %d,cannot open directory %s",dirp,Ptr->SrcPath);
+            "Playback Dir Error %d,cannot open directory %s", (int)dirp,Ptr->SrcPath);
         CFE_ES_PerfLogExit(CF_QDIRFILES_PERF_ID);
         return CF_ERROR;
     }

@@ -475,10 +475,7 @@ int32 CF_BuildPutRequest(CF_QueueEntry_t *QueueEntryPtr)
 {
     static char EntireString[MAX_REQUEST_STRING_LENGTH];
     uint32      ReqLen = 0;
-    uint32      Chan;
-    
-    Chan = QueueEntryPtr->ChanNum;
-    
+        
     strcpy(EntireString,"PUT ");
     ReqLen = 5;/* size of "PUT " plus one for null term */
     
@@ -1138,7 +1135,7 @@ void CF_GetCondCodeString(char *CallersBuf,uint32 CondCode,uint32 BufSize)
             break;            
 
         default:
-            sprintf(CallersBuf,"UNEXPECTED %lu",CondCode);
+            sprintf(CallersBuf,"UNEXPECTED %lu",(long unsigned int)CondCode);
             break;
             
     }/* end switch */
