@@ -1,5 +1,5 @@
 /************************************************************************
-** File: cf_version.h
+** File: cf_crc.h
 **
 ** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF) 
 ** Application version 3.0.0”
@@ -15,23 +15,29 @@
 ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
 ** See the License for the specific language governing permissions and 
 ** limitations under the License.
+** 
 **
 ** Purpose:
-**  The CFS CFDP (CF) Application header file containing version number
+**  The CF Application CRC calculation header file
 **
-** Notes:
-**
-**
+** 
+** 
 *************************************************************************/
-#ifndef _cf_version_h_
-#define _cf_version_h_
 
-#define CF_MAJOR_VERSION 3
-#define CF_MINOR_VERSION 0
-#define CF_REVISION      0
+#ifndef CF_CRC__H
+#define CF_CRC__H
 
-#endif /* _cf_version_h_ */
+#include "cfe.h"
 
-/************************/
-/*  End of File Comment */
-/************************/
+typedef struct {
+    uint32 working;
+    uint32 result;
+    uint8 index;
+} cf_crc_t;
+
+extern void CF_CRC_Start(cf_crc_t *c);
+extern void CF_CRC_Digest(cf_crc_t *c, const uint8 *data, int len);
+extern void CF_CRC_Finalize(cf_crc_t *c);
+
+#endif /* !CF_CRC__H */
+

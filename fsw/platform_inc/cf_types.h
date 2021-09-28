@@ -1,5 +1,5 @@
 /************************************************************************
-** File: cf_version.h
+** File: cf_types.h
 **
 ** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF) 
 ** Application version 3.0.0”
@@ -15,23 +15,35 @@
 ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
 ** See the License for the specific language governing permissions and 
 ** limitations under the License.
+** 
 **
 ** Purpose:
-**  The CFS CFDP (CF) Application header file containing version number
+**  The CF Application Types header file
 **
-** Notes:
-**
-**
+** 
+** 
 *************************************************************************/
-#ifndef _cf_version_h_
-#define _cf_version_h_
 
-#define CF_MAJOR_VERSION 3
-#define CF_MINOR_VERSION 0
-#define CF_REVISION      0
+#ifndef CF_TYPES__H
+#define CF_TYPES__H
 
-#endif /* _cf_version_h_ */
+#include "cfe.h"
 
-/************************/
-/*  End of File Comment */
-/************************/
+typedef enum fault_handler_t {
+    FH_ISSUE_NOTICE_OF_CANCELLATION,
+    FH_ISSUE_NOTICE_OF_SUSPENSION,
+    FH_NO_ACTION,
+    FH_ABANDON,
+} fault_handler_t;
+
+typedef enum local_entity_flags_t {
+    LE_SENT_INDICATION_REQUIRED = (1<<0),
+    LE_RECV_INDICATION_REQUIRED = (1<<1),
+    LE_FILE_SEGMENT_RECV_INDICATION_REQUIRED = (1<<2),
+    LE_TRANSACTION_FINISHED_INDICATION_REQUIRED = (1<<3),
+    LE_SUSPENDED_INDICATION_REQUIRED = (1<<4),
+    LE_RESUMED_INDICATION_REQUIRED = (1<<5),
+} local_entity_flags_t;
+
+#endif /* !CF_TYPES__H */
+

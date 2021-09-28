@@ -1,113 +1,97 @@
 /************************************************************************
-** File:
-**   $Id: cf_utils.h 1.16.1.1 2015/03/06 15:30:35EST sstrege Exp  $
+** File: cf_utils.h
 **
-**   Copyright � 2007-2014 United States Government as represented by the 
-**   Administrator of the National Aeronautics and Space Administration. 
-**   All Other Rights Reserved.  
+** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF) 
+** Application version 3.0.0”
+** Copyright © 2019 United States Government as represented by the 
+** Administrator of the National Aeronautics and Space Administration. 
+** All Rights Reserved.
+** Licensed under the Apache License, Version 2.0 (the "License"); you may 
+** not use this file except in compliance with the License. You may obtain 
+** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 **
-**   This software was created at NASA's Goddard Space Flight Center.
-**   This software is governed by the NASA Open Source Agreement and may be 
-**   used, distributed and modified only pursuant to the terms of that 
-**   agreement.
+** Unless required by applicable law or agreed to in writing, software 
+** distributed under the License is distributed on an "AS IS" BASIS, 
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+** See the License for the specific language governing permissions and 
+** limitations under the License.
+** 
 **
-** Purpose: 
+** Purpose:
+**  The CF Application utils header file
 **
-** Notes:
-**
-** $Log: cf_utils.h  $
-** Revision 1.16.1.1 2015/03/06 15:30:35EST sstrege 
-** Added copyright information
-** Revision 1.16 2011/05/09 11:52:11EDT rmcgraw 
-** DCR13317:1 Allow Destintaion path to be blank
-** Revision 1.15 2010/11/04 11:37:47EDT rmcgraw 
-** Dcr13051:1 Wrap OS_printfs in platform cfg CF_DEBUG
-** Revision 1.14 2010/10/25 11:21:48EDT rmcgraw 
-** DCR12573:1 Changes to allow more than one incoming PDU MsgId
-** Revision 1.13 2010/10/21 13:48:11EDT rmcgraw 
-** DCR13060:2 Changed FindUpNodebyTransnum to FindUpNodeByTransID
-** Revision 1.12 2010/10/20 14:55:54EDT rmcgraw 
-** DCR12825:1 Change quick stat cmd to show active and suspended status
-** Revision 1.11 2010/07/08 13:50:31EDT rmcgraw 
-** DCR11510:1 Added proto for SendEventNoTerm
-** Revision 1.10 2010/07/08 13:47:31EDT rmcgraw 
-** DCR11510:1 Added termination checking on all cmds that take a string
-** Revision 1.9 2010/07/07 17:41:52EDT rmcgraw 
-** DCR11510:1 New prototypes for checking termination, validate paths etc
-** Revision 1.8 2010/06/11 16:13:16EDT rmcgraw 
-** DCR11510:1 ZeroCopy, Un-hardcoded cmd/tlm input/output pdus
-** Revision 1.7 2010/06/01 11:02:41EDT rmcgraw 
-** DCR11510:1 Removed CheckForGapsInTrans
-** Revision 1.6 2010/04/23 15:46:45EDT rmcgraw 
-** DCR11510:1 Added CF_CheckIfFileIsActive
-** Revision 1.5 2010/04/23 08:39:14EDT rmcgraw 
-** Dcr11510:1 Code Review Prep
-** Revision 1.4 2010/03/26 15:30:22EDT rmcgraw 
-** DCR11510 Various developmental changes
-** Revision 1.3 2010/03/12 12:14:37EST rmcgraw 
-** DCR11510:1 Initial check-in towards CF Version 1000
-** Revision 1.2 2009/12/08 09:18:23EST rmcgraw 
-** DCR10350:3 Added CF_ShowCfg function
-** Revision 1.1 2009/11/24 12:48:57EST rmcgraw 
-** Initial revision
-** Member added to CFS CF project
-**
-*************************************************************************/
-#ifndef _cf_utils_h_
-#define _cf_utils_h_
-
-
-/************************************************************************
-** Includes
+** 
+** 
 *************************************************************************/
 
+#ifndef __CF_UTILS_H_
+#define __CF_UTILS_H_
 
-int32 CF_BuildPutRequest(CF_QueueEntry_t *QueueEntryPtr);
-void CF_SendEventPutStrTooLong(char *SrcFile);
-int32 CF_BuildCmdedRequest(char *Req,char *Trans);
-int32 CF_FindActiveTransIdByName(char *TransIdBuf,char *Filename);
-CF_QueueEntry_t *CF_FindNodeAtFrontOfQueue(TRANS_STATUS TransInfo);
-CF_QueueEntry_t *CF_FindUpNodeByTransID(uint32 Queue, char *SrcEntityId, uint32 Trans);
-CF_QueueEntry_t *CF_FindPbNodeByTransNum(uint32 Chan, uint32 Queue, uint32 Trans);
-CF_QueueEntry_t *CF_FindNodeByTransId(char *TransIdStr);
-CF_QueueEntry_t *CF_FindUpHistoryNodeByName(char *SrcFile);
-CF_QueueEntry_t *CF_FindUpActiveNodeByName(char *SrcFile);
-CF_QueueEntry_t *CF_FindUpNodeByName(char *SrcFile);
-CF_QueueEntry_t *CF_FindPbHistoryNodeByName(char *SrcFile);
-CF_QueueEntry_t *CF_FindPbActiveNodeByName(char *SrcFile);
-CF_QueueEntry_t *CF_FindPbPendingNodeByName(char *SrcFile);
-CF_QueueEntry_t *CF_FindPbNodeByName(char *SrcFile);
-CF_QueueEntry_t *CF_FindNodeByName(char *SrcFile);
-void CF_IncrFaultCtr(TRANS_STATUS *TransInfoPtr);
-int32 CF_ValidateEntityId(char *EntityIdStrPtr);
-uint32 CF_FileOpenCheck(char *Filename);
-int32 CF_CheckIfFileIsActive(char *Filename);
-void CF_MoveUpNodeActiveToHistory(char *SrcEntity, uint32 TransNum);
-void CF_MoveDwnNodeActiveToHistory(uint32 TransNum);
-void CF_GetStatString(char *CallersBuf,uint32 Stat, uint32 BufSize);
-void CF_GetFinalStatString(char *CallersBuf,uint32 FinalStat, uint32 BufSize);
-void CF_GetCondCodeString(char *CallersBuf,uint32 CondCode,uint32 BufSize);
-uint32  CF_GetPktType(CFE_SB_MsgId_t MsgId);
-int32 CF_ValidatePathFile(char *PathFilename);
-int32 CF_ValidateSrcPath(char *Pathname);
-int32 CF_ValidateDstPath(char *Pathname);
-int32 CF_ChkTermination(char *String, uint32 MaxLength);
-int32 CF_ValidateFilenameReportErr(char *Filename, char *Source);
-void CF_SendEventNoTerm(char *Source);
-uint8 CF_GetResponseChanFromMsgId(CFE_SB_MsgPtr_t MessagePtr);
-uint8 CF_GetResponseChanFromTransId(uint32 Queue, char *SrcEntityId, uint32 Trans);
+#include "cf_cfdp.h"
+#include "cf_assert.h"
 
-#ifdef CF_DEBUG
-    void CF_ShowTbl(void);
-    void CF_ShowCfg(void);
-    void CF_PrintPDUType (uint8 FileDirCode, uint8 DirCode2);
-    void CF_PrintAckType (uint8 DirCode2);
-    void CF_ShowQs(void);
-#endif
+/* free a transaction from the queue it's on.
+ * NOTE: this leaves the transaction in a bad state,
+ * so it must be followed by placing the transaction on
+ * another queue. Need this function because the path of
+ * freeing a transaction (returning to default state)
+ * means that it must be removed from the current queue
+ * otherwise if the structure is zero'd out the queue
+ * will become corrupted due to other nodes on the queue
+ * pointing to an invalid node */
+static inline void cf_dequeue_transaction(transaction_t *t)
+{
+    CF_Assert(t&&(t->chan_num<CF_NUM_CHANNELS));
+    CF_CList_Remove(&CF_AppData.engine.channels[t->chan_num].qs[t->flags.all.q_index], &t->cl_node);
+    CF_Assert(CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.all.q_index]); /* sanity check */
+    --CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.all.q_index];
+}
 
+static inline void cf_move_transaction(transaction_t *t, cf_queue_index_t q)
+{
+    CF_Assert(t&&(t->chan_num<CF_NUM_CHANNELS));
+    CF_CList_Remove(&CF_AppData.engine.channels[t->chan_num].qs[t->flags.all.q_index], &t->cl_node);
+    CF_Assert(CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.all.q_index]); /* sanity check */
+    --CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.all.q_index];
+    CF_CList_InsertBack(&CF_AppData.engine.channels[t->chan_num].qs[q], &t->cl_node);
+    t->flags.all.q_index = q;
+    ++CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.all.q_index];
+}
 
-#endif /* _cf_utils_h_ */
+static inline void CF_CList_Remove_Ex(channel_t *c, cf_queue_index_t index, clist_node node)
+{
+    CF_CList_Remove(&c->qs[index], node);
+    CF_Assert(CF_AppData.hk.channel_hk[c-CF_AppData.engine.channels].q_size[index]); /* sanity check */
+    --CF_AppData.hk.channel_hk[c-CF_AppData.engine.channels].q_size[index];
+}
 
-/************************/
-/*  End of File Comment */
-/************************/
+static inline void CF_CList_InsertAfter_Ex(channel_t *c, cf_queue_index_t index, clist_node start, clist_node after)
+{
+    CF_CList_InsertAfter(&c->qs[index], start, after);
+    ++CF_AppData.hk.channel_hk[c-CF_AppData.engine.channels].q_size[index];
+}
+
+static inline void CF_CList_InsertBack_Ex(channel_t *c, cf_queue_index_t index, clist_node node)
+{
+    CF_CList_InsertBack(&c->qs[index], node);
+    ++CF_AppData.hk.channel_hk[c-CF_AppData.engine.channels].q_size[index];
+}
+
+int32 CF_WriteQueueDataToFile(int32 fd, channel_t *c, cf_queue_index_t q);
+int32 CF_WriteHistoryQueueDataToFile(int32 fd, channel_t *c, direction_t dir);
+
+void CF_InsertSortPrio(transaction_t *t, cf_queue_index_t q);
+
+typedef void(*CF_TraverseAllTransactions_fn_t)(transaction_t*, void*);
+/* these return the number of transactions traversed */
+extern int CF_TraverseAllTransactions(channel_t *c, CF_TraverseAllTransactions_fn_t fn, void*);
+extern int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void*);
+
+extern int32 CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 access);
+extern void CF_WrappedClose(osal_id_t fd);
+extern int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size);
+extern int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size);
+extern int32 CF_WrappedLseek(osal_id_t fd, off_t offset, int mode);
+
+#endif /* !__CF_UTILS_H_ */
+

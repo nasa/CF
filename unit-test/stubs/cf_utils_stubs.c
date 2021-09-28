@@ -1,29 +1,16 @@
 /************************************************************************
-** File: cf_utils.c
+** File: cf_utils_stubs.c
 **
-** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF) 
-** Application version 3.0.0”
-** Copyright © 2019 United States Government as represented by the 
-** Administrator of the National Aeronautics and Space Administration. 
-** All Rights Reserved.
-** Licensed under the Apache License, Version 2.0 (the "License"); you may 
-** not use this file except in compliance with the License. You may obtain 
-** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software 
-** distributed under the License is distributed on an "AS IS" BASIS, 
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-** See the License for the specific language governing permissions and 
-** limitations under the License.
-** 
+** %LICENSE_START
+** %LICENSE_STOP
 **
 ** Purpose:
-**  The CF Application general utility functions source file
+**  The CF Application general utility functions stubs file
 **
 **  Various odds and ends are put here.
 **
-** 
-** 
+** Revision 1.0 2020/05/01 sseeger
+**  Initial revision
 *************************************************************************/
 
 #include "cf_app.h"
@@ -35,8 +22,16 @@
 
 #include "cf_assert.h"
 
+/* UT includes */
+#include "uttest.h"
+#include "utstubs.h"
+#include "utgenstub.h"
+
+#include "cf_test_utils.h"
+
+
 typedef struct {
-    osal_id_t fd;
+    int32 fd;
     int32 result;
     int32 counter;
 } trav_arg_t;
@@ -72,28 +67,7 @@ typedef struct {
 *************************************************************************/
 static int CF_TraverseHistory(clist_node n, trav_arg_t *context)
 {
-    static const char *dstr[] = { "RX", "TX" };
-    int i;
-    int32 ret;
-    int32 len;
-    char linebuf[LINEBUF_LEN]; /* buffer for line data */
-    history_t *h = container_of(n, history_t, cl_node);
-
-    CF_Assert(h->dir<CF_DIR_NUM);
-    len = snprintf(linebuf, sizeof(linebuf)-1, "SEQ (%d, %d)\tDIR: %s\tPEER %d\tCC: %d", h->src_eid, h->seq_num, dstr[h->dir], h->peer_eid, h->cc);
-    for(i=0; i<2; ++i) {
-        static const char *fstr[] = { "SRC: %s", "DST: %s" };
-        const char *fnames[] = { h->fnames.src_filename, h->fnames.dst_filename };
-        len = snprintf(linebuf, sizeof(linebuf)-1, fstr[i], fnames[i]);
-        ret = CF_WrappedWrite(context->fd, linebuf, len);
-        if(ret!=len) {
-            context->result = 1; /* failed */
-            CFE_EVS_SendEvent(CF_EID_ERR_CMD_WHIST_WRITE, CFE_EVS_EventType_ERROR, "CF: writing queue file failed, expected 0x%08x got 0x%08x", len, ret);
-            return CLIST_EXIT;
-        }
-    }
-
-    return CLIST_CONT;
+    unimplemented(__FUNCTION__, __FILE__, __LINE__);
 }
 
 /************************************************************************/
@@ -110,19 +84,7 @@ static int CF_TraverseHistory(clist_node n, trav_arg_t *context)
 *************************************************************************/
 static int CF_TraverseTransactions(clist_node n, trav_arg_t *context)
 {
-    transaction_t *t = container_of(n, transaction_t, cl_node);
-
-    /* use CF_TraverseHistory to print filenames and direction */
-    /* NOTE: ok to ignore return value of CF_TraverseHistory. We care
-     * about the value in context->result. The reason for this confusion
-     * is CF_TraverseHistory is also a list traversal function. In this
-     * function we are just calling it directly. */
-    /* ignore return value */ CF_TraverseHistory(&t->history->cl_node, context);
-    if(context->result) {
-        return CLIST_EXIT;
-    }
-
-    return CLIST_CONT;
+    unimplemented(__FUNCTION__, __FILE__, __LINE__);
 }
 
 /************************************************************************/
@@ -138,9 +100,11 @@ static int CF_TraverseTransactions(clist_node n, trav_arg_t *context)
 *************************************************************************/
 int32 CF_WriteQueueDataToFile(int32 fd, channel_t *c, cf_queue_index_t q)
 {
-    trav_arg_t arg = { fd, 0, 0 };
-    CF_CList_Traverse(c->qs[q], (clist_fn_t)CF_TraverseTransactions, &arg);
-    return arg.result;
+    UT_Stub_CopyFromLocal(UT_KEY(CF_WriteQueueDataToFile), &fd, sizeof(fd));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_WriteQueueDataToFile), &c, sizeof(c));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_WriteQueueDataToFile), &q, sizeof(q));
+
+    return UT_DEFAULT_IMPL(CF_WriteQueueDataToFile);
 }
 
 /************************************************************************/
@@ -156,9 +120,11 @@ int32 CF_WriteQueueDataToFile(int32 fd, channel_t *c, cf_queue_index_t q)
 *************************************************************************/
 int32 CF_WriteHistoryQueueDataToFile(int32 fd, channel_t *c, direction_t dir)
 {
-    trav_arg_t arg = { fd, 0, 0 };
-    CF_CList_Traverse(c->qs[CF_Q_HIST], (clist_fn_t)CF_TraverseHistory, &arg);
-    return arg.result;
+    UT_Stub_CopyFromLocal(UT_KEY(CF_WriteHistoryQueueDataToFile), &fd, sizeof(fd));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_WriteHistoryQueueDataToFile), &c, sizeof(c));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_WriteHistoryQueueDataToFile), &dir, sizeof(dir));
+
+    return UT_DEFAULT_IMPL(CF_WriteHistoryQueueDataToFile);
 }
 
 /************************************************************************/
@@ -178,19 +144,7 @@ int32 CF_WriteHistoryQueueDataToFile(int32 fd, channel_t *c, direction_t dir)
 *************************************************************************/
 static int CF_PrioSearch(clist_node node, void *context)
 {
-    transaction_t *t = container_of(node, transaction_t, cl_node);
-    priority_arg_t *p = (priority_arg_t*)context;
-
-    if(t->priority<=p->priority) {
-        /* found it!
-         *
-         * the current transaction's prio is less than desired (higher)
-         */
-        p->t = t;
-        return CLIST_EXIT;
-    }
-
-    return CLIST_CONT;
+    unimplemented(__FUNCTION__, __FILE__, __LINE__);
 }
 
 /************************************************************************/
@@ -208,33 +162,10 @@ static int CF_PrioSearch(clist_node node, void *context)
 *************************************************************************/
 void CF_InsertSortPrio(transaction_t *t, cf_queue_index_t q)
 {
-    int insert_back = 0;
-    channel_t *c = &CF_AppData.engine.channels[t->chan_num];
-    CF_Assert(t->chan_num<CF_NUM_CHANNELS);
-    CF_Assert(t->state!=CFDP_IDLE);
-    
-    /* look for proper position on PEND queue for this transaction.
-     * This is a simple priority sort. */
+    UT_Stub_CopyFromLocal(UT_KEY(CF_InsertSortPrio), &t, sizeof(t));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_InsertSortPrio), &q, sizeof(q));
 
-    if(!c->qs[q]) {
-        /* list is empty, so just insert */
-        insert_back = 1;
-    }   
-    else {
-        priority_arg_t p = { NULL, t->priority };
-        CF_CList_Traverse_R(c->qs[q], CF_PrioSearch, &p);
-        if(p.t) {
-            CF_CList_InsertAfter_Ex(c, q, &p.t->cl_node, &t->cl_node);
-        }
-        else {
-            insert_back = 1;
-        }
-    }   
-    
-    if(insert_back) {
-        CF_CList_InsertBack_Ex(c, q, &t->cl_node);
-    }
-    t->flags.all.q_index = q;
+    UT_DEFAULT_IMPL(CF_InsertSortPrio);
 }
 
 /************************************************************************/
@@ -254,10 +185,7 @@ void CF_InsertSortPrio(transaction_t *t, cf_queue_index_t q)
 *************************************************************************/
 static int CF_TraverseAllTransactions_(clist_node n, traverse_all_args_t *args)
 {
-    transaction_t *t = container_of(n, transaction_t, cl_node);
-    args->fn(t, args->context);
-    ++args->counter;
-    return CLIST_CONT;
+    unimplemented(__FUNCTION__, __FILE__, __LINE__);
 }
 
 /************************************************************************/
@@ -267,17 +195,25 @@ static int CF_TraverseAllTransactions_(clist_node n, traverse_all_args_t *args)
 **       c must not be NULL. fn must be a valid function. context must not be NULL.
 **
 **  \returns
-**  \retstmt Number of transactions traversed, or anything else on error. \endcode
+**  \retcode #CFE_SUCCESS \retdesc \copydoc CFE_SUCCESSS \endcode
+**  \retstmt Returns anything else on error.             \endcode
 **  \endreturns
 **
 *************************************************************************/
 int CF_TraverseAllTransactions(channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context)
 {
-    traverse_all_args_t args = { fn, context, 0 };
-    cf_queue_index_t index;
-    for(index=CF_Q_PEND; index<=CF_Q_RX; ++index) CF_CList_Traverse(c->qs[index], (clist_fn_t)CF_TraverseAllTransactions_, &args);
+    int forced_return;
+    
+    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions), &c,
+      sizeof(c));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions), &fn,
+      sizeof(fn));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions), &context,
+      sizeof(context));
 
-    return args.counter;
+    forced_return = UT_DEFAULT_IMPL(CF_TraverseAllTransactions);
+
+    return forced_return;
 }
 
 /************************************************************************/
@@ -287,16 +223,38 @@ int CF_TraverseAllTransactions(channel_t *c, CF_TraverseAllTransactions_fn_t fn,
 **       fn must be a valid function. context must not be NULL.
 **
 **  \returns
-**  \retstmt Number of transactions traversed, or anything else on error. \endcode
+**  \retcode #CFE_SUCCESS \retdesc \copydoc CFE_SUCCESSS \endcode
+**  \retstmt Returns anything else on error.             \endcode
 **  \endreturns
 **
 *************************************************************************/
 int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context)
 {
-    int i;
-    int ret=0;
-    for(i=0; i<CF_NUM_CHANNELS; ++i) ret += CF_TraverseAllTransactions(CF_AppData.engine.channels+i, fn, context);
-    return ret;
+    int forced_return;
+    
+    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions_All_Channels), &fn,
+      sizeof(fn));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions_All_Channels), &context,
+      sizeof(context));
+    
+    UT_DEFAULT_IMPL(CF_TraverseAllTransactions_All_Channels);
+    
+    UT_Stub_CopyToLocal(UT_KEY(CF_TraverseAllTransactions_All_Channels), &forced_return,
+      sizeof(forced_return));
+
+      /* TODO: setting the context here by using a specified force_return value is NOT the way to do things, this MUST be turned into a hook function */
+    if (forced_return == 0xDCDCDCDC)
+    {
+      forced_return = -1;
+      *((int*)context) = 1;
+    }
+    if (forced_return == 0xDC0000DC)
+    {
+      forced_return = -1;
+      *((int*)context) = 0;
+    }
+      
+    return forced_return;
 }
 
 /************************************************************************/
@@ -311,13 +269,20 @@ int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, 
 **
 *************************************************************************/
 int32 CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 access)
-{
-    int32 ret;
+{    
+    int forced_return;
+    
+    UT_Stub_CopyFromLocal(UT_KEY(CF_WrappedOpenCreate), &fd, sizeof(fd));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_WrappedOpenCreate), &fname, sizeof(fname));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_WrappedOpenCreate), &flags, sizeof(flags));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_WrappedOpenCreate), &access, sizeof(access));
 
-    CFE_ES_PerfLogEntry(CF_PERF_ID_FOPEN);
-    ret = OS_OpenCreate(fd, fname, flags, access);
-    CFE_ES_PerfLogExit(CF_PERF_ID_FOPEN);
-    return ret;
+    UT_DEFAULT_IMPL(CF_WrappedOpenCreate);
+    
+    UT_Stub_CopyToLocal(UT_KEY(CF_WrappedOpenCreate), &forced_return,
+      sizeof(forced_return));
+
+    return forced_return;
 }
 
 /************************************************************************/
@@ -329,15 +294,9 @@ int32 CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 
 *************************************************************************/
 void CF_WrappedClose(osal_id_t fd)
 {
-    int32 ret;
-
-    CFE_ES_PerfLogEntry(CF_PERF_ID_FCLOSE);
-    ret = OS_close(fd);
-    CFE_ES_PerfLogExit(CF_PERF_ID_FCLOSE);
-
-    if(ret!=OS_SUCCESS) {
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_CLOSE_ERR, CFE_EVS_EventType_ERROR, "CF: failed to close file 0x%x, OS_close returned 0x%08x", fd, ret);
-    }
+    UT_Stub_CopyFromLocal(UT_KEY(CF_WrappedClose), &fd, sizeof(fd));
+    
+    UT_DEFAULT_IMPL(CF_WrappedClose);
 }
 
 /************************************************************************/
@@ -353,13 +312,16 @@ void CF_WrappedClose(osal_id_t fd)
 **
 *************************************************************************/
 int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size)
-{
-    int32 ret;
+{  
+    UT_GenStub_SetupReturnBuffer(CF_WrappedRead, int32);
 
-    CFE_ES_PerfLogEntry(CF_PERF_ID_FREAD);
-    ret = OS_read(fd, buf, read_size);
-    CFE_ES_PerfLogExit(CF_PERF_ID_FREAD);
-    return ret;
+    UT_GenStub_AddParam(CF_WrappedRead, osal_id_t, fd);
+    UT_GenStub_AddParam(CF_WrappedRead, const char *, buf);
+    UT_GenStub_AddParam(CF_WrappedRead, uint16, read_size);
+
+    UT_GenStub_Execute(CF_WrappedRead, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_WrappedRead, int32);
 }
 
 /************************************************************************/
@@ -376,12 +338,15 @@ int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size)
 *************************************************************************/
 int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size)
 {
-    int32 ret;
+    UT_GenStub_SetupReturnBuffer(CF_WrappedWrite, int32);
 
-    CFE_ES_PerfLogEntry(CF_PERF_ID_FWRITE);
-    ret = OS_write(fd, buf, write_size);
-    CFE_ES_PerfLogExit(CF_PERF_ID_FWRITE);
-    return ret;
+    UT_GenStub_AddParam(CF_WrappedWrite, osal_id_t, fd);
+    UT_GenStub_AddParam(CF_WrappedWrite, const char *, buf);
+    UT_GenStub_AddParam(CF_WrappedWrite, uint16, write_size);
+
+    UT_GenStub_Execute(CF_WrappedWrite, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_WrappedWrite, int32);
 }
 
 /************************************************************************/
@@ -396,12 +361,17 @@ int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size)
 **  \endreturns
 **
 *************************************************************************/
+
 int32 CF_WrappedLseek(osal_id_t fd, off_t offset, int mode)
 {
-    int ret;
-    CFE_ES_PerfLogEntry(CF_PERF_ID_FSEEK);
-    ret = OS_lseek(fd, offset, mode);
-    CFE_ES_PerfLogExit(CF_PERF_ID_FSEEK);
-    return ret;
+    UT_GenStub_SetupReturnBuffer(CF_WrappedLseek, int32);
+
+    UT_GenStub_AddParam(CF_WrappedLseek, osal_id_t, fd);
+    UT_GenStub_AddParam(CF_WrappedLseek, off_t, offset);
+    UT_GenStub_AddParam(CF_WrappedLseek, int, mode);
+
+    UT_GenStub_Execute(CF_WrappedLseek, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_WrappedLseek, int32);
 }
 

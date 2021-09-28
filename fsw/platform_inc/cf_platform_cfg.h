@@ -1,64 +1,74 @@
 /************************************************************************
-** File:
-**   $Id: cf_platform_cfg.h 1.15.1.1 2015/03/06 15:30:43EST sstrege Exp  $
+** File: cf_platform_cfg.h
 **
-**   Copyright � 2007-2014 United States Government as represented by the 
-**   Administrator of the National Aeronautics and Space Administration. 
-**   All Other Rights Reserved.  
+** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF) 
+** Application version 3.0.0”
+** Copyright © 2019 United States Government as represented by the 
+** Administrator of the National Aeronautics and Space Administration. 
+** All Rights Reserved.
+** Licensed under the Apache License, Version 2.0 (the "License"); you may 
+** not use this file except in compliance with the License. You may obtain 
+** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 **
-**   This software was created at NASA's Goddard Space Flight Center.
-**   This software is governed by the NASA Open Source Agreement and may be 
-**   used, distributed and modified only pursuant to the terms of that 
-**   agreement.
+** Unless required by applicable law or agreed to in writing, software 
+** distributed under the License is distributed on an "AS IS" BASIS, 
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+** See the License for the specific language governing permissions and 
+** limitations under the License.
+** 
 **
-** Purpose: 
-**  The CFS CF Application platform configuration header file
+** Purpose:
+**  CF application platform configuration.
 **
-** Notes:
+**   These options are used to configure application behavior.
 **
-** $Log: cf_platform_cfg.h  $
-** Revision 1.15.1.1 2015/03/06 15:30:43EST sstrege 
-** Added copyright information
-** Revision 1.15 2011/05/19 15:32:04EDT rmcgraw 
-** DCR15033:1 Add auto suspend processing
-** Revision 1.14 2011/05/19 13:15:13EDT rmcgraw 
-** DCR14532:1 Let user select fix or variable size outgoing PDU pkts
-** Revision 1.13 2011/05/13 14:59:26EDT rmcgraw 
-** DCR13439:1 Added platform config param CF_STARTUP_SYNC_TIMEOUT
-** Revision 1.12 2010/11/04 11:37:45EDT rmcgraw 
-** Dcr13051:1 Wrap OS_printfs in platform cfg CF_DEBUG
-** Revision 1.11 2010/10/25 11:21:51EDT rmcgraw 
-** DCR12573:1 Changes to allow more than one incoming PDU MsgId
-** Revision 1.10 2010/10/20 16:07:01EDT rmcgraw 
-** DCR13054:1 Expanded max event filters at startup from four to eight
-** Revision 1.9 2010/10/20 10:13:31EDT rmcgraw 
-** DCR12982:1 Moved 4th digit in version to platform cfg file
-** Revision 1.8 2010/08/06 18:45:56EDT rmcgraw 
-** Dcr11510:1 Fixed cfg params with buffer sizes
-** Revision 1.7 2010/08/04 15:16:09EDT rmcgraw 
-** DCR11510:1 Added Event Filtering
-** Revision 1.6 2010/07/20 14:37:40EDT rmcgraw 
-** Dcr11510:1 Remove Downlink buffer references
-** Revision 1.5 2010/07/07 17:25:12EDT rmcgraw 
-** DCR11510:1 Change incoming pdu data buf to incoming pdu buffer and corrected 
-**     the comments
-** Revision 1.4 2010/04/27 09:06:54EDT rmcgraw 
-** DCR11510:1 Comment changes
-** Revision 1.3 2010/04/23 08:39:16EDT rmcgraw 
-** Dcr11510:1 Code Review Prep
-** Revision 1.2 2010/03/12 12:14:39EST rmcgraw 
-** DCR11510:1 Initial check-in towards CF Version 1000
-** Revision 1.1 2009/11/24 12:47:36EST rmcgraw 
-** Initial revision
-** Member added to CFS CF project
-**
+** 
+** 
 *************************************************************************/
-#ifndef _cf_platform_cfg_h_
-#define _cf_platform_cfg_h_
+#ifndef _CF_PLATFORM_CFG_H_
+#define _CF_PLATFORM_CFG_H_
 
 /*************************************************************************
 ** Macro definitions
 **************************************************************************/
+
+/**
+ ** \cfcfg Entity id size
+ **
+ ** \par Description:
+ **         The max size of the entity id as expected for all CFDP packets.
+ **         CF supports the spec's variable size of EID, which can be smaller
+ **             than the size specified here.
+ **
+ ** \par Limits
+ **         Must be one of uint8, uint16, uint32, uint64.
+ */
+typedef uint8 cf_entity_id_t;
+
+/**
+ ** \cfcfg transaction sequence number size
+ **
+ ** \par Description:
+ **         The max size of the transaction sequence number as expected for all CFDP packets.
+ **         CF supports the spec's variable size of TSN, which can be smaller
+ **             than the size specified here.
+ **
+ ** \par Limits
+ **         Must be one of uint8, uint16, uint32, uint64.
+ */
+typedef uint32 cf_transaction_seq_t;
+
+/**
+ ** \cfcfg CF_HW_ALIGNMENT and CF_SW_ALIGNMENT
+ **
+ **  \par Description:
+ **       ONE AND ONLY ONE must be #define.
+ **
+ **     CF_HW_ALIGNMENT is set for platforms that can handle alignment in hardware (load/store used)
+ **     CF_SW_ALIGNMENT is for platforms that can't handle alignment natively (memcpy used)
+ */
+#define CF_HW_ALIGNMENT
+#undef CF_SW_ALIGNMENT
 
 /**
 **  \cfcfg Application Pipe Depth 
@@ -71,96 +81,164 @@
 **       The maximum size dictated by cFE platform configuration 
 **		 parameter is CFE_SB_MAX_PIPE_DEPTH
 */
-#define CF_PIPE_DEPTH                       40
-
+#define CF_PIPE_DEPTH                                               32
 
 /**
-**  \cfcfg Application Pipe Name 
+**  \cfcfg Number of channels
 **
 **  \par Description:
-**       Dictates the pipe name of the cf command pipe.
+**       The number of chanenls in the engine. Changing this
+**       value changes the configuration table for the application.
+**
+**  \par Limits:
+**       Must be less <= 200. Obviously it will be smaller than that.
+*/
+#define CF_NUM_CHANNELS                                             2
+
+/**
+**  \cfcfg Max NAK segments supported in a NAK pdu
+**
+**  \par Description:
+**       When a NAK pdu is sent or received, this is the max number of
+**       segment requests supported. This number should match the ground
+**       cfdp engine configuration as well.
 **
 **  \par Limits:
 **
 */
-#define CF_PIPE_NAME                        "CF_CMD_PIPE"
+#define CF_NAK_MAX_SEGMENTS                                         58 /* max number of NAK segments CF supports (leave room for overhead */
 
-
+/* CHUNKS -
+ * A chunk is a representatino of a range range (offset, size) of data received by a receiver.
+ *
+ * Class 2 CFDP deals with NAK, so received data must be tracked for receivers in order to generate
+ * the NAK. The sender must also keep track of NAK requests and send new file data PDUs as a result.
+ * (array size must be CF_NUM_CHANNELS)
+ * CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION is an array for each channel indicating the number of chunks per transaction
+ * CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION is an array for each channel indciate the number of chunks to keep track of 
+ *   NAK requests from the receiver per transaction*/
 /**
-**  \cfcfg Maximum Simulataneous Transactions 
+**  \cfcfg RX chunks per transaction (per channel)
 **
 **  \par Description:
-**      Dictates max number of transactions (uplink and downlink)
-**      that can be in progress at any given time.
+**       Number of chunks per transaction per channel (RX).
 **
 **  \par Limits:
 **
 */
-#define CF_MAX_SIMULTANEOUS_TRANSACTIONS    100
-
-
+#define CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION                    {CF_NAK_MAX_SEGMENTS, CF_NAK_MAX_SEGMENTS}
 
 /**
-**  \cfcfg Uplink PDU Data Buffer Size 
+**  \cfcfg TX chunks per transaction (per channel)
 **
 **  \par Description:
-**      This parameter sets the statically allocated size (in bytes) of the
-**      incoming PDU buffer. This buffer will be used to hold the pdu hdr and 
-**      data portion of the incoming PDUs. Incoming PDUs are enclosed in a CCSDS
-**      packet. This parameter should not include the size of the CCSDS pkt hdr.
+**       Number of chunks per transaction per channel (TX).
 **
 **  \par Limits:
-**      Must be greater than or equal to the sum of the ground engine parameter 
-**      outgoing-file-chunk-size, pdu hdr size and the 4 bytes of 'offset' in
-**      file-data pdus. Upper limit of 64K derived from 16 bit PDU header field 
-**      named 'PDU Data Field Length'.
-**      This parameter must be less-than or equal-to the outgoing pdu buffer.
-**      
 **
 */
-#define CF_INCOMING_PDU_BUF_SIZE            512
-
-
+#define CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION                    {CF_NAK_MAX_SEGMENTS, CF_NAK_MAX_SEGMENTS}
 
 /**
-**  \cfcfg Outgoing PDU Data Buffer Size 
+**  \cfcfg Total number of chunks (tx, rx, all channels)
 **
 **  \par Description:
-**      This parameter sets the statically allocated size (in bytes) of the
-**      outgoing PDU buffer. This buffer will be used to hold the pdu hdr and 
-**      data portion of the outgoing PDUs. Outgoing PDUs are enclosed in a CCSDS
-**      packet. This parameter should not include the size of the CCSDS pkt hdr.
+**       Must be equal to the sum of all values input in CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION
+**       and CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION.
 **
 **  \par Limits:
-**      This parameter will put an upper limit on the table parameter 
-**      'outgoing_file_chunk_size'. The max 'outgoing_file_chunk_size' allowed
-**      will be CF_OUTGOING_PDU_BUF_SIZE - (12 + 4) The 12 and 4 are pdu hdr   
-**      size and offset field in file-data pdu, respectively.
-**      This parameter has an upper limit of 64K derived from 16 bit PDU header 
-**      field named 'PDU Data Field Length'.
-**      This parameter must be greater-than or equal-to the incoming pdu buffer.
-**      
 **
 */
-#define CF_OUTGOING_PDU_BUF_SIZE            2048
+/* CF_TOTAL_CHUNKS must be equal to the total number of chunks per rx/tx transactions per channel */
+/* (in other words, the summation of all elements in CF_CHANNEL_NUM_R/TX_CHUNKS_PER_TRANSACTION */
+#define CF_TOTAL_CHUNKS                                             (CF_NAK_MAX_SEGMENTS*4)
 
+/* definitions that affect file queuing */
+/**
+**  \cfcfg Number of max commanded playback files per chan.
+**
+**  \par Description:
+**       This is the max number of outstanding ground commanded file transmits per channel.
+**
+**  \par Limits:
+**
+*/
+#define CF_MAX_COMMANDED_PLAYBACK_FILES_PER_CHAN                    10
 
 /**
-**  \cfcfg Path name and file prefix of the engine temp files
+**  \cfcfg Max number of simultaneous file receives.
 **
 **  \par Description:
-**      The receiving engine constructs all files in a temporary file. This 
-**      parameter specifies the path and base filename of the temporary files.
-**      The engine appends a sequence number to this parameter to get a complete
-**      filename.
+**       Each channel can support this number of file receive transactions at a time.
 **
 **  \par Limits:
-**      - The length of this string, including the NULL terminator cannot exceed 
-**          the #OS_MAX_PATH_LEN value. 
-**      - The last character should not be a slash.
 **
 */
-#define CF_ENGINE_TEMP_FILE_PREFIX          "/ram/cftmp"
+#define CF_MAX_SIMULTANEOUS_RX                                      5
+
+/* definitions that affect execution */
+
+/**
+**  \cfcfg Max number of commanded playback directories per channel.
+**
+**  \par Description:
+**       Each channel can support this number of groudn commanded directory playbacks.
+**
+**  \par Limits:
+**
+*/
+#define CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN              2
+
+/**
+**  \cfcfg Max number of polling directories per channel.
+**
+**  \par Description:
+**       This affects the configuration table. There must be an entry (can
+**       be empty) for each of these polling directories per channel.
+**
+**  \par Limits:
+**
+*/
+#define CF_MAX_POLLING_DIR_PER_CHAN                                 5
+
+/**
+**  \cfcfg Number of transactions per playback directoriy.
+**
+**  \par Description:
+**       Each playback/polling directory operation will be able to have this
+**       many active transfers at a time pending or active.
+**
+**  \par Limits:
+**
+*/
+#define CF_NUM_TRANSACTIONS_PER_PLAYBACK                            5
+
+/**
+**  \cfcfg Number of histories per channel
+**
+**  \par Description:
+**       Each channel can support this number of file receive transactions at a time.
+**
+**  \par Limits:
+**       65536 is the current max.
+*/
+#define CF_NUM_HISTORIES_PER_CHANNEL                                256
+
+/**
+**  \cfcfg Max PDU size.
+**
+**  \par Description:
+**       The max PDU size across all channels in the system. Keep in mind that
+**       the max filedata pdu will be smaller than this. This size includes
+**       the PDU headers and everything. While this is the max value for all
+**       channels, the outgoing_file_chunk_size in the configuration table
+**       is different for each channel so a smaller size can be used.
+**
+**  \par Limits:
+**
+*/
+/* CF_MAX_PDU_SIZE must be the max possible PDU for any channel. Channels can be configured with a smaller max. */
+#define CF_MAX_PDU_SIZE                                             512
 
 /**
 **  \cfcfg Name of the CF Configuration Table 
@@ -172,8 +250,7 @@
 **       The length of this string, including the NULL terminator cannot exceed 
 **       the #OS_MAX_PATH_LEN value.
 */
-#define CF_CONFIG_TABLE_NAME                "ConfigTable"
-
+#define CF_CONFIG_TABLE_NAME                                        "config_table"
 
 /**
 **  \cfcfg CF Configuration Table Filename
@@ -185,244 +262,57 @@
 **       The length of this string, including the NULL terminator cannot exceed 
 **       the #OS_MAX_PATH_LEN value.
 */
-#define CF_CONFIG_TABLE_FILENAME            "/cf/cf_cfgtable.tbl"
-
-
-/**
-**  \cfcfg Number of Input Channels
-**
-**  \par Description:
-**      Defines the number of input channels  
-**      defined in the configuration table. Input channels were added to the 
-**      design to support class 2 file receives from multiple peers. It is 
-**      necessary for the code to know what output channel should be used for 
-**      responses (ACK-EOF,NAK, etc) of incoming, class 2 transactions.
-**      Each input channel has a dedicated MsgId for incoming PDUs and an output
-**      channel for responses of class 2, file-receive transactions.
-**
-**  \par Limits
-**      Lower Limit of 1, Upper limit of 255.
-**
-*/
-#define CF_NUM_INPUT_CHANNELS               1
-
+#define CF_CONFIG_TABLE_FILENAME                                    "/cf/cf_def_config.tbl"
 
 /**
-**  \cfcfg Max Number of Playback Output Channels
-**
-**  \par Description:
-**      Defines the max number of playback output channels that may ever be 
-**      defined in the configuration table. Refer to the configuration table for
-**      more details about playback output channels.
-**
-**  \par Limits
-**      Lower Limit of 1, Upper limit of 255.
-**
-**  \par Notes:
-**      The CF configuration table must have an entry for this number of 
-**      playback channels, but some may be marked as not-in-use. This saves 
-**      having to recompile and reload a new CF Application when a playback 
-**      channel is added.
-*/
-#define CF_MAX_PLAYBACK_CHANNELS            2
-
-
-/**
-**  \cfcfg Max Number of Polling(Hot) Directories per Playback Output Channel
-**
-**  \par Description:
-**      Defines the max number of polling directories that may ever be defined
-**      in the configuration table. A polling directory is a directory that
-**      is periodically checked for playback files. Files found in the polling
-**      directory are immediately placed on the playback pending queue for 
-**      downlink.
+**  \cfcfg Maximum file name length.
 **
 **  \par Limits:
-**      Lower limit of 1, Upper limit of 255.
-**
-**  \par Notes:
-**      The CF configuration table must have an entry for this number of polling   
-**      directories, but some may be marked as not-in-use. This saves having to  
-**      recompile and reload a new CF Application when a polling directory is 
-**      added.
 **
 */
-#define CF_MAX_POLLING_DIRS_PER_CHAN        8
-
+#define CF_FILENAME_MAX_NAME                                        OS_MAX_FILE_NAME
 
 /**
-**  \cfcfg Number of bytes in the CF Memory Pool 
-**
-**  \par Description:
-**      The CF memory pool contains the memory needed to hold information for 
-**      each transaction. The info for each transaction is defined by a
-**      CF_QueueEntry_t. The number of CF_QueueEntry_t's needed is based on:
-**      
-**      UplinkHistoryQDepth + CF_MAX_SIMULTANEOUS_TRANSACTIONS +        
-**      ((CF_MAX_PLAYBACK_CHANNELS * (PendingQDepth + HistoryQDepth))
-**
-**      Lower case variables are defined in config table, upper case params are
-**      defined in platform config file (cf_platform_cfg.h)
-**
-**      See CF Housekeeping page for memory utilization details
-**
-**
-**  \par Limits
-**       Lower Limit of 256, Upper limit of 4 Gigabytes
-*/
-#define CF_MEMORY_POOL_BYTES                32768
-
-
-/**
-**  \cfcfg Default Queue Information Filename
-**
-**  \par Description:
-**       The value of this constant defines the filename used to store the CF
-**       queue information.  This filename is used only when no filename is
-**       specified in the command.
-**
-**  \par Limits
-**       The length of each string, including the NULL terminator cannot exceed 
-**       the OS_MAX_PATH_LEN value.
-*/
-#define CF_DEFAULT_QUEUE_INFO_FILENAME      "/ram/cf_queue_info.dat"
-
-
-/**
-**  \cfcfg CF Event Filtering
-**
-**  \par Description:
-**       This group of configuration parameters dictates what CF events will be
-**       filtered through EVS. The filtering will begin after the CF app 
-**       initializes and stay in effect until changed via EVS command.
-**       Mark all unused event Id values and mask values to zero
-**       eg.    #define CF_FILTERED_EVENT1          0
-**              #define CF_FILTER_MASK1             0
-**       To filter the event, set the mask value to CFE_EVS_FIRST_ONE_STOP
-**       To disable filtering of the event, set mask value to CFE_EVS_NO_FILTER
-**
-**  \par Limits
-**       These parameters have a lower limit of 0 and an upper limit of 65535.
-*/
-
-#define CF_FILTERED_EVENT1                  CF_IN_TRANS_START_EID
-#define CF_FILTER_MASK1                     CFE_EVS_NO_FILTER
-
-#define CF_FILTERED_EVENT2                  CF_IN_TRANS_OK_EID
-#define CF_FILTER_MASK2                     CFE_EVS_NO_FILTER
-
-#define CF_FILTERED_EVENT3                  CF_OUT_TRANS_START_EID
-#define CF_FILTER_MASK3                     CFE_EVS_NO_FILTER
-
-#define CF_FILTERED_EVENT4                  CF_OUT_TRANS_OK_EID
-#define CF_FILTER_MASK4                     CFE_EVS_NO_FILTER
-
-#define CF_FILTERED_EVENT5                  0
-#define CF_FILTER_MASK5                     CFE_EVS_NO_FILTER
-
-#define CF_FILTERED_EVENT6                  0
-#define CF_FILTER_MASK6                     CFE_EVS_NO_FILTER
-
-#define CF_FILTERED_EVENT7                  0
-#define CF_FILTER_MASK7                     CFE_EVS_NO_FILTER
-
-#define CF_FILTERED_EVENT8                  0
-#define CF_FILTER_MASK8                     CFE_EVS_NO_FILTER
-
-
-
-/**
-**  \cfcfg Time to wait for all apps to be started (in milliseconds)
-**
-**  \par Description:
-**       Dictates the timeout for the #CFE_ES_WaitForStartupSync call that
-**       CF uses to ensure that TO or the downlink App has completed it's
-**       initialization which includes creating the semaphore needed by CF.
-**
-**  \par Limits
-**       This parameter can't be larger than an unsigned 32 bit
-**       integer (4294967295).
-**
-**       This should be greater than or equal to the Startup Sync timeout for
-**       any application in the Application Monitor Table.
-*/
-#define CF_STARTUP_SYNC_TIMEOUT   65000
-
-
-/**
-**  \cfcfg Use fixed size packets (for outgoing PDUs) or not.
-**
-**  \par Description:
-**       When sending PDUs, CF can be configured to place the PDUs in fixed-size
-**       pkts or let the PDU size determine the pkt size. The value defined 
-**       must correspond to the CCSDS Total Message size which includes the PDU
-**       header, the CCSDS header and data.
-**       Set this value to 0 for variable pkt sizes.
-**
-**  \par Limits
-**       This parameter can't be larger than CFE_SB_MAX_SB_MSG_SIZE (typically
-**       set to 32K or 64K bytes)
-**
-**       If non-zero, this should be greater than or equal to the size needed to 
-**       hold the largest PDU expected to be sent by the engine (typically a 
-**       file data PDU which is derived from the CF table cfg param 
-**       "OutgoingFileChunkSize").
-*/
-#define CF_SEND_FIXED_SIZE_PKTS   0
-
-
-/**
-**  \cfcfg Auto-Suspend, max transactions to suspend
-**
-**  \par Description:
-**       When auto suspend is enabled, after EOF is sent the transaction number
-**       is logged in a buffer. The buffer size is defined in this parameter.
-**       After the following wakeup cmd is received, cF will check this buffer 
-**       for transactions to suspend. They cannot be suspended at the time the
-**       EOF is sent because the engine is not designed to re-entrant.
-**
-**  \par Limits
-**       This parameter must be greater than zero and can't be larger than an 
-**       unsigned 32 bit integer (4294967295).
-*/
-#define CF_AUTOSUSPEND_MAX_TRANS  1 
-
-
-
-
-/** \cfcfg Mission specific version number for CF application
-**  
-**  \par Description:
-**       An application version number consists of four parts:
-**       major version number, minor version number, revision
-**       number and mission specific revision number. The mission
-**       specific revision number is defined here and the other
-**       parts are defined in "cf_version.h".
+**  \cfcfg Maximum file path (not including file name)
 **
 **  \par Limits:
-**       Must be defined as a numeric value that is greater than
-**       or equal to zero.
+**
 */
-#define CF_MISSION_REV      0
+#define CF_FILENAME_MAX_PATH                                        (OS_MAX_PATH_LEN-OS_MAX_FILE_NAME)
 
-
-/** \cfcfg Compile-time debug switch for CF application
-**  
-**  \par Description:
-**      CF_DEBUG should NOT be defined under normal conditions. It is to be used 
-**      as a safety net during development, when a uart terminal is connected to
-**      the processor. When the code is compiled with CF_DEBUG defined, the code 
-**      will issue OS_printfs in areas that would otherwise be quiet.
+/**
+**  \cfcfg Max filename and path length.
 **
 **  \par Limits:
-**       Must be defined or commented out.
+**
 */
-/* #define CF_DEBUG */
+#define CF_FILENAME_MAX_LEN                                         (CF_FILENAME_MAX_NAME+CF_FILENAME_MAX_PATH)
 
+/**
+**  \cfcfg R2 crc calc chunk size
+**
+**  \par Description
+**       R2 performs crc calculation upon file completion in chunks. This is the size
+**       of the buffer. The larger the size the more stack will be used, but
+**       the faster it can go. The overall number of bytes calculated per wakeup
+**       is set in the configuration table.
+**
+**  \par Limits:
+**
+*/
+#define CF_R2_CRC_CHUNK_SIZE                                        1024
 
+#if CF_FILENAME_MAX_LEN > OS_MAX_PATH_LEN
+#error CF_FILENAME_MAX_LEN must be <= OS_MAX_PATH_LEN
+#endif
 
-#endif /* _cf_platform_cfg_h_ */
+/**
+**  \cfcfg Number of milliseconds to wait for a SB message
+**
+**  \par Limits:
+**
+*/
+#define CF_RCVMSG_TIMEOUT                                           100
 
-/************************/
-/*  End of File Comment */
-/************************/
+#endif /* !_CF_PLATFORM_CFG_H_ */
+

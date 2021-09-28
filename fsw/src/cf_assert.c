@@ -1,5 +1,5 @@
 /************************************************************************
-** File: cf_version.h
+** File: CF_Assert.c
 **
 ** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF) 
 ** Application version 3.0.0”
@@ -15,23 +15,22 @@
 ** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
 ** See the License for the specific language governing permissions and 
 ** limitations under the License.
+** 
 **
 ** Purpose:
-**  The CFS CFDP (CF) Application header file containing version number
+**  The CF Application CF_Assertion macro
 **
-** Notes:
-**
-**
+** Revision 1.0 2020/07/15 sseeger
+** 
 *************************************************************************/
-#ifndef _cf_version_h_
-#define _cf_version_h_
 
-#define CF_MAJOR_VERSION 3
-#define CF_MINOR_VERSION 0
-#define CF_REVISION      0
+#include "cf_assert.h"
+#include "cf_verify.h"
+#include "cf_events.h"
 
-#endif /* _cf_version_h_ */
+void CF_HandleAssert(const char *file, int line)
+{
+    CFE_EVS_SendEvent(CF_EID_ERR_ASSERT, CFE_EVS_EventType_ERROR, "CF: failed CF_Assertion (%s:%d)", file, line);
+    CFE_ES_ExitApp(-1);
+}
 
-/************************/
-/*  End of File Comment */
-/************************/
