@@ -60,7 +60,7 @@ int CF_GetMemcpySize(const uint8_t *num, int size) {
   UT_GenStub_Execute(CF_GetMemcpySize, Basic, NULL);
 
   UT_Stub_CopyToLocal(UT_KEY(CF_GetMemcpySize), &forced_return, sizeof(forced_return));
-  UT_Stub_SetReturnValue(CF_GetMemcpySize, forced_return);
+  UT_Stub_SetReturnValue(UT_KEY(CF_GetMemcpySize), forced_return);
 
   return UT_GenStub_GetReturnValue(CF_GetMemcpySize, int);
 }

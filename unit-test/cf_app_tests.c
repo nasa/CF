@@ -61,12 +61,9 @@ void Test_CF_HkCmd_TimestampAndSendMessageWith_CF_AppData_hk(void)
     CF_HkCmd();
 
 
-
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_SetMsgTime, 1);
-    UtAssert_True(context_CFE_MSG_SetMsgTime.MsgPtr == &CF_AppData.hk.tlm_header.Msg,
-      "CFE_MSG_SetMsgTime received MsgPtr %p and should be %p (&CF_AppData.hk.tlm_header.Msg)", 
-      context_CFE_MSG_SetMsgTime.MsgPtr, &CF_AppData.hk.tlm_header.Msg);
+    UtAssert_ADDRESS_EQ(context_CFE_MSG_SetMsgTime.MsgPtr, &CF_AppData.hk.tlm_header.Msg);
     UtAssert_True(context_CFE_MSG_SetMsgTime.Time.Seconds == fake_time.Seconds,
       "CFE_MSG_SetMsgTime received Time.Seconds %u and should be %u (call to CFE_TIME_GetTime Seconds)", 
       context_CFE_MSG_SetMsgTime.Time.Seconds, fake_time.Seconds);
@@ -74,9 +71,7 @@ void Test_CF_HkCmd_TimestampAndSendMessageWith_CF_AppData_hk(void)
       "CFE_MSG_SetMsgTime received Time.Subseconds %u and should be %u (call to CFE_TIME_GetTime Subseconds)", 
       context_CFE_MSG_SetMsgTime.Time.Subseconds, fake_time.Subseconds);
     UtAssert_STUB_COUNT(CFE_SB_TransmitMsg, 1);
-    UtAssert_True(context_CFE_SB_TransmitMsg.MsgPtr == &CF_AppData.hk.tlm_header.Msg,
-      "CFE_SB_TransmitMsg received MsgPtr %p and should be %p (&CF_AppData.hk.tlm_header.Msg)", 
-      context_CFE_SB_TransmitMsg.MsgPtr, &CF_AppData.hk.tlm_header.Msg);
+    UtAssert_ADDRESS_EQ(context_CFE_SB_TransmitMsg.MsgPtr, &CF_AppData.hk.tlm_header.Msg);
     UtAssert_True(context_CFE_SB_TransmitMsg.IncrementSequenceCount == true,
       "CFE_SB_TransmitMsg received IncrementSequenceCount '%s' and should be 'true'", 
       context_CFE_SB_TransmitMsg.IncrementSequenceCount ? "true" : "false");
@@ -635,13 +630,9 @@ void Test_CF_ProcessMsg_ProcessGroundCommand(void)
       
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetMsgId, 1);
-    UtAssert_True(context_CFE_MSG_GetMsgId.MsgPtr == arg_msg,
-      "CFE_MSG_GetMsgId received MsgPtr %p and should be %p (&msg->Msg)",
-      context_CFE_MSG_GetMsgId.MsgPtr, arg_msg);
+    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetMsgId.MsgPtr, (CFE_MSG_Message_t*)arg_msg);
     UtAssert_STUB_COUNT(CF_ProcessGroundCommand, 1);
-    UtAssert_True(context_CF_ProcessGroundCommand_msg == arg_msg,
-      "ProcessGroundCommand received msg %p and should be %p", 
-      context_CF_ProcessGroundCommand_msg, arg_msg);
+    UtAssert_ADDRESS_EQ(context_CF_ProcessGroundCommand_msg, arg_msg);
 } /* end Test_CF_ProcessMsg_ProcessGroundCommand */
 
 void Test_CF_ProcessMsg_WakeUp(void)
@@ -661,9 +652,7 @@ void Test_CF_ProcessMsg_WakeUp(void)
     
     /* Assert */  
     UtAssert_STUB_COUNT(CFE_MSG_GetMsgId, 1);
-    UtAssert_True(context_CFE_MSG_GetMsgId.MsgPtr == &arg_msg->Msg,
-      "CFE_MSG_GetMsgId received MsgPtr %p and should be %p (&msg->Msg)",
-      context_CFE_MSG_GetMsgId.MsgPtr, &arg_msg->Msg);
+    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetMsgId.MsgPtr, &arg_msg->Msg);
     /* Assert Unstubbable - CF_WakeUp */
     UtAssert_STUB_COUNT(CF_CFDP_CycleEngine, 1);
 } /* end Test_CF_ProcessMsg_WakeUp */
@@ -694,9 +683,7 @@ void Test_CF_ProcessMsg_SendHk(void)
     /* Assert */ 
     UtAssert_STUB_COUNT(CFE_MSG_GetMsgId, 1);
     /* Assert for CF_HkCmd*/  
-    UtAssert_True(context_CFE_SB_TransmitMsg.MsgPtr == &CF_AppData.hk.tlm_header.Msg,
-      "CFE_SB_TransmitMsg received %p and should be %p (&CF_AppData.hk.tlm_header.Msg)", 
-      context_CFE_SB_TransmitMsg.MsgPtr, &CF_AppData.hk.tlm_header.Msg);
+    UtAssert_ADDRESS_EQ(context_CFE_SB_TransmitMsg.MsgPtr, &CF_AppData.hk.tlm_header.Msg);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 } /* end Test_CF_ProcessMsg_SendHk */
 
@@ -753,7 +740,7 @@ void Test_CF_AppMain_CallTo_CF_Init_DoNotReturn_CFE_SUCCESS_Set_CF_AppData_run_s
     /* Arrange unstubbable: CF_Init */
     CFE_Status_t  forced_return_CFE_EVS_Register = Any_CFE_Status_t_Except(CFE_SUCCESS);
 
-    UT_SetDefaultReturnValue(CFE_EVS_Register, forced_return_CFE_EVS_Register);
+    UT_SetDefaultReturnValue(UT_KEY(CFE_EVS_Register), forced_return_CFE_EVS_Register);
     
     /* Act */
     CF_AppMain();
@@ -784,7 +771,6 @@ void Test_CF_AppMain_CallTo_CFE_ES_RunLoop_Returns_false_AppExit(void)
 void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_ReturnsNot_CFE_SUCCESS_AndNot_CFE_SB_TIME_OUT_SendEvent(void)
 {
     /* Arrange */
-    int32             exceptions[2] = {CFE_SUCCESS, CFE_SB_TIME_OUT};
     int32             forced_return_CFE_SB_ReceiveBuffer = Any_int32_Negative();  /* TODO: has to be negative unless a handler is used */
     CFE_SB_Buffer_t*  dummy_msg = NULL;
 
@@ -871,7 +857,7 @@ void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndV
     UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), forced_return_CFE_SB_ReceiveBuffer);
 
     /* Arrange unstubbable: CF_ProcessMsg */
-    UT_SetDefaultReturnValue(CFE_MSG_GetMsgId, UINT32_MAX); /* UINT32_MAX selected because it should error out */
+    UT_SetDefaultReturnValue(UT_KEY(CFE_MSG_GetMsgId), UINT32_MAX); /* UINT32_MAX selected because it should error out */
     CF_AppData.hk.counters.err = initial_hk_counters_err;
 
     /* Act */

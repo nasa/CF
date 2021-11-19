@@ -1,8 +1,6 @@
-
 /* cf testing includes */
-#include "cf_timer.c"
 #include "cf_test_utils.h"
-
+#include "cf_timer.c"
 
 /*******************************************************************************
 **
@@ -28,7 +26,7 @@ void cf_timer_tests_Teardown(void)
 **
 *******************************************************************************/
 
-void Test_CF_Timer_Sec2Ticks_ReturnsExpectedValue(void) 
+void Test_CF_Timer_Sec2Ticks_ReturnExpectedValue(void) 
 {
     /* Arrange */
     cf_timer_sec_t      arg_sec = Any_uint32();
@@ -45,7 +43,7 @@ void Test_CF_Timer_Sec2Ticks_ReturnsExpectedValue(void)
     UtAssert_True(result == arg_sec * dummy_ticks_per_second,
       "Result was %u and should be %u", result, 
       arg_sec * dummy_ticks_per_second);
-} /* end Test_CF_Timer_Sec2Ticks_ReturnsExpectedValue */
+} /* end Test_CF_Timer_Sec2Ticks_ReturnExpectedValue */
 
 /* end CF_Timer_Sec2Ticks tests */
 
@@ -55,7 +53,7 @@ void Test_CF_Timer_Sec2Ticks_ReturnsExpectedValue(void)
 **
 *******************************************************************************/
 
-void Test_CF_Timer_InitRelSec_GetsExpectedValue(void)
+void Test_CF_Timer_InitRelSec_ReceiveExpectedValue(void)
 {
     /* Arrange */
     uint32          arg_rel_sec = Any_uint32();
@@ -78,7 +76,7 @@ void Test_CF_Timer_InitRelSec_GetsExpectedValue(void)
     UtAssert_True(arg_t->tick == arg_rel_sec * dummy_ticks_per_second,
       "Timer ticks are %u and should be %u (return from CF_Timer_Sec2Ticks)", 
       arg_t->tick, arg_rel_sec * dummy_ticks_per_second);
-} /* end Test_CF_Timer_InitRelSec_GetsExpectedValue */
+} /* end Test_CF_Timer_InitRelSec_ReceiveExpectedValue */
 
 /* end CF_Timer_InitRelSec tests */
 
@@ -88,7 +86,7 @@ void Test_CF_Timer_InitRelSec_GetsExpectedValue(void)
 **
 *******************************************************************************/
 
-void Test_CF_Timer_Expired_Returns1WhenTickIs0(void)
+void Test_CF_Timer_Expired_When_t_tick_Is_0_Return_1(void)
 {
     /* Arrange */
     cf_timer_t          dummy_timer;
@@ -103,9 +101,9 @@ void Test_CF_Timer_Expired_Returns1WhenTickIs0(void)
     /* Assert */
     UtAssert_True(local_result == expected_result,
       "Result was %u and should be %u", local_result, expected_result);
-} /* end Test_CF_Timer_Expired_Returns1WhenTickIs0 */
+} /* end Test_CF_Timer_Expired_When_t_tick_Is_0_Return_1 */
 
-void Test_CF_Timer_Expired_Returns0WhenTickIs1(void) 
+void Test_CF_Timer_Expired_When_t_tick_Is_1_Return_0(void) 
 {
     /* Arrange */
     cf_timer_t          dummy_timer;
@@ -120,9 +118,9 @@ void Test_CF_Timer_Expired_Returns0WhenTickIs1(void)
     /* Assert */
     UtAssert_True(local_result == expected_result,
       "Result was %u and should be %u", local_result, expected_result);
-} /* end Test_CF_Timer_Expired_Returns0WhenTickIs1 */
+} /* end Test_CF_Timer_Expired_When_t_tick_Is_1_Return_0 */
 
-void Test_CF_Timer_Expired_Returns0WhenTickIsAnyIntegerExcept0(void) 
+void Test_CF_Timer_Expired_When_t_tick_IsAnyIntegerExcept_0_Return_0(void) 
 {
     /* Arrange */
     cf_timer_t          dummy_timer;
@@ -137,7 +135,7 @@ void Test_CF_Timer_Expired_Returns0WhenTickIsAnyIntegerExcept0(void)
     /* Assert */
     UtAssert_True(local_result == expected_result,
       "Result was %u and should be %u", local_result, expected_result);
-} /* end Test_CF_Timer_Expired_Returns0WhenTickIsAnyIntegerExcept0 */
+} /* end Test_CF_Timer_Expired_When_t_tick_IsAnyIntegerExcept_0_Return_0 */
 
 /* end CF_Timer_Expired tests */
 
@@ -147,17 +145,17 @@ void Test_CF_Timer_Expired_Returns0WhenTickIsAnyIntegerExcept0(void)
 **
 *******************************************************************************/
 
-void Test_CF_Timer_TickAssertsWhenTimerTickIs0(void)
+void Test_CF_Timer_TickAssertsBecause_t_tick_Is_0(void)
 {
-    /* Arrange */
+    // /* Arrange */
     
-    /* Act */
+    // /* Act */
     
-    /* Assert */
-    UtAssert_Failed("CF_Assert issue");
-} /* Test_CF_Timer_Tick */
+    // /* Assert */
+    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - t->tick");
+} /* Test_CF_Timer_TickAssertsBecause_t_tick_Is_0 */
 
-void Test_CF_Timer_TickDecreasesTimerTickWhenNon0(void)
+void Test_CF_Timer_Tick_When_t_tick_Is_non0_Decrement_t_tick(void)
 {
     /* Arrange */
     uint32          initial_tick = Any_uint32_Except(0);
@@ -174,7 +172,7 @@ void Test_CF_Timer_TickDecreasesTimerTickWhenNon0(void)
       "tick is %d and should have decreased by 1 from %d",
       arg_t->tick, initial_tick);
     
-} /* Test_CF_Timer_Tick */
+} /* Test_CF_Timer_Tick_When_t_tick_Is_non0_Decrement_t_tick */
 
 /* end CF_Timer_Tick tests */
 
@@ -186,43 +184,42 @@ void Test_CF_Timer_TickDecreasesTimerTickWhenNon0(void)
 
 void add_CF_Timer_Sec2Ticks_tests(void)
 {
-    UtTest_Add(Test_CF_Timer_Sec2Ticks_ReturnsExpectedValue, 
+    UtTest_Add(Test_CF_Timer_Sec2Ticks_ReturnExpectedValue, 
       cf_timer_tests_Setup, cf_timer_tests_Teardown, 
-      "Test_CF_Timer_Sec2Ticks_ReturnsExpectedValue");  
+      "Test_CF_Timer_Sec2Ticks_ReturnExpectedValue");  
 }
 
 void add_CF_Timer_InitRelSec_tests(void)
 {
-    UtTest_Add(Test_CF_Timer_InitRelSec_GetsExpectedValue, 
+    UtTest_Add(Test_CF_Timer_InitRelSec_ReceiveExpectedValue, 
       cf_timer_tests_Setup, cf_timer_tests_Teardown, 
-      "Test_CF_Timer_InitRelSec_GetsExpectedValue");  
+      "Test_CF_Timer_InitRelSec_ReceiveExpectedValue");  
 }
 
 void add_CF_Timer_Expired_tests(void)
 {
-    UtTest_Add(Test_CF_Timer_Expired_Returns1WhenTickIs0, 
+    UtTest_Add(Test_CF_Timer_Expired_When_t_tick_Is_0_Return_1, 
       cf_timer_tests_Setup, cf_timer_tests_Teardown, 
-      "Test_CF_Timer_Expired_Returns1WhenTickIs0");
+      "Test_CF_Timer_Expired_When_t_tick_Is_0_Return_1");
 
-    UtTest_Add(Test_CF_Timer_Expired_Returns0WhenTickIs1, 
+    UtTest_Add(Test_CF_Timer_Expired_When_t_tick_Is_1_Return_0, 
       cf_timer_tests_Setup, cf_timer_tests_Teardown, 
-      "Test_CF_Timer_Expired_Returns0WhenTickIs1");
+      "Test_CF_Timer_Expired_When_t_tick_Is_1_Return_0");
 
-    UtTest_Add(Test_CF_Timer_Expired_Returns0WhenTickIsAnyIntegerExcept0, 
+    UtTest_Add(Test_CF_Timer_Expired_When_t_tick_IsAnyIntegerExcept_0_Return_0, 
       cf_timer_tests_Setup, cf_timer_tests_Teardown, 
-      "Test_CF_Timer_Expired_Returns0WhenTickIsAnyIntegerExcept0"); 
+      "Test_CF_Timer_Expired_When_t_tick_IsAnyIntegerExcept_0_Return_0"); 
 }
 
 void add_CF_Timer_Tick_tests(void)
 {
-    UtTest_Add(Test_CF_Timer_TickAssertsWhenTimerTickIs0, 
+    UtTest_Add(Test_CF_Timer_TickAssertsBecause_t_tick_Is_0, 
       cf_timer_tests_Setup, cf_timer_tests_Teardown, 
-      "Test_CF_Timer_TickAssertsWhenTimerTickIs0"); 
-    UtTest_Add(Test_CF_Timer_TickDecreasesTimerTickWhenNon0, 
+      "Test_CF_Timer_TickAssertsBecause_t_tick_Is_0"); 
+    UtTest_Add(Test_CF_Timer_Tick_When_t_tick_Is_non0_Decrement_t_tick, 
       cf_timer_tests_Setup, cf_timer_tests_Teardown, 
-      "Test_CF_Timer_TickDecreasesTimerTickWhenNon0");    
+      "Test_CF_Timer_Tick_When_t_tick_Is_non0_Decrement_t_tick");    
 }
-
 
 /* end cf_timer_tests UtTest_Add groups */
 

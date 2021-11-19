@@ -52,6 +52,8 @@ void cf_tests_Setup(void)
     set_default_ptr(&context_CFE_MSG_SetMsgTime.MsgPtr);
     context_CFE_MSG_SetMsgTime.Time.Seconds = UT_INT_32_DEFAULT;
     context_CFE_MSG_SetMsgTime.Time.Subseconds = UT_INT_32_DEFAULT;
+
+    type_of_context_CF_CList_Traverse = NOT_YET_SET;
 }
 
 void cf_tests_Teardown(void)
@@ -365,12 +367,6 @@ uint16 Any_uint16_ExceptThese(uint16 exceptions[], uint8 num_exceptions)
 {
     uint8 i = 0;
     uint16 random_val = Any_uint16();
-  printf("exceptions = %p\n", exceptions);
-    for (i=0;i<num_exceptions;++i)
-    {
-      printf("exceptions[%u] = %u\n", i, exceptions[i]);
-    }
-
 
     i = 0;
     while (i != num_exceptions)
@@ -632,7 +628,9 @@ int32 Any_int32_Negative(void)
 
 int32 Any_int32_ZeroOrPositive()
 {
-  int random_val = rand() % INT32_MAX;
+  int32 random_val = rand() % INT32_MAX;
+
+  return random_val;
 }
 
 uint64 Any_uint64()
@@ -768,7 +766,7 @@ CFE_MSG_Size_t Any_CFE_MSG_Size_t()
 
 CFE_MSG_Size_t Any_CFE_MSG_Size_t_LessThan(size_t ceiling)
 {
-  CFE_MSG_Size_t rand_val;
+  CFE_MSG_Size_t rand_val = UT_INT_16_DEFAULT; /* switch(sizeof(CFE_MSG_Size_t)) statements will ensure this value is never used, but this removes the build warning */
   /* TODO: development machine uses 64 bit size_t */
   switch(sizeof(CFE_MSG_Size_t))
   {
@@ -793,41 +791,44 @@ uint8 Any_cf_chan_num(void)
     return Any_uint8_LessThan(CF_NUM_CHANNELS);
 }
 
-#ifdef MESSAGE_FORMAT_IS_CCSDS_VER_2
 
-    uint32 Any_MsgId(void)
+CFE_SB_MsgId_t Any_MsgId(void)
+{
+    size_t msg_id_size  = sizeof(CFE_SB_MsgId_t);
+
+    switch(msg_id_size)
     {
-        return Any_uint32();
+        case 4:
+            return Any_uint32();
+            
+        case 2:
+            return Any_uint16();
+
+        default:
+            UtPrintf("Any_MsgId_ExceptThese unimplemented sizeof(CFE_SB_MsgId_t) = %lu", msg_id_size);
+            assert(ERROR_RETRIEVING_ANY_VALUE);
     }
 
-    CFE_SB_MsgId_t Any_MsgId_ExceptThese(CFE_SB_MsgId_t exceptions[], uint8 num_exceptions)
-    {    
-        return Any_uint32_ExceptThese(exceptions, num_exceptions);
-    }
+    return (CFE_SB_MsgId_t)UT_UINT_16_DEFAULT;/* default for switch(msg_id_size) will always assert, this should not be able to happen, but removes warning on build */
+}
 
-#else
 
-    uint16 Any_MsgId(void)
+CFE_SB_MsgId_t Any_MsgId_ExceptThese(CFE_SB_MsgId_t exceptions[], uint8 num_exceptions)
+{   
+    size_t msg_id_size  = sizeof(CFE_SB_MsgId_t);
+
+    switch(msg_id_size)
     {
-        return Any_uint16();
+        case 4:
+            return Any_uint32_ExceptThese((uint32*)exceptions, num_exceptions);
+            
+        case 2:
+            return Any_uint16_ExceptThese((uint16*)exceptions, num_exceptions);
+
+        default:
+            UtPrintf("Any_MsgId_ExceptThese unimplemented sizeof(CFE_SB_MsgId_t) = %lu", msg_id_size);
+            assert(ERROR_RETRIEVING_ANY_VALUE);
     }
 
-    CFE_SB_MsgId_t Any_MsgId_ExceptThese(CFE_SB_MsgId_t exceptions[], uint8 num_exceptions)
-    {   
-        size_t msg_id_size  = sizeof(CFE_SB_MsgId_t);
-
-        switch(msg_id_size)
-        {
-            case 4:
-                return Any_uint32_ExceptThese(exceptions, num_exceptions);
-                
-            case 2:
-                return Any_uint16_ExceptThese(exceptions, num_exceptions);
-
-            default:
-                UtPrintf("Any_MsgId_ExceptThese unimplemented sizeof(CFE_SB_MsgId_t) = %u", msg_id_size);
-                assert(ERROR_RETRIEVING_ANY_VALUE);
-        }
-    }
-
-#endif
+    return (CFE_SB_MsgId_t)UT_UINT_16_DEFAULT; /* default for switch(msg_id_size) will always assert, this should not be able to happen, but removes warning on build */
+}

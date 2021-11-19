@@ -34,6 +34,7 @@
 /* UT includes */
 #include "uttest.h"
 #include "utstubs.h"
+#include "uttools.h"
 #include "utgenstub.h"
 
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))
@@ -45,10 +46,12 @@
 **       chunks must not be NULL.
 **
 *************************************************************************/
-static void CF_Chunks_EraseRange(chunks_t *chunks, index_t start, index_t end)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_Chunks_EraseRange(chunks_t *chunks, index_t start, index_t end)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Erase a single chunk.
@@ -57,10 +60,12 @@ static void CF_Chunks_EraseRange(chunks_t *chunks, index_t start, index_t end)
 **       chunks must not be NULL.
 **
 *************************************************************************/
-static void CF_Chunks_EraseChunk(chunks_t *chunks, index_t erase_index)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_Chunks_EraseChunk(chunks_t *chunks, index_t erase_index)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Insert a chunk before index_before.
@@ -69,10 +74,12 @@ static void CF_Chunks_EraseChunk(chunks_t *chunks, index_t erase_index)
 **       chunks must not be NULL. chunk must not be NULL.
 **
 *************************************************************************/
-static void CF_Chunks_InsertChunk(chunks_t *chunks, index_t index_before, const chunk_t *chunk)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_Chunks_InsertChunk(chunks_t *chunks, index_t index_before, const chunk_t *chunk)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Finds where a chunk should be inserted in the chunks.
@@ -88,10 +95,12 @@ static void CF_Chunks_InsertChunk(chunks_t *chunks, index_t index_before, const 
 **  \endreturns
 **
 *************************************************************************/
-static index_t CF_Chunks_FindInsertPosition(chunks_t *chunks, const chunk_t *chunk)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static index_t CF_Chunks_FindInsertPosition(chunks_t *chunks, const chunk_t *chunk)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Possibly combines the given chunk with the previous chunk.
@@ -104,10 +113,12 @@ static index_t CF_Chunks_FindInsertPosition(chunks_t *chunks, const chunk_t *chu
 **  \endreturns
 **
 *************************************************************************/
-static int CF_Chunks_CombinePrevious(chunks_t *chunks, index_t i, const chunk_t *chunk)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_Chunks_CombinePrevious(chunks_t *chunks, index_t i, const chunk_t *chunk)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Possibly combines the given chunk with the next chunk.
@@ -120,10 +131,12 @@ static int CF_Chunks_CombinePrevious(chunks_t *chunks, index_t i, const chunk_t 
 **  \endreturns
 **
 *************************************************************************/
-static int CF_Chunks_CombineNext(chunks_t *chunks, index_t i, const chunk_t *chunk)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_Chunks_CombineNext(chunks_t *chunks, index_t i, const chunk_t *chunk)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Finds the smallest size out of all chunks.
@@ -136,10 +149,12 @@ static int CF_Chunks_CombineNext(chunks_t *chunks, index_t i, const chunk_t *chu
 **  \endreturns
 **
 *************************************************************************/
-static index_t CF_Chunks_FindSmallestSize(const chunks_t *chunks)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static index_t CF_Chunks_FindSmallestSize(const chunks_t *chunks)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Insert a chunk.
@@ -152,10 +167,12 @@ static index_t CF_Chunks_FindSmallestSize(const chunks_t *chunks)
 **       chunks must not be NULL. chunk must not be NULL.
 **
 *************************************************************************/
-static void CF_Chunks_Insert(chunks_t *chunks, index_t i, const chunk_t *chunk)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_Chunks_Insert(chunks_t *chunks, index_t i, const chunk_t *chunk)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Public function to add a chunk.
@@ -243,7 +260,8 @@ void CF_Chunks_Init(chunks_t *chunks, index_t CF_max_chunks, chunk_t *chunks_mem
 *************************************************************************/
 void CF_ChunksReset(chunks_t *chunks)
 {
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
+    UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
+    exit(-86);
 }
 
 /************************************************************************/

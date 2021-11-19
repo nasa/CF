@@ -29,6 +29,7 @@
 /* UT includes */
 #include "uttest.h"
 #include "utstubs.h"
+#include "uttools.h"
 #include "utgenstub.h"
 
 typedef struct {
@@ -44,10 +45,12 @@ typedef struct {
 **       t must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R2_SetCc(transaction_t *t, condition_code_t cc)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_R2_SetCc(transaction_t *t, condition_code_t cc)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief CFDP R1 transaction reset function.
@@ -61,10 +64,12 @@ static void CF_CFDP_R2_SetCc(transaction_t *t, condition_code_t cc)
 **       t must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R1_Reset(transaction_t *t)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_R1_Reset(transaction_t *t)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief CFDP R2 transaction reset function.
@@ -76,10 +81,12 @@ static void CF_CFDP_R1_Reset(transaction_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R2_Reset(transaction_t *t)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_R2_Reset(transaction_t *t)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Checks that the transaction file's CRC matches expected.
@@ -92,10 +99,12 @@ static void CF_CFDP_R2_Reset(transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_R_CheckCrc(transaction_t *t, uint32 expected_crc)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_CFDP_R_CheckCrc(transaction_t *t, uint32 expected_crc)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Checks R2 transaction state for transaction completion status.
@@ -113,10 +122,12 @@ static int CF_CFDP_R_CheckCrc(transaction_t *t, uint32 expected_crc)
 **       t must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R2_Complete(transaction_t *t, int ok_to_send_nak)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_R2_Complete(transaction_t *t, int ok_to_send_nak)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Process a filedata PDU on a transaction.
@@ -129,10 +140,12 @@ static void CF_CFDP_R2_Complete(transaction_t *t, int ok_to_send_nak)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_R_ProcessFd(transaction_t *t, uint32 *bytes_received)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_CFDP_R_ProcessFd(transaction_t *t, uint32 *bytes_received)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Processing receive EOF common functionality for R1/R2.
@@ -150,10 +163,12 @@ static int CF_CFDP_R_ProcessFd(transaction_t *t, uint32 *bytes_received)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_R_SubstateRecvEof(transaction_t *t, const pdu_header_t *pdu)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_CFDP_R_SubstateRecvEof(transaction_t *t, const pdu_header_t *pdu)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Process receive EOF for R1.
@@ -169,10 +184,12 @@ static int CF_CFDP_R_SubstateRecvEof(transaction_t *t, const pdu_header_t *pdu)
 **  \endreturns
 **
 *************************************************************************/
-static void CF_CFDP_R1_SubstateRecvEof(transaction_t *t, const pdu_header_t *pdu)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_R1_SubstateRecvEof(transaction_t *t, const pdu_header_t *pdu)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Process receive EOF for R2.
@@ -189,10 +206,12 @@ static void CF_CFDP_R1_SubstateRecvEof(transaction_t *t, const pdu_header_t *pdu
 **  \endreturns
 **
 *************************************************************************/
-static void CF_CFDP_R2_SubstateRecvEof(transaction_t *t, const pdu_header_t *pdu)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_R2_SubstateRecvEof(transaction_t *t, const pdu_header_t *pdu)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Process received file data for R1.
@@ -204,10 +223,12 @@ static void CF_CFDP_R2_SubstateRecvEof(transaction_t *t, const pdu_header_t *pdu
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R1_SubstateRecvFileData(transaction_t *t, const pdu_header_t *pdu)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_R1_SubstateRecvFileData(transaction_t *t, const pdu_header_t *pdu)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Process received file data for R2.
@@ -223,10 +244,12 @@ static void CF_CFDP_R1_SubstateRecvFileData(transaction_t *t, const pdu_header_t
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R2_SubstateRecvFileData(transaction_t *t, const pdu_header_t *pdu)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_R2_SubstateRecvFileData(transaction_t *t, const pdu_header_t *pdu)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Loads a single NAK segment request.
@@ -242,10 +265,12 @@ static void CF_CFDP_R2_SubstateRecvFileData(transaction_t *t, const pdu_header_t
 **  \endreturns
 **
 *************************************************************************/
-static void CF_CFDP_R2_GapCompute(const chunks_t *chunks, const chunk_t *c, void *opaque)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_R2_GapCompute(const chunks_t *chunks, const chunk_t *c, void *opaque)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Send a NAK pdu for R2.
@@ -265,10 +290,12 @@ static void CF_CFDP_R2_GapCompute(const chunks_t *chunks, const chunk_t *c, void
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_R_SubstateSendNak(transaction_t *t)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_CFDP_R_SubstateSendNak(transaction_t *t)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Initialize a transaction structure for R.
@@ -279,13 +306,9 @@ static int CF_CFDP_R_SubstateSendNak(transaction_t *t)
 *************************************************************************/
 void CF_CFDP_R_Init(transaction_t *t)
 {    
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_R_Init, int);
-
     UT_GenStub_AddParam(CF_CFDP_R_Init, transaction_t *, t);
 
     UT_GenStub_Execute(CF_CFDP_R_Init, Basic, NULL);
-
-    return UT_GenStub_GetReturnValue(CF_CFDP_R_Init, int);
 }
 
 /************************************************************************/
@@ -310,10 +333,12 @@ void CF_CFDP_R_Init(transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_R2_CalcCrcChunk(transaction_t *t)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_CFDP_R2_CalcCrcChunk(transaction_t *t)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Send a FIN pdu.
@@ -326,10 +351,12 @@ static int CF_CFDP_R2_CalcCrcChunk(transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-static int CFDP_R2_SubstateSendFin(transaction_t *t)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CFDP_R2_SubstateSendFin(transaction_t *t)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Process receive FIN-ACK pdu.
@@ -342,10 +369,12 @@ static int CFDP_R2_SubstateSendFin(transaction_t *t)
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R2_Recv_fin_ack(transaction_t *t, const pdu_header_t *pdu)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_R2_Recv_fin_ack(transaction_t *t, const pdu_header_t *pdu)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Process receive metadata pdu for R2.
@@ -361,10 +390,12 @@ static void CF_CFDP_R2_Recv_fin_ack(transaction_t *t, const pdu_header_t *pdu)
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R2_RecvMd(transaction_t *t, const pdu_header_t *pdu)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_R2_RecvMd(transaction_t *t, const pdu_header_t *pdu)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Dispatch function for all received packets.
@@ -378,10 +409,12 @@ static void CF_CFDP_R2_RecvMd(transaction_t *t, const pdu_header_t *pdu)
 **       t must not be NULL. fns must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R_DispatchRecv(transaction_t *t, void (*const fns[SEND_NUM_STATES][PDU_INVALID_MAX])(transaction_t*, const pdu_header_t*), void (*const fd_fn)(transaction_t*, const pdu_header_t*))
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_R_DispatchRecv(transaction_t *t, void (*const fns[SEND_NUM_STATES][PDU_INVALID_MAX])(transaction_t*, const pdu_header_t*), void (*const fd_fn)(transaction_t*, const pdu_header_t*))
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief R1 receive pdu processing.
@@ -432,10 +465,12 @@ void CF_CFDP_R_Cancel(transaction_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R_SendInactivityEvent(transaction_t *t)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_R_SendInactivityEvent(transaction_t *t)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Perform tick (time-based) processing for R transactions.
@@ -453,6 +488,7 @@ static void CF_CFDP_R_SendInactivityEvent(transaction_t *t)
 *************************************************************************/
 void CF_CFDP_R_Tick(transaction_t *t, int *cont)
 {
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
+    UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
+    exit(-86);
 }
 

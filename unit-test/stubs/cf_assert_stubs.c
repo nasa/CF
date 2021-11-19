@@ -20,7 +20,6 @@
 #include "uttest.h"
 #include "utstubs.h"
 
-
 void CF_HandleAssert(const char *file, int line)
 {
     /* 

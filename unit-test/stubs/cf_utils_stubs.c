@@ -65,10 +65,12 @@ typedef struct {
 **  \endreturns
 **
 *************************************************************************/
-static int CF_TraverseHistory(clist_node n, trav_arg_t *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_TraverseHistory(clist_node n, trav_arg_t *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Walk over all transactions and print information from their history.
@@ -82,10 +84,12 @@ static int CF_TraverseHistory(clist_node n, trav_arg_t *context)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_TraverseTransactions(clist_node n, trav_arg_t *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_TraverseTransactions(clist_node n, trav_arg_t *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Write a transaction-based queue's transaction history to a file.
@@ -142,10 +146,12 @@ int32 CF_WriteHistoryQueueDataToFile(int32 fd, channel_t *c, direction_t dir)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_PrioSearch(clist_node node, void *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_PrioSearch(clist_node node, void *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Insert a transaction into a priority sorted transaction queue.
@@ -183,10 +189,12 @@ void CF_InsertSortPrio(transaction_t *t, cf_queue_index_t q)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_TraverseAllTransactions_(clist_node n, traverse_all_args_t *args)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_TraverseAllTransactions_(clist_node n, traverse_all_args_t *args)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Traverses all transactions on all active queues and performs an operation on them.

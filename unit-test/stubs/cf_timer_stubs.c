@@ -39,10 +39,12 @@
 **  \endreturns
 **
 *************************************************************************/
-static uint32 CF_Timer_Sec2Ticks(cf_timer_sec_t sec)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static uint32 CF_Timer_Sec2Ticks(cf_timer_sec_t sec)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Initialize a timer with a relative number of seconds.

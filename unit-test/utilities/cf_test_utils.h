@@ -379,6 +379,7 @@ typedef enum {
     MAX_TYPE_OF_CONTEXT_CF_CLIST_TRAVERSE
 } type_of_context_CF_CList_Traverse_t;
 
+type_of_context_CF_CList_Traverse_t type_of_context_CF_CList_Traverse; /* moved here to remove warning, a special setting for the stub */
 
 void cf_tests_Setup(void);
 void cf_tests_Teardown(void);
@@ -455,16 +456,7 @@ CFE_Status_t Any_CFE_Status_t_Except(CFE_Status_t exception);
 CFE_MSG_Size_t Any_CFE_MSG_Size_t(void);
 CFE_MSG_Size_t Any_CFE_MSG_Size_t_LessThan(size_t ceiling);
 
-#ifdef MESSAGE_FORMAT_IS_CCSDS_VER_2
-
-    uint32 Any_MsgId(void);
-    uint32 Any_MsgId_ExceptThese(uint32 *exceptions, uint8 num_exceptions);
-
-#else
-
-    uint16 Any_MsgId(void);
-    CFE_SB_MsgId_t Any_MsgId_ExceptThese(CFE_SB_MsgId_t exceptions[], uint8 num_exceptions);
-
-#endif /* MESSAGE_FORMAT_IS_CCSDS_VER_2 */
+CFE_SB_MsgId_t Any_MsgId(void);
+CFE_SB_MsgId_t Any_MsgId_ExceptThese(CFE_SB_MsgId_t exceptions[], uint8 num_exceptions);
 
 #endif /* _cf_test_utils_h_ */

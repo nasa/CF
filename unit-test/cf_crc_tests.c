@@ -1,8 +1,6 @@
-
 /* cf testing includes */
-#include "cf_crc.c"
 #include "cf_test_utils.h"
-
+#include "cf_crc.c"
 
 /*******************************************************************************
 **
@@ -25,7 +23,6 @@ uint8 Any_cf_crc_index_except_3(void)
 }
 /* end cf_crc_tests local utility functions */
 
-
 /*******************************************************************************
 **
 **  cf_crc_tests Setup and Teardown
@@ -44,15 +41,13 @@ void cf_crc_tests_Teardown(void)
 
 /* end cf_crc_tests Setup and Teardown */
 
-
 /*******************************************************************************
 **
 **  CF_CRC_Start tests
 **
 *******************************************************************************/
-void test_CF_CRC_Start_ReinitializesGiven_c_ToAllZeroValues(void)
+void test_CF_CRC_Start_ReinitializeGiven_c_ToAllZeroValues(void)
 {
-    // TODO: would rather be able to -wrap and therefor stub memset to test this
     /* Arrange */
     cf_crc_t    dummy_c;
     cf_crc_t*   arg_c = &dummy_c;
@@ -75,8 +70,9 @@ void test_CF_CRC_Start_ReinitializesGiven_c_ToAllZeroValues(void)
       "c->index was set to %d and should be 0", 
       arg_c->index);
     
-} /* end test_CF_CRC_Start_ReinitializesGiven_c_ToAllZeroValues*/
+} /* end test_CF_CRC_Start_ReinitializeGiven_c_ToAllZeroValues*/
 
+/* end CF_CRC_Start tests */
 
 /*******************************************************************************
 **
@@ -84,10 +80,10 @@ void test_CF_CRC_Start_ReinitializesGiven_c_ToAllZeroValues(void)
 **
 *******************************************************************************/
 
-// TODO: not testing len > data's size, by contract this should not occur, 
-// should it be an assumption in the doxygen comments?
+/* NOTE: not testing len > data's size, by contract this should not occur, 
+** should it be an assumption in the doxygen comments? */
 
-void Test_CF_CRC_Digest_DoesNotAlter_c_working_or_c_result_or_c_index_When_len_Eq0(void)
+void Test_CF_CRC_Digest_When_len_Is_0_DoNotAlter_c_working_or_c_result_or_c_index(void)
 {        
     /* Arrange */
     cf_crc_t        dummy_c;
@@ -116,9 +112,9 @@ void Test_CF_CRC_Digest_DoesNotAlter_c_working_or_c_result_or_c_index_When_len_E
       "c->index is %d which is unchanged from %d", 
       arg_c->index, initial_c_index);
    
-} /* end Test_CF_CRC_Digest_DoesNotAlter_c_working_or_c_result_or_c_index_When_len_Eq0 */
+} /* end Test_CF_CRC_Digest_When_len_Is_0_DoNotAlter_c_working_or_c_result_or_c_index */
 
-void Test_CF_CRC_Digest_PushesDataLeftOnto_c_working_When_len_Eq1(void)
+void Test_CF_CRC_Digest_When_len_Eq_1_PushDataLeftOnto_c_working(void)
 {        
     /* Arrange */
     cf_crc_t        dummy_c;
@@ -143,9 +139,9 @@ void Test_CF_CRC_Digest_PushesDataLeftOnto_c_working_When_len_Eq1(void)
       "c->working is %u and should be %u", 
       arg_c->working, expected_c_working);
    
-} /* end Test_CF_CRC_Digest_PushesDataLeftOnto_c_working_When_len_Eq1 */
+} /* end Test_CF_CRC_Digest_When_len_Eq_1_PushDataLeftOnto_c_working */
 
-void Test_CF_CRC_Digest_PushesDataLeftOnto_c_working_NumberOfTimesEqTo_len(void)
+void Test_CF_CRC_Digest_PushDataLeftOnto_c_working_NumberOfTimesEqTo_len(void)
 {        
     /* Arrange */
     cf_crc_t        dummy_c;
@@ -157,7 +153,7 @@ void Test_CF_CRC_Digest_PushesDataLeftOnto_c_working_NumberOfTimesEqTo_len(void)
 
     arg_c->working = Any_uint32();
     arg_c->index = Any_cf_crc_index();
-    arg_len = Any_uint16_GreaterThan(1) / 2;  // TODO: change type if len changes,  Any_uint16_GreaterThan(1) / 2 roughly translates to a positive int that runs the test within a reasonable timeframe for size of len, this could change when more is learned about what len is supposed to be
+    arg_len = Any_uint16_GreaterThan(1) / 2;  // NOTE: change type if len changes,  Any_uint16_GreaterThan(1) / 2 roughly translates to a positive int that runs the test within a reasonable timeframe for size of len, this could change when more is learned about what len is supposed to be
     
     arg_data = malloc((size_t)arg_len);
     AnyBufferOf_uint8_WithSize((uint8*)arg_data, arg_len);
@@ -180,9 +176,9 @@ void Test_CF_CRC_Digest_PushesDataLeftOnto_c_working_NumberOfTimesEqTo_len(void)
     /* local Teardown */
     free((uint8*)arg_data);
    
-} /* end Test_CF_CRC_Digest_PushesDataLeftOnto_c_working_NumberOfTimesEqTo_len */
+} /* end Test_CF_CRC_Digest_PushDataLeftOnto_c_working_NumberOfTimesEqTo_len */
 
-void Test_CF_CRC_Digest_DoesNotUpdate_c_result_WhenIndexIsNot3(void)
+void Test_CF_CRC_Digest_When_index_IsNot_3_DoNotUpdate_c_result(void)
 {        
     /* Arrange */
     cf_crc_t        dummy_c;
@@ -203,9 +199,9 @@ void Test_CF_CRC_Digest_DoesNotUpdate_c_result_WhenIndexIsNot3(void)
       "c->result was not altered and is %u and should be %u", 
       arg_c->result, initial_c_result);
    
-} /* end Test_CF_CRC_Digest_Updates_c_result_ */
+} /* end Test_CF_CRC_Digest_When_index_IsNot_3_DoNotUpdate_c_result */
 
-void Test_CF_CRC_Digest_Updates_c_result_When_c_index_Is3(void)
+void Test_CF_CRC_Digest_When_c_index_Is_3_Update_c_result(void)
 {        
     /* Arrange */
     cf_crc_t        dummy_c;
@@ -233,9 +229,9 @@ void Test_CF_CRC_Digest_Updates_c_result_When_c_index_Is3(void)
       "c->result is %u and should be %u", 
       arg_c->result, expected_c_result);
    
-} /* end Test_CF_CRC_Digest_Updates_c_result_When_c_index_Is3 */
+} /* end Test_CF_CRC_Digest_When_c_index_Is_3_Update_c_result */
 
-void Test_CF_CRC_Digest_Updates_c_result_TheNumberOfTimesIndexReaches4(void)
+void Test_CF_CRC_Digest_Update_c_result_TheNumberOfTimes_index_Reaches4(void)
 {        
     /* Arrange */
     cf_crc_t        dummy_c;
@@ -250,7 +246,7 @@ void Test_CF_CRC_Digest_Updates_c_result_TheNumberOfTimesIndexReaches4(void)
     arg_c->working = Any_uint32();
     arg_c->index = Any_cf_crc_index();
     arg_c->result = Any_uint32();
-    arg_len = (int32) (Any_uint16() / 2); // TODO: change type if len changes,  Any_uint16_Except(0) / 2 roughly translates to a positive int that runs the test within a reasonable timeframe for size of len, this could change when more is learned about what len is supposed to be
+    arg_len = (int32) (Any_uint16_GreaterThan(1) / 2);  // NOTE: change type if len changes,  Any_uint16_GreaterThan(1) / 2 roughly translates to a positive int that runs the test within a reasonable timeframe for size of len, this could change when more is learned about what len is supposed to be
     
     arg_data = malloc((size_t)arg_len);
     AnyBufferOf_uint8_WithSize((uint8*)arg_data, arg_len);
@@ -297,9 +293,9 @@ void Test_CF_CRC_Digest_Updates_c_result_TheNumberOfTimesIndexReaches4(void)
     /* local Teardown */
     free((uint8*)arg_data);
    
-} /* end Test_CF_CRC_Digest_Updates_c_result_TheNumberOfTimesIndexReaches4 */
+} /* end Test_CF_CRC_Digest_Update_c_result_TheNumberOfTimes_index_Reaches4 */
 
-void Test_CF_CRC_Digest_Updates_c_index_By1When_len_Eq1_And_c_index_LessThan3(void)
+void Test_CF_CRC_Digest_When_len_Eq1_And_c_index_LessThan_3_Update_c_index_By_1(void)
 {        
     /* Arrange */
     cf_crc_t        dummy_c;
@@ -323,9 +319,9 @@ void Test_CF_CRC_Digest_Updates_c_index_By1When_len_Eq1_And_c_index_LessThan3(vo
       "c->index is %u and should be %u", 
       arg_c->index, expected_c_index);
    
-} /* end Test_CF_CRC_Digest_Updates_c_index_By1When_len_Eq1_And_c_index_LessThan3 */
+} /* end Test_CF_CRC_Digest_When_len_Eq1_And_c_index_LessThan_3_Update_c_index_By_1 */
 
-void Test_CF_CRC_Digest_Updates_c_index_To0When_len_Eq1_And_c_index_Is3(void)
+void Test_CF_CRC_Digest_When_len_Eq1_And_c_index_Is_3_Update_c_index_To_0(void)
 {        
     /* Arrange */
     cf_crc_t        dummy_c;
@@ -346,9 +342,9 @@ void Test_CF_CRC_Digest_Updates_c_index_To0When_len_Eq1_And_c_index_Is3(void)
       "c->index is %u and should be 0", 
       arg_c->index);
    
-} /* end Test_CF_CRC_Digest_Updates_c_index_To0When_len_Eq1_And_c_index_Is3 */
+} /* end Test_CF_CRC_Digest_When_len_Eq1_And_c_index_Is_3_Update_c_index_To_0 */
 
-void Test_CF_CRC_Digest_Updates_c_index_CorrectlyDependingOn_c_index_And_len_Values(void)
+void Test_CF_CRC_Digest_Update_c_index_CorrectlyDependingOn_c_index_And_len_Values(void)
 {        
     /* Arrange */
     cf_crc_t        dummy_c;
@@ -360,7 +356,7 @@ void Test_CF_CRC_Digest_Updates_c_index_CorrectlyDependingOn_c_index_And_len_Val
     arg_c->working = Any_uint32();
     arg_c->index = Any_cf_crc_index();
     arg_c->result = Any_uint32();
-    arg_len = (int32) (Any_uint16() / 2); // TODO: change type if len changes,  Any_uint16_Except(0) / 2 roughly translates to a positive int that runs the test within a reasonable timeframe for size of len, this could change when more is learned about what len is supposed to be
+    arg_len = (int32) (Any_uint16_GreaterThan(1) / 2);  // NOTE: change type if len changes,  Any_uint16_GreaterThan(1) / 2 roughly translates to a positive int that runs the test within a reasonable timeframe for size of len, this could change when more is learned about what len is supposed to be
     
     arg_data = malloc((size_t)arg_len);
     AnyBufferOf_uint8_WithSize((uint8*)arg_data, arg_len);
@@ -378,7 +374,7 @@ void Test_CF_CRC_Digest_Updates_c_index_CorrectlyDependingOn_c_index_And_len_Val
     /* local Teardown */
     free((uint8*)arg_data);
    
-} /* end Test_CF_CRC_Digest_Updates_c_index_To0When_len_Eq1_And_c_index_Is3 */
+} /* end Test_CF_CRC_Digest_Update_c_index_CorrectlyDependingOn_c_index_And_len_Values */
 
 /* end CF_CRC_Digest tests */
 
@@ -388,7 +384,7 @@ void Test_CF_CRC_Digest_Updates_c_index_CorrectlyDependingOn_c_index_And_len_Val
 **
 *******************************************************************************/
 
-void Test_CF_CRC_Finalize_DoesNothingWhenIndexIs0(void)
+void Test_CF_CRC_Finalize_When_index_Is_0_DoNothing(void)
 {
     /* Arrange */
     cf_crc_t        dummy_c;
@@ -413,9 +409,9 @@ void Test_CF_CRC_Finalize_DoesNothingWhenIndexIs0(void)
     UtAssert_True(arg_c->index == 0,
       "c->index is %d which is unchanged from 0",
       arg_c->index);
-} /* end Test_CF_CRC_Finalize_DoesNothingWhenIndexIs0 */
+} /* end Test_CF_CRC_Finalize_When_index_Is_0_DoNothing */
 
-void Test_CF_CRC_Finalize_Getsexpected_resultAtIndex1(void)
+void Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_1(void)
 {
     /* Arrange */
     cf_crc_t        dummy_c;
@@ -442,9 +438,9 @@ void Test_CF_CRC_Finalize_Getsexpected_resultAtIndex1(void)
     UtAssert_True(arg_c->index == 0,
       "c->index is %u and it should be 0",
       arg_c->index);
-} /* end Test_CF_CRC_Finalize_Getsexpected_resultAtIndex1 */
+} /* end Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_1 */
 
-void Test_CF_CRC_Finalize_Getsexpected_resultAtIndex2(void)
+void Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_2(void)
 {
     /* Arrange */
     cf_crc_t        dummy_c;
@@ -472,9 +468,9 @@ void Test_CF_CRC_Finalize_Getsexpected_resultAtIndex2(void)
     UtAssert_True(arg_c->index == 0,
       "c->index is %u and it should be 0",
       arg_c->index);
-} /* end Test_CF_CRC_Finalize_Getsexpected_resultAtIndex2 */
+} /* end Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_2 */
 
-void Test_CF_CRC_Finalize_Getsexpected_resultAtIndex3(void)
+void Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_3(void)
 {
     /* Arrange */
     cf_crc_t        dummy_c;
@@ -502,72 +498,71 @@ void Test_CF_CRC_Finalize_Getsexpected_resultAtIndex3(void)
     UtAssert_True(arg_c->index == 0,
       "c->index is %u and it should be 0",
       arg_c->index);
-} /* end Test_CF_CRC_Finalize_Getsexpected_resultAtIndex3 */
+} /* end Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_3 */
 
 /* end CF_CRC_Finalize tests */
 
-
-
 /*******************************************************************************
 **
-**  cf_crc_tests ADD TESTS functions
+**  cf_crc_tests UtTest_Add groups
 **
 *******************************************************************************/
 
 void add_CF_CRC_Start_tests(void)
 {
-    UtTest_Add(test_CF_CRC_Start_ReinitializesGiven_c_ToAllZeroValues, 
+    UtTest_Add(test_CF_CRC_Start_ReinitializeGiven_c_ToAllZeroValues, 
       cf_crc_tests_Setup, cf_crc_tests_Teardown, 
-      "test_CF_CRC_Start_ReinitializesGiven_c_ToAllZeroValues");
-}
+      "test_CF_CRC_Start_ReinitializeGiven_c_ToAllZeroValues");
+} /* end add_CF_CRC_Start_tests */
 
 void add_CF_CRC_Digest_tests(void)
 {
-    UtTest_Add(Test_CF_CRC_Digest_DoesNotAlter_c_working_or_c_result_or_c_index_When_len_Eq0, 
+    UtTest_Add(Test_CF_CRC_Digest_When_len_Is_0_DoNotAlter_c_working_or_c_result_or_c_index, 
       cf_crc_tests_Setup, cf_crc_tests_Teardown, 
-      "Test_CF_CRC_Digest_DoesNotAlter_c_working_or_c_result_or_c_index_When_len_Eq0");
-    UtTest_Add(Test_CF_CRC_Digest_PushesDataLeftOnto_c_working_When_len_Eq1, 
+      "Test_CF_CRC_Digest_When_len_Is_0_DoNotAlter_c_working_or_c_result_or_c_index");
+    UtTest_Add(Test_CF_CRC_Digest_When_len_Eq_1_PushDataLeftOnto_c_working, 
       cf_crc_tests_Setup, cf_crc_tests_Teardown, 
-      "Test_CF_CRC_Digest_PushesDataLeftOnto_c_working_When_len_Eq1");
-    UtTest_Add(Test_CF_CRC_Digest_PushesDataLeftOnto_c_working_NumberOfTimesEqTo_len, 
+      "Test_CF_CRC_Digest_When_len_Eq_1_PushDataLeftOnto_c_working");
+    UtTest_Add(Test_CF_CRC_Digest_PushDataLeftOnto_c_working_NumberOfTimesEqTo_len, 
       cf_crc_tests_Setup, cf_crc_tests_Teardown, 
-      "Test_CF_CRC_Digest_PushesDataLeftOnto_c_working_NumberOfTimesEqTo_len");
-    UtTest_Add(Test_CF_CRC_Digest_DoesNotUpdate_c_result_WhenIndexIsNot3, 
+      "Test_CF_CRC_Digest_PushDataLeftOnto_c_working_NumberOfTimesEqTo_len");
+    UtTest_Add(Test_CF_CRC_Digest_When_index_IsNot_3_DoNotUpdate_c_result, 
       cf_crc_tests_Setup, cf_crc_tests_Teardown, 
-      "Test_CF_CRC_Digest_DoesNotUpdate_c_result_WhenIndexIsNot3");
-    UtTest_Add(Test_CF_CRC_Digest_Updates_c_result_When_c_index_Is3, 
+      "Test_CF_CRC_Digest_When_index_IsNot_3_DoNotUpdate_c_result");
+    UtTest_Add(Test_CF_CRC_Digest_When_c_index_Is_3_Update_c_result, 
       cf_crc_tests_Setup, cf_crc_tests_Teardown, 
-      "Test_CF_CRC_Digest_Updates_c_result_When_c_index_Is3");
-    UtTest_Add(Test_CF_CRC_Digest_Updates_c_result_TheNumberOfTimesIndexReaches4, 
+      "Test_CF_CRC_Digest_When_c_index_Is_3_Update_c_result");
+    UtTest_Add(Test_CF_CRC_Digest_Update_c_result_TheNumberOfTimes_index_Reaches4, 
       cf_crc_tests_Setup, cf_crc_tests_Teardown, 
-      "Test_CF_CRC_Digest_Updates_c_result_TheNumberOfTimesIndexReaches4");
-    UtTest_Add(Test_CF_CRC_Digest_Updates_c_index_By1When_len_Eq1_And_c_index_LessThan3, 
+      "Test_CF_CRC_Digest_Update_c_result_TheNumberOfTimes_index_Reaches4");
+    UtTest_Add(Test_CF_CRC_Digest_When_len_Eq1_And_c_index_LessThan_3_Update_c_index_By_1, 
       cf_crc_tests_Setup, cf_crc_tests_Teardown, 
-      "Test_CF_CRC_Digest_Updates_c_index_By1When_len_Eq1_And_c_index_LessThan3");
-    UtTest_Add(Test_CF_CRC_Digest_Updates_c_index_To0When_len_Eq1_And_c_index_Is3, 
+      "Test_CF_CRC_Digest_When_len_Eq1_And_c_index_LessThan_3_Update_c_index_By_1");
+    UtTest_Add(Test_CF_CRC_Digest_When_len_Eq1_And_c_index_Is_3_Update_c_index_To_0, 
       cf_crc_tests_Setup, cf_crc_tests_Teardown, 
-      "Test_CF_CRC_Digest_Updates_c_index_To0When_len_Eq1_And_c_index_Is3");
-    UtTest_Add(Test_CF_CRC_Digest_Updates_c_index_CorrectlyDependingOn_c_index_And_len_Values, 
+      "Test_CF_CRC_Digest_When_len_Eq1_And_c_index_Is_3_Update_c_index_To_0");
+    UtTest_Add(Test_CF_CRC_Digest_Update_c_index_CorrectlyDependingOn_c_index_And_len_Values, 
       cf_crc_tests_Setup, cf_crc_tests_Teardown, 
-      "Test_CF_CRC_Digest_Updates_c_index_CorrectlyDependingOn_c_index_And_len_Values");
-}
+      "Test_CF_CRC_Digest_Update_c_index_CorrectlyDependingOn_c_index_And_len_Values");
+} /* end add_CF_CRC_Digest_tests */
 
 void add_CF_CRC_Finalize_tests(void)
 {
-    UtTest_Add(Test_CF_CRC_Finalize_DoesNothingWhenIndexIs0, 
+    UtTest_Add(Test_CF_CRC_Finalize_When_index_Is_0_DoNothing, 
       cf_crc_tests_Setup, cf_crc_tests_Teardown, 
-      "Test_CF_CRC_Finalize_DoesNothingWhenIndexIs0");
-    UtTest_Add(Test_CF_CRC_Finalize_Getsexpected_resultAtIndex1, 
+      "Test_CF_CRC_Finalize_When_index_Is_0_DoNothing");
+    UtTest_Add(Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_1, 
       cf_crc_tests_Setup, cf_crc_tests_Teardown, 
-      "Test_CF_CRC_Finalize_Getsexpected_resultAtIndex1");
-    UtTest_Add(Test_CF_CRC_Finalize_Getsexpected_resultAtIndex2, 
+      "Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_1");
+    UtTest_Add(Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_2, 
       cf_crc_tests_Setup, cf_crc_tests_Teardown, 
-      "Test_CF_CRC_Finalize_Getsexpected_resultAtIndex2");
-    UtTest_Add(Test_CF_CRC_Finalize_Getsexpected_resultAtIndex3, 
+      "Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_2");
+    UtTest_Add(Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_3, 
       cf_crc_tests_Setup, cf_crc_tests_Teardown, 
-      "Test_CF_CRC_Finalize_Getsexpected_resultAtIndex3");
-}
+      "Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_3");
+} /* end add_CF_CRC_Finalize_tests */
 
+/* end cf_crc_tests UtTest_Add groups */
 
 /*******************************************************************************
 **
@@ -585,6 +580,5 @@ void UtTest_Setup(void)
     
     add_CF_CRC_Finalize_tests();
 } /* end UtTest_Setup for cf_crc_tests.c */
-
 
 /* end cf_crc_tests.c */

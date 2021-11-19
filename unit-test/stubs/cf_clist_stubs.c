@@ -28,6 +28,8 @@
 #include "cf_test_utils.h"
 #include "cf_cfdp.h"
 
+extern type_of_context_CF_CList_Traverse_t type_of_context_CF_CList_Traverse;
+
 /************************************************************************/
 /** \brief Initialize a clist node.
 **  
@@ -51,7 +53,8 @@ void CF_CList_InitNode(clist_node node)
 *************************************************************************/
 void CF_CList_InsertFront(clist_node *head, clist_node node)
 {
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
+    UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
+    exit(-86);
 }
 
 /************************************************************************/
@@ -131,8 +134,6 @@ void CF_CList_InsertAfter(clist_node *head, clist_node start, clist_node after)
 **       start must not be NULL. fn must be a valid function.
 **
 *************************************************************************/
-extern type_of_context_CF_CList_Traverse_t type_of_context_CF_CList_Traverse = 
-  NOT_YET_SET;
 
 void CF_CList_Traverse(clist_node start, clist_fn_t fn, void *context)
 {   
@@ -151,10 +152,10 @@ void CF_CList_Traverse(clist_node start, clist_fn_t fn, void *context)
             case TRAV_ARG_T:
                 UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), context, 
                   sizeof(int32));
-                result_location = context + sizeof(int32);
+                result_location = (uint8*)context + sizeof(int32);
                 UT_Stub_CopyToLocal(UT_KEY(CF_CList_Traverse), result_location, 
                   sizeof(int32));
-                UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), context +  
+                UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), (uint8*)context +  
                   (sizeof(int32) *2), sizeof(fn));
                 break;
             
@@ -165,12 +166,12 @@ void CF_CList_Traverse(clist_node start, clist_fn_t fn, void *context)
                 fn_size = sizeof(clist_fn_t);
                 UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), context, 
                   fn_size);
-                UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), context + 
+                UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), (uint8*)context + 
                   fn_size, sizeof(void*));
                 //TODO: does the counter really need this behavior?  all it is
                 //counting is number of times stub is called which is already
                 //counted.
-                result_location = context + fn_size + sizeof(void*);
+                result_location = (uint8*)context + fn_size + sizeof(void*);
                 ++(*(int32*)result_location); /* increase count */
                 int32 count = *((int32*)result_location); /* count val to copy */
                 UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), &count, 
@@ -186,8 +187,8 @@ void CF_CList_Traverse(clist_node start, clist_fn_t fn, void *context)
                 {
                   void*   transaction_sequence_number = context;
                   void*   src_eid = 
-                    transaction_sequence_number + 4; /* uint32 - 4 bytes */
-                  void*   t = src_eid + 4; /* uint8 - 4 bytes, no packing in struct */
+                    (uint8*)transaction_sequence_number + 4; /* uint32 - 4 bytes */
+                  void*   t = (uint8*)src_eid + 4; /* uint8 - 4 bytes, no packing in struct */
                   
                   UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), transaction_sequence_number, 
                     sizeof(cf_transaction_seq_t)); 
@@ -199,8 +200,7 @@ void CF_CList_Traverse(clist_node start, clist_fn_t fn, void *context)
                 break;
 
             default:
-            //TODO:printf CF_CList_Traverse should be made into a UT message
-                printf("CF_CList_Traverse Stub type_of_context_CF_CList_Traverse = NOT_YET_SET or a value not in case statement.\n"
+                UtAssertEx(false, UTASSERT_CASETYPE_TSF, __FILE__, __LINE__, "CF_CList_Traverse Stub type_of_context_CF_CList_Traverse = NOT_YET_SET or a value not in case statement.\n"
                        "This means the context will not be used/saved correctly.\n"
                        "It should be set to a value equal to the expected context type.\n");
         } /* end switch */

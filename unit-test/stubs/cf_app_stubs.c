@@ -26,6 +26,7 @@
 /* UT includes */
 #include "uttest.h"
 #include "utstubs.h"
+#include "uttools.h"
 
 CF_AppData_t CF_AppData;
 
@@ -40,10 +41,12 @@ CF_AppData_t CF_AppData;
 **       None
 **
 *************************************************************************/
-static void CF_HkCmd(void)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_HkCmd(void)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Checks to see if a table update is pending, and perform it.
@@ -55,10 +58,12 @@ static void CF_HkCmd(void)
 **       None
 **
 *************************************************************************/
-static void CF_CheckTables(void)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CheckTables(void)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Validation function for config table.
@@ -75,10 +80,12 @@ static void CF_CheckTables(void)
 **  \endreturns
 **
 *************************************************************************/
-static int32 CF_ValidateConfigTable(void *tbl_ptr)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int32 CF_ValidateConfigTable(void *tbl_ptr)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Load the table on application start
@@ -92,10 +99,12 @@ static int32 CF_ValidateConfigTable(void *tbl_ptr)
 **  \endreturns
 **
 *************************************************************************/
-static int32 CF_TableInit(void)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int32 CF_TableInit(void)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief CF app init function
@@ -113,10 +122,12 @@ static int32 CF_TableInit(void)
 **  \endreturns
 **
 *************************************************************************/
-static int32 CF_Init(void)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int32 CF_Init(void)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief CF wakeup function
@@ -128,10 +139,12 @@ static int32 CF_Init(void)
 **       None
 **
 *************************************************************************/
-static void CF_WakeUp(void)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_WakeUp(void)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief CF message processing function
@@ -144,10 +157,12 @@ static void CF_WakeUp(void)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_ProcessMsg(CFE_SB_Buffer_t msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_ProcessMsg(CFE_SB_Buffer_t msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief CF app entry point
@@ -160,8 +175,10 @@ static void CF_ProcessMsg(CFE_SB_Buffer_t msg)
 **       This must only be called once.
 **
 *************************************************************************/
-void CF_AppMain(void)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// void CF_AppMain(void)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 

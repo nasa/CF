@@ -1,6 +1,11 @@
+#include <string.h>
 
 /* UT includes */
 #include "ut_utils_cfe_hooks.h"
+
+/* NOTE: This was designed and used before the advent of the ut-assert hander
+** ability.  It's use is only for the legacy code that needed it before the
+** changes to ut-assert.  Handlers should be used instead of this function */
 
 /*****************************************************************************/
 /**
@@ -73,15 +78,15 @@
  */
 int32 stub_reporter_hook(void *UserObj, int32 StubRetcode, uint32 CallCount, const UT_StubContext_t *Context)
 {
-  uint8 i = 0;                /* i is index */
-  uint8 size_used = 0;        /* determines size of argument to be saved */
-  void* val_location = NULL;  /* pointer to arg value to be saved */
-  void* obj_ptr;              /* tracker indicates where to push data into UserObj */
+  uint8  i = 0;                /* i is index */
+  uint8  size_used = 0;        /* determines size of argument to be saved */
+  const void*  val_location = NULL;  /* pointer to arg value to be saved */
+  uint8* obj_ptr;              /* tracker indicates where to push data into UserObj */
 
   /* Determine where in the UserObj we should be located dependent upon CallCount */
   if (CallCount == 0)
   {
-      obj_ptr = UserObj; 
+      obj_ptr = (uint8*)UserObj; 
   }
   else
   {
@@ -101,7 +106,7 @@ int32 stub_reporter_hook(void *UserObj, int32 StubRetcode, uint32 CallCount, con
       }
 
       /* obj_ptr moves a full context_size for every call (initial value is 0) -- user object for calls > 1 must be an array of contexts */
-      obj_ptr = UserObj + (context_size * CallCount);
+      obj_ptr = (uint8*)UserObj + (context_size * CallCount);
   }
   
   for(i = 0; i < Context->ArgCount; ++i)
@@ -123,29 +128,6 @@ int32 stub_reporter_hook(void *UserObj, int32 StubRetcode, uint32 CallCount, con
     obj_ptr += size_used;
   }
   
-  /* All arguments saved to context, check for va */
-
-  /* va is UNDER CONSTRUCTION due to multi-call changes */
-  /* va exists when there is a variable argument function like CFE_EVS_SendEvent */
-  // if (va != NULL)
-  // {
-    // /* user object expecting any va MUST have a uint8 directly after */
-    // uint8 num_args = *(uint8*)obj_ptr;
-    // /* TODO: 8 bytes is arbitrary and is currenlty what my system supports, this should be platform independent somehow */
-    // uint16 bytes_of_data = num_args * 8;
-    
-    // /* step past the argument uint8 in the user object */
-    // ++obj_ptr;
-    // /* copy as much data as the number of args in the reg_save_area starting at the gp_offset */
-    // memcpy(obj_ptr, va[0].reg_save_area + va[0].gp_offset, bytes_of_data);
-
-    // /* return 0 is success? */
-    // return 0;
   // }
   return StubRetcode;
 }
-
-// int32 stub_reporter_hook(void *UserObj, int32 StubRetcode, uint32 CallCount, const UT_StubContext_t *Context)
-// {
-//   return stub_reporter_va_hook(UserObj, StubRetcode, CallCount, Context, NULL);
-// }

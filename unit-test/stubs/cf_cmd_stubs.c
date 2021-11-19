@@ -56,10 +56,12 @@ typedef struct {
 **       None
 **
 *************************************************************************/
-static void CF_CmdAcc(void)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdAcc(void)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Increment the command rejected counter.
@@ -68,10 +70,12 @@ static void CF_CmdAcc(void)
 **       None
 **
 *************************************************************************/
-static void CF_CmdRej(void)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdRej(void)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Conditionally increment the command accept or reject counters.
@@ -80,10 +84,12 @@ static void CF_CmdRej(void)
 **       None
 **
 *************************************************************************/
-static void CF_CmdCond(int cond)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdCond(int cond)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief The no-operation command.
@@ -98,10 +104,12 @@ static void CF_CmdCond(int cond)
 **       None
 **
 *************************************************************************/
-static void CF_CmdNoop(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdNoop(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief The reset counters command.
@@ -116,10 +124,12 @@ static void CF_CmdNoop(CFE_SB_Buffer_t* msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdReset(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdReset(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Ground command to start a file transfer.
@@ -132,10 +142,12 @@ static void CF_CmdReset(CFE_SB_Buffer_t* msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdTxFile(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdTxFile(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Ground command to start directory playback.
@@ -148,10 +160,12 @@ static void CF_CmdTxFile(CFE_SB_Buffer_t* msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdPlaybackDir(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdPlaybackDir(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Common logic for all channel-based commands.
@@ -170,10 +184,12 @@ static void CF_CmdPlaybackDir(CFE_SB_Buffer_t* msg)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_DoChanAction(cf_cmd_unionargs_t *cmd, const char *errstr, chan_action_fn_t fn, void *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_DoChanAction(cf_cmd_unionargs_t *cmd, const char *errstr, chan_action_fn_t fn, void *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Channel action to set the frozen bit for a channel.
@@ -186,10 +202,12 @@ static int CF_DoChanAction(cf_cmd_unionargs_t *cmd, const char *errstr, chan_act
 **  \endreturns
 **
 *************************************************************************/
-static int CF_DoFreezeThaw(uint8 chan_num, const bool_arg_t *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_DoFreezeThaw(uint8 chan_num, const bool_arg_t *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Freeze a channel.
@@ -198,10 +216,12 @@ static int CF_DoFreezeThaw(uint8 chan_num, const bool_arg_t *context)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdFreeze(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdFreeze(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Thaw a channel.
@@ -210,10 +230,12 @@ static void CF_CmdFreeze(CFE_SB_Buffer_t* msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdThaw(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdThaw(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Search for a transaction across all channels.
@@ -226,10 +248,12 @@ static void CF_CmdThaw(CFE_SB_Buffer_t* msg)
 **  \endreturns
 **
 *************************************************************************/
-static transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(cf_transaction_seq_t ts, cf_entity_id_t eid)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(cf_transaction_seq_t ts, cf_entity_id_t eid)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /* CF_TsnChanAction() returns the number of transactions acted upon */
 /************************************************************************/
@@ -249,10 +273,12 @@ static transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(cf_tran
 **  \endreturns
 **
 *************************************************************************/
-static int CF_TsnChanAction(cf_cmd_transaction_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_TsnChanAction(cf_cmd_transaction_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Set the suspended bit in a transaction.
@@ -261,10 +287,12 @@ static int CF_TsnChanAction(cf_cmd_transaction_t *cmd, const char *cmdstr, CF_Ts
 **       t must not be NULL. context must not be NULL.
 **
 *************************************************************************/
-static void CF_DoSuspRes_(transaction_t *t, susp_res_arg_t *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_DoSuspRes_(transaction_t *t, susp_res_arg_t *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Handle transaction suspend and resume commands.
@@ -277,10 +305,12 @@ static void CF_DoSuspRes_(transaction_t *t, susp_res_arg_t *context)
 **       cmd must not be NULL.
 **
 *************************************************************************/
-static void CF_DoSuspRes(cf_cmd_transaction_t *cmd, uint8 action)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_DoSuspRes(cf_cmd_transaction_t *cmd, uint8 action)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Handle transaction suspend command.
@@ -289,10 +319,12 @@ static void CF_DoSuspRes(cf_cmd_transaction_t *cmd, uint8 action)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdSuspend(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdSuspend(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Handle transaction resume command.
@@ -301,10 +333,12 @@ static void CF_CmdSuspend(CFE_SB_Buffer_t* msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdResume(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdResume(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief tsn chan action to cancel a transaction.
@@ -313,10 +347,12 @@ static void CF_CmdResume(CFE_SB_Buffer_t* msg)
 **       t must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdCancel_(transaction_t *t, void *ignored)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdCancel_(transaction_t *t, void *ignored)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Handle a cancel ground command.
@@ -325,10 +361,12 @@ static void CF_CmdCancel_(transaction_t *t, void *ignored)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdCancel(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdCancel(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief tsn chan action to abandon a transaction.
@@ -337,10 +375,12 @@ static void CF_CmdCancel(CFE_SB_Buffer_t* msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdAbandon_(transaction_t *t, void *ignored)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdAbandon_(transaction_t *t, void *ignored)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Handle an abandon ground command.
@@ -349,10 +389,12 @@ static void CF_CmdAbandon_(transaction_t *t, void *ignored)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdAbandon(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdAbandon(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Sets the dequeue enable/disable flag for a channel.
@@ -361,10 +403,12 @@ static void CF_CmdAbandon(CFE_SB_Buffer_t* msg)
 **       context must not be NULL.
 **
 *************************************************************************/
-static void CF_DoEnableDisableDequeue(uint8 chan_num, const bool_arg_t *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_DoEnableDisableDequeue(uint8 chan_num, const bool_arg_t *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Handle an enable dequeue ground command.
@@ -373,10 +417,12 @@ static void CF_DoEnableDisableDequeue(uint8 chan_num, const bool_arg_t *context)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdEnableDequeue(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdEnableDequeue(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Handle a disable dequeue ground command.
@@ -385,10 +431,12 @@ static void CF_CmdEnableDequeue(CFE_SB_Buffer_t* msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdDisableDequeue(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdDisableDequeue(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Sets the enable/disable flag for the specified polling directory.
@@ -397,10 +445,12 @@ static void CF_CmdDisableDequeue(CFE_SB_Buffer_t* msg)
 **       context must not be NULL.
 **
 *************************************************************************/
-static int CF_DoEnableDisablePolldir(uint8 chan_num, const bool_msg_arg_t *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_DoEnableDisablePolldir(uint8 chan_num, const bool_msg_arg_t *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Enable a polling dir ground command.
@@ -409,10 +459,12 @@ static int CF_DoEnableDisablePolldir(uint8 chan_num, const bool_msg_arg_t *conte
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdEnablePolldir(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdEnablePolldir(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Disable a polling dir ground command.
@@ -421,10 +473,12 @@ static void CF_CmdEnablePolldir(CFE_SB_Buffer_t* msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdDisablePolldir(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdDisablePolldir(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Purge the history queue for the given channel.
@@ -433,10 +487,12 @@ static void CF_CmdDisablePolldir(CFE_SB_Buffer_t* msg)
 **       n must not be NULL. c must not be NULL.
 **
 *************************************************************************/
-static int CF_PurgeHistory(clist_node n, channel_t *c)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_PurgeHistory(clist_node n, channel_t *c)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Purge the pending transaction queue.
@@ -445,10 +501,12 @@ static int CF_PurgeHistory(clist_node n, channel_t *c)
 **       n must not be NULL.
 **
 *************************************************************************/
-static int CF_PurgeTransaction(clist_node n, void *ignored)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_PurgeTransaction(clist_node n, void *ignored)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Channel action command to perform purge queue operations.
@@ -465,10 +523,12 @@ static int CF_PurgeTransaction(clist_node n, void *ignored)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_DoPurgeQueue(uint8 chan_num, cf_cmd_unionargs_t *cmd)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_DoPurgeQueue(uint8 chan_num, cf_cmd_unionargs_t *cmd)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Ground command to purge either the history or pending queues.
@@ -477,10 +537,12 @@ static int CF_DoPurgeQueue(uint8 chan_num, cf_cmd_unionargs_t *cmd)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdPurgeQueue(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdPurgeQueue(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Ground command to write a file with queue information.
@@ -489,10 +551,12 @@ static void CF_CmdPurgeQueue(CFE_SB_Buffer_t* msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdWriteQueue(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdWriteQueue(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Ground command to send configuration parameters.
@@ -501,10 +565,12 @@ static void CF_CmdWriteQueue(CFE_SB_Buffer_t* msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdSendCfgParams(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdSendCfgParams(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Checks if the value is less than or equal to the max pdu size.
@@ -517,10 +583,12 @@ static void CF_CmdSendCfgParams(CFE_SB_Buffer_t* msg)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CmdValidateChunkSize(uint32 val, uint8 chan_num /* ignored */)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_CmdValidateChunkSize(uint32 val, uint8 chan_num /* ignored */)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Perform a configuration get/set operation.
@@ -534,10 +602,12 @@ static int CF_CmdValidateChunkSize(uint32 val, uint8 chan_num /* ignored */)
 *************************************************************************/
 /* combine getset into a single function with a branch to avoid wasted memory footprint with duplicate
  * logic for finding the parameter */
-static void CF_CmdGetSetParam(uint8 is_set, uint8 param_id, uint32 value, uint8 chan_num)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdGetSetParam(uint8 is_set, uint8 param_id, uint32 value, uint8 chan_num)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Ground command to set a configuration parameter.
@@ -546,10 +616,12 @@ static void CF_CmdGetSetParam(uint8 is_set, uint8 param_id, uint32 value, uint8 
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdSetParam(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdSetParam(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Ground command to set a configuration parameter.
@@ -558,10 +630,12 @@ static void CF_CmdSetParam(CFE_SB_Buffer_t* msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdGetParam(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdGetParam(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Ground command enable engine.
@@ -570,10 +644,12 @@ static void CF_CmdGetParam(CFE_SB_Buffer_t* msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdEnableEngine(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdEnableEngine(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Ground command disable engine.
@@ -582,10 +658,12 @@ static void CF_CmdEnableEngine(CFE_SB_Buffer_t* msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdDisableEngine(CFE_SB_Buffer_t* msg)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CmdDisableEngine(CFE_SB_Buffer_t* msg)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Process any ground command contained in the given message.

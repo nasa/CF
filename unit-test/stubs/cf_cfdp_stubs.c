@@ -40,10 +40,10 @@
 #define NUM_CLISTS 4
 const int CF_max_chunks[CF_DIR_NUM][CF_NUM_CHANNELS] = {CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION, CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION};
 
-static void CF_CFDP_RecvIdle(transaction_t*);
-static void CF_CFDP_RecvDrop(transaction_t*);
+// static void CF_CFDP_RecvIdle(transaction_t*);
+// static void CF_CFDP_RecvDrop(transaction_t*);
 
-static void CF_CFDP_TxFile__(transaction_t *t, cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority);
+// static void CF_CFDP_TxFile__(transaction_t *t, cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority);
 
 
 typedef struct trans_seq_arg_t {
@@ -90,10 +90,12 @@ void CF_CFDP_ArmAckTimer(transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-static cfdp_class_t CF_CFDP_GetClass(transaction_t *ti)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static cfdp_class_t CF_CFDP_GetClass(transaction_t *ti)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Determine if a cfdp transaction is a sender or not
@@ -106,10 +108,12 @@ static cfdp_class_t CF_CFDP_GetClass(transaction_t *ti)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_IsSender(transaction_t *ti)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_CFDP_IsSender(transaction_t *ti)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief arm inactivity timer
@@ -122,10 +126,12 @@ static int CF_CFDP_IsSender(transaction_t *ti)
 **       The given transaction is active and initialized.
 **
 *************************************************************************/
-static void CF_CFDP_ArmInactTimer(transaction_t *t)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_ArmInactTimer(transaction_t *t)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Dispatch received packet to its transaction.
@@ -134,10 +140,12 @@ static void CF_CFDP_ArmInactTimer(transaction_t *t)
 **       t must not be null. It must be an initialized transaction.
 **
 *************************************************************************/
-static void CF_CFDP_DispatchRecv(transaction_t *t)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_DispatchRecv(transaction_t *t)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Dispatches control to the active tx transaction.
@@ -146,10 +154,12 @@ static void CF_CFDP_DispatchRecv(transaction_t *t)
 **       t must not be NULL. t must be a valid tx transaction.
 **
 *************************************************************************/
-static void CF_CFDP_DispatchTx(transaction_t *t)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_DispatchTx(transaction_t *t)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Get an unused chunks structure off the chunks queue.
@@ -162,10 +172,12 @@ static void CF_CFDP_DispatchTx(transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-static chunks_wrapper_t *CF_CFDP_FindUnusedChunks(channel_t *c, direction_t dir)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static chunks_wrapper_t *CF_CFDP_FindUnusedChunks(channel_t *c, direction_t dir)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Find an unused transaction on a channel.
@@ -179,10 +191,12 @@ static chunks_wrapper_t *CF_CFDP_FindUnusedChunks(channel_t *c, direction_t dir)
 **
 *************************************************************************/
 /* finds an unused transaction and returns with it on no Q */
-static transaction_t *CF_CFDP_FindUnusedTransaction(channel_t *c)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static transaction_t *CF_CFDP_FindUnusedTransaction(channel_t *c)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Returns a history structure back to its unused state.
@@ -210,10 +224,12 @@ void CF_CFDP_ResetHistory(channel_t *c, history_t *h)
 **       t must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_FreeTransaction(transaction_t *t)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_FreeTransaction(transaction_t *t)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief List traversal function to check if the desired sequence number matches.
@@ -227,10 +243,12 @@ static void CF_CFDP_FreeTransaction(transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_FindTransactionBySequenceNumber_(clist_node n, trans_seq_arg_t *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_CFDP_FindTransactionBySequenceNumber_(clist_node n, trans_seq_arg_t *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Finds an active transaction by sequence number.
@@ -308,10 +326,12 @@ pdu_header_t *CF_CFDP_MsgOutGet(const transaction_t *t, int silent)
 **       The PDU in the output buffer is ready to transmit.
 **
 *************************************************************************/
-static void CF_CFDP_Send(uint8 chan_num, uint32 len)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_Send(uint8 chan_num, uint32 len)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Build the PDU header in the output buffer to prepare to send a packet.
@@ -347,7 +367,7 @@ void Handler_CF_CFDP_ConstructPduHeader_Default(void *UserObj, UT_EntryKey_t Fun
 
     UT_Stub_CopyToLocal(UT_KEY(CF_CFDP_ConstructPduHeader), &forced_return, sizeof(forced_return));
 
-    UT_Stub_SetReturnValue(CF_CFDP_ConstructPduHeader, forced_return);
+    UT_Stub_SetReturnValue(UT_KEY(CF_CFDP_ConstructPduHeader), forced_return);
 }
 
 pdu_header_t *CF_CFDP_ConstructPduHeader(const transaction_t *t, uint8 directive_code, cf_entity_id_t src_eid, cf_entity_id_t dst_eid, uint8 towards_sender, cf_transaction_seq_t tsn, int silent)
@@ -401,7 +421,8 @@ cfdp_send_ret_t CF_CFDP_SendMd(transaction_t *t)
 *************************************************************************/
 pdu_header_t *CF_CFDP_EarlySendFd(transaction_t *t)
 {
-  unimplemented(__FUNCTION__, __FILE__, __LINE__);
+    UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
+    exit(-86);
 }
 
 /************************************************************************/
@@ -444,10 +465,12 @@ cfdp_send_ret_t CF_CFDP_SendFd(transaction_t *t, uint32 offset, int len)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_FinishEofAck(pdu_header_t *pdu)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_CFDP_FinishEofAck(pdu_header_t *pdu)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Build a eof PDU for transmit.
@@ -577,7 +600,8 @@ cfdp_send_ret_t CF_CFDP_SendNak(transaction_t *t, int num_segment_requests)
 *************************************************************************/
 pdu_header_t *CF_CFDP_EarlySendNak(transaction_t *t)
 {
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
+    UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
+    exit(-86);
 }
 
 /************************************************************************/
@@ -596,10 +620,12 @@ pdu_header_t *CF_CFDP_EarlySendNak(transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_RecvPh(int chan_num)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_CFDP_RecvPh(int chan_num)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Unpack a metadata PDU from a received message.
@@ -733,10 +759,10 @@ int CF_CFDP_RecvNak(int *num_segment_requests)
 **       t must not be NULL. There must be a received message.
 **
 *************************************************************************/
-static void CF_CFDP_RecvDrop(transaction_t *t)
-{
-    ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.dropped;
-}
+// static void CF_CFDP_RecvDrop(transaction_t *t)
+// {
+//     ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.dropped;
+// }
 
 /************************************************************************/
 /** \brief Receive state function to process new rx transaction.
@@ -752,10 +778,12 @@ static void CF_CFDP_RecvDrop(transaction_t *t)
 **       t must not be NULL. There must be a received message.
 **
 *************************************************************************/
-static void CF_CFDP_RecvIdle(transaction_t *t)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_RecvIdle(transaction_t *t)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Initialization function for the cfdp engine
@@ -774,7 +802,7 @@ static void CF_CFDP_RecvIdle(transaction_t *t)
 *************************************************************************/
 int32 CF_CFDP_InitEngine(void)
 {
-    UT_DEFAULT_IMPL(CF_CFDP_InitEngine);
+    return UT_DEFAULT_IMPL(CF_CFDP_InitEngine);
 }
 
 /************************************************************************/
@@ -784,10 +812,12 @@ int32 CF_CFDP_InitEngine(void)
 **       c must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_ReceiveMessage(channel_t *c)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_ReceiveMessage(channel_t *c)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief List traversal function that cycles the first active tx.
@@ -806,10 +836,12 @@ static void CF_CFDP_ReceiveMessage(channel_t *c)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_CycleTx_(clist_node node, void *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_CFDP_CycleTx_(clist_node node, void *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Cycle the current active tx or make a new one active.
@@ -829,10 +861,12 @@ static int CF_CFDP_CycleTx_(clist_node node, void *context)
 **  \endreturns
 **
 *************************************************************************/
-static void CF_CFDP_CycleTx(channel_t *c)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_CycleTx(channel_t *c)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief List traversal function that calls a r or s tick function.
@@ -846,10 +880,12 @@ static void CF_CFDP_CycleTx(channel_t *c)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_DoTick(clist_node node, void *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_CFDP_DoTick(clist_node node, void *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Call R and then S tick functions for all active transactions.
@@ -867,10 +903,12 @@ static int CF_CFDP_DoTick(clist_node node, void *context)
 **  \endreturns
 **
 *************************************************************************/
-static void CF_CFDP_TickTransactions(channel_t *c)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_TickTransactions(channel_t *c)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Helper function to set tx file state in a transaction.
@@ -879,10 +917,12 @@ static void CF_CFDP_TickTransactions(channel_t *c)
 **       t must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_TxFile__(transaction_t *t, cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_TxFile__(transaction_t *t, cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Helper function to set tx fiel state in a transaction.
@@ -900,10 +940,12 @@ static void CF_CFDP_TxFile__(transaction_t *t, cfdp_class_t cfdp_class, uint8 ke
 **  \endreturns
 **
 *************************************************************************/
-static void CF_CFDP_TxFile_(transaction_t *t, cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority, cf_entity_id_t dest_id)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_TxFile_(transaction_t *t, cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority, cf_entity_id_t dest_id)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Begin transmit of a file.
@@ -957,10 +999,12 @@ int32 CF_CFDP_TxFile(const char src_filename[CF_FILENAME_MAX_LEN], const char ds
 **  \endreturns
 **
 *************************************************************************/
-static int32 CF_CFDP_PlaybackDir_(playback_t *p, const char src_filename[CF_FILENAME_MAX_LEN], const char dst_filename[CF_FILENAME_MAX_LEN], cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority, cf_entity_id_t dest_id)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int32 CF_CFDP_PlaybackDir_(playback_t *p, const char src_filename[CF_FILENAME_MAX_LEN], const char dst_filename[CF_FILENAME_MAX_LEN], cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority, cf_entity_id_t dest_id)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Begin transmit of a directory.
@@ -1015,10 +1059,12 @@ int32 CF_CFDP_PlaybackDir(const char src_filename[CF_FILENAME_MAX_LEN], const ch
 **  \endreturns
 **
 *************************************************************************/
-static void CF_CFDP_ProcessPlaybackDirectory(channel_t *c, playback_t *p)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_ProcessPlaybackDirectory(channel_t *c, playback_t *p)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Update the playback or polling counter for channel HK
@@ -1028,10 +1074,12 @@ static void CF_CFDP_ProcessPlaybackDirectory(channel_t *c, playback_t *p)
 **       must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_UpdatePollPbCounted(int chan_index, playback_t *pb, int up, uint8 *counter)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_UpdatePollPbCounted(int chan_index, playback_t *pb, int up, uint8 *counter)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Call CF_CFDP_ProcessPlaybackDirectory on all commanded playbacks.
@@ -1044,10 +1092,12 @@ static void CF_CFDP_UpdatePollPbCounted(int chan_index, playback_t *pb, int up, 
 **       c must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_ProcessPlaybackDirectories(channel_t *c)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_ProcessPlaybackDirectories(channel_t *c)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Kick the dir playback if timer elapsed.
@@ -1060,10 +1110,12 @@ static void CF_CFDP_ProcessPlaybackDirectories(channel_t *c)
 **       c must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_ProcessPollingDirectories(channel_t *c)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static void CF_CFDP_ProcessPollingDirectories(channel_t *c)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Cycle the engine. Called once per wakeup.
@@ -1108,7 +1160,8 @@ void CF_CFDP_ResetTransaction(transaction_t *t, int keep_history)
 *************************************************************************/
 int CF_CFDP_CopyDataToLv(lv_t *dest_lv, const uint8 *data, uint32 len)
 {
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
+    UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
+    exit(-86);
 }
 
 /************************************************************************/
@@ -1125,7 +1178,8 @@ int CF_CFDP_CopyDataToLv(lv_t *dest_lv, const uint8 *data, uint32 len)
 *************************************************************************/
 int CF_CFDP_CopyDataFromLv(uint8 buf[CF_FILENAME_MAX_LEN], const lv_t *src_lv)
 {
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
+    UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
+    exit(-86);
 }
 
 /************************************************************************/
@@ -1152,10 +1206,12 @@ void CF_CFDP_CancelTransaction(transaction_t *t)
 **  \retcode Always 0 indicate list traversal should not exit early. \endcode
 **  \endreturns
 *************************************************************************/
-static int CF_CFDP_CloseFiles(clist_node n, void *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_CFDP_CloseFiles(clist_node n, void *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Disables the cfdp engine and resets all state in it.

@@ -72,6 +72,8 @@ void *CSLO_memset(void *__s, int __c, size_t __n)
   UT_Stub_CopyFromLocal(UT_KEY(CSLO_memset), &__n, sizeof(__n));
 
   UT_DEFAULT_IMPL(CSLO_memset);
+
+  return __s;
 }
 
 /* end cf standard lib overrides */
@@ -86,7 +88,7 @@ void cf_cfdp_helpers_tests_Setup(void)
 {
     cf_tests_Setup();
 
-    memset_context.__s = ut_default_ptr;
+    memset_context.__s = NULL;
     memset_context.__c = UT_INT_32_DEFAULT;
     memset_context.__n = UT_INT_32_DEFAULT;
 
@@ -229,16 +231,16 @@ void Test_CF_GetMemcpySize_WhenGiven_num_ElementsAre_0_FromGiven_size_UntilAnoth
 
 void Test_CF_MemcpyToBE_Asserts_src_size_EqTo_0(void)
 {
-    /* Arrange */
-    uint8 *     arg_dst;
-    uint8 *     arg_src;
-    int         arg_src_size = 0;
-    int         arg_dst_size = Any_int_Positive();
+    // /* Arrange */
+    // uint8 *     arg_dst;
+    // uint8 *     arg_src;
+    // int         arg_src_size = 0;
+    // int         arg_dst_size = Any_int_Positive();
 
-    /* Act */
-    //CF_MemcpyToBE(arg_dst, arg_src, arg_src_size, arg_dst_size);
+    // /* Act */
+    // CF_MemcpyToBE(arg_dst, arg_src, arg_src_size, arg_dst_size);
 
-    /* Assert */
+    // /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - (src_size>0)&&(dst_size>0)");
 } /* end Test_CF_MemcpyToBE_Asserts_src_size_EqTo_0 */
 
@@ -260,16 +262,16 @@ void Test_CF_MemcpyToBE_Asserts_src_size_EqTo_0(void)
 
 void Test_CF_MemcpyToBE_Asserts_dst_size_EqTo_0(void)
 {
-    /* Arrange */
-    uint8 *     arg_dst;
-    uint8 *     arg_src;
-    int         arg_src_size = Any_int_Positive();
-    int         arg_dst_size = 0;
+    // /* Arrange */
+    // uint8 *     arg_dst;
+    // uint8 *     arg_src;
+    // int         arg_src_size = Any_int_Positive();
+    // int         arg_dst_size = 0;
 
-    /* Act */
-    //CF_MemcpyToBE(arg_dst, arg_src, arg_src_size, arg_dst_size);
+    // /* Act */
+    // CF_MemcpyToBE(arg_dst, arg_src, arg_src_size, arg_dst_size);
 
-    /* Assert */
+    // /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - (src_size>0)&&(dst_size>0)");
 } /* end Test_CF_MemcpyToBE_Asserts_dst_size_EqTo_0 */
 
@@ -291,16 +293,16 @@ void Test_CF_MemcpyToBE_Asserts_dst_size_EqTo_0(void)
 
 void Test_CF_MemcpyToBE_Asserts_both_src_size_And_dst_size_Are_0(void)
 {
-    /* Arrange */
-    uint8 *     arg_dst;
-    uint8 *     arg_src;
-    int         arg_src_size = 0;
-    int         arg_dst_size = 0;
+    // /* Arrange */
+    // uint8 *     arg_dst;
+    // uint8 *     arg_src;
+    // int         arg_src_size = 0;
+    // int         arg_dst_size = 0;
 
-    /* Act */
-    //CF_MemcpyToBE(arg_dst, arg_src, arg_src_size, arg_dst_size);
+    // /* Act */
+    // CF_MemcpyToBE(arg_dst, arg_src, arg_src_size, arg_dst_size);
 
-    /* Assert */
+    // /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - src_size>=dst_size");
 } /* end Test_CF_MemcpyToBE_Asserts_both_src_size_And_dst_size_Are_0 */
 
@@ -447,16 +449,16 @@ void Test_CF_MemcpyToBE_CopyAllRequisite_src_ValuesInto_dst_When_dst_size_IsEqTo
 
 void Test_CF_MemcpyFromBE_Asserts_src_size_EqTo_0(void)
 {
-    /* Arrange */
-    uint8 *     arg_dst;
-    uint8 *     arg_src;
-    int         arg_src_size = 0;
-    int         arg_dst_size = Any_int_Positive();
+    // /* Arrange */
+    // uint8 *     arg_dst;
+    // uint8 *     arg_src;
+    // int         arg_src_size = 0;
+    // int         arg_dst_size = Any_int_Positive();
 
-    /* Act */
-    //CF_MemcpyFromBE(arg_dst, arg_src, arg_src_size, arg_dst_size);
+    // /* Act */
+    // CF_MemcpyFromBE(arg_dst, arg_src, arg_src_size, arg_dst_size);
 
-    /* Assert */
+    // /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - (src_size>0)&&(dst_size>0)");
 } /* end Test_CF_MemcpyFromBE_Asserts_src_size_EqTo_0 */
 
@@ -479,15 +481,15 @@ void Test_CF_MemcpyFromBE_Asserts_src_size_EqTo_0(void)
 void Test_CF_MemcpyFromBE_Asserts_dst_size_EqTo_0(void)
 {
     /* Arrange */
-    uint8 *     arg_dst;
-    uint8 *     arg_src;
-    int         arg_src_size = Any_int_Positive();
-    int         arg_dst_size = 0;
+    // uint8 *     arg_dst;
+    // uint8 *     arg_src;
+    // int         arg_src_size = Any_int_Positive();
+    // int         arg_dst_size = 0;
 
-    /* Act */
-    //CF_MemcpyFromBE(arg_dst, arg_src, arg_src_size, arg_dst_size);
+    // /* Act */
+    // CF_MemcpyFromBE(arg_dst, arg_src, arg_src_size, arg_dst_size);
 
-    /* Assert */
+    // /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - (src_size>0)&&(dst_size>0)");
 } /* end Test_CF_MemcpyFromBE_Asserts_dst_size_EqTo_0 */
 
@@ -509,16 +511,16 @@ void Test_CF_MemcpyFromBE_Asserts_dst_size_EqTo_0(void)
 
 void Test_CF_MemcpyToBE_Asserts_dst_size_IsLessThan_src_size(void)
 {
-    /* Arrange */
-    uint8 *     arg_dst;
-    uint8 *     arg_src;
-    int         arg_dst_size = Any_int_ZeroOrPositiveLessThan(INT32_MAX - 2) + 1; /* -2 then +1 for 1 to INT32_MAX - 1 */
-    int         arg_src_size = arg_dst_size + 1; /* TODO change to any int greater than? DNE at time of writing */
+    // /* Arrange */
+    // uint8 *     arg_dst;
+    // uint8 *     arg_src;
+    // int         arg_dst_size = Any_int_ZeroOrPositiveLessThan(INT32_MAX - 2) + 1; /* -2 then +1 for 1 to INT32_MAX - 1 */
+    // int         arg_src_size = arg_dst_size + 1; /* TODO change to any int greater than? DNE at time of writing */
 
-    /* Act */
-    //CF_MemcpyFromBE(arg_dst, arg_src, arg_src_size, arg_dst_size);
+    // /* Act */
+    // CF_MemcpyFromBE(arg_dst, arg_src, arg_src_size, arg_dst_size);
 
-    /* Assert */
+    // /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - dst_size>=src_size");
 } /* end Test_CF_MemcpyToBE_Asserts_dst_size_IsLessThan_src_size */
 
@@ -678,7 +680,7 @@ void Test_CF_GetTSNSize_When_ret_Is_1_LessThan_size_of_cf_transaction_seq_t_Add_
 
     /* Assert */
     UtAssert_True(local_result == expected_result,
-      "CF_GetTSNSize returned %d and should be %d (sizeof(cf_transaction_seq_t))",
+      "CF_GetTSNSize returned %d and should be %ld (sizeof(cf_transaction_seq_t))",
       local_result, sizeof(cf_transaction_seq_t));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 } /* end Test_CF_GetTSNSize_When_ret_Is_1_LessThan_size_of_cf_transaction_seq_t_Add_1_MakingItEqToThatSizeReturnThatValue */
@@ -698,7 +700,7 @@ void Test_CF_GetTSNSize_When_ret_Is_LessThan_size_of_cf_transaction_seq_t_Add_1_
     local_result = CF_GetTSNSize(arg_ph);
 
     /* Assert */
-    UtAssert_True(local_result == forced_return_FGV + 1,
+    UtAssert_True(local_result == expected_result,
       "CF_GetTSNSize returned %d and should be 1 more than %d (FGV)",
       local_result, forced_return_FGV);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
@@ -748,7 +750,7 @@ void Test_CF_GetEIDSize_When_ret_Is_1_LessThan_size_of_cf_entity_id_t_Add_1_Maki
 
     /* Assert */
     UtAssert_True(local_result == expected_result,
-      "CF_GetEIDSize returned %d and should be %d (sizeof(cf_entity_id_t))",
+      "CF_GetEIDSize returned %d and should be %ld (sizeof(cf_entity_id_t))",
       local_result, sizeof(cf_entity_id_t));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 } /* end Test_CF_GetEIDSize_When_ret_Is_1_LessThan_size_of_cf_entity_id_t_Add_1_MakingItEqToThatSizeReturnThatValue */
@@ -768,7 +770,7 @@ void Test_CF_GetEIDSize_When_ret_Is_LessThan_size_of_cf_entity_id_t_Add_1_AndRet
     local_result = CF_GetEIDSize(arg_ph);
 
     /* Assert */
-    UtAssert_True(local_result == forced_return_FGV + 1,
+    UtAssert_True(local_result == expected_result,
       "CF_GetEIDSize returned %d and should be 1 more than %d (FGV)",
       local_result, forced_return_FGV);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
@@ -788,7 +790,7 @@ void Test_CF_GetVariableHeader_When_eid_l_AND_tsn_l_AreNotGreaterThan_0_DoesNotC
     pdu_r_msg_t     dummy_ph;
     int             local_result;
 
-    CF_AppData.engine.in.msg = &dummy_ph;
+    CF_AppData.engine.in.msg = (CFE_SB_Buffer_t*)&dummy_ph;
 
     /* Arrange for CF_GetEIDSize */
     uint32           forced_return_FGV_from_EID = sizeof(cf_entity_id_t); /* unstubbable code adds +1 to this value */
@@ -817,7 +819,7 @@ void Test_CF_GetVariableHeader_WhenOnly_eid_l_IsGreaterThan_0_DoesNotCallAnyMemC
     pdu_r_msg_t     dummy_ph;
     int             local_result;
 
-    CF_AppData.engine.in.msg = &dummy_ph;
+    CF_AppData.engine.in.msg = (CFE_SB_Buffer_t*)&dummy_ph;
 
     /* Arrange for CF_GetEIDSize */
     uint32           forced_return_FGV_from_EID = sizeof(cf_entity_id_t) - 1; /* unstubbable code adds +1 to this value */
@@ -846,7 +848,7 @@ void Test_CF_GetVariableHeader_WhenOnly_tsn_l_IsGreaterThan_0_DoesNotCallAnyMemC
     pdu_r_msg_t     dummy_ph;
     int             local_result;
 
-    CF_AppData.engine.in.msg = &dummy_ph;
+    CF_AppData.engine.in.msg = (CFE_SB_Buffer_t*)&dummy_ph;
 
     /* Arrange for CF_GetEIDSize */
     uint32           forced_return_FGV_from_EID = sizeof(cf_entity_id_t); /* unstubbable code adds +1 to this value */
@@ -875,7 +877,7 @@ void Test_CF_GetVariableHeader_GetsAllThreeVariableLengthItemsOutOfHeaderAndRetu
     pdu_r_msg_t     dummy_ph;
     int             local_result;
 
-    CF_AppData.engine.in.msg = &dummy_ph;
+    CF_AppData.engine.in.msg = (CFE_SB_Buffer_t*)&dummy_ph;
 
     /* Arrange for CF_GetEIDSize */
     uint32           forced_return_FGV_from_EID = Any_uint32_LessThan(sizeof(cf_entity_id_t)); /* unstubbable code adds +1 to this value */
@@ -909,12 +911,12 @@ void Test_CF_GetVariableHeader_GetsAllThreeVariableLengthItemsOutOfHeaderAndRetu
 void Test_CF_SetVariableHeader_Call_FSV_Twice(void)
 {
     /* Arrange */
-    cf_entity_id_t          arg_src_eid;
-    cf_entity_id_t          arg_dst_eid;
-    cf_transaction_seq_t    arg_tsn;
+    cf_entity_id_t          arg_src_eid = 1;
+    cf_entity_id_t          arg_dst_eid = 1;
+    cf_transaction_seq_t    arg_tsn = 1;
     pdu_s_msg_t             dummy_msg;
 
-    CF_AppData.engine.out.msg = &dummy_msg;
+    CF_AppData.engine.out.msg = (CFE_SB_Buffer_t*)&dummy_msg;
 
     /* Act */
     CF_SetVariableHeader(arg_src_eid, arg_dst_eid, arg_tsn);
@@ -933,18 +935,18 @@ void Test_CF_SetVariableHeader_Call_FSV_Twice(void)
 
 void Test_CF_HeaderSize_AssertsWhen_eid_l_IsNotGreaterThan_0(void)
 {
-    /* Arrange */
-    pdu_header_t      dummy_ph;
-    pdu_header_t*     arg_ph = &dummy_ph;
-    int32             forced_return_FGV_for_eid_l = Any_int32_Negative(); /* negative forces error */
-    int32             forced_return_FGV_for_tsn_l = Any_uint8(); /* uint8 used arbitrarily for small size */
-    int               local_result;
+    // /* Arrange */
+    // pdu_header_t      dummy_ph;
+    // pdu_header_t*     arg_ph = &dummy_ph;
+    // int32             forced_return_FGV_for_eid_l = Any_int32_Negative(); /* negative forces error */
+    // int32             forced_return_FGV_for_tsn_l = Any_uint8(); /* uint8 used arbitrarily for small size */
+    // int               local_result;
     
-    UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_for_eid_l);
-    UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_for_tsn_l);
+    // UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_for_eid_l);
+    // UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_for_tsn_l);
 
-    /* Act */
-    //local_result = CF_HeaderSize(arg_ph);
+    // /* Act */
+    // local_result = CF_HeaderSize(arg_ph);
 
     /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - (eid_l>0)&&(tsn_l>0)");
@@ -952,18 +954,18 @@ void Test_CF_HeaderSize_AssertsWhen_eid_l_IsNotGreaterThan_0(void)
 
 void Test_CF_HeaderSize_AssertsWhen_tsn_l_IsNotGreaterThan_0(void)
 {
-    /* Arrange */
-    pdu_header_t      dummy_ph;
-    pdu_header_t*     arg_ph = &dummy_ph;
-    int32             forced_return_FGV_for_eid_l = Any_uint8(); /* uint8 used arbitrarily for small size */
-    int32             forced_return_FGV_for_tsn_l = Any_int32_Negative(); /* negative forces error */
-    int               local_result;
+    // /* Arrange */
+    // pdu_header_t      dummy_ph;
+    // pdu_header_t*     arg_ph = &dummy_ph;
+    // int32             forced_return_FGV_for_eid_l = Any_uint8(); /* uint8 used arbitrarily for small size */
+    // int32             forced_return_FGV_for_tsn_l = Any_int32_Negative(); /* negative forces error */
+    // int               local_result;
     
-    UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_for_eid_l);
-    UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_for_tsn_l);
+    // UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_for_eid_l);
+    // UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_for_tsn_l);
 
-    /* Act */
-    //local_result = CF_HeaderSize(arg_ph);
+    // /* Act */
+    // local_result = CF_HeaderSize(arg_ph);
 
     /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - (eid_l>0)&&(tsn_l>0)");
@@ -1018,9 +1020,7 @@ void Test_CF_EndOfHeaderPtr_Return_ph_PointerPlus_CF_HeaderSize_ph(void)
     local_result = CF_EndOfHeaderPtr(arg_ph);
 
     /* Assert */
-    UtAssert_True(local_result == expected_result,
-      "CF_GetVariableHeader returned %p and should be %p ((void*)(((uint8*)ph)+CF_HeaderSize(ph)))",
-      local_result, expected_result);
+    UtAssert_ADDRESS_EQ(local_result, expected_result);
     /* Assert for CF_HeaderSize */
     UtAssert_STUB_COUNT(FGV, 2);
 } /* end Test_CF_EndOfHeaderPtr_Return_ph_PointerPlus_CF_HeaderSize_ph */
