@@ -1,29 +1,29 @@
 /************************************************************************
 ** File: cf_platform_cfg.h
 **
-** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF) 
+** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
 ** Application version 3.0.0”
-** Copyright © 2019 United States Government as represented by the 
-** Administrator of the National Aeronautics and Space Administration. 
+** Copyright © 2019 United States Government as represented by the
+** Administrator of the National Aeronautics and Space Administration.
 ** All Rights Reserved.
-** Licensed under the Apache License, Version 2.0 (the "License"); you may 
-** not use this file except in compliance with the License. You may obtain 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may
+** not use this file except in compliance with the License. You may obtain
 ** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 **
-** Unless required by applicable law or agreed to in writing, software 
-** distributed under the License is distributed on an "AS IS" BASIS, 
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-** See the License for the specific language governing permissions and 
+** Unless required by applicable law or agreed to in writing, software
+** distributed under the License is distributed on an "AS IS" BASIS,
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+** See the License for the specific language governing permissions and
 ** limitations under the License.
-** 
+**
 **
 ** Purpose:
 **  CF application platform configuration.
 **
 **   These options are used to configure application behavior.
 **
-** 
-** 
+**
+**
 *************************************************************************/
 #ifndef _CF_PLATFORM_CFG_H_
 #define _CF_PLATFORM_CFG_H_
@@ -71,17 +71,17 @@ typedef uint32 cf_transaction_seq_t;
 #undef CF_SW_ALIGNMENT
 
 /**
-**  \cfcfg Application Pipe Depth 
+**  \cfcfg Application Pipe Depth
 **
 **  \par Description:
 **       Dictates the pipe depth of the cf command pipe.
 **
 **  \par Limits:
 **		 The minimum size of this paramater is 1
-**       The maximum size dictated by cFE platform configuration 
+**       The maximum size dictated by cFE platform configuration
 **		 parameter is CFE_SB_MAX_PIPE_DEPTH
 */
-#define CF_PIPE_DEPTH                                               32
+#define CF_PIPE_DEPTH 32
 
 /**
 **  \cfcfg Number of channels
@@ -93,7 +93,7 @@ typedef uint32 cf_transaction_seq_t;
 **  \par Limits:
 **       Must be less <= 200. Obviously it will be smaller than that.
 */
-#define CF_NUM_CHANNELS                                             2
+#define CF_NUM_CHANNELS 2
 
 /**
 **  \cfcfg Max NAK segments supported in a NAK pdu
@@ -106,7 +106,7 @@ typedef uint32 cf_transaction_seq_t;
 **  \par Limits:
 **
 */
-#define CF_NAK_MAX_SEGMENTS                                         58 /* max number of NAK segments CF supports (leave room for overhead */
+#define CF_NAK_MAX_SEGMENTS 58 /* max number of NAK segments CF supports (leave room for overhead */
 
 /* CHUNKS -
  * A chunk is a representatino of a range range (offset, size) of data received by a receiver.
@@ -115,7 +115,7 @@ typedef uint32 cf_transaction_seq_t;
  * the NAK. The sender must also keep track of NAK requests and send new file data PDUs as a result.
  * (array size must be CF_NUM_CHANNELS)
  * CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION is an array for each channel indicating the number of chunks per transaction
- * CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION is an array for each channel indciate the number of chunks to keep track of 
+ * CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION is an array for each channel indciate the number of chunks to keep track of
  *   NAK requests from the receiver per transaction*/
 /**
 **  \cfcfg RX chunks per transaction (per channel)
@@ -126,7 +126,10 @@ typedef uint32 cf_transaction_seq_t;
 **  \par Limits:
 **
 */
-#define CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION                    {CF_NAK_MAX_SEGMENTS, CF_NAK_MAX_SEGMENTS}
+#define CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION \
+    {                                            \
+        CF_NAK_MAX_SEGMENTS, CF_NAK_MAX_SEGMENTS \
+    }
 
 /**
 **  \cfcfg TX chunks per transaction (per channel)
@@ -137,7 +140,10 @@ typedef uint32 cf_transaction_seq_t;
 **  \par Limits:
 **
 */
-#define CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION                    {CF_NAK_MAX_SEGMENTS, CF_NAK_MAX_SEGMENTS}
+#define CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION \
+    {                                            \
+        CF_NAK_MAX_SEGMENTS, CF_NAK_MAX_SEGMENTS \
+    }
 
 /**
 **  \cfcfg Total number of chunks (tx, rx, all channels)
@@ -151,7 +157,7 @@ typedef uint32 cf_transaction_seq_t;
 */
 /* CF_TOTAL_CHUNKS must be equal to the total number of chunks per rx/tx transactions per channel */
 /* (in other words, the summation of all elements in CF_CHANNEL_NUM_R/TX_CHUNKS_PER_TRANSACTION */
-#define CF_TOTAL_CHUNKS                                             (CF_NAK_MAX_SEGMENTS*4)
+#define CF_TOTAL_CHUNKS (CF_NAK_MAX_SEGMENTS * 4)
 
 /* definitions that affect file queuing */
 /**
@@ -163,7 +169,7 @@ typedef uint32 cf_transaction_seq_t;
 **  \par Limits:
 **
 */
-#define CF_MAX_COMMANDED_PLAYBACK_FILES_PER_CHAN                    10
+#define CF_MAX_COMMANDED_PLAYBACK_FILES_PER_CHAN 10
 
 /**
 **  \cfcfg Max number of simultaneous file receives.
@@ -174,7 +180,7 @@ typedef uint32 cf_transaction_seq_t;
 **  \par Limits:
 **
 */
-#define CF_MAX_SIMULTANEOUS_RX                                      5
+#define CF_MAX_SIMULTANEOUS_RX 5
 
 /* definitions that affect execution */
 
@@ -187,7 +193,7 @@ typedef uint32 cf_transaction_seq_t;
 **  \par Limits:
 **
 */
-#define CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN              2
+#define CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN 2
 
 /**
 **  \cfcfg Max number of polling directories per channel.
@@ -199,7 +205,7 @@ typedef uint32 cf_transaction_seq_t;
 **  \par Limits:
 **
 */
-#define CF_MAX_POLLING_DIR_PER_CHAN                                 5
+#define CF_MAX_POLLING_DIR_PER_CHAN 5
 
 /**
 **  \cfcfg Number of transactions per playback directoriy.
@@ -211,7 +217,7 @@ typedef uint32 cf_transaction_seq_t;
 **  \par Limits:
 **
 */
-#define CF_NUM_TRANSACTIONS_PER_PLAYBACK                            5
+#define CF_NUM_TRANSACTIONS_PER_PLAYBACK 5
 
 /**
 **  \cfcfg Number of histories per channel
@@ -222,7 +228,7 @@ typedef uint32 cf_transaction_seq_t;
 **  \par Limits:
 **       65536 is the current max.
 */
-#define CF_NUM_HISTORIES_PER_CHANNEL                                256
+#define CF_NUM_HISTORIES_PER_CHANNEL 256
 
 /**
 **  \cfcfg Max PDU size.
@@ -238,19 +244,19 @@ typedef uint32 cf_transaction_seq_t;
 **
 */
 /* CF_MAX_PDU_SIZE must be the max possible PDU for any channel. Channels can be configured with a smaller max. */
-#define CF_MAX_PDU_SIZE                                             512
+#define CF_MAX_PDU_SIZE 512
 
 /**
-**  \cfcfg Name of the CF Configuration Table 
+**  \cfcfg Name of the CF Configuration Table
 **
 **  \par Description:
-**       This parameter defines the name of the CF Configuration Table. 
+**       This parameter defines the name of the CF Configuration Table.
 **
 **  \par Limits
-**       The length of this string, including the NULL terminator cannot exceed 
+**       The length of this string, including the NULL terminator cannot exceed
 **       the #OS_MAX_PATH_LEN value.
 */
-#define CF_CONFIG_TABLE_NAME                                        "config_table"
+#define CF_CONFIG_TABLE_NAME "config_table"
 
 /**
 **  \cfcfg CF Configuration Table Filename
@@ -259,10 +265,10 @@ typedef uint32 cf_transaction_seq_t;
 **       The value of this constant defines the filename of the CF Config Table
 **
 **  \par Limits
-**       The length of this string, including the NULL terminator cannot exceed 
+**       The length of this string, including the NULL terminator cannot exceed
 **       the #OS_MAX_PATH_LEN value.
 */
-#define CF_CONFIG_TABLE_FILENAME                                    "/cf/cf_def_config.tbl"
+#define CF_CONFIG_TABLE_FILENAME "/cf/cf_def_config.tbl"
 
 /**
 **  \cfcfg Maximum file name length.
@@ -270,7 +276,7 @@ typedef uint32 cf_transaction_seq_t;
 **  \par Limits:
 **
 */
-#define CF_FILENAME_MAX_NAME                                        OS_MAX_FILE_NAME
+#define CF_FILENAME_MAX_NAME OS_MAX_FILE_NAME
 
 /**
 **  \cfcfg Maximum file path (not including file name)
@@ -278,7 +284,7 @@ typedef uint32 cf_transaction_seq_t;
 **  \par Limits:
 **
 */
-#define CF_FILENAME_MAX_PATH                                        (OS_MAX_PATH_LEN-OS_MAX_FILE_NAME)
+#define CF_FILENAME_MAX_PATH (OS_MAX_PATH_LEN - OS_MAX_FILE_NAME)
 
 /**
 **  \cfcfg Max filename and path length.
@@ -286,7 +292,7 @@ typedef uint32 cf_transaction_seq_t;
 **  \par Limits:
 **
 */
-#define CF_FILENAME_MAX_LEN                                         (CF_FILENAME_MAX_NAME+CF_FILENAME_MAX_PATH)
+#define CF_FILENAME_MAX_LEN (CF_FILENAME_MAX_NAME + CF_FILENAME_MAX_PATH)
 
 /**
 **  \cfcfg R2 crc calc chunk size
@@ -300,7 +306,7 @@ typedef uint32 cf_transaction_seq_t;
 **  \par Limits:
 **
 */
-#define CF_R2_CRC_CHUNK_SIZE                                        1024
+#define CF_R2_CRC_CHUNK_SIZE 1024
 
 #if CF_FILENAME_MAX_LEN > OS_MAX_PATH_LEN
 #error CF_FILENAME_MAX_LEN must be <= OS_MAX_PATH_LEN
@@ -312,7 +318,6 @@ typedef uint32 cf_transaction_seq_t;
 **  \par Limits:
 **
 */
-#define CF_RCVMSG_TIMEOUT                                           100
+#define CF_RCVMSG_TIMEOUT 100
 
 #endif /* !_CF_PLATFORM_CFG_H_ */
-

@@ -5,8 +5,8 @@
 ** %LICENSE_STOP
 **
 ** Purpose:
-**  Stubs to facilitate unit testing based upon the cf_cfdp_pdu.h file to 
-**  create these stubs because the definitions for the methods in 
+**  Stubs to facilitate unit testing based upon the cf_cfdp_pdu.h file to
+**  create these stubs because the definitions for the methods in
 **  cf_cfdp_helpers.c are in there not in cf_cfdp_helpers.h.
 **
 ** Revision 1.0 2020/05/01 sseeger
@@ -34,14 +34,15 @@
  * Generated stub function for CF_EndOfHeaderPtr()
  * ----------------------------------------------------
  */
-void *CF_EndOfHeaderPtr(const pdu_header_t *ph) {
-  UT_GenStub_SetupReturnBuffer(CF_EndOfHeaderPtr, void *);
+void *CF_EndOfHeaderPtr(const pdu_header_t *ph)
+{
+    UT_GenStub_SetupReturnBuffer(CF_EndOfHeaderPtr, void *);
 
-  UT_GenStub_AddParam(CF_EndOfHeaderPtr, const pdu_header_t *, ph);
+    UT_GenStub_AddParam(CF_EndOfHeaderPtr, const pdu_header_t *, ph);
 
-  UT_GenStub_Execute(CF_EndOfHeaderPtr, Basic, NULL);
+    UT_GenStub_Execute(CF_EndOfHeaderPtr, Basic, NULL);
 
-  return UT_GenStub_GetReturnValue(CF_EndOfHeaderPtr, void *);
+    return UT_GenStub_GetReturnValue(CF_EndOfHeaderPtr, void *);
 }
 
 /*
@@ -49,20 +50,22 @@ void *CF_EndOfHeaderPtr(const pdu_header_t *ph) {
  * Generated stub function for CF_GetMemcpySize()
  * ----------------------------------------------------
  */
-int CF_GetMemcpySize(const uint8_t *num, int size) {
-  int forced_return; /* TODO: CF_GetMemcpySize should be using a full context with num and size, but is only using a forced_return */
-  
-  UT_GenStub_SetupReturnBuffer(CF_GetMemcpySize, int);
+int CF_GetMemcpySize(const uint8_t *num, int size)
+{
+    int forced_return; /* TODO: CF_GetMemcpySize should be using a full context with num and size, but is only using a
+                          forced_return */
 
-  UT_GenStub_AddParam(CF_GetMemcpySize, const uint8_t *, num);
-  UT_GenStub_AddParam(CF_GetMemcpySize, int, size);
+    UT_GenStub_SetupReturnBuffer(CF_GetMemcpySize, int);
 
-  UT_GenStub_Execute(CF_GetMemcpySize, Basic, NULL);
+    UT_GenStub_AddParam(CF_GetMemcpySize, const uint8_t *, num);
+    UT_GenStub_AddParam(CF_GetMemcpySize, int, size);
 
-  UT_Stub_CopyToLocal(UT_KEY(CF_GetMemcpySize), &forced_return, sizeof(forced_return));
-  UT_Stub_SetReturnValue(UT_KEY(CF_GetMemcpySize), forced_return);
+    UT_GenStub_Execute(CF_GetMemcpySize, Basic, NULL);
 
-  return UT_GenStub_GetReturnValue(CF_GetMemcpySize, int);
+    UT_Stub_CopyToLocal(UT_KEY(CF_GetMemcpySize), &forced_return, sizeof(forced_return));
+    UT_Stub_SetReturnValue(UT_KEY(CF_GetMemcpySize), forced_return);
+
+    return UT_GenStub_GetReturnValue(CF_GetMemcpySize, int);
 }
 
 /*
@@ -70,12 +73,13 @@ int CF_GetMemcpySize(const uint8_t *num, int size) {
  * Generated stub function for CF_GetVariableHeader()
  * ----------------------------------------------------
  */
-int CF_GetVariableHeader(void) {
-  UT_GenStub_SetupReturnBuffer(CF_GetVariableHeader, int);
+int CF_GetVariableHeader(void)
+{
+    UT_GenStub_SetupReturnBuffer(CF_GetVariableHeader, int);
 
-  UT_GenStub_Execute(CF_GetVariableHeader, Basic, NULL);
+    UT_GenStub_Execute(CF_GetVariableHeader, Basic, NULL);
 
-  return UT_GenStub_GetReturnValue(CF_GetVariableHeader, int);
+    return UT_GenStub_GetReturnValue(CF_GetVariableHeader, int);
 }
 
 /*
@@ -83,14 +87,15 @@ int CF_GetVariableHeader(void) {
  * Generated stub function for CF_HeaderSize()
  * ----------------------------------------------------
  */
-int CF_HeaderSize(const pdu_header_t *ph) {
-  UT_GenStub_SetupReturnBuffer(CF_HeaderSize, int);
+int CF_HeaderSize(const pdu_header_t *ph)
+{
+    UT_GenStub_SetupReturnBuffer(CF_HeaderSize, int);
 
-  UT_GenStub_AddParam(CF_HeaderSize, const pdu_header_t *, ph);
+    UT_GenStub_AddParam(CF_HeaderSize, const pdu_header_t *, ph);
 
-  UT_GenStub_Execute(CF_HeaderSize, Basic, NULL);
+    UT_GenStub_Execute(CF_HeaderSize, Basic, NULL);
 
-  return UT_GenStub_GetReturnValue(CF_HeaderSize, int);
+    return UT_GenStub_GetReturnValue(CF_HeaderSize, int);
 }
 
 /*
@@ -98,13 +103,14 @@ int CF_HeaderSize(const pdu_header_t *ph) {
  * Generated stub function for CF_MemcpyToBE()
  * ----------------------------------------------------
  */
-void CF_MemcpyToBE(uint8 *dst, const uint8 *src, int src_size, int dst_size) {
-  UT_GenStub_AddParam(CF_MemcpyToBE, uint8 *, dst);
-  UT_GenStub_AddParam(CF_MemcpyToBE, const uint8 *, src);
-  UT_GenStub_AddParam(CF_MemcpyToBE, int, src_size);
-  UT_GenStub_AddParam(CF_MemcpyToBE, int, dst_size);
+void CF_MemcpyToBE(uint8 *dst, const uint8 *src, int src_size, int dst_size)
+{
+    UT_GenStub_AddParam(CF_MemcpyToBE, uint8 *, dst);
+    UT_GenStub_AddParam(CF_MemcpyToBE, const uint8 *, src);
+    UT_GenStub_AddParam(CF_MemcpyToBE, int, src_size);
+    UT_GenStub_AddParam(CF_MemcpyToBE, int, dst_size);
 
-  UT_GenStub_Execute(CF_MemcpyToBE, Basic, NULL);
+    UT_GenStub_Execute(CF_MemcpyToBE, Basic, NULL);
 }
 
 /*
@@ -112,11 +118,11 @@ void CF_MemcpyToBE(uint8 *dst, const uint8 *src, int src_size, int dst_size) {
  * Generated stub function for CF_SetVariableHeader()
  * ----------------------------------------------------
  */
-void CF_SetVariableHeader(cf_entity_id_t src_eid, cf_entity_id_t dst_eid,
-                          cf_transaction_seq_t tsn) {
-  UT_GenStub_AddParam(CF_SetVariableHeader, cf_entity_id_t, src_eid);
-  UT_GenStub_AddParam(CF_SetVariableHeader, cf_entity_id_t, dst_eid);
-  UT_GenStub_AddParam(CF_SetVariableHeader, cf_transaction_seq_t, tsn);
+void CF_SetVariableHeader(cf_entity_id_t src_eid, cf_entity_id_t dst_eid, cf_transaction_seq_t tsn)
+{
+    UT_GenStub_AddParam(CF_SetVariableHeader, cf_entity_id_t, src_eid);
+    UT_GenStub_AddParam(CF_SetVariableHeader, cf_entity_id_t, dst_eid);
+    UT_GenStub_AddParam(CF_SetVariableHeader, cf_transaction_seq_t, tsn);
 
-  UT_GenStub_Execute(CF_SetVariableHeader, Basic, NULL);
+    UT_GenStub_Execute(CF_SetVariableHeader, Basic, NULL);
 }

@@ -7,7 +7,7 @@
 ** Purpose:
 **  The CF Application main application stubs file for unit tests
 **
-**  This file contains the stubs for the functions that initialize the 
+**  This file contains the stubs for the functions that initialize the
 **  application and link all logic and functionality to the CFS.
 **
 ** Revision 1.0 2020/08/04 agibso1
@@ -32,7 +32,7 @@ CF_AppData_t CF_AppData;
 
 /************************************************************************/
 /** \brief Send CF housekeeping packet
-**  
+**
 **  \par Description
 **       The command to send the CF housekeeping packet comes in on
 **       the software bus. This function sends the message.
@@ -43,14 +43,14 @@ CF_AppData_t CF_AppData;
 *************************************************************************/
 // static void CF_HkCmd(void)
 // {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
 //     exit(-86);
 // }
 
 /************************************************************************/
 /** \brief Checks to see if a table update is pending, and perform it.
-**  
+**
 **  \par Description
 **       Updates the table if the engine is disabled.
 **
@@ -60,14 +60,14 @@ CF_AppData_t CF_AppData;
 *************************************************************************/
 // static void CF_CheckTables(void)
 // {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
 //     exit(-86);
 // }
 
 /************************************************************************/
 /** \brief Validation function for config table.
-**  
+**
 **  \par Description
 **       Checks that the config table being loaded has correct data.
 **
@@ -82,14 +82,14 @@ CF_AppData_t CF_AppData;
 *************************************************************************/
 // static int32 CF_ValidateConfigTable(void *tbl_ptr)
 // {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
 //     exit(-86);
 // }
 
 /************************************************************************/
 /** \brief Load the table on application start
-**  
+**
 **  \par Assumptions, External Events, and Notes:
 **       None
 **
@@ -101,14 +101,14 @@ CF_AppData_t CF_AppData;
 *************************************************************************/
 // static int32 CF_TableInit(void)
 // {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
 //     exit(-86);
 // }
 
 /************************************************************************/
 /** \brief CF app init function
-**  
+**
 **  \par Description
 **       Initializes all aspects of the CF application. Messages,
 **       pipes, events, table, and the cfdp engine.
@@ -124,14 +124,14 @@ CF_AppData_t CF_AppData;
 *************************************************************************/
 // static int32 CF_Init(void)
 // {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
 //     exit(-86);
 // }
 
 /************************************************************************/
 /** \brief CF wakeup function
-**  
+**
 **  \par Description
 **       Performs a single engine cycle for each wakeup
 **
@@ -141,14 +141,14 @@ CF_AppData_t CF_AppData;
 *************************************************************************/
 // static void CF_WakeUp(void)
 // {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
 //     exit(-86);
 // }
 
 /************************************************************************/
 /** \brief CF message processing function
-**  
+**
 **  \par Description
 **       Initializes all aspects of the CF application. Messages,
 **       pipes, events, table, and the cfdp engine.
@@ -159,14 +159,14 @@ CF_AppData_t CF_AppData;
 *************************************************************************/
 // static void CF_ProcessMsg(CFE_SB_Buffer_t msg)
 // {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
 //     exit(-86);
 // }
 
 /************************************************************************/
 /** \brief CF app entry point
-**  
+**
 **  \par Description
 **       Main entry point of CF application.
 **       Calls the init function and manages the app run loop.
@@ -177,8 +177,7 @@ CF_AppData_t CF_AppData;
 *************************************************************************/
 // void CF_AppMain(void)
 // {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", 
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
 //     exit(-86);
 // }
-
