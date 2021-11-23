@@ -115,8 +115,8 @@ file_directive_t Any_file_directive_t_Except(file_directive_t exception)
     {
         if (++num_tries > max_tries)
         {
-            UtPrintf("Unable to achieve different random value within %u tries.", max_tries);
-            assert(ERROR_RETRIEVING_ANY_VALUE);
+            UtAssert_Failed("Unable to achieve different random value within %u tries.", max_tries);
+            UtAssert_Abort(__func__);
         }
 
         rand_val = rand() % PDU_INVALID_MAX;
