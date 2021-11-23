@@ -2,6 +2,54 @@
 #include "cf_test_utils.h"
 #include "cf_cmd.c"
 
+/*
+ * In order to properly instantiate buffers to pass to functions that
+ * accept a CFE_SB_Buffer_t, a union must be used to align the
+ * data.
+ */
+
+typedef union
+{
+    cf_cmd_unionargs_t ua;
+    CFE_SB_Buffer_t    buf;
+} CF_UT_cmd_unionargs_buf_t;
+
+typedef union
+{
+    cf_cmd_set_param_args_t sp;
+    CFE_SB_Buffer_t         buf;
+} CF_UT_cmd_set_param_args_buf_t;
+
+typedef union
+{
+    cf_cmd_get_param_args_t gp;
+    CFE_SB_Buffer_t         buf;
+} CF_UT_cmd_get_param_args_buf_t;
+
+typedef union
+{
+    cf_cmd_tx_file_t tf;
+    CFE_SB_Buffer_t  buf;
+} CF_UT_cmd_tx_file_buf_t;
+
+typedef union
+{
+    cf_cmd_playback_dir_t pd;
+    CFE_SB_Buffer_t       buf;
+} CF_UT_cmd_playback_dir_buf_t;
+
+typedef union
+{
+    cf_cmd_transaction_t xact;
+    CFE_SB_Buffer_t      buf;
+} CF_UT_cmd_transaction_buf_t;
+
+typedef union
+{
+    cf_cmd_write_q_t wq;
+    CFE_SB_Buffer_t  buf;
+} CF_UT_cmd_write_q_buf_t;
+
 /* cf_cmd_tests globals */
 extern type_of_context_CF_CList_Traverse_t type_of_context_CF_CList_Traverse;
 
@@ -238,10 +286,13 @@ void Test_CF_CmdNoop_SendNoopEventAndAcceptCommand(void)
 void Test_CF_CmdReset_tests_WhenCommandByteIsEqTo_5_SendEventAndRejectCommand(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
 
-    dummy_msg.data.byte[0] = 5; /* 5 is size of 'names' */
+    memset(&utbuf, 0, sizeof(utbuf));
+
+    dummy_msg->data.byte[0] = 5; /* 5 is size of 'names' */
 
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
 
@@ -267,10 +318,13 @@ void Test_CF_CmdReset_tests_WhenCommandByteIsEqTo_5_SendEventAndRejectCommand(vo
 void Test_CF_CmdReset_tests_WhenCommandByteIsGreaterThan_5_SendEventAndRejectCommand(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
 
-    dummy_msg.data.byte[0] = Any_uint8_GreaterThan(5); /* 5 is size of 'names' */
+    memset(&utbuf, 0, sizeof(utbuf));
+
+    dummy_msg->data.byte[0] = Any_uint8_GreaterThan(5); /* 5 is size of 'names' */
 
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
 
@@ -296,10 +350,13 @@ void Test_CF_CmdReset_tests_WhenCommandByteIsGreaterThan_5_SendEventAndRejectCom
 void Test_CF_CmdReset_tests_WhenCommandByteIs_command_AndResetHkCmdAndErrCountSendEvent(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
 
-    dummy_msg.data.byte[0] = 1; /* 1 is 'cmd' */
+    memset(&utbuf, 0, sizeof(utbuf));
+
+    dummy_msg->data.byte[0] = 1; /* 1 is 'cmd' */
 
     CF_AppData.hk.counters.cmd = Any_uint16_Except(0);
     CF_AppData.hk.counters.err = Any_uint16_Except(0);
@@ -323,11 +380,14 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_command_AndResetHkCmdAndErrCountSe
 void Test_CF_CmdReset_tests_WhenCommandByteIs_fault_ResetAllHkFaultCountSendEventAndAcceptCommand(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
-    int                i       = 0;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    int                       i         = 0;
 
-    dummy_msg.data.byte[0] = 2; /* 2 is 'fault' */
+    memset(&utbuf, 0, sizeof(utbuf));
+
+    dummy_msg->data.byte[0] = 2; /* 2 is 'fault' */
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
@@ -411,11 +471,14 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_fault_ResetAllHkFaultCountSendEven
 void Test_CF_CmdReset_tests_WhenCommandByteIs_up_AndResetAllHkRecvCountSendEventAndAcceptCommand(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
-    int                i       = 0;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    int                       i         = 0;
 
-    dummy_msg.data.byte[0] = 3; /* 3 is 'up' */
+    memset(&utbuf, 0, sizeof(utbuf));
+
+    dummy_msg->data.byte[0] = 3; /* 3 is 'up' */
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
@@ -475,11 +538,14 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_up_AndResetAllHkRecvCountSendEvent
 void Test_CF_CmdReset_tests_SWhenCommandByteIs_down_AndResetAllHkSentCountendEventAcceptCommand(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
-    uint8              i       = 0;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    uint8                     i         = 0;
 
-    dummy_msg.data.byte[0] = 4; /* 4 is 'down' */
+    memset(&utbuf, 0, sizeof(utbuf));
+
+    dummy_msg->data.byte[0] = 4; /* 4 is 'down' */
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
@@ -527,11 +593,14 @@ void Test_CF_CmdReset_tests_SWhenCommandByteIs_down_AndResetAllHkSentCountendEve
 void Test_CF_CmdReset_tests_WhenCommandByteIs_all_AndResetAllMemValuesSendEvent(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
-    int                i       = 0;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    int                       i         = 0;
 
-    dummy_msg.data.byte[0] = 0; /* 0 is 'all' */
+    memset(&utbuf, 0, sizeof(utbuf));
+
+    dummy_msg->data.byte[0] = 0; /* 0 is 'all' */
 
     CF_AppData.hk.counters.cmd = Any_uint16_Except(0);
     CF_AppData.hk.counters.err = Any_uint16_Except(0);
@@ -615,20 +684,23 @@ void Test_CF_CmdTxFile_WhenCallTo_CF_CFDP_TxFile_Returns_0_AcceptCommand(void)
 {
     /* Arrange */
     int32                    dummy_CF_CFDP_TxFile_return = 0;
-    cf_cmd_tx_file_t         dummy_msg;
-    CFE_SB_Buffer_t         *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CF_UT_cmd_tx_file_buf_t  utbuf;
+    cf_cmd_tx_file_t        *dummy_msg = &utbuf.tf;
+    CFE_SB_Buffer_t         *arg_msg   = &utbuf.buf;
     CF_CFDP_TxFile_context_t context_CF_CFDP_TxFile;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_TxFile), dummy_CF_CFDP_TxFile_return);
     UT_SetDataBuffer(UT_KEY(CF_CFDP_TxFile), &context_CF_CFDP_TxFile, sizeof(context_CF_CFDP_TxFile), false);
 
-    memcpy(dummy_msg.src_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    memcpy(dummy_msg.dst_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    dummy_msg.cfdp_class = Any_cfdp_class_t();
-    dummy_msg.keep       = Any_uint8();
-    dummy_msg.chan_num   = Any_uint8();
-    dummy_msg.priority   = Any_uint8();
-    dummy_msg.dest_id    = Any_cf_entity_id_t();
+    memcpy(dummy_msg->src_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
+    memcpy(dummy_msg->dst_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
+    dummy_msg->cfdp_class = Any_cfdp_class_t();
+    dummy_msg->keep       = Any_uint8();
+    dummy_msg->chan_num   = Any_uint8();
+    dummy_msg->priority   = Any_uint8();
+    dummy_msg->dest_id    = Any_cf_entity_id_t();
 
     /* Arrange unstubbable: CF_CmdAcc via CF_CmdCond */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -638,28 +710,28 @@ void Test_CF_CmdTxFile_WhenCallTo_CF_CFDP_TxFile_Returns_0_AcceptCommand(void)
     CF_CmdTxFile(arg_msg);
 
     /* Assert */
-    UtAssert_StrCmp(context_CF_CFDP_TxFile.src_filename, dummy_msg.src_filename,
+    UtAssert_StrCmp(context_CF_CFDP_TxFile.src_filename, dummy_msg->src_filename,
                     "CF_CFDP_TxFile received source_filename %s and should be %s (tx->src_filename)",
-                    context_CF_CFDP_TxFile.src_filename, dummy_msg.src_filename);
-    UtAssert_StrCmp(context_CF_CFDP_TxFile.dst_filename, dummy_msg.dst_filename,
+                    context_CF_CFDP_TxFile.src_filename, dummy_msg->src_filename);
+    UtAssert_StrCmp(context_CF_CFDP_TxFile.dst_filename, dummy_msg->dst_filename,
                     "CF_CFDP_TxFile received source_filename %s and should be %s (tx->dst_filename)",
-                    context_CF_CFDP_TxFile.dst_filename, dummy_msg.dst_filename);
-    UtAssert_True(context_CF_CFDP_TxFile.cfdp_class == dummy_msg.cfdp_class,
+                    context_CF_CFDP_TxFile.dst_filename, dummy_msg->dst_filename);
+    UtAssert_True(context_CF_CFDP_TxFile.cfdp_class == dummy_msg->cfdp_class,
                   "CF_CFDP_TxFile received cfdp_class %u and should be %u (tx->cfdp_class)",
-                  context_CF_CFDP_TxFile.cfdp_class, dummy_msg.cfdp_class);
-    UtAssert_True(context_CF_CFDP_TxFile.keep == dummy_msg.keep,
+                  context_CF_CFDP_TxFile.cfdp_class, dummy_msg->cfdp_class);
+    UtAssert_True(context_CF_CFDP_TxFile.keep == dummy_msg->keep,
                   "CF_CFDP_TxFile received keep %u and should be %u (tx->keep)", context_CF_CFDP_TxFile.keep,
-                  dummy_msg.keep);
+                  dummy_msg->keep);
     /* chan vs. chan_num -> cf_cmd_tx_file_t uses chan_num, CUT uses chan */
-    UtAssert_True(context_CF_CFDP_TxFile.chan == dummy_msg.chan_num,
+    UtAssert_True(context_CF_CFDP_TxFile.chan == dummy_msg->chan_num,
                   "CF_CFDP_TxFile received chan %u and should be %u (tx->chan_num)", context_CF_CFDP_TxFile.chan,
-                  dummy_msg.chan_num);
-    UtAssert_True(context_CF_CFDP_TxFile.priority == dummy_msg.priority,
+                  dummy_msg->chan_num);
+    UtAssert_True(context_CF_CFDP_TxFile.priority == dummy_msg->priority,
                   "CF_CFDP_TxFile received priority %u and should be %u (tx->priority)",
-                  context_CF_CFDP_TxFile.priority, dummy_msg.priority);
-    UtAssert_True(context_CF_CFDP_TxFile.dest_id == dummy_msg.dest_id,
+                  context_CF_CFDP_TxFile.priority, dummy_msg->priority);
+    UtAssert_True(context_CF_CFDP_TxFile.dest_id == dummy_msg->dest_id,
                   "CF_CFDP_TxFile received dest_id %u and should be %u (tx->dest_id)", context_CF_CFDP_TxFile.dest_id,
-                  dummy_msg.dest_id);
+                  dummy_msg->dest_id);
     /* Assert for CF-CmdAcc */
     UtAssert_True(CF_AppData.hk.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
                   "CF_AppData.hk.counters.cmd is %d and should be 1 more than %d", CF_AppData.hk.counters.cmd,
@@ -671,20 +743,23 @@ void Test_CF_CmdTxFile_WhenCAllTo_CF_CFDP_TxFile_Returns_Non0_RejectCommand(void
 {
     /* Arrange */
     int32                    dummy_CF_CFDP_TxFile_return = Any_int32_Except(0);
-    cf_cmd_tx_file_t         dummy_msg;
-    CFE_SB_Buffer_t         *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CF_UT_cmd_tx_file_buf_t  utbuf;
+    cf_cmd_tx_file_t        *dummy_msg = &utbuf.tf;
+    CFE_SB_Buffer_t         *arg_msg   = &utbuf.buf;
     CF_CFDP_TxFile_context_t context_CF_CFDP_TxFile;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_TxFile), dummy_CF_CFDP_TxFile_return);
     UT_SetDataBuffer(UT_KEY(CF_CFDP_TxFile), &context_CF_CFDP_TxFile, sizeof(context_CF_CFDP_TxFile), false);
 
-    memcpy(dummy_msg.src_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    memcpy(dummy_msg.dst_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    dummy_msg.cfdp_class = Any_cfdp_class_t();
-    dummy_msg.keep       = Any_uint8();
-    dummy_msg.chan_num   = Any_uint8();
-    dummy_msg.priority   = Any_uint8();
-    dummy_msg.dest_id    = Any_cf_entity_id_t();
+    memcpy(dummy_msg->src_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
+    memcpy(dummy_msg->dst_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
+    dummy_msg->cfdp_class = Any_cfdp_class_t();
+    dummy_msg->keep       = Any_uint8();
+    dummy_msg->chan_num   = Any_uint8();
+    dummy_msg->priority   = Any_uint8();
+    dummy_msg->dest_id    = Any_cf_entity_id_t();
 
     /* Arrange unstubbable: CF_CmdAcc via CF_CmdCond */
     uint16 initial_hk_err_counter = Any_uint16();
@@ -695,28 +770,28 @@ void Test_CF_CmdTxFile_WhenCAllTo_CF_CFDP_TxFile_Returns_Non0_RejectCommand(void
     CF_CmdTxFile(arg_msg);
 
     /* Assert */
-    UtAssert_StrCmp(context_CF_CFDP_TxFile.src_filename, dummy_msg.src_filename,
+    UtAssert_StrCmp(context_CF_CFDP_TxFile.src_filename, dummy_msg->src_filename,
                     "CF_CFDP_TxFile received source_filename %s and should be %s (tx->src_filename)",
-                    context_CF_CFDP_TxFile.src_filename, dummy_msg.src_filename);
-    UtAssert_StrCmp(context_CF_CFDP_TxFile.dst_filename, dummy_msg.dst_filename,
+                    context_CF_CFDP_TxFile.src_filename, dummy_msg->src_filename);
+    UtAssert_StrCmp(context_CF_CFDP_TxFile.dst_filename, dummy_msg->dst_filename,
                     "CF_CFDP_TxFile received source_filename %s and should be %s (tx->dst_filename)",
-                    context_CF_CFDP_TxFile.dst_filename, dummy_msg.dst_filename);
-    UtAssert_True(context_CF_CFDP_TxFile.cfdp_class == dummy_msg.cfdp_class,
+                    context_CF_CFDP_TxFile.dst_filename, dummy_msg->dst_filename);
+    UtAssert_True(context_CF_CFDP_TxFile.cfdp_class == dummy_msg->cfdp_class,
                   "CF_CFDP_TxFile received cfdp_class %u and should be %u (tx->cfdp_class)",
-                  context_CF_CFDP_TxFile.cfdp_class, dummy_msg.cfdp_class);
-    UtAssert_True(context_CF_CFDP_TxFile.keep == dummy_msg.keep,
+                  context_CF_CFDP_TxFile.cfdp_class, dummy_msg->cfdp_class);
+    UtAssert_True(context_CF_CFDP_TxFile.keep == dummy_msg->keep,
                   "CF_CFDP_TxFile received keep %u and should be %u (tx->keep)", context_CF_CFDP_TxFile.keep,
-                  dummy_msg.keep);
+                  dummy_msg->keep);
     /* chan vs. chan_num -> cf_cmd_tx_file_t uses chan_num, CUT uses chan */
-    UtAssert_True(context_CF_CFDP_TxFile.chan == dummy_msg.chan_num,
+    UtAssert_True(context_CF_CFDP_TxFile.chan == dummy_msg->chan_num,
                   "CF_CFDP_TxFile received chan %u and should be %u (tx->chan_num)", context_CF_CFDP_TxFile.chan,
-                  dummy_msg.chan_num);
-    UtAssert_True(context_CF_CFDP_TxFile.priority == dummy_msg.priority,
+                  dummy_msg->chan_num);
+    UtAssert_True(context_CF_CFDP_TxFile.priority == dummy_msg->priority,
                   "CF_CFDP_TxFile received priority %u and should be %u (tx->priority)",
-                  context_CF_CFDP_TxFile.priority, dummy_msg.priority);
-    UtAssert_True(context_CF_CFDP_TxFile.dest_id == dummy_msg.dest_id,
+                  context_CF_CFDP_TxFile.priority, dummy_msg->priority);
+    UtAssert_True(context_CF_CFDP_TxFile.dest_id == dummy_msg->dest_id,
                   "CF_CFDP_TxFile received dest_id %u and should be %u (tx->dest_id)", context_CF_CFDP_TxFile.dest_id,
-                  dummy_msg.dest_id);
+                  dummy_msg->dest_id);
     /* Assert for CF-CmdAcc */
     UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
                   "CF_AppData.hk.counters.err is %d and should be 1 more than %d", CF_AppData.hk.counters.err,
@@ -736,21 +811,24 @@ void Test_CF_CmdPlaybackDir_WhenCAllTo_CF_CFDP_PlaybackDir_Returns_0_AcceptComma
 {
     /* Arrange */
     int32                         dummy_CF_CFDP_PlaybackDir_return = 0;
-    cf_cmd_playback_dir_t         dummy_msg;
-    CFE_SB_Buffer_t              *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CF_UT_cmd_playback_dir_buf_t  utbuf;
+    cf_cmd_playback_dir_t        *dummy_msg = &utbuf.pd;
+    CFE_SB_Buffer_t              *arg_msg   = &utbuf.buf;
     CF_CFDP_PlaybackDir_context_t context_CF_CFDP_PlaybackDir;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_PlaybackDir), dummy_CF_CFDP_PlaybackDir_return);
     UT_SetDataBuffer(UT_KEY(CF_CFDP_PlaybackDir), &context_CF_CFDP_PlaybackDir, sizeof(context_CF_CFDP_PlaybackDir),
                      false);
 
-    memcpy(dummy_msg.src_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    memcpy(dummy_msg.dst_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    dummy_msg.cfdp_class = Any_cfdp_class_t();
-    dummy_msg.keep       = Any_uint8();
-    dummy_msg.chan_num   = Any_uint8();
-    dummy_msg.priority   = Any_uint8();
-    dummy_msg.dest_id    = Any_cf_entity_id_t();
+    memcpy(dummy_msg->src_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
+    memcpy(dummy_msg->dst_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
+    dummy_msg->cfdp_class = Any_cfdp_class_t();
+    dummy_msg->keep       = Any_uint8();
+    dummy_msg->chan_num   = Any_uint8();
+    dummy_msg->priority   = Any_uint8();
+    dummy_msg->dest_id    = Any_cf_entity_id_t();
 
     /* Arrange unstubbable: CF_CmdAcc via CF_CmdCond */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -760,28 +838,28 @@ void Test_CF_CmdPlaybackDir_WhenCAllTo_CF_CFDP_PlaybackDir_Returns_0_AcceptComma
     CF_CmdPlaybackDir(arg_msg);
 
     /* Assert */
-    UtAssert_True(UtAssert_StrCmp(context_CF_CFDP_PlaybackDir.src_filename, dummy_msg.src_filename, "Strings matched"),
+    UtAssert_True(UtAssert_StrCmp(context_CF_CFDP_PlaybackDir.src_filename, dummy_msg->src_filename, "Strings matched"),
                   "CF_CmdPlaybackDir received source_filename %s and should be %s (tx->src_filename)",
-                  context_CF_CFDP_PlaybackDir.src_filename, dummy_msg.src_filename);
-    UtAssert_True(UtAssert_StrCmp(context_CF_CFDP_PlaybackDir.dst_filename, dummy_msg.dst_filename, "Strings matched"),
+                  context_CF_CFDP_PlaybackDir.src_filename, dummy_msg->src_filename);
+    UtAssert_True(UtAssert_StrCmp(context_CF_CFDP_PlaybackDir.dst_filename, dummy_msg->dst_filename, "Strings matched"),
                   "CF_CmdPlaybackDir received source_filename %s and should be %s (tx->dst_filename)",
-                  context_CF_CFDP_PlaybackDir.dst_filename, dummy_msg.dst_filename);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.cfdp_class == dummy_msg.cfdp_class,
+                  context_CF_CFDP_PlaybackDir.dst_filename, dummy_msg->dst_filename);
+    UtAssert_True(context_CF_CFDP_PlaybackDir.cfdp_class == dummy_msg->cfdp_class,
                   "CF_CmdPlaybackDir received cfdp_class %u and should be %u (tx->cfdp_class)",
-                  context_CF_CFDP_PlaybackDir.cfdp_class, dummy_msg.cfdp_class);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.keep == dummy_msg.keep,
+                  context_CF_CFDP_PlaybackDir.cfdp_class, dummy_msg->cfdp_class);
+    UtAssert_True(context_CF_CFDP_PlaybackDir.keep == dummy_msg->keep,
                   "CF_CmdPlaybackDir received keep %u and should be %u (tx->keep)", context_CF_CFDP_PlaybackDir.keep,
-                  dummy_msg.keep);
+                  dummy_msg->keep);
     /* chan vs. chan_num -> cf_cmd_tx_file_t uses chan_num, CUT uses chan */
-    UtAssert_True(context_CF_CFDP_PlaybackDir.chan == dummy_msg.chan_num,
+    UtAssert_True(context_CF_CFDP_PlaybackDir.chan == dummy_msg->chan_num,
                   "CF_CmdPlaybackDir received chan %u and should be %u (tx->chan_num)",
-                  context_CF_CFDP_PlaybackDir.chan, dummy_msg.chan_num);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.priority == dummy_msg.priority,
+                  context_CF_CFDP_PlaybackDir.chan, dummy_msg->chan_num);
+    UtAssert_True(context_CF_CFDP_PlaybackDir.priority == dummy_msg->priority,
                   "CF_CmdPlaybackDir received priority %u and should be %u (tx->priority)",
-                  context_CF_CFDP_PlaybackDir.priority, dummy_msg.priority);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.dest_id == dummy_msg.dest_id,
+                  context_CF_CFDP_PlaybackDir.priority, dummy_msg->priority);
+    UtAssert_True(context_CF_CFDP_PlaybackDir.dest_id == dummy_msg->dest_id,
                   "CF_CmdPlaybackDir received dest_id %u and should be %u (tx->dest_id)",
-                  context_CF_CFDP_PlaybackDir.dest_id, dummy_msg.dest_id);
+                  context_CF_CFDP_PlaybackDir.dest_id, dummy_msg->dest_id);
     /* Assert for CF-CmdAcc */
     UtAssert_True(CF_AppData.hk.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
                   "CF_AppData.hk.counters.cmd is %d and should be 1 more than %d", CF_AppData.hk.counters.cmd,
@@ -793,21 +871,24 @@ void Test_CF_CmdPlaybackDir_WhenCallTo_CF_CmdPlaybackDir_Returns_non0_RejectComm
 {
     /* Arrange */
     int32                         dummy_CF_CFDP_PlaybackDir_return = Any_int32_Except(0);
-    cf_cmd_playback_dir_t         dummy_msg;
-    CFE_SB_Buffer_t              *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CF_UT_cmd_playback_dir_buf_t  utbuf;
+    cf_cmd_playback_dir_t        *dummy_msg = &utbuf.pd;
+    CFE_SB_Buffer_t              *arg_msg   = &utbuf.buf;
     CF_CFDP_PlaybackDir_context_t context_CF_CFDP_PlaybackDir;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_PlaybackDir), dummy_CF_CFDP_PlaybackDir_return);
     UT_SetDataBuffer(UT_KEY(CF_CFDP_PlaybackDir), &context_CF_CFDP_PlaybackDir, sizeof(context_CF_CFDP_PlaybackDir),
                      false);
 
-    memcpy(dummy_msg.src_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    memcpy(dummy_msg.dst_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    dummy_msg.cfdp_class = Any_cfdp_class_t();
-    dummy_msg.keep       = Any_uint8();
-    dummy_msg.chan_num   = Any_uint8();
-    dummy_msg.priority   = Any_uint8();
-    dummy_msg.dest_id    = Any_cf_entity_id_t();
+    memcpy(dummy_msg->src_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
+    memcpy(dummy_msg->dst_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
+    dummy_msg->cfdp_class = Any_cfdp_class_t();
+    dummy_msg->keep       = Any_uint8();
+    dummy_msg->chan_num   = Any_uint8();
+    dummy_msg->priority   = Any_uint8();
+    dummy_msg->dest_id    = Any_cf_entity_id_t();
 
     /* Arrange unstubbable: CF_CmdAcc via CF_CmdCond */
     uint16 initial_hk_err_counter = Any_uint16();
@@ -818,28 +899,28 @@ void Test_CF_CmdPlaybackDir_WhenCallTo_CF_CmdPlaybackDir_Returns_non0_RejectComm
     CF_CmdPlaybackDir(arg_msg);
 
     /* Assert */
-    UtAssert_True(UtAssert_StrCmp(context_CF_CFDP_PlaybackDir.src_filename, dummy_msg.src_filename, "Strings matched"),
+    UtAssert_True(UtAssert_StrCmp(context_CF_CFDP_PlaybackDir.src_filename, dummy_msg->src_filename, "Strings matched"),
                   "CF_CmdPlaybackDir received source_filename %s and should be %s (tx->src_filename)",
-                  context_CF_CFDP_PlaybackDir.src_filename, dummy_msg.src_filename);
-    UtAssert_True(UtAssert_StrCmp(context_CF_CFDP_PlaybackDir.dst_filename, dummy_msg.dst_filename, "Strings matched"),
+                  context_CF_CFDP_PlaybackDir.src_filename, dummy_msg->src_filename);
+    UtAssert_True(UtAssert_StrCmp(context_CF_CFDP_PlaybackDir.dst_filename, dummy_msg->dst_filename, "Strings matched"),
                   "CF_CmdPlaybackDir received source_filename %s and should be %s (tx->dst_filename)",
-                  context_CF_CFDP_PlaybackDir.dst_filename, dummy_msg.dst_filename);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.cfdp_class == dummy_msg.cfdp_class,
+                  context_CF_CFDP_PlaybackDir.dst_filename, dummy_msg->dst_filename);
+    UtAssert_True(context_CF_CFDP_PlaybackDir.cfdp_class == dummy_msg->cfdp_class,
                   "CF_CmdPlaybackDir received cfdp_class %u and should be %u (tx->cfdp_class)",
-                  context_CF_CFDP_PlaybackDir.cfdp_class, dummy_msg.cfdp_class);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.keep == dummy_msg.keep,
+                  context_CF_CFDP_PlaybackDir.cfdp_class, dummy_msg->cfdp_class);
+    UtAssert_True(context_CF_CFDP_PlaybackDir.keep == dummy_msg->keep,
                   "CF_CmdPlaybackDir received keep %u and should be %u (tx->keep)", context_CF_CFDP_PlaybackDir.keep,
-                  dummy_msg.keep);
+                  dummy_msg->keep);
     /* chan vs. chan_num -> cf_cmd_tx_file_t uses chan_num, CUT uses chan */
-    UtAssert_True(context_CF_CFDP_PlaybackDir.chan == dummy_msg.chan_num,
+    UtAssert_True(context_CF_CFDP_PlaybackDir.chan == dummy_msg->chan_num,
                   "CF_CmdPlaybackDir received chan %u and should be %u (tx->chan_num)",
-                  context_CF_CFDP_PlaybackDir.chan, dummy_msg.chan_num);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.priority == dummy_msg.priority,
+                  context_CF_CFDP_PlaybackDir.chan, dummy_msg->chan_num);
+    UtAssert_True(context_CF_CFDP_PlaybackDir.priority == dummy_msg->priority,
                   "CF_CmdPlaybackDir received priority %u and should be %u (tx->priority)",
-                  context_CF_CFDP_PlaybackDir.priority, dummy_msg.priority);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.dest_id == dummy_msg.dest_id,
+                  context_CF_CFDP_PlaybackDir.priority, dummy_msg->priority);
+    UtAssert_True(context_CF_CFDP_PlaybackDir.dest_id == dummy_msg->dest_id,
                   "CF_CmdPlaybackDir received dest_id %u and should be %u (tx->dest_id)",
-                  context_CF_CFDP_PlaybackDir.dest_id, dummy_msg.dest_id);
+                  context_CF_CFDP_PlaybackDir.dest_id, dummy_msg->dest_id);
     /* Assert for CF-CmdAcc */
     UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
                   "CF_AppData.hk.counters.err is %d and should be 1 more than %d", CF_AppData.hk.counters.err,
@@ -858,14 +939,16 @@ void Test_CF_CmdPlaybackDir_WhenCallTo_CF_CmdPlaybackDir_Returns_non0_RejectComm
 void Test_CF_DoChanAction_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t  dummy_cmd;
-    cf_cmd_unionargs_t *arg_cmd    = &dummy_cmd;
-    const char         *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
-    chan_action_fn_t    arg_fn     = &Dummy_chan_action_fn_t;
-    int                 dummy_context;
-    void               *arg_context    = &dummy_context;
-    uint8               random_fn_call = Any_uint8_LessThan(CF_NUM_CHANNELS) + 1;
-    int                 local_result;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *arg_cmd    = &utbuf.ua;
+    const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    chan_action_fn_t          arg_fn     = &Dummy_chan_action_fn_t;
+    int                       dummy_context;
+    void                     *arg_context    = &dummy_context;
+    uint8                     random_fn_call = Any_uint8_LessThan(CF_NUM_CHANNELS) + 1;
+    int                       local_result;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     arg_cmd->data.byte[0] = ALL_CHANNELS;
 
@@ -887,13 +970,15 @@ void Test_CF_DoChanAction_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1(void)
 void Test_CF_DoChanAction_ALL_CHANNELS_WhenAll_fn_return_1_Return_1(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t  dummy_cmd;
-    cf_cmd_unionargs_t *arg_cmd    = &dummy_cmd;
-    const char         *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
-    chan_action_fn_t    arg_fn     = &Dummy_chan_action_fn_t;
-    int                 dummy_context;
-    void               *arg_context = &dummy_context;
-    int                 local_result;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *arg_cmd    = &utbuf.ua;
+    const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    chan_action_fn_t          arg_fn     = &Dummy_chan_action_fn_t;
+    int                       dummy_context;
+    void                     *arg_context = &dummy_context;
+    int                       local_result;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     arg_cmd->data.byte[0] = ALL_CHANNELS;
 
@@ -915,13 +1000,15 @@ void Test_CF_DoChanAction_ALL_CHANNELS_WhenAll_fn_return_1_Return_1(void)
 void Test_CF_DoChanAction_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t  dummy_cmd;
-    cf_cmd_unionargs_t *arg_cmd    = &dummy_cmd;
-    const char         *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
-    chan_action_fn_t    arg_fn     = &Dummy_chan_action_fn_t;
-    int                 dummy_context;
-    void               *arg_context = &dummy_context;
-    int                 local_result;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *arg_cmd    = &utbuf.ua;
+    const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    chan_action_fn_t          arg_fn     = &Dummy_chan_action_fn_t;
+    int                       dummy_context;
+    void                     *arg_context = &dummy_context;
+    int                       local_result;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     arg_cmd->data.byte[0] = ALL_CHANNELS;
 
@@ -943,13 +1030,15 @@ void Test_CF_DoChanAction_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0(void)
 void Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_1_Return_1(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t  dummy_cmd;
-    cf_cmd_unionargs_t *arg_cmd    = &dummy_cmd;
-    const char         *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
-    chan_action_fn_t    arg_fn     = &Dummy_chan_action_fn_t;
-    int                 dummy_context;
-    void               *arg_context = &dummy_context;
-    int                 local_result;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *arg_cmd    = &utbuf.ua;
+    const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    chan_action_fn_t          arg_fn     = &Dummy_chan_action_fn_t;
+    int                       dummy_context;
+    void                     *arg_context = &dummy_context;
+    int                       local_result;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     arg_cmd->data.byte[0] = Any_cf_channel();
 
@@ -971,13 +1060,15 @@ void Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_1_Return_1(void)
 void Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_0_Return_1(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t  dummy_cmd;
-    cf_cmd_unionargs_t *arg_cmd    = &dummy_cmd;
-    const char         *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
-    chan_action_fn_t    arg_fn     = &Dummy_chan_action_fn_t;
-    int                 dummy_context;
-    void               *arg_context = &dummy_context;
-    int                 local_result;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *arg_cmd    = &utbuf.ua;
+    const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    chan_action_fn_t          arg_fn     = &Dummy_chan_action_fn_t;
+    int                       dummy_context;
+    void                     *arg_context = &dummy_context;
+    int                       local_result;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     arg_cmd->data.byte[0] = Any_cf_channel();
 
@@ -999,13 +1090,15 @@ void Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_0_Return_1(void)
 void Test_CF_DoChanAction_WhenChanNumberEq_CF_NUM_CHANNELS_Return_neg1_And_SendEvent_(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t  dummy_cmd;
-    cf_cmd_unionargs_t *arg_cmd    = &dummy_cmd;
-    const char         *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
-    chan_action_fn_t    arg_fn     = &Dummy_chan_action_fn_t;
-    int                 dummy_context;
-    void               *arg_context = &dummy_context;
-    int                 local_result;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *arg_cmd    = &utbuf.ua;
+    const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    chan_action_fn_t          arg_fn     = &Dummy_chan_action_fn_t;
+    int                       dummy_context;
+    void                     *arg_context = &dummy_context;
+    int                       local_result;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     arg_cmd->data.byte[0] = CF_NUM_CHANNELS;
 
@@ -1031,13 +1124,15 @@ void Test_CF_DoChanAction_WhenChanNumberEq_CF_NUM_CHANNELS_Return_neg1_And_SendE
 void Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t  dummy_cmd;
-    cf_cmd_unionargs_t *arg_cmd    = &dummy_cmd;
-    const char         *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
-    chan_action_fn_t    arg_fn     = &Dummy_chan_action_fn_t;
-    int                 dummy_context;
-    void               *arg_context = &dummy_context;
-    int                 local_result;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *arg_cmd    = &utbuf.ua;
+    const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    chan_action_fn_t          arg_fn     = &Dummy_chan_action_fn_t;
+    int                       dummy_context;
+    void                     *arg_context = &dummy_context;
+    int                       local_result;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* force ALL_CHANNELS to not be a selection possibility */
     arg_cmd->data.byte[0] = ALL_CHANNELS;
@@ -1119,14 +1214,17 @@ void Test_CF_DoFreezeThaw_Set_frozen_ToGiven_context_barg_AndReturn_0(void)
 void Test_CF_CmdFreeze_Set_frozen_To_1_AndAcceptCommand(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
 
     /* Arrange unstubbable: CF_DoFreezeThaw via CF_DoChanAction */
     uint8 dummy_chan_num = Any_cf_channel();
 
+    memset(&utbuf, 0, sizeof(utbuf));
+
     /* Arrange unstubbable: CF_DoChanAction */
-    dummy_msg.data.byte[0] = dummy_chan_num;
+    dummy_msg->data.byte[0] = dummy_chan_num;
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -1156,14 +1254,17 @@ void Test_CF_CmdFreeze_Set_frozen_To_1_AndAcceptCommand(void)
 void Test_CF_CmdFThaw_Set_frozen_To_0_AndAcceptCommand(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
 
     /* Arrange unstubbable: CF_DoFreezeThaw via CF_DoChanAction */
     uint8 dummy_chan_num = Any_cf_channel();
 
+    memset(&utbuf, 0, sizeof(utbuf));
+
     /* Arrange unstubbable: CF_DoChanAction */
-    dummy_msg.data.byte[0] = dummy_chan_num;
+    dummy_msg->data.byte[0] = dummy_chan_num;
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -1285,15 +1386,16 @@ void Test_CF_CFDP_FindTransactionBySequenceNumberAllChannels_Return_TransactionF
 void Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_COMPOUND_KEY_TransactionNotFoundAndReturn_neg1_Fail(void)
 {
     /* Arrange */
-    cf_cmd_transaction_t  dummy_cmd;
-    cf_cmd_transaction_t *arg_cmd = &dummy_cmd;
-    char                  dummy_cmdstr[10]; /* 10 is arbitrary */
-    const char            arg_cmdstr[10];   /* 10 is arbitrary */
-    CF_TsnChanAction_fn_t arg_fn = &Dummy_CF_TsnChanAction_fn_t;
-    int                   dummy_context;
-    void                 *arg_context = &dummy_context;
-    int                   local_result;
+    CF_UT_cmd_transaction_buf_t utbuf;
+    cf_cmd_transaction_t       *arg_cmd = &utbuf.xact;
+    char                        dummy_cmdstr[10]; /* 10 is arbitrary */
+    const char                  arg_cmdstr[10];   /* 10 is arbitrary */
+    CF_TsnChanAction_fn_t       arg_fn = &Dummy_CF_TsnChanAction_fn_t;
+    int                         dummy_context;
+    void                       *arg_context = &dummy_context;
+    int                         local_result;
 
+    memset(&utbuf, 0, sizeof(utbuf));
     AnyRandomStringOfLettersOfLengthCopy(dummy_cmdstr, 10);
     memcpy((char *)arg_cmdstr, &dummy_cmdstr, 10);
 
@@ -1331,8 +1433,8 @@ void Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_COMPOUND_KEY_TransactionNotFoun
 void Test_CF_TsnChanAction_cmd_chan_Eq_COMPOUND_KEY_TransactionFoundRun_fn_AndReturn_CFE_SUCCESS(void)
 {
     /* Arrange */
-    cf_cmd_transaction_t                  dummy_cmd;
-    cf_cmd_transaction_t                 *arg_cmd = &dummy_cmd;
+    CF_UT_cmd_transaction_buf_t           utbuf;
+    cf_cmd_transaction_t                 *arg_cmd = &utbuf.xact;
     char                                  dummy_cmdstr[10]; /* 10 is arbitrary */
     const char                            arg_cmdstr[10];   /* 10 is arbitrary */
     CF_TsnChanAction_fn_t                 arg_fn = &Dummy_CF_TsnChanAction_fn_t;
@@ -1342,6 +1444,7 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_COMPOUND_KEY_TransactionFoundRun_fn_AndRe
     int                                   local_result;
     Dummy_CF_TsnChanAction_fn_t_context_t context_Dummy_CF_TsnChanAction_fn_t;
 
+    memset(&utbuf, 0, sizeof(utbuf));
     AnyRandomStringOfLettersOfLengthCopy(dummy_cmdstr, 10);
     memcpy((char *)arg_cmdstr, &dummy_cmdstr, 10);
 
@@ -1379,8 +1482,8 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_COMPOUND_KEY_TransactionFoundRun_fn_AndRe
 void Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels(void)
 {
     /* Arrange */
-    cf_cmd_transaction_t                              dummy_cmd;
-    cf_cmd_transaction_t                             *arg_cmd = &dummy_cmd;
+    CF_UT_cmd_transaction_buf_t                       utbuf;
+    cf_cmd_transaction_t                             *arg_cmd = &utbuf.xact;
     char                                              dummy_cmdstr[10]; /* 10 is arbitrary */
     const char                                        arg_cmdstr[10];   /* 10 is arbitrary */
     CF_TsnChanAction_fn_t                             arg_fn = &Dummy_CF_TsnChanAction_fn_t;
@@ -1390,6 +1493,7 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransac
     int                                               local_result;
     CF_TraverseAllTransactions_All_Channels_context_t context_CF_TATAC;
 
+    memset(&utbuf, 0, sizeof(utbuf));
     AnyRandomStringOfLettersOfLengthCopy(dummy_cmdstr, 10);
     memcpy((char *)arg_cmdstr, &dummy_cmdstr, 10);
 
@@ -1414,8 +1518,8 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransac
 void Test_CF_TsnChanAction_cmd_chan_IsASingleChannel(void)
 {
     /* Arrange */
-    cf_cmd_transaction_t                 dummy_cmd;
-    cf_cmd_transaction_t                *arg_cmd       = &dummy_cmd;
+    CF_UT_cmd_transaction_buf_t          utbuf;
+    cf_cmd_transaction_t                *arg_cmd       = &utbuf.xact;
     const char                           arg_cmdstr[1] = "";
     CF_TsnChanAction_fn_t                arg_fn        = &Dummy_CF_TsnChanAction_fn_t;
     int                                  dummy_context;
@@ -1424,6 +1528,7 @@ void Test_CF_TsnChanAction_cmd_chan_IsASingleChannel(void)
     int                                  local_result;
     CF_TraverseAllTransactions_context_t context_CF_TraverseAllTransactions;
 
+    memset(&utbuf, 0, sizeof(utbuf));
     arg_cmd->chan = Any_cf_channel();
 
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
@@ -1445,14 +1550,15 @@ void Test_CF_TsnChanAction_cmd_chan_IsASingleChannel(void)
 void Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid(void)
 {
     /* Arrange */
-    cf_cmd_transaction_t  dummy_cmd;
-    cf_cmd_transaction_t *arg_cmd       = &dummy_cmd;
-    const char            arg_cmdstr[1] = "";
-    CF_TsnChanAction_fn_t arg_fn        = &Dummy_CF_TsnChanAction_fn_t;
-    int                   dummy_context;
-    void                 *arg_context = &dummy_context;
-    int                   local_result;
+    CF_UT_cmd_transaction_buf_t utbuf;
+    cf_cmd_transaction_t       *arg_cmd       = &utbuf.xact;
+    const char                  arg_cmdstr[1] = "";
+    CF_TsnChanAction_fn_t       arg_fn        = &Dummy_CF_TsnChanAction_fn_t;
+    int                         dummy_context;
+    void                       *arg_context = &dummy_context;
+    int                         local_result;
 
+    memset(&utbuf, 0, sizeof(utbuf));
     arg_cmd->chan = Any_uint8_BetweenExcludeMax(CF_NUM_CHANNELS, COMPOUND_KEY);
 
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
@@ -1540,12 +1646,13 @@ void Test_CF_DoSuspRes__When_suspended_NotEqTo_action_Set_suspended_To_action(vo
 void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasChangedTo_1_SendEventAndRejectCmd(void)
 {
     /* Arrange */
-    transaction_t         dummy_t_instance;
-    transaction_t        *dummy_t = &dummy_t_instance;
-    cf_cmd_transaction_t  dummy_cmd;
-    cf_cmd_transaction_t *arg_cmd    = &dummy_cmd;
-    uint8                 arg_action = 1; // 0 is a WAG
+    transaction_t               dummy_t_instance;
+    transaction_t              *dummy_t = &dummy_t_instance;
+    CF_UT_cmd_transaction_buf_t utbuf;
+    cf_cmd_transaction_t       *arg_cmd    = &utbuf.xact;
+    uint8                       arg_action = 1; // 0 is a WAG
 
+    memset(&utbuf, 0, sizeof(utbuf));
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
 
     /* Arrange unstubbable: CF_TsnChanAction  - causes areturn -1*/
@@ -1587,9 +1694,11 @@ void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasChange
 void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_neg1_And_args_same_WasChangedTo_1_SendEventAndRejectCmd(void)
 {
     /* Arrange */
-    cf_cmd_transaction_t  dummy_cmd;
-    cf_cmd_transaction_t *arg_cmd    = &dummy_cmd;
-    uint8                 arg_action = 1; // 0 is a WAG
+    CF_UT_cmd_transaction_buf_t utbuf;
+    cf_cmd_transaction_t       *arg_cmd    = &utbuf.xact;
+    uint8                       arg_action = 1; // 0 is a WAG
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
 
@@ -1631,9 +1740,11 @@ void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_neg1_And_args_same_WasNot
     void)
 {
     /* Arrange */
-    cf_cmd_transaction_t  dummy_cmd;
-    cf_cmd_transaction_t *arg_cmd    = &dummy_cmd;
-    uint8                 arg_action = 1; // 0 is a WAG
+    CF_UT_cmd_transaction_buf_t utbuf;
+    cf_cmd_transaction_t       *arg_cmd    = &utbuf.xact;
+    uint8                       arg_action = 1; // 0 is a WAG
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
 
@@ -1675,11 +1786,13 @@ void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_neg1_And_args_same_WasNot
 void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasNotChangedFrom_0_AcceptCmd(void)
 {
     /* Arrange */
-    transaction_t         dummy_t_instance;
-    transaction_t        *dummy_t = &dummy_t_instance;
-    cf_cmd_transaction_t  dummy_cmd;
-    cf_cmd_transaction_t *arg_cmd    = &dummy_cmd;
-    uint8                 arg_action = 1; // 0 is a WAG
+    transaction_t               dummy_t_instance;
+    transaction_t              *dummy_t = &dummy_t_instance;
+    CF_UT_cmd_transaction_buf_t utbuf;
+    cf_cmd_transaction_t       *arg_cmd    = &utbuf.xact;
+    uint8                       arg_action = 1; // 0 is a WAG
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
 
@@ -1722,15 +1835,18 @@ void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasNotCha
 void Test_CF_CmdSuspend_Call_CF_DoSuspRes_WithGiven_msg_And_action_1(void)
 {
     /* Arrange */
-    cf_cmd_transaction_t dummy_cmd;
-    CFE_SB_Buffer_t     *arg_cmd = (CFE_SB_Buffer_t *)&dummy_cmd;
-    uint16               local_EventID[2];
+    CF_UT_cmd_transaction_buf_t utbuf;
+    cf_cmd_transaction_t       *dummy_cmd = &utbuf.xact;
+    CFE_SB_Buffer_t            *arg_cmd   = &utbuf.buf;
+    uint16                      local_EventID[2];
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* Arrange unstubbable: CF_DoSuspRes */
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), local_EventID, sizeof(local_EventID), false);
 
     /* Arrange unstubbable: CF_TsnChanAction  - causes areturn -1*/
-    dummy_cmd.chan = Any_uint8_BetweenExcludeMax(CF_NUM_CHANNELS, COMPOUND_KEY);
+    dummy_cmd->chan = Any_uint8_BetweenExcludeMax(CF_NUM_CHANNELS, COMPOUND_KEY);
 
     /* Arrange unstubbable: CF_CmdRej */
     uint16 initial_hk_err_counter = Any_uint16();
@@ -1768,15 +1884,18 @@ void Test_CF_CmdSuspend_Call_CF_DoSuspRes_WithGiven_msg_And_action_1(void)
 void Test_CF_CmdResume_Call_CF_DoSuspRes_WithGiven_msg_And_action_0(void)
 {
     /* Arrange */
-    cf_cmd_transaction_t dummy_cmd;
-    CFE_SB_Buffer_t     *arg_cmd = (CFE_SB_Buffer_t *)&dummy_cmd;
-    uint16               local_EventID[2];
+    CF_UT_cmd_transaction_buf_t utbuf;
+    cf_cmd_transaction_t       *dummy_cmd = &utbuf.xact;
+    CFE_SB_Buffer_t            *arg_cmd   = &utbuf.buf;
+    uint16                      local_EventID[2];
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* Arrange unstubbable: CF_DoSuspRes */
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), local_EventID, sizeof(local_EventID), false);
 
     /* Arrange unstubbable: CF_TsnChanAction  - causes areturn -1*/
-    dummy_cmd.chan = Any_uint8_BetweenExcludeMax(CF_NUM_CHANNELS, COMPOUND_KEY);
+    dummy_cmd->chan = Any_uint8_BetweenExcludeMax(CF_NUM_CHANNELS, COMPOUND_KEY);
 
     /* Arrange unstubbable: CF_CmdRej */
     uint16 initial_hk_err_counter = Any_uint16();
@@ -1838,15 +1957,18 @@ void Test_CF_CmdCancel__Call_CF_CFDP_CancelTransaction_WithGiven_t(void)
 void Test_CF_CmdCancel_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
 {
     /* Arrange */
-    cf_cmd_transaction_t dummy_msg;
-    CFE_SB_Buffer_t     *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CF_UT_cmd_transaction_buf_t utbuf;
+    cf_cmd_transaction_t       *dummy_msg = &utbuf.xact;
+    CFE_SB_Buffer_t            *arg_msg   = &utbuf.buf;
 
     // TODO: CF_TsnChanAction result is default with no setup; it should be controlled, but in the essence of time this
     // default value is used to show functionality of the code
     /* Arrange unstubbable: CF_TsnChanAction */
     CF_TraverseAllTransactions_context_t context_CF_TraverseAllTransactions;
 
-    ((cf_cmd_transaction_t *)arg_msg)->chan = Any_cf_chan_num();
+    memset(&utbuf, 0, sizeof(utbuf));
+
+    dummy_msg->chan = Any_cf_chan_num();
 
     UT_SetDataBuffer(UT_KEY(CF_TraverseAllTransactions), &context_CF_TraverseAllTransactions,
                      sizeof(context_CF_TraverseAllTransactions), false);
@@ -1863,8 +1985,7 @@ void Test_CF_CmdCancel_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
     /* Assert */
     /* Assert for CF_TsnChanAction */
     UtAssert_STUB_COUNT(CF_TraverseAllTransactions, 1);
-    UtAssert_ADDRESS_EQ(context_CF_TraverseAllTransactions.c,
-                        CF_AppData.engine.channels + ((cf_cmd_transaction_t *)arg_msg)->chan);
+    UtAssert_ADDRESS_EQ(context_CF_TraverseAllTransactions.c, CF_AppData.engine.channels + dummy_msg->chan);
     UtAssert_True(context_CF_TraverseAllTransactions.fn == CF_CmdCancel_,
                   "context_CF_TraverseAllTransactions.fn ==  CF_CmdCancel_");
     UtAssert_ADDRESS_EQ(context_CF_TraverseAllTransactions.context, NULL);
@@ -1911,15 +2032,18 @@ void Test_CF_CmdAbandon__Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0(void)
 void Test_CF_CmdAbandon_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
 {
     /* Arrange */
-    cf_cmd_transaction_t dummy_msg;
-    CFE_SB_Buffer_t     *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CF_UT_cmd_transaction_buf_t utbuf;
+    cf_cmd_transaction_t       *dummy_msg = &utbuf.xact;
+    CFE_SB_Buffer_t            *arg_msg   = &utbuf.buf;
 
     // TODO: CF_TsnChanAction result is default with no setup; it should be controlled, but in the essence of time this
     // default value is used to show functionality of the code
     /* Arrange unstubbable: CF_TsnChanAction */
     CF_TraverseAllTransactions_context_t context_CF_TraverseAllTransactions;
 
-    ((cf_cmd_transaction_t *)arg_msg)->chan = Any_cf_chan_num();
+    memset(&utbuf, 0, sizeof(utbuf));
+
+    dummy_msg->chan = Any_cf_chan_num();
 
     UT_SetDataBuffer(UT_KEY(CF_TraverseAllTransactions), &context_CF_TraverseAllTransactions,
                      sizeof(context_CF_TraverseAllTransactions), false);
@@ -1936,8 +2060,7 @@ void Test_CF_CmdAbandon_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
     /* Assert */
     /* Assert for CF_TsnChanAction */
     UtAssert_STUB_COUNT(CF_TraverseAllTransactions, 1);
-    UtAssert_ADDRESS_EQ(context_CF_TraverseAllTransactions.c,
-                        CF_AppData.engine.channels + ((cf_cmd_transaction_t *)arg_msg)->chan);
+    UtAssert_ADDRESS_EQ(context_CF_TraverseAllTransactions.c, CF_AppData.engine.channels + dummy_msg->chan);
     UtAssert_True(context_CF_TraverseAllTransactions.fn == CF_CmdAbandon_,
                   "context_CF_TraverseAllTransactions.fn ==  CF_CmdAbandon_");
     UtAssert_ADDRESS_EQ(context_CF_TraverseAllTransactions.context, NULL);
@@ -1983,17 +2106,20 @@ void Test_CF_DoEnableDisableDequeue_Set_chan_num_EnabledFlagTo_context_barg(void
 void Test_CF_CmdEnableDequeue_Call_CmdCond_WithResultsOf_CF_DoChanAction(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
 
     /* Arrange unstubbable: CF_DoEnableDisableDequeue via CF_DoChanAction */
     cf_config_table_t dummy_config_table;
     uint8             dummy_chan_num = Any_cf_channel();
 
+    memset(&utbuf, 0, sizeof(utbuf));
+
     CF_AppData.config_table = &dummy_config_table;
 
     /* Arrange unstubbable: CF_DoChanAction */
-    dummy_msg.data.byte[0] = dummy_chan_num;
+    dummy_msg->data.byte[0] = dummy_chan_num;
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -2024,17 +2150,20 @@ void Test_CF_CmdEnableDequeue_Call_CmdCond_WithResultsOf_CF_DoChanAction(void)
 void Test_CF_CmdDisableDequeue_Call_CmdCond_WithResultsOf_CF_DoChanAction(void)
 {
     /* Arrange */
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
 
     /* Arrange unstubbable: CF_DoEnableDisableDequeue via CF_DoChanAction */
     cf_config_table_t dummy_config_table;
     uint8             dummy_chan_num = Any_cf_channel();
 
+    memset(&utbuf, 0, sizeof(utbuf));
+
     CF_AppData.config_table = &dummy_config_table;
 
     /* Arrange unstubbable: CF_DoChanAction */
-    dummy_msg.data.byte[0] = dummy_chan_num;
+    dummy_msg->data.byte[0] = dummy_chan_num;
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -2065,20 +2194,21 @@ void Test_CF_DoEnableDisablePolldir_When_ALL_CHANNELS_SetAllPolldirsInChannelEna
 {
     /* Arrange */
     uint8                     arg_chan_num = Any_cf_channel();
-    cf_cmd_unionargs_t        dummy_msg;
-    const cf_cmd_unionargs_t *dummy_msg_ptr;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
     bool_msg_arg_t            dummy_context;
     bool_msg_arg_t           *arg_context = &dummy_context;
     cf_config_table_t         dummy_config_table;
     uint8                     expected_enabled;
     int                       local_result;
 
+    memset(&utbuf, 0, sizeof(utbuf));
+
     CF_AppData.config_table = &dummy_config_table;
 
-    dummy_msg.data.byte[1] = ALL_CHANNELS;
-    dummy_msg_ptr          = &dummy_msg;
+    dummy_msg->data.byte[1] = ALL_CHANNELS;
 
-    dummy_context.msg  = dummy_msg_ptr;
+    dummy_context.msg  = dummy_msg;
     dummy_context.barg = Any_bool_arg_t_barg();
     expected_enabled   = dummy_context.barg;
 
@@ -2103,20 +2233,21 @@ void Test_CF_DoEnableDisablePolldir_WhenSetToSpecificPolldirSetPolldirFrom_conte
     /* Arrange */
     uint8                     arg_chan_num  = Any_cf_channel();
     uint8                     dummy_polldir = Any_cf_polldir();
-    cf_cmd_unionargs_t        dummy_msg;
-    const cf_cmd_unionargs_t *dummy_msg_ptr;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
     bool_msg_arg_t            dummy_context;
     bool_msg_arg_t           *arg_context = &dummy_context;
     cf_config_table_t         dummy_config_table;
     uint8                     expected_enabled;
     int                       local_result;
 
+    memset(&utbuf, 0, sizeof(utbuf));
+
     CF_AppData.config_table = &dummy_config_table;
 
-    dummy_msg.data.byte[1] = dummy_polldir;
-    dummy_msg_ptr          = &dummy_msg;
+    dummy_msg->data.byte[1] = dummy_polldir;
 
-    dummy_context.msg  = dummy_msg_ptr;
+    dummy_context.msg  = dummy_msg;
     dummy_context.barg = Any_bool_arg_t_barg();
     expected_enabled   = dummy_context.barg;
 
@@ -2135,19 +2266,20 @@ void Test_CF_DoEnableDisablePolldir_FailPolldirEq_CF_MAX_POLLING_DIR_PER_CHAN_An
 {
     /* Arrange */
     uint8                     arg_chan_num = Any_cf_channel();
-    cf_cmd_unionargs_t        dummy_msg;
-    const cf_cmd_unionargs_t *dummy_msg_ptr;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
     bool_msg_arg_t            dummy_context;
     bool_msg_arg_t           *arg_context = &dummy_context;
     cf_config_table_t         dummy_config_table;
     int                       local_result;
 
+    memset(&utbuf, 0, sizeof(utbuf));
+
     CF_AppData.config_table = &dummy_config_table;
 
-    dummy_msg.data.byte[1] = CF_MAX_POLLING_DIR_PER_CHAN;
-    dummy_msg_ptr          = &dummy_msg;
+    dummy_msg->data.byte[1] = CF_MAX_POLLING_DIR_PER_CHAN;
 
-    dummy_context.msg  = dummy_msg_ptr;
+    dummy_context.msg  = dummy_msg;
     dummy_context.barg = Any_bool_arg_t_barg();
 
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
@@ -2168,19 +2300,20 @@ void Test_CF_DoEnableDisablePolldir_FailAnyBadPolldirSendEvent(void)
 {
     /* Arrange */
     uint8                     arg_chan_num = Any_cf_channel();
-    cf_cmd_unionargs_t        dummy_msg;
-    const cf_cmd_unionargs_t *dummy_msg_ptr;
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
     bool_msg_arg_t            dummy_context;
     bool_msg_arg_t           *arg_context = &dummy_context;
     cf_config_table_t         dummy_config_table;
     int                       local_result;
 
+    memset(&utbuf, 0, sizeof(utbuf));
+
     CF_AppData.config_table = &dummy_config_table;
 
-    dummy_msg.data.byte[1] = CF_MAX_POLLING_DIR_PER_CHAN;
-    dummy_msg_ptr          = &dummy_msg;
+    dummy_msg->data.byte[1] = CF_MAX_POLLING_DIR_PER_CHAN;
 
-    dummy_context.msg  = dummy_msg_ptr;
+    dummy_context.msg  = dummy_msg;
     dummy_context.barg = Any_bool_arg_t_barg();
 
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
@@ -2206,19 +2339,22 @@ void Test_CF_DoEnableDisablePolldir_FailAnyBadPolldirSendEvent(void)
 void Test_CF_CmdEnablePolldir_SuccessWhenActionSuccess(void)
 {
     /* Arrange */
-    cf_config_table_t  dummy_config_table;
-    uint8              dummy_channel = Any_cf_channel();
-    uint8              dummy_polldir = Any_cf_polldir();
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    cf_config_table_t         dummy_config_table;
+    uint8                     dummy_channel = Any_cf_channel();
+    uint8                     dummy_polldir = Any_cf_polldir();
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     CF_AppData.config_table = &dummy_config_table;
 
     /* Arrange unstubbable: CF_DoChanAction */
-    dummy_msg.data.byte[0] = dummy_channel;
+    dummy_msg->data.byte[0] = dummy_channel;
 
     /* Arrange unstubbable: CF_DoEnableDisablePolldir */
-    dummy_msg.data.byte[1] = dummy_polldir;
+    dummy_msg->data.byte[1] = dummy_polldir;
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -2242,16 +2378,19 @@ void Test_CF_CmdEnablePolldir_SuccessWhenActionSuccess(void)
 void Test_CF_CmdEnablePolldir_FailWhenActionFail(void)
 {
     /* Arrange */
-    uint8              dummy_channel = Any_cf_channel();
-    uint8              error_polldir = Any_uint8_BetweenInclusive(CF_MAX_POLLING_DIR_PER_CHAN, ALL_CHANNELS - 1);
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    uint8                     dummy_channel = Any_cf_channel();
+    uint8                     error_polldir = Any_uint8_BetweenInclusive(CF_MAX_POLLING_DIR_PER_CHAN, ALL_CHANNELS - 1);
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* Arrange unstubbable: CF_DoChanAction */
-    dummy_msg.data.byte[0] = dummy_channel;
+    dummy_msg->data.byte[0] = dummy_channel;
 
     /* Arrange unstubbable: CF_DoEnableDisablePolldir */
-    dummy_msg.data.byte[1] = error_polldir;
+    dummy_msg->data.byte[1] = error_polldir;
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_err_counter = Any_uint16();
@@ -2280,19 +2419,22 @@ void Test_CF_CmdEnablePolldir_FailWhenActionFail(void)
 void Test_CF_CmdDisablePolldir_SuccessWhenActionSuccess(void)
 {
     /* Arrange */
-    cf_config_table_t  dummy_config_table;
-    uint8              dummy_channel = Any_cf_channel();
-    uint8              dummy_polldir = Any_cf_polldir();
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    cf_config_table_t         dummy_config_table;
+    uint8                     dummy_channel = Any_cf_channel();
+    uint8                     dummy_polldir = Any_cf_polldir();
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     CF_AppData.config_table = &dummy_config_table;
 
     /* Arrange unstubbable: CF_DoChanAction */
-    dummy_msg.data.byte[0] = dummy_channel;
+    dummy_msg->data.byte[0] = dummy_channel;
 
     /* Arrange unstubbable: CF_DoEnableDisablePolldir */
-    dummy_msg.data.byte[1] = dummy_polldir;
+    dummy_msg->data.byte[1] = dummy_polldir;
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -2316,16 +2458,19 @@ void Test_CF_CmdDisablePolldir_SuccessWhenActionSuccess(void)
 void Test_CF_CmdDisablePolldir_FailWhenActionFail(void)
 {
     /* Arrange */
-    uint8              dummy_channel = Any_cf_channel();
-    uint8              error_polldir = Any_uint8_BetweenInclusive(CF_MAX_POLLING_DIR_PER_CHAN, ALL_CHANNELS - 1);
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    uint8                     dummy_channel = Any_cf_channel();
+    uint8                     error_polldir = Any_uint8_BetweenInclusive(CF_MAX_POLLING_DIR_PER_CHAN, ALL_CHANNELS - 1);
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* Arrange unstubbable: CF_DoChanAction */
-    dummy_msg.data.byte[0] = dummy_channel;
+    dummy_msg->data.byte[0] = dummy_channel;
 
     /* Arrange unstubbable: CF_DoEnableDisablePolldir */
-    dummy_msg.data.byte[1] = error_polldir;
+    dummy_msg->data.byte[1] = error_polldir;
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_err_counter = Any_uint16();
@@ -2415,13 +2560,15 @@ void Test_CF_DoPurgeQueue_PendOnly(void)
 {
     /* Arrange */
     uint8                               arg_chan_num = Any_cf_channel();
-    cf_cmd_unionargs_t                  dummy_cmd;
-    cf_cmd_unionargs_t                 *arg_cmd = &dummy_cmd;
+    CF_UT_cmd_unionargs_buf_t           utbuf;
+    cf_cmd_unionargs_t                 *arg_cmd = &utbuf.ua;
     channel_t                          *dummy_c;
     clist_node_t                        dummy_start;
     clist_node_t                       *expected_start = &dummy_start;
     int                                 local_result;
     CF_CList_Traverse_POINTER_context_t context_CF_CList_Traverse;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     arg_cmd->data.byte[1] = 0; /* pend */
 
@@ -2451,13 +2598,15 @@ void Test_CF_DoPurgeQueue_HistoryOnly(void)
 {
     /* Arrange */
     uint8                               arg_chan_num = Any_cf_channel();
-    cf_cmd_unionargs_t                  dummy_cmd;
-    cf_cmd_unionargs_t                 *arg_cmd = &dummy_cmd;
+    CF_UT_cmd_unionargs_buf_t           utbuf;
+    cf_cmd_unionargs_t                 *arg_cmd = &utbuf.ua;
     channel_t                          *dummy_c;
     clist_node_t                        dummy_start;
     clist_node_t                       *expected_start = &dummy_start;
     int                                 local_result;
     CF_CList_Traverse_POINTER_context_t context_CF_CList_Traverse;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     arg_cmd->data.byte[1] = 1; /* history */
 
@@ -2487,8 +2636,8 @@ void Test_CF_DoPurgeQueue_Both(void)
 {
     /* Arrange */
     uint8                               arg_chan_num = Any_cf_channel();
-    cf_cmd_unionargs_t                  dummy_cmd;
-    cf_cmd_unionargs_t                 *arg_cmd = &dummy_cmd;
+    CF_UT_cmd_unionargs_buf_t           utbuf;
+    cf_cmd_unionargs_t                 *arg_cmd = &utbuf.ua;
     channel_t                          *dummy_c;
     clist_node_t                        dummy_pend_start;
     clist_node_t                       *expected_pend_start = &dummy_pend_start;
@@ -2496,6 +2645,8 @@ void Test_CF_DoPurgeQueue_Both(void)
     clist_node_t                       *expected_history_start = &dummy_history_start;
     int                                 local_result;
     CF_CList_Traverse_POINTER_context_t context_CF_CList_Traverse[2];
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     arg_cmd->data.byte[1] = 2; /* both */
 
@@ -2529,10 +2680,12 @@ void Test_CF_DoPurgeQueue_Both(void)
 void Test_CF_DoPurgeQueue_GivenBad_data_byte_1_SendEventAndReturn_neg1(void)
 {
     /* Arrange */
-    uint8               arg_chan_num = Any_cf_channel();
-    cf_cmd_unionargs_t  dummy_cmd;
-    cf_cmd_unionargs_t *arg_cmd = &dummy_cmd;
-    int                 local_result;
+    uint8                     arg_chan_num = Any_cf_channel();
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *arg_cmd = &utbuf.ua;
+    int                       local_result;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     arg_cmd->data.byte[1] = 3; /* 3 is first default value */
 
@@ -2555,10 +2708,12 @@ void Test_CF_DoPurgeQueue_GivenBad_data_byte_1_SendEventAndReturn_neg1(void)
 void Test_CF_DoPurgeQueue_AnyGivenBad_data_byte_1_SendEventAndReturn_neg1(void)
 {
     /* Arrange */
-    uint8               arg_chan_num = Any_cf_channel();
-    cf_cmd_unionargs_t  dummy_cmd;
-    cf_cmd_unionargs_t *arg_cmd = &dummy_cmd;
-    int                 local_result;
+    uint8                     arg_chan_num = Any_cf_channel();
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *arg_cmd = &utbuf.ua;
+    int                       local_result;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     arg_cmd->data.byte[1] = Any_uint8_GreaterThan_or_EqualTo(3);
 
@@ -2587,16 +2742,19 @@ void Test_CF_DoPurgeQueue_AnyGivenBad_data_byte_1_SendEventAndReturn_neg1(void)
 void Test_CF_CmdPurgeQueue_FailWhenActionFail(void)
 {
     /* Arrange */
-    uint8              dummy_channel = Any_cf_channel();
-    uint8              error_purge   = 3; /* Shortest return from CF_DoPurgeQueue */
-    cf_cmd_unionargs_t dummy_msg;
-    CFE_SB_Buffer_t   *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    uint8                     dummy_channel = Any_cf_channel();
+    uint8                     error_purge   = 3; /* Shortest return from CF_DoPurgeQueue */
+    CF_UT_cmd_unionargs_buf_t utbuf;
+    cf_cmd_unionargs_t       *dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* Arrange unstubbable: CF_DoChanAction */
-    dummy_msg.data.byte[0] = dummy_channel;
+    dummy_msg->data.byte[0] = dummy_channel;
 
     /* Arrange unstubbable: CF_DoPurgeQueue */
-    dummy_msg.data.byte[1] = error_purge;
+    dummy_msg->data.byte[1] = error_purge;
 
     /* Arrange unstubbable: CF_CmdRej */
     uint16 initial_hk_err_counter = Any_uint16();
@@ -2623,11 +2781,14 @@ void Test_CF_CmdPurgeQueue_FailWhenActionFail(void)
 void Test_CF_CmdWriteQueue_When_chan_Eq_CF_NUM_CAHNNELS_SendEventAndRejectCommand(void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* invalid channel */
-    dummy_wq.chan = CF_NUM_CHANNELS;
+    dummy_wq->chan = CF_NUM_CHANNELS;
 
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
 
@@ -2653,11 +2814,14 @@ void Test_CF_CmdWriteQueue_When_chan_Eq_CF_NUM_CAHNNELS_SendEventAndRejectComman
 void Test_CF_CmdWriteQueue_When_chan_GreaterThan_CF_NUM_CAHNNELS_SendEventAndRejectCommand(void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* invalid channel */
-    dummy_wq.chan = Any_uint8_GreaterThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_GreaterThan(CF_NUM_CHANNELS);
 
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
 
@@ -2683,15 +2847,18 @@ void Test_CF_CmdWriteQueue_When_chan_GreaterThan_CF_NUM_CAHNNELS_SendEventAndRej
 void Test_CF_CmdWriteQueue_WhenUpAndPendingQueueSendEventAndRejectCommand(void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* invalid combination up direction, pending queue */
-    dummy_wq.type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 0; /* 0 is q_pend */
+    dummy_wq->type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 0; /* 0 is q_pend */
 
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
 
@@ -2718,18 +2885,21 @@ void Test_CF_CmdWriteQueue_When_CF_WrappedCreat_Fails_type_Is_type_up_And_queue_
     void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination up direction, NOT pending queue */
-    dummy_wq.type  = 1;                         /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = Any_queue_Except_q_pend(); /* 0 is q_pend */
+    dummy_wq->type  = 1;                         /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = Any_queue_Except_q_pend(); /* 0 is q_pend */
 
     /* invalid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -2768,18 +2938,21 @@ void Test_CF_CmdWriteQueue_When_CF_WrappedCreat_Fails_type_IsNot_type_up_And_que
     void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination down direction, pending queue */
-    dummy_wq.type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 0; /* 0 is q_pend */
+    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 0; /* 0 is q_pend */
 
     /* invalid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -2818,18 +2991,21 @@ void Test_CF_CmdWriteQueue_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedC
     void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 0; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 3; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 0; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 3; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -2875,18 +3051,21 @@ void Test_CF_CmdWriteQueue_When_CF_WriteQueueDataToFile_FailsAnd_wq_IsUpAnd_queu
     void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -2937,18 +3116,21 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsUpA
     void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 2; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 2; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -2999,18 +3181,21 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnFirstCallAnd_wq
     void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -3061,18 +3246,21 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnSecondCallAnd_w
     void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -3125,18 +3313,21 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
     void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 0; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 0; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -3187,18 +3378,21 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
     void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 2; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 2; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -3248,18 +3442,21 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
 void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_All(void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 0; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 3; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 0; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 3; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -3300,18 +3497,21 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_All(void)
 void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_History(void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 0; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 2; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 0; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 2; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -3347,18 +3547,21 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_History(void)
 void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_Active(void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 0; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 0; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -3394,18 +3597,21 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_Active(void)
 void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_Pend(void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 0; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 0; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 0; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 0; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -3441,18 +3647,21 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_Pend(void)
 void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_UpAnd_q_All(void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 3; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 3; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -3493,18 +3702,21 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_UpAnd_q_All(void)
 void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_UpAnd_q_History(void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 2; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 2; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -3540,18 +3752,21 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_UpAnd_q_History(void)
 void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_UpAnd_q_Active(void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -3589,18 +3804,21 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_UpAnd_q_Active(void)
 void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_All(void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 3; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 3; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -3636,18 +3854,21 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_All(void)
 void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_History(void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 2; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 2; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -3683,18 +3904,21 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_History(void)
 void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_Active(void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -3730,18 +3954,21 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_Active(void)
 void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_Pend(void)
 {
     /* Arrange */
-    cf_cmd_write_q_t dummy_wq;
-    CFE_SB_Buffer_t *arg_msg = (CFE_SB_Buffer_t *)&dummy_wq;
+    CF_UT_cmd_write_q_buf_t utbuf;
+    cf_cmd_write_q_t       *dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     /* valid channel */
-    dummy_wq.chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq.type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq.queue = 0; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->queue = 0; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
 
     /* valid result from CF_WrappedCreat */
-    strncpy(dummy_wq.filename, AnyRandomStringOfLettersOfLength(10), 10);
+    strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
 
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
@@ -3785,11 +4012,13 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_Pend(void)
 void Test_CF_CmdSendCfgParams_Set_cfg_TimeStampAndSendMsg_AcceptCommand(void)
 {
     /* Arrange */
-    CFE_MSG_Message_t            dummy_msg;
-    CFE_SB_Buffer_t             *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CFE_SB_Buffer_t              utbuf;
+    CFE_SB_Buffer_t             *arg_msg = &utbuf;
     cf_config_table_t            dummy_config_table;
     CFE_TIME_SysTime_t           fake_time;
     CFE_SB_TransmitMsg_context_t context_CFE_SB_TransmitMsg;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     dummy_config_table.ticks_per_second             = Any_uint32();
     dummy_config_table.rx_crc_calc_bytes_per_wakeup = Any_uint32();
@@ -4303,15 +4532,18 @@ void Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_5_Uses_SPTRFN_ThenC
 void Test_CF_CmdSetParam_Call_CF_CmdGetSetParam_With_cmd_key_And_cmd_value(void)
 {
     /* Arrange */
-    cf_cmd_set_param_args_t dummy_msg;
-    CFE_SB_Buffer_t        *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CF_UT_cmd_set_param_args_buf_t utbuf;
+    cf_cmd_set_param_args_t       *dummy_msg = &utbuf.sp;
+    CFE_SB_Buffer_t               *arg_msg   = &utbuf.buf;
 
     /* Arrange unstubbable: CF_CmdGetSetParam */
     cf_config_table_t dummy_config_table;
 
-    dummy_msg.key      = 0;
-    dummy_msg.value    = Any_uint32();
-    dummy_msg.chan_num = 0;
+    memset(&utbuf, 0, sizeof(utbuf));
+
+    dummy_msg->key      = 0;
+    dummy_msg->value    = Any_uint32();
+    dummy_msg->chan_num = 0;
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -4326,9 +4558,9 @@ void Test_CF_CmdSetParam_Call_CF_CmdGetSetParam_With_cmd_key_And_cmd_value(void)
     CF_CmdSetParam(arg_msg);
 
     /* Assert */
-    UtAssert_True(CF_AppData.config_table->ticks_per_second == dummy_msg.value,
+    UtAssert_True(CF_AppData.config_table->ticks_per_second == dummy_msg->value,
                   "ticks_per_second is %u and should be %u (msg->value)", CF_AppData.config_table->ticks_per_second,
-                  dummy_msg.value);
+                  dummy_msg->value);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UtAssert_True(EventID == CF_EID_INF_CMD_GETSET1,
                   "CFE_EVS_SendEvent received %u and should have received %u (CF_EID_INF_CMD_GETSET1)", EventID,
@@ -4354,11 +4586,14 @@ void Test_CF_CmdSetParam_Call_CF_CmdGetSetParam_With_cmd_key_And_cmd_value(void)
 void Test_CF_CmdGetParam_Call_CF_CmdGetSetParam_With_cmd_data_byte_0_AndConstantValue_0(void)
 {
     /* Arrange */
-    cf_cmd_get_param_args_t dummy_msg;
-    CFE_SB_Buffer_t        *arg_msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    CF_UT_cmd_get_param_args_buf_t utbuf;
+    cf_cmd_get_param_args_t       *dummy_msg = &utbuf.gp;
+    CFE_SB_Buffer_t               *arg_msg   = &utbuf.buf;
 
-    dummy_msg.key      = 0;
-    dummy_msg.chan_num = Any_cf_chan_num();
+    memset(&utbuf, 0, sizeof(utbuf));
+
+    dummy_msg->key      = 0;
+    dummy_msg->chan_num = Any_cf_chan_num();
 
     /* Arrange unstubbable: CF_CmdGetSetParam */
     cf_config_table_t dummy_config_table;
@@ -4564,11 +4799,13 @@ void Test_CF_CmdDisableEngine_WhenEngineDisabledAndIncrementCmdAccCounterThenFai
 void Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent(void)
 {
     /* Arrange */
-    CFE_MSG_Message_t            dummy_msg;
-    CFE_SB_Buffer_t             *arg_msg                          = (CFE_SB_Buffer_t *)&dummy_msg;
+    CFE_SB_Buffer_t              utbuf;
+    CFE_SB_Buffer_t             *arg_msg                          = &utbuf;
     CFE_MSG_FcnCode_t            forced_return_CFE_MSG_GetFcnCode = CF_NUM_COMMANDS;
     const char                  *expected_Spec                    = "CF: invalid ground command packet cmd_code=0x%02x";
     CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
                      sizeof(forced_return_CFE_MSG_GetFcnCode), false);
@@ -4609,11 +4846,13 @@ void Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent
 void Test_CF_ProcessGroundCommand_When_cmd_GreaterThan_CF_NUM_COMMANDS_FailAndSendEvent(void)
 {
     /* Arrange */
-    CFE_MSG_Message_t            dummy_msg;
-    CFE_SB_Buffer_t             *arg_msg                          = (CFE_SB_Buffer_t *)&dummy_msg;
+    CFE_SB_Buffer_t              utbuf;
+    CFE_SB_Buffer_t             *arg_msg                          = &utbuf;
     CFE_MSG_FcnCode_t            forced_return_CFE_MSG_GetFcnCode = Any_uint8_GreaterThan(CF_NUM_COMMANDS);
     CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
     const char                  *expected_Spec = "CF: invalid ground command packet cmd_code=0x%02x";
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
                      sizeof(forced_return_CFE_MSG_GetFcnCode), false);
@@ -4655,14 +4894,16 @@ void Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForT
     void)
 {
     /* Arrange */
-    CFE_MSG_Message_t dummy_msg;
-    CFE_SB_Buffer_t  *arg_msg                          = (CFE_SB_Buffer_t *)&dummy_msg;
+    CFE_SB_Buffer_t   utbuf;
+    CFE_SB_Buffer_t  *arg_msg                          = &utbuf;
     CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = 0x00; /* 0x00 forces fns[0] which is CF_CmdNoop */
     CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize    = Any_uint16_Except(
               sizeof(cf_cmd_noargs_t)); /* sizeof(cf_cmd_noargs_t) is expected size of CF_CmdNoop, using uint16 as a
                                            reasonable size constraint here as size_t is at least 16 bit */
     const char *expected_Spec = "CF: invalid ground command length for command 0x%02x, expected %d got %zd";
     CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
                      sizeof(forced_return_CFE_MSG_GetFcnCode), false);
@@ -4707,13 +4948,15 @@ void Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForT
 void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_msg(void)
 {
     /* Arrange */
-    CFE_MSG_Message_t dummy_msg;
-    CFE_SB_Buffer_t  *arg_msg                          = (CFE_SB_Buffer_t *)&dummy_msg;
+    CFE_SB_Buffer_t   utbuf;
+    CFE_SB_Buffer_t  *arg_msg                          = &utbuf;
     CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = 0x00; /* 0x00 forces fns[0] which is CF_CmdNoop */
     CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize =
         sizeof(cf_cmd_noargs_t); /* sizeof(cf_cmd_noargs_t) is expected size of CF_CmdNoop */
     const char                  *expected_Spec = "CF: No-Op received, Version %d.%d.%d";
     CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
                      sizeof(forced_return_CFE_MSG_GetFcnCode), false);
@@ -4762,11 +5005,13 @@ void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_m
 void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_12_Is_NULL(void)
 {
     /* Arrange */
-    CFE_MSG_Message_t            dummy_msg;
-    CFE_SB_Buffer_t             *arg_msg                          = (CFE_SB_Buffer_t *)&dummy_msg;
+    CFE_SB_Buffer_t              utbuf;
+    CFE_SB_Buffer_t             *arg_msg                          = &utbuf;
     CFE_MSG_FcnCode_t            forced_return_CFE_MSG_GetFcnCode = 0x0C; /* 0x0C forces a null slot */
     CFE_MSG_Size_t               forced_return_CFE_MSG_GetSize    = 0;
     CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
+
+    memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
                      sizeof(forced_return_CFE_MSG_GetFcnCode), false);
