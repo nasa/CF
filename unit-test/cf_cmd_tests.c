@@ -5,6 +5,8 @@
 /* cf_cmd_tests globals */
 extern type_of_context_CF_CList_Traverse_t type_of_context_CF_CList_Traverse;
 
+CFE_MSG_GetSize_context_t context_CFE_MSG_GetSize;
+
 /*******************************************************************************
 **
 **  cf_cmd_tests Setup and Teardown

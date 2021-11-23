@@ -13,6 +13,15 @@
 #define HEADS true
 #define TAILS false
 
+int32  result;
+uint16 EventID;
+
+type_of_context_CF_CList_Traverse_t type_of_context_CF_CList_Traverse;
+
+CFE_EVS_SendEvent_context_t  context_CFE_EVS_SendEvent;
+CFE_MSG_GetMsgId_context_t   context_CFE_MSG_GetMsgId;
+CFE_MSG_SetMsgTime_context_t context_CFE_MSG_SetMsgTime;
+
 const char *ut_default_const_char = "!WARNING! - UNSET CONST CHAR";
 const uint8 ut_default_uint8      = UT_UINT_8_DEFAULT;
 /* default_ptr changes per run, but value pointed at if not set correctly in test will always
