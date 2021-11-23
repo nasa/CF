@@ -775,10 +775,12 @@ void Test_CF_GetEIDSize_When_ret_Is_LessThan_size_of_cf_entity_id_t_Add_1_AndRet
 void Test_CF_GetVariableHeader_When_eid_l_AND_tsn_l_AreNotGreaterThan_0_DoesNotCallAnyMemCopiesReturn_neg1(void)
 {
     /* Arrange */
-    pdu_r_msg_t dummy_ph;
-    int         local_result;
+    CF_UT_inmsg_buffer_t dummy_ph;
+    int                  local_result;
 
-    CF_AppData.engine.in.msg = (CFE_SB_Buffer_t *)&dummy_ph;
+    memset(&dummy_ph, 0, sizeof(dummy_ph));
+
+    CF_AppData.engine.in.msg = &dummy_ph.cfe_sb_buffer;
 
     /* Arrange for CF_GetEIDSize */
     uint32 forced_return_FGV_from_EID = sizeof(cf_entity_id_t); /* unstubbable code adds +1 to this value */
@@ -804,10 +806,12 @@ void Test_CF_GetVariableHeader_When_eid_l_AND_tsn_l_AreNotGreaterThan_0_DoesNotC
 void Test_CF_GetVariableHeader_WhenOnly_eid_l_IsGreaterThan_0_DoesNotCallAnyMemCopiesReturn_neg1(void)
 {
     /* Arrange */
-    pdu_r_msg_t dummy_ph;
-    int         local_result;
+    CF_UT_inmsg_buffer_t dummy_ph;
+    int                  local_result;
 
-    CF_AppData.engine.in.msg = (CFE_SB_Buffer_t *)&dummy_ph;
+    memset(&dummy_ph, 0, sizeof(dummy_ph));
+
+    CF_AppData.engine.in.msg = &dummy_ph.cfe_sb_buffer;
 
     /* Arrange for CF_GetEIDSize */
     uint32 forced_return_FGV_from_EID = sizeof(cf_entity_id_t) - 1; /* unstubbable code adds +1 to this value */
@@ -835,10 +839,12 @@ void Test_CF_GetVariableHeader_WhenOnly_eid_l_IsGreaterThan_0_DoesNotCallAnyMemC
 void Test_CF_GetVariableHeader_WhenOnly_tsn_l_IsGreaterThan_0_DoesNotCallAnyMemCopiesReturn_neg1(void)
 {
     /* Arrange */
-    pdu_r_msg_t dummy_ph;
-    int         local_result;
+    CF_UT_inmsg_buffer_t dummy_ph;
+    int                  local_result;
 
-    CF_AppData.engine.in.msg = (CFE_SB_Buffer_t *)&dummy_ph;
+    memset(&dummy_ph, 0, sizeof(dummy_ph));
+
+    CF_AppData.engine.in.msg = &dummy_ph.cfe_sb_buffer;
 
     /* Arrange for CF_GetEIDSize */
     uint32 forced_return_FGV_from_EID = sizeof(cf_entity_id_t); /* unstubbable code adds +1 to this value */
@@ -866,10 +872,12 @@ void Test_CF_GetVariableHeader_WhenOnly_tsn_l_IsGreaterThan_0_DoesNotCallAnyMemC
 void Test_CF_GetVariableHeader_GetsAllThreeVariableLengthItemsOutOfHeaderAndReturn_0(void)
 {
     /* Arrange */
-    pdu_r_msg_t dummy_ph;
-    int         local_result;
+    CF_UT_inmsg_buffer_t dummy_ph;
+    int                  local_result;
 
-    CF_AppData.engine.in.msg = (CFE_SB_Buffer_t *)&dummy_ph;
+    memset(&dummy_ph, 0, sizeof(dummy_ph));
+
+    CF_AppData.engine.in.msg = &dummy_ph.cfe_sb_buffer;
 
     /* Arrange for CF_GetEIDSize */
     uint32 forced_return_FGV_from_EID =
@@ -903,12 +911,14 @@ void Test_CF_GetVariableHeader_GetsAllThreeVariableLengthItemsOutOfHeaderAndRetu
 void Test_CF_SetVariableHeader_Call_FSV_Twice(void)
 {
     /* Arrange */
-    cf_entity_id_t       arg_src_eid = 1;
-    cf_entity_id_t       arg_dst_eid = 1;
-    cf_transaction_seq_t arg_tsn     = 1;
-    pdu_s_msg_t          dummy_msg;
+    cf_entity_id_t        arg_src_eid = 1;
+    cf_entity_id_t        arg_dst_eid = 1;
+    cf_transaction_seq_t  arg_tsn     = 1;
+    CF_UT_outmsg_buffer_t dummy_msg;
 
-    CF_AppData.engine.out.msg = (CFE_SB_Buffer_t *)&dummy_msg;
+    memset(&dummy_msg, 0, sizeof(dummy_msg));
+
+    CF_AppData.engine.out.msg = &dummy_msg.cfe_sb_buffer;
 
     /* Act */
     CF_SetVariableHeader(arg_src_eid, arg_dst_eid, arg_tsn);
@@ -973,6 +983,8 @@ void Test_CF_HeaderSize_Return_sizeof_pdu_header_t_Plus_2_Times_eid_l_Plus_tsn_l
     int           expected_result             = sizeof(pdu_header_t) + (2 * (forced_return_FGV_for_eid_l + 1)) +
                           (forced_return_FGV_for_tsn_l + 1); /* each +1 added by CUT */
     int local_result;
+
+    memset(&dummy_ph, 0, sizeof(dummy_ph));
 
     UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_for_eid_l);
     UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_for_tsn_l);
