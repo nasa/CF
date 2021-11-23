@@ -8424,6 +8424,8 @@ void Test_CF_CFDP_CopyDataToLv_FailsBecause_len_IsGreaterThan_sizeof_dest_lv_dat
     uint32 arg_len = Any_uint32_GreaterThan(sizeof(arg_dest_lv->data));
     int    local_result;
 
+    memset(arg_data, 0xEE, sizeof(arg_data));
+
     /* Act */
     local_result = CF_CFDP_CopyDataToLv(arg_dest_lv, arg_data, arg_len);
 
@@ -8441,7 +8443,7 @@ void Test_CF_CFDP_CopyDataToLv_FailsBecause_len_IsEqTo_sizeof_dest_lv_data_Retur
     uint32 arg_len = sizeof(arg_dest_lv->data);
     int    local_result;
 
-    // AnyBufferOf_uint8_WithSize(arg_data, arg_len);
+    memset(arg_data, 0xEE, sizeof(arg_data));
 
     /* Act */
     local_result = CF_CFDP_CopyDataToLv(arg_dest_lv, arg_data, arg_len);
