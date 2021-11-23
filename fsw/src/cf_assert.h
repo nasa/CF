@@ -31,11 +31,23 @@
 
 extern void CF_HandleAssert(const char *file, int line);
 
+/*
+ * Note that in some cases, code in CF may compute or store a value for the
+ * sole purpose of checking it with a CF_Assert().  If CF_Assert is then entirely
+ * compiled out with NDEBUG, the compiler may see that as an unused value and
+ * trigger a warning.
+ *
+ * To avoid this, a no-op inline function is used, such that the value in the
+ * CF_Assert call is still evaluated, but the result is ignored.
+ */
+
 #ifdef NDEBUG
 /* this is release mode */
-#define CF_Assert(x)   \
-    if (unlikely((x))) \
-        CF_HandleAssert(__FILE__, __LINE__);
+static inline void CF_NoAssert(bool cond)
+{
+    /* no-op to avoid unused value warning */
+}
+#define CF_Assert(x) CF_NoAssert(x)
 #else /* NDEBUG */
 #include <assert.h>
 #define CF_Assert(x) assert(x)
