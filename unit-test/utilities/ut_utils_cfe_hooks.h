@@ -7,6 +7,5 @@
 /* UT includes */
 #include "utstubs.h"
 
-
 int32 stub_reporter_hook(void *UserObj, int32 StubRetcode, uint32 CallCount, const UT_StubContext_t *Context);
 #endif

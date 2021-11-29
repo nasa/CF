@@ -29,29 +29,31 @@
 
 #include "cf_test_utils.h"
 
-
-typedef struct {
+typedef struct
+{
     int32 fd;
     int32 result;
     int32 counter;
 } trav_arg_t;
 
-typedef struct priority_arg_t {
-    transaction_t *t; /* OUT: holds value of transaction with which to call CF_CList_InsertAfter on */
-    uint8 priority; /* seeking this priority */
+typedef struct priority_arg_t
+{
+    transaction_t *t;        /* OUT: holds value of transaction with which to call CF_CList_InsertAfter on */
+    uint8          priority; /* seeking this priority */
 } priority_arg_t;
 
-typedef struct {
+typedef struct
+{
     CF_TraverseAllTransactions_fn_t fn;
-    void *context;
-    int counter;
+    void                           *context;
+    int                             counter;
 } traverse_all_args_t;
 
-#define LINEBUF_LEN ((CF_FILENAME_MAX_LEN*2)+128)
+#define LINEBUF_LEN ((CF_FILENAME_MAX_LEN * 2) + 128)
 
 /************************************************************************/
 /** \brief Walks through a history queue and builds a human readable representation of it.
-**  
+**
 **  \par Description
 **       This function is used as both a list traversal function and a direct
 **       function call.
@@ -65,14 +67,16 @@ typedef struct {
 **  \endreturns
 **
 *************************************************************************/
-static int CF_TraverseHistory(clist_node n, trav_arg_t *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_TraverseHistory(clist_node n, trav_arg_t *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Walk over all transactions and print information from their history.
-**  
+**
 **  \par Assumptions, External Events, and Notes:
 **       None
 **
@@ -82,14 +86,16 @@ static int CF_TraverseHistory(clist_node n, trav_arg_t *context)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_TraverseTransactions(clist_node n, trav_arg_t *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_TraverseTransactions(clist_node n, trav_arg_t *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Write a transaction-based queue's transaction history to a file.
-**  
+**
 **  \par Assumptions, External Events, and Notes:
 **       c must not be NULL.
 **
@@ -109,7 +115,7 @@ int32 CF_WriteQueueDataToFile(int32 fd, channel_t *c, cf_queue_index_t q)
 
 /************************************************************************/
 /** \brief Write a history-based queue's transaction history to a file.
-**  
+**
 **  \par Assumptions, External Events, and Notes:
 **       c must not be NULL.
 **
@@ -129,7 +135,7 @@ int32 CF_WriteHistoryQueueDataToFile(int32 fd, channel_t *c, direction_t dir)
 
 /************************************************************************/
 /** \brief Searches for the first transaction with a lower priority than given.
-**  
+**
 **  \par Description
 **        that the config table being loaded has correct data.
 **
@@ -142,14 +148,16 @@ int32 CF_WriteHistoryQueueDataToFile(int32 fd, channel_t *c, direction_t dir)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_PrioSearch(clist_node node, void *context)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_PrioSearch(clist_node node, void *context)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Insert a transaction into a priority sorted transaction queue.
-**  
+**
 **  \par Description
 **       This function works by walking the queue in reverse to find a
 **       transaction with a higher priority than the given transaction.
@@ -170,7 +178,7 @@ void CF_InsertSortPrio(transaction_t *t, cf_queue_index_t q)
 
 /************************************************************************/
 /** \brief List traversal function performs operation on every active transaction.
-**  
+**
 **  \par Description
 **       Called on every transaction via list traversal. Calls another function
 **       on that transaction.
@@ -183,14 +191,16 @@ void CF_InsertSortPrio(transaction_t *t, cf_queue_index_t q)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_TraverseAllTransactions_(clist_node n, traverse_all_args_t *args)
-{
-    unimplemented(__FUNCTION__, __FILE__, __LINE__);
-}
+// static int CF_TraverseAllTransactions_(clist_node n, traverse_all_args_t *args)
+// {
+//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
+//       __FILE__, __LINE__);
+//     exit(-86);
+// }
 
 /************************************************************************/
 /** \brief Traverses all transactions on all active queues and performs an operation on them.
-**  
+**
 **  \par Assumptions, External Events, and Notes:
 **       c must not be NULL. fn must be a valid function. context must not be NULL.
 **
@@ -203,13 +213,10 @@ static int CF_TraverseAllTransactions_(clist_node n, traverse_all_args_t *args)
 int CF_TraverseAllTransactions(channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context)
 {
     int forced_return;
-    
-    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions), &c,
-      sizeof(c));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions), &fn,
-      sizeof(fn));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions), &context,
-      sizeof(context));
+
+    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions), &c, sizeof(c));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions), &fn, sizeof(fn));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions), &context, sizeof(context));
 
     forced_return = UT_DEFAULT_IMPL(CF_TraverseAllTransactions);
 
@@ -231,35 +238,33 @@ int CF_TraverseAllTransactions(channel_t *c, CF_TraverseAllTransactions_fn_t fn,
 int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context)
 {
     int forced_return;
-    
-    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions_All_Channels), &fn,
-      sizeof(fn));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions_All_Channels), &context,
-      sizeof(context));
-    
-    UT_DEFAULT_IMPL(CF_TraverseAllTransactions_All_Channels);
-    
-    UT_Stub_CopyToLocal(UT_KEY(CF_TraverseAllTransactions_All_Channels), &forced_return,
-      sizeof(forced_return));
 
-      /* TODO: setting the context here by using a specified force_return value is NOT the way to do things, this MUST be turned into a hook function */
+    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions_All_Channels), &fn, sizeof(fn));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions_All_Channels), &context, sizeof(context));
+
+    UT_DEFAULT_IMPL(CF_TraverseAllTransactions_All_Channels);
+
+    UT_Stub_CopyToLocal(UT_KEY(CF_TraverseAllTransactions_All_Channels), &forced_return, sizeof(forced_return));
+
+    /* TODO: setting the context here by using a specified force_return value is NOT the way to do things, this MUST be
+     * turned into a hook function */
     if (forced_return == 0xDCDCDCDC)
     {
-      forced_return = -1;
-      *((int*)context) = 1;
+        forced_return     = -1;
+        *((int *)context) = 1;
     }
     if (forced_return == 0xDC0000DC)
     {
-      forced_return = -1;
-      *((int*)context) = 0;
+        forced_return     = -1;
+        *((int *)context) = 0;
     }
-      
+
     return forced_return;
 }
 
 /************************************************************************/
 /** \brief Wrap the filesystem open call with a perf counter.
-**  
+**
 **  \par Assumptions, External Events, and Notes:
 **       fname must not be NULL.
 **
@@ -269,25 +274,24 @@ int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, 
 **
 *************************************************************************/
 int32 CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 access)
-{    
+{
     int forced_return;
-    
+
     UT_Stub_CopyFromLocal(UT_KEY(CF_WrappedOpenCreate), &fd, sizeof(fd));
     UT_Stub_CopyFromLocal(UT_KEY(CF_WrappedOpenCreate), &fname, sizeof(fname));
     UT_Stub_CopyFromLocal(UT_KEY(CF_WrappedOpenCreate), &flags, sizeof(flags));
     UT_Stub_CopyFromLocal(UT_KEY(CF_WrappedOpenCreate), &access, sizeof(access));
 
     UT_DEFAULT_IMPL(CF_WrappedOpenCreate);
-    
-    UT_Stub_CopyToLocal(UT_KEY(CF_WrappedOpenCreate), &forced_return,
-      sizeof(forced_return));
+
+    UT_Stub_CopyToLocal(UT_KEY(CF_WrappedOpenCreate), &forced_return, sizeof(forced_return));
 
     return forced_return;
 }
 
 /************************************************************************/
 /** \brief Wrap the filesystem close call with a perf counter.
-**  
+**
 **  \par Assumptions, External Events, and Notes:
 **       None
 **
@@ -295,13 +299,13 @@ int32 CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 
 void CF_WrappedClose(osal_id_t fd)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_WrappedClose), &fd, sizeof(fd));
-    
+
     UT_DEFAULT_IMPL(CF_WrappedClose);
 }
 
 /************************************************************************/
 /** \brief Wrap the filesystem read call with a perf counter.
-**  
+**
 **  \par Assumptions, External Events, and Notes:
 **       buf must not be NULL.
 **
@@ -312,7 +316,7 @@ void CF_WrappedClose(osal_id_t fd)
 **
 *************************************************************************/
 int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size)
-{  
+{
     UT_GenStub_SetupReturnBuffer(CF_WrappedRead, int32);
 
     UT_GenStub_AddParam(CF_WrappedRead, osal_id_t, fd);
@@ -326,7 +330,7 @@ int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size)
 
 /************************************************************************/
 /** \brief Wrap the filesystem write call with a perf counter.
-**  
+**
 **  \par Assumptions, External Events, and Notes:
 **       buf must not be NULL.
 **
@@ -351,7 +355,7 @@ int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size)
 
 /************************************************************************/
 /** \brief Wrap the filesystem lseek call with a perf counter.
-**  
+**
 **  \par Assumptions, External Events, and Notes:
 **       fname must not be NULL.
 **
@@ -374,4 +378,3 @@ int32 CF_WrappedLseek(osal_id_t fd, off_t offset, int mode)
 
     return UT_GenStub_GetReturnValue(CF_WrappedLseek, int32);
 }
-

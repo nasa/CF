@@ -1,27 +1,27 @@
 /************************************************************************
 ** File: cf_timer.h
 **
-** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF) 
+** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
 ** Application version 3.0.0”
-** Copyright © 2019 United States Government as represented by the 
-** Administrator of the National Aeronautics and Space Administration. 
+** Copyright © 2019 United States Government as represented by the
+** Administrator of the National Aeronautics and Space Administration.
 ** All Rights Reserved.
-** Licensed under the Apache License, Version 2.0 (the "License"); you may 
-** not use this file except in compliance with the License. You may obtain 
+** Licensed under the Apache License, Version 2.0 (the "License"); you may
+** not use this file except in compliance with the License. You may obtain
 ** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 **
-** Unless required by applicable law or agreed to in writing, software 
-** distributed under the License is distributed on an "AS IS" BASIS, 
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-** See the License for the specific language governing permissions and 
+** Unless required by applicable law or agreed to in writing, software
+** distributed under the License is distributed on an "AS IS" BASIS,
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+** See the License for the specific language governing permissions and
 ** limitations under the License.
-** 
+**
 **
 ** Purpose:
 **  The CF Application timer header file
 **
-** 
-** 
+**
+**
 *************************************************************************/
 
 #ifndef CF_TIMER__H
@@ -35,7 +35,8 @@
 typedef uint32 CF_Timer_Tick_t;
 typedef uint32 cf_timer_sec_t;
 
-typedef struct {
+typedef struct
+{
     CF_Timer_Tick_t tick; /* expires when reaches 0 */
 } cf_timer_t;
 
@@ -53,4 +54,3 @@ extern int CF_Timer_Expired(const cf_timer_t *t);
 extern void CF_Timer_Tick(cf_timer_t *t);
 
 #endif /* !CF_TIMER__H */
-
