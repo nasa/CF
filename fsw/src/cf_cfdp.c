@@ -1363,7 +1363,7 @@ static void CF_CFDP_ReceiveMessage(channel_t *c)
     for (; count < CF_AppData.config_table->chan[chan_num].rx_max_messages_per_wakeup; ++count)
     {
         status = CFE_SB_ReceiveBuffer(&CF_AppData.engine.in.msg, c->pipe, CFE_SB_POLL);
-        if (status == CFE_SB_NO_MESSAGE)
+        if (status != CFE_SUCCESS)
         {
             break; /* no more messages */
         }

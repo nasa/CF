@@ -455,7 +455,8 @@ static void CF_ProcessMsg(CFE_SB_Buffer_t *msg)
 *************************************************************************/
 void CF_AppMain(void)
 {
-    int32 status;
+    int32            status;
+    CFE_SB_Buffer_t *msg;
 
     CFE_ES_PerfLogEntry(CF_PERF_ID_APPMAIN);
 
@@ -465,23 +466,28 @@ void CF_AppMain(void)
         CF_AppData.run_status = CFE_ES_RunStatus_APP_ERROR;
     }
 
+    msg = NULL;
+
     while (CFE_ES_RunLoop(&CF_AppData.run_status))
     {
-        CFE_SB_Buffer_t *msg;
         CFE_ES_PerfLogExit(CF_PERF_ID_APPMAIN);
 
         status = CFE_SB_ReceiveBuffer(&msg, CF_AppData.cmd_pipe, CF_RCVMSG_TIMEOUT);
         CFE_ES_PerfLogEntry(CF_PERF_ID_APPMAIN);
 
-        if (((status != CFE_SUCCESS) && (status != CFE_SB_TIME_OUT)) || ((status == CFE_SUCCESS) && !msg))
+        /*
+         * note that CFE_SB_ReceiveBuffer() guarantees that a CFE_SUCCESS status is accompanied by
+         * a valid (non-NULL) output message pointer.  However the unit test can force this condition.
+         */
+        if (status == CFE_SUCCESS && msg != NULL)
+        {
+            CF_ProcessMsg(msg);
+        }
+        else if (status != CFE_SB_TIME_OUT && status != CFE_SB_NO_MESSAGE)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_MSG_RECV, CFE_EVS_EventType_ERROR,
                               "CF: exiting due to CFE_SB_ReceiveBuffer error 0x%08x", status);
             CF_AppData.run_status = CFE_ES_RunStatus_APP_ERROR;
-        }
-        else if (msg)
-        {
-            CF_ProcessMsg(msg);
         }
         else
         {
