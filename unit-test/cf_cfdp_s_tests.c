@@ -158,7 +158,7 @@ void Test_CFDP_S_SendEof_When_flag_tx_crc_calc_Is_0_Call_CF_CRC_Finalize_AndSet_
     /* Arrange */
     CF_Transaction_t          dummy_t;
     CF_Transaction_t         *arg_t = &dummy_t;
-    cf_crc_t                 *context_CF_CRC_Finalize;
+    CF_Crc_t                 *context_CF_CRC_Finalize;
     CF_SendRet_t              local_result;
     CF_SendRet_t              forced_return_CF_CFDP_SendEof = Any_cfdp_send_ret_t();
     CF_CFDP_SendEof_context_t context_CF_CFDP_SendEof;

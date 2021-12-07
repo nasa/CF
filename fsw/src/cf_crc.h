@@ -24,20 +24,20 @@
 **
 *************************************************************************/
 
-#ifndef CF_CRC__H
-#define CF_CRC__H
+#ifndef CF_CRC_H
+#define CF_CRC_H
 
 #include "cfe.h"
 
-typedef struct
+typedef struct CF_Crc
 {
     uint32 working;
     uint32 result;
     uint8  index;
-} cf_crc_t;
+} CF_Crc_t;
 
-extern void CF_CRC_Start(cf_crc_t *c);
-extern void CF_CRC_Digest(cf_crc_t *c, const uint8 *data, int len);
-extern void CF_CRC_Finalize(cf_crc_t *c);
+extern void CF_CRC_Start(CF_Crc_t *c);
+extern void CF_CRC_Digest(CF_Crc_t *c, const uint8 *data, int len);
+extern void CF_CRC_Finalize(CF_Crc_t *c);
 
-#endif /* !CF_CRC__H */
+#endif /* !CF_CRC_H */

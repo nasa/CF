@@ -41,7 +41,7 @@
 **       c must not be NULL.
 **
 *************************************************************************/
-void CF_CRC_Start(cf_crc_t *c)
+void CF_CRC_Start(CF_Crc_t *c)
 {
     memset(c, 0, sizeof(*c));
 }
@@ -57,7 +57,7 @@ void CF_CRC_Start(cf_crc_t *c)
 **       c must not be NULL.
 **
 *************************************************************************/
-void CF_CRC_Digest(cf_crc_t *c, const uint8 *data, int len)
+void CF_CRC_Digest(CF_Crc_t *c, const uint8 *data, int len)
 {
     int i = 0;
 
@@ -119,7 +119,7 @@ void CF_CRC_Digest(cf_crc_t *c, const uint8 *data, int len)
 **       c must not be NULL.
 **
 *************************************************************************/
-void CF_CRC_Finalize(cf_crc_t *c)
+void CF_CRC_Finalize(CF_Crc_t *c)
 {
     if (c->index)
     {

@@ -49,8 +49,8 @@ void cf_crc_tests_Teardown(void)
 void test_CF_CRC_Start_ReinitializeGiven_c_ToAllZeroValues(void)
 {
     /* Arrange */
-    cf_crc_t  dummy_c;
-    cf_crc_t *arg_c = &dummy_c;
+    CF_Crc_t  dummy_c;
+    CF_Crc_t *arg_c = &dummy_c;
 
     arg_c->working = Any_uint32_Except(0);
     arg_c->result  = Any_uint32_Except(0);
@@ -80,8 +80,8 @@ void test_CF_CRC_Start_ReinitializeGiven_c_ToAllZeroValues(void)
 void Test_CF_CRC_Digest_When_len_Is_0_DoNotAlter_c_working_or_c_result_or_c_index(void)
 {
     /* Arrange */
-    cf_crc_t    dummy_c;
-    cf_crc_t   *arg_c             = &dummy_c;
+    CF_Crc_t    dummy_c;
+    CF_Crc_t   *arg_c             = &dummy_c;
     const uint8 arg_data[1]       = {UT_UINT_8_DEFAULT};
     int32       arg_len           = 0;
     uint32      initial_c_working = Any_uint32();
@@ -108,8 +108,8 @@ void Test_CF_CRC_Digest_When_len_Is_0_DoNotAlter_c_working_or_c_result_or_c_inde
 void Test_CF_CRC_Digest_When_len_Eq_1_PushDataLeftOnto_c_working(void)
 {
     /* Arrange */
-    cf_crc_t    dummy_c;
-    cf_crc_t   *arg_c       = &dummy_c;
+    CF_Crc_t    dummy_c;
+    CF_Crc_t   *arg_c       = &dummy_c;
     const uint8 arg_data[1] = {UT_UINT_8_DEFAULT};
     int32       arg_len     = 1;
     int         i           = 0;
@@ -134,8 +134,8 @@ void Test_CF_CRC_Digest_When_len_Eq_1_PushDataLeftOnto_c_working(void)
 void Test_CF_CRC_Digest_PushDataLeftOnto_c_working_NumberOfTimesEqTo_len(void)
 {
     /* Arrange */
-    cf_crc_t     dummy_c;
-    cf_crc_t    *arg_c = &dummy_c;
+    CF_Crc_t     dummy_c;
+    CF_Crc_t    *arg_c = &dummy_c;
     const uint8 *arg_data;
     int32        arg_len;
     int          i = 0;
@@ -173,8 +173,8 @@ void Test_CF_CRC_Digest_PushDataLeftOnto_c_working_NumberOfTimesEqTo_len(void)
 void Test_CF_CRC_Digest_When_index_IsNot_3_DoNotUpdate_c_result(void)
 {
     /* Arrange */
-    cf_crc_t    dummy_c;
-    cf_crc_t   *arg_c            = &dummy_c;
+    CF_Crc_t    dummy_c;
+    CF_Crc_t   *arg_c            = &dummy_c;
     const uint8 arg_data[1]      = {UT_UINT_8_DEFAULT};
     int32       arg_len          = 1;
     uint32      initial_c_result = Any_uint32();
@@ -195,8 +195,8 @@ void Test_CF_CRC_Digest_When_index_IsNot_3_DoNotUpdate_c_result(void)
 void Test_CF_CRC_Digest_When_c_index_Is_3_Update_c_result(void)
 {
     /* Arrange */
-    cf_crc_t    dummy_c;
-    cf_crc_t   *arg_c       = &dummy_c;
+    CF_Crc_t    dummy_c;
+    CF_Crc_t   *arg_c       = &dummy_c;
     const uint8 arg_data[1] = {UT_UINT_8_DEFAULT};
     int32       arg_len;
     int         i = 0;
@@ -224,8 +224,8 @@ void Test_CF_CRC_Digest_When_c_index_Is_3_Update_c_result(void)
 void Test_CF_CRC_Digest_Update_c_result_TheNumberOfTimes_index_Reaches4(void)
 {
     /* Arrange */
-    cf_crc_t     dummy_c;
-    cf_crc_t    *arg_c = &dummy_c;
+    CF_Crc_t     dummy_c;
+    CF_Crc_t    *arg_c = &dummy_c;
     const uint8 *arg_data;
     int32        arg_len;
     uint32       dummy_c_working;
@@ -290,8 +290,8 @@ void Test_CF_CRC_Digest_Update_c_result_TheNumberOfTimes_index_Reaches4(void)
 void Test_CF_CRC_Digest_When_len_Eq1_And_c_index_LessThan_3_Update_c_index_By_1(void)
 {
     /* Arrange */
-    cf_crc_t    dummy_c;
-    cf_crc_t   *arg_c       = &dummy_c;
+    CF_Crc_t    dummy_c;
+    CF_Crc_t   *arg_c       = &dummy_c;
     const uint8 arg_data[1] = {UT_UINT_8_DEFAULT};
     int32       arg_len;
     uint8       expected_c_index;
@@ -314,8 +314,8 @@ void Test_CF_CRC_Digest_When_len_Eq1_And_c_index_LessThan_3_Update_c_index_By_1(
 void Test_CF_CRC_Digest_When_len_Eq1_And_c_index_Is_3_Update_c_index_To_0(void)
 {
     /* Arrange */
-    cf_crc_t    dummy_c;
-    cf_crc_t   *arg_c       = &dummy_c;
+    CF_Crc_t    dummy_c;
+    CF_Crc_t   *arg_c       = &dummy_c;
     const uint8 arg_data[1] = {UT_UINT_8_DEFAULT};
     int32       arg_len;
 
@@ -335,8 +335,8 @@ void Test_CF_CRC_Digest_When_len_Eq1_And_c_index_Is_3_Update_c_index_To_0(void)
 void Test_CF_CRC_Digest_Update_c_index_CorrectlyDependingOn_c_index_And_len_Values(void)
 {
     /* Arrange */
-    cf_crc_t     dummy_c;
-    cf_crc_t    *arg_c = &dummy_c;
+    CF_Crc_t     dummy_c;
+    CF_Crc_t    *arg_c = &dummy_c;
     const uint8 *arg_data;
     int32        arg_len;
     uint8        expected_c_index;
@@ -376,8 +376,8 @@ void Test_CF_CRC_Digest_Update_c_index_CorrectlyDependingOn_c_index_And_len_Valu
 void Test_CF_CRC_Finalize_When_index_Is_0_DoNothing(void)
 {
     /* Arrange */
-    cf_crc_t  dummy_c;
-    cf_crc_t *arg_c             = &dummy_c;
+    CF_Crc_t  dummy_c;
+    CF_Crc_t *arg_c             = &dummy_c;
     uint32    initial_c_working = Any_uint32();
     uint32    initial_c_result  = Any_uint32();
 
@@ -399,8 +399,8 @@ void Test_CF_CRC_Finalize_When_index_Is_0_DoNothing(void)
 void Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_1(void)
 {
     /* Arrange */
-    cf_crc_t  dummy_c;
-    cf_crc_t *arg_c         = &dummy_c;
+    CF_Crc_t  dummy_c;
+    CF_Crc_t *arg_c         = &dummy_c;
     uint32    working_shift = 256 * 256 * 256; /* 3 left shifts */
     uint32    expected_result;
 
@@ -422,8 +422,8 @@ void Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_1(void)
 void Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_2(void)
 {
     /* Arrange */
-    cf_crc_t  dummy_c;
-    cf_crc_t *arg_c         = &dummy_c;
+    CF_Crc_t  dummy_c;
+    CF_Crc_t *arg_c         = &dummy_c;
     uint8     dummy_index   = 2;
     uint32    working_shift = 256 * 256; /* 2 left shifts */
     uint32    expected_result;
@@ -446,8 +446,8 @@ void Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_2(void)
 void Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_3(void)
 {
     /* Arrange */
-    cf_crc_t  dummy_c;
-    cf_crc_t *arg_c         = &dummy_c;
+    CF_Crc_t  dummy_c;
+    CF_Crc_t *arg_c         = &dummy_c;
     uint8     dummy_index   = 3;
     uint32    working_shift = 256; /* 1 left shift */
     uint32    expected_result;

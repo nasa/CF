@@ -230,7 +230,7 @@ typedef struct CF_Transaction
     uint32    foffs; /* offset into file for next read */
     osal_id_t fd;
 
-    cf_crc_t crc;
+    CF_Crc_t crc;
 
     uint8 keep;
     uint8 chan_num; /* if ever more than one engine, this may need to change to pointer */

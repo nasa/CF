@@ -39,8 +39,8 @@ static void Dummy_fns(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 
 void Handler_CF_CRC_Finalize_SetResult(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
-    cf_crc_t *c             = UT_Hook_GetArgValueByName(Context, "c", cf_crc_t *);
-    cf_crc_t *c_with_result = (cf_crc_t *)UserObj;
+    CF_Crc_t *c             = UT_Hook_GetArgValueByName(Context, "c", CF_Crc_t *);
+    CF_Crc_t *c_with_result = (CF_Crc_t *)UserObj;
 
     c->result = c_with_result->result;
 }
@@ -281,8 +281,8 @@ void Test_CF_CFDP_R_CheckCrc_When_crc_NotEq_expected_crc_SendEventAndCountMismat
     CF_History_t        dummy_history;
     CF_EntityId_t       dummy_src_eid = Any_uint8();
     CF_TransactionSeq_t dummy_seq_num = Any_uint32();
-    cf_crc_t            dummy_crc;
-    cf_crc_t           *received_crc;
+    CF_Crc_t            dummy_crc;
+    CF_Crc_t           *received_crc;
     uint32              arg_expected_crc = Any_uint32();
     int                 expected_result  = 1;
     int                 local_result;
@@ -327,8 +327,8 @@ void Test_CF_CFDP_R_CheckCrc_When_crc_calculated_IsEqTo_expected_crc_Return_0(vo
 {
     /* Arrange */
     CF_Transaction_t arg_t;
-    cf_crc_t         dummy_crc;
-    cf_crc_t        *received_crc;
+    CF_Crc_t         dummy_crc;
+    CF_Crc_t        *received_crc;
     uint32           arg_expected_crc = Any_uint32();
     int              expected_result  = 0;
     int              local_result;
@@ -2662,8 +2662,8 @@ void Test_CF_CFDP_R2_CalcCrcChunk_Given_t_state_data_r_cached_pos_IsEqTo_RXC_Cal
     arg_t->history->cc = Any_uint8_Except(CF_CFDP_ConditionCode_FILE_SIZE_ERROR);
 
     /* Arrange for CF_CFDP_R_CheckCrc */
-    cf_crc_t  dummy_crc;
-    cf_crc_t *received_crc = &dummy_crc;
+    CF_Crc_t  dummy_crc;
+    CF_Crc_t *received_crc = &dummy_crc;
 
     received_crc->result = Any_uint32_Except(arg_t->state_data.r.r2.eof_crc);
 

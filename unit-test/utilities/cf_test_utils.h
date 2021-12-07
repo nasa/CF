@@ -385,7 +385,7 @@ typedef struct
 
 typedef struct
 {
-    cf_crc_t    *c;
+    CF_Crc_t    *c;
     const uint8 *data;
     int          len;
 } CF_PACK CF_CRC_Digest_context_t;
