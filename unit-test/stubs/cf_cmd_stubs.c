@@ -491,7 +491,7 @@ typedef struct
 **       n must not be NULL. c must not be NULL.
 **
 *************************************************************************/
-// static int CF_PurgeHistory(clist_node n, CF_Channel_t *c)
+// static int CF_PurgeHistory(CF_CListNode_t * n, CF_Channel_t *c)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -505,7 +505,7 @@ typedef struct
 **       n must not be NULL.
 **
 *************************************************************************/
-// static int CF_PurgeTransaction(clist_node n, void *ignored)
+// static int CF_PurgeTransaction(CF_CListNode_t * n, void *ignored)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);

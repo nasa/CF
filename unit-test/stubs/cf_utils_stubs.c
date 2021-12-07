@@ -67,7 +67,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_TraverseHistory(clist_node n, trav_arg_t *context)
+// static int CF_TraverseHistory(CF_CListNode_t * n, trav_arg_t *context)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -86,7 +86,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_TraverseTransactions(clist_node n, trav_arg_t *context)
+// static int CF_TraverseTransactions(CF_CListNode_t * n, trav_arg_t *context)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -148,7 +148,7 @@ int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t d
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_PrioSearch(clist_node node, void *context)
+// static int CF_PrioSearch(CF_CListNode_t * node, void *context)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -191,7 +191,7 @@ void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q)
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_TraverseAllTransactions_(clist_node n, traverse_all_args_t *args)
+// static int CF_TraverseAllTransactions_(CF_CListNode_t * n, traverse_all_args_t *args)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);

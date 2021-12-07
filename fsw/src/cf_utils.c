@@ -73,7 +73,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-static int CF_TraverseHistory(clist_node n, trav_arg_t *context)
+static int CF_TraverseHistory(CF_CListNode_t *n, trav_arg_t *context)
 {
     static const char *dstr[] = {"RX", "TX"};
     int                i;
@@ -96,11 +96,11 @@ static int CF_TraverseHistory(clist_node n, trav_arg_t *context)
             context->result = 1; /* failed */
             CFE_EVS_SendEvent(CF_EID_ERR_CMD_WHIST_WRITE, CFE_EVS_EventType_ERROR,
                               "CF: writing queue file failed, expected 0x%08x got 0x%08x", len, ret);
-            return CLIST_EXIT;
+            return CF_CLIST_EXIT;
         }
     }
 
-    return CLIST_CONT;
+    return CF_CLIST_CONT;
 }
 
 /************************************************************************/
@@ -115,7 +115,7 @@ static int CF_TraverseHistory(clist_node n, trav_arg_t *context)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_TraverseTransactions(clist_node n, trav_arg_t *context)
+static int CF_TraverseTransactions(CF_CListNode_t *n, trav_arg_t *context)
 {
     CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
 
@@ -127,10 +127,10 @@ static int CF_TraverseTransactions(clist_node n, trav_arg_t *context)
     /* ignore return value */ CF_TraverseHistory(&t->history->cl_node, context);
     if (context->result)
     {
-        return CLIST_EXIT;
+        return CF_CLIST_EXIT;
     }
 
-    return CLIST_CONT;
+    return CF_CLIST_CONT;
 }
 
 /************************************************************************/
@@ -147,7 +147,7 @@ static int CF_TraverseTransactions(clist_node n, trav_arg_t *context)
 int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q)
 {
     trav_arg_t arg = {fd, 0, 0};
-    CF_CList_Traverse(c->qs[q], (clist_fn_t)CF_TraverseTransactions, &arg);
+    CF_CList_Traverse(c->qs[q], (CF_CListFn_t)CF_TraverseTransactions, &arg);
     return arg.result;
 }
 
@@ -165,7 +165,7 @@ int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q)
 int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t dir)
 {
     trav_arg_t arg = {fd, 0, 0};
-    CF_CList_Traverse(c->qs[CF_QueueIdx_HIST], (clist_fn_t)CF_TraverseHistory, &arg);
+    CF_CList_Traverse(c->qs[CF_QueueIdx_HIST], (CF_CListFn_t)CF_TraverseHistory, &arg);
     return arg.result;
 }
 
@@ -184,7 +184,7 @@ int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t d
 **  \endreturns
 **
 *************************************************************************/
-static int CF_PrioSearch(clist_node node, void *context)
+static int CF_PrioSearch(CF_CListNode_t *node, void *context)
 {
     CF_Transaction_t *t = container_of(node, CF_Transaction_t, cl_node);
     priority_arg_t   *p = (priority_arg_t *)context;
@@ -196,10 +196,10 @@ static int CF_PrioSearch(clist_node node, void *context)
          * the current transaction's prio is less than desired (higher)
          */
         p->t = t;
-        return CLIST_EXIT;
+        return CF_CLIST_EXIT;
     }
 
-    return CLIST_CONT;
+    return CF_CLIST_CONT;
 }
 
 /************************************************************************/
@@ -266,12 +266,12 @@ void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_TraverseAllTransactions_(clist_node n, traverse_all_args_t *args)
+static int CF_TraverseAllTransactions_(CF_CListNode_t *n, traverse_all_args_t *args)
 {
     CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
     args->fn(t, args->context);
     ++args->counter;
-    return CLIST_CONT;
+    return CF_CLIST_CONT;
 }
 
 /************************************************************************/
@@ -290,7 +290,7 @@ int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t 
     traverse_all_args_t args = {fn, context, 0};
     CF_QueueIdx_t       index;
     for (index = CF_QueueIdx_PEND; index <= CF_QueueIdx_RX; ++index)
-        CF_CList_Traverse(c->qs[index], (clist_fn_t)CF_TraverseAllTransactions_, &args);
+        CF_CList_Traverse(c->qs[index], (CF_CListFn_t)CF_TraverseAllTransactions_, &args);
 
     return args.counter;
 }

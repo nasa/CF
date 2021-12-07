@@ -274,9 +274,9 @@ typedef struct
 
 typedef struct
 {
-    clist_node start;
-    clist_fn_t fn;
-    void      *context;
+    CF_CListNode_t *start;
+    CF_CListFn_t    fn;
+    void           *context;
 } CF_PACK CF_CList_Traverse_POINTER_context_t;
 
 typedef struct
@@ -371,8 +371,8 @@ typedef struct
 
 typedef struct
 {
-    clist_node *head;
-    clist_node  node;
+    CF_CListNode_t **head;
+    CF_CListNode_t  *node;
 } CF_PACK CF_CList_Remove_context_t;
 
 typedef struct
@@ -404,20 +404,20 @@ typedef struct
 
 typedef struct
 {
-    clist_node *head;
-    clist_node  forced_return;
+    CF_CListNode_t **head;
+    CF_CListNode_t  *forced_return;
 } CF_PACK CF_CList_Pop_context_t;
 
 typedef struct
 {
-    clist_node *head;
-    clist_node  node;
+    CF_CListNode_t **head;
+    CF_CListNode_t  *node;
 } CF_PACK CF_CList_InsertBack_context_t;
 
 typedef struct
 {
-    clist_node          start;
-    clist_fn_t          fn;
+    CF_CListNode_t     *start;
+    CF_CListFn_t        fn;
     CF_TransactionSeq_t context_transaction_sequence_number;
     CF_EntityId_t       context_src_eid;
     CF_Transaction_t   *context_forced_t; /* out param */
@@ -425,37 +425,37 @@ typedef struct
 
 typedef struct
 {
-    clist_node start;
-    clist_fn_t fn;
-    void      *context;
+    CF_CListNode_t *start;
+    CF_CListFn_t    fn;
+    void           *context;
 } CF_PACK CF_CList_Traverse_CLOSE_FILES_context_t;
 
 typedef struct
 {
-    clist_node *head;
-    clist_node  node;
+    CF_CListNode_t **head;
+    CF_CListNode_t  *node;
 } CF_PACK CF_Clist_Remove_context_t;
 
 typedef struct
 {
-    clist_node *head;
-    clist_node  start;
-    clist_node  after;
+    CF_CListNode_t **head;
+    CF_CListNode_t  *start;
+    CF_CListNode_t  *after;
 } CF_PACK CF_CList_InsertAfter_context_t;
 
 typedef struct
 {
-    clist_node start;
-    clist_fn_t fn;
-    int32      context_fd;
-    int32      context_result;
-    int32      context_counter;
+    CF_CListNode_t *start;
+    CF_CListFn_t    fn;
+    int32           context_fd;
+    int32           context_result;
+    int32           context_counter;
 } CF_PACK CF_CList_Traverse_TRAV_ARG_T_context_t;
 
 typedef struct
 {
-    clist_node                      start;
-    clist_fn_t                      fn;
+    CF_CListNode_t                 *start;
+    CF_CListFn_t                    fn;
     CF_TraverseAllTransactions_fn_t context_fn;
     void                           *context_context;
     int                             context_counter;
@@ -463,8 +463,8 @@ typedef struct
 
 typedef struct
 {
-    clist_node        end;
-    clist_fn_t        fn;
+    CF_CListNode_t   *end;
+    CF_CListFn_t      fn;
     CF_Transaction_t *context_t;
 } CF_PACK CF_CList_Traverse_R_context_t;
 

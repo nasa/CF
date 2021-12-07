@@ -2500,7 +2500,7 @@ void Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT(void)
 {
     /* Arrange */
     CF_History_t                   dummy_h;
-    clist_node                     arg_n = &dummy_h.cl_node;
+    CF_CListNode_t                *arg_n = &dummy_h.cl_node;
     CF_Channel_t                   dummy_c;
     CF_Channel_t                  *arg_c = &dummy_c;
     int                            local_result;
@@ -2515,8 +2515,8 @@ void Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT(void)
     /* Assert */
     UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetHistory.c, arg_c);
     UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetHistory.h, &dummy_h);
-    UtAssert_True(local_result == CLIST_CONT, "CF_PurgeHistory returned %d and should be %d (CLIST_CONT)", local_result,
-                  CLIST_CONT);
+    UtAssert_True(local_result == CF_CLIST_CONT, "CF_PurgeHistory returned %d and should be %d (CF_CLIST_CONT)",
+                  local_result, CF_CLIST_CONT);
 
 } /* end Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT */
 
@@ -2530,7 +2530,7 @@ void Test_CF_PurgeTransaction_Call_CF_CFDP_ResetTransaction_AndReturn_CLIST_CONT
 {
     /* Arrange */
     CF_Transaction_t                   dummy_t;
-    clist_node                         arg_n = &dummy_t.cl_node;
+    CF_CListNode_t                    *arg_n = &dummy_t.cl_node;
     int                                dummy_ignored;
     void                              *arg_ignored = &dummy_ignored;
     int                                local_result;
@@ -2547,8 +2547,8 @@ void Test_CF_PurgeTransaction_Call_CF_CFDP_ResetTransaction_AndReturn_CLIST_CONT
     UtAssert_True(context_CF_CFDP_ResetTransaction.keep_history == 0,
                   "CF_CFDP_ResetTransaction received keep_history %u and should be 0 (constant)",
                   context_CF_CFDP_ResetTransaction.keep_history);
-    UtAssert_True(local_result == CLIST_CONT, "CF_PurgeHistory returned %d and should be %d (CLIST_CONT)", local_result,
-                  CLIST_CONT);
+    UtAssert_True(local_result == CF_CLIST_CONT, "CF_PurgeHistory returned %d and should be %d (CF_CLIST_CONT)",
+                  local_result, CF_CLIST_CONT);
 
 } /* end Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT */
 
@@ -2565,8 +2565,8 @@ void Test_CF_DoPurgeQueue_PendOnly(void)
     CF_UT_cmd_unionargs_buf_t           utbuf;
     cf_cmd_unionargs_t                 *arg_cmd = &utbuf.ua;
     CF_Channel_t                       *dummy_c;
-    clist_node_t                        dummy_start;
-    clist_node_t                       *expected_start = &dummy_start;
+    CF_CListNode_t                      dummy_start;
+    CF_CListNode_t                     *expected_start = &dummy_start;
     int                                 local_result;
     CF_CList_Traverse_POINTER_context_t context_CF_CList_Traverse;
 
@@ -2603,8 +2603,8 @@ void Test_CF_DoPurgeQueue_HistoryOnly(void)
     CF_UT_cmd_unionargs_buf_t           utbuf;
     cf_cmd_unionargs_t                 *arg_cmd = &utbuf.ua;
     CF_Channel_t                       *dummy_c;
-    clist_node_t                        dummy_start;
-    clist_node_t                       *expected_start = &dummy_start;
+    CF_CListNode_t                      dummy_start;
+    CF_CListNode_t                     *expected_start = &dummy_start;
     int                                 local_result;
     CF_CList_Traverse_POINTER_context_t context_CF_CList_Traverse;
 
@@ -2628,8 +2628,8 @@ void Test_CF_DoPurgeQueue_HistoryOnly(void)
     /* Assert */
     UtAssert_STUB_COUNT(CF_CList_Traverse, 1);
     UtAssert_ADDRESS_EQ(context_CF_CList_Traverse.start, expected_start);
-    UtAssert_True(context_CF_CList_Traverse.fn == (clist_fn_t)CF_PurgeHistory,
-                  "context_CF_CList_Traverse.fn ==  (clist_fn_t)CF_PurgeHistory");
+    UtAssert_True(context_CF_CList_Traverse.fn == (CF_CListFn_t)CF_PurgeHistory,
+                  "context_CF_CList_Traverse.fn ==  (CF_CListFn_t )CF_PurgeHistory");
     UtAssert_ADDRESS_EQ(context_CF_CList_Traverse.context, dummy_c);
     UtAssert_True(local_result == 0, "CF_DoPurgeQueue returned %d and should be 0", local_result);
 } /* end Test_CF_DoPurgeQueue_HistoryOnly */
@@ -2641,10 +2641,10 @@ void Test_CF_DoPurgeQueue_Both(void)
     CF_UT_cmd_unionargs_buf_t           utbuf;
     cf_cmd_unionargs_t                 *arg_cmd = &utbuf.ua;
     CF_Channel_t                       *dummy_c;
-    clist_node_t                        dummy_pend_start;
-    clist_node_t                       *expected_pend_start = &dummy_pend_start;
-    clist_node_t                        dummy_history_start;
-    clist_node_t                       *expected_history_start = &dummy_history_start;
+    CF_CListNode_t                      dummy_pend_start;
+    CF_CListNode_t                     *expected_pend_start = &dummy_pend_start;
+    CF_CListNode_t                      dummy_history_start;
+    CF_CListNode_t                     *expected_history_start = &dummy_history_start;
     int                                 local_result;
     CF_CList_Traverse_POINTER_context_t context_CF_CList_Traverse[2];
 
@@ -2673,8 +2673,8 @@ void Test_CF_DoPurgeQueue_Both(void)
                   "context_CF_CList_Traverse[0].fn ==  CF_PurgeTransaction");
     UtAssert_ADDRESS_EQ(context_CF_CList_Traverse[0].context, NULL);
     UtAssert_ADDRESS_EQ(context_CF_CList_Traverse[1].start, expected_history_start);
-    UtAssert_True(context_CF_CList_Traverse[1].fn == (clist_fn_t)CF_PurgeHistory,
-                  "context_CF_CList_Traverse[1].fn ==  (clist_fn_t)CF_PurgeHistory");
+    UtAssert_True(context_CF_CList_Traverse[1].fn == (CF_CListFn_t)CF_PurgeHistory,
+                  "context_CF_CList_Traverse[1].fn ==  (CF_CListFn_t )CF_PurgeHistory");
     UtAssert_ADDRESS_EQ(context_CF_CList_Traverse[1].context, dummy_c);
     UtAssert_True(local_result == 0, "CF_DoPurgeQueue returned %d and should be 0", local_result);
 } /* end Test_CF_DoPurgeQueue_Both */

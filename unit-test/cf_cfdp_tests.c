@@ -24,7 +24,7 @@ int32 Stub_FGV(uint8 source, CF_FIELD_FIELD name);
 void cf_dequeue_transaction(CF_Transaction_t *t);
 #undef CF_CList_InsertBack_Ex
 #define CF_CList_InsertBack_Ex Stub_CF_CList_InsertBack_Ex
-void Stub_CF_CList_InsertBack_Ex(CF_Channel_t *c, CF_QueueIdx_t index, clist_node node);
+void Stub_CF_CList_InsertBack_Ex(CF_Channel_t *c, CF_QueueIdx_t index, CF_CListNode_t *node);
 
 #include "cf_cfdp.c"
 #include "cf_cfdp_pdu.h"
@@ -295,11 +295,11 @@ void handler_CF_CList_InsertBack_Ex_Record_indexes(void *UserObj, UT_EntryKey_t 
     *(((CF_QueueIdx_t *)UserObj) + (UT_GetStubCount(FuncKey) - 1)) = index;
 }
 
-void Stub_CF_CList_InsertBack_Ex(CF_Channel_t *c, CF_QueueIdx_t index, clist_node node)
+void Stub_CF_CList_InsertBack_Ex(CF_Channel_t *c, CF_QueueIdx_t index, CF_CListNode_t *node)
 {
     UT_GenStub_AddParam(Stub_CF_CList_InsertBack_Ex, CF_Channel_t *, c);
     UT_GenStub_AddParam(Stub_CF_CList_InsertBack_Ex, CF_QueueIdx_t, index);
-    UT_GenStub_AddParam(Stub_CF_CList_InsertBack_Ex, clist_node, node);
+    UT_GenStub_AddParam(Stub_CF_CList_InsertBack_Ex, CF_CListNode_t *, node);
 
     UT_GenStub_Execute(Stub_CF_CList_InsertBack_Ex, Basic, NULL);
 }
@@ -899,11 +899,11 @@ void Test_CF_CFDP_FindUnusedChunks_Success(void)
     CF_ChunkWrapper_t      dummy_expected_result;
     CF_ChunkWrapper_t     *expected_result = &dummy_expected_result;
     CF_ChunkWrapper_t     *local_result;
-    clist_node             forced_return_CF_CList_Pop;
+    CF_CListNode_t        *forced_return_CF_CList_Pop;
     CF_CList_Pop_context_t context_CF_CList_Pop;
 
     forced_return_CF_CList_Pop         = &expected_result->cl_node;
-    arg_c->cs[arg_dir]                 = (clist_node)&forced_return_CF_CList_Pop;
+    arg_c->cs[arg_dir]                 = (CF_CListNode_t *)&forced_return_CF_CList_Pop;
     context_CF_CList_Pop.forced_return = forced_return_CF_CList_Pop;
 
     UT_SetDataBuffer(UT_KEY(CF_CList_Pop), &context_CF_CList_Pop, sizeof(context_CF_CList_Pop), false);
@@ -984,7 +984,7 @@ void Test_CF_CFDP_FindUnusedTransaction_WhenNoFreeHistoryReturnExpected_t(void)
 {
     /* Arrange */
     CF_Channel_t             *arg_c;
-    clist_node                dummy_n;
+    CF_CListNode_t           *dummy_n;
     CF_History_t              dummy_history;
     CF_Transaction_t          dummy_expected_t;
     uint8                     dummy_channel = Any_uint8_LessThan(CF_NUM_CHANNELS);
@@ -1018,7 +1018,7 @@ void Test_CF_CFDP_FindUnusedTransaction_WhenFreeHistoryReturnExpected_t(void)
 {
     /* Arrange */
     CF_Channel_t             *arg_c;
-    clist_node                dummy_n;
+    CF_CListNode_t           *dummy_n;
     CF_History_t              dummy_history;
     CF_Transaction_t          dummy_expected_t;
     uint8                     dummy_channel = Any_uint8_LessThan(CF_NUM_CHANNELS);
@@ -1112,7 +1112,7 @@ void Test_CF_CFDP_FreeTransaction_Call_CF_CList_InitNode_And_CF_CList_InsertBack
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t          = &dummy_t;
     uint8             dummy_chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
-    clist_node        context_CF_CList_InitNode;
+    CF_CListNode_t   *context_CF_CList_InitNode;
 
     arg_t->chan_num = dummy_chan_num;
 
@@ -1147,7 +1147,7 @@ void Test_CF_CFDP_FreeTransaction_Call_CF_CList_InitNode_And_CF_CList_InsertBack
 void Test_CF_CFDP_FindTransactionBySequenceNumber__When_context_src_eid_NotEq_history_src_eid_DoNotFindTransaction(void)
 {
     /* Arrange */
-    clist_node       arg_n;
+    CF_CListNode_t  *arg_n;
     trans_seq_arg_t  dummy_context;
     trans_seq_arg_t *arg_context = &dummy_context;
     CF_Transaction_t dummy_t;
@@ -1176,7 +1176,7 @@ void Test_CF_CFDP_FindTransactionBySequenceNumber__When_context_transaction_sequ
     void)
 {
     /* Arrange */
-    clist_node       arg_n;
+    CF_CListNode_t  *arg_n;
     trans_seq_arg_t  dummy_context;
     trans_seq_arg_t *arg_context = &dummy_context;
     CF_Transaction_t dummy_t;
@@ -1206,7 +1206,7 @@ void Test_CF_CFDP_FindTransactionBySequenceNumber__When_history_And_context_Matc
     void)
 {
     /* Arrange */
-    clist_node       arg_n;
+    CF_CListNode_t  *arg_n;
     trans_seq_arg_t  dummy_context;
     trans_seq_arg_t *arg_context = &dummy_context;
     CF_Transaction_t dummy_t;
@@ -1246,7 +1246,7 @@ void Test_CF_CFDP_FindTransactionBySequenceNumber_DoNotFindTransaction(void)
     CF_Channel_t       *arg_c                           = &dummy_c;
     CF_TransactionSeq_t arg_transaction_sequence_number = Any_uint32();
     CF_EntityId_t       arg_src_eid                     = Any_uint8();
-    clist_node          expected_ptrs[NUM_CLISTS];
+    CF_CListNode_t     *expected_ptrs[NUM_CLISTS];
     CF_Transaction_t   *local_result;
     int                 i = 0;
 
@@ -1277,8 +1277,8 @@ void Test_CF_CFDP_FindTransactionBySequenceNumber_DoNotFindTransaction(void)
     for (i = 0; i < NUM_CLISTS; ++i)
     {
         UtAssert_ADDRESS_EQ(context_CF_CList_Traverse[i].start, expected_ptrs[i]);
-        UtAssert_True(context_CF_CList_Traverse[i].fn == (clist_fn_t)CF_CFDP_FindTransactionBySequenceNumber_,
-                      "context_CF_CList_Traverse[i].fn ==  (clist_fn_t)CF_CFDP_FindTransactionBySequenceNumber_");
+        UtAssert_True(context_CF_CList_Traverse[i].fn == (CF_CListFn_t)CF_CFDP_FindTransactionBySequenceNumber_,
+                      "context_CF_CList_Traverse[i].fn ==  (CF_CListFn_t )CF_CFDP_FindTransactionBySequenceNumber_");
         UtAssert_True(
             context_CF_CList_Traverse[i].context_transaction_sequence_number == arg_transaction_sequence_number,
             "CF_CList_Traverse received context.transaction_sequence_number %u and should be %u "
@@ -1297,7 +1297,7 @@ void Test_CF_CFDP_FindTransactionBySequenceNumber_FindTransactionOnLastClist(voi
     CF_Channel_t       *arg_c                           = &dummy_c;
     CF_TransactionSeq_t arg_transaction_sequence_number = Any_uint32();
     CF_EntityId_t       arg_src_eid                     = Any_uint8();
-    clist_node          expected_ptrs[NUM_CLISTS];
+    CF_CListNode_t     *expected_ptrs[NUM_CLISTS];
     CF_Transaction_t    dummy_result;
     CF_Transaction_t   *expected_result = &dummy_result;
     CF_Transaction_t   *local_result;
@@ -1332,8 +1332,8 @@ void Test_CF_CFDP_FindTransactionBySequenceNumber_FindTransactionOnLastClist(voi
     for (i = 0; i < NUM_CLISTS; ++i)
     {
         UtAssert_ADDRESS_EQ(context_CF_CList_Traverse[i].start, expected_ptrs[i]);
-        UtAssert_True(context_CF_CList_Traverse[i].fn == (clist_fn_t)CF_CFDP_FindTransactionBySequenceNumber_,
-                      "context_CF_CList_Traverse[i].fn ==  (clist_fn_t)CF_CFDP_FindTransactionBySequenceNumber_");
+        UtAssert_True(context_CF_CList_Traverse[i].fn == (CF_CListFn_t)CF_CFDP_FindTransactionBySequenceNumber_,
+                      "context_CF_CList_Traverse[i].fn ==  (CF_CListFn_t )CF_CFDP_FindTransactionBySequenceNumber_");
         UtAssert_True(
             context_CF_CList_Traverse[i].context_transaction_sequence_number == arg_transaction_sequence_number,
             "CF_CList_Traverse received context.transaction_sequence_number %u and should be %u "
@@ -4006,14 +4006,14 @@ void Test_CF_CFDP_RecvIdle_CheckOf_PDU_HDR_FLAGS_TYPE_And_PDU_HDR_FLAGS_MODE_Are
     CF_Channel_t          *ptr_c = &dummy_c;
     CF_ChunkWrapper_t      dummy_CF_CFDP_FindUnusedChunks_result;
     CF_ChunkWrapper_t     *forced_CF_CFDP_FindUnusedChunks_result = &dummy_CF_CFDP_FindUnusedChunks_result;
-    clist_node_t           dummy_c_list_node;
-    clist_node             forced_return_CF_CList_Pop = &dummy_c_list_node;
+    CF_CListNode_t         dummy_c_list_node;
+    CF_CListNode_t        *forced_return_CF_CList_Pop = &dummy_c_list_node;
     CF_CList_Pop_context_t context_CF_CList_Pop;
 
     CF_AppData.engine.channels[arg_t->chan_num].cs[CF_Direction_RX] = forced_return_CF_CList_Pop;
 
     forced_return_CF_CList_Pop         = &forced_CF_CFDP_FindUnusedChunks_result->cl_node;
-    ptr_c->cs[CF_Direction_RX]         = (clist_node)&forced_return_CF_CList_Pop;
+    ptr_c->cs[CF_Direction_RX]         = (CF_CListNode_t *)&forced_return_CF_CList_Pop;
     context_CF_CList_Pop.forced_return = forced_return_CF_CList_Pop;
 
     UT_SetDataBuffer(UT_KEY(CF_CList_Pop), &context_CF_CList_Pop, sizeof(context_CF_CList_Pop), false);
@@ -4057,14 +4057,14 @@ void Test_CF_CFDP_RecvIdle_CheckOf_PDU_HDR_FLAGS_TYPE_Is_true_And_PDU_HDR_FLAGS_
     CF_Channel_t          *ptr_c = &dummy_c;
     CF_ChunkWrapper_t      dummy_CF_CFDP_FindUnusedChunks_result;
     CF_ChunkWrapper_t     *forced_CF_CFDP_FindUnusedChunks_result = &dummy_CF_CFDP_FindUnusedChunks_result;
-    clist_node_t           dummy_c_list_node;
-    clist_node             forced_return_CF_CList_Pop = &dummy_c_list_node;
+    CF_CListNode_t         dummy_c_list_node;
+    CF_CListNode_t        *forced_return_CF_CList_Pop = &dummy_c_list_node;
     CF_CList_Pop_context_t context_CF_CList_Pop;
 
     CF_AppData.engine.channels[arg_t->chan_num].cs[CF_Direction_RX] = forced_return_CF_CList_Pop;
 
     forced_return_CF_CList_Pop         = &forced_CF_CFDP_FindUnusedChunks_result->cl_node;
-    ptr_c->cs[CF_Direction_RX]         = (clist_node)&forced_return_CF_CList_Pop;
+    ptr_c->cs[CF_Direction_RX]         = (CF_CListNode_t *)&forced_return_CF_CList_Pop;
     context_CF_CList_Pop.forced_return = forced_return_CF_CList_Pop;
 
     UT_SetDataBuffer(UT_KEY(CF_CList_Pop), &context_CF_CList_Pop, sizeof(context_CF_CList_Pop), false);
@@ -4121,14 +4121,14 @@ void Test_CF_CFDP_RecvIdle_CheckOf_PDU_HDR_FLAGS_TYPE_Is_true_And_PDU_HDR_FLAGS_
     CF_Channel_t          *ptr_c = &dummy_c;
     CF_ChunkWrapper_t      dummy_CF_CFDP_FindUnusedChunks_result;
     CF_ChunkWrapper_t     *forced_CF_CFDP_FindUnusedChunks_result = &dummy_CF_CFDP_FindUnusedChunks_result;
-    clist_node_t           dummy_c_list_node;
-    clist_node             forced_return_CF_CList_Pop = &dummy_c_list_node;
+    CF_CListNode_t         dummy_c_list_node;
+    CF_CListNode_t        *forced_return_CF_CList_Pop = &dummy_c_list_node;
     CF_CList_Pop_context_t context_CF_CList_Pop;
 
     CF_AppData.engine.channels[arg_t->chan_num].cs[CF_Direction_RX] = forced_return_CF_CList_Pop;
 
     forced_return_CF_CList_Pop         = &forced_CF_CFDP_FindUnusedChunks_result->cl_node;
-    ptr_c->cs[CF_Direction_RX]         = (clist_node)&forced_return_CF_CList_Pop;
+    ptr_c->cs[CF_Direction_RX]         = (CF_CListNode_t *)&forced_return_CF_CList_Pop;
     context_CF_CList_Pop.forced_return = forced_return_CF_CList_Pop;
 
     UT_SetDataBuffer(UT_KEY(CF_CList_Pop), &context_CF_CList_Pop, sizeof(context_CF_CList_Pop), false);
@@ -4206,14 +4206,14 @@ void Test_CF_CFDP_RecvIdle_CheckOf_PDU_HDR_FLAGS_TYPE_Returns_false_But_fdh_dire
     CF_Channel_t          *ptr_c = &dummy_c;
     CF_ChunkWrapper_t      dummy_CF_CFDP_FindUnusedChunks_result;
     CF_ChunkWrapper_t     *forced_CF_CFDP_FindUnusedChunks_result = &dummy_CF_CFDP_FindUnusedChunks_result;
-    clist_node_t           dummy_c_list_node;
-    clist_node             forced_return_CF_CList_Pop = &dummy_c_list_node;
+    CF_CListNode_t         dummy_c_list_node;
+    CF_CListNode_t        *forced_return_CF_CList_Pop = &dummy_c_list_node;
     CF_CList_Pop_context_t context_CF_CList_Pop;
 
     CF_AppData.engine.channels[arg_t->chan_num].cs[CF_Direction_RX] = forced_return_CF_CList_Pop;
 
     forced_return_CF_CList_Pop         = &forced_CF_CFDP_FindUnusedChunks_result->cl_node;
-    ptr_c->cs[CF_Direction_RX]         = (clist_node)&forced_return_CF_CList_Pop;
+    ptr_c->cs[CF_Direction_RX]         = (CF_CListNode_t *)&forced_return_CF_CList_Pop;
     context_CF_CList_Pop.forced_return = forced_return_CF_CList_Pop;
 
     UT_SetDataBuffer(UT_KEY(CF_CList_Pop), &context_CF_CList_Pop, sizeof(context_CF_CList_Pop), false);
@@ -4282,14 +4282,14 @@ void Test_CF_CFDP_RecvIdle_CheckOf_PDU_HDR_FLAGS_TYPE_Returns_false_And_fdh_dire
     CF_Channel_t          *ptr_c = &dummy_c;
     CF_ChunkWrapper_t      dummy_CF_CFDP_FindUnusedChunks_result;
     CF_ChunkWrapper_t     *forced_CF_CFDP_FindUnusedChunks_result = &dummy_CF_CFDP_FindUnusedChunks_result;
-    clist_node_t           dummy_c_list_node;
-    clist_node             forced_return_CF_CList_Pop = &dummy_c_list_node;
+    CF_CListNode_t         dummy_c_list_node;
+    CF_CListNode_t        *forced_return_CF_CList_Pop = &dummy_c_list_node;
     CF_CList_Pop_context_t context_CF_CList_Pop;
 
     CF_AppData.engine.channels[arg_t->chan_num].cs[CF_Direction_RX] = forced_return_CF_CList_Pop;
 
     forced_return_CF_CList_Pop         = &forced_CF_CFDP_FindUnusedChunks_result->cl_node;
-    ptr_c->cs[CF_Direction_RX]         = (clist_node)&forced_return_CF_CList_Pop;
+    ptr_c->cs[CF_Direction_RX]         = (CF_CListNode_t *)&forced_return_CF_CList_Pop;
     context_CF_CList_Pop.forced_return = forced_return_CF_CList_Pop;
 
     UT_SetDataBuffer(UT_KEY(CF_CList_Pop), &context_CF_CList_Pop, sizeof(context_CF_CList_Pop), false);
@@ -4372,14 +4372,14 @@ void Test_CF_CFDP_RecvIdle_CheckOf_PDU_HDR_FLAGS_TYPE_Returns_false_And_fdh_dire
     CF_Channel_t          *ptr_c = &dummy_c;
     CF_ChunkWrapper_t      dummy_CF_CFDP_FindUnusedChunks_result;
     CF_ChunkWrapper_t     *forced_CF_CFDP_FindUnusedChunks_result = &dummy_CF_CFDP_FindUnusedChunks_result;
-    clist_node_t           dummy_c_list_node;
-    clist_node             forced_return_CF_CList_Pop = &dummy_c_list_node;
+    CF_CListNode_t         dummy_c_list_node;
+    CF_CListNode_t        *forced_return_CF_CList_Pop = &dummy_c_list_node;
     CF_CList_Pop_context_t context_CF_CList_Pop;
 
     CF_AppData.engine.channels[arg_t->chan_num].cs[CF_Direction_RX] = forced_return_CF_CList_Pop;
 
     forced_return_CF_CList_Pop         = &forced_CF_CFDP_FindUnusedChunks_result->cl_node;
-    ptr_c->cs[CF_Direction_RX]         = (clist_node)&forced_return_CF_CList_Pop;
+    ptr_c->cs[CF_Direction_RX]         = (CF_CListNode_t *)&forced_return_CF_CList_Pop;
     context_CF_CList_Pop.forced_return = forced_return_CF_CList_Pop;
 
     UT_SetDataBuffer(UT_KEY(CF_CList_Pop), &context_CF_CList_Pop, sizeof(context_CF_CList_Pop), false);
@@ -4458,14 +4458,14 @@ void Test_CF_CFDP_RecvIdle_CheckOf_PDU_HDR_FLAGS_TYPE_Returns_false_And_fdh_dire
     CF_Channel_t          *ptr_c = &dummy_c;
     CF_ChunkWrapper_t      dummy_CF_CFDP_FindUnusedChunks_result;
     CF_ChunkWrapper_t     *forced_CF_CFDP_FindUnusedChunks_result = &dummy_CF_CFDP_FindUnusedChunks_result;
-    clist_node_t           dummy_c_list_node;
-    clist_node             forced_return_CF_CList_Pop = &dummy_c_list_node;
+    CF_CListNode_t         dummy_c_list_node;
+    CF_CListNode_t        *forced_return_CF_CList_Pop = &dummy_c_list_node;
     CF_CList_Pop_context_t context_CF_CList_Pop;
 
     CF_AppData.engine.channels[arg_t->chan_num].cs[CF_Direction_RX] = forced_return_CF_CList_Pop;
 
     forced_return_CF_CList_Pop         = &forced_CF_CFDP_FindUnusedChunks_result->cl_node;
-    ptr_c->cs[CF_Direction_RX]         = (clist_node)&forced_return_CF_CList_Pop;
+    ptr_c->cs[CF_Direction_RX]         = (CF_CListNode_t *)&forced_return_CF_CList_Pop;
     context_CF_CList_Pop.forced_return = forced_return_CF_CList_Pop;
 
     UT_SetDataBuffer(UT_KEY(CF_CList_Pop), &context_CF_CList_Pop, sizeof(context_CF_CList_Pop), false);
@@ -5904,14 +5904,14 @@ void Test_2CF_CFDP_ReceiveMessage_CallTo_src_IsNotEqTo_config_table_local_eid_Bu
     }
 
     /* Arrange for CF_CFDP_FindUnusedChunks */
-    clist_node_t dummy_node;
+    CF_CListNode_t dummy_node;
 
     (&CF_AppData.engine.channels[dummy_t.chan_num])->cs[CF_Direction_RX] = &dummy_node;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_ObjectIdDefined), true);
 
     /* Arrange for CF_CFDP_FindUnusedTransaction */
-    clist_node_t dummy_cf_q_hist;
+    CF_CListNode_t dummy_cf_q_hist;
 
     CF_AppData.hk.channel_hk[arg_c - CF_AppData.engine.channels].q_size[CF_QueueIdx_FREE] = 1;
     CF_AppData.hk.channel_hk[arg_c - CF_AppData.engine.channels].q_size[CF_QueueIdx_HIST] = 1;
@@ -5953,7 +5953,7 @@ void Test_CF_CFDP_CycleTx__Given_node_TransactionContainer_t_flags_all_suspended
 {
     /* Arrange */
     CF_Transaction_t       dummy_t;
-    clist_node             arg_clist_node = &dummy_t.cl_node;
+    CF_CListNode_t        *arg_clist_node = &dummy_t.cl_node;
     CF_CFDP_CycleTx_args_t dummy_args;
     void                  *arg_context = (void *)&dummy_args;
     int                    local_result;
@@ -5971,7 +5971,7 @@ void Test_CF_CFDP_CycleTx__AssertsBecauseGiven_node_TransactionContainer_t_flags
 {
     // /* Arrange */
     // CF_Transaction_t           dummy_t;
-    // clist_node              arg_clist_node = &dummy_t.cl_node;
+    // CF_CListNode_t *              arg_clist_node = &dummy_t.cl_node;
     // CF_CFDP_CycleTx_args_t  dummy_args;
     // void*                   arg_context = (void*)&dummy_args;
     // int                     local_result;
@@ -5994,7 +5994,7 @@ void Test_CF_CFDP_CycleTx__Given_node_TransactionContainer_t_flags_all_q_index_I
     CF_Channel_t           dummy_c;
     CF_Transaction_t       dummy_cur;
     CF_Transaction_t       dummy_t;
-    clist_node             arg_clist_node = &dummy_t.cl_node;
+    CF_CListNode_t        *arg_clist_node = &dummy_t.cl_node;
     CF_CFDP_CycleTx_args_t dummy_args;
     void                  *arg_context = (void *)&dummy_args;
     int                    local_result;
@@ -6026,7 +6026,7 @@ void Test_CF_CFDP_CycleTx__Given_node_TransactionContainer_t_flags_all_q_index_I
     /* Arrange */
     CF_Channel_t           dummy_c;
     CF_Transaction_t       dummy_t;
-    clist_node             arg_clist_node = &dummy_t.cl_node;
+    CF_CListNode_t        *arg_clist_node = &dummy_t.cl_node;
     CF_CFDP_CycleTx_args_t dummy_args;
     void                  *arg_context = (void *)&dummy_args;
     int                    local_result;
@@ -6066,7 +6066,7 @@ void Test_CF_CFDP_CycleTx__Given_node_TransactionContainer_t_flags_all_q_index_I
     /* Arrange */
     CF_Channel_t           dummy_c;
     CF_Transaction_t       dummy_t;
-    clist_node             arg_clist_node = &dummy_t.cl_node;
+    CF_CListNode_t        *arg_clist_node = &dummy_t.cl_node;
     CF_CFDP_CycleTx_args_t dummy_args;
     void                  *arg_context = (void *)&dummy_args;
     int                    local_result;
@@ -6108,7 +6108,7 @@ void Test_CF_CFDP_CycleTx_Given_node_TransactionContainer_t_flags_all_q_index_Is
     /* Arrange */
     CF_Channel_t           dummy_c;
     CF_Transaction_t       dummy_t;
-    clist_node             arg_clist_node = &dummy_t.cl_node;
+    CF_CListNode_t        *arg_clist_node = &dummy_t.cl_node;
     CF_CFDP_CycleTx_args_t dummy_args;
     void                  *arg_context = (void *)&dummy_args;
     int                    local_result;
@@ -6303,7 +6303,7 @@ void Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_IsNotNull_And_NotEq
     CF_Transaction_t dummy_cur;
     CF_Channel_t     dummy_c;
     CF_Transaction_t dummy_t;
-    clist_node       arg_node = &dummy_t.cl_node;
+    CF_CListNode_t  *arg_node = &dummy_t.cl_node;
     tick_args_t      dummy_args;
     void            *arg_context = (void *)&dummy_args;
     int              local_result;
@@ -6315,8 +6315,8 @@ void Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_IsNotNull_And_NotEq
     local_result = CF_CFDP_DoTick(arg_node, arg_context);
 
     /* Assert */
-    UtAssert_True(local_result == CLIST_CONT, "CF_CFDP_DoTick returned %d and should be %d (CLIST_CONT)", local_result,
-                  CLIST_CONT);
+    UtAssert_True(local_result == CF_CLIST_CONT, "CF_CFDP_DoTick returned %d and should be %d (CF_CLIST_CONT)",
+                  local_result, CF_CLIST_CONT);
 } /* end Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_IsNotNull_And_NotEqTo_t_Return_CLIST_CONT */
 
 void Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_IsNull_But_t_flags_all_suspended_IsTrueReturn_CLIST_CONT(
@@ -6325,7 +6325,7 @@ void Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_IsNull_But_t_flags_
     /* Arrange */
     CF_Channel_t     dummy_c;
     CF_Transaction_t dummy_t;
-    clist_node       arg_node = &dummy_t.cl_node;
+    CF_CListNode_t  *arg_node = &dummy_t.cl_node;
     tick_args_t      dummy_args;
     void            *arg_context = (void *)&dummy_args;
     int              local_result;
@@ -6339,8 +6339,8 @@ void Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_IsNull_But_t_flags_
     local_result = CF_CFDP_DoTick(arg_node, arg_context);
 
     /* Assert */
-    UtAssert_True(local_result == CLIST_CONT, "CF_CFDP_DoTick returned %d and should be %d (CLIST_CONT)", local_result,
-                  CLIST_CONT);
+    UtAssert_True(local_result == CF_CLIST_CONT, "CF_CFDP_DoTick returned %d and should be %d (CF_CLIST_CONT)",
+                  local_result, CF_CLIST_CONT);
     UtAssert_NULL(dummy_args.c->cur);
 } /* end
      Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_IsNull_But_t_flags_all_suspended_IsTrueReturn_CLIST_CONT */
@@ -6351,7 +6351,7 @@ void Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_Is_t_But_t_flags_al
     /* Arrange */
     CF_Channel_t     dummy_c;
     CF_Transaction_t dummy_t;
-    clist_node       arg_node = &dummy_t.cl_node;
+    CF_CListNode_t  *arg_node = &dummy_t.cl_node;
     tick_args_t      dummy_args;
     void            *arg_context = (void *)&dummy_args;
     int              local_result;
@@ -6365,8 +6365,8 @@ void Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_Is_t_But_t_flags_al
     local_result = CF_CFDP_DoTick(arg_node, arg_context);
 
     /* Assert */
-    UtAssert_True(local_result == CLIST_CONT, "CF_CFDP_DoTick returned %d and should be %d (CLIST_CONT)", local_result,
-                  CLIST_CONT);
+    UtAssert_True(local_result == CF_CLIST_CONT, "CF_CFDP_DoTick returned %d and should be %d (CF_CLIST_CONT)",
+                  local_result, CF_CLIST_CONT);
     UtAssert_NULL(dummy_args.c->cur);
 } /* end Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_Is_t_But_t_flags_all_suspended_IsTrueReturn_CLIST_CONT
    */
@@ -6377,7 +6377,7 @@ void Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_Is_t_And_t_flags_al
     /* Arrange */
     CF_Channel_t     dummy_c;
     CF_Transaction_t dummy_t;
-    clist_node       arg_node = &dummy_t.cl_node;
+    CF_CListNode_t  *arg_node = &dummy_t.cl_node;
     tick_args_t      dummy_args;
     void            *arg_context        = (void *)&dummy_args;
     int              initial_early_exit = Any_int_Except(1);
@@ -6396,8 +6396,8 @@ void Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_Is_t_And_t_flags_al
     local_result = CF_CFDP_DoTick(arg_node, arg_context);
 
     /* Assert */
-    UtAssert_True(local_result == CLIST_CONT, "CF_CFDP_DoTick returned %d and should be %d (CLIST_CONT)", local_result,
-                  CLIST_CONT);
+    UtAssert_True(local_result == CF_CLIST_CONT, "CF_CFDP_DoTick returned %d and should be %d (CF_CLIST_CONT)",
+                  local_result, CF_CLIST_CONT);
     UtAssert_STUB_COUNT(Dummy_tick_args_t_fn, 1);
     UtAssert_NULL(dummy_args.c->cur);
     UtAssert_True(dummy_args.early_exit == initial_early_exit,
@@ -6413,7 +6413,7 @@ void Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_Is_t_And_t_flags_al
     /* Arrange */
     CF_Channel_t     dummy_c;
     CF_Transaction_t dummy_t;
-    clist_node       arg_node = &dummy_t.cl_node;
+    CF_CListNode_t  *arg_node = &dummy_t.cl_node;
     tick_args_t      dummy_args;
     void            *arg_context = (void *)&dummy_args;
     int              local_result;
@@ -6434,8 +6434,8 @@ void Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_Is_t_And_t_flags_al
     local_result = CF_CFDP_DoTick(arg_node, arg_context);
 
     /* Assert */
-    UtAssert_True(local_result == CLIST_EXIT, "CF_CFDP_DoTick returned %d and should be %d (CLIST_EXIT)", local_result,
-                  CLIST_EXIT);
+    UtAssert_True(local_result == CF_CLIST_EXIT, "CF_CFDP_DoTick returned %d and should be %d (CF_CLIST_EXIT)",
+                  local_result, CF_CLIST_EXIT);
     UtAssert_STUB_COUNT(Dummy_tick_args_t_fn, 1);
     UtAssert_NOT_NULL(dummy_args.c->cur);
     UtAssert_True(dummy_args.early_exit == 1, "args->early_exit is %d and should be 1", dummy_args.early_exit);
@@ -6716,7 +6716,7 @@ void Test_CF_CFDP_TxFile_DoesNotError(void)
     arg_t->history = &dummy_history;
 
     /* Arrange for CF_CFDP_FindUnusedChunks */
-    clist_node_t dummy_cs;
+    CF_CListNode_t dummy_cs;
 
     CF_AppData.engine.channels[arg_chan].cs[CF_Direction_TX] = &dummy_cs;
 
@@ -6928,7 +6928,7 @@ void Test_CF_CFDP_TxFile_SuccessIncrements_c_num_cmd_tx_AndSets_t_flags_tx_cmd_t
     CF_AppData.config_table = &dummy_config_table;
 
     /* Arrange for CF_CFDP_FindUnusedChunks */
-    clist_node_t dummy_cs;
+    CF_CListNode_t dummy_cs;
 
     dummy_c->cs[CF_Direction_TX] = &dummy_cs;
 
@@ -7356,7 +7356,7 @@ void Test_CF_CFDP_ProcessPlaybackDirectory_FirstCallTo_OS_DirectoryRead_Returns_
     CF_AppData.config_table = &dummy_config_table;
 
     /* Arrange for CF_CFDP_FindUnusedChunks */
-    clist_node_t dummy_cs;
+    CF_CListNode_t dummy_cs;
 
     arg_c->cs[CF_Direction_TX] = &dummy_cs;
 
@@ -8801,7 +8801,7 @@ void Test_CF_CFDP_CloseFiles_DoesNothingBecause_t_fd_Is_0_Returns_CLIST_CONT(voi
 {
     /* Arrange */
     CF_Transaction_t dummy_t;
-    clist_node       arg_n       = &dummy_t.cl_node;
+    CF_CListNode_t  *arg_n       = &dummy_t.cl_node;
     void            *arg_context = NULL;
     int              local_result;
 
@@ -8811,8 +8811,8 @@ void Test_CF_CFDP_CloseFiles_DoesNothingBecause_t_fd_Is_0_Returns_CLIST_CONT(voi
     local_result = CF_CFDP_CloseFiles(arg_n, arg_context);
 
     /* Assert */
-    UtAssert_True(local_result == CLIST_CONT, "CF_CFDP_CloseFiles returned %u and should be %u (CLIST_CONT)",
-                  local_result, CLIST_CONT);
+    UtAssert_True(local_result == CF_CLIST_CONT, "CF_CFDP_CloseFiles returned %u and should be %u (CF_CLIST_CONT)",
+                  local_result, CF_CLIST_CONT);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
 
 } /* end Test_CF_CFDP_CloseFiles_DoesNothingBecause_t_fd_Is_0_Returns_CLIST_CONT */
@@ -8821,7 +8821,7 @@ void Test_CF_CFDP_CloseFiles_Calls_CF_WrappedClose_Because_t_fd_Is_not0_Returns_
 {
     /* Arrange */
     CF_Transaction_t dummy_t;
-    clist_node       arg_n       = &dummy_t.cl_node;
+    CF_CListNode_t  *arg_n       = &dummy_t.cl_node;
     void            *arg_context = NULL;
     int              local_result;
     int32            context_CF_CFDP_CloseFiles;
@@ -8834,8 +8834,8 @@ void Test_CF_CFDP_CloseFiles_Calls_CF_WrappedClose_Because_t_fd_Is_not0_Returns_
     local_result = CF_CFDP_CloseFiles(arg_n, arg_context);
 
     /* Assert */
-    UtAssert_True(local_result == CLIST_CONT, "CF_CFDP_CloseFiles returned %u and should be %u (CLIST_CONT)",
-                  local_result, CLIST_CONT);
+    UtAssert_True(local_result == CF_CLIST_CONT, "CF_CFDP_CloseFiles returned %u and should be %u (CF_CLIST_CONT)",
+                  local_result, CF_CLIST_CONT);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
     UtAssert_True(context_CF_CFDP_CloseFiles == dummy_t.fd, "CF_WrappedClose received fd %d should be %d (t->fd)",
                   context_CF_CFDP_CloseFiles, dummy_t.fd);
@@ -8870,7 +8870,7 @@ void Test_CF_CFDP_DisableEngine_ClosesAllActiveFilesAndNoOpenPlaybackDirectories
         dummy_channel[ci]->pipe = CFE_SB_PIPEID_C(CFE_ResourceId_FromInteger(1 + ci));
         for (qi = 0; qi < num_clist_node_ptrs; ++qi)
         {
-            (CF_AppData.engine.channels + ci)->qs[qs_index[qi]] = malloc(sizeof(clist_node));
+            (CF_AppData.engine.channels + ci)->qs[qs_index[qi]] = malloc(sizeof(CF_CListNode_t *));
         }
     }
 
@@ -8960,7 +8960,7 @@ void Test_CF_CFDP_DisableEngine_ClosesAllActiveFilesAndAnyOpenPlaybackDirectorie
         dummy_channel[ci]->pipe = CFE_SB_PIPEID_C(CFE_ResourceId_FromInteger(1 + ci));
         for (qi = 0; qi < num_clist_node_ptrs; ++qi)
         {
-            (CF_AppData.engine.channels + ci)->qs[qs_index[qi]] = malloc(sizeof(clist_node));
+            (CF_AppData.engine.channels + ci)->qs[qs_index[qi]] = malloc(sizeof(CF_CListNode_t *));
         }
     }
 
@@ -9067,7 +9067,7 @@ void Test_CF_CFDP_DisableEngine_ClosesAllActiveFilesAndAllOpenPlaybackDirectorie
         dummy_channel[ci]->pipe = CFE_SB_PIPEID_C(CFE_ResourceId_FromInteger(1 + ci));
         for (qi = 0; qi < num_clist_node_ptrs; ++qi)
         {
-            (CF_AppData.engine.channels + ci)->qs[qs_index[qi]] = malloc(sizeof(clist_node));
+            (CF_AppData.engine.channels + ci)->qs[qs_index[qi]] = malloc(sizeof(CF_CListNode_t *));
         }
     }
 

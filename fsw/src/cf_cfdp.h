@@ -98,7 +98,7 @@ typedef enum
 typedef struct CF_History
 {
     CF_TxnFilenames_t       fnames;
-    clist_node_t            cl_node;
+    CF_CListNode_t          cl_node;
     CF_Direction_t          dir;
     CF_CFDP_ConditionCode_t cc;
     CF_EntityId_t           src_eid;  /* src_eid is always the source eid */
@@ -109,7 +109,7 @@ typedef struct CF_History
 typedef struct CF_ChunkWrapper
 {
     CF_ChunkList_t chunks;
-    clist_node_t   cl_node;
+    CF_CListNode_t cl_node;
 } CF_ChunkWrapper_t;
 
 typedef struct CF_Playback
@@ -236,7 +236,7 @@ typedef struct CF_Transaction
     uint8 chan_num; /* if ever more than one engine, this may need to change to pointer */
     uint8 priority;
 
-    clist_node_t cl_node;
+    CF_CListNode_t cl_node;
 
     CF_Playback_t *p; /* NULL if transaction does not belong to a playback */
 
@@ -280,8 +280,8 @@ typedef enum
 
 typedef struct CF_Channel
 {
-    clist_node qs[CF_QueueIdx_NUM];
-    clist_node cs[CF_Direction_NUM];
+    CF_CListNode_t *qs[CF_QueueIdx_NUM];
+    CF_CListNode_t *cs[CF_Direction_NUM];
 
     CFE_SB_PipeId_t pipe;
 

@@ -40,7 +40,7 @@
 **       node must not be NULL.
 **
 *************************************************************************/
-void CF_CList_InitNode(clist_node node)
+void CF_CList_InitNode(CF_CListNode_t *node)
 {
     node->next = node;
     node->prev = node;
@@ -53,7 +53,7 @@ void CF_CList_InitNode(clist_node node)
 **       head must not be NULL. node must not be NULL.
 **
 *************************************************************************/
-void CF_CList_InsertFront(clist_node *head, clist_node node)
+void CF_CList_InsertFront(CF_CListNode_t **head, CF_CListNode_t *node)
 {
     CF_Assert(head);
     CF_Assert(node);
@@ -62,7 +62,7 @@ void CF_CList_InsertFront(clist_node *head, clist_node node)
 
     if (*head)
     {
-        clist_node_t *last = (*head)->prev;
+        CF_CListNode_t *last = (*head)->prev;
 
         node->next = *head;
         node->prev = last;
@@ -80,7 +80,7 @@ void CF_CList_InsertFront(clist_node *head, clist_node node)
 **       head must not be NULL. node must not be NULL.
 **
 *************************************************************************/
-void CF_CList_InsertBack(clist_node *head, clist_node node)
+void CF_CList_InsertBack(CF_CListNode_t **head, CF_CListNode_t *node)
 {
     CF_Assert(head);
     CF_Assert(node);
@@ -93,7 +93,7 @@ void CF_CList_InsertBack(clist_node *head, clist_node node)
     }
     else
     {
-        clist_node_t *last = (*head)->prev;
+        CF_CListNode_t *last = (*head)->prev;
 
         node->next    = *head;
         (*head)->prev = node;
@@ -113,9 +113,9 @@ void CF_CList_InsertBack(clist_node *head, clist_node node)
 **  \endreturns
 **
 *************************************************************************/
-clist_node CF_CList_Pop(clist_node *head)
+CF_CListNode_t *CF_CList_Pop(CF_CListNode_t **head)
 {
-    clist_node ret;
+    CF_CListNode_t *ret;
 
     CF_Assert(head);
 
@@ -135,7 +135,7 @@ clist_node CF_CList_Pop(clist_node *head)
 **       head must not be NULL. node must not be NULL.
 **
 *************************************************************************/
-void CF_CList_Remove(clist_node *head, clist_node node)
+void CF_CList_Remove(CF_CListNode_t **head, CF_CListNode_t *node)
 {
     CF_Assert(head);
     CF_Assert(node);
@@ -171,7 +171,7 @@ void CF_CList_Remove(clist_node *head, clist_node node)
 **       head must not be NULL. node must not be NULL.
 **
 *************************************************************************/
-void CF_CList_InsertAfter(clist_node *head, clist_node start, clist_node after)
+void CF_CList_InsertAfter(CF_CListNode_t **head, CF_CListNode_t *start, CF_CListNode_t *after)
 {
     /* calling insert_after with nothing to insert after (no head) makes no sense */
     CF_Assert(head);
@@ -193,11 +193,11 @@ void CF_CList_InsertAfter(clist_node *head, clist_node start, clist_node after)
 **       start may be NULL. fn must be a valid function. context may be NULL.
 **
 *************************************************************************/
-void CF_CList_Traverse(clist_node start, clist_fn_t fn, void *context)
+void CF_CList_Traverse(CF_CListNode_t *start, CF_CListFn_t fn, void *context)
 {
-    clist_node n = start;
-    clist_node nn;
-    int        last = 0;
+    CF_CListNode_t *n = start;
+    CF_CListNode_t *nn;
+    int             last = 0;
 
     if (n)
     {
@@ -235,13 +235,13 @@ err_out:;
 **       end may be NULL. fn must be a valid function. context may be NULL.
 **
 *************************************************************************/
-void CF_CList_Traverse_R(clist_node end, clist_fn_t fn, void *context)
+void CF_CList_Traverse_R(CF_CListNode_t *end, CF_CListFn_t fn, void *context)
 {
     if (end)
     {
-        clist_node n = end->prev;
-        clist_node nn;
-        int        last = 0;
+        CF_CListNode_t *n = end->prev;
+        CF_CListNode_t *nn;
+        int             last = 0;
 
         if (n)
         {

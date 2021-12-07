@@ -247,7 +247,7 @@ void CF_CFDP_ResetHistory(CF_Channel_t *c, CF_History_t *h)
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_CFDP_FindTransactionBySequenceNumber_(clist_node n, trans_seq_arg_t *context)
+// static int CF_CFDP_FindTransactionBySequenceNumber_(CF_CListNode_t * n, trans_seq_arg_t *context)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -839,7 +839,7 @@ int32 CF_CFDP_InitEngine(void)
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_CFDP_CycleTx_(clist_node node, void *context)
+// static int CF_CFDP_CycleTx_(CF_CListNode_t * node, void *context)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -883,7 +883,7 @@ int32 CF_CFDP_InitEngine(void)
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_CFDP_DoTick(clist_node node, void *context)
+// static int CF_CFDP_DoTick(CF_CListNode_t * node, void *context)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -1196,7 +1196,7 @@ void CF_CFDP_CancelTransaction(CF_Transaction_t *t)
 **  \retcode Always 0 indicate list traversal should not exit early. \endcode
 **  \endreturns
 *************************************************************************/
-// static int CF_CFDP_CloseFiles(clist_node n, void *context)
+// static int CF_CFDP_CloseFiles(CF_CListNode_t * n, void *context)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);

@@ -666,11 +666,11 @@ static void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
 **       n must not be NULL. c must not be NULL.
 **
 *************************************************************************/
-static int CF_PurgeHistory(clist_node n, CF_Channel_t *c)
+static int CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c)
 {
     CF_History_t *h = container_of(n, CF_History_t, cl_node);
     CF_CFDP_ResetHistory(c, h); /* ok to reset transaction since it's in PEND it hasn't started yet */
-    return CLIST_CONT;
+    return CF_CLIST_CONT;
 }
 
 /************************************************************************/
@@ -680,11 +680,11 @@ static int CF_PurgeHistory(clist_node n, CF_Channel_t *c)
 **       n must not be NULL.
 **
 *************************************************************************/
-static int CF_PurgeTransaction(clist_node n, void *ignored)
+static int CF_PurgeTransaction(CF_CListNode_t *n, void *ignored)
 {
     CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
     CF_CFDP_ResetTransaction(t, 0);
-    return CLIST_CONT;
+    return CF_CLIST_CONT;
 }
 
 /************************************************************************/
@@ -740,7 +740,7 @@ static int CF_DoPurgeQueue(uint8 chan_num, cf_cmd_unionargs_t *cmd)
 
     if (hist)
     {
-        CF_CList_Traverse(c->qs[CF_QueueIdx_HIST], (clist_fn_t)CF_PurgeHistory, c);
+        CF_CList_Traverse(c->qs[CF_QueueIdx_HIST], (CF_CListFn_t)CF_PurgeHistory, c);
     }
 
     return ret;

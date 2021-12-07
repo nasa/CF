@@ -37,7 +37,7 @@ extern type_of_context_CF_CList_Traverse_t type_of_context_CF_CList_Traverse;
 **       node must not be NULL.
 **
 *************************************************************************/
-void CF_CList_InitNode(clist_node node)
+void CF_CList_InitNode(CF_CListNode_t *node)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_CList_InitNode), &node, sizeof(node));
 
@@ -51,7 +51,7 @@ void CF_CList_InitNode(clist_node node)
 **       head must not be NULL. node must not be NULL.
 **
 *************************************************************************/
-void CF_CList_InsertFront(clist_node *head, clist_node node)
+void CF_CList_InsertFront(CF_CListNode_t **head, CF_CListNode_t *node)
 {
     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
     exit(-86);
@@ -64,7 +64,7 @@ void CF_CList_InsertFront(clist_node *head, clist_node node)
 **       head must not be NULL. node must not be NULL.
 **
 *************************************************************************/
-void CF_CList_InsertBack(clist_node *head, clist_node node)
+void CF_CList_InsertBack(CF_CListNode_t **head, CF_CListNode_t *node)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_CList_InsertBack), &head, sizeof(head));
     UT_Stub_CopyFromLocal(UT_KEY(CF_CList_InsertBack), &node, sizeof(node));
@@ -83,9 +83,9 @@ void CF_CList_InsertBack(clist_node *head, clist_node node)
 **  \endreturns
 **
 *************************************************************************/
-clist_node CF_CList_Pop(clist_node *head)
+CF_CListNode_t *CF_CList_Pop(CF_CListNode_t **head)
 {
-    clist_node forced_return;
+    CF_CListNode_t *forced_return;
 
     UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Pop), &head, sizeof(head));
 
@@ -103,7 +103,7 @@ clist_node CF_CList_Pop(clist_node *head)
 **       head must not be NULL. node must not be NULL.
 **
 *************************************************************************/
-void CF_CList_Remove(clist_node *head, clist_node node)
+void CF_CList_Remove(CF_CListNode_t **head, CF_CListNode_t *node)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Remove), &head, sizeof(head));
     UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Remove), &node, sizeof(node));
@@ -118,7 +118,7 @@ void CF_CList_Remove(clist_node *head, clist_node node)
 **       head must not be NULL. node must not be NULL.
 **
 *************************************************************************/
-void CF_CList_InsertAfter(clist_node *head, clist_node start, clist_node after)
+void CF_CList_InsertAfter(CF_CListNode_t **head, CF_CListNode_t *start, CF_CListNode_t *after)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_CList_InsertAfter), &head, sizeof(head));
     UT_Stub_CopyFromLocal(UT_KEY(CF_CList_InsertAfter), &start, sizeof(start));
@@ -135,7 +135,7 @@ void CF_CList_InsertAfter(clist_node *head, clist_node start, clist_node after)
 **
 *************************************************************************/
 
-void CF_CList_Traverse(clist_node start, clist_fn_t fn, void *context)
+void CF_CList_Traverse(CF_CListNode_t *start, CF_CListFn_t fn, void *context)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), &start, sizeof(start));
     UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), &fn, sizeof(fn));
@@ -157,10 +157,10 @@ void CF_CList_Traverse(clist_node start, clist_fn_t fn, void *context)
                 break;
 
             case TRAVERSE_ALL_ARGS_T:
-                // TODO: fn_size = sizeof(clist_fn_t) is cheating and an
+                // TODO: fn_size = sizeof(CF_CListFn_t ) is cheating and an
                 // assumption the actual type I've seen as the context fn here is
                 // CF_TraverseAllTransactions_fn_t and happens to be same size 8
-                fn_size = sizeof(clist_fn_t);
+                fn_size = sizeof(CF_CListFn_t);
                 UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), context, fn_size);
                 UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), (uint8 *)context + fn_size, sizeof(void *));
                 // TODO: does the counter really need this behavior?  all it is
@@ -216,7 +216,7 @@ void CF_CList_Traverse(clist_node start, clist_fn_t fn, void *context)
 *************************************************************************/
 #include "cf_cfdp.h" //TODO:this is to get CF_Transaction_t -- find a better way?
 
-void CF_CList_Traverse_R(clist_node end, clist_fn_t fn, void *context)
+void CF_CList_Traverse_R(CF_CListNode_t *end, CF_CListFn_t fn, void *context)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse_R), &end, sizeof(end));
     UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse_R), &fn, sizeof(fn));

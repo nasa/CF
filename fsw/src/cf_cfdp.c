@@ -218,7 +218,7 @@ static CF_Transaction_t *CF_CFDP_FindUnusedTransaction(CF_Channel_t *c)
         int       q_index; /* initialized below in if */
         const int chan_index = (c - CF_AppData.engine.channels);
 
-        clist_node        n = c->qs[CF_QueueIdx_FREE];
+        CF_CListNode_t   *n = c->qs[CF_QueueIdx_FREE];
         CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
 
         CF_CList_Remove_Ex(c, CF_QueueIdx_FREE, &t->cl_node);
@@ -298,7 +298,7 @@ static void CF_CFDP_FreeTransaction(CF_Transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_FindTransactionBySequenceNumber_(clist_node n, trans_seq_arg_t *context)
+static int CF_CFDP_FindTransactionBySequenceNumber_(CF_CListNode_t *n, trans_seq_arg_t *context)
 {
     CF_Transaction_t *t   = container_of(n, CF_Transaction_t, cl_node);
     int               ret = 0;
@@ -336,14 +336,14 @@ CF_Transaction_t *CF_CFDP_FindTransactionBySequenceNumber(CF_Channel_t       *c,
      *
      * Let's put CF_QueueIdx_RX up front, because most RX packets will be file data PDUs */
     trans_seq_arg_t   ctx              = {transaction_sequence_number, src_eid, NULL};
-    clist_node        ptrs[NUM_CLISTS] = {c->qs[CF_QueueIdx_RX], c->qs[CF_QueueIdx_PEND], c->qs[CF_QueueIdx_TXA],
-                                   c->qs[CF_QueueIdx_TXW]};
+    CF_CListNode_t   *ptrs[NUM_CLISTS] = {c->qs[CF_QueueIdx_RX], c->qs[CF_QueueIdx_PEND], c->qs[CF_QueueIdx_TXA],
+                                        c->qs[CF_QueueIdx_TXW]};
     int               i;
     CF_Transaction_t *ret = NULL;
 
     for (i = 0; i < NUM_CLISTS; ++i)
     {
-        CF_CList_Traverse(ptrs[i], (clist_fn_t)CF_CFDP_FindTransactionBySequenceNumber_, &ctx);
+        CF_CList_Traverse(ptrs[i], (CF_CListFn_t)CF_CFDP_FindTransactionBySequenceNumber_, &ctx);
         if (ctx.t)
         {
             ret = ctx.t;
@@ -1488,7 +1488,7 @@ static void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_CycleTx_(clist_node node, void *context)
+static int CF_CFDP_CycleTx_(CF_CListNode_t *node, void *context)
 {
     CF_CFDP_CycleTx_args_t *args = (CF_CFDP_CycleTx_args_t *)context;
     CF_Transaction_t       *t    = container_of(node, CF_Transaction_t, cl_node);
@@ -1577,9 +1577,9 @@ static void CF_CFDP_CycleTx(CF_Channel_t *c)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_DoTick(clist_node node, void *context)
+static int CF_CFDP_DoTick(CF_CListNode_t *node, void *context)
 {
-    int               ret  = CLIST_CONT; /* CLIST_CONT means don't tick one, keep looking for cur */
+    int               ret  = CF_CLIST_CONT; /* CF_CLIST_CONT means don't tick one, keep looking for cur */
     tick_args_t      *args = (tick_args_t *)context;
     CF_Transaction_t *t    = container_of(node, CF_Transaction_t, cl_node);
     if (!args->c->cur || (args->c->cur == t))
@@ -1596,7 +1596,7 @@ static int CF_CFDP_DoTick(clist_node node, void *context)
          *     so there is no need to check it here */
         if (args->c->cur)
         {
-            ret              = CLIST_EXIT;
+            ret              = CF_CLIST_EXIT;
             args->early_exit = 1;
         }
     }
@@ -2234,14 +2234,14 @@ void CF_CFDP_CancelTransaction(CF_Transaction_t *t)
 **  \retcode Always 0 indicate list traversal should not exit early. \endcode
 **  \endreturns
 *************************************************************************/
-static int CF_CFDP_CloseFiles(clist_node n, void *context)
+static int CF_CFDP_CloseFiles(CF_CListNode_t *n, void *context)
 {
     CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
     if (OS_ObjectIdDefined(t->fd))
     {
         CF_WrappedClose(t->fd);
     }
-    return CLIST_CONT;
+    return CF_CLIST_CONT;
 }
 
 /************************************************************************/
@@ -2260,7 +2260,7 @@ void CF_CFDP_DisableEngine(void)
     {
         CF_Channel_t *c = CF_AppData.engine.channels + i;
         /* first, close all active files */
-        clist_node ptrs[] = {c->qs[CF_QueueIdx_RX], c->qs[CF_QueueIdx_TXA], c->qs[CF_QueueIdx_TXW]};
+        CF_CListNode_t *ptrs[] = {c->qs[CF_QueueIdx_RX], c->qs[CF_QueueIdx_TXA], c->qs[CF_QueueIdx_TXW]};
         for (j = 0; j < sizeof(ptrs) / sizeof(*ptrs); ++j)
             CF_CList_Traverse(ptrs[j], CF_CFDP_CloseFiles, NULL);
 

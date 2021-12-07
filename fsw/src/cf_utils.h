@@ -58,20 +58,21 @@ static inline void cf_move_transaction(CF_Transaction_t *t, CF_QueueIdx_t q)
     ++CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index];
 }
 
-static inline void CF_CList_Remove_Ex(CF_Channel_t *c, CF_QueueIdx_t index, clist_node node)
+static inline void CF_CList_Remove_Ex(CF_Channel_t *c, CF_QueueIdx_t index, CF_CListNode_t *node)
 {
     CF_CList_Remove(&c->qs[index], node);
     CF_Assert(CF_AppData.hk.channel_hk[c - CF_AppData.engine.channels].q_size[index]); /* sanity check */
     --CF_AppData.hk.channel_hk[c - CF_AppData.engine.channels].q_size[index];
 }
 
-static inline void CF_CList_InsertAfter_Ex(CF_Channel_t *c, CF_QueueIdx_t index, clist_node start, clist_node after)
+static inline void CF_CList_InsertAfter_Ex(CF_Channel_t *c, CF_QueueIdx_t index, CF_CListNode_t *start,
+                                           CF_CListNode_t *after)
 {
     CF_CList_InsertAfter(&c->qs[index], start, after);
     ++CF_AppData.hk.channel_hk[c - CF_AppData.engine.channels].q_size[index];
 }
 
-static inline void CF_CList_InsertBack_Ex(CF_Channel_t *c, CF_QueueIdx_t index, clist_node node)
+static inline void CF_CList_InsertBack_Ex(CF_Channel_t *c, CF_QueueIdx_t index, CF_CListNode_t *node)
 {
     CF_CList_InsertBack(&c->qs[index], node);
     ++CF_AppData.hk.channel_hk[c - CF_AppData.engine.channels].q_size[index];
