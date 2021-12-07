@@ -992,40 +992,6 @@ void Test_CF_HeaderSize_Return_sizeof_pdu_header_t_Plus_2_Times_eid_l_Plus_tsn_l
 
 /*******************************************************************************
 **
-**  CF_EndOfHeaderPtr tests (simple) - full coverage - [unstubbables: CF_HeaderSize]
-**
-*******************************************************************************/
-
-void Test_CF_EndOfHeaderPtr_Return_ph_PointerPlus_CF_HeaderSize_ph(void)
-{
-    /* Arrange */
-    pdu_header_t  dummy_ph;
-    pdu_header_t *arg_ph                      = &dummy_ph;
-    int32         forced_return_FGV_for_eid_l = Any_uint8_LessThan(
-                sizeof(cf_entity_id_t)); /*  Any_uint8_LessThan(sizeof(cf_entity_id_t)) used for reasonable size */
-    int32 forced_return_FGV_for_tsn_l = Any_uint8_LessThan(
-        sizeof(cf_transaction_seq_t)); /*  Any_uint8_LessThan(sizeof(cf_transaction_seq_t)) used for reasonable size */
-    void *expected_result = (uint8 *)arg_ph + sizeof(pdu_header_t) + (2 * (forced_return_FGV_for_eid_l + 1)) +
-                            (forced_return_FGV_for_tsn_l + 1); /* each +1 added by CUT */
-    void *local_result;
-
-    /* Arrange for CF_HeaderSize */
-    UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_for_eid_l);
-    UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_for_tsn_l);
-
-    /* Act */
-    local_result = CF_EndOfHeaderPtr(arg_ph);
-
-    /* Assert */
-    UtAssert_ADDRESS_EQ(local_result, expected_result);
-    /* Assert for CF_HeaderSize */
-    UtAssert_STUB_COUNT(FGV, 2);
-} /* end Test_CF_EndOfHeaderPtr_Return_ph_PointerPlus_CF_HeaderSize_ph */
-
-/* end CF_EndOfHeaderPtr tests */
-
-/*******************************************************************************
-**
 **  cf_cfdp_helpers_tests UtTest_Add groups
 **
 *******************************************************************************/
@@ -1172,12 +1138,6 @@ void add_CF_HeaderSize_tests(void)
                "Test_CF_HeaderSize_Return_sizeof_pdu_header_t_Plus_2_Times_eid_l_Plus_tsn_l");
 } /* end add_CF_HeaderSize_tests */
 
-void add_CF_EndOfHeaderPtr_tests(void)
-{
-    UtTest_Add(Test_CF_EndOfHeaderPtr_Return_ph_PointerPlus_CF_HeaderSize_ph, cf_cfdp_helpers_tests_Setup,
-               cf_cfdp_helpers_tests_Teardown, "Test_CF_EndOfHeaderPtr_Return_ph_PointerPlus_CF_HeaderSize_ph");
-} /* end add_CF_EndOfHeaderPtr_tests */
-
 /* end cf_cfdp_helpers_tests UtTest_Add groups */
 
 /*******************************************************************************
@@ -1205,8 +1165,6 @@ void UtTest_Setup(void)
     add_CF_SetVariableHeader_tests();
 
     add_CF_HeaderSize_tests();
-
-    add_CF_EndOfHeaderPtr_tests();
 
 } /* end UtTest_Setup for cf_cfdp_helpers_tests.c */
 

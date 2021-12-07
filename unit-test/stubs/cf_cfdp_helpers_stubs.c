@@ -31,22 +31,6 @@
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_EndOfHeaderPtr()
- * ----------------------------------------------------
- */
-void *CF_EndOfHeaderPtr(const pdu_header_t *ph)
-{
-    UT_GenStub_SetupReturnBuffer(CF_EndOfHeaderPtr, void *);
-
-    UT_GenStub_AddParam(CF_EndOfHeaderPtr, const pdu_header_t *, ph);
-
-    UT_GenStub_Execute(CF_EndOfHeaderPtr, Basic, NULL);
-
-    return UT_GenStub_GetReturnValue(CF_EndOfHeaderPtr, void *);
-}
-
-/*
- * ----------------------------------------------------
  * Generated stub function for CF_GetMemcpySize()
  * ----------------------------------------------------
  */
