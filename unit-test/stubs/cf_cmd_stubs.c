@@ -251,7 +251,8 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(CF_TransactionSeq_t ts, CF_EntityId_t eid)
+// static CF_Transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(CF_TransactionSeq_t ts, CF_EntityId_t
+// eid)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -290,7 +291,7 @@ typedef struct
 **       t must not be NULL. context must not be NULL.
 **
 *************************************************************************/
-// static void CF_DoSuspRes_(transaction_t *t, susp_res_arg_t *context)
+// static void CF_DoSuspRes_(CF_Transaction_t *t, susp_res_arg_t *context)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -350,7 +351,7 @@ typedef struct
 **       t must not be NULL.
 **
 *************************************************************************/
-// static void CF_CmdCancel_(transaction_t *t, void *ignored)
+// static void CF_CmdCancel_(CF_Transaction_t *t, void *ignored)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -378,7 +379,7 @@ typedef struct
 **       msg must not be NULL.
 **
 *************************************************************************/
-// static void CF_CmdAbandon_(transaction_t *t, void *ignored)
+// static void CF_CmdAbandon_(CF_Transaction_t *t, void *ignored)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -490,7 +491,7 @@ typedef struct
 **       n must not be NULL. c must not be NULL.
 **
 *************************************************************************/
-// static int CF_PurgeHistory(clist_node n, channel_t *c)
+// static int CF_PurgeHistory(clist_node n, CF_Channel_t *c)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);

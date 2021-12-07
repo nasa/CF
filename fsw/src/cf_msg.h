@@ -81,7 +81,7 @@ typedef struct
 typedef struct
 {
     hk_cfdp_counters_t counters;
-    uint16             q_size[CF_Q_NUM];
+    uint16             q_size[CF_QueueIdx_NUM];
     uint8              poll_counter;
     uint8              playback_counter;
     uint8              frozen; /* NOTE: this could be more than one flag if we ever need it */
@@ -100,7 +100,7 @@ typedef struct
     hk_channel_data_t channel_hk[CF_NUM_CHANNELS];
 } cf_hk_packet_t;
 
-/* used with CF_SEND_CFG_PARAMS_CC */
+/* used with CF_SendRet_CFG_PARAMS_CC */
 typedef struct
 {
     CFE_MSG_TelemetryHeader_t tlm_header;
@@ -132,20 +132,20 @@ typedef struct
 /* ANOTHER NOTE: not all of these are used, but they are here legacy from the old app */
 typedef enum
 {
-    CF_NOOP_CC            = 0,
-    CF_RESET_CC           = 1,
-    CF_TX_FILE_CC         = 2,
-    CF_PLAYBACK_DIR_CC    = 3,
-    CF_FREEZE_CC          = 4,
-    CF_THAW_CC            = 5,
-    CF_SUSPEND_CC         = 6,
-    CF_RESUME_CC          = 7,
-    CF_CANCEL_CC          = 8,
-    CF_ABANDON_CC         = 9,
-    CF_SET_MIB_PARAM_CC   = 10,
-    CF_GET_MIB_PARAM_CC   = 11,
-    CF_SEND_CFG_PARAMS_CC = 14,
-    CF_WRITE_QUEUE_CC     = 15,
+    CF_NOOP_CC               = 0,
+    CF_RESET_CC              = 1,
+    CF_TX_FILE_CC            = 2,
+    CF_PLAYBACK_DIR_CC       = 3,
+    CF_FREEZE_CC             = 4,
+    CF_THAW_CC               = 5,
+    CF_SUSPEND_CC            = 6,
+    CF_RESUME_CC             = 7,
+    CF_CANCEL_CC             = 8,
+    CF_ABANDON_CC            = 9,
+    CF_SET_MIB_PARAM_CC      = 10,
+    CF_GET_MIB_PARAM_CC      = 11,
+    CF_SendRet_CFG_PARAMS_CC = 14,
+    CF_WRITE_QUEUE_CC        = 15,
 
     /* NOTE: ENABLE/DISABLE commands should be a single command code, but legacy has them separate (ugh) */
     CF_ENABLE_DEQUEUE_CC      = 16,

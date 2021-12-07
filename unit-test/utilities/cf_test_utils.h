@@ -145,21 +145,21 @@ typedef union
 
 typedef struct
 {
-    transaction_t  *t;
-    int             num_segment_requests;
-    cfdp_send_ret_t forced_return;
+    CF_Transaction_t *t;
+    int               num_segment_requests;
+    CF_SendRet_t      forced_return;
 } CF_PACK CF_CFDP_SendNak_context_t;
 
 typedef struct
 {
-    const transaction_t *t;
-    uint8                directive_code;
-    CF_EntityId_t        src_eid;
-    CF_EntityId_t        dst_eid;
-    uint8                towards_sender;
-    CF_TransactionSeq_t  tsn;
-    int                  silent;
-    CF_CFDP_PduHeader_t *forced_return;
+    const CF_Transaction_t *t;
+    uint8                   directive_code;
+    CF_EntityId_t           src_eid;
+    CF_EntityId_t           dst_eid;
+    uint8                   towards_sender;
+    CF_TransactionSeq_t     tsn;
+    int                     silent;
+    CF_CFDP_PduHeader_t    *forced_return;
 } CF_PACK CF_CFDP_ConstructPduHeader_context_t;
 
 typedef struct
@@ -247,10 +247,10 @@ typedef struct
 
 typedef struct
 {
-    channel_t          *c;
+    CF_Channel_t       *c;
     CF_TransactionSeq_t transaction_sequence_number;
     CF_EntityId_t       src_eid;
-    transaction_t      *forced_return;
+    CF_Transaction_t   *forced_return;
 } CF_PACK CF_CFDP_FindTransactionBySequenceNumber_context_t;
 
 typedef struct
@@ -262,14 +262,14 @@ typedef struct
 
 typedef struct
 {
-    transaction_t *t;
-    int            keep_history;
+    CF_Transaction_t *t;
+    int               keep_history;
 } CF_PACK CF_CFDP_ResetTransaction_context_t;
 
 typedef struct
 {
-    channel_t *c;
-    history_t *h;
+    CF_Channel_t *c;
+    CF_History_t *h;
 } CF_PACK CF_CFDP_ResetHistory_context_t;
 
 typedef struct
@@ -281,21 +281,21 @@ typedef struct
 
 typedef struct
 {
-    int32            fd;
-    channel_t       *c;
-    cf_queue_index_t q;
+    int32         fd;
+    CF_Channel_t *c;
+    CF_QueueIdx_t q;
 } CF_PACK CF_WriteQueueDataToFile_context_t;
 
 typedef struct
 {
-    int32       fd;
-    channel_t  *c;
-    direction_t dir;
+    int32          fd;
+    CF_Channel_t  *c;
+    CF_Direction_t dir;
 } CF_PACK CF_WriteHistoryQueueDataToFile_context_t;
 
 typedef struct
 {
-    channel_t                      *c;
+    CF_Channel_t                   *c;
     CF_TraverseAllTransactions_fn_t fn;
     void                           *context;
     /* TODO: add forced return? Stub is kinda using it but not from context */
@@ -303,19 +303,19 @@ typedef struct
 
 typedef struct
 {
-    transaction_t   *t;
-    cf_queue_index_t q;
+    CF_Transaction_t *t;
+    CF_QueueIdx_t     q;
 } CF_PACK CF_InsertSortPrio_context_t;
 
 typedef struct
 {
-    transaction_t  *t;
-    cfdp_send_ret_t forced_return;
+    CF_Transaction_t *t;
+    CF_SendRet_t      forced_return;
 } CF_PACK CF_CFDP_SendEof_context_t;
 
 typedef struct
 {
-    transaction_t       *t;
+    CF_Transaction_t    *t;
     int                  silent;
     CF_CFDP_PduHeader_t *forced_return;
 } CF_PACK CF_CFDP_MsgOutGet_context_t;
@@ -353,13 +353,13 @@ typedef struct
 
 typedef struct
 {
-    transaction_t          *t;
+    CF_Transaction_t       *t;
     CF_CFDP_AckTxnStatus_t  ts;
     CF_CFDP_FileDirective_t dir_code;
     CF_CFDP_ConditionCode_t cc;
     CF_EntityId_t           peer_eid;
     CF_TransactionSeq_t     tsn;
-    cfdp_send_ret_t         forced_return;
+    CF_SendRet_t            forced_return;
 } CF_PACK CF_CFDP_SendAck_context_t;
 
 typedef struct
@@ -377,10 +377,10 @@ typedef struct
 
 typedef struct
 {
-    transaction_t  *t;
-    uint32          offset;
-    int             len;
-    cfdp_send_ret_t forced_return;
+    CF_Transaction_t *t;
+    uint32            offset;
+    int               len;
+    CF_SendRet_t      forced_return;
 } CF_PACK CF_CFDP_SendFd_context_t;
 
 typedef struct
@@ -420,7 +420,7 @@ typedef struct
     clist_fn_t          fn;
     CF_TransactionSeq_t context_transaction_sequence_number;
     CF_EntityId_t       context_src_eid;
-    transaction_t      *context_forced_t; /* out param */
+    CF_Transaction_t   *context_forced_t; /* out param */
 } CF_PACK CF_CList_Traverse_FIND_T_BY_SEQ_NUM_context_t;
 
 typedef struct
@@ -463,32 +463,32 @@ typedef struct
 
 typedef struct
 {
-    clist_node     end;
-    clist_fn_t     fn;
-    transaction_t *context_t;
+    clist_node        end;
+    clist_fn_t        fn;
+    CF_Transaction_t *context_t;
 } CF_PACK CF_CList_Traverse_R_context_t;
 
 typedef struct
 {
-    transaction_t *t;
-    void          *context;
+    CF_Transaction_t *t;
+    void             *context;
 } CF_PACK DummyFunctionFor_CF_TraverseAllTransactions__context_t;
 
 typedef struct
 {
-    transaction_t       *t;
+    CF_Transaction_t    *t;
     CF_CFDP_PduHeader_t *pdu;
 } CF_PACK Dummy_fd_fn_context_t;
 
 typedef struct
 {
-    transaction_t       *t;
+    CF_Transaction_t    *t;
     CF_CFDP_PduHeader_t *pdu;
 } CF_PACK Dummy_fns_context_t;
 
 typedef struct
 {
-    transaction_t             *t;
+    CF_Transaction_t          *t;
     const CF_CFDP_PduHeader_t *pdu;
 } CF_PACK Dummy_fns_CF_CFDP_S_DispatchRecv_context_t;
 

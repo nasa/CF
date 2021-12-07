@@ -34,7 +34,7 @@
 
 typedef struct
 {
-    transaction_t       *t;
+    CF_Transaction_t    *t;
     CF_CFDP_PduHeader_t *pdu;
     uint32               gap_counter;
 } gap_compute_args_t;
@@ -46,7 +46,7 @@ typedef struct
 **       t must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_R2_SetCc(transaction_t *t, CF_CFDP_ConditionCode_t cc)
+// static void CF_CFDP_R2_SetCc(CF_Transaction_t *t, CF_CFDP_ConditionCode_t cc)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -65,7 +65,7 @@ typedef struct
 **       t must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_R1_Reset(transaction_t *t)
+// static void CF_CFDP_R1_Reset(CF_Transaction_t *t)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -82,7 +82,7 @@ typedef struct
 **       t must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_R2_Reset(transaction_t *t)
+// static void CF_CFDP_R2_Reset(CF_Transaction_t *t)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -100,7 +100,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_CFDP_R_CheckCrc(transaction_t *t, uint32 expected_crc)
+// static int CF_CFDP_R_CheckCrc(CF_Transaction_t *t, uint32 expected_crc)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -123,7 +123,7 @@ typedef struct
 **       t must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_R2_Complete(transaction_t *t, int ok_to_send_nak)
+// static void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -141,7 +141,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_CFDP_R_ProcessFd(transaction_t *t, uint32 *bytes_received)
+// static int CF_CFDP_R_ProcessFd(CF_Transaction_t *t, uint32 *bytes_received)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -164,7 +164,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_CFDP_R_SubstateRecvEof(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
+// static int CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -185,7 +185,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static void CF_CFDP_R1_SubstateRecvEof(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
+// static void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -207,7 +207,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static void CF_CFDP_R2_SubstateRecvEof(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
+// static void CF_CFDP_R2_SubstateRecvEof(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -224,7 +224,7 @@ typedef struct
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_R1_SubstateRecvFileData(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
+// static void CF_CFDP_R1_SubstateRecvFileData(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -245,7 +245,7 @@ typedef struct
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_R2_SubstateRecvFileData(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
+// static void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -291,7 +291,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_CFDP_R_SubstateSendNak(transaction_t *t)
+// static int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -305,9 +305,9 @@ typedef struct
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CFDP_R_Init(transaction_t *t)
+void CF_CFDP_R_Init(CF_Transaction_t *t)
 {
-    UT_GenStub_AddParam(CF_CFDP_R_Init, transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_R_Init, CF_Transaction_t *, t);
 
     UT_GenStub_Execute(CF_CFDP_R_Init, Basic, NULL);
 }
@@ -334,7 +334,7 @@ void CF_CFDP_R_Init(transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_CFDP_R2_CalcCrcChunk(transaction_t *t)
+// static int CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -352,7 +352,7 @@ void CF_CFDP_R_Init(transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-// static int CFDP_R2_SubstateSendFin(transaction_t *t)
+// static int CF_TxnState_R2_SubstateSendFin(CF_Transaction_t *t)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -370,7 +370,7 @@ void CF_CFDP_R_Init(transaction_t *t)
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_R2_Recv_fin_ack(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
+// static void CF_CFDP_R2_Recv_fin_ack(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -391,7 +391,7 @@ void CF_CFDP_R_Init(transaction_t *t)
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_R2_RecvMd(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
+// static void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -410,9 +410,9 @@ void CF_CFDP_R_Init(transaction_t *t)
 **       t must not be NULL. fns must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_R_DispatchRecv(transaction_t *t, void (*const
-// fns[SEND_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(transaction_t*, const CF_CFDP_PduHeader_t*), void (*const
-// fd_fn)(transaction_t*, const CF_CFDP_PduHeader_t*))
+// static void CF_CFDP_R_DispatchRecv(CF_Transaction_t *t, void (*const
+// fns[CF_TxSubState_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(CF_Transaction_t*, const CF_CFDP_PduHeader_t*),
+// void (*const fd_fn)(CF_Transaction_t*, const CF_CFDP_PduHeader_t*))
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -426,9 +426,9 @@ void CF_CFDP_R_Init(transaction_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CFDP_R1_Recv(transaction_t *t)
+void CF_CFDP_R1_Recv(CF_Transaction_t *t)
 {
-    UT_GenStub_AddParam(CF_CFDP_R_Init, transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_R_Init, CF_Transaction_t *, t);
 
     UT_GenStub_Execute(CF_CFDP_R_Init, Basic, NULL);
 }
@@ -440,9 +440,9 @@ void CF_CFDP_R1_Recv(transaction_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CFDP_R2_Recv(transaction_t *t)
+void CF_CFDP_R2_Recv(CF_Transaction_t *t)
 {
-    UT_GenStub_AddParam(CF_CFDP_R2_Recv, transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_R2_Recv, CF_Transaction_t *, t);
 
     UT_GenStub_Execute(CF_CFDP_R2_Recv, Basic, NULL);
 }
@@ -454,7 +454,7 @@ void CF_CFDP_R2_Recv(transaction_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CFDP_R_Cancel(transaction_t *t)
+void CF_CFDP_R_Cancel(CF_Transaction_t *t)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_R_Cancel), &t, sizeof(t));
 
@@ -468,7 +468,7 @@ void CF_CFDP_R_Cancel(transaction_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_R_SendInactivityEvent(transaction_t *t)
+// static void CF_CFDP_R_SendInactivityEvent(CF_Transaction_t *t)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -489,7 +489,7 @@ void CF_CFDP_R_Cancel(transaction_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CFDP_R_Tick(transaction_t *t, int *cont)
+void CF_CFDP_R_Tick(CF_Transaction_t *t, int *cont)
 {
     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
     exit(-86);

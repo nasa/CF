@@ -345,10 +345,10 @@ static void CF_CmdThaw(CFE_SB_Buffer_t *msg)
 **  \endreturns
 **
 *************************************************************************/
-static transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(CF_TransactionSeq_t ts, CF_EntityId_t eid)
+static CF_Transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(CF_TransactionSeq_t ts, CF_EntityId_t eid)
 {
-    int            i;
-    transaction_t *ret = NULL;
+    int               i;
+    CF_Transaction_t *ret = NULL;
 
     /* transaction sequence numbers are referenced with the tuple (eid, tsn)
      * Even though these tuples are unique to a channel, they should be unique
@@ -393,7 +393,7 @@ static int CF_TsnChanAction(cf_cmd_transaction_t *cmd, const char *cmdstr, CF_Ts
     {
         /* special value 254 means to use the compound key (cmd->eid, cmd->ts) to find the transaction
          * to act upon */
-        transaction_t *t = CF_CFDP_FindTransactionBySequenceNumberAllChannels(cmd->ts, cmd->eid);
+        CF_Transaction_t *t = CF_CFDP_FindTransactionBySequenceNumberAllChannels(cmd->ts, cmd->eid);
         if (t)
         {
             fn(t, context);
@@ -431,7 +431,7 @@ static int CF_TsnChanAction(cf_cmd_transaction_t *cmd, const char *cmdstr, CF_Ts
 **       t must not be NULL. context must not be NULL.
 **
 *************************************************************************/
-static void CF_DoSuspRes_(transaction_t *t, susp_res_arg_t *context)
+static void CF_DoSuspRes_(CF_Transaction_t *t, susp_res_arg_t *context)
 {
     CF_Assert(t);
     if (t->flags.com.suspended == context->action)
@@ -511,7 +511,7 @@ static void CF_CmdResume(CFE_SB_Buffer_t *msg)
 **       t must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdCancel_(transaction_t *t, void *ignored)
+static void CF_CmdCancel_(CF_Transaction_t *t, void *ignored)
 {
     CF_CFDP_CancelTransaction(t);
 }
@@ -535,7 +535,7 @@ static void CF_CmdCancel(CFE_SB_Buffer_t *msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdAbandon_(transaction_t *t, void *ignored)
+static void CF_CmdAbandon_(CF_Transaction_t *t, void *ignored)
 {
     CF_CFDP_ResetTransaction(t, 0);
 }
@@ -666,9 +666,9 @@ static void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
 **       n must not be NULL. c must not be NULL.
 **
 *************************************************************************/
-static int CF_PurgeHistory(clist_node n, channel_t *c)
+static int CF_PurgeHistory(clist_node n, CF_Channel_t *c)
 {
-    history_t *h = container_of(n, history_t, cl_node);
+    CF_History_t *h = container_of(n, CF_History_t, cl_node);
     CF_CFDP_ResetHistory(c, h); /* ok to reset transaction since it's in PEND it hasn't started yet */
     return CLIST_CONT;
 }
@@ -682,7 +682,7 @@ static int CF_PurgeHistory(clist_node n, channel_t *c)
 *************************************************************************/
 static int CF_PurgeTransaction(clist_node n, void *ignored)
 {
-    transaction_t *t = container_of(n, transaction_t, cl_node);
+    CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
     CF_CFDP_ResetTransaction(t, 0);
     return CLIST_CONT;
 }
@@ -706,7 +706,7 @@ static int CF_DoPurgeQueue(uint8 chan_num, cf_cmd_unionargs_t *cmd)
 {
     int ret = 0;
     /* no need to bounds check chan_num, done in caller */
-    channel_t *c = &CF_AppData.engine.channels[chan_num];
+    CF_Channel_t *c = &CF_AppData.engine.channels[chan_num];
 
     int pend = 0;
     int hist = 0;
@@ -735,12 +735,12 @@ static int CF_DoPurgeQueue(uint8 chan_num, cf_cmd_unionargs_t *cmd)
 
     if (pend)
     {
-        CF_CList_Traverse(c->qs[CF_Q_PEND], CF_PurgeTransaction, NULL);
+        CF_CList_Traverse(c->qs[CF_QueueIdx_PEND], CF_PurgeTransaction, NULL);
     }
 
     if (hist)
     {
-        CF_CList_Traverse(c->qs[CF_Q_HIST], (clist_fn_t)CF_PurgeHistory, c);
+        CF_CList_Traverse(c->qs[CF_QueueIdx_HIST], (clist_fn_t)CF_PurgeHistory, c);
     }
 
     return ret;
@@ -775,7 +775,7 @@ static void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
     static const int  q_history = 2;
     static const int  q_all     = 3;
     cf_cmd_write_q_t *wq        = (cf_cmd_write_q_t *)msg;
-    channel_t        *c         = &CF_AppData.engine.channels[wq->chan];
+    CF_Channel_t     *c         = &CF_AppData.engine.channels[wq->chan];
     osal_id_t         fd;
     int32             ret;
 
@@ -810,18 +810,18 @@ static void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
         /* process uplink queue data */
         if ((wq->queue == q_all) || (wq->queue == q_active))
         {
-            ret = CF_WriteQueueDataToFile(fd, c, CF_Q_RX);
+            ret = CF_WriteQueueDataToFile(fd, c, CF_QueueIdx_RX);
             if (ret)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_RX, CFE_EVS_EventType_ERROR,
-                                  "CF: write queue failed to write CF_Q_RX data");
+                                  "CF: write queue failed to write CF_QueueIdx_RX data");
                 goto out_close;
             }
         }
 
         if ((wq->queue == q_all) || (wq->queue == q_history))
         {
-            ret = CF_WriteHistoryQueueDataToFile(fd, c, CF_DIR_RX);
+            ret = CF_WriteHistoryQueueDataToFile(fd, c, CF_Direction_RX);
             if (ret)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEHIST_RX, CFE_EVS_EventType_ERROR,
@@ -838,7 +838,7 @@ static void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
         if ((wq->queue == q_all) || (wq->queue == q_active))
         {
             int              i;
-            static const int qs[2] = {CF_Q_TXA, CF_Q_TXW};
+            static const int qs[2] = {CF_QueueIdx_TXA, CF_QueueIdx_TXW};
             for (i = 0; i < 2; ++i)
             {
                 ret = CF_WriteQueueDataToFile(fd, c, qs[i]);
@@ -854,7 +854,7 @@ static void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
         if ((wq->queue == q_all) || (wq->queue == q_pend))
         {
             /* write pending queue */
-            ret = CF_WriteQueueDataToFile(fd, c, CF_Q_PEND);
+            ret = CF_WriteQueueDataToFile(fd, c, CF_QueueIdx_PEND);
             if (ret)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_PEND, CFE_EVS_EventType_ERROR,
@@ -866,11 +866,11 @@ static void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
         if ((wq->queue == q_all) || (wq->queue == q_history))
         {
             /* write history queue */
-            ret = CF_WriteHistoryQueueDataToFile(fd, c, CF_DIR_TX);
+            ret = CF_WriteHistoryQueueDataToFile(fd, c, CF_Direction_TX);
             if (ret)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEHIST_TX, CFE_EVS_EventType_ERROR,
-                                  "CF: write queue failed to write CF_Q_TX data");
+                                  "CF: write queue failed to write CF_QueueIdx_TX data");
                 goto out_close;
             }
         }
@@ -1169,7 +1169,7 @@ void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
         CF_CmdGetParam,    /* CF_GET_MIB_PARAM_CC */
         NULL,
         NULL,
-        CF_CmdSendCfgParams,  /* CF_SEND_CFG_PARAMS_CC */
+        CF_CmdSendCfgParams,  /* CF_SendRet_CFG_PARAMS_CC */
         CF_CmdWriteQueue,     /* CF_WRITE_QUEUE_CC */
         CF_CmdEnableDequeue,  /* CF_ENABLE_DEQUEUE_CC */
         CF_CmdDisableDequeue, /* CF_DISABLE_DEQUEUE_CC */
@@ -1196,7 +1196,7 @@ void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
         sizeof(cf_cmd_get_param_args_t), /* CF_GET_MIB_PARAM_CC */
         0,
         0,
-        sizeof(cf_cmd_noargs_t),    /* CF_SEND_CFG_PARAMS_CC */
+        sizeof(cf_cmd_noargs_t),    /* CF_SendRet_CFG_PARAMS_CC */
         sizeof(cf_cmd_write_q_t),   /* CF_WRITE_QUEUE_CC */
         sizeof(cf_cmd_unionargs_t), /* CF_ENABLE_DEQUEUE_CC */
         sizeof(cf_cmd_unionargs_t), /* CF_DISABLE_DEQUEUE_CC */

@@ -134,17 +134,17 @@ int Dummy_chan_action_fn_t(uint8 chan_num, void *context)
     return UT_DEFAULT_IMPL(Dummy_chan_action_fn_t);
 }
 
-void Dummy_CF_TsnChanAction_fn_t(transaction_t *t, void *context)
+void Dummy_CF_TsnChanAction_fn_t(CF_Transaction_t *t, void *context)
 {
-    UT_Stub_CopyFromLocal(UT_KEY(Dummy_CF_TsnChanAction_fn_t), &t, sizeof(transaction_t *));
+    UT_Stub_CopyFromLocal(UT_KEY(Dummy_CF_TsnChanAction_fn_t), &t, sizeof(CF_Transaction_t *));
     UT_Stub_CopyFromLocal(UT_KEY(Dummy_CF_TsnChanAction_fn_t), &context, sizeof(void *));
 
     UT_DEFAULT_IMPL(Dummy_CF_TsnChanAction_fn_t);
 }
 typedef struct
 {
-    transaction_t *t;
-    void          *context;
+    CF_Transaction_t *t;
+    void             *context;
 } CF_PACK Dummy_CF_TsnChanAction_fn_t_context_t;
 
 /*******************************************************************************
@@ -1299,8 +1299,8 @@ void Test_CF_CFDP_FindTransactionBySequenceNumberAllChannels_WhenNoTransactionFo
     /* Arrange */
     CF_TransactionSeq_t arg_ts  = Any_CF_TransactionSeq_t();
     CF_EntityId_t       arg_eid = Any_CF_EntityId_t();
-    transaction_t      *local_result;
-    transaction_t      *expected_result = NULL;
+    CF_Transaction_t   *local_result;
+    CF_Transaction_t   *expected_result = NULL;
 
     CF_CFDP_FindTransactionBySequenceNumber_context_t context_CF_CFDP_FTBSN;
 
@@ -1333,9 +1333,9 @@ void Test_CF_CFDP_FindTransactionBySequenceNumberAllChannels_Return_TransactionF
     CF_TransactionSeq_t arg_ts                   = Any_CF_TransactionSeq_t();
     CF_EntityId_t       arg_eid                  = Any_CF_EntityId_t();
     uint8               number_transaction_match = Any_uint8_LessThan(CF_NUM_CHANNELS);
-    transaction_t       dummy_return_value;
-    transaction_t      *local_result;
-    transaction_t      *expected_result = &dummy_return_value;
+    CF_Transaction_t    dummy_return_value;
+    CF_Transaction_t   *local_result;
+    CF_Transaction_t   *expected_result = &dummy_return_value;
 
     CF_CFDP_FindTransactionBySequenceNumber_context_t contexts_CF_CFDP_FTBSN[CF_NUM_CHANNELS];
 
@@ -1442,7 +1442,7 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_COMPOUND_KEY_TransactionFoundRun_fn_AndRe
     CF_TsnChanAction_fn_t                 arg_fn = &Dummy_CF_TsnChanAction_fn_t;
     int                                   dummy_context;
     void                                 *arg_context = &dummy_context;
-    transaction_t                         dummy_t;
+    CF_Transaction_t                      dummy_t;
     int                                   local_result;
     Dummy_CF_TsnChanAction_fn_t_context_t context_Dummy_CF_TsnChanAction_fn_t;
 
@@ -1595,10 +1595,10 @@ void Test_CF_DoSuspRes__Asserts_t_Is_NULL(void)
 void Test_CF_DoSuspRes__Set_context_same_To_1_suspended_Eq_action(void)
 {
     /* Arrange */
-    transaction_t   dummy_t;
-    transaction_t  *arg_t = &dummy_t;
-    susp_res_arg_t  dummy_context;
-    susp_res_arg_t *arg_context = &dummy_context;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t = &dummy_t;
+    susp_res_arg_t    dummy_context;
+    susp_res_arg_t   *arg_context = &dummy_context;
 
     /* set same to 0 to ensure change was done - not required for test,
      * but it is helpful for verification that the function did the change */
@@ -1618,10 +1618,10 @@ void Test_CF_DoSuspRes__Set_context_same_To_1_suspended_Eq_action(void)
 void Test_CF_DoSuspRes__When_suspended_NotEqTo_action_Set_suspended_To_action(void)
 {
     /* Arrange */
-    transaction_t   dummy_t;
-    transaction_t  *arg_t = &dummy_t;
-    susp_res_arg_t  dummy_context;
-    susp_res_arg_t *arg_context = &dummy_context;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t = &dummy_t;
+    susp_res_arg_t    dummy_context;
+    susp_res_arg_t   *arg_context = &dummy_context;
 
     /* set same to 0 to ensure change was done - not required for test,
      * but it is helpful for verification that the function did the change */
@@ -1648,8 +1648,8 @@ void Test_CF_DoSuspRes__When_suspended_NotEqTo_action_Set_suspended_To_action(vo
 void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasChangedTo_1_SendEventAndRejectCmd(void)
 {
     /* Arrange */
-    transaction_t               dummy_t_instance;
-    transaction_t              *dummy_t = &dummy_t_instance;
+    CF_Transaction_t            dummy_t_instance;
+    CF_Transaction_t           *dummy_t = &dummy_t_instance;
     CF_UT_cmd_transaction_buf_t utbuf;
     cf_cmd_transaction_t       *arg_cmd    = &utbuf.xact;
     uint8                       arg_action = 1; // 0 is a WAG
@@ -1788,8 +1788,8 @@ void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_neg1_And_args_same_WasNot
 void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasNotChangedFrom_0_AcceptCmd(void)
 {
     /* Arrange */
-    transaction_t               dummy_t_instance;
-    transaction_t              *dummy_t = &dummy_t_instance;
+    CF_Transaction_t            dummy_t_instance;
+    CF_Transaction_t           *dummy_t = &dummy_t_instance;
     CF_UT_cmd_transaction_buf_t utbuf;
     cf_cmd_transaction_t       *arg_cmd    = &utbuf.xact;
     uint8                       arg_action = 1; // 0 is a WAG
@@ -1934,10 +1934,10 @@ void Test_CF_CmdResume_Call_CF_DoSuspRes_WithGiven_msg_And_action_0(void)
 void Test_CF_CmdCancel__Call_CF_CFDP_CancelTransaction_WithGiven_t(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t       = &dummy_t;
-    void          *arg_ignored = NULL;
-    transaction_t *context_CF_CFDP_CancelTransaction;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t       = &dummy_t;
+    void             *arg_ignored = NULL;
+    CF_Transaction_t *context_CF_CFDP_CancelTransaction;
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_CancelTransaction), &context_CF_CFDP_CancelTransaction,
                      sizeof(context_CF_CFDP_CancelTransaction), false);
@@ -2006,8 +2006,8 @@ void Test_CF_CmdCancel_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
 void Test_CF_CmdAbandon__Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0(void)
 {
     /* Arrange */
-    transaction_t                      dummy_t;
-    transaction_t                     *arg_t       = &dummy_t;
+    CF_Transaction_t                   dummy_t;
+    CF_Transaction_t                  *arg_t       = &dummy_t;
     void                              *arg_ignored = NULL;
     CF_CFDP_ResetTransaction_context_t context_CF_CFDP_ResetTransaction;
 
@@ -2499,10 +2499,10 @@ void Test_CF_CmdDisablePolldir_FailWhenActionFail(void)
 void Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT(void)
 {
     /* Arrange */
-    history_t                      dummy_h;
+    CF_History_t                   dummy_h;
     clist_node                     arg_n = &dummy_h.cl_node;
-    channel_t                      dummy_c;
-    channel_t                     *arg_c = &dummy_c;
+    CF_Channel_t                   dummy_c;
+    CF_Channel_t                  *arg_c = &dummy_c;
     int                            local_result;
     CF_CFDP_ResetHistory_context_t context_CF_CFDP_ResetHistory;
 
@@ -2529,7 +2529,7 @@ void Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT(void)
 void Test_CF_PurgeTransaction_Call_CF_CFDP_ResetTransaction_AndReturn_CLIST_CONT(void)
 {
     /* Arrange */
-    transaction_t                      dummy_t;
+    CF_Transaction_t                   dummy_t;
     clist_node                         arg_n = &dummy_t.cl_node;
     int                                dummy_ignored;
     void                              *arg_ignored = &dummy_ignored;
@@ -2564,7 +2564,7 @@ void Test_CF_DoPurgeQueue_PendOnly(void)
     uint8                               arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t           utbuf;
     cf_cmd_unionargs_t                 *arg_cmd = &utbuf.ua;
-    channel_t                          *dummy_c;
+    CF_Channel_t                       *dummy_c;
     clist_node_t                        dummy_start;
     clist_node_t                       *expected_start = &dummy_start;
     int                                 local_result;
@@ -2579,8 +2579,8 @@ void Test_CF_DoPurgeQueue_PendOnly(void)
     /* set correct context type for CF_CList_Traverse stub */
     type_of_context_CF_CList_Traverse = POINTER;
 
-    dummy_c                = &CF_AppData.engine.channels[arg_chan_num];
-    dummy_c->qs[CF_Q_PEND] = expected_start;
+    dummy_c                       = &CF_AppData.engine.channels[arg_chan_num];
+    dummy_c->qs[CF_QueueIdx_PEND] = expected_start;
 
     /* Act */
     local_result = CF_DoPurgeQueue(arg_chan_num, arg_cmd);
@@ -2602,7 +2602,7 @@ void Test_CF_DoPurgeQueue_HistoryOnly(void)
     uint8                               arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t           utbuf;
     cf_cmd_unionargs_t                 *arg_cmd = &utbuf.ua;
-    channel_t                          *dummy_c;
+    CF_Channel_t                       *dummy_c;
     clist_node_t                        dummy_start;
     clist_node_t                       *expected_start = &dummy_start;
     int                                 local_result;
@@ -2617,8 +2617,8 @@ void Test_CF_DoPurgeQueue_HistoryOnly(void)
     /* set correct context type for CF_CList_Traverse stub */
     type_of_context_CF_CList_Traverse = POINTER;
 
-    dummy_c                = &CF_AppData.engine.channels[arg_chan_num];
-    dummy_c->qs[CF_Q_HIST] = expected_start;
+    dummy_c                       = &CF_AppData.engine.channels[arg_chan_num];
+    dummy_c->qs[CF_QueueIdx_HIST] = expected_start;
 
     /* Act */
     local_result = CF_DoPurgeQueue(arg_chan_num, arg_cmd);
@@ -2640,7 +2640,7 @@ void Test_CF_DoPurgeQueue_Both(void)
     uint8                               arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t           utbuf;
     cf_cmd_unionargs_t                 *arg_cmd = &utbuf.ua;
-    channel_t                          *dummy_c;
+    CF_Channel_t                       *dummy_c;
     clist_node_t                        dummy_pend_start;
     clist_node_t                       *expected_pend_start = &dummy_pend_start;
     clist_node_t                        dummy_history_start;
@@ -2657,9 +2657,9 @@ void Test_CF_DoPurgeQueue_Both(void)
     /* set correct context type for CF_CList_Traverse stub */
     type_of_context_CF_CList_Traverse = POINTER;
 
-    dummy_c                = &CF_AppData.engine.channels[arg_chan_num];
-    dummy_c->qs[CF_Q_PEND] = expected_pend_start;
-    dummy_c->qs[CF_Q_HIST] = expected_history_start;
+    dummy_c                       = &CF_AppData.engine.channels[arg_chan_num];
+    dummy_c->qs[CF_QueueIdx_PEND] = expected_pend_start;
+    dummy_c->qs[CF_QueueIdx_HIST] = expected_history_start;
 
     /* Act */
     local_result = CF_DoPurgeQueue(arg_chan_num, arg_cmd);

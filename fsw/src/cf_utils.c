@@ -44,8 +44,8 @@ typedef struct
 
 typedef struct priority_arg_t
 {
-    transaction_t *t;        /* OUT: holds value of transaction with which to call CF_CList_InsertAfter on */
-    uint8          priority; /* seeking this priority */
+    CF_Transaction_t *t;        /* OUT: holds value of transaction with which to call CF_CList_InsertAfter on */
+    uint8             priority; /* seeking this priority */
 } priority_arg_t;
 
 typedef struct
@@ -80,9 +80,9 @@ static int CF_TraverseHistory(clist_node n, trav_arg_t *context)
     int32              ret;
     int32              len;
     char               linebuf[LINEBUF_LEN]; /* buffer for line data */
-    history_t         *h = container_of(n, history_t, cl_node);
+    CF_History_t      *h = container_of(n, CF_History_t, cl_node);
 
-    CF_Assert(h->dir < CF_DIR_NUM);
+    CF_Assert(h->dir < CF_Direction_NUM);
     len = snprintf(linebuf, sizeof(linebuf) - 1, "SEQ (%d, %d)\tDIR: %s\tPEER %d\tCC: %d", h->src_eid, h->seq_num,
                    dstr[h->dir], h->peer_eid, h->cc);
     for (i = 0; i < 2; ++i)
@@ -117,7 +117,7 @@ static int CF_TraverseHistory(clist_node n, trav_arg_t *context)
 *************************************************************************/
 static int CF_TraverseTransactions(clist_node n, trav_arg_t *context)
 {
-    transaction_t *t = container_of(n, transaction_t, cl_node);
+    CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
 
     /* use CF_TraverseHistory to print filenames and direction */
     /* NOTE: ok to ignore return value of CF_TraverseHistory. We care
@@ -144,7 +144,7 @@ static int CF_TraverseTransactions(clist_node n, trav_arg_t *context)
 **  \endreturns
 **
 *************************************************************************/
-int32 CF_WriteQueueDataToFile(int32 fd, channel_t *c, cf_queue_index_t q)
+int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q)
 {
     trav_arg_t arg = {fd, 0, 0};
     CF_CList_Traverse(c->qs[q], (clist_fn_t)CF_TraverseTransactions, &arg);
@@ -162,10 +162,10 @@ int32 CF_WriteQueueDataToFile(int32 fd, channel_t *c, cf_queue_index_t q)
 **  \endreturns
 **
 *************************************************************************/
-int32 CF_WriteHistoryQueueDataToFile(int32 fd, channel_t *c, direction_t dir)
+int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t dir)
 {
     trav_arg_t arg = {fd, 0, 0};
-    CF_CList_Traverse(c->qs[CF_Q_HIST], (clist_fn_t)CF_TraverseHistory, &arg);
+    CF_CList_Traverse(c->qs[CF_QueueIdx_HIST], (clist_fn_t)CF_TraverseHistory, &arg);
     return arg.result;
 }
 
@@ -186,8 +186,8 @@ int32 CF_WriteHistoryQueueDataToFile(int32 fd, channel_t *c, direction_t dir)
 *************************************************************************/
 static int CF_PrioSearch(clist_node node, void *context)
 {
-    transaction_t  *t = container_of(node, transaction_t, cl_node);
-    priority_arg_t *p = (priority_arg_t *)context;
+    CF_Transaction_t *t = container_of(node, CF_Transaction_t, cl_node);
+    priority_arg_t   *p = (priority_arg_t *)context;
 
     if (t->priority <= p->priority)
     {
@@ -215,12 +215,12 @@ static int CF_PrioSearch(clist_node node, void *context)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_InsertSortPrio(transaction_t *t, cf_queue_index_t q)
+void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q)
 {
-    int        insert_back = 0;
-    channel_t *c           = &CF_AppData.engine.channels[t->chan_num];
+    int           insert_back = 0;
+    CF_Channel_t *c           = &CF_AppData.engine.channels[t->chan_num];
     CF_Assert(t->chan_num < CF_NUM_CHANNELS);
-    CF_Assert(t->state != CFDP_IDLE);
+    CF_Assert(t->state != CF_TxnState_IDLE);
 
     /* look for proper position on PEND queue for this transaction.
      * This is a simple priority sort. */
@@ -268,7 +268,7 @@ void CF_InsertSortPrio(transaction_t *t, cf_queue_index_t q)
 *************************************************************************/
 static int CF_TraverseAllTransactions_(clist_node n, traverse_all_args_t *args)
 {
-    transaction_t *t = container_of(n, transaction_t, cl_node);
+    CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
     args->fn(t, args->context);
     ++args->counter;
     return CLIST_CONT;
@@ -285,11 +285,11 @@ static int CF_TraverseAllTransactions_(clist_node n, traverse_all_args_t *args)
 **  \endreturns
 **
 *************************************************************************/
-int CF_TraverseAllTransactions(channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context)
+int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context)
 {
     traverse_all_args_t args = {fn, context, 0};
-    cf_queue_index_t    index;
-    for (index = CF_Q_PEND; index <= CF_Q_RX; ++index)
+    CF_QueueIdx_t       index;
+    for (index = CF_QueueIdx_PEND; index <= CF_QueueIdx_RX; ++index)
         CF_CList_Traverse(c->qs[index], (clist_fn_t)CF_TraverseAllTransactions_, &args);
 
     return args.counter;

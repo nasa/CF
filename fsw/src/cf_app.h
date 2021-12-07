@@ -49,7 +49,7 @@ typedef struct
     CFE_TBL_Handle_t   config_handle;
     cf_config_table_t *config_table;
 
-    cfdp_engine_t engine;
+    CF_Engine_t engine;
 } CF_AppData_t;
 
 extern CF_AppData_t CF_AppData;

@@ -185,7 +185,7 @@ void CF_CList_Traverse(clist_node start, clist_fn_t fn, void *context)
                 UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), transaction_sequence_number,
                                       sizeof(CF_TransactionSeq_t));
                 UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), src_eid, sizeof(CF_EntityId_t));
-                UT_Stub_CopyToLocal(UT_KEY(CF_CList_Traverse), t, sizeof(transaction_t *));
+                UT_Stub_CopyToLocal(UT_KEY(CF_CList_Traverse), t, sizeof(CF_Transaction_t *));
             }
             break;
 
@@ -214,7 +214,7 @@ void CF_CList_Traverse(clist_node start, clist_fn_t fn, void *context)
 **       end must not be NULL. fn must be a valid function.
 **
 *************************************************************************/
-#include "cf_cfdp.h" //TODO:this is to get transaction_t -- find a better way?
+#include "cf_cfdp.h" //TODO:this is to get CF_Transaction_t -- find a better way?
 
 void CF_CList_Traverse_R(clist_node end, clist_fn_t fn, void *context)
 {
@@ -228,6 +228,6 @@ void CF_CList_Traverse_R(clist_node end, clist_fn_t fn, void *context)
     {
         void *result_location = context;
 
-        UT_Stub_CopyToLocal(UT_KEY(CF_CList_Traverse_R), result_location, sizeof(transaction_t *));
+        UT_Stub_CopyToLocal(UT_KEY(CF_CList_Traverse_R), result_location, sizeof(CF_Transaction_t *));
     }
 }
