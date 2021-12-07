@@ -46,7 +46,7 @@
 **       chunks must not be NULL.
 **
 *************************************************************************/
-// static void CF_Chunks_EraseRange(chunks_t *chunks, index_t start, index_t end)
+// static void CF_Chunks_EraseRange(CF_ChunkList_t *chunks, CF_ChunkIdx_t start, CF_ChunkIdx_t end)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -60,7 +60,7 @@
 **       chunks must not be NULL.
 **
 *************************************************************************/
-// static void CF_Chunks_EraseChunk(chunks_t *chunks, index_t erase_index)
+// static void CF_Chunks_EraseChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t erase_index)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -74,7 +74,7 @@
 **       chunks must not be NULL. chunk must not be NULL.
 **
 *************************************************************************/
-// static void CF_Chunks_InsertChunk(chunks_t *chunks, index_t index_before, const chunk_t *chunk)
+// static void CF_Chunks_InsertChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t index_before, const CF_Chunk_t *chunk)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -95,7 +95,7 @@
 **  \endreturns
 **
 *************************************************************************/
-// static index_t CF_Chunks_FindInsertPosition(chunks_t *chunks, const chunk_t *chunk)
+// static CF_ChunkIdx_t CF_Chunks_FindInsertPosition(CF_ChunkList_t *chunks, const CF_Chunk_t *chunk)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -113,7 +113,7 @@
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_Chunks_CombinePrevious(chunks_t *chunks, index_t i, const chunk_t *chunk)
+// static int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -131,7 +131,7 @@
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_Chunks_CombineNext(chunks_t *chunks, index_t i, const chunk_t *chunk)
+// static int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -149,7 +149,7 @@
 **  \endreturns
 **
 *************************************************************************/
-// static index_t CF_Chunks_FindSmallestSize(const chunks_t *chunks)
+// static CF_ChunkIdx_t CF_Chunks_FindSmallestSize(const CF_ChunkList_t *chunks)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -167,7 +167,7 @@
 **       chunks must not be NULL. chunk must not be NULL.
 **
 *************************************************************************/
-// static void CF_Chunks_Insert(chunks_t *chunks, index_t i, const chunk_t *chunk)
+// static void CF_Chunks_Insert(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -181,13 +181,13 @@
 **       chunks must not be NULL.
 **
 *************************************************************************/
-void CF_Chunks_Add(chunks_t *chunks, chunk_offset_t offset, chunk_size_t size)
+void CF_ChunkListAdd(CF_ChunkList_t *chunks, CF_ChunkOffset_t offset, CF_ChunkSize_t size)
 {
-    UT_Stub_CopyFromLocal(UT_KEY(CF_Chunks_Add), &chunks, sizeof(chunks));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_Chunks_Add), &offset, sizeof(offset));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_Chunks_Add), &size, sizeof(size));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkListAdd), &chunks, sizeof(chunks));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkListAdd), &offset, sizeof(offset));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkListAdd), &size, sizeof(size));
 
-    UT_DEFAULT_IMPL(CF_Chunks_Add);
+    UT_DEFAULT_IMPL(CF_ChunkListAdd);
 }
 
 /************************************************************************/
@@ -202,12 +202,12 @@ void CF_Chunks_Add(chunks_t *chunks, chunk_offset_t offset, chunk_size_t size)
 **       chunks must not be NULL.
 **
 *************************************************************************/
-void CF_Chunks_RemoveFromFirst(chunks_t *chunks, chunk_size_t size)
+void CF_ChunkList_RemoveFromFirst(CF_ChunkList_t *chunks, CF_ChunkSize_t size)
 {
-    UT_Stub_CopyFromLocal(UT_KEY(CF_Chunks_RemoveFromFirst), &chunks, sizeof(chunks));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_Chunks_RemoveFromFirst), &size, sizeof(size));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_RemoveFromFirst), &chunks, sizeof(chunks));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_RemoveFromFirst), &size, sizeof(size));
 
-    UT_DEFAULT_IMPL(CF_Chunks_RemoveFromFirst);
+    UT_DEFAULT_IMPL(CF_ChunkList_RemoveFromFirst);
 }
 
 /************************************************************************/
@@ -222,15 +222,15 @@ void CF_Chunks_RemoveFromFirst(chunks_t *chunks, chunk_size_t size)
 **       chunks must not be NULL.
 **
 *************************************************************************/
-const chunk_t *CF_Chunks_GetFirstChunk(const chunks_t *chunks)
+const CF_Chunk_t *CF_ChunkList_GetFirstChunk(const CF_ChunkList_t *chunks)
 {
-    chunk_t *forced_return;
+    CF_Chunk_t *forced_return;
 
-    UT_Stub_CopyFromLocal(UT_KEY(CF_Chunks_GetFirstChunk), &chunks, sizeof(chunks));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_GetFirstChunk), &chunks, sizeof(chunks));
 
-    UT_DEFAULT_IMPL(CF_Chunks_GetFirstChunk);
+    UT_DEFAULT_IMPL(CF_ChunkList_GetFirstChunk);
 
-    UT_Stub_CopyToLocal(UT_KEY(CF_Chunks_GetFirstChunk), &forced_return, sizeof(forced_return));
+    UT_Stub_CopyToLocal(UT_KEY(CF_ChunkList_GetFirstChunk), &forced_return, sizeof(forced_return));
 
     return forced_return;
 }
@@ -242,13 +242,13 @@ const chunk_t *CF_Chunks_GetFirstChunk(const chunks_t *chunks)
 **       chunks must not be NULL. chunks_mem must not be NULL.
 **
 *************************************************************************/
-void CF_Chunks_Init(chunks_t *chunks, index_t CF_max_chunks, chunk_t *chunks_mem)
+void CF_ChunkListInit(CF_ChunkList_t *chunks, CF_ChunkIdx_t CF_max_chunks, CF_Chunk_t *chunks_mem)
 {
-    UT_GenStub_AddParam(CF_Chunks_Init, chunks_t *, chunks);
-    UT_GenStub_AddParam(CF_Chunks_Init, index_t, CF_max_chunks);
-    UT_GenStub_AddParam(CF_Chunks_Init, chunk_t *, chunks_mem);
+    UT_GenStub_AddParam(CF_ChunkListInit, CF_ChunkList_t *, chunks);
+    UT_GenStub_AddParam(CF_ChunkListInit, CF_ChunkIdx_t, CF_max_chunks);
+    UT_GenStub_AddParam(CF_ChunkListInit, CF_Chunk_t *, chunks_mem);
 
-    UT_GenStub_Execute(CF_Chunks_Init, Basic, NULL);
+    UT_GenStub_Execute(CF_ChunkListInit, Basic, NULL);
 }
 
 /************************************************************************/
@@ -258,7 +258,7 @@ void CF_Chunks_Init(chunks_t *chunks, index_t CF_max_chunks, chunk_t *chunks_mem
 **       chunks must not be NULL.
 **
 *************************************************************************/
-void CF_ChunksReset(chunks_t *chunks)
+void CF_ChunkListReset(CF_ChunkList_t *chunks)
 {
     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
     exit(-86);
@@ -280,14 +280,14 @@ void CF_ChunksReset(chunks_t *chunks)
 **  \endreturns
 **
 *************************************************************************/
-uint32 CF_Chunks_ComputeGaps(const chunks_t *chunks, index_t max_gaps, chunk_size_t total, chunk_offset_t start,
-                             compute_gap_fn_t compute_gap_fn, void *opaque)
+uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_gaps, CF_ChunkSize_t total,
+                                CF_ChunkOffset_t start, CF_ChunkList_ComputeGapFn_t compute_gap_fn, void *opaque)
 {
-    UT_Stub_CopyFromLocal(UT_KEY(CF_Chunks_ComputeGaps), &chunks, sizeof(chunks));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_Chunks_ComputeGaps), &max_gaps, sizeof(max_gaps));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_Chunks_ComputeGaps), &total, sizeof(total));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_Chunks_ComputeGaps), &compute_gap_fn, sizeof(compute_gap_fn));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_Chunks_ComputeGaps), &opaque, sizeof(opaque));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_ComputeGaps), &chunks, sizeof(chunks));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_ComputeGaps), &max_gaps, sizeof(max_gaps));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_ComputeGaps), &total, sizeof(total));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_ComputeGaps), &compute_gap_fn, sizeof(compute_gap_fn));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_ComputeGaps), &opaque, sizeof(opaque));
 
-    return UT_DEFAULT_IMPL(CF_Chunks_ComputeGaps);
+    return UT_DEFAULT_IMPL(CF_ChunkList_ComputeGaps);
 }

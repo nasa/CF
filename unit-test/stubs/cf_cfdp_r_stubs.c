@@ -266,7 +266,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static void CF_CFDP_R2_GapCompute(const chunks_t *chunks, const chunk_t *c, void *opaque)
+// static void CF_CFDP_R2_GapCompute(const CF_ChunkList_t *chunks, const CF_Chunk_t *c, void *opaque)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);

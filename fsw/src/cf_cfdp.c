@@ -1336,7 +1336,7 @@ int32 CF_CFDP_InitEngine(void)
             for (k = 0; k < CF_Direction_NUM; ++k, ++c)
             {
                 CF_Assert((chunk_mem_offset + CF_max_chunks[k][i]) <= CF_NUM_CHUNKS_ALL_CHANNELS);
-                CF_Chunks_Init(&c->chunks, CF_max_chunks[k][i], &CF_AppData.engine.chunk_mem[chunk_mem_offset]);
+                CF_ChunkListInit(&c->chunks, CF_max_chunks[k][i], &CF_AppData.engine.chunk_mem[chunk_mem_offset]);
                 chunk_mem_offset += CF_max_chunks[k][i];
                 CF_CList_InitNode(&c->cl_node);
                 CF_CList_InsertBack(&CF_AppData.engine.channels[i].cs[k], &c->cl_node);

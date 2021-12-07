@@ -165,7 +165,7 @@ static void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
     else
     {
         /* only look for 1 gap, since the goal here is just to know that there are gaps */
-        uint32 ret = CF_Chunks_ComputeGaps(&t->chunks->chunks, 1, t->fsize, 0, NULL, NULL);
+        uint32 ret = CF_ChunkList_ComputeGaps(&t->chunks->chunks, 1, t->fsize, 0, NULL, NULL);
 
         if (ret)
         {
@@ -481,7 +481,7 @@ static void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, const CF_CFDP_P
 
     cfdp_ldst_uint32(offset, STATIC_CAST(ph, CF_CFDP_PduFd_t)->fdh.offset);
     /* class 2 does crc at FIN, but track gaps */
-    CF_Chunks_Add(&t->chunks->chunks, offset, (uint32)bytes_received);
+    CF_ChunkListAdd(&t->chunks->chunks, offset, (uint32)bytes_received);
 
     if (t->flags.rx.fd_nak_sent)
     {
@@ -515,7 +515,7 @@ err_out:
 **  \endreturns
 **
 *************************************************************************/
-static void CF_CFDP_R2_GapCompute(const chunks_t *chunks, const chunk_t *c, void *opaque)
+static void CF_CFDP_R2_GapCompute(const CF_ChunkList_t *chunks, const CF_Chunk_t *c, void *opaque)
 {
     gap_compute_args_t *args = (gap_compute_args_t *)opaque;
     CF_CFDP_PduNak_t   *nak  = STATIC_CAST(args->ph, CF_CFDP_PduNak_t);
@@ -567,11 +567,11 @@ static int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
             uint32             cret;
 
             cfdp_ldst_uint32(nak->scope_start, 0);
-            cret = CF_Chunks_ComputeGaps(&t->chunks->chunks,
-                                         (t->chunks->chunks.count < t->chunks->chunks.CF_max_chunks)
-                                             ? t->chunks->chunks.CF_max_chunks
-                                             : (t->chunks->chunks.CF_max_chunks - 1),
-                                         t->fsize, 0, CF_CFDP_R2_GapCompute, &args);
+            cret = CF_ChunkList_ComputeGaps(&t->chunks->chunks,
+                                            (t->chunks->chunks.count < t->chunks->chunks.CF_max_chunks)
+                                                ? t->chunks->chunks.CF_max_chunks
+                                                : (t->chunks->chunks.CF_max_chunks - 1),
+                                            t->fsize, 0, CF_CFDP_R2_GapCompute, &args);
 
             if (!cret)
             {

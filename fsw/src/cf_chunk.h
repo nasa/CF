@@ -24,47 +24,47 @@
 **
 *************************************************************************/
 
-#ifndef CF_CHUNK__H
-#define CF_CHUNK__H
+#ifndef CF_CHUNK_H
+#define CF_CHUNK_H
 
 #include "cfe.h"
 
-typedef uint32 index_t;
-typedef uint32 chunk_offset_t;
-typedef uint32 chunk_size_t;
+typedef uint32 CF_ChunkIdx_t;
+typedef uint32 CF_ChunkOffset_t;
+typedef uint32 CF_ChunkSize_t;
 
 /* I talked this over with a friend, Stephen Newell (stephen@sjnewell.com) and he wrote something in c++.
  * I liked it, so converted it to C. Giving credit where it's due. */
 
-typedef struct
+typedef struct CF_Chunk
 {
-    chunk_offset_t offset;
-    chunk_size_t   size;
-} chunk_t;
+    CF_ChunkOffset_t offset;
+    CF_ChunkSize_t   size;
+} CF_Chunk_t;
 
-typedef struct
+typedef struct CF_ChunkList
 {
-    index_t  count;
-    index_t  CF_max_chunks;
-    chunk_t *chunks;
-} chunks_t;
+    CF_ChunkIdx_t count;
+    CF_ChunkIdx_t CF_max_chunks;
+    CF_Chunk_t   *chunks;
+} CF_ChunkList_t;
 
-void CF_Chunks_Init(chunks_t *chunks, index_t CF_max_chunks, chunk_t *chunks_mem);
-void CF_Chunks_Add(chunks_t *chunks, chunk_offset_t offset, chunk_size_t size);
-void CF_ChunksReset(chunks_t *chunks);
-/* CF_Chunks_RemoveFromFirst -
+void CF_ChunkListInit(CF_ChunkList_t *chunks, CF_ChunkIdx_t CF_max_chunks, CF_Chunk_t *chunks_mem);
+void CF_ChunkListAdd(CF_ChunkList_t *chunks, CF_ChunkOffset_t offset, CF_ChunkSize_t size);
+void CF_ChunkListReset(CF_ChunkList_t *chunks);
+/* CF_ChunkList_RemoveFromFirst -
  *
  * Good computer science would have a generic remove function, but that's much more complex
  * than we need for the use case. We aren't trying to make chunks a general purpose
  * reusable module, so just take the simple case that we need.
  *
- * Same applies for CF_Chunks_GetFirstChunk() */
-void           CF_Chunks_RemoveFromFirst(chunks_t *chunks, chunk_size_t size);
-const chunk_t *CF_Chunks_GetFirstChunk(const chunks_t *chunks);
+ * Same applies for CF_ChunkList_GetFirstChunk() */
+void              CF_ChunkList_RemoveFromFirst(CF_ChunkList_t *chunks, CF_ChunkSize_t size);
+const CF_Chunk_t *CF_ChunkList_GetFirstChunk(const CF_ChunkList_t *chunks);
 
-typedef void (*compute_gap_fn_t)(const chunks_t *cs, const chunk_t *c, void *opaque);
+typedef void (*CF_ChunkList_ComputeGapFn_t)(const CF_ChunkList_t *cs, const CF_Chunk_t *c, void *opaque);
 /* returns number of gaps, in case anyone cares about number of gaps */
-uint32 CF_Chunks_ComputeGaps(const chunks_t *chunks, index_t max_gaps, chunk_size_t total, chunk_offset_t start,
-                             compute_gap_fn_t compute_gap_fn, void *opaque);
+uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_gaps, CF_ChunkSize_t total,
+                                CF_ChunkOffset_t start, CF_ChunkList_ComputeGapFn_t compute_gap_fn, void *opaque);
 
-#endif /* !CF_CHUNK__H */
+#endif /* !CF_CHUNK_H */

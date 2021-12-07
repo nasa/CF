@@ -53,7 +53,7 @@
 **       chunks must not be NULL.
 **
 *************************************************************************/
-static void CF_Chunks_EraseRange(chunks_t *chunks, index_t start, index_t end)
+static void CF_Chunks_EraseRange(CF_ChunkList_t *chunks, CF_ChunkIdx_t start, CF_ChunkIdx_t end)
 {
     CF_Assert(end >= start);
     if (start < chunks->count)
@@ -70,7 +70,7 @@ static void CF_Chunks_EraseRange(chunks_t *chunks, index_t start, index_t end)
 **       chunks must not be NULL.
 **
 *************************************************************************/
-static void CF_Chunks_EraseChunk(chunks_t *chunks, index_t erase_index)
+static void CF_Chunks_EraseChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t erase_index)
 {
     CF_Assert(chunks->count > 0);
     CF_Assert(erase_index < chunks->count);
@@ -88,7 +88,7 @@ static void CF_Chunks_EraseChunk(chunks_t *chunks, index_t erase_index)
 **       chunks must not be NULL. chunk must not be NULL.
 **
 *************************************************************************/
-static void CF_Chunks_InsertChunk(chunks_t *chunks, index_t index_before, const chunk_t *chunk)
+static void CF_Chunks_InsertChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t index_before, const CF_Chunk_t *chunk)
 {
     CF_Assert(chunks->count < chunks->CF_max_chunks);
     CF_Assert(index_before <= chunks->count);
@@ -117,12 +117,12 @@ static void CF_Chunks_InsertChunk(chunks_t *chunks, index_t index_before, const 
 **  \endreturns
 **
 *************************************************************************/
-static index_t CF_Chunks_FindInsertPosition(chunks_t *chunks, const chunk_t *chunk)
+static CF_ChunkIdx_t CF_Chunks_FindInsertPosition(CF_ChunkList_t *chunks, const CF_Chunk_t *chunk)
 {
-    index_t first = 0;
-    index_t i;
-    index_t count = chunks->count;
-    index_t step;
+    CF_ChunkIdx_t first = 0;
+    CF_ChunkIdx_t i;
+    CF_ChunkIdx_t count = chunks->count;
+    CF_ChunkIdx_t step;
 
     while (count > 0)
     {
@@ -154,17 +154,17 @@ static index_t CF_Chunks_FindInsertPosition(chunks_t *chunks, const chunk_t *chu
 **  \endreturns
 **
 *************************************************************************/
-static int CF_Chunks_CombinePrevious(chunks_t *chunks, index_t i, const chunk_t *chunk)
+static int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
     int ret = 0;
     CF_Assert(i <= chunks->CF_max_chunks);
 
-    chunk_offset_t chunk_end = chunk->offset + chunk->size;
+    CF_ChunkOffset_t chunk_end = chunk->offset + chunk->size;
 
     if ((i && chunks->count))
     {
-        chunk_t       *prev     = &chunks->chunks[i - 1];
-        chunk_offset_t prev_end = prev->offset + prev->size;
+        CF_Chunk_t      *prev     = &chunks->chunks[i - 1];
+        CF_ChunkOffset_t prev_end = prev->offset + prev->size;
         if (chunk->offset <= prev_end)
         {
             if (prev_end < chunk_end)
@@ -189,25 +189,25 @@ static int CF_Chunks_CombinePrevious(chunks_t *chunks, index_t i, const chunk_t 
 **  \endreturns
 **
 *************************************************************************/
-static int CF_Chunks_CombineNext(chunks_t *chunks, index_t i, const chunk_t *chunk)
+static int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
     /* check if not at the end */
     int ret = 0;
     if (i != chunks->count)
     {
-        chunk_offset_t chunk_end = chunk->offset + chunk->size;
+        CF_ChunkOffset_t chunk_end = chunk->offset + chunk->size;
         CF_Assert(chunk_end >= chunk->offset);
 
         /* check if anything can be combined */
         if (chunks->chunks[i].offset <= chunk_end)
         {
             /* figure out how many chunks can be combined */
-            index_t        combined_i = i;
-            chunk_offset_t new_end; /* initialized below */
+            CF_ChunkIdx_t    combined_i = i;
+            CF_ChunkOffset_t new_end; /* initialized below */
 
             for (; combined_i < chunks->count; ++combined_i)
             {
-                chunk_offset_t existing_end = chunks->chunks[combined_i].offset + chunks->chunks[combined_i].size;
+                CF_ChunkOffset_t existing_end = chunks->chunks[combined_i].offset + chunks->chunks[combined_i].size;
                 if (chunk_end < existing_end)
                 {
                     break;
@@ -251,10 +251,10 @@ static int CF_Chunks_CombineNext(chunks_t *chunks, index_t i, const chunk_t *chu
 **  \endreturns
 **
 *************************************************************************/
-static index_t CF_Chunks_FindSmallestSize(const chunks_t *chunks)
+static CF_ChunkIdx_t CF_Chunks_FindSmallestSize(const CF_ChunkList_t *chunks)
 {
-    index_t i;
-    index_t smallest = 0;
+    CF_ChunkIdx_t i;
+    CF_ChunkIdx_t smallest = 0;
 
     for (i = 1; i < chunks->count; ++i)
     {
@@ -278,7 +278,7 @@ static index_t CF_Chunks_FindSmallestSize(const chunks_t *chunks)
 **       chunks must not be NULL. chunk must not be NULL.
 **
 *************************************************************************/
-static void CF_Chunks_Insert(chunks_t *chunks, index_t i, const chunk_t *chunk)
+static void CF_Chunks_Insert(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
     int n = CF_Chunks_CombineNext(chunks, i, chunk);
     if (n)
@@ -300,8 +300,8 @@ static void CF_Chunks_Insert(chunks_t *chunks, index_t i, const chunk_t *chunk)
             }
             else
             {
-                index_t  smallest_i = CF_Chunks_FindSmallestSize(chunks);
-                chunk_t *smallest_c = &chunks->chunks[smallest_i];
+                CF_ChunkIdx_t smallest_i = CF_Chunks_FindSmallestSize(chunks);
+                CF_Chunk_t   *smallest_c = &chunks->chunks[smallest_i];
                 if (smallest_c->size < chunk->size)
                 {
                     CF_Chunks_EraseChunk(chunks, smallest_i);
@@ -319,10 +319,10 @@ static void CF_Chunks_Insert(chunks_t *chunks, index_t i, const chunk_t *chunk)
 **       chunks must not be NULL.
 **
 *************************************************************************/
-void CF_Chunks_Add(chunks_t *chunks, chunk_offset_t offset, chunk_size_t size)
+void CF_ChunkListAdd(CF_ChunkList_t *chunks, CF_ChunkOffset_t offset, CF_ChunkSize_t size)
 {
-    const chunk_t chunk = {offset, size};
-    const index_t i     = CF_Chunks_FindInsertPosition(chunks, &chunk);
+    const CF_Chunk_t    chunk = {offset, size};
+    const CF_ChunkIdx_t i     = CF_Chunks_FindInsertPosition(chunks, &chunk);
 
     /* PTFO: files won't be so big we need to gracefully handle overflow,
      * and in that case the user should change everything in chunks
@@ -353,9 +353,9 @@ void CF_Chunks_Add(chunks_t *chunks, chunk_offset_t offset, chunk_size_t size)
 **       chunks must not be NULL.
 **
 *************************************************************************/
-void CF_Chunks_RemoveFromFirst(chunks_t *chunks, chunk_size_t size)
+void CF_ChunkList_RemoveFromFirst(CF_ChunkList_t *chunks, CF_ChunkSize_t size)
 {
-    chunk_t *c = &chunks->chunks[0]; /* front is always 0 */
+    CF_Chunk_t *c = &chunks->chunks[0]; /* front is always 0 */
 
     if (size > c->size)
     {
@@ -385,7 +385,7 @@ void CF_Chunks_RemoveFromFirst(chunks_t *chunks, chunk_size_t size)
 **       chunks must not be NULL.
 **
 *************************************************************************/
-const chunk_t *CF_Chunks_GetFirstChunk(const chunks_t *chunks)
+const CF_Chunk_t *CF_ChunkList_GetFirstChunk(const CF_ChunkList_t *chunks)
 {
     return chunks->count ? &chunks->chunks[0] : NULL;
 }
@@ -397,12 +397,12 @@ const chunk_t *CF_Chunks_GetFirstChunk(const chunks_t *chunks)
 **       chunks must not be NULL. chunks_mem must not be NULL.
 **
 *************************************************************************/
-void CF_Chunks_Init(chunks_t *chunks, index_t CF_max_chunks, chunk_t *chunks_mem)
+void CF_ChunkListInit(CF_ChunkList_t *chunks, CF_ChunkIdx_t CF_max_chunks, CF_Chunk_t *chunks_mem)
 {
     CF_Assert(CF_max_chunks > 0);
     chunks->CF_max_chunks = CF_max_chunks;
     chunks->chunks        = chunks_mem;
-    CF_ChunksReset(chunks);
+    CF_ChunkListReset(chunks);
 }
 
 /************************************************************************/
@@ -412,7 +412,7 @@ void CF_Chunks_Init(chunks_t *chunks, index_t CF_max_chunks, chunk_t *chunks_mem
 **       chunks must not be NULL.
 **
 *************************************************************************/
-void CF_ChunksReset(chunks_t *chunks)
+void CF_ChunkListReset(CF_ChunkList_t *chunks)
 {
     chunks->count = 0;
     memset(chunks->chunks, 0, sizeof(*chunks->chunks) * chunks->CF_max_chunks);
@@ -434,19 +434,19 @@ void CF_ChunksReset(chunks_t *chunks)
 **  \endreturns
 **
 *************************************************************************/
-uint32 CF_Chunks_ComputeGaps(const chunks_t *chunks, index_t max_gaps, chunk_size_t total, chunk_offset_t start,
-                             compute_gap_fn_t compute_gap_fn, void *opaque)
+uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_gaps, CF_ChunkSize_t total,
+                                CF_ChunkOffset_t start, CF_ChunkList_ComputeGapFn_t compute_gap_fn, void *opaque)
 {
-    uint32  ret     = 0;
-    index_t i       = 0;
-    int     started = 0;
+    uint32        ret     = 0;
+    CF_ChunkIdx_t i       = 0;
+    int           started = 0;
     CF_Assert(total); /* does it make sense to have a 0 byte file? */
     CF_Assert(start < total);
 
     /* simple case: there is no chunk data, which means there is a single gap of the entire size */
     if (!chunks->count)
     {
-        chunk_t c = {0, total};
+        CF_Chunk_t c = {0, total};
         if (compute_gap_fn)
         {
             compute_gap_fn(chunks, &c, opaque);
@@ -457,10 +457,10 @@ uint32 CF_Chunks_ComputeGaps(const chunks_t *chunks, index_t max_gaps, chunk_siz
 
     while ((ret < max_gaps) && (i < chunks->count))
     {
-        chunk_offset_t next_off  = (i == (chunks->count - 1)) ? total : chunks->chunks[i + 1].offset;
-        chunk_offset_t gap_start = (chunks->chunks[i].offset + chunks->chunks[i].size);
-        chunk_size_t   gap_size  = (next_off - gap_start);
-        chunk_t        c         = {gap_start, gap_size};
+        CF_ChunkOffset_t next_off  = (i == (chunks->count - 1)) ? total : chunks->chunks[i + 1].offset;
+        CF_ChunkOffset_t gap_start = (chunks->chunks[i].offset + chunks->chunks[i].size);
+        CF_ChunkSize_t   gap_size  = (next_off - gap_start);
+        CF_Chunk_t       c         = {gap_start, gap_size};
 
         if (gap_start >= total)
         {
@@ -470,7 +470,7 @@ uint32 CF_Chunks_ComputeGaps(const chunks_t *chunks, index_t max_gaps, chunk_siz
         /* check if start has been passed */
         if (!started && ((c.offset + c.size) >= start))
         {
-            chunk_size_t start_diff = (start - c.offset);
+            CF_ChunkSize_t start_diff = (start - c.offset);
             if (start_diff < c.offset)
             {
                 c.offset += start_diff;

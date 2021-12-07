@@ -338,8 +338,8 @@ typedef struct
 
 typedef struct
 {
-    const chunks_t *chunks;
-    const chunk_t  *forced_return;
+    const CF_ChunkList_t *chunks;
+    const CF_Chunk_t     *forced_return;
 } CF_PACK CF_Chunks_GetFirstChunk_context_t;
 
 typedef struct
@@ -364,9 +364,9 @@ typedef struct
 
 typedef struct
 {
-    chunks_t      *chunks;
-    chunk_offset_t offset;
-    chunk_size_t   size;
+    CF_ChunkList_t  *chunks;
+    CF_ChunkOffset_t offset;
+    CF_ChunkSize_t   size;
 } CF_PACK CF_Chunks_Add_context_t;
 
 typedef struct
@@ -392,8 +392,8 @@ typedef struct
 
 typedef struct
 {
-    chunks_t    *chunks;
-    chunk_size_t size;
+    CF_ChunkList_t *chunks;
+    CF_ChunkSize_t  size;
 } CF_PACK CF_Chunks_RemoveFromFirst_context_t;
 
 typedef struct

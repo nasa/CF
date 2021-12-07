@@ -1161,7 +1161,7 @@ void Test_CF_CFDP_S_CheckAndRespondNak_DoesNothingBecause_CF_Chunks_GetFirstChun
     arg_t->chunks                = &dummy_chunks;
 
     context_CF_Chunks_GetFirstChunk.forced_return = NULL;
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
+    UT_SetDataBuffer(UT_KEY(CF_ChunkList_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
                      sizeof(context_CF_Chunks_GetFirstChunk), false);
 
     /* Act */
@@ -1173,7 +1173,7 @@ void Test_CF_CFDP_S_CheckAndRespondNak_DoesNothingBecause_CF_Chunks_GetFirstChun
     UtAssert_True(arg_t->flags.tx.md_need_send == 0,
                   "CF_CFDP_S_CheckAndRespondNak did not set t->flags.tx.md_need_send %d and should be 0",
                   arg_t->flags.tx.md_need_send);
-    UtAssert_STUB_COUNT(CF_Chunks_GetFirstChunk, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_GetFirstChunk, 1);
     UtAssert_ADDRESS_EQ(context_CF_Chunks_GetFirstChunk.chunks, &arg_t->chunks->chunks);
 } /* end Test_CF_CFDP_S_CheckAndRespondNak_DoesNothingBecause_CF_Chunks_GetFirstChunk_Returns_NULL_Return_0 */
 
@@ -1185,15 +1185,15 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturns_non
     CF_Transaction_t                 *arg_t = &dummy_t;
     int                               local_result;
     CF_ChunkWrapper_t                 dummy_chunks;
-    chunk_t                           dummy_c_instance;
-    chunk_t                          *dummy_c = &dummy_c_instance;
+    CF_Chunk_t                        dummy_c_instance;
+    CF_Chunk_t                       *dummy_c = &dummy_c_instance;
     CF_Chunks_GetFirstChunk_context_t context_CF_Chunks_GetFirstChunk;
 
     arg_t->flags.tx.md_need_send = 0; /* 0 = false */
     arg_t->chunks                = &dummy_chunks;
 
     context_CF_Chunks_GetFirstChunk.forced_return = dummy_c;
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
+    UT_SetDataBuffer(UT_KEY(CF_ChunkList_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
                      sizeof(context_CF_Chunks_GetFirstChunk), false);
 
     /* Arrange for CF_CFDP_S_SendFileData - ph will be null err_out returns 0 */
@@ -1213,7 +1213,7 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturns_non
     /* Assert */
     UtAssert_True(local_result == 0, "CF_CFDP_S_CheckAndRespondNak returned %d and should be 0", local_result);
     UtAssert_STUB_COUNT(CF_CFDP_SendMd, 0);
-    UtAssert_STUB_COUNT(CF_Chunks_GetFirstChunk, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_GetFirstChunk, 1);
     UtAssert_ADDRESS_EQ(context_CF_Chunks_GetFirstChunk.chunks, &arg_t->chunks->chunks);
     /* Assert unstubbable:CF_CFDP_S_SendFileData */
     UtAssert_STUB_COUNT(CF_CFDP_ConstructPduHeader, 1);
@@ -1229,15 +1229,15 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturns_non
     CF_Transaction_t                 *arg_t = &dummy_t;
     int                               local_result;
     CF_ChunkWrapper_t                 dummy_chunks;
-    chunk_t                           dummy_c_instance;
-    chunk_t                          *dummy_c = &dummy_c_instance;
+    CF_Chunk_t                        dummy_c_instance;
+    CF_Chunk_t                       *dummy_c = &dummy_c_instance;
     CF_Chunks_GetFirstChunk_context_t context_CF_Chunks_GetFirstChunk;
 
     arg_t->flags.tx.md_need_send = 0; /* 0 = false */
     arg_t->chunks                = &dummy_chunks;
 
     context_CF_Chunks_GetFirstChunk.forced_return = dummy_c;
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
+    UT_SetDataBuffer(UT_KEY(CF_ChunkList_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
                      sizeof(context_CF_Chunks_GetFirstChunk), false);
 
     /* Arrange for CF_CFDP_S_SendFileData - fail return -1 */
@@ -1263,7 +1263,7 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturns_non
     // /* Assert */
     UtAssert_True(local_result == -1, "CF_CFDP_S_CheckAndRespondNak returned %d and should be -1", local_result);
     UtAssert_STUB_COUNT(CF_CFDP_SendMd, 0);
-    UtAssert_STUB_COUNT(CF_Chunks_GetFirstChunk, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_GetFirstChunk, 1);
     UtAssert_ADDRESS_EQ(context_CF_Chunks_GetFirstChunk.chunks, &arg_t->chunks->chunks);
     /* Assert unstubbable:CF_CFDP_S_SendFileData */
     UtAssert_STUB_COUNT(CF_CFDP_ConstructPduHeader, 1);
@@ -1280,15 +1280,15 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturned_no
     CF_Transaction_t                 *arg_t = &dummy_t;
     int                               local_result;
     CF_ChunkWrapper_t                 dummy_chunks;
-    chunk_t                           dummy_c_instance;
-    chunk_t                          *dummy_c = &dummy_c_instance;
+    CF_Chunk_t                        dummy_c_instance;
+    CF_Chunk_t                       *dummy_c = &dummy_c_instance;
     CF_Chunks_GetFirstChunk_context_t context_CF_Chunks_GetFirstChunk;
 
     arg_t->flags.tx.md_need_send = 0; /* 0 = false */
     arg_t->chunks                = &dummy_chunks;
 
     context_CF_Chunks_GetFirstChunk.forced_return = dummy_c;
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
+    UT_SetDataBuffer(UT_KEY(CF_ChunkList_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
                      sizeof(context_CF_Chunks_GetFirstChunk), false);
 
     dummy_c->size = Any_uint8_GreaterThan(0); /* uint8 used for small size during testing */
@@ -1324,9 +1324,9 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturned_no
     // /* Assert */
     UtAssert_True(local_result == 1, "CF_CFDP_S_CheckAndRespondNak returned %d and should be 1", local_result);
     UtAssert_STUB_COUNT(CF_CFDP_SendMd, 0);
-    UtAssert_STUB_COUNT(CF_Chunks_GetFirstChunk, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_GetFirstChunk, 1);
     UtAssert_ADDRESS_EQ(context_CF_Chunks_GetFirstChunk.chunks, &arg_t->chunks->chunks);
-    UtAssert_STUB_COUNT(CF_Chunks_RemoveFromFirst, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_RemoveFromFirst, 1);
     /* Assert unstubbable:CF_CFDP_S_SendFileData */
     UtAssert_STUB_COUNT(CF_CFDP_ConstructPduHeader, 1);
     UtAssert_STUB_COUNT(CF_WrappedLseek, 0);
@@ -1379,7 +1379,7 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
     arg_t->flags.tx.md_need_send = 0; /* 0 = false */
 
     context_CF_Chunks_GetFirstChunk.forced_return = NULL;
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
+    UT_SetDataBuffer(UT_KEY(CF_ChunkList_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
                      sizeof(context_CF_Chunks_GetFirstChunk), false);
 
     /* Arrange for CF_CFDP_S_SubstateSendFileData */
@@ -1404,7 +1404,7 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
 
     /* Assert */
     /* Assert for CF_CFDP_S_CheckAndRespondNak */
-    UtAssert_STUB_COUNT(CF_Chunks_GetFirstChunk, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_GetFirstChunk, 1);
     /* Assert for CF_CFDP_S_SubstateSendFileData via CF_CFDP_S_SendFileData*/
     UtAssert_STUB_COUNT(CF_CFDP_ConstructPduHeader, 1);
 } /* end
@@ -1479,14 +1479,14 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
     CF_Transaction_t *arg_t = &dummy_t;
 
     /* Arrange for CF_CFDP_S_CheckAndRespondNak (get it to return 0)*/
-    chunk_t                           fake_c;
-    chunk_t                          *dummy_c = &fake_c;
+    CF_Chunk_t                        fake_c;
+    CF_Chunk_t                       *dummy_c = &fake_c;
     CF_Chunks_GetFirstChunk_context_t context_CF_Chunks_GetFirstChunk;
 
     arg_t->flags.tx.md_need_send = 0; /* 0 = false */
 
     context_CF_Chunks_GetFirstChunk.forced_return = dummy_c;
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
+    UT_SetDataBuffer(UT_KEY(CF_ChunkList_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
                      sizeof(context_CF_Chunks_GetFirstChunk), false);
 
     /* Arrange for CF_CFDP_S_SendFileData */
@@ -1523,7 +1523,7 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
 
     /* Assert */
     /* Assert for CF_CFDP_S_CheckAndRespondNak */
-    UtAssert_STUB_COUNT(CF_Chunks_GetFirstChunk, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_GetFirstChunk, 1);
     /* Assert for CF_CFDP_S_SubstateSendFileData via CF_CFDP_S_SendFileData*/
     UtAssert_STUB_COUNT(CF_CFDP_ConstructPduHeader, 1);
 } /* end Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_ReturnsPositiveValueDoNothing */
@@ -2485,7 +2485,7 @@ void Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsEqualToTr
 
     arg_t->flags.tx.md_need_send = 0; /* setting md_need_send is not required, but assists in verification */
 
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_Add), &context_CF_Chunks_Add, sizeof(context_CF_Chunks_Add), false);
+    UT_SetDataBuffer(UT_KEY(CF_ChunkListAdd), &context_CF_Chunks_Add, sizeof(context_CF_Chunks_Add), false);
 
     /* Act */
     CF_CFDP_S2_Nak(arg_t, arg_ph);
@@ -2500,13 +2500,13 @@ void Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsEqualToTr
         context_CF_CFDP_RecvNak_forced_num_sr, initial_nak_segment_requests);
     UtAssert_True(arg_t->flags.tx.md_need_send == 0, "md_need_send is %u and should not have changed from 0",
                   arg_t->flags.tx.md_need_send);
-    UtAssert_STUB_COUNT(CF_Chunks_Add, 1);
+    UtAssert_STUB_COUNT(CF_ChunkListAdd, 1);
     UtAssert_ADDRESS_EQ(context_CF_Chunks_Add.chunks, &arg_t->chunks->chunks);
     UtAssert_True(context_CF_Chunks_Add.offset == dummy_offset_start,
-                  "CF_Chunks_Add received offset %u and should be %u (start)", context_CF_Chunks_Add.offset,
+                  "CF_ChunkListAdd received offset %u and should be %u (start)", context_CF_Chunks_Add.offset,
                   dummy_offset_start);
     UtAssert_True(context_CF_Chunks_Add.size == dummy_offset_end - dummy_offset_start,
-                  "CF_Chunks_Add received size %u and should be %u (size)", context_CF_Chunks_Add.size,
+                  "CF_ChunkListAdd received size %u and should be %u (size)", context_CF_Chunks_Add.size,
                   dummy_offset_end - dummy_offset_start);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 } /* end Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsEqualToTransaction_fsize */
@@ -2543,7 +2543,7 @@ void Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsLessThanT
 
     arg_t->flags.tx.md_need_send = 0; /* setting md_need_send is not required, but assists in verification */
 
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_Add), &context_CF_Chunks_Add, sizeof(context_CF_Chunks_Add), false);
+    UT_SetDataBuffer(UT_KEY(CF_ChunkListAdd), &context_CF_Chunks_Add, sizeof(context_CF_Chunks_Add), false);
 
     /* Act */
     CF_CFDP_S2_Nak(arg_t, arg_ph);
@@ -2558,13 +2558,13 @@ void Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsLessThanT
         context_CF_CFDP_RecvNak_forced_num_sr, initial_nak_segment_requests);
     UtAssert_True(arg_t->flags.tx.md_need_send == 0, "md_need_send is %u and should not have changed from 0",
                   arg_t->flags.tx.md_need_send);
-    UtAssert_STUB_COUNT(CF_Chunks_Add, 1);
+    UtAssert_STUB_COUNT(CF_ChunkListAdd, 1);
     UtAssert_ADDRESS_EQ(context_CF_Chunks_Add.chunks, &arg_t->chunks->chunks);
     UtAssert_True(context_CF_Chunks_Add.offset == dummy_offset_start,
-                  "CF_Chunks_Add received offset %u and should be %u (start)", context_CF_Chunks_Add.offset,
+                  "CF_ChunkListAdd received offset %u and should be %u (start)", context_CF_Chunks_Add.offset,
                   dummy_offset_start);
     UtAssert_True(context_CF_Chunks_Add.size == dummy_offset_end - dummy_offset_start,
-                  "CF_Chunks_Add received size %u and should be %u (size)", context_CF_Chunks_Add.size,
+                  "CF_ChunkListAdd received size %u and should be %u (size)", context_CF_Chunks_Add.size,
                   dummy_offset_end - dummy_offset_start);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 } /* end Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsLessThanTransaction_fsize */

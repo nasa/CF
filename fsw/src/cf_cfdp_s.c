@@ -267,8 +267,8 @@ static void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *t)
 *************************************************************************/
 static int CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
 {
-    const chunk_t *c;
-    int            ret = 0;
+    const CF_Chunk_t *c;
+    int               ret = 0;
 
     if (t->flags.tx.md_need_send)
     {
@@ -290,12 +290,12 @@ static int CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
         /* unless CF_SendRet_ERROR, return 1 to keep caller from sending file data */
         ret = 1; /* 1 means nak processed, so don't send filedata */
     }
-    else if ((c = CF_Chunks_GetFirstChunk(&t->chunks->chunks)))
+    else if ((c = CF_ChunkList_GetFirstChunk(&t->chunks->chunks)))
     {
         ret = CF_CFDP_S_SendFileData(t, c->offset, c->size, 0);
         if (ret > 0)
         {
-            CF_Chunks_RemoveFromFirst(&t->chunks->chunks, ret);
+            CF_ChunkList_RemoveFromFirst(&t->chunks->chunks, ret);
             ret = 1; /* processed nak, so caller doesn't send file data */
         }
         else if (ret < 0)
@@ -535,7 +535,7 @@ static void CF_CFDP_S2_Nak(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph)
                 if ((start + size) <= t->fsize)
                 {
                     /* insert gap data in chunks */
-                    CF_Chunks_Add(&t->chunks->chunks, start, size);
+                    CF_ChunkListAdd(&t->chunks->chunks, start, size);
                 }
                 else
                 {

@@ -108,8 +108,8 @@ typedef struct CF_History
 
 typedef struct CF_ChunkWrapper
 {
-    chunks_t     chunks;
-    clist_node_t cl_node;
+    CF_ChunkList_t chunks;
+    clist_node_t   cl_node;
 } CF_ChunkWrapper_t;
 
 typedef struct CF_Playback
@@ -329,7 +329,7 @@ typedef struct CF_Engine
     CF_Channel_t     channels[CF_NUM_CHANNELS];
 
     CF_ChunkWrapper_t chunks[CF_NUM_TRANSACTIONS * CF_Direction_NUM];
-    chunk_t           chunk_mem[CF_NUM_CHUNKS_ALL_CHANNELS];
+    CF_Chunk_t        chunk_mem[CF_NUM_CHUNKS_ALL_CHANNELS];
 
     uint32 outgoing_counter;
     uint8  enabled;

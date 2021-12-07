@@ -376,7 +376,7 @@ void Test_CF_CFDP_R2_Complete_Given_t_history_cc_IsNotEqTo_CC_NO_ERROR_DoNothing
     CF_CFDP_R2_Complete(arg_t, arg_ok_to_send_nak);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_Chunks_ComputeGaps, 0);
+    UtAssert_STUB_COUNT(CF_ChunkList_ComputeGaps, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_True(arg_t->state_data.r.sub_state == initial_sub_state,
                   "t->state_data.r.sub_state is %u and should be %u (unchanged)", arg_t->state_data.r.sub_state,
@@ -405,7 +405,7 @@ void Test_CF_CFDP_R2_Complete_Given_t_Sets_send_nak_To_1_Given_ok_to_send_nak_Is
     CF_CFDP_R2_Complete(arg_t, arg_ok_to_send_nak);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_Chunks_ComputeGaps, 0);
+    UtAssert_STUB_COUNT(CF_ChunkList_ComputeGaps, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_True(arg_t->state_data.r.sub_state == CF_RxSubState_FILEDATA,
                   "t->state_data.r.sub_state is %u and should be %u (CF_RxSubState_FILEDATA)",
@@ -441,7 +441,7 @@ void Test_CF_CFDP_R2_Complete_Given_t_Sets_send_nak_To_1_Given_ok_to_send_nak_Is
     CF_CFDP_R2_Complete(arg_t, arg_ok_to_send_nak);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_Chunks_ComputeGaps, 0);
+    UtAssert_STUB_COUNT(CF_ChunkList_ComputeGaps, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UtAssert_True(arg_t->state_data.r.sub_state == CF_RxSubState_FILEDATA,
                   "t->state_data.r.sub_state is %u and should be %u (CF_RxSubState_FILEDATA)",
@@ -478,7 +478,7 @@ void Test_CF_CFDP_R2_Complete_Given_t_Sets_send_nak_To_1_Given_ok_to_send_nak_Is
     CF_CFDP_R2_Complete(arg_t, arg_ok_to_send_nak);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_Chunks_ComputeGaps, 0);
+    UtAssert_STUB_COUNT(CF_ChunkList_ComputeGaps, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_True(arg_t->flags.rx.send_nak == 1, "t->flags.rx.send_nak is %u and should be 1",
                   arg_t->flags.rx.send_nak);
@@ -509,7 +509,7 @@ void Test_CF_CFDP_R2_Complete_Calls_CF_Chunks_ComputeGaps_Returns_non0_Set_send_
     arg_t->flags.rx.md_recv       = 1;
     arg_t->flags.rx.send_nak      = 0;
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_Chunks_ComputeGaps), Any_int_Except(0));
+    UT_SetDefaultReturnValue(UT_KEY(CF_ChunkList_ComputeGaps), Any_int_Except(0));
 
     CF_AppData.config_table            = &dummy_config_table;
     CF_AppData.config_table->nak_limit = Any_uint8_GreaterThan(1);
@@ -519,7 +519,7 @@ void Test_CF_CFDP_R2_Complete_Calls_CF_Chunks_ComputeGaps_Returns_non0_Set_send_
     CF_CFDP_R2_Complete(arg_t, arg_ok_to_send_nak);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_Chunks_ComputeGaps, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_ComputeGaps, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_True(arg_t->flags.rx.send_nak == 1, "t->flags.rx.send_nak is %u and should be 1",
                   arg_t->flags.rx.send_nak);
@@ -550,7 +550,7 @@ void Test_CF_CFDP_R2_Complete_Calls_CF_Chunks_ComputeGaps_Returns_non0_Set_send_
     arg_t->flags.rx.md_recv       = 1;
     arg_t->flags.rx.send_nak      = 0;
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_Chunks_ComputeGaps), 0);
+    UT_SetDefaultReturnValue(UT_KEY(CF_ChunkList_ComputeGaps), 0);
     arg_t->flags.rx.eof_recv = 0;
 
     CF_AppData.config_table            = &dummy_config_table;
@@ -561,7 +561,7 @@ void Test_CF_CFDP_R2_Complete_Calls_CF_Chunks_ComputeGaps_Returns_non0_Set_send_
     CF_CFDP_R2_Complete(arg_t, arg_ok_to_send_nak);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_Chunks_ComputeGaps, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_ComputeGaps, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_True(arg_t->flags.rx.send_nak == 0, "t->flags.rx.send_nak is %u and should be 0",
                   arg_t->flags.rx.send_nak);
@@ -593,7 +593,7 @@ void Test_CF_CFDP_R2_Complete_Calls_CF_Chunks_ComputeGaps_Returns_non0_Set_send_
     arg_t->flags.rx.send_nak      = 0;
     arg_t->flags.rx.send_fin      = 0;
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_Chunks_ComputeGaps), 0);
+    UT_SetDefaultReturnValue(UT_KEY(CF_ChunkList_ComputeGaps), 0);
     arg_t->flags.rx.eof_recv = 1;
 
     CF_AppData.config_table            = &dummy_config_table;
@@ -604,7 +604,7 @@ void Test_CF_CFDP_R2_Complete_Calls_CF_Chunks_ComputeGaps_Returns_non0_Set_send_
     CF_CFDP_R2_Complete(arg_t, arg_ok_to_send_nak);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_Chunks_ComputeGaps, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_ComputeGaps, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_True(arg_t->flags.rx.send_nak == 0, "t->flags.rx.send_nak is %u and should be 0",
                   arg_t->flags.rx.send_nak);
@@ -1503,7 +1503,7 @@ void Test_CF_CFDP_R2_SubstateRecvFileData_CallTo_CF_CFDP_RecvFd_Returns_non0_Cal
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_RecvFd, 1);
-    UtAssert_STUB_COUNT(CF_Chunks_Add, 0);
+    UtAssert_STUB_COUNT(CF_ChunkListAdd, 0);
     /* Assert for CF_CFDP_R_ProcessFd */
     UtAssert_STUB_COUNT(CF_HeaderSize, 0);
     /* Assert for CF_CFDP_R2_Reset via CF_CFDP_R1_Reset */
@@ -1534,7 +1534,7 @@ void Test_CF_CFDP_R2_SubstateRecvFileData_CallTo_CF_CFDP_RecvFd_Returns_0_CallTo
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_RecvFd, 1);
-    UtAssert_STUB_COUNT(CF_Chunks_Add, 0);
+    UtAssert_STUB_COUNT(CF_ChunkListAdd, 0);
     /* Assert for CF_CFDP_R_ProcessFd */
     UtAssert_STUB_COUNT(CF_HeaderSize, 1);
     /* Assert for CF_CFDP_R2_Reset via CF_CFDP_R1_Reset */
@@ -1597,7 +1597,7 @@ void Test_CF_CFDP_R2_SubstateRecvFileData_t_flags_rx_fd_nak_sent_Is_0_And_t_flag
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_RecvFd, 1);
-    UtAssert_STUB_COUNT(CF_Chunks_Add, 1);
+    UtAssert_STUB_COUNT(CF_ChunkListAdd, 1);
     UtAssert_True(arg_t->state_data.r.r2.counter.nak == 0, "t->state_data.r.r2.counter.nak is %u and should be 0",
                   arg_t->state_data.r.r2.counter.nak);
     /* Assert for CF_CFDP_R_ProcessFd - 3 calls, one in function two in STATIC_CAST */
@@ -1665,7 +1665,7 @@ void Test_CF_CFDP_R2_SubstateRecvFileData_t_flags_rx_fd_nak_sent_Is_1_Call_CF_CF
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_RecvFd, 1);
-    UtAssert_STUB_COUNT(CF_Chunks_Add, 1);
+    UtAssert_STUB_COUNT(CF_ChunkListAdd, 1);
     UtAssert_True(arg_t->state_data.r.r2.counter.nak == 0, "t->state_data.r.r2.counter.nak is %u and should be 0",
                   arg_t->state_data.r.r2.counter.nak);
     /* Assert for CF_CFDP_R_ProcessFd - 3 calls, one in function two in STATIC_CAST */
@@ -1730,7 +1730,7 @@ void Test_CF_CFDP_R2_SubstateRecvFileData_t_flags_rx_fd_nak_sent_Is_0_And_t_flag
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_RecvFd, 1);
-    UtAssert_STUB_COUNT(CF_Chunks_Add, 1);
+    UtAssert_STUB_COUNT(CF_ChunkListAdd, 1);
     UtAssert_STUB_COUNT(CF_CFDP_ArmAckTimer, 1);
     UtAssert_True(arg_t->state_data.r.r2.counter.nak == 0, "t->state_data.r.r2.counter.nak is %u and should be 0",
                   arg_t->state_data.r.r2.counter.nak);
@@ -1753,9 +1753,9 @@ void Test_CF_CFDP_R2_SubstateRecvFileData_t_flags_rx_fd_nak_sent_Is_0_And_t_flag
 void Test_CF_CFDP_R2_GapCompute_AssertsWhenGiven_c_size_Is_0(void)
 {
     // /* Arrange */
-    // chunks_t*             arg_chunks;
-    // chunk_t               dummy_c;
-    // chunk_t*              arg_c = &dummy_c;
+    // CF_ChunkList_t*             arg_chunks;
+    // CF_Chunk_t               dummy_c;
+    // CF_Chunk_t*              arg_c = &dummy_c;
     // gap_compute_args_t    dummy_args;
     // void*                 arg_opaque = &dummy_args;
 
@@ -1771,10 +1771,10 @@ void Test_CF_CFDP_R2_GapCompute_AssertsWhenGiven_c_size_Is_0(void)
 void Test_CF_CFDP_R2_GapCompute_WhenGiven_c_size_IsGreaterThan_0_Increment_gap_counter(void)
 {
     /* Arrange */
-    chunks_t           dummy_chunks;
-    chunks_t          *arg_chunks = &dummy_chunks;
-    chunk_t            dummy_c;
-    chunk_t           *arg_c = &dummy_c;
+    CF_ChunkList_t     dummy_chunks;
+    CF_ChunkList_t    *arg_chunks = &dummy_chunks;
+    CF_Chunk_t         dummy_c;
+    CF_Chunk_t        *arg_c = &dummy_c;
     CF_UT_fullhdr_t    dummy;
     gap_compute_args_t dummy_args;
     void              *arg_opaque          = &dummy_args;
@@ -1959,7 +1959,7 @@ void Test_CF_CFDP_R_SubstateSendNak_Given_t_md_recv_Is_1_CallTo_CF_Chunks_Comput
     UT_SetDataBuffer(UT_KEY(CF_CFDP_ConstructPduHeader), &context_CF_CFDP_ConstructPduHeader,
                      sizeof(context_CF_CFDP_ConstructPduHeader), false);
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_Chunks_ComputeGaps), Any_uint32_Except(0));
+    UT_SetDefaultReturnValue(UT_KEY(CF_ChunkList_ComputeGaps), Any_uint32_Except(0));
 
     context_CF_CFDP_SendNak.forced_return = Any_uint8_ExceptThese(exceptions, 2);
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendNak), &context_CF_CFDP_SendNak, sizeof(context_CF_CFDP_SendNak), false);
@@ -1998,7 +1998,7 @@ void Test_CF_CFDP_R_SubstateSendNak_AssertsBecauseGiven_t_md_recv_Is_1_CallTo_CF
     // UT_SetDataBuffer(UT_KEY(CF_CFDP_ConstructPduHeader), &context_CF_CFDP_ConstructPduHeader,
     //   sizeof(context_CF_CFDP_ConstructPduHeader), false);
 
-    // UT_SetDefaultReturnValue(UT_KEY(CF_Chunks_ComputeGaps), Any_uint32_Except(0));
+    // UT_SetDefaultReturnValue(UT_KEY(CF_ChunkList_ComputeGaps), Any_uint32_Except(0));
 
     // context_CF_CFDP_SendNak.forced_return = CF_SendRet_ERROR;
     // UT_SetDataBuffer(UT_KEY(CF_CFDP_SendNak), &context_CF_CFDP_SendNak,
@@ -2042,7 +2042,7 @@ void Test_CF_CFDP_R_SubstateSendNak_Given_t_md_recv_Is_1_CallTo_CF_Chunks_Comput
     UT_SetDataBuffer(UT_KEY(CF_CFDP_ConstructPduHeader), &context_CF_CFDP_ConstructPduHeader,
                      sizeof(context_CF_CFDP_ConstructPduHeader), false);
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_Chunks_ComputeGaps), Any_uint32_Except(0));
+    UT_SetDefaultReturnValue(UT_KEY(CF_ChunkList_ComputeGaps), Any_uint32_Except(0));
 
     context_CF_CFDP_SendNak.forced_return = CF_SendRet_SUCCESS;
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendNak), &context_CF_CFDP_SendNak, sizeof(context_CF_CFDP_SendNak), false);
@@ -2081,7 +2081,7 @@ void Test_CF_CFDP_R_SubstateSendNak_Given_t_md_recv_Is_1_CallTo_CF_Chunks_Comput
     UT_SetDataBuffer(UT_KEY(CF_CFDP_ConstructPduHeader), &context_CF_CFDP_ConstructPduHeader,
                      sizeof(context_CF_CFDP_ConstructPduHeader), false);
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_Chunks_ComputeGaps), 0);
+    UT_SetDefaultReturnValue(UT_KEY(CF_ChunkList_ComputeGaps), 0);
 
     dummy_chunks.chunks.CF_max_chunks = Any_uint32_Except(0);
     dummy_chunks.chunks.count         = Any_uint32_LessThan(dummy_chunks.chunks.CF_max_chunks);
@@ -2119,7 +2119,7 @@ void Test_CF_CFDP_R_SubstateSendNak_Given_t_md_recv_Is_1_CallTo_CF_Chunks_Comput
     UT_SetDataBuffer(UT_KEY(CF_CFDP_ConstructPduHeader), &context_CF_CFDP_ConstructPduHeader,
                      sizeof(context_CF_CFDP_ConstructPduHeader), false);
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_Chunks_ComputeGaps), 0);
+    UT_SetDefaultReturnValue(UT_KEY(CF_ChunkList_ComputeGaps), 0);
 
     dummy_chunks.chunks.CF_max_chunks = Any_uint32_Except(0);
     dummy_chunks.chunks.count         = dummy_chunks.chunks.CF_max_chunks;
@@ -2157,7 +2157,7 @@ void Test_CF_CFDP_R_SubstateSendNak_Given_t_md_recv_Is_1_CallTo_CF_Chunks_Comput
     UT_SetDataBuffer(UT_KEY(CF_CFDP_ConstructPduHeader), &context_CF_CFDP_ConstructPduHeader,
                      sizeof(context_CF_CFDP_ConstructPduHeader), false);
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_Chunks_ComputeGaps), 0);
+    UT_SetDefaultReturnValue(UT_KEY(CF_ChunkList_ComputeGaps), 0);
 
     dummy_chunks.chunks.CF_max_chunks = Any_uint32_Except(UINT32_MAX);
     dummy_chunks.chunks.count         = Any_uint32_GreaterThan(dummy_chunks.chunks.CF_max_chunks);
@@ -4157,7 +4157,7 @@ void Test_CF_CFDP_R_Tick_Given_t_state_IsEqTo_CFDP_R2_And_inactivity_fired_Is_1_
     UT_SetDataBuffer(UT_KEY(CF_CFDP_ConstructPduHeader), &context_CF_CFDP_ConstructPduHeader,
                      sizeof(context_CF_CFDP_ConstructPduHeader), false);
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_Chunks_ComputeGaps), Any_uint32_Except(0));
+    UT_SetDefaultReturnValue(UT_KEY(CF_ChunkList_ComputeGaps), Any_uint32_Except(0));
 
     context_CF_CFDP_SendNak.forced_return = CF_SendRet_SUCCESS;
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendNak), &context_CF_CFDP_SendNak, sizeof(context_CF_CFDP_SendNak), false);
