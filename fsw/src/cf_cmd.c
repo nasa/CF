@@ -345,7 +345,7 @@ static void CF_CmdThaw(CFE_SB_Buffer_t *msg)
 **  \endreturns
 **
 *************************************************************************/
-static transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(cf_transaction_seq_t ts, cf_entity_id_t eid)
+static transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(CF_TransactionSeq_t ts, CF_EntityId_t eid)
 {
     int            i;
     transaction_t *ret = NULL;
@@ -925,7 +925,7 @@ static void CF_CmdSendCfgParams(CFE_SB_Buffer_t *msg)
 static int CF_CmdValidateChunkSize(uint32 val, uint8 chan_num /* ignored */)
 {
     int ret = 0;
-    if (val > sizeof(pdu_fd_data_t))
+    if (val > sizeof(CF_CFDP_PduFileDataContent_t))
     {
         ret = 1; /* failed */
     }

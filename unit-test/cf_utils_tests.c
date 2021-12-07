@@ -39,10 +39,10 @@ direction_t Any_direction_t(void)
     return (direction_t)Any_uint8_LessThan(CF_DIR_NUM);
 }
 
-condition_code_t Any_condition_code_t(void)
+CF_CFDP_ConditionCode_t Any_condition_code_t(void)
 {
     uint8 codes[13] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15};
-    return (condition_code_t)Any_uint8_FromThese(codes, sizeof(codes) / sizeof(codes[0]));
+    return (CF_CFDP_ConditionCode_t)Any_uint8_FromThese(codes, sizeof(codes) / sizeof(codes[0]));
 }
 
 void local_handler_OS_close(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)

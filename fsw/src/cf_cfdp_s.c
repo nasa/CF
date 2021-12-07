@@ -135,10 +135,10 @@ static void CF_CFDP_S2_SubstateSendEof(transaction_t *t)
 /* if bytes_to_read is 0, then read max possible */
 static int32 CF_CFDP_S_SendFileData(transaction_t *t, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc)
 {
-    int32         ret = -1;
-    pdu_header_t *ph  = CF_CFDP_ConstructPduHeader(t, 0, CF_AppData.config_table->local_eid, t->history->peer_eid, 0,
-                                                   t->history->seq_num, 1);
-    pdu_fd_t     *fd;
+    int32                ret = -1;
+    CF_CFDP_PduHeader_t *ph = CF_CFDP_ConstructPduHeader(t, 0, CF_AppData.config_table->local_eid, t->history->peer_eid,
+                                                         0, t->history->seq_num, 1);
+    CF_CFDP_PduFd_t     *fd;
     if (!ph)
     {
         ret = 0;
@@ -146,7 +146,7 @@ static int32 CF_CFDP_S_SendFileData(transaction_t *t, uint32 foffs, uint32 bytes
     }
     int status;
 
-    fd = STATIC_CAST(ph, pdu_fd_t);
+    fd = STATIC_CAST(ph, CF_CFDP_PduFd_t);
 
     if (bytes_to_read > CF_AppData.config_table->outgoing_file_chunk_size)
     {
@@ -240,7 +240,7 @@ static void CF_CFDP_S_SubstateSendFileData(transaction_t *t)
     else if (bytes_processed < 0)
     {
         /* IO error -- change state and send EOF */
-        t->history->cc            = CC_FILESTORE_REJECTION;
+        t->history->cc            = CF_CFDP_ConditionCode_FILESTORE_REJECTION;
         t->state_data.s.sub_state = SEND_EOF;
     }
     else
@@ -426,7 +426,7 @@ static void CF_CFDP_S_SubstateSendMetadata(transaction_t *t)
     return;
 
 err_out:
-    t->history->cc = CC_FILESTORE_REJECTION;
+    t->history->cc = CF_CFDP_ConditionCode_FILESTORE_REJECTION;
     CF_CFDP_S_Reset(t);
 }
 
@@ -440,8 +440,8 @@ err_out:
 static void CF_CFDP_S_SubstateSendFinAck(transaction_t *t)
 {
     /* if send, or error, reset. if no message, try again next cycle */
-    if (CF_CFDP_SendAck(t, ACK_TS_ACTIVE, PDU_FIN, t->state_data.s.s2.fin_cc, t->history->peer_eid,
-                        t->history->seq_num) != CF_SEND_NO_MSG)
+    if (CF_CFDP_SendAck(t, CF_CFDP_AckTxnStatus_ACTIVE, CF_CFDP_FileDirective_FIN, t->state_data.s.s2.fin_cc,
+                        t->history->peer_eid, t->history->seq_num) != CF_SEND_NO_MSG)
     {
         CF_CFDP_S_Reset(t);
     }
@@ -454,7 +454,7 @@ static void CF_CFDP_S_SubstateSendFinAck(transaction_t *t)
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_S2_EarlyFin(transaction_t *t, const pdu_header_t *ph)
+static void CF_CFDP_S2_EarlyFin(transaction_t *t, const CF_CFDP_PduHeader_t *ph)
 {
     /* received early fin, so just cancel */
     CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_EARLY_FIN, CFE_EVS_EventType_ERROR,
@@ -470,11 +470,11 @@ static void CF_CFDP_S2_EarlyFin(transaction_t *t, const pdu_header_t *ph)
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_S2_Fin(transaction_t *t, const pdu_header_t *ph)
+static void CF_CFDP_S2_Fin(transaction_t *t, const CF_CFDP_PduHeader_t *ph)
 {
     if (!CF_CFDP_RecvFin())
     {
-        t->state_data.s.s2.fin_cc = FGV(STATIC_CAST(ph, pdu_fin_t)->flags, PDU_FLAGS_CC);
+        t->state_data.s.s2.fin_cc = FGV(STATIC_CAST(ph, CF_CFDP_PduFin_t)->flags, CF_CFDP_PduFin_FLAGS_CC);
         t->state_data.s.sub_state = SEND_SEND_FIN_ACK;
     }
     else
@@ -497,7 +497,7 @@ static void CF_CFDP_S2_Fin(transaction_t *t, const pdu_header_t *ph)
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_S2_Nak(transaction_t *t, const pdu_header_t *ph)
+static void CF_CFDP_S2_Nak(transaction_t *t, const CF_CFDP_PduHeader_t *ph)
 {
     /* temporary function to respond to naks */
     int counter;
@@ -506,7 +506,7 @@ static void CF_CFDP_S2_Nak(transaction_t *t, const pdu_header_t *ph)
 
     if (!CF_CFDP_RecvNak(&num_sr) && num_sr)
     {
-        pdu_nak_t *nak = STATIC_CAST(ph, pdu_nak_t);
+        CF_CFDP_PduNak_t *nak = STATIC_CAST(ph, CF_CFDP_PduNak_t);
         CF_Assert(num_sr <= CF_NAK_MAX_SEGMENTS); // sanity check
 
         for (counter = 0; counter < num_sr; ++counter)
@@ -567,7 +567,7 @@ static void CF_CFDP_S2_Nak(transaction_t *t, const pdu_header_t *ph)
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_S2_Nak_Arm(transaction_t *t, const pdu_header_t *ph)
+static void CF_CFDP_S2_Nak_Arm(transaction_t *t, const CF_CFDP_PduHeader_t *ph)
 {
     CF_CFDP_ArmAckTimer(t);
     CF_CFDP_S2_Nak(t, ph);
@@ -584,13 +584,13 @@ static void CF_CFDP_S2_Nak_Arm(transaction_t *t, const pdu_header_t *ph)
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_S2_WaitForEofAck(transaction_t *t, const pdu_header_t *ph)
+static void CF_CFDP_S2_WaitForEofAck(transaction_t *t, const CF_CFDP_PduHeader_t *ph)
 {
     if (!CF_CFDP_RecvAck())
     {
         /* don't send fin if error. Don't check the eof CC, just go with
          * the stored one we sent before */
-        if (t->history->cc != CC_NO_ERROR)
+        if (t->history->cc != CF_CFDP_ConditionCode_NO_ERROR)
         {
             CF_CFDP_S_Reset(t);
         }
@@ -620,20 +620,20 @@ static void CF_CFDP_S2_WaitForEofAck(transaction_t *t, const pdu_header_t *ph)
 **       t must not be NULL. fns must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_S_DispatchRecv(transaction_t *t,
-                                   void (*const fns[SEND_NUM_STATES][PDU_INVALID_MAX])(transaction_t *,
-                                                                                       const pdu_header_t *))
+static void CF_CFDP_S_DispatchRecv(
+    transaction_t *t,
+    void (*const fns[SEND_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(transaction_t *, const CF_CFDP_PduHeader_t *))
 {
     CF_Assert(t->state_data.s.sub_state < SEND_NUM_STATES);
     CF_Assert(CF_AppData.engine.in.msg);
 
     /* at this point, pdu header for recv message is unmarshaled */
-    pdu_header_t *ph = &((pdu_r_msg_t *)CF_AppData.engine.in.msg)->ph;
+    CF_CFDP_PduHeader_t *ph = &((CF_PduRecvMsg_t *)CF_AppData.engine.in.msg)->ph;
     /* send state, so we only care about file directive PDU */
-    if (!FGV(ph->flags, PDU_HDR_FLAGS_TYPE))
+    if (!FGV(ph->flags, CF_CFDP_PduHeader_FLAGS_TYPE))
     {
-        pdu_file_directive_header_t *fdh = STATIC_CAST(ph, pdu_file_directive_header_t);
-        if (fdh->directive_code < PDU_INVALID_MAX)
+        CF_CFDP_PduFileDirectiveHeader_t *fdh = STATIC_CAST(ph, CF_CFDP_PduFileDirectiveHeader_t);
+        if (fdh->directive_code < CF_CFDP_FileDirective_INVALID_MAX)
         {
             /* check that there's a valid function pointer. if there isn't,
              * then silently ignore. We may want to discuss if it's worth
@@ -673,8 +673,8 @@ static void CF_CFDP_S_DispatchRecv(transaction_t *t,
 void CF_CFDP_S1_Recv(transaction_t *t)
 {
     /* s1 doesn't need to receive anything */
-    static void (*const substate_fns[SEND_NUM_STATES][PDU_INVALID_MAX])(transaction_t *,
-                                                                        const pdu_header_t *) = {{NULL}};
+    static void (*const substate_fns[SEND_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(
+        transaction_t *, const CF_CFDP_PduHeader_t *) = {{NULL}};
     CF_CFDP_S_DispatchRecv(t, substate_fns);
 }
 
@@ -687,7 +687,8 @@ void CF_CFDP_S1_Recv(transaction_t *t)
 *************************************************************************/
 void CF_CFDP_S2_Recv(transaction_t *t)
 {
-    static void (*const substate_fns[SEND_NUM_STATES][PDU_INVALID_MAX])(transaction_t *, const pdu_header_t *) = {
+    static void (*const substate_fns[SEND_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(
+        transaction_t *, const CF_CFDP_PduHeader_t *) = {
         {NULL, NULL, NULL, NULL, NULL, CF_CFDP_S2_EarlyFin, NULL, NULL, NULL, NULL, NULL},           /* SEND_METADATA */
         {NULL, NULL, NULL, NULL, NULL, CF_CFDP_S2_EarlyFin, NULL, NULL, CF_CFDP_S2_Nak, NULL, NULL}, /* SEND_FILEDATA */
         {NULL, NULL, NULL, NULL, NULL, CF_CFDP_S2_EarlyFin, NULL, NULL, CF_CFDP_S2_Nak, NULL, NULL}, /* SEND_EOF */

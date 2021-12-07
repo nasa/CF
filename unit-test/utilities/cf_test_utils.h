@@ -57,7 +57,7 @@ void Handler_CF_CFDP_ConstructPduHeader_ForceReturnOnly(void *UserObj, UT_EntryK
 **
 **  Buffer allocation types
 **
-**  The "pdu_s_msg_t" and "pdu_r_msg_t" are only minimally-sized types, reflecting
+**  The "CF_PduSendMsg_t" and "CF_PduRecvMsg_t" are only minimally-sized types, reflecting
 **  the common parts of all PDUs, without any definition of the optional/extra parts.
 **
 **  In order to call one of the CFDP functions that accept a larger buffer, the
@@ -71,25 +71,25 @@ void Handler_CF_CFDP_ConstructPduHeader_ForceReturnOnly(void *UserObj, UT_EntryK
 /* A combination of all the various CFDP secondary header types */
 typedef union
 {
-    pdu_file_directive_header_t fdirh;
-    pdu_file_data_header_t      fdatah;
-    pdu_md_t                    md;
-    pdu_eof_t                   eof;
-    pdu_ack_t                   ack;
-    pdu_fin_t                   fin;
-    pdu_nak_t                   nak;
+    CF_CFDP_PduFileDirectiveHeader_t fdirh;
+    CF_CFDP_PduFileDataHeader_t      fdatah;
+    CF_CFDP_PduMd_t                  md;
+    CF_CFDP_PduEof_t                 eof;
+    CF_CFDP_PduAck_t                 ack;
+    CF_CFDP_PduFin_t                 fin;
+    CF_CFDP_PduNak_t                 nak;
 } pdu_any_sechdr_t;
 
 typedef struct
 {
-    /* note that technically the pdu_header_t is variably sized,
+    /* note that technically the CF_CFDP_PduHeader_t is variably sized,
        but for most UT test cases the extension data is not used, thus
        the second header follows it immediately */
-    pdu_header_t     common;
-    pdu_any_sechdr_t secondary;
+    CF_CFDP_PduHeader_t common;
+    pdu_any_sechdr_t    secondary;
 
-    /* extra space just in case the pdu_header_t is longer than nominal */
-    uint8_t pad[CF_MAX_HEADER_SIZE - sizeof(pdu_header_t)];
+    /* extra space just in case the CF_CFDP_PduHeader_t is longer than nominal */
+    uint8_t pad[CF_MAX_HEADER_SIZE - sizeof(CF_CFDP_PduHeader_t)];
 
 } CF_UT_fullhdr_t;
 
@@ -111,7 +111,7 @@ typedef union
 {
     CFE_MSG_Message_t  cfe_msg;
     CFE_SB_Buffer_t    cfe_sb_buffer;
-    pdu_s_msg_t        pdu_s_msg;
+    CF_PduSendMsg_t    pdu_s_msg;
     CF_UT_any_outmsg_t content;
 
     /* This ensures the buffer is large enough to store any PDU type,
@@ -124,7 +124,7 @@ typedef union
 {
     CFE_MSG_Message_t cfe_msg;
     CFE_SB_Buffer_t   cfe_sb_buffer;
-    pdu_r_msg_t       pdu_r_msg;
+    CF_PduRecvMsg_t   pdu_r_msg;
     CF_UT_any_inmsg_t content;
 
     /* This ensures the buffer is large enough to store any PDU type,
@@ -154,12 +154,12 @@ typedef struct
 {
     const transaction_t *t;
     uint8                directive_code;
-    cf_entity_id_t       src_eid;
-    cf_entity_id_t       dst_eid;
+    CF_EntityId_t        src_eid;
+    CF_EntityId_t        dst_eid;
     uint8                towards_sender;
-    cf_transaction_seq_t tsn;
+    CF_TransactionSeq_t  tsn;
     int                  silent;
-    pdu_header_t        *forced_return;
+    CF_CFDP_PduHeader_t *forced_return;
 } CF_PACK CF_CFDP_ConstructPduHeader_context_t;
 
 typedef struct
@@ -225,32 +225,32 @@ typedef struct
 
 typedef struct
 {
-    const char     src_filename[CF_FILENAME_MAX_LEN];
-    const char     dst_filename[CF_FILENAME_MAX_LEN];
-    cfdp_class_t   cfdp_class;
-    uint8          keep;
-    uint8          chan;
-    uint8          priority;
-    cf_entity_id_t dest_id;
+    const char      src_filename[CF_FILENAME_MAX_LEN];
+    const char      dst_filename[CF_FILENAME_MAX_LEN];
+    CF_CFDP_Class_t cfdp_class;
+    uint8           keep;
+    uint8           chan;
+    uint8           priority;
+    CF_EntityId_t   dest_id;
 } CF_PACK CF_CFDP_TxFile_context_t;
 
 typedef struct
 {
-    const char     src_filename[CF_FILENAME_MAX_LEN];
-    const char     dst_filename[CF_FILENAME_MAX_LEN];
-    cfdp_class_t   cfdp_class;
-    uint8          keep;
-    uint8          chan;
-    uint8          priority;
-    cf_entity_id_t dest_id;
+    const char      src_filename[CF_FILENAME_MAX_LEN];
+    const char      dst_filename[CF_FILENAME_MAX_LEN];
+    CF_CFDP_Class_t cfdp_class;
+    uint8           keep;
+    uint8           chan;
+    uint8           priority;
+    CF_EntityId_t   dest_id;
 } CF_PACK CF_CFDP_PlaybackDir_context_t;
 
 typedef struct
 {
-    channel_t           *c;
-    cf_transaction_seq_t transaction_sequence_number;
-    cf_entity_id_t       src_eid;
-    transaction_t       *forced_return;
+    channel_t          *c;
+    CF_TransactionSeq_t transaction_sequence_number;
+    CF_EntityId_t       src_eid;
+    transaction_t      *forced_return;
 } CF_PACK CF_CFDP_FindTransactionBySequenceNumber_context_t;
 
 typedef struct
@@ -315,9 +315,9 @@ typedef struct
 
 typedef struct
 {
-    transaction_t *t;
-    int            silent;
-    pdu_header_t  *forced_return;
+    transaction_t       *t;
+    int                  silent;
+    CF_CFDP_PduHeader_t *forced_return;
 } CF_PACK CF_CFDP_MsgOutGet_context_t;
 
 typedef struct
@@ -353,13 +353,13 @@ typedef struct
 
 typedef struct
 {
-    transaction_t           *t;
-    ack_transaction_status_t ts;
-    file_directive_t         dir_code;
-    condition_code_t         cc;
-    cf_entity_id_t           peer_eid;
-    cf_transaction_seq_t     tsn;
-    cfdp_send_ret_t          forced_return;
+    transaction_t          *t;
+    CF_CFDP_AckTxnStatus_t  ts;
+    CF_CFDP_FileDirective_t dir_code;
+    CF_CFDP_ConditionCode_t cc;
+    CF_EntityId_t           peer_eid;
+    CF_TransactionSeq_t     tsn;
+    cfdp_send_ret_t         forced_return;
 } CF_PACK CF_CFDP_SendAck_context_t;
 
 typedef struct
@@ -416,11 +416,11 @@ typedef struct
 
 typedef struct
 {
-    clist_node           start;
-    clist_fn_t           fn;
-    cf_transaction_seq_t context_transaction_sequence_number;
-    cf_entity_id_t       context_src_eid;
-    transaction_t       *context_forced_t; /* out param */
+    clist_node          start;
+    clist_fn_t          fn;
+    CF_TransactionSeq_t context_transaction_sequence_number;
+    CF_EntityId_t       context_src_eid;
+    transaction_t      *context_forced_t; /* out param */
 } CF_PACK CF_CList_Traverse_FIND_T_BY_SEQ_NUM_context_t;
 
 typedef struct
@@ -476,20 +476,20 @@ typedef struct
 
 typedef struct
 {
-    transaction_t *t;
-    pdu_header_t  *pdu;
+    transaction_t       *t;
+    CF_CFDP_PduHeader_t *pdu;
 } CF_PACK Dummy_fd_fn_context_t;
 
 typedef struct
 {
-    transaction_t *t;
-    pdu_header_t  *pdu;
+    transaction_t       *t;
+    CF_CFDP_PduHeader_t *pdu;
 } CF_PACK Dummy_fns_context_t;
 
 typedef struct
 {
-    transaction_t      *t;
-    const pdu_header_t *pdu;
+    transaction_t             *t;
+    const CF_CFDP_PduHeader_t *pdu;
 } CF_PACK Dummy_fns_CF_CFDP_S_DispatchRecv_context_t;
 
 /* bottom */

@@ -117,7 +117,7 @@ typedef struct
     uint8  ack_limit; /* number of times to retry ACK (for ex, send fin and wait for fin-ack) */
     uint8  nak_limit; /* number of times to retry NAK before giving up (resets on a single response */
 
-    cf_entity_id_t local_eid;
+    CF_EntityId_t local_eid;
 /* must #define the number of data items in this struct for command processing */
 #define CF_NUM_CFG_PACKET_ITEMS 10
 } CF_PACK cf_cfg_packet_t;
@@ -206,7 +206,7 @@ typedef struct
     uint8                   keep;       /* if 1, then keep the file -- otherwise delete */
     uint8                   chan_num;
     uint8                   priority;
-    cf_entity_id_t          dest_id;
+    CF_EntityId_t           dest_id;
     char                    src_filename[CF_FILENAME_MAX_LEN];
     char                    dst_filename[CF_FILENAME_MAX_LEN];
 } CF_PACK cf_cmd_tx_file_t;
@@ -226,8 +226,8 @@ typedef cf_cmd_tx_file_t cf_cmd_playback_dir_t;
 typedef struct
 {
     CFE_MSG_CommandHeader_t cmd_header;
-    cf_transaction_seq_t    ts;
-    cf_entity_id_t          eid;
+    CF_TransactionSeq_t     ts;
+    CF_EntityId_t           eid;
     uint8                   chan; /* if 254, use ts. if 255, all channels */
 } CF_PACK cf_cmd_transaction_t;
 

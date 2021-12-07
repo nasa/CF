@@ -183,8 +183,8 @@ void CF_CList_Traverse(clist_node start, clist_fn_t fn, void *context)
                 void *t                           = (uint8 *)src_eid + 4; /* uint8 - 4 bytes, no packing in struct */
 
                 UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), transaction_sequence_number,
-                                      sizeof(cf_transaction_seq_t));
-                UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), src_eid, sizeof(cf_entity_id_t));
+                                      sizeof(CF_TransactionSeq_t));
+                UT_Stub_CopyFromLocal(UT_KEY(CF_CList_Traverse), src_eid, sizeof(CF_EntityId_t));
                 UT_Stub_CopyToLocal(UT_KEY(CF_CList_Traverse), t, sizeof(transaction_t *));
             }
             break;

@@ -129,7 +129,7 @@ static int32 CF_ValidateConfigTable(void *tbl_ptr)
                           "CF: config table has rx crc size not aligned with 1024");
         ret = crc_alignment; /* must be 1024-byte aligned */
     }
-    else if (tbl->outgoing_file_chunk_size > sizeof(pdu_fd_data_t))
+    else if (tbl->outgoing_file_chunk_size > sizeof(CF_CFDP_PduFileDataContent_t))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_INIT_OUTGOING_SIZE, CFE_EVS_EventType_ERROR,
                           "CF: config table has outgoing file chunk size too large");

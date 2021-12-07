@@ -38,7 +38,7 @@ cf_config_table_t CF_config_table = {
          0x18c8,
          0x08c2,
          16,
-         {{5, 25, CLASS_2, 23, "/cf/poll_dir", "./poll_dir", 0}, {0}, {0}, {0}, {0}},
+         {{5, 25, CF_CFDP_CLASS_2, 23, "/cf/poll_dir", "./poll_dir", 0}, {0}, {0}, {0}, {0}},
          "cf_1_sem",
          1,
      },

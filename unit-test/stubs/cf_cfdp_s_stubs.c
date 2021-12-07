@@ -226,7 +226,7 @@
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_S2_EarlyFin(transaction_t *t, const pdu_header_t *pdu)
+// static void CF_CFDP_S2_EarlyFin(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -240,7 +240,7 @@
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_S2_Fin(transaction_t *t, const pdu_header_t *pdu)
+// static void CF_CFDP_S2_Fin(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -259,7 +259,7 @@
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_S2_Nak(transaction_t *t, const pdu_header_t *pdu)
+// static void CF_CFDP_S2_Nak(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -273,7 +273,7 @@
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_S2_Nak_Arm(transaction_t *t, const pdu_header_t *pdu)
+// static void CF_CFDP_S2_Nak_Arm(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -291,7 +291,7 @@
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_S2_WaitForEofAck(transaction_t *t, const pdu_header_t *pdu)
+// static void CF_CFDP_S2_WaitForEofAck(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -311,7 +311,7 @@
 **
 *************************************************************************/
 // static void CF_CFDP_S_DispatchRecv(transaction_t *t, void (*const
-// fns[SEND_NUM_STATES][PDU_INVALID_MAX])(transaction_t*, const pdu_header_t*))
+// fns[SEND_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(transaction_t*, const CF_CFDP_PduHeader_t*))
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);

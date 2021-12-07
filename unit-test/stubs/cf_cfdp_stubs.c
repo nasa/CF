@@ -44,13 +44,13 @@ const int CF_max_chunks[CF_DIR_NUM][CF_NUM_CHANNELS] = {CF_CHANNEL_NUM_RX_CHUNKS
 // static void CF_CFDP_RecvIdle(transaction_t*);
 // static void CF_CFDP_RecvDrop(transaction_t*);
 
-// static void CF_CFDP_TxFile__(transaction_t *t, cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority);
+// static void CF_CFDP_TxFile__(transaction_t *t, CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority);
 
 typedef struct trans_seq_arg_t
 {
-    cf_transaction_seq_t transaction_sequence_number;
-    cf_entity_id_t       src_eid;
-    transaction_t       *t; /* out param */
+    CF_TransactionSeq_t transaction_sequence_number;
+    CF_EntityId_t       src_eid;
+    transaction_t      *t; /* out param */
 } trans_seq_arg_t;
 
 typedef struct CF_CFDP_CycleTx_args_t
@@ -93,7 +93,7 @@ void CF_CFDP_ArmAckTimer(transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-// static cfdp_class_t CF_CFDP_GetClass(transaction_t *ti)
+// static CF_CFDP_Class_t CF_CFDP_GetClass(transaction_t *ti)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -268,15 +268,15 @@ void CF_CFDP_ResetHistory(channel_t *c, history_t *h)
 **  \endreturns
 **
 *************************************************************************/
-transaction_t *CF_CFDP_FindTransactionBySequenceNumber(channel_t *c, cf_transaction_seq_t transaction_sequence_number,
-                                                       cf_entity_id_t src_eid)
+transaction_t *CF_CFDP_FindTransactionBySequenceNumber(channel_t *c, CF_TransactionSeq_t transaction_sequence_number,
+                                                       CF_EntityId_t src_eid)
 {
     transaction_t *forced_return;
 
     UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_FindTransactionBySequenceNumber), &c, sizeof(channel_t *));
     UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_FindTransactionBySequenceNumber), &transaction_sequence_number,
-                          sizeof(cf_transaction_seq_t));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_FindTransactionBySequenceNumber), &src_eid, sizeof(cf_entity_id_t));
+                          sizeof(CF_TransactionSeq_t));
+    UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_FindTransactionBySequenceNumber), &src_eid, sizeof(CF_EntityId_t));
 
     UT_DEFAULT_IMPL(CF_CFDP_FindTransactionBySequenceNumber);
 
@@ -300,13 +300,13 @@ transaction_t *CF_CFDP_FindTransactionBySequenceNumber(channel_t *c, cf_transact
 **       t must not be NULL.
 **
 **  \returns
-**  \retstmt Pointer to a pdu_header_t within a software bus buffer on success. Otherwise NULL. \endcode
+**  \retstmt Pointer to a CF_CFDP_PduHeader_t within a software bus buffer on success. Otherwise NULL. \endcode
 **  \endreturns
 **
 *************************************************************************/
-pdu_header_t *CF_CFDP_MsgOutGet(const transaction_t *t, int silent)
+CF_CFDP_PduHeader_t *CF_CFDP_MsgOutGet(const transaction_t *t, int silent)
 {
-    pdu_header_t *forced_return;
+    CF_CFDP_PduHeader_t *forced_return;
 
     UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_MsgOutGet), &t, sizeof(t));
     UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_MsgOutGet), &silent, sizeof(silent));
@@ -343,19 +343,19 @@ pdu_header_t *CF_CFDP_MsgOutGet(const transaction_t *t, int silent)
 void Handler_CF_CFDP_ConstructPduHeader_ForceReturnOnly(void *UserObj, UT_EntryKey_t FuncKey,
                                                         const UT_StubContext_t *Context)
 {
-    UT_Stub_CopyToReturnValue(UT_KEY(CF_CFDP_ConstructPduHeader), UserObj, sizeof(pdu_header_t *));
+    UT_Stub_CopyToReturnValue(UT_KEY(CF_CFDP_ConstructPduHeader), UserObj, sizeof(CF_CFDP_PduHeader_t *));
 }
 
 void Handler_CF_CFDP_ConstructPduHeader_Default(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
     const transaction_t *t              = UT_Hook_GetArgValueByName(Context, "t", const transaction_t *);
     uint8                directive_code = UT_Hook_GetArgValueByName(Context, "directive_code", uint8);
-    cf_entity_id_t       src_eid        = UT_Hook_GetArgValueByName(Context, "src_eid", cf_entity_id_t);
-    cf_entity_id_t       dst_eid        = UT_Hook_GetArgValueByName(Context, "dst_eid", cf_entity_id_t);
+    CF_EntityId_t        src_eid        = UT_Hook_GetArgValueByName(Context, "src_eid", CF_EntityId_t);
+    CF_EntityId_t        dst_eid        = UT_Hook_GetArgValueByName(Context, "dst_eid", CF_EntityId_t);
     uint8                towards_sender = UT_Hook_GetArgValueByName(Context, "towards_sender", uint8);
-    cf_transaction_seq_t tsn            = UT_Hook_GetArgValueByName(Context, "tsn", cf_transaction_seq_t);
+    CF_TransactionSeq_t  tsn            = UT_Hook_GetArgValueByName(Context, "tsn", CF_TransactionSeq_t);
     int                  silent         = UT_Hook_GetArgValueByName(Context, "silent", int);
-    pdu_header_t        *forced_return;
+    CF_CFDP_PduHeader_t *forced_return;
 
     UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_ConstructPduHeader), &t, sizeof(t));
     UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_ConstructPduHeader), &directive_code, sizeof(directive_code));
@@ -370,23 +370,23 @@ void Handler_CF_CFDP_ConstructPduHeader_Default(void *UserObj, UT_EntryKey_t Fun
     UT_Stub_SetReturnValue(UT_KEY(CF_CFDP_ConstructPduHeader), forced_return);
 }
 
-pdu_header_t *CF_CFDP_ConstructPduHeader(const transaction_t *t, uint8 directive_code, cf_entity_id_t src_eid,
-                                         cf_entity_id_t dst_eid, uint8 towards_sender, cf_transaction_seq_t tsn,
-                                         int silent)
+CF_CFDP_PduHeader_t *CF_CFDP_ConstructPduHeader(const transaction_t *t, uint8 directive_code, CF_EntityId_t src_eid,
+                                                CF_EntityId_t dst_eid, uint8 towards_sender, CF_TransactionSeq_t tsn,
+                                                int silent)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_ConstructPduHeader, pdu_header_t *);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_ConstructPduHeader, CF_CFDP_PduHeader_t *);
 
     UT_GenStub_AddParam(CF_CFDP_ConstructPduHeader, const transaction_t *, t);
     UT_GenStub_AddParam(CF_CFDP_ConstructPduHeader, uint8, directive_code);
-    UT_GenStub_AddParam(CF_CFDP_ConstructPduHeader, cf_entity_id_t, src_eid);
-    UT_GenStub_AddParam(CF_CFDP_ConstructPduHeader, cf_entity_id_t, dst_eid);
+    UT_GenStub_AddParam(CF_CFDP_ConstructPduHeader, CF_EntityId_t, src_eid);
+    UT_GenStub_AddParam(CF_CFDP_ConstructPduHeader, CF_EntityId_t, dst_eid);
     UT_GenStub_AddParam(CF_CFDP_ConstructPduHeader, uint8, towards_sender);
-    UT_GenStub_AddParam(CF_CFDP_ConstructPduHeader, cf_transaction_seq_t, tsn);
+    UT_GenStub_AddParam(CF_CFDP_ConstructPduHeader, CF_TransactionSeq_t, tsn);
     UT_GenStub_AddParam(CF_CFDP_ConstructPduHeader, int, silent);
 
     UT_GenStub_Execute(CF_CFDP_ConstructPduHeader, Basic, Handler_CF_CFDP_ConstructPduHeader_Default);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_ConstructPduHeader, pdu_header_t *);
+    return UT_GenStub_GetReturnValue(CF_CFDP_ConstructPduHeader, CF_CFDP_PduHeader_t *);
 }
 
 /************************************************************************/
@@ -421,7 +421,7 @@ cfdp_send_ret_t CF_CFDP_SendMd(transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-pdu_header_t *CF_CFDP_EarlySendFd(transaction_t *t)
+CF_CFDP_PduHeader_t *CF_CFDP_EarlySendFd(transaction_t *t)
 {
     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
     exit(-86);
@@ -466,7 +466,7 @@ cfdp_send_ret_t CF_CFDP_SendFd(transaction_t *t, uint32 offset, int len)
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_CFDP_FinishEofAck(pdu_header_t *pdu)
+// static int CF_CFDP_FinishEofAck(CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -512,8 +512,8 @@ cfdp_send_ret_t CF_CFDP_SendEof(transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-cfdp_send_ret_t CF_CFDP_SendAck(transaction_t *t, ack_transaction_status_t ts, file_directive_t dir_code,
-                                condition_code_t cc, cf_entity_id_t peer_eid, cf_transaction_seq_t tsn)
+cfdp_send_ret_t CF_CFDP_SendAck(transaction_t *t, CF_CFDP_AckTxnStatus_t ts, CF_CFDP_FileDirective_t dir_code,
+                                CF_CFDP_ConditionCode_t cc, CF_EntityId_t peer_eid, CF_TransactionSeq_t tsn)
 {
     cfdp_send_ret_t forced_return;
 
@@ -544,14 +544,15 @@ cfdp_send_ret_t CF_CFDP_SendAck(transaction_t *t, ack_transaction_status_t ts, f
 **  \endreturns
 **
 *************************************************************************/
-cfdp_send_ret_t CF_CFDP_SendFin(transaction_t *t, fin_delivery_code_t dc, fin_file_status_t fs, condition_code_t cc)
+cfdp_send_ret_t CF_CFDP_SendFin(transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, CF_CFDP_FinFileStatus_t fs,
+                                CF_CFDP_ConditionCode_t cc)
 {
     UT_GenStub_SetupReturnBuffer(CF_CFDP_SendFin, int32);
 
     UT_GenStub_AddParam(CF_CFDP_SendFin, transaction_t *, t);
-    UT_GenStub_AddParam(CF_CFDP_SendFin, fin_delivery_code_t, dc);
-    UT_GenStub_AddParam(CF_CFDP_SendFin, fin_file_status_t, fs);
-    UT_GenStub_AddParam(CF_CFDP_SendFin, condition_code_t, cc);
+    UT_GenStub_AddParam(CF_CFDP_SendFin, CF_CFDP_FinDeliveryCode_t, dc);
+    UT_GenStub_AddParam(CF_CFDP_SendFin, CF_CFDP_FinFileStatus_t, fs);
+    UT_GenStub_AddParam(CF_CFDP_SendFin, CF_CFDP_ConditionCode_t, cc);
 
     UT_GenStub_Execute(CF_CFDP_SendFin, Basic, NULL);
 
@@ -598,7 +599,7 @@ cfdp_send_ret_t CF_CFDP_SendNak(transaction_t *t, int num_segment_requests)
 **  \endreturns
 **
 *************************************************************************/
-pdu_header_t *CF_CFDP_EarlySendNak(transaction_t *t)
+CF_CFDP_PduHeader_t *CF_CFDP_EarlySendNak(transaction_t *t)
 {
     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
     exit(-86);
@@ -917,7 +918,7 @@ int32 CF_CFDP_InitEngine(void)
 **       t must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_TxFile__(transaction_t *t, cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority)
+// static void CF_CFDP_TxFile__(transaction_t *t, CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -940,8 +941,8 @@ int32 CF_CFDP_InitEngine(void)
 **  \endreturns
 **
 *************************************************************************/
-// static void CF_CFDP_TxFile_(transaction_t *t, cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority,
-// cf_entity_id_t dest_id)
+// static void CF_CFDP_TxFile_(transaction_t *t, CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority,
+// CF_EntityId_t dest_id)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -965,7 +966,7 @@ int32 CF_CFDP_InitEngine(void)
 **
 *************************************************************************/
 int32 CF_CFDP_TxFile(const char src_filename[CF_FILENAME_MAX_LEN], const char dst_filename[CF_FILENAME_MAX_LEN],
-                     cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority, cf_entity_id_t dest_id)
+                     CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority, CF_EntityId_t dest_id)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_TxFile), src_filename, CF_FILENAME_MAX_LEN);
     UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_TxFile), dst_filename, CF_FILENAME_MAX_LEN);
@@ -994,7 +995,7 @@ int32 CF_CFDP_TxFile(const char src_filename[CF_FILENAME_MAX_LEN], const char ds
 **
 *************************************************************************/
 // static int32 CF_CFDP_PlaybackDir_(playback_t *p, const char src_filename[CF_FILENAME_MAX_LEN], const char
-// dst_filename[CF_FILENAME_MAX_LEN], cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority, cf_entity_id_t
+// dst_filename[CF_FILENAME_MAX_LEN], CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority, CF_EntityId_t
 // dest_id)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
@@ -1019,7 +1020,7 @@ int32 CF_CFDP_TxFile(const char src_filename[CF_FILENAME_MAX_LEN], const char ds
 **
 *************************************************************************/
 int32 CF_CFDP_PlaybackDir(const char src_filename[CF_FILENAME_MAX_LEN], const char dst_filename[CF_FILENAME_MAX_LEN],
-                          cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority, uint16 dest_id)
+                          CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority, uint16 dest_id)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_PlaybackDir), src_filename, CF_FILENAME_MAX_LEN);
     UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_PlaybackDir), dst_filename, CF_FILENAME_MAX_LEN);
@@ -1145,7 +1146,7 @@ void CF_CFDP_ResetTransaction(transaction_t *t, int keep_history)
 **  \endreturns
 **
 *************************************************************************/
-int CF_CFDP_CopyDataToLv(lv_t *dest_lv, const uint8 *data, uint32 len)
+int CF_CFDP_CopyDataToLv(CF_CFDP_lv_t *dest_lv, const uint8 *data, uint32 len)
 {
     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
     exit(-86);
@@ -1163,7 +1164,7 @@ int CF_CFDP_CopyDataToLv(lv_t *dest_lv, const uint8 *data, uint32 len)
 **  \endreturns
 **
 *************************************************************************/
-int CF_CFDP_CopyDataFromLv(uint8 buf[CF_FILENAME_MAX_LEN], const lv_t *src_lv)
+int CF_CFDP_CopyDataFromLv(uint8 buf[CF_FILENAME_MAX_LEN], const CF_CFDP_lv_t *src_lv)
 {
     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
     exit(-86);

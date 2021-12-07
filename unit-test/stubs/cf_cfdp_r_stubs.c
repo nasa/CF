@@ -34,9 +34,9 @@
 
 typedef struct
 {
-    transaction_t *t;
-    pdu_header_t  *pdu;
-    uint32         gap_counter;
+    transaction_t       *t;
+    CF_CFDP_PduHeader_t *pdu;
+    uint32               gap_counter;
 } gap_compute_args_t;
 
 /************************************************************************/
@@ -46,7 +46,7 @@ typedef struct
 **       t must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_R2_SetCc(transaction_t *t, condition_code_t cc)
+// static void CF_CFDP_R2_SetCc(transaction_t *t, CF_CFDP_ConditionCode_t cc)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -164,7 +164,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_CFDP_R_SubstateRecvEof(transaction_t *t, const pdu_header_t *pdu)
+// static int CF_CFDP_R_SubstateRecvEof(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -185,7 +185,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static void CF_CFDP_R1_SubstateRecvEof(transaction_t *t, const pdu_header_t *pdu)
+// static void CF_CFDP_R1_SubstateRecvEof(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -207,7 +207,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static void CF_CFDP_R2_SubstateRecvEof(transaction_t *t, const pdu_header_t *pdu)
+// static void CF_CFDP_R2_SubstateRecvEof(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -224,7 +224,7 @@ typedef struct
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_R1_SubstateRecvFileData(transaction_t *t, const pdu_header_t *pdu)
+// static void CF_CFDP_R1_SubstateRecvFileData(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -245,7 +245,7 @@ typedef struct
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_R2_SubstateRecvFileData(transaction_t *t, const pdu_header_t *pdu)
+// static void CF_CFDP_R2_SubstateRecvFileData(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -370,7 +370,7 @@ void CF_CFDP_R_Init(transaction_t *t)
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_R2_Recv_fin_ack(transaction_t *t, const pdu_header_t *pdu)
+// static void CF_CFDP_R2_Recv_fin_ack(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -391,7 +391,7 @@ void CF_CFDP_R_Init(transaction_t *t)
 **       t must not be NULL. pdu must not be NULL.
 **
 *************************************************************************/
-// static void CF_CFDP_R2_RecvMd(transaction_t *t, const pdu_header_t *pdu)
+// static void CF_CFDP_R2_RecvMd(transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -411,8 +411,8 @@ void CF_CFDP_R_Init(transaction_t *t)
 **
 *************************************************************************/
 // static void CF_CFDP_R_DispatchRecv(transaction_t *t, void (*const
-// fns[SEND_NUM_STATES][PDU_INVALID_MAX])(transaction_t*, const pdu_header_t*), void (*const fd_fn)(transaction_t*,
-// const pdu_header_t*))
+// fns[SEND_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(transaction_t*, const CF_CFDP_PduHeader_t*), void (*const
+// fd_fn)(transaction_t*, const CF_CFDP_PduHeader_t*))
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);

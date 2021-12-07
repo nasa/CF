@@ -79,14 +79,14 @@ void cf_cmd_tests_Teardown(void)
 **
 *******************************************************************************/
 
-cfdp_class_t Any_cfdp_class_t(void)
+CF_CFDP_Class_t Any_cfdp_class_t(void)
 {
-    return (cfdp_class_t)AnyCoinFlip();
+    return (CF_CFDP_Class_t)AnyCoinFlip();
 }
 
-cf_entity_id_t Any_cf_entity_id_t(void)
+CF_EntityId_t Any_CF_EntityId_t(void)
 {
-    return (cf_entity_id_t)Any_uint8();
+    return (CF_EntityId_t)Any_uint8();
 }
 
 /* uint8 used for Any_cf_channel likely there will never be that many channels */
@@ -113,9 +113,9 @@ uint8 Any_queue_Except_q_pend(void)
     return (rand() % 2) + 1; /* 0-2, + 1 -> 1-3 */
 }
 
-cf_transaction_seq_t Any_cf_transaction_seq_t(void)
+CF_TransactionSeq_t Any_CF_TransactionSeq_t(void)
 {
-    return (cf_transaction_seq_t)Any_uint32();
+    return (CF_TransactionSeq_t)Any_uint32();
 }
 
 /* end cf_cmd_tests specific Any functions */
@@ -702,7 +702,7 @@ void Test_CF_CmdTxFile_WhenCallTo_CF_CFDP_TxFile_Returns_0_AcceptCommand(void)
     dummy_msg->keep       = Any_uint8();
     dummy_msg->chan_num   = Any_uint8();
     dummy_msg->priority   = Any_uint8();
-    dummy_msg->dest_id    = Any_cf_entity_id_t();
+    dummy_msg->dest_id    = Any_CF_EntityId_t();
 
     /* Arrange unstubbable: CF_CmdAcc via CF_CmdCond */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -761,7 +761,7 @@ void Test_CF_CmdTxFile_WhenCAllTo_CF_CFDP_TxFile_Returns_Non0_RejectCommand(void
     dummy_msg->keep       = Any_uint8();
     dummy_msg->chan_num   = Any_uint8();
     dummy_msg->priority   = Any_uint8();
-    dummy_msg->dest_id    = Any_cf_entity_id_t();
+    dummy_msg->dest_id    = Any_CF_EntityId_t();
 
     /* Arrange unstubbable: CF_CmdAcc via CF_CmdCond */
     uint16 initial_hk_err_counter = Any_uint16();
@@ -830,7 +830,7 @@ void Test_CF_CmdPlaybackDir_WhenCAllTo_CF_CFDP_PlaybackDir_Returns_0_AcceptComma
     dummy_msg->keep       = Any_uint8();
     dummy_msg->chan_num   = Any_uint8();
     dummy_msg->priority   = Any_uint8();
-    dummy_msg->dest_id    = Any_cf_entity_id_t();
+    dummy_msg->dest_id    = Any_CF_EntityId_t();
 
     /* Arrange unstubbable: CF_CmdAcc via CF_CmdCond */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -890,7 +890,7 @@ void Test_CF_CmdPlaybackDir_WhenCallTo_CF_CmdPlaybackDir_Returns_non0_RejectComm
     dummy_msg->keep       = Any_uint8();
     dummy_msg->chan_num   = Any_uint8();
     dummy_msg->priority   = Any_uint8();
-    dummy_msg->dest_id    = Any_cf_entity_id_t();
+    dummy_msg->dest_id    = Any_CF_EntityId_t();
 
     /* Arrange unstubbable: CF_CmdAcc via CF_CmdCond */
     uint16 initial_hk_err_counter = Any_uint16();
@@ -1297,10 +1297,10 @@ void Test_CF_CmdFThaw_Set_frozen_To_0_AndAcceptCommand(void)
 void Test_CF_CFDP_FindTransactionBySequenceNumberAllChannels_WhenNoTransactionFoundReturn_NULL(void)
 {
     /* Arrange */
-    cf_transaction_seq_t arg_ts  = Any_cf_transaction_seq_t();
-    cf_entity_id_t       arg_eid = Any_cf_entity_id_t();
-    transaction_t       *local_result;
-    transaction_t       *expected_result = NULL;
+    CF_TransactionSeq_t arg_ts  = Any_CF_TransactionSeq_t();
+    CF_EntityId_t       arg_eid = Any_CF_EntityId_t();
+    transaction_t      *local_result;
+    transaction_t      *expected_result = NULL;
 
     CF_CFDP_FindTransactionBySequenceNumber_context_t context_CF_CFDP_FTBSN;
 
@@ -1330,12 +1330,12 @@ void Test_CF_CFDP_FindTransactionBySequenceNumberAllChannels_WhenNoTransactionFo
 void Test_CF_CFDP_FindTransactionBySequenceNumberAllChannels_Return_TransactionFound(void)
 {
     /* Arrange */
-    cf_transaction_seq_t arg_ts                   = Any_cf_transaction_seq_t();
-    cf_entity_id_t       arg_eid                  = Any_cf_entity_id_t();
-    uint8                number_transaction_match = Any_uint8_LessThan(CF_NUM_CHANNELS);
-    transaction_t        dummy_return_value;
-    transaction_t       *local_result;
-    transaction_t       *expected_result = &dummy_return_value;
+    CF_TransactionSeq_t arg_ts                   = Any_CF_TransactionSeq_t();
+    CF_EntityId_t       arg_eid                  = Any_CF_EntityId_t();
+    uint8               number_transaction_match = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    transaction_t       dummy_return_value;
+    transaction_t      *local_result;
+    transaction_t      *expected_result = &dummy_return_value;
 
     CF_CFDP_FindTransactionBySequenceNumber_context_t contexts_CF_CFDP_FTBSN[CF_NUM_CHANNELS];
 
@@ -4107,7 +4107,7 @@ void Test_CF_CmdValidateChunkSize_val_GreaterThan_pdu_fd_data_t_FailAndReturn_1(
 {
     /* Arrange */
     uint8  arg_chan_num = Any_uint8(); /* value labeled as 'ignored' in func def */
-    uint32 arg_val      = sizeof(pdu_fd_data_t) + 1;
+    uint32 arg_val      = sizeof(CF_CFDP_PduFileDataContent_t) + 1;
     int    local_result;
 
     /* Act */
@@ -4122,7 +4122,7 @@ void Test_CF_CmdValidateChunkSize_Any_val_GreaterThan_pdu_fd_data_t_FailAndRetur
 {
     /* Arrange */
     uint8  arg_chan_num = Any_uint8(); /* value labeled as 'ignored' in func def */
-    uint32 arg_val      = Any_uint32_GreaterThan(sizeof(pdu_fd_data_t));
+    uint32 arg_val      = Any_uint32_GreaterThan(sizeof(CF_CFDP_PduFileDataContent_t));
     int    local_result;
 
     /* Act */
@@ -4137,7 +4137,7 @@ void Test_CF_CmdValidateChunkSize_val_SizeOf_pdu_fd_data_t_SuccessAndReturn_0(vo
 {
     /* Arrange */
     uint8  arg_chan_num = Any_uint8(); /* value labeled as 'ignored' in func def */
-    uint32 arg_val      = sizeof(pdu_fd_data_t);
+    uint32 arg_val      = sizeof(CF_CFDP_PduFileDataContent_t);
     int    local_result;
 
     /* Act */
@@ -4152,7 +4152,7 @@ void Test_CF_CmdValidateChunkSize_val_LessThanOrEqSizeOf_pdu_fd_data_t_SuccessAn
 {
     /* Arrange */
     uint8  arg_chan_num = Any_uint8(); /* value labeled as 'ignored' in func def */
-    uint32 arg_val      = Any_uint32_LessThan_or_EqualTo(sizeof(pdu_fd_data_t));
+    uint32 arg_val      = Any_uint32_LessThan_or_EqualTo(sizeof(CF_CFDP_PduFileDataContent_t));
     int    local_result;
 
     /* Act */
@@ -4448,9 +4448,9 @@ void Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_5_Uses_SPTRFN_SendE
     cf_config_table_t dummy_config_table;
     uint8             arg_is_set   = 1;
     uint8             arg_param_id = 5;
-    uint32            arg_value    = Any_uint32_GreaterThan(
-                      sizeof(pdu_fd_data_t)); /* Arrange unstubbable: CF_CmdValidateChunkSize - specific value needed */
-    uint8 arg_chan_num = Any_cf_chan_num();
+    uint32            arg_value    = Any_uint32_GreaterThan(sizeof(
+        CF_CFDP_PduFileDataContent_t)); /* Arrange unstubbable: CF_CmdValidateChunkSize - specific value needed */
+    uint8             arg_chan_num = Any_cf_chan_num();
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -4487,9 +4487,9 @@ void Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_5_Uses_SPTRFN_ThenC
     cf_config_table_t dummy_config_table;
     uint8             arg_is_set   = 1;
     uint8             arg_param_id = 5;
-    uint32            arg_value    = Any_uint32_LessThan_or_EqualTo(
-                      sizeof(pdu_fd_data_t)); /* Arrange unstubbable: CF_CmdValidateChunkSize - specific value needed */
-    uint8 arg_chan_num = Any_cf_chan_num();
+    uint32            arg_value    = Any_uint32_LessThan_or_EqualTo(sizeof(
+        CF_CFDP_PduFileDataContent_t)); /* Arrange unstubbable: CF_CmdValidateChunkSize - specific value needed */
+    uint8             arg_chan_num = Any_cf_chan_num();
 
     CF_AppData.config_table = &dummy_config_table;
 

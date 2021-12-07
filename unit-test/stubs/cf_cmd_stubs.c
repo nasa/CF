@@ -251,7 +251,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(cf_transaction_seq_t ts, cf_entity_id_t eid)
+// static transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(CF_TransactionSeq_t ts, CF_EntityId_t eid)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);

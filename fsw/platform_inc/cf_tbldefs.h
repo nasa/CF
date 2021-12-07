@@ -32,14 +32,14 @@
 
 typedef struct
 {
-    uint32_t interval_sec;                        /* number of seconds to wait before trying a new directory.
-                                                     Must be >0 or slot is inactive. */
-    uint8          priority;                      /* priority to use when placing transactions on the pending queue */
-    cfdp_class_t   cfdp_class;                    /* the CFDP class to send */
-    cf_entity_id_t dest_eid;                      /* destination entity id */
-    char           src_dir[CF_FILENAME_MAX_PATH]; /* path to source dir */
-    char           dst_dir[CF_FILENAME_MAX_PATH]; /* path to destination dir */
-    uint8          enabled;
+    uint32_t interval_sec;                         /* number of seconds to wait before trying a new directory.
+                                                      Must be >0 or slot is inactive. */
+    uint8           priority;                      /* priority to use when placing transactions on the pending queue */
+    CF_CFDP_Class_t cfdp_class;                    /* the CFDP class to send */
+    CF_EntityId_t   dest_eid;                      /* destination entity id */
+    char            src_dir[CF_FILENAME_MAX_PATH]; /* path to source dir */
+    char            dst_dir[CF_FILENAME_MAX_PATH]; /* path to destination dir */
+    uint8           enabled;
 } polldir_t;
 
 typedef struct
@@ -64,7 +64,7 @@ typedef struct
     uint32 rx_crc_calc_bytes_per_wakeup; /* max number of bytes per wakeup to calculate r2 crc for recvd file (must by
                                             1024-byte aligned */
 
-    cf_entity_id_t local_eid; /* the local entity ID of the CF app */
+    CF_EntityId_t local_eid; /* the local entity ID of the CF app */
 
     cf_channel_t chan[CF_NUM_CHANNELS];
     uint32       ack_timer_s;        /* in seconds */

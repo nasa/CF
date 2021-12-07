@@ -97,13 +97,13 @@ typedef enum direction_t
 
 typedef struct
 {
-    transaction_fnames_t fnames;
-    clist_node_t         cl_node;
-    direction_t          dir;
-    condition_code_t     cc;
-    cf_entity_id_t       src_eid;  /* src_eid is always the source eid */
-    cf_entity_id_t       peer_eid; /* peer_eid is always the "other guy", which is the same src_eid for RX */
-    cf_transaction_seq_t seq_num;  /* stays constant for entire transfer */
+    transaction_fnames_t    fnames;
+    clist_node_t            cl_node;
+    direction_t             dir;
+    CF_CFDP_ConditionCode_t cc;
+    CF_EntityId_t           src_eid;  /* src_eid is always the source eid */
+    CF_EntityId_t           peer_eid; /* peer_eid is always the "other guy", which is the same src_eid for RX */
+    CF_TransactionSeq_t     seq_num;  /* stays constant for entire transfer */
 } history_t;
 
 typedef struct
@@ -117,11 +117,11 @@ struct transaction_t;
 typedef struct
 {
     uint32               dir_id;
-    cfdp_class_t         cfdp_class;
+    CF_CFDP_Class_t      cfdp_class;
     transaction_fnames_t fnames;
     uint16               num_ts; /* number of transactions -- 16 bit should be enough */
     uint8                priority;
-    cf_entity_id_t       dest_id;
+    CF_EntityId_t        dest_id;
 
     bool busy;
     bool diropen;
@@ -158,13 +158,13 @@ typedef struct
 
 typedef struct
 {
-    uint32              eof_crc;
-    uint32              eof_size;
-    uint32              rx_crc_calc_bytes;
-    fin_delivery_code_t dc;
-    fin_file_status_t   fs;
-    uint8               eof_cc; /* remember the cc in the received eof pdu to echo in eof-ack */
-    rxtx_counters_t     counter;
+    uint32                    eof_crc;
+    uint32                    eof_size;
+    uint32                    rx_crc_calc_bytes;
+    CF_CFDP_FinDeliveryCode_t dc;
+    CF_CFDP_FinFileStatus_t   fs;
+    uint8                     eof_cc; /* remember the cc in the received eof pdu to echo in eof-ack */
+    rxtx_counters_t           counter;
 } rx_r2_data_t;
 
 typedef struct
@@ -308,11 +308,11 @@ typedef struct
 
 typedef struct
 {
-    CFE_SB_Buffer_t     *msg;
-    CFE_MSG_Size_t       bytes_received;
-    cf_entity_id_t       src;
-    cf_entity_id_t       dst;
-    cf_transaction_seq_t tsn;
+    CFE_SB_Buffer_t    *msg;
+    CFE_MSG_Size_t      bytes_received;
+    CF_EntityId_t       src;
+    CF_EntityId_t       dst;
+    CF_TransactionSeq_t tsn;
 } in_t;
 
 /* An engine represents a pairing to a local EID
@@ -320,7 +320,7 @@ typedef struct
  * Each engine can have at most CF_MAX_SIMULTANEOUS_TRANSACTIONS */
 typedef struct
 {
-    cf_transaction_seq_t seq_num; /* keep track of the next sequence number to use for sends */
+    CF_TransactionSeq_t seq_num; /* keep track of the next sequence number to use for sends */
 
     out_t out;
     in_t  in;
@@ -351,28 +351,28 @@ extern void  CF_CFDP_DisableEngine(void);
 /* ground commands into the engine */
 /* returns NULL on err */
 extern int32 CF_CFDP_TxFile(const char src_filename[CF_FILENAME_MAX_LEN], const char dst_filename[CF_FILENAME_MAX_LEN],
-                            cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority, cf_entity_id_t dest_id);
+                            CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority, CF_EntityId_t dest_id);
 extern int32 CF_CFDP_PlaybackDir(const char src_filename[CF_FILENAME_MAX_LEN],
-                                 const char dst_filename[CF_FILENAME_MAX_LEN], cfdp_class_t cfdp_class, uint8 keep,
+                                 const char dst_filename[CF_FILENAME_MAX_LEN], CF_CFDP_Class_t cfdp_class, uint8 keep,
                                  uint8 chan, uint8 priority, uint16 dest_id);
 
 /* PDU send functions */
 /* CF_CFDP_ConstructPduHeader sets length of 0. Must set it after building packet */
-extern pdu_header_t   *CF_CFDP_ConstructPduHeader(const transaction_t *t, uint8 directive_code, cf_entity_id_t src_eid,
-                                                  cf_entity_id_t dst_eid, uint8 towards_sender, cf_transaction_seq_t tsn,
-                                                  int silent);
-extern cfdp_send_ret_t CF_CFDP_SendMd(transaction_t *t);
-extern cfdp_send_ret_t CF_CFDP_SendFd(transaction_t *t, uint32 offset, int len);
+extern CF_CFDP_PduHeader_t *CF_CFDP_ConstructPduHeader(const transaction_t *t, uint8 directive_code,
+                                                       CF_EntityId_t src_eid, CF_EntityId_t dst_eid,
+                                                       uint8 towards_sender, CF_TransactionSeq_t tsn, int silent);
+extern cfdp_send_ret_t      CF_CFDP_SendMd(transaction_t *t);
+extern cfdp_send_ret_t      CF_CFDP_SendFd(transaction_t *t, uint32 offset, int len);
 
 extern cfdp_send_ret_t CF_CFDP_SendEof(transaction_t *t);
-/* NOTE: CF_CFDP_SendAck() takes a cf_transaction_seq_t instead of getting it from transaction history because
+/* NOTE: CF_CFDP_SendAck() takes a CF_TransactionSeq_t instead of getting it from transaction history because
  * of the special case where a FIN-ACK must be sent for an unknown transaction. It's better for
  * long term maintenance to not build an incomplete history_t for it.
  */
-extern cfdp_send_ret_t CF_CFDP_SendAck(transaction_t *t, ack_transaction_status_t ts, file_directive_t dir_code,
-                                       condition_code_t cc, cf_entity_id_t peer_eid, cf_transaction_seq_t tsn);
-extern cfdp_send_ret_t CF_CFDP_SendFin(transaction_t *t, fin_delivery_code_t dc, fin_file_status_t fs,
-                                       condition_code_t cc);
+extern cfdp_send_ret_t CF_CFDP_SendAck(transaction_t *t, CF_CFDP_AckTxnStatus_t ts, CF_CFDP_FileDirective_t dir_code,
+                                       CF_CFDP_ConditionCode_t cc, CF_EntityId_t peer_eid, CF_TransactionSeq_t tsn);
+extern cfdp_send_ret_t CF_CFDP_SendFin(transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, CF_CFDP_FinFileStatus_t fs,
+                                       CF_CFDP_ConditionCode_t cc);
 extern cfdp_send_ret_t CF_CFDP_SendNak(transaction_t *t, int num_segment_requests);
 
 /* PDU receive functions */
@@ -400,18 +400,18 @@ extern void CF_CFDP_R_Init(transaction_t *t);
 
 extern void CF_CFDP_CancelTransaction(transaction_t *t);
 
-extern pdu_header_t *CF_CFDP_MsgOutGet(const transaction_t *t, int silent);
+extern CF_CFDP_PduHeader_t *CF_CFDP_MsgOutGet(const transaction_t *t, int silent);
 
 /* functions to handle LVs (length-value, cfdp spec) */
 /* returns number of bytes copied, or -1 on error */
-extern int CF_CFDP_CopyDataToLv(lv_t *dest_lv, const uint8 *data, uint32 len);
-extern int CF_CFDP_CopyDataFromLv(uint8 buf[CF_FILENAME_MAX_LEN], const lv_t *dest_lv);
+extern int CF_CFDP_CopyDataToLv(CF_CFDP_lv_t *dest_lv, const uint8 *data, uint32 len);
+extern int CF_CFDP_CopyDataFromLv(uint8 buf[CF_FILENAME_MAX_LEN], const CF_CFDP_lv_t *dest_lv);
 
 extern const int CF_max_chunks[CF_DIR_NUM][CF_NUM_CHANNELS];
 
 extern void CF_CFDP_ArmAckTimer(transaction_t *);
 
 extern transaction_t *CF_CFDP_FindTransactionBySequenceNumber(channel_t *c, uint32 transaction_sequence_number,
-                                                              cf_entity_id_t src_eid);
+                                                              CF_EntityId_t src_eid);
 
 #endif /* !CF_CFDP__H */
