@@ -59,8 +59,8 @@ typedef struct
 
 typedef struct
 {
-    const cf_cmd_unionargs_t *msg;
-    uint8                     barg;
+    const CF_UnionArgsCmd_t *msg;
+    uint8                    barg;
 } bool_msg_arg_t;
 
 /************************************************************************/
@@ -140,8 +140,8 @@ static void CF_CmdReset(CFE_SB_Buffer_t *msg)
     static const int counters_up      = 3;
     static const int counters_down    = 4;
 
-    cf_cmd_unionargs_t *cmd      = (cf_cmd_unionargs_t *)msg;
-    static const char  *names[5] = {"all", "cmd", "fault", "up", "down"};
+    CF_UnionArgsCmd_t *cmd      = (CF_UnionArgsCmd_t *)msg;
+    static const char *names[5] = {"all", "cmd", "fault", "up", "down"};
     /* 0=all, 1=cmd, 2=fault 3=up 4=down */
     uint8 param = cmd->data.byte[0];
     int   i;
@@ -211,7 +211,7 @@ err_out:;
 *************************************************************************/
 static void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
 {
-    cf_cmd_tx_file_t *tx = (cf_cmd_tx_file_t *)msg;
+    CF_TxFileCmd_t *tx = (CF_TxFileCmd_t *)msg;
 
     /* make sure that the src and dst filenames are null terminated */
     tx->src_filename[sizeof(tx->src_filename) - 1] = 0;
@@ -234,7 +234,7 @@ static void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
 *************************************************************************/
 static void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
 {
-    cf_cmd_playback_dir_t *tx = (cf_cmd_playback_dir_t *)msg;
+    CF_PlaybackDirCmd_t *tx = (CF_PlaybackDirCmd_t *)msg;
 
     /* make sure that the src and dst filenames are null terminated */
     tx->src_filename[sizeof(tx->src_filename) - 1] = 0;
@@ -261,7 +261,7 @@ static void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_DoChanAction(cf_cmd_unionargs_t *cmd, const char *errstr, chan_action_fn_t fn, void *context)
+static int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, chan_action_fn_t fn, void *context)
 {
     int ret = 0;
 
@@ -318,7 +318,7 @@ static int CF_DoFreezeThaw(uint8 chan_num, const bool_arg_t *context)
 static void CF_CmdFreeze(CFE_SB_Buffer_t *msg)
 {
     bool_arg_t barg = {1}; /* param is frozen, so 1 means freeze */
-    CF_CmdCond(CF_DoChanAction((cf_cmd_unionargs_t *)msg, "freeze", (chan_action_fn_t)CF_DoFreezeThaw, &barg));
+    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "freeze", (chan_action_fn_t)CF_DoFreezeThaw, &barg));
 }
 
 /************************************************************************/
@@ -331,7 +331,7 @@ static void CF_CmdFreeze(CFE_SB_Buffer_t *msg)
 static void CF_CmdThaw(CFE_SB_Buffer_t *msg)
 {
     bool_arg_t barg = {0}; /* param is frozen, so 0 means thawed */
-    CF_CmdCond(CF_DoChanAction((cf_cmd_unionargs_t *)msg, "thaw", (chan_action_fn_t)CF_DoFreezeThaw, &barg));
+    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "thaw", (chan_action_fn_t)CF_DoFreezeThaw, &barg));
 }
 
 /************************************************************************/
@@ -385,7 +385,7 @@ static CF_Transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(CF_T
 **  \endreturns
 **
 *************************************************************************/
-static int CF_TsnChanAction(cf_cmd_transaction_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
+static int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
 {
     int ret = -1;
 
@@ -455,7 +455,7 @@ static void CF_DoSuspRes_(CF_Transaction_t *t, susp_res_arg_t *context)
 **       cmd must not be NULL.
 **
 *************************************************************************/
-static void CF_DoSuspRes(cf_cmd_transaction_t *cmd, uint8 action)
+static void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
 {
     /* ok to not bounds check action, because the caller is using it in two places with constant values 0 or 1 */
     static const char *msgstr[] = {"resume", "suspend"};
@@ -489,7 +489,7 @@ static void CF_DoSuspRes(cf_cmd_transaction_t *cmd, uint8 action)
 *************************************************************************/
 static void CF_CmdSuspend(CFE_SB_Buffer_t *msg)
 {
-    CF_DoSuspRes((cf_cmd_transaction_t *)msg, 1);
+    CF_DoSuspRes((CF_TransactionCmd_t *)msg, 1);
 }
 
 /************************************************************************/
@@ -501,7 +501,7 @@ static void CF_CmdSuspend(CFE_SB_Buffer_t *msg)
 *************************************************************************/
 static void CF_CmdResume(CFE_SB_Buffer_t *msg)
 {
-    CF_DoSuspRes((cf_cmd_transaction_t *)msg, 0);
+    CF_DoSuspRes((CF_TransactionCmd_t *)msg, 0);
 }
 
 /************************************************************************/
@@ -525,7 +525,7 @@ static void CF_CmdCancel_(CF_Transaction_t *t, void *ignored)
 *************************************************************************/
 static void CF_CmdCancel(CFE_SB_Buffer_t *msg)
 {
-    CF_CmdCond(CF_TsnChanAction((cf_cmd_transaction_t *)msg, "cancel", CF_CmdCancel_, NULL));
+    CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "cancel", CF_CmdCancel_, NULL));
 }
 
 /************************************************************************/
@@ -549,7 +549,7 @@ static void CF_CmdAbandon_(CF_Transaction_t *t, void *ignored)
 *************************************************************************/
 static void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
 {
-    CF_CmdCond(CF_TsnChanAction((cf_cmd_transaction_t *)msg, "abandon", CF_CmdAbandon_, NULL));
+    CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "abandon", CF_CmdAbandon_, NULL));
 }
 
 /************************************************************************/
@@ -580,7 +580,7 @@ static int CF_DoEnableDisableDequeue(uint8 chan_num, const bool_arg_t *context)
 static void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
 {
     bool_arg_t barg = {1};
-    CF_CmdCond(CF_DoChanAction((cf_cmd_unionargs_t *)msg, "enable_dequeue", (chan_action_fn_t)CF_DoEnableDisableDequeue,
+    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "enable_dequeue", (chan_action_fn_t)CF_DoEnableDisableDequeue,
                                &barg));
 }
 
@@ -594,8 +594,8 @@ static void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
 static void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg)
 {
     bool_arg_t barg = {0};
-    CF_CmdCond(CF_DoChanAction((cf_cmd_unionargs_t *)msg, "disable_dequeue",
-                               (chan_action_fn_t)CF_DoEnableDisableDequeue, &barg));
+    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "disable_dequeue", (chan_action_fn_t)CF_DoEnableDisableDequeue,
+                               &barg));
 }
 
 /************************************************************************/
@@ -640,8 +640,8 @@ static int CF_DoEnableDisablePolldir(uint8 chan_num, const bool_msg_arg_t *conte
 *************************************************************************/
 static void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
 {
-    bool_msg_arg_t barg = {(cf_cmd_unionargs_t *)msg, 1};
-    CF_CmdCond(CF_DoChanAction((cf_cmd_unionargs_t *)msg, "enable_polldir", (chan_action_fn_t)CF_DoEnableDisablePolldir,
+    bool_msg_arg_t barg = {(CF_UnionArgsCmd_t *)msg, 1};
+    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "enable_polldir", (chan_action_fn_t)CF_DoEnableDisablePolldir,
                                &barg));
 }
 
@@ -654,9 +654,9 @@ static void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
 *************************************************************************/
 static void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
 {
-    bool_msg_arg_t barg = {(cf_cmd_unionargs_t *)msg, 0};
-    CF_CmdCond(CF_DoChanAction((cf_cmd_unionargs_t *)msg, "disable_polldir",
-                               (chan_action_fn_t)CF_DoEnableDisablePolldir, &barg));
+    bool_msg_arg_t barg = {(CF_UnionArgsCmd_t *)msg, 0};
+    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "disable_polldir", (chan_action_fn_t)CF_DoEnableDisablePolldir,
+                               &barg));
 }
 
 /************************************************************************/
@@ -702,7 +702,7 @@ static int CF_PurgeTransaction(CF_CListNode_t *n, void *ignored)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_DoPurgeQueue(uint8 chan_num, cf_cmd_unionargs_t *cmd)
+static int CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
 {
     int ret = 0;
     /* no need to bounds check chan_num, done in caller */
@@ -755,7 +755,7 @@ static int CF_DoPurgeQueue(uint8 chan_num, cf_cmd_unionargs_t *cmd)
 *************************************************************************/
 static void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
 {
-    CF_CmdCond(CF_DoChanAction((cf_cmd_unionargs_t *)msg, "purge_queue", (chan_action_fn_t)CF_DoPurgeQueue, msg));
+    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "purge_queue", (chan_action_fn_t)CF_DoPurgeQueue, msg));
 }
 
 /************************************************************************/
@@ -768,16 +768,16 @@ static void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
 static void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
 {
     /* a type value of 0 means to process both type_up and type_down */
-    static const int  type_up   = 1;
-    static const int  type_down = 2;
-    static const int  q_pend    = 0;
-    static const int  q_active  = 1;
-    static const int  q_history = 2;
-    static const int  q_all     = 3;
-    cf_cmd_write_q_t *wq        = (cf_cmd_write_q_t *)msg;
-    CF_Channel_t     *c         = &CF_AppData.engine.channels[wq->chan];
-    osal_id_t         fd;
-    int32             ret;
+    static const int    type_up   = 1;
+    static const int    type_down = 2;
+    static const int    q_pend    = 0;
+    static const int    q_active  = 1;
+    static const int    q_history = 2;
+    static const int    q_all     = 3;
+    CF_WriteQueueCmd_t *wq        = (CF_WriteQueueCmd_t *)msg;
+    CF_Channel_t       *c         = &CF_AppData.engine.channels[wq->chan];
+    osal_id_t           fd;
+    int32               ret;
 
     /* check the commands for validity */
     if (wq->chan >= CF_NUM_CHANNELS)
@@ -1076,7 +1076,7 @@ err_out:
 *************************************************************************/
 static void CF_CmdSetParam(CFE_SB_Buffer_t *msg)
 {
-    cf_cmd_set_param_args_t *cmd = (cf_cmd_set_param_args_t *)msg;
+    CF_SetParamCmd_t *cmd = (CF_SetParamCmd_t *)msg;
     CF_CmdGetSetParam(1, cmd->key, cmd->value, cmd->chan_num);
 }
 
@@ -1089,7 +1089,7 @@ static void CF_CmdSetParam(CFE_SB_Buffer_t *msg)
 *************************************************************************/
 static void CF_CmdGetParam(CFE_SB_Buffer_t *msg)
 {
-    cf_cmd_get_param_args_t *cmd = (cf_cmd_get_param_args_t *)msg;
+    CF_GetParamCmd_t *cmd = (CF_GetParamCmd_t *)msg;
     CF_CmdGetSetParam(0, cmd->key, 0, cmd->chan_num);
 }
 
@@ -1182,30 +1182,30 @@ void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
     };
 
     static const uint16 expected_lengths[CF_NUM_COMMANDS] = {
-        sizeof(cf_cmd_noargs_t),         /* CF_NOOP_CC */
-        sizeof(cf_cmd_unionargs_t),      /* CF_RESET_CC */
-        sizeof(cf_cmd_tx_file_t),        /* CF_TX_FILE_CC */
-        sizeof(cf_cmd_playback_dir_t),   /* CF_PLAYBACK_DIR_CC */
-        sizeof(cf_cmd_unionargs_t),      /* CF_FREEZE_CC */
-        sizeof(cf_cmd_unionargs_t),      /* CF_THAW_CC */
-        sizeof(cf_cmd_transaction_t),    /* CF_SUSPEND_CC */
-        sizeof(cf_cmd_transaction_t),    /* CF_RESUME_CC */
-        sizeof(cf_cmd_transaction_t),    /* CF_CANCEL_CC */
-        sizeof(cf_cmd_transaction_t),    /* CF_ABANDON_CC */
-        sizeof(cf_cmd_set_param_args_t), /* CF_SET_MIB_PARAM_CC */
-        sizeof(cf_cmd_get_param_args_t), /* CF_GET_MIB_PARAM_CC */
+        sizeof(CF_NoArgsCmd_t),      /* CF_NOOP_CC */
+        sizeof(CF_UnionArgsCmd_t),   /* CF_RESET_CC */
+        sizeof(CF_TxFileCmd_t),      /* CF_TX_FILE_CC */
+        sizeof(CF_PlaybackDirCmd_t), /* CF_PLAYBACK_DIR_CC */
+        sizeof(CF_UnionArgsCmd_t),   /* CF_FREEZE_CC */
+        sizeof(CF_UnionArgsCmd_t),   /* CF_THAW_CC */
+        sizeof(CF_TransactionCmd_t), /* CF_SUSPEND_CC */
+        sizeof(CF_TransactionCmd_t), /* CF_RESUME_CC */
+        sizeof(CF_TransactionCmd_t), /* CF_CANCEL_CC */
+        sizeof(CF_TransactionCmd_t), /* CF_ABANDON_CC */
+        sizeof(CF_SetParamCmd_t),    /* CF_SET_MIB_PARAM_CC */
+        sizeof(CF_GetParamCmd_t),    /* CF_GET_MIB_PARAM_CC */
         0,
         0,
-        sizeof(cf_cmd_noargs_t),    /* CF_SendRet_CFG_PARAMS_CC */
-        sizeof(cf_cmd_write_q_t),   /* CF_WRITE_QUEUE_CC */
-        sizeof(cf_cmd_unionargs_t), /* CF_ENABLE_DEQUEUE_CC */
-        sizeof(cf_cmd_unionargs_t), /* CF_DISABLE_DEQUEUE_CC */
-        sizeof(cf_cmd_unionargs_t), /* CF_ENABLE_DIR_POLLING_CC */
-        sizeof(cf_cmd_unionargs_t), /* CF_DISABLE_DIR_POLLING_CC */
+        sizeof(CF_NoArgsCmd_t),     /* CF_SendRet_CFG_PARAMS_CC */
+        sizeof(CF_WriteQueueCmd_t), /* CF_WRITE_QUEUE_CC */
+        sizeof(CF_UnionArgsCmd_t),  /* CF_ENABLE_DEQUEUE_CC */
+        sizeof(CF_UnionArgsCmd_t),  /* CF_DISABLE_DEQUEUE_CC */
+        sizeof(CF_UnionArgsCmd_t),  /* CF_ENABLE_DIR_POLLING_CC */
+        sizeof(CF_UnionArgsCmd_t),  /* CF_DISABLE_DIR_POLLING_CC */
         0,                          /* CF_DELETE_QUEUE_NODE_CC */
-        sizeof(cf_cmd_unionargs_t), /* CF_PURGE_QUEUE_CC */
-        sizeof(cf_cmd_noargs_t),    /* CF_ENABLE_ENGINE_CC */
-        sizeof(cf_cmd_noargs_t),    /* CF_DISABLE_ENGINE_CC */
+        sizeof(CF_UnionArgsCmd_t),  /* CF_PURGE_QUEUE_CC */
+        sizeof(CF_NoArgsCmd_t),     /* CF_ENABLE_ENGINE_CC */
+        sizeof(CF_NoArgsCmd_t),     /* CF_DISABLE_ENGINE_CC */
     };
 
     CFE_MSG_FcnCode_t cmd;

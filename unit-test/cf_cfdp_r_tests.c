@@ -286,7 +286,7 @@ void Test_CF_CFDP_R_CheckCrc_When_crc_NotEq_expected_crc_SendEventAndCountMismat
     uint32              arg_expected_crc = Any_uint32();
     int                 expected_result  = 1;
     int                 local_result;
-    hk_channel_data_t   dummy_channel_hk;
+    CF_HkChannel_Data_t dummy_channel_hk;
     uint16              initial_crc_mismatch = Any_uint16();
     uint16              expectedEventID      = CF_EID_ERR_CFDP_R_CRC;
 
