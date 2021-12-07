@@ -24,8 +24,8 @@
 **
 *************************************************************************/
 
-#ifndef __CF_UTILS_H_
-#define __CF_UTILS_H_
+#ifndef CF_UTILS_H
+#define CF_UTILS_H
 
 #include "cf_cfdp.h"
 #include "cf_assert.h"
@@ -39,7 +39,7 @@
  * otherwise if the structure is zero'd out the queue
  * will become corrupted due to other nodes on the queue
  * pointing to an invalid node */
-static inline void cf_dequeue_transaction(CF_Transaction_t *t)
+static inline void CF_DequeueTransaction(CF_Transaction_t *t)
 {
     CF_Assert(t && (t->chan_num < CF_NUM_CHANNELS));
     CF_CList_Remove(&CF_AppData.engine.channels[t->chan_num].qs[t->flags.com.q_index], &t->cl_node);
@@ -47,7 +47,7 @@ static inline void cf_dequeue_transaction(CF_Transaction_t *t)
     --CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index];
 }
 
-static inline void cf_move_transaction(CF_Transaction_t *t, CF_QueueIdx_t q)
+static inline void CF_MoveTransaction(CF_Transaction_t *t, CF_QueueIdx_t q)
 {
     CF_Assert(t && (t->chan_num < CF_NUM_CHANNELS));
     CF_CList_Remove(&CF_AppData.engine.channels[t->chan_num].qs[t->flags.com.q_index], &t->cl_node);
@@ -94,4 +94,4 @@ extern int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size);
 extern int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size);
 extern int32 CF_WrappedLseek(osal_id_t fd, off_t offset, int mode);
 
-#endif /* !__CF_UTILS_H_ */
+#endif /* !CF_UTILS_H */

@@ -278,7 +278,7 @@ void Test_CF_CFDP_S1_SubstateSendEof_Call_CF_CFDP_S_Reset_With_t_When_CFDP_S_Sen
 
 /*******************************************************************************
 **
-**  CF_CFDP_S2_SubstateSendEof tests (small) - full coverage - [unstubbables: cf_dequeue_transaction]
+**  CF_CFDP_S2_SubstateSendEof tests (small) - full coverage - [unstubbables: CF_DequeueTransaction]
 **
 *******************************************************************************/
 
@@ -295,7 +295,7 @@ void Test_CF_CFDP_S2_SubstateSendEof_TriggerTickProcessing(void)
 
     UT_SetDataBuffer(UT_KEY(CF_InsertSortPrio), &context_CF_InsertSortPrio, sizeof(context_CF_InsertSortPrio), false);
 
-    /* Arrange unstubbable: cf_dequeue_transaction */
+    /* Arrange unstubbable: CF_DequeueTransaction */
     uint16                    initial_q_size_q_index = Any_uint16_GreaterThan(0);
     CF_CList_Remove_context_t context_CF_CList_Remove;
 
@@ -319,7 +319,7 @@ void Test_CF_CFDP_S2_SubstateSendEof_TriggerTickProcessing(void)
     UtAssert_True(context_CF_InsertSortPrio.q == CF_QueueIdx_TXW,
                   "CF_InsertSortPrio received q %u and should be %u (CF_QueueIdx_TXW)", context_CF_InsertSortPrio.q,
                   CF_QueueIdx_TXW);
-    /* Assert for cf_dequeue_transaction */
+    /* Assert for CF_DequeueTransaction */
     UtAssert_STUB_COUNT(CF_CList_Remove, 1);
     UtAssert_ADDRESS_EQ(context_CF_CList_Remove.head,
                         &CF_AppData.engine.channels[arg_t->chan_num].qs[arg_t->flags.com.q_index]);
@@ -3395,7 +3395,7 @@ void Test_CF_CFDP_S_Tick_CallTo_CF_TimerExpired_Returns_1_ThenSendsEventAndCalls
     CF_Transaction_t           *arg_t                    = &dummy_t;
     int                        *arg_cont                 = NULL;
     uint16                      initial_inactivity_timer = Any_uint16();
-    cf_timer_t                 *context_CF_Timer_Expired;
+    CF_Timer_t                 *context_CF_Timer_Expired;
     const char                 *expected_Spec = "CF S2(%u:%u): inactivity timer expired";
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
 
@@ -3460,8 +3460,8 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     uint16            initial_inactivity_timer = Any_uint16();
     uint16            initial_fault_ack_limit  = Any_uint16();
     uint8             dummy_ack_limit          = Any_uint8();
-    cf_timer_t       *context_CF_Timer_Expired[2];
-    cf_timer_t       *context_CF_Timer_Tick;
+    CF_Timer_t       *context_CF_Timer_Expired[2];
+    CF_Timer_t       *context_CF_Timer_Tick;
     const char       *expected_Spec = "CF S2(%u:%u), ack limit reached, no eof-ack";
 
     arg_t->history                   = &dummy_history;
@@ -3541,8 +3541,8 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     uint16            initial_inactivity_timer = Any_uint16();
     uint16            initial_fault_ack_limit  = Any_uint16();
     uint8             dummy_ack_limit          = Any_uint8();
-    cf_timer_t       *context_CF_Timer_Expired[2];
-    cf_timer_t       *context_CF_Timer_Tick;
+    CF_Timer_t       *context_CF_Timer_Expired[2];
+    CF_Timer_t       *context_CF_Timer_Tick;
 
     arg_t->history                   = &dummy_history;
     arg_t->chan_num                  = Any_cf_chan_num();
@@ -3611,8 +3611,8 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     uint16            initial_inactivity_timer = Any_uint16();
     uint16            initial_fault_ack_limit  = Any_uint16();
     uint8             dummy_ack_limit          = Any_uint8();
-    cf_timer_t       *context_CF_Timer_Expired[2];
-    cf_timer_t       *context_CF_Timer_Tick;
+    CF_Timer_t       *context_CF_Timer_Expired[2];
+    CF_Timer_t       *context_CF_Timer_Tick;
 
     arg_t->history                   = &dummy_history;
     arg_t->chan_num                  = Any_cf_chan_num();
@@ -3691,8 +3691,8 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     uint16            initial_inactivity_timer = Any_uint16();
     uint16            initial_fault_ack_limit  = Any_uint16();
     uint8             dummy_ack_limit          = Any_uint8();
-    cf_timer_t       *context_CF_Timer_Expired[2];
-    cf_timer_t       *context_CF_Timer_Tick;
+    CF_Timer_t       *context_CF_Timer_Expired[2];
+    CF_Timer_t       *context_CF_Timer_Tick;
     CF_Transaction_t *context_CF_CFDP_ArmAckTimer;
 
     arg_t->history                   = &dummy_history;
@@ -3765,8 +3765,8 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpired_sub_state_NotEqTo_SEND_WAIT_FOR_EOF_A
     uint8             exceptions[2]            = {
         CF_TxSubState_WAIT_FOR_EOF_ACK,
         CF_TxSubState_SEND_FIN_ACK}; // CF_TxSubState_SEND_FIN_ACK only excepted for separate behavior 'if' block
-    cf_timer_t *context_CF_Timer_Expired[2];
-    cf_timer_t *context_CF_Timer_Tick;
+    CF_Timer_t *context_CF_Timer_Expired[2];
+    CF_Timer_t *context_CF_Timer_Tick;
 
     arg_t->chan_num                  = Any_cf_chan_num();
     arg_t->state                     = CF_TxnState_S2;
@@ -3813,8 +3813,8 @@ void Test_CF_CFDP_S_Tick_ArmedTimerNotExpiredCall_CF_Timer_Tick(void)
     int              *arg_cont                 = NULL;
     uint16            initial_inactivity_timer = Any_uint16();
     uint16            initial_fault_ack_limit  = Any_uint16();
-    cf_timer_t       *context_CF_Timer_Expired[2];
-    cf_timer_t       *context_CF_Timer_Tick[2];
+    CF_Timer_t       *context_CF_Timer_Expired[2];
+    CF_Timer_t       *context_CF_Timer_Tick[2];
 
     arg_t->chan_num                  = Any_cf_chan_num();
     arg_t->state                     = CF_TxnState_S2;
@@ -3862,8 +3862,8 @@ void Test_CF_CFDP_S_Tick_TimerNotArmedDoNotArmAckTimerOrDoTick(void)
     int              *arg_cont                 = NULL;
     uint16            initial_inactivity_timer = Any_uint16();
     uint16            initial_fault_ack_limit  = Any_uint16();
-    cf_timer_t       *context_CF_Timer_Expired;
-    cf_timer_t       *context_CF_Timer_Tick;
+    CF_Timer_t       *context_CF_Timer_Expired;
+    CF_Timer_t       *context_CF_Timer_Tick;
 
     arg_t->chan_num                  = Any_cf_chan_num();
     arg_t->state                     = CF_TxnState_S2;
@@ -3909,8 +3909,8 @@ void Test_CF_CFDP_S_Tick_When_sub_state_IsEqTo_SEND_SEND_FIN_ACK_Call_CF_CFDP_S_
     int              *arg_cont                 = NULL;
     uint16            initial_inactivity_timer = Any_uint16();
     uint16            initial_fault_ack_limit  = Any_uint16();
-    cf_timer_t       *context_CF_Timer_Expired;
-    cf_timer_t       *context_CF_Timer_Tick;
+    CF_Timer_t       *context_CF_Timer_Expired;
+    CF_Timer_t       *context_CF_Timer_Tick;
 
     arg_t->history                   = &dummy_history;
     arg_t->chan_num                  = Any_cf_chan_num();

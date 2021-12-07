@@ -72,7 +72,7 @@ void DummyFunctionFor_CF_TraverseAllTransactions_(CF_Transaction_t *t, void *con
 **
 *******************************************************************************/
 
-/* cf_dequeue_transaction tests */
+/* CF_DequeueTransaction tests */
 
 void Test_cf_dequeue_transaction_AssertsBecause_t_IsNull(void)
 {
@@ -80,7 +80,7 @@ void Test_cf_dequeue_transaction_AssertsBecause_t_IsNull(void)
     // CF_Transaction_t   *arg_t = NULL;
 
     // /* Act */
-    // cf_dequeue_transaction(arg_t);
+    // CF_DequeueTransaction(arg_t);
 
     // /* Assert */
     // UtAssert_STUB_COUNT(CF_HandleAssert, 1);
@@ -99,7 +99,7 @@ void Test_cf_dequeue_transaction_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANN
     // arg_t.chan_num = dummy_chan_num;
 
     // /* Act */
-    // cf_dequeue_transaction(&arg_t);
+    // CF_DequeueTransaction(&arg_t);
 
     // /* Assert */
     // UtAssert_STUB_COUNT(CF_HandleAssert, 1);
@@ -112,7 +112,7 @@ void Test_cf_dequeue_transaction_AssertsBecause_q_size_Eq0(void)
     // CF_Transaction_t   *arg_t = NULL;
 
     // /* Act */
-    // cf_dequeue_transaction(arg_t);
+    // CF_DequeueTransaction(arg_t);
 
     // /* Assert */
     // UtAssert_STUB_COUNT(CF_HandleAssert, 1);
@@ -138,7 +138,7 @@ void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
     CF_AppData.hk.channel_hk[arg_t.chan_num].q_size[arg_t.flags.com.q_index] = initial_q_size;
 
     /* Act */
-    cf_dequeue_transaction(&arg_t);
+    CF_DequeueTransaction(&arg_t);
 
     uint16 updated_q_size = CF_AppData.hk.channel_hk[arg_t.chan_num].q_size[arg_t.flags.com.q_index];
 
@@ -151,9 +151,9 @@ void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
 
 } /* end Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size */
 
-/* end cf_dequeue_transaction tests */
+/* end CF_DequeueTransaction tests */
 
-/* cf_move_transaction tests */
+/* CF_MoveTransaction tests */
 
 void Test_cf_move_transaction_AssertsBecause_t_IsNull(void)
 {
@@ -216,7 +216,7 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
         Any_uint8_LessThanCeilingExcept(CF_QueueIdx_NUM + 1, 0);
 
     /* Act */
-    cf_move_transaction(arg_t, arg_q);
+    CF_MoveTransaction(arg_t, arg_q);
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_HandleAssert, 0);
@@ -231,7 +231,7 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
                   arg_q);
 } /* end Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q */
 
-/* end cf_move_transaction tests */
+/* end CF_MoveTransaction tests */
 
 /* CF_CList_Remove_Ex tests */
 
@@ -1255,7 +1255,7 @@ void Test_CF_WrappedLseek_Call_OS_lseek_WithGivenArgumentsAndReturnItsReturnValu
 
 void add_cf_utils_h_tests(void)
 {
-    /* cf_dequeue_transaction tests */
+    /* CF_DequeueTransaction tests */
     UtTest_Add(Test_cf_dequeue_transaction_AssertsBecause_t_IsNull, cf_utils_tests_Setup, cf_utils_tests_Teardown,
                "Test_cf_dequeue_transaction_AssertsBecause_t_IsNull");
     UtTest_Add(Test_cf_dequeue_transaction_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANNELS, cf_utils_tests_Setup,
@@ -1265,9 +1265,9 @@ void add_cf_utils_h_tests(void)
                "Test_cf_dequeue_transaction_AssertsBecause_q_size_Eq0");
     UtTest_Add(Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size, cf_utils_tests_Setup,
                cf_utils_tests_Teardown, "Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size");
-    /* end cf_dequeue_transaction tests */
+    /* end CF_DequeueTransaction tests */
 
-    /* cf_move_transaction tests */
+    /* CF_MoveTransaction tests */
     UtTest_Add(Test_cf_move_transaction_AssertsBecause_t_IsNull, cf_utils_tests_Setup, cf_utils_tests_Teardown,
                "Test_cf_move_transaction_AssertsBecause_t_IsNull");
     UtTest_Add(Test_cf_move_transaction_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANNELS, cf_utils_tests_Setup,
@@ -1276,7 +1276,7 @@ void add_cf_utils_h_tests(void)
                cf_utils_tests_Teardown, "Test_cf_move_transaction_AssertsBecause_channel_hk_Has_q_size_Eq0");
     UtTest_Add(Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q, cf_utils_tests_Setup,
                cf_utils_tests_Teardown, "Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q");
-    /* end cf_move_transaction tests */
+    /* end CF_MoveTransaction tests */
 
     /* CF_CList_Remove_Ex tests */
     UtTest_Add(Test_CF_CList_Remove_Ex_AssertsBecause_q_size_Eq0, cf_utils_tests_Setup, cf_utils_tests_Teardown,

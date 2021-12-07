@@ -39,7 +39,7 @@
 **  \endreturns
 **
 *************************************************************************/
-// static uint32 CF_Timer_Sec2Ticks(cf_timer_sec_t sec)
+// static uint32 CF_Timer_Sec2Ticks(CF_Timer_Seconds_t sec)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -53,7 +53,7 @@
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_Timer_InitRelSec(cf_timer_t *t, uint32 rel_sec)
+void CF_Timer_InitRelSec(CF_Timer_t *t, uint32 rel_sec)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_Timer_InitRelSec), &t, sizeof(t));
     UT_Stub_CopyFromLocal(UT_KEY(CF_Timer_InitRelSec), &rel_sec, sizeof(rel_sec));
@@ -72,7 +72,7 @@ void CF_Timer_InitRelSec(cf_timer_t *t, uint32 rel_sec)
 **  \endreturns
 **
 *************************************************************************/
-int CF_Timer_Expired(const cf_timer_t *t)
+int CF_Timer_Expired(const CF_Timer_t *t)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_Timer_Expired), &t, sizeof(t));
 
@@ -86,7 +86,7 @@ int CF_Timer_Expired(const cf_timer_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_Timer_Tick(cf_timer_t *t)
+void CF_Timer_Tick(CF_Timer_t *t)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_Timer_Tick), &t, sizeof(t));
 

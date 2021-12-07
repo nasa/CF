@@ -1553,7 +1553,7 @@ static void CF_CFDP_CycleTx(CF_Channel_t *c)
                 /* didn't find anything on TXA to run, so pop one off Q_PEND and try again.
                  * Keep going until CF_QueueIdx_PEND is empty or something is run */
                 CF_Transaction_t *t = container_of(c->qs[CF_QueueIdx_PEND], CF_Transaction_t, cl_node);
-                cf_move_transaction(t, CF_QueueIdx_TXA);
+                CF_MoveTransaction(t, CF_QueueIdx_TXA);
                 /* args is ok, still { c, 0 } */
             entry_jump:
                 CF_CList_Traverse(c->qs[CF_QueueIdx_TXA], CF_CFDP_CycleTx_, &args);
@@ -2095,7 +2095,7 @@ void CF_CFDP_ResetTransaction(CF_Transaction_t *t, int keep_history)
     CF_Channel_t *c = &CF_AppData.engine.channels[t->chan_num];
     CF_Assert(t->chan_num < CF_NUM_CHANNELS);
 
-    cf_dequeue_transaction(t);
+    CF_DequeueTransaction(t);
 
     if (OS_ObjectIdDefined(t->fd))
     {

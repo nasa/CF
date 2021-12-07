@@ -19,9 +19,9 @@
 #undef FGV
 #define FGV Stub_FGV
 int32 Stub_FGV(uint8 source, CF_FIELD_FIELD name);
-#undef cf_dequeue_transaction
-#define cf_dequeue_transaction Stub_cf_dequeue_transaction
-void cf_dequeue_transaction(CF_Transaction_t *t);
+#undef CF_DequeueTransaction
+#define CF_DequeueTransaction Stub_cf_dequeue_transaction
+void CF_DequeueTransaction(CF_Transaction_t *t);
 #undef CF_CList_InsertBack_Ex
 #define CF_CList_InsertBack_Ex Stub_CF_CList_InsertBack_Ex
 void Stub_CF_CList_InsertBack_Ex(CF_Channel_t *c, CF_QueueIdx_t index, CF_CListNode_t *node);
@@ -6147,7 +6147,7 @@ void Test_CF_CFDP_CycleTx_Given_node_TransactionContainer_t_flags_all_q_index_Is
 
 /*******************************************************************************
 **
-**  CF_CFDP_CycleTx tests (small) - full coverage - [unstubbables: cf_move_transaction (small) [], CF_CFDP_CycleTx_
+**  CF_CFDP_CycleTx tests (small) - full coverage - [unstubbables: CF_MoveTransaction (small) [], CF_CFDP_CycleTx_
 *tests (medium) - full coverage - [unstubbables: CF_CFDP_DispatchTx (small)]].
 **
 *******************************************************************************/
@@ -6265,13 +6265,13 @@ void Test_CF_CFDP_CycleTx_EnterWhileLoopOnceAndCall_cf_move_transaction_SecondCa
     // POINTER,
     // FIND_T_BY_SEQ_NUM,
     // CLOSE_FILES,
-    /* Arrange for cf_move_transaction */
+    /* Arrange for CF_MoveTransaction */
     type_of_context_CF_CList_Traverse = POINTER;
 
     UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), Handler_CF_CList_Traverse_SecondCallSet_ran_one_To_1,
                           &context_CF_CList_Traverse);
 
-    /* Arrange for cf_move_transaction */
+    /* Arrange for CF_MoveTransaction */
     dummy_cur.chan_num = Any_cf_chan_num();
 
     CF_AppData.hk.channel_hk[dummy_cur.chan_num].q_size[dummy_cur.flags.com.q_index] = 1; /* 1 for non zero */
@@ -6282,7 +6282,7 @@ void Test_CF_CFDP_CycleTx_EnterWhileLoopOnceAndCall_cf_move_transaction_SecondCa
     /* Assert */
     UtAssert_STUB_COUNT(CF_CList_Traverse, 2);
     UtAssert_NULL(arg_c->cur);
-    /* Assert for cf_move_transaction */
+    /* Assert for CF_MoveTransaction */
     UtAssert_STUB_COUNT(CF_CList_Remove, 1);
     UtAssert_STUB_COUNT(CF_CList_InsertBack, 1);
 } /* end
@@ -8090,7 +8090,7 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_true_Call_C
     CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
 
     /* Assert */
-    UtAssert_STUB_COUNT(cf_dequeue_transaction, 1);
+    UtAssert_STUB_COUNT(CF_DequeueTransaction, 1);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
     UtAssert_STUB_COUNT(OS_remove, 0);
     UtAssert_STUB_COUNT(CF_CList_InsertBack_Ex, 2); /* Includes one call in CF_CFDP_FreeTransaction */
@@ -8140,7 +8140,7 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_true_Call_C
     CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
 
     /* Assert */
-    UtAssert_STUB_COUNT(cf_dequeue_transaction, 1);
+    UtAssert_STUB_COUNT(CF_DequeueTransaction, 1);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
     UtAssert_STUB_COUNT(OS_remove, 1);
     UtAssert_ADDRESS_EQ(recorded_path, expected_path);
@@ -8193,7 +8193,7 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_true_Call_C
     CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
 
     /* Assert */
-    UtAssert_STUB_COUNT(cf_dequeue_transaction, 1);
+    UtAssert_STUB_COUNT(CF_DequeueTransaction, 1);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
     UtAssert_STUB_COUNT(OS_remove, 1);
     UtAssert_ADDRESS_EQ(recorded_path, expected_path);
@@ -8236,7 +8236,7 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_false_And_t
     CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
 
     /* Assert */
-    UtAssert_STUB_COUNT(cf_dequeue_transaction, 1);
+    UtAssert_STUB_COUNT(CF_DequeueTransaction, 1);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     UtAssert_STUB_COUNT(CF_CList_InsertBack_Ex, 2); /* Includes one call in CF_CFDP_FreeTransaction */
     UtAssert_True(recorded_index[0] == CF_QueueIdx_HIST_FREE,
@@ -8276,7 +8276,7 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_false_And_t
     CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
 
     /* Assert */
-    UtAssert_STUB_COUNT(cf_dequeue_transaction, 1);
+    UtAssert_STUB_COUNT(CF_DequeueTransaction, 1);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     UtAssert_STUB_COUNT(CF_CList_InsertBack_Ex, 2); /* Includes one call in CF_CFDP_FreeTransaction */
     UtAssert_True(recorded_index[0] == CF_QueueIdx_HIST,
@@ -8320,7 +8320,7 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_false_And_t
     CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
 
     /* Assert */
-    UtAssert_STUB_COUNT(cf_dequeue_transaction, 1);
+    UtAssert_STUB_COUNT(CF_DequeueTransaction, 1);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     UtAssert_STUB_COUNT(CF_CList_InsertBack_Ex, 2); /* Includes one call in CF_CFDP_FreeTransaction */
     UtAssert_True(recorded_index[0] == CF_QueueIdx_HIST,
@@ -8365,7 +8365,7 @@ void Test_CF_CFDP_ResetTransaction_AssertsBecause_c_num_cmd_tx_Is_0(void)
     // CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
 
     // /* Assert */
-    // UtAssert_STUB_COUNT(cf_dequeue_transaction, 1);
+    // UtAssert_STUB_COUNT(CF_DequeueTransaction, 1);
     // UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     // UtAssert_UINT32_EQ((&CF_AppData.engine.channels[arg_t->chan_num])->num_cmd_tx, initial_num_cmd_tx - 1);
     // UtAssert_STUB_COUNT(CF_CList_InsertBack_Ex, 2); /* Includes one call in CF_CFDP_FreeTransaction */
@@ -8412,7 +8412,7 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_false_And_t
     CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
 
     /* Assert */
-    UtAssert_STUB_COUNT(cf_dequeue_transaction, 1);
+    UtAssert_STUB_COUNT(CF_DequeueTransaction, 1);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     UtAssert_UINT32_EQ((&CF_AppData.engine.channels[arg_t->chan_num])->num_cmd_tx, initial_num_cmd_tx - 1);
     UtAssert_STUB_COUNT(CF_CList_InsertBack_Ex, 2); /* Includes one call in CF_CFDP_FreeTransaction */
@@ -8459,7 +8459,7 @@ void Test_CF_CFDP_ResetTransaction_AssertsBecause_t_p_num_ts_Is_0(void)
     // CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
 
     // /* Assert */
-    // UtAssert_STUB_COUNT(cf_dequeue_transaction, 1);
+    // UtAssert_STUB_COUNT(CF_DequeueTransaction, 1);
     // UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     // UtAssert_UINT32_EQ((&CF_AppData.engine.channels[arg_t->chan_num])->num_cmd_tx, initial_num_cmd_tx - 1);
     // UtAssert_STUB_COUNT(CF_CList_InsertBack_Ex, 2); /* Includes one call in CF_CFDP_FreeTransaction */
@@ -8508,7 +8508,7 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_false_And_t
     CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
 
     /* Assert */
-    UtAssert_STUB_COUNT(cf_dequeue_transaction, 1);
+    UtAssert_STUB_COUNT(CF_DequeueTransaction, 1);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     UtAssert_UINT32_EQ(dummy_p.num_ts,
                        initial_num_ts -
@@ -8551,7 +8551,7 @@ void Test_CF_CFDP_ResetTransaction_AssertsBecause_t_history_dir_IsNeither_CF_DIR
     // CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
 
     // /* Assert */
-    // UtAssert_STUB_COUNT(cf_dequeue_transaction, 1);
+    // UtAssert_STUB_COUNT(CF_DequeueTransaction, 1);
     // UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     UtAssert_MIR(
         "JIRA: GSFCCFS-1733 CF_Assert - 0 (no not a typo, literally 0 is this one, comes from a default switch)");

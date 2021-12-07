@@ -112,7 +112,7 @@ static void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *t)
     /* no longer need to send file data PDU except in the case of NAK response */
 
     /* move this transaction off Q_PEND */
-    cf_dequeue_transaction(t);
+    CF_DequeueTransaction(t);
     CF_InsertSortPrio(t, CF_QueueIdx_TXW);
 }
 

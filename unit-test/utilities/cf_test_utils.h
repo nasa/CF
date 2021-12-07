@@ -398,7 +398,7 @@ typedef struct
 
 typedef struct
 {
-    cf_timer_t *t;
+    CF_Timer_t *t;
     uint32      rel_sec;
 } CF_PACK CF_Timer_InitRelSec_context_t;
 

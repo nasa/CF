@@ -130,7 +130,7 @@ typedef struct CF_Playback
 typedef struct CF_Poll
 {
     CF_Playback_t pb;
-    cf_timer_t    interval_timer;
+    CF_Timer_t    interval_timer;
     bool          timer_set;
 } CF_Poll_t;
 
@@ -223,8 +223,8 @@ typedef struct CF_Transaction
 
     CF_History_t      *history;          /* weird, but this also holds active filenames and possibly other info */
     CF_ChunkWrapper_t *chunks;           /* for gap tracking, only used on class 2 */
-    cf_timer_t         inactivity_timer; /* set to the overall inactivity timer of a remote */
-    cf_timer_t         ack_timer;        /* called ack_timer, but is also nak_timer */
+    CF_Timer_t         inactivity_timer; /* set to the overall inactivity timer of a remote */
+    CF_Timer_t         ack_timer;        /* called ack_timer, but is also nak_timer */
 
     uint32    fsize; /* lseek() should be 64-bit on 64-bit system, but osal limits to 32-bit */
     uint32    foffs; /* offset into file for next read */

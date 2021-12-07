@@ -29,7 +29,7 @@ void cf_timer_tests_Teardown(void)
 void Test_CF_Timer_Sec2Ticks_ReturnExpectedValue(void)
 {
     /* Arrange */
-    cf_timer_sec_t    arg_sec                = Any_uint32();
+    CF_Timer_Seconds_t    arg_sec                = Any_uint32();
     uint32            dummy_ticks_per_second = Any_uint32();
     cf_config_table_t dummy_config_table;
 
@@ -56,8 +56,8 @@ void Test_CF_Timer_InitRelSec_ReceiveExpectedValue(void)
 {
     /* Arrange */
     uint32      arg_rel_sec = Any_uint32();
-    cf_timer_t  dummy_timer;
-    cf_timer_t *arg_t = &dummy_timer;
+    CF_Timer_t  dummy_timer;
+    CF_Timer_t *arg_t = &dummy_timer;
 
     /* Arrange unstubbalbe: CF_Timer_Sec2Ticks in same file */
     uint32            dummy_ticks_per_second = Any_uint32();
@@ -88,9 +88,9 @@ void Test_CF_Timer_InitRelSec_ReceiveExpectedValue(void)
 void Test_CF_Timer_Expired_When_t_tick_Is_0_Return_1(void)
 {
     /* Arrange */
-    cf_timer_t dummy_timer;
+    CF_Timer_t dummy_timer;
     dummy_timer.tick        = 0;
-    const cf_timer_t *arg_t = &dummy_timer;
+    const CF_Timer_t *arg_t = &dummy_timer;
     int               local_result;
     int               expected_result = 1;
 
@@ -104,9 +104,9 @@ void Test_CF_Timer_Expired_When_t_tick_Is_0_Return_1(void)
 void Test_CF_Timer_Expired_When_t_tick_Is_1_Return_0(void)
 {
     /* Arrange */
-    cf_timer_t dummy_timer;
+    CF_Timer_t dummy_timer;
     dummy_timer.tick        = 1;
-    const cf_timer_t *arg_t = &dummy_timer;
+    const CF_Timer_t *arg_t = &dummy_timer;
     int               local_result;
     int               expected_result = 0;
 
@@ -120,9 +120,9 @@ void Test_CF_Timer_Expired_When_t_tick_Is_1_Return_0(void)
 void Test_CF_Timer_Expired_When_t_tick_IsAnyIntegerExcept_0_Return_0(void)
 {
     /* Arrange */
-    cf_timer_t dummy_timer;
+    CF_Timer_t dummy_timer;
     dummy_timer.tick        = Any_int_Except(0);
-    const cf_timer_t *arg_t = &dummy_timer;
+    const CF_Timer_t *arg_t = &dummy_timer;
     int               local_result;
     int               expected_result = 0;
 
@@ -155,8 +155,8 @@ void Test_CF_Timer_Tick_When_t_tick_Is_non0_Decrement_t_tick(void)
 {
     /* Arrange */
     uint32      initial_tick = Any_uint32_Except(0);
-    cf_timer_t  dummy_t;
-    cf_timer_t *arg_t = &dummy_t;
+    CF_Timer_t  dummy_t;
+    CF_Timer_t *arg_t = &dummy_t;
 
     arg_t->tick = initial_tick;
 
