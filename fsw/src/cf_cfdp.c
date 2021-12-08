@@ -1769,9 +1769,9 @@ err_out:
 **  \endreturns
 **
 *************************************************************************/
-static int32 CF_CFDP_PlaybackDir_(playback_t *p, const char src_filename[CF_FILENAME_MAX_LEN],
-                                  const char dst_filename[CF_FILENAME_MAX_LEN], cfdp_class_t cfdp_class, uint8 keep,
-                                  uint8 chan, uint8 priority, cf_entity_id_t dest_id)
+static int32 CF_CFDP_PlaybackDir_(playback_t *p, const char *src_filename, const char *dst_filename,
+                                  cfdp_class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority,
+                                  cf_entity_id_t dest_id)
 {
     int32 ret = CFE_SUCCESS;
 
