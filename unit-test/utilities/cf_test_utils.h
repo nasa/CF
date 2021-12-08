@@ -42,8 +42,8 @@
 #define SECOND_CALL 2
 #define NEXT_CALL   1
 
-int32  result;
-uint16 EventID;
+extern int32  result;
+extern uint16 EventID;
 
 extern const char   *ut_default_const_char;
 extern const uint8   ut_default_uint8;
@@ -166,30 +166,29 @@ typedef struct
 {
     CFE_MSG_Message_t *MsgPtr;
     CFE_TIME_SysTime_t Time;
-} CF_PACK                    CFE_MSG_SetMsgTime_context_t;
-CFE_MSG_SetMsgTime_context_t context_CFE_MSG_SetMsgTime;
+} CF_PACK                           CFE_MSG_SetMsgTime_context_t;
+extern CFE_MSG_SetMsgTime_context_t context_CFE_MSG_SetMsgTime;
 
 typedef struct
 {
     const CFE_MSG_Message_t *MsgPtr;
     CFE_SB_MsgId_t          *returned_MsgId;
-} CF_PACK                  CFE_MSG_GetMsgId_context_t;
-CFE_MSG_GetMsgId_context_t context_CFE_MSG_GetMsgId;
+} CF_PACK                         CFE_MSG_GetMsgId_context_t;
+extern CFE_MSG_GetMsgId_context_t context_CFE_MSG_GetMsgId;
 
 typedef struct
 {
     uint16      EventID;
     uint16      EventType;
     const char *Spec;
-} CF_PACK                   CFE_EVS_SendEvent_context_t;
-CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
+} CF_PACK                          CFE_EVS_SendEvent_context_t;
+extern CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
 
 typedef struct
 {
     const CFE_MSG_Message_t *MsgPtr;
     CFE_MSG_Size_t          *Size;
-} CF_PACK                 CFE_MSG_GetSize_context_t;
-CFE_MSG_GetSize_context_t context_CFE_MSG_GetSize;
+} CF_PACK CFE_MSG_GetSize_context_t;
 
 typedef struct
 {
@@ -505,9 +504,6 @@ typedef enum
     CLOSE_FILES,
     MAX_TYPE_OF_CONTEXT_CF_CLIST_TRAVERSE
 } type_of_context_CF_CList_Traverse_t;
-
-type_of_context_CF_CList_Traverse_t
-    type_of_context_CF_CList_Traverse; /* moved here to remove warning, a special setting for the stub */
 
 void cf_tests_Setup(void);
 void cf_tests_Teardown(void);
