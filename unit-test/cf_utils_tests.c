@@ -92,7 +92,7 @@ void Test_cf_dequeue_transaction_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANN
     // /* Arrange */
     // transaction_t   arg_t;
     // clist_node      *expected_qs =
-    //   &CF_AppData.engine.channels[arg_t.chan_num].qs[arg_t.flags.all.q_index];
+    //   &CF_AppData.engine.channels[arg_t.chan_num].qs[arg_t.flags.com.q_index];
     // uint8           dummy_chan_num =
     //   Any_uint8_GreaterThan_or_EqualTo(CF_NUM_CHANNELS);
 
@@ -116,7 +116,7 @@ void Test_cf_dequeue_transaction_AssertsBecause_q_size_Eq0(void)
 
     // /* Assert */
     // UtAssert_STUB_COUNT(CF_HandleAssert, 1);
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.all.q_index]");
+    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index]");
 } /* end Test_cf_dequeue_transaction_AssertsBecause_q_size_Eq0 */
 
 void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
@@ -132,15 +132,15 @@ void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
     UT_SetDataBuffer(UT_KEY(CF_CList_Remove), &context_clist_remove, sizeof(context_clist_remove), false);
 
     arg_t.chan_num   = dummy_chan_num;
-    expected_head    = &CF_AppData.engine.channels[arg_t.chan_num].qs[arg_t.flags.all.q_index];
+    expected_head    = &CF_AppData.engine.channels[arg_t.chan_num].qs[arg_t.flags.com.q_index];
     expected_cl_node = &arg_t.cl_node;
 
-    CF_AppData.hk.channel_hk[arg_t.chan_num].q_size[arg_t.flags.all.q_index] = initial_q_size;
+    CF_AppData.hk.channel_hk[arg_t.chan_num].q_size[arg_t.flags.com.q_index] = initial_q_size;
 
     /* Act */
     cf_dequeue_transaction(&arg_t);
 
-    uint16 updated_q_size = CF_AppData.hk.channel_hk[arg_t.chan_num].q_size[arg_t.flags.all.q_index];
+    uint16 updated_q_size = CF_AppData.hk.channel_hk[arg_t.chan_num].q_size[arg_t.flags.com.q_index];
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_HandleAssert, 0);
@@ -182,7 +182,7 @@ void Test_cf_move_transaction_AssertsBecause_channel_hk_Has_q_size_Eq0(void)
     // /* Act */
 
     // /* Assert */
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.all.q_index]");
+    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index]");
 } /* end Test_cf_move_transaction_AssertsBecause_channel_hk_Has_q_size_Eq0 */
 
 void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(void)
@@ -202,7 +202,7 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
     CF_Clist_Remove_context_t context_clist_remove;
     UT_SetDataBuffer(UT_KEY(CF_CList_Remove), &context_clist_remove, sizeof(context_clist_remove), false);
 
-    expected_remove_head = &CF_AppData.engine.channels[arg_t->chan_num].qs[arg_t->flags.all.q_index];
+    expected_remove_head = &CF_AppData.engine.channels[arg_t->chan_num].qs[arg_t->flags.com.q_index];
     expected_remove_node = &arg_t->cl_node;
 
     CF_CList_InsertBack_context_t context_clist_insert_back;
@@ -212,7 +212,7 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
     expected_insert_back_node = &arg_t->cl_node;
 
     /* after here must have chan_num set */
-    CF_AppData.hk.channel_hk[arg_t->chan_num].q_size[arg_t->flags.all.q_index] =
+    CF_AppData.hk.channel_hk[arg_t->chan_num].q_size[arg_t->flags.com.q_index] =
         Any_uint8_LessThanCeilingExcept(CF_Q_NUM + 1, 0);
 
     /* Act */
@@ -226,8 +226,8 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
     UtAssert_STUB_COUNT(CF_CList_InsertBack, 1);
     UtAssert_ADDRESS_EQ(context_clist_insert_back.head, expected_insert_back_head);
     UtAssert_ADDRESS_EQ(context_clist_insert_back.node, expected_insert_back_node);
-    UtAssert_True(arg_t->flags.all.q_index == arg_q,
-                  "t->flags.all.q_index set to %u and should equal passed in q value %u", arg_t->flags.all.q_index,
+    UtAssert_True(arg_t->flags.com.q_index == arg_q,
+                  "t->flags.com.q_index set to %u and should equal passed in q value %u", arg_t->flags.com.q_index,
                   arg_q);
 } /* end Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q */
 
@@ -825,8 +825,8 @@ void Test_CF_InsertSortPrio_Call_CF_CList_InsertBack_Ex_ListIsEmpty_AndSet_q_ind
     UtAssert_STUB_COUNT(CF_CList_InsertBack, 1);
     UtAssert_ADDRESS_EQ(context_clist_insert_back.head, expected_insert_back_head);
     UtAssert_ADDRESS_EQ(context_clist_insert_back.node, expected_insert_back_node);
-    UtAssert_True(arg_t->flags.all.q_index == arg_q,
-                  "arg_t->flags.all.q_index set to %d and should be %d (cf_queue_index_t q)", arg_t->flags.all.q_index,
+    UtAssert_True(arg_t->flags.com.q_index == arg_q,
+                  "arg_t->flags.com.q_index set to %d and should be %d (cf_queue_index_t q)", arg_t->flags.com.q_index,
                   arg_q);
 } /* end Test_CF_InsertSortPrio_Call_CF_CList_InsertBack_Ex_ListIsEmpty_AndSet_q_index_To_q */
 
@@ -884,8 +884,8 @@ void Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q(voi
     UtAssert_ADDRESS_EQ(context_CF_CList_InsertAfter.head, (clist_node *)expected_insert_after_head);
     UtAssert_ADDRESS_EQ(context_CF_CList_InsertAfter.start, (clist_node)expected_insert_after_start);
     UtAssert_ADDRESS_EQ(context_CF_CList_InsertAfter.after, (clist_node)expected_insert_after_after);
-    UtAssert_True(arg_t->flags.all.q_index == arg_q, "t->flags.all.q_index is %u and should be %u (q)",
-                  arg_t->flags.all.q_index, arg_q);
+    UtAssert_True(arg_t->flags.com.q_index == arg_q, "t->flags.com.q_index is %u and should be %u (q)",
+                  arg_t->flags.com.q_index, arg_q);
 
 } /* end Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q */
 
@@ -939,8 +939,8 @@ void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
     UtAssert_STUB_COUNT(CF_CList_InsertBack, 1);
     UtAssert_ADDRESS_EQ(context_clist_insert_back.head, expected_insert_back_head);
     UtAssert_ADDRESS_EQ(context_clist_insert_back.node, expected_insert_back_node);
-    UtAssert_True(arg_t->flags.all.q_index == arg_q, "t->flags.all.q_index is %u and should be %u (q)",
-                  arg_t->flags.all.q_index, arg_q);
+    UtAssert_True(arg_t->flags.com.q_index == arg_q, "t->flags.com.q_index is %u and should be %u (q)",
+                  arg_t->flags.com.q_index, arg_q);
 
 } /* end Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex */
 

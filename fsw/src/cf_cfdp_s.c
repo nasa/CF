@@ -71,10 +71,10 @@ static inline void CF_CFDP_S_Reset(transaction_t *t)
 *************************************************************************/
 static cfdp_send_ret_t CF_CFDP_S_SendEof(transaction_t *t)
 {
-    if (!t->flags.tx.crc_calc)
+    if (!t->flags.com.crc_calc)
     {
         CF_CRC_Finalize(&t->crc);
-        t->flags.tx.crc_calc = 1;
+        t->flags.com.crc_calc = 1;
     }
     return CF_CFDP_SendEof(t);
 }
@@ -106,8 +106,8 @@ static void CF_CFDP_S1_SubstateSendEof(transaction_t *t)
 *************************************************************************/
 static void CF_CFDP_S2_SubstateSendEof(transaction_t *t)
 {
-    t->state_data.s.sub_state   = SEND_WAIT_FOR_EOF_ACK;
-    t->flags.tx.ack_timer_armed = 1; /* will cause tick to see ack_timer as expired, and act */
+    t->state_data.s.sub_state    = SEND_WAIT_FOR_EOF_ACK;
+    t->flags.com.ack_timer_armed = 1; /* will cause tick to see ack_timer as expired, and act */
 
     /* no longer need to send file data PDU except in the case of NAK response */
 
@@ -596,8 +596,8 @@ static void CF_CFDP_S2_WaitForEofAck(transaction_t *t, const pdu_header_t *ph)
         }
         else
         {
-            t->state_data.s.sub_state   = SEND_WAIT_FOR_FIN;
-            t->flags.tx.ack_timer_armed = 0; /* just wait for fin now, nothing to re-send */
+            t->state_data.s.sub_state    = SEND_WAIT_FOR_FIN;
+            t->flags.com.ack_timer_armed = 0; /* just wait for fin now, nothing to re-send */
         }
     }
     else
@@ -781,7 +781,7 @@ void CF_CFDP_S_Tick(transaction_t *t, int *cont /* unused */)
         {
             CF_Timer_Tick(&t->inactivity_timer);
 
-            if (t->flags.tx.ack_timer_armed)
+            if (t->flags.com.ack_timer_armed)
             {
                 if (CF_Timer_Expired(&t->ack_timer))
                 {

@@ -248,7 +248,7 @@ void CF_InsertSortPrio(transaction_t *t, cf_queue_index_t q)
     {
         CF_CList_InsertBack_Ex(c, q, &t->cl_node);
     }
-    t->flags.all.q_index = q;
+    t->flags.com.q_index = q;
 }
 
 /************************************************************************/

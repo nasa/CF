@@ -180,7 +180,7 @@ void Handler_CF_CFDP_S1_Tx_notCF_Q_TXA_q_index(void *UserObj, UT_EntryKey_t Func
 
     if (UT_GetStubCount(FuncKey) > 1)
     {
-        t->flags.all.q_index = CF_Q_NUM;
+        t->flags.com.q_index = CF_Q_NUM;
     }
 }
 
@@ -346,7 +346,7 @@ void Test_CF_CFDP_ArmAckTimer_Call_CF_Timer_InitRelSec_WithCorrectParamsAndArmsT
     CF_AppData.config_table              = &dummy_config_table;
     CF_AppData.config_table->ack_timer_s = Any_uint32();
 
-    arg_t->flags.all.ack_timer_armed = 0; /* not required but helps show assert */
+    arg_t->flags.com.ack_timer_armed = 0; /* not required but helps show assert */
 
     UT_SetDataBuffer(UT_KEY(CF_Timer_InitRelSec), &context_CF_Timer_InitRelSec, sizeof(context_CF_Timer_InitRelSec),
                      false);
@@ -360,8 +360,8 @@ void Test_CF_CFDP_ArmAckTimer_Call_CF_Timer_InitRelSec_WithCorrectParamsAndArmsT
     UtAssert_True(context_CF_Timer_InitRelSec.rel_sec == CF_AppData.config_table->ack_timer_s,
                   "CF_Timer_InitRelSec received rel_sec %u and should be %u (CF_AppData.config_table->ack_timer_s)",
                   context_CF_Timer_InitRelSec.rel_sec, CF_AppData.config_table->ack_timer_s);
-    UtAssert_True(arg_t->flags.all.ack_timer_armed == 1,
-                  "CF_CFDP_ArmAckTimer set ack_timer_armed to %u and should be 1", arg_t->flags.all.ack_timer_armed);
+    UtAssert_True(arg_t->flags.com.ack_timer_armed == 1,
+                  "CF_CFDP_ArmAckTimer set ack_timer_armed to %u and should be 1", arg_t->flags.com.ack_timer_armed);
 } /* end Test_CF_CFDP_ArmAckTimer_Call_CF_Timer_InitRelSec_WithCorrectParamsAndArmsTimer */
 
 /* end CF_CFDP_ArmAckTimer tests */
@@ -378,7 +378,7 @@ void Test_CF_CFDP_GetClass_AssertsBecause_q_index_IsEqTo_CF_Q_FREE(void)
     // transaction_t   dummy_ti;
     // transaction_t*  arg_ti = &dummy_ti;
 
-    // arg_ti->flags.all.q_index = CF_Q_FREE;
+    // arg_ti->flags.com.q_index = CF_Q_FREE;
 
     // /* Act */
     // //CF_CFDP_GetClass(arg_ti);
@@ -396,7 +396,7 @@ void Test_CF_CFDP_GetClass_WhenNeitherStateIsSet_Return_CLASS_1(void)
     transaction_t *arg_ti = &dummy_ti;
     cfdp_class_t   local_result;
 
-    arg_ti->flags.all.q_index = Any_cf_queue_index_t_Except(CF_Q_FREE);
+    arg_ti->flags.com.q_index = Any_cf_queue_index_t_Except(CF_Q_FREE);
     arg_ti->state = Any_cfdp_state_t_ExceptThese(excepted_states, sizeof(excepted_states) / sizeof(excepted_states[0]));
 
     /* Act */
@@ -414,7 +414,7 @@ void Test_CF_CFDP_GetClass_WhenStateIs_CFDP_S2_Return_CLASS_1(void)
     transaction_t *arg_ti = &dummy_ti;
     cfdp_class_t   local_result;
 
-    arg_ti->flags.all.q_index = Any_cf_queue_index_t_Except(CF_Q_FREE);
+    arg_ti->flags.com.q_index = Any_cf_queue_index_t_Except(CF_Q_FREE);
     arg_ti->state             = CFDP_S2;
 
     /* Act */
@@ -432,7 +432,7 @@ void Test_CF_CFDP_GetClass_WhenStateIs_CFDP_R2_Return_CLASS_1(void)
     transaction_t *arg_ti = &dummy_ti;
     cfdp_class_t   local_result;
 
-    arg_ti->flags.all.q_index = Any_cf_queue_index_t_Except(CF_Q_FREE);
+    arg_ti->flags.com.q_index = Any_cf_queue_index_t_Except(CF_Q_FREE);
     arg_ti->state             = CFDP_R2;
 
     /* Act */
@@ -457,7 +457,7 @@ void Test_CF_CFDP_IsSender_AssertsBecause_q_index_IsEqTo_CF_Q_FREE(void)
     // transaction_t   dummy_ti;
     // transaction_t*  arg_ti = &dummy_ti;
 
-    // arg_ti->flags.all.q_index = CF_Q_FREE;
+    // arg_ti->flags.com.q_index = CF_Q_FREE;
 
     // /* Act */
     // CF_CFDP_IsSender(arg_ti);
@@ -474,7 +474,7 @@ void Test_CF_CFDP_IsSender_WhenNeitherStateIsSetReturn_0_MeaningReciever(void)
     transaction_t *arg_ti = &dummy_ti;
     int            local_result;
 
-    arg_ti->flags.all.q_index = Any_cf_queue_index_t_Except(CF_Q_FREE);
+    arg_ti->flags.com.q_index = Any_cf_queue_index_t_Except(CF_Q_FREE);
     arg_ti->state = Any_cfdp_state_t_ExceptThese(excepted_states, sizeof(excepted_states) / sizeof(excepted_states[0]));
 
     /* Act */
@@ -491,7 +491,7 @@ void Test_CF_CFDP_IsSender_WhenStateIs_CFDP_S1_Return_1_MeaningSender(void)
     transaction_t *arg_ti = &dummy_ti;
     int            local_result;
 
-    arg_ti->flags.all.q_index = Any_cf_queue_index_t_Except(CF_Q_FREE);
+    arg_ti->flags.com.q_index = Any_cf_queue_index_t_Except(CF_Q_FREE);
     arg_ti->state             = CFDP_S1;
 
     /* Act */
@@ -508,7 +508,7 @@ void Test_CF_CFDP_IsSender_WhenStateIs_CFDP_S2_Return_1_MeaningSender(void)
     transaction_t *arg_ti = &dummy_ti;
     int            local_result;
 
-    arg_ti->flags.all.q_index = Any_cf_queue_index_t_Except(CF_Q_FREE);
+    arg_ti->flags.com.q_index = Any_cf_queue_index_t_Except(CF_Q_FREE);
     arg_ti->state             = CFDP_S2;
 
     /* Act */
@@ -1437,7 +1437,7 @@ void Test_CF_CFDP_MsgOutGet_When_outgoing_counter_DoesNotEq_max_outgoing_message
     initial_outgoing_counter = CF_AppData.engine.outgoing_counter;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    arg_t->flags.all.suspended                       = 1;
+    arg_t->flags.com.suspended                       = 1;
 
     /* Act */
     local_result = CF_CFDP_MsgOutGet(arg_t, arg_silent);
@@ -1519,7 +1519,7 @@ void Test_CF_CFDP_MsgOutGet_When_sem_name_0_Is_non0_But_CallTo_OS_CountSemTimedW
     initial_outgoing_counter = CF_AppData.engine.outgoing_counter;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    arg_t->flags.all.suspended                       = 0;
+    arg_t->flags.com.suspended                       = 0;
 
     CF_AppData.config_table->chan[arg_t->chan_num].sem_name[0] = Any_char_Except(0);
     UT_SetDefaultReturnValue(UT_KEY(OS_CountSemTimedWait), Any_int32_Except(OS_SUCCESS));
@@ -1570,7 +1570,7 @@ void Test_CF_CFDP_MsgOutGet_When_sem_name_0_Is_non0_But_CallTo_OS_CountSemTimedW
     initial_outgoing_counter = CF_AppData.engine.outgoing_counter;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    arg_t->flags.all.suspended                       = 0;
+    arg_t->flags.com.suspended                       = 0;
 
     CF_AppData.config_table->chan[arg_t->chan_num].sem_name[0] = Any_char_Except(0);
     UT_SetDefaultReturnValue(UT_KEY(OS_CountSemTimedWait), Any_int32_Except(OS_SUCCESS));
@@ -1616,7 +1616,7 @@ void Test_CF_CFDP_MsgOutGet_When_sem_name_0_Is_non0_Then_CallTo_OS_CountSemTimed
     initial_outgoing_counter = CF_AppData.engine.outgoing_counter;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    arg_t->flags.all.suspended                       = 0;
+    arg_t->flags.com.suspended                       = 0;
 
     CF_AppData.config_table->chan[arg_t->chan_num].sem_name[0] = Any_char_Except(0);
     UT_SetDefaultReturnValue(UT_KEY(OS_CountSemTimedWait), OS_SUCCESS);
@@ -1665,7 +1665,7 @@ void Test_CF_CFDP_MsgOutGet_When_sem_name_0_Is_0_Then_CallTo_OS_CountSemTimedWai
     initial_outgoing_counter = CF_AppData.engine.outgoing_counter;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    arg_t->flags.all.suspended                       = 0;
+    arg_t->flags.com.suspended                       = 0;
 
     CF_AppData.config_table->chan[arg_t->chan_num].sem_name[0] = '\0';
     UT_SetDefaultReturnValue(UT_KEY(OS_CountSemTimedWait), OS_SUCCESS);
@@ -1817,7 +1817,7 @@ void Test_CF_CFDP_ConstructPduHeader_CallTo_CF_CFDP_MsgOutGet_Returns_NULL_DoNot
     CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 0;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    arg_t->flags.all.suspended                       = 0;
+    arg_t->flags.com.suspended                       = 0;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_CountSemTimedWait), Any_uint32_Except(OS_SUCCESS));
 
@@ -1959,8 +1959,8 @@ void Test_CF_CFDP_SendMd_GetNull_pdu_header_Return_CF_SEND_NO_MSG(void)
     CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup =
         CF_AppData.engine.outgoing_counter;
 
-    arg_t->flags.all.q_index =
-        CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures ti->flags.all.q_index!=CF_Q_FREE is never false */
+    arg_t->flags.com.q_index =
+        CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     /* Act */
     local_result = CF_CFDP_SendMd(arg_t);
@@ -1991,11 +1991,11 @@ void Test_CF_CFDP_SendMd_AssertsBecause_state_NotEq_CFDP_S1_Or_CFDP_S2(void)
     // CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup =
     //   CF_AppData.engine.outgoing_counter + 1;
     // CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    // arg_t->flags.all.suspended = 0;
+    // arg_t->flags.com.suspended = 0;
     // CF_AppData.engine.out.msg = (CFE_SB_Buffer_t*)&dummy_msg_out;
 
-    // arg_t->flags.all.q_index = CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures
-    // ti->flags.all.q_index!=CF_Q_FREE is never false */
+    // arg_t->flags.com.q_index = CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures
+    // ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     /* Act */
     // local_result = CF_CFDP_SendMd(arg_t);
@@ -2034,11 +2034,11 @@ void Test_CF_CFDP_SendMd_When_src_len_Eq_sizeof_src_filename_Return_CF_SEND_FAIL
     CF_AppData.engine.outgoing_counter = 0;
     CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 1;
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen                                = 0;
-    arg_t->flags.all.suspended                                                      = 0;
+    arg_t->flags.com.suspended                                                      = 0;
     CF_AppData.engine.out.msg                                                       = &dummy_msg_out.cfe_sb_buffer;
 
-    arg_t->flags.all.q_index =
-        CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures ti->flags.all.q_index!=CF_Q_FREE is never false */
+    arg_t->flags.com.q_index =
+        CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     /* Act */
     local_result = CF_CFDP_SendMd(arg_t);
@@ -2075,11 +2075,11 @@ void Test_CF_CFDP_SendMd_When_dst_len_Eq_sizeof_dst_filename_Return_CF_SEND_FAIL
     CF_AppData.engine.outgoing_counter = 0;
     CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 1;
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen                                = 0;
-    arg_t->flags.all.suspended                                                      = 0;
+    arg_t->flags.com.suspended                                                      = 0;
     CF_AppData.engine.out.msg                                                       = &dummy_msg_out.cfe_sb_buffer;
 
-    arg_t->flags.all.q_index =
-        CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures ti->flags.all.q_index!=CF_Q_FREE is never false */
+    arg_t->flags.com.q_index =
+        CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     /* Act */
     local_result = CF_CFDP_SendMd(arg_t);
@@ -2114,11 +2114,11 @@ void Test_CF_CFDP_SendMd_Returns_CF_SEND_ERROR_CF_CFDP_CopyDataToLv_Returns_neg1
     // CF_AppData.engine.outgoing_counter = 0;
     // CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 1;
     // CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    // arg_t->flags.all.suspended = 0;
+    // arg_t->flags.com.suspended = 0;
     // CF_AppData.engine.out.msg = (CFE_SB_Buffer_t*)&dummy_msg_out;
 
-    // arg_t->flags.all.q_index = CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures
-    // ti->flags.all.q_index!=CF_Q_FREE is never false */
+    // arg_t->flags.com.q_index = CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures
+    // ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     // /* Arrange unstubbable: CF_CFDP_CopyDataToLv */
     // /* no way to arrange it to fail */
@@ -2156,11 +2156,11 @@ void Test_CF_CFDP_SendMd_WhenCallTo_CF_CFDP_CopyDataToLv_Returns_neg1_OnThe_dst_
     // CF_AppData.engine.outgoing_counter = 0;
     // CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 1;
     // CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    // arg_t->flags.all.suspended = 0;
+    // arg_t->flags.com.suspended = 0;
     // CF_AppData.engine.out.msg = (CFE_SB_Buffer_t*)&dummy_msg_out;
 
-    // arg_t->flags.all.q_index = CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures
-    // ti->flags.all.q_index!=CF_Q_FREE is never false */
+    // arg_t->flags.com.q_index = CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures
+    // ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     // /* Arrange for CF_CFDP_CopyDataToLv */
     // /* no way to arrange it to fail */
@@ -2200,11 +2200,11 @@ void Test_CF_CFDP_SendMd_Return_CF_SEND_SUCCESS(void)
     CF_AppData.engine.outgoing_counter = 0;
     CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 1;
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen                                = 0;
-    arg_t->flags.all.suspended                                                      = 0;
+    arg_t->flags.com.suspended                                                      = 0;
     CF_AppData.engine.out.msg                                                       = &dummy_msg_out.cfe_sb_buffer;
 
-    arg_t->flags.all.q_index =
-        CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures ti->flags.all.q_index!=CF_Q_FREE is never false */
+    arg_t->flags.com.q_index =
+        CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     /* Arrange for CF_CFDP_CopyDataToLv */
     /* no way to arrange it to fail - which for success test is fine */
@@ -2332,7 +2332,7 @@ void Test_CF_CFDP_SendEof_Get_NULL_pdu_Return_CF_SEND_NO_MSG(void)
     CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 0;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    arg_t->flags.all.suspended                       = 0;
+    arg_t->flags.com.suspended                       = 0;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_CountSemTimedWait), Any_uint32_Except(OS_SUCCESS));
 
@@ -2365,7 +2365,7 @@ void Test_CF_CFDP_SendEof_SuccessWithNoError(void)
     CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 0;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    arg_t->flags.all.suspended                       = 0;
+    arg_t->flags.com.suspended                       = 0;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_CountSemTimedWait), Any_uint32_Except(OS_SUCCESS));
 
@@ -2398,7 +2398,7 @@ void Test_CF_CFDP_SendEof_SuccessWithError(void)
     CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 0;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    arg_t->flags.all.suspended                       = 0;
+    arg_t->flags.com.suspended                       = 0;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_CountSemTimedWait), Any_uint32_Except(OS_SUCCESS));
 
@@ -2440,7 +2440,7 @@ void Test_CF_CFDP_SendAck_When_CF_CFDP_IsSender_Returns_false_Get_NULL_ph_Return
     arg_t->history          = &dummy_history;
 
     /* Arrange for CF_CFDP_IsSender */
-    arg_t->flags.all.q_index = Any_uint8_LessThan(CF_Q_FREE);
+    arg_t->flags.com.q_index = Any_uint8_LessThan(CF_Q_FREE);
     arg_t->state             = CFDP_DROP; /* ensures false from CF_CFDP_IsSender */
 
     /* Arrange for CF_CFDP_ConstructPduHeader */
@@ -2449,7 +2449,7 @@ void Test_CF_CFDP_SendAck_When_CF_CFDP_IsSender_Returns_false_Get_NULL_ph_Return
     CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 0;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    arg_t->flags.all.suspended                       = 0;
+    arg_t->flags.com.suspended                       = 0;
 
     /* Act */
     local_result = CF_CFDP_SendAck(arg_t, arg_ts, arg_dir_code, arg_cc, arg_peer_eid, arg_tsn);
@@ -2479,7 +2479,7 @@ void Test_CF_CFDP_SendAck_AssertsBecauseGiven_dir_code_Is_Not_PDU_EOF_Or_PDU_FIN
     // arg_t->history = &dummy_history;
 
     // /* Arrange for CF_CFDP_IsSender */
-    // arg_t->flags.all.q_index = Any_uint8_LessThan(CF_Q_FREE);
+    // arg_t->flags.com.q_index = Any_uint8_LessThan(CF_Q_FREE);
     // arg_t->state = CFDP_S1; /* ensures true from CF_CFDP_IsSender */
 
     // /* Arrange for CF_CFDP_ConstructPduHeader */
@@ -2488,7 +2488,7 @@ void Test_CF_CFDP_SendAck_AssertsBecauseGiven_dir_code_Is_Not_PDU_EOF_Or_PDU_FIN
     // CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 0;
 
     // CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    // arg_t->flags.all.suspended = 0;
+    // arg_t->flags.com.suspended = 0;
 
     // /* Act */
     // local_result = CF_CFDP_SendAck(arg_t, arg_ts, arg_dir_code, arg_cc, arg_peer_eid, arg_tsn);
@@ -2522,7 +2522,7 @@ void Test_CF_CFDP_SendAck_WhenGiven_dir_code_Is_PDU_EOF_And_CF_CFDP_IsSender_Ret
     arg_t->history          = &dummy_history;
 
     /* Arrange for CF_CFDP_IsSender */
-    arg_t->flags.all.q_index = Any_uint8_LessThan(CF_Q_FREE);
+    arg_t->flags.com.q_index = Any_uint8_LessThan(CF_Q_FREE);
     arg_t->state             = CFDP_S1; /* ensures true from CF_CFDP_IsSender */
 
     /* Arrange for CF_CFDP_ConstructPduHeader */
@@ -2531,7 +2531,7 @@ void Test_CF_CFDP_SendAck_WhenGiven_dir_code_Is_PDU_EOF_And_CF_CFDP_IsSender_Ret
     CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 0;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    arg_t->flags.all.suspended                       = 0;
+    arg_t->flags.com.suspended                       = 0;
 
     /* Act */
     local_result = CF_CFDP_SendAck(arg_t, arg_ts, arg_dir_code, arg_cc, arg_peer_eid, arg_tsn);
@@ -2565,7 +2565,7 @@ void Test_CF_CFDP_SendAck_WhenGiven_dir_code_Is_PDU_FIN_And_CF_CFDP_IsSender_Ret
     arg_t->history          = &dummy_history;
 
     /* Arrange for CF_CFDP_IsSender */
-    arg_t->flags.all.q_index = Any_uint8_LessThan(CF_Q_FREE);
+    arg_t->flags.com.q_index = Any_uint8_LessThan(CF_Q_FREE);
     arg_t->state             = CFDP_S1; /* ensures true from CF_CFDP_IsSender */
 
     /* Arrange for CF_CFDP_ConstructPduHeader */
@@ -2574,7 +2574,7 @@ void Test_CF_CFDP_SendAck_WhenGiven_dir_code_Is_PDU_FIN_And_CF_CFDP_IsSender_Ret
     CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 0;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    arg_t->flags.all.suspended                       = 0;
+    arg_t->flags.com.suspended                       = 0;
 
     /* Act */
     local_result = CF_CFDP_SendAck(arg_t, arg_ts, arg_dir_code, arg_cc, arg_peer_eid, arg_tsn);
@@ -2617,7 +2617,7 @@ void Test_CF_CFDP_SendFin_Get_NULL_ph_Return_CF_SEND_NO_MSG(void)
     CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 0;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    arg_t->flags.all.suspended                       = 0;
+    arg_t->flags.com.suspended                       = 0;
 
     /* Act */
     local_result = CF_CFDP_SendFin(arg_t, arg_dc, arg_fs, arg_cc);
@@ -2651,7 +2651,7 @@ void Test_CF_CFDP_SendFin_Given_cc_NotEqTo_CC_NO_ERROR_GetNull_ph_Return_CF_SEND
     CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 0;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    arg_t->flags.all.suspended                       = 0;
+    arg_t->flags.com.suspended                       = 0;
 
     /* Act */
     local_result = CF_CFDP_SendFin(arg_t, arg_dc, arg_fs, arg_cc);
@@ -2687,7 +2687,7 @@ void Test_CF_CFDP_SendFin_Given_cc_EqTo_CC_NO_ERROR_GetNull_ph_Return_CF_SEND_SU
     CF_AppData.config_table->chan[arg_t->chan_num].max_outgoing_messages_per_wakeup = 0;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].frozen = 0;
-    arg_t->flags.all.suspended                       = 0;
+    arg_t->flags.com.suspended                       = 0;
 
     /* Act */
     local_result = CF_CFDP_SendFin(arg_t, arg_dc, arg_fs, arg_cc);
@@ -2738,7 +2738,7 @@ void Test_CF_CFDP_SendNak_AssertsBecause_CF_CFDP_GetClass_With_t_Eq_CLASS_2(void
     // CF_AppData.engine.out.msg = (CFE_SB_Buffer_t*)&dummy_nak;
 
     // /* Arrange for CF_CFDP_GetClass */
-    // arg_t->flags.all.q_index = Any_uint8_LessThan(CF_Q_FREE);
+    // arg_t->flags.com.q_index = Any_uint8_LessThan(CF_Q_FREE);
     // arg_t->state = CFDP_S1; /* ensures failre */
 
     // /* Act */
@@ -2774,7 +2774,7 @@ void Test_CF_CFDP_SendNak_Success_Return_CF_SEND_SUCCESS(void)
     arg_t->chan_num = dummy_chan_num;
 
     /* Arrange for CF_CFDP_GetClass */
-    arg_t->flags.all.q_index = CF_Q_PEND;
+    arg_t->flags.com.q_index = CF_Q_PEND;
     arg_t->state             = CFDP_S2; /* ensures pass */
 
     /* Act */
@@ -4124,8 +4124,8 @@ void Test_CF_CFDP_RecvIdle_CheckOf_PDU_HDR_FLAGS_TYPE_Is_true_And_PDU_HDR_FLAGS_
 
     /* Special arrange for CF_Timer_InitRelSec to change t->state value within call to CF_CFDP_DispatchRecv */
     UT_SetHandlerFunction(UT_KEY(CF_Timer_InitRelSec), Handler_CF_Timer_InitRelSec_Change_t_state_To_CFDP_IDLE, arg_t);
-    arg_t->flags.all.q_index                                                   = 0;
-    CF_AppData.hk.channel_hk[arg_t->chan_num].q_size[arg_t->flags.all.q_index] = 1;
+    arg_t->flags.com.q_index                                                   = 0;
+    CF_AppData.hk.channel_hk[arg_t->chan_num].q_size[arg_t->flags.com.q_index] = 1;
 
     arg_t->history->dir = CF_DIR_TX;
     arg_t->p            = NULL; /* arg_t->p = NULL bypasses an unnecessary branch */
@@ -5939,7 +5939,7 @@ void Test_CF_CFDP_CycleTx__Given_node_TransactionContainer_t_flags_all_suspended
     void                  *arg_context = (void *)&dummy_args;
     int                    local_result;
 
-    dummy_t.flags.all.suspended = true;
+    dummy_t.flags.com.suspended = true;
 
     /* Act */
     local_result = CF_CFDP_CycleTx_(arg_clist_node, arg_context);
@@ -5957,15 +5957,15 @@ void Test_CF_CFDP_CycleTx__AssertsBecauseGiven_node_TransactionContainer_t_flags
     // void*                   arg_context = (void*)&dummy_args;
     // int                     local_result;
 
-    // dummy_t.flags.all.suspended = false;
+    // dummy_t.flags.com.suspended = false;
 
-    // dummy_t.flags.all.q_index = Any_uint8_Except(CF_Q_TXA);
+    // dummy_t.flags.com.q_index = Any_uint8_Except(CF_Q_TXA);
 
     // /* Act */
     // local_result = CF_CFDP_CycleTx_(arg_clist_node, arg_context);
 
     // /* Assert */
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - t->flags.all.q_index==CF_Q_TXA");
+    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - t->flags.com.q_index==CF_Q_TXA");
 } /* end Test_CF_CFDP_CycleTx__AssertsBecauseGiven_node_TransactionContainer_t_flags_all_q_index_IsNotEqTo_CF_Q_TXA */
 
 void Test_CF_CFDP_CycleTx__Given_node_TransactionContainer_t_flags_all_q_index_IsEqTo_CF_Q_TXA_And_args_c_cur_Is_notNULL_Sets_args_ran_one_To_1_ThenReturn_1(
@@ -5980,9 +5980,9 @@ void Test_CF_CFDP_CycleTx__Given_node_TransactionContainer_t_flags_all_q_index_I
     void                  *arg_context = (void *)&dummy_args;
     int                    local_result;
 
-    dummy_t.flags.all.suspended = false;
+    dummy_t.flags.com.suspended = false;
 
-    dummy_t.flags.all.q_index = CF_Q_TXA;
+    dummy_t.flags.com.q_index = CF_Q_TXA;
 
     dummy_c.cur  = &dummy_cur;
     dummy_args.c = &dummy_c;
@@ -6012,9 +6012,9 @@ void Test_CF_CFDP_CycleTx__Given_node_TransactionContainer_t_flags_all_q_index_I
     void                  *arg_context = (void *)&dummy_args;
     int                    local_result;
 
-    dummy_t.flags.all.suspended = false;
+    dummy_t.flags.com.suspended = false;
 
-    dummy_t.flags.all.q_index = CF_Q_TXA;
+    dummy_t.flags.com.q_index = CF_Q_TXA;
 
     dummy_c.cur  = NULL;
     dummy_args.c = &dummy_c;
@@ -6052,9 +6052,9 @@ void Test_CF_CFDP_CycleTx__Given_node_TransactionContainer_t_flags_all_q_index_I
     void                  *arg_context = (void *)&dummy_args;
     int                    local_result;
 
-    dummy_t.flags.all.suspended = false;
+    dummy_t.flags.com.suspended = false;
 
-    dummy_t.flags.all.q_index = CF_Q_TXA;
+    dummy_t.flags.com.q_index = CF_Q_TXA;
 
     dummy_c.cur  = NULL;
     dummy_args.c = &dummy_c;
@@ -6094,9 +6094,9 @@ void Test_CF_CFDP_CycleTx_Given_node_TransactionContainer_t_flags_all_q_index_Is
     void                  *arg_context = (void *)&dummy_args;
     int                    local_result;
 
-    dummy_t.flags.all.suspended = false;
+    dummy_t.flags.com.suspended = false;
 
-    dummy_t.flags.all.q_index = CF_Q_TXA;
+    dummy_t.flags.com.q_index = CF_Q_TXA;
 
     dummy_c.cur  = NULL;
     dummy_args.c = &dummy_c;
@@ -6255,7 +6255,7 @@ void Test_CF_CFDP_CycleTx_EnterWhileLoopOnceAndCall_cf_move_transaction_SecondCa
     /* Arrange for cf_move_transaction */
     dummy_cur.chan_num = Any_cf_chan_num();
 
-    CF_AppData.hk.channel_hk[dummy_cur.chan_num].q_size[dummy_cur.flags.all.q_index] = 1; /* 1 for non zero */
+    CF_AppData.hk.channel_hk[dummy_cur.chan_num].q_size[dummy_cur.flags.com.q_index] = 1; /* 1 for non zero */
 
     /* Act */
     CF_CFDP_CycleTx(arg_c);
@@ -6314,7 +6314,7 @@ void Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_IsNull_But_t_flags_
     dummy_args.c      = &dummy_c;
     dummy_args.c->cur = NULL;
 
-    dummy_t.flags.all.suspended = true;
+    dummy_t.flags.com.suspended = true;
 
     /* Act */
     local_result = CF_CFDP_DoTick(arg_node, arg_context);
@@ -6340,7 +6340,7 @@ void Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_Is_t_But_t_flags_al
     dummy_args.c      = &dummy_c;
     dummy_args.c->cur = &dummy_t;
 
-    dummy_t.flags.all.suspended = true;
+    dummy_t.flags.com.suspended = true;
 
     /* Act */
     local_result = CF_CFDP_DoTick(arg_node, arg_context);
@@ -6367,7 +6367,7 @@ void Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_Is_t_And_t_flags_al
     dummy_args.c      = &dummy_c;
     dummy_args.c->cur = &dummy_t;
 
-    dummy_t.flags.all.suspended = false;
+    dummy_t.flags.com.suspended = false;
 
     dummy_args.fn = (void (*)(transaction_t *, int *))Dummy_tick_args_t_fn;
 
@@ -6402,7 +6402,7 @@ void Test_CF_CFDP_DoTick_Given_context_Determined_args_c_cur_Is_t_And_t_flags_al
     dummy_args.c      = &dummy_c;
     dummy_args.c->cur = &dummy_t;
 
-    dummy_t.flags.all.suspended = false;
+    dummy_t.flags.com.suspended = false;
 
     dummy_args.fn = (void (*)(transaction_t *, int *))Dummy_tick_args_t_fn;
 
@@ -8057,8 +8057,8 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_true_Call_C
     arg_t->fd = Any_uint32_Except(0); /* Any_uint32_Except(0) causes OS_ObjectIdDefined (non 0 != 0) to return true */
 
     /* Arrange for CF_CFDP_GetClass */
-    arg_t->flags.all.q_index =
-        CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures ti->flags.all.q_index!=CF_Q_FREE is never false */
+    arg_t->flags.com.q_index =
+        CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     /* Act */
     CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
@@ -8106,7 +8106,7 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_true_Call_C
     arg_t->fd = Any_uint32_Except(0); /* Any_uint32_Except(0) causes OS_ObjectIdDefined (non 0 != 0) to return true */
 
     /* Arrange for CF_CFDP_IsSender */
-    arg_t->flags.all.q_index = CF_Q_RX; /* bypass CF_Assert */
+    arg_t->flags.com.q_index = CF_Q_RX; /* bypass CF_Assert */
 
     arg_t->state = CFDP_R1; /* arg_t->state = CFDP_R1 forces 0 return */
 
@@ -8159,7 +8159,7 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_true_Call_C
     arg_t->fd = Any_uint32_Except(0); /* Any_uint32_Except(0) causes OS_ObjectIdDefined (non 0 != 0) to return true */
 
     /* Arrange for CF_CFDP_IsSender */
-    arg_t->flags.all.q_index = CF_Q_RX; /* bypass CF_Assert */
+    arg_t->flags.com.q_index = CF_Q_RX; /* bypass CF_Assert */
 
     arg_t->state = CFDP_S1; /* arg_t->state = CFDP_S1 forces non 0 return */
 
@@ -8203,8 +8203,8 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_false_And_t
     arg_t->fd = 0; /* arg_t->fd = 0 causes OS_ObjectIdDefined (0 != 0) to return false */
 
     /* Arrange for CF_CFDP_GetClass */
-    arg_t->flags.all.q_index =
-        CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures ti->flags.all.q_index!=CF_Q_FREE is never false */
+    arg_t->flags.com.q_index =
+        CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     /* Act */
     CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
@@ -8243,8 +8243,8 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_false_And_t
     arg_t->fd = 0; /* arg_t->fd = 0 causes OS_ObjectIdDefined (0 != 0) to return false */
 
     /* Arrange for CF_CFDP_GetClass */
-    arg_t->flags.all.q_index =
-        CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures ti->flags.all.q_index!=CF_Q_FREE is never false */
+    arg_t->flags.com.q_index =
+        CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     /* Act */
     CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
@@ -8287,8 +8287,8 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_false_And_t
     arg_t->fd = 0; /* arg_t->fd = 0 causes OS_ObjectIdDefined (0 != 0) to return false */
 
     /* Arrange for CF_CFDP_GetClass */
-    arg_t->flags.all.q_index =
-        CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures ti->flags.all.q_index!=CF_Q_FREE is never false */
+    arg_t->flags.com.q_index =
+        CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     /* Act */
     CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
@@ -8332,8 +8332,8 @@ void Test_CF_CFDP_ResetTransaction_AssertsBecause_c_num_cmd_tx_Is_0(void)
     // arg_t->fd = 0; /* arg_t->fd = 0 causes OS_ObjectIdDefined (0 != 0) to return false */
 
     // /* Arrange for CF_CFDP_GetClass */
-    // arg_t->flags.all.q_index = CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures
-    // ti->flags.all.q_index!=CF_Q_FREE is never false */
+    // arg_t->flags.com.q_index = CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures
+    // ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     // /* Act */
     // CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
@@ -8379,8 +8379,8 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_false_And_t
     arg_t->fd = 0; /* arg_t->fd = 0 causes OS_ObjectIdDefined (0 != 0) to return false */
 
     /* Arrange for CF_CFDP_GetClass */
-    arg_t->flags.all.q_index =
-        CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures ti->flags.all.q_index!=CF_Q_FREE is never false */
+    arg_t->flags.com.q_index =
+        CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     /* Act */
     CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
@@ -8426,8 +8426,8 @@ void Test_CF_CFDP_ResetTransaction_AssertsBecause_t_p_num_ts_Is_0(void)
     // arg_t->fd = 0; /* arg_t->fd = 0 causes OS_ObjectIdDefined (0 != 0) to return false */
 
     // /* Arrange for CF_CFDP_GetClass */
-    // arg_t->flags.all.q_index = CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures
-    // ti->flags.all.q_index!=CF_Q_FREE is never false */
+    // arg_t->flags.com.q_index = CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures
+    // ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     // /* Act */
     // CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
@@ -8475,8 +8475,8 @@ void Test_CF_CFDP_ResetTransaction_CallTo_OS_ObjectIdDefined_Returns_false_And_t
     arg_t->fd = 0; /* arg_t->fd = 0 causes OS_ObjectIdDefined (0 != 0) to return false */
 
     /* Arrange for CF_CFDP_GetClass */
-    arg_t->flags.all.q_index =
-        CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures ti->flags.all.q_index!=CF_Q_FREE is never false */
+    arg_t->flags.com.q_index =
+        CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     /* Act */
     CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
@@ -8518,8 +8518,8 @@ void Test_CF_CFDP_ResetTransaction_AssertsBecause_t_history_dir_IsNeither_CF_DIR
     // arg_t->fd = 0; /* arg_t->fd = 0 causes OS_ObjectIdDefined (0 != 0) to return false */
 
     // /* Arrange for CF_CFDP_GetClass */
-    // arg_t->flags.all.q_index = CF_Q_PEND; /* arg_t->flags.all.q_index = CF_Q_PEND ensures
-    // ti->flags.all.q_index!=CF_Q_FREE is never false */
+    // arg_t->flags.com.q_index = CF_Q_PEND; /* arg_t->flags.com.q_index = CF_Q_PEND ensures
+    // ti->flags.com.q_index!=CF_Q_FREE is never false */
 
     // /* Act */
     // CF_CFDP_ResetTransaction(arg_t, arg_keep_history);
@@ -8685,7 +8685,7 @@ void Test_CF_CFDP_CancelTransaction_DoesNothingBecause_flags_all_cancelled_IsAlr
     transaction_t *context_CF_CFDP_R_Cancel;
     transaction_t *context_CF_CFDP_S_Cancel;
 
-    arg_t->flags.all.canceled = 1; /* 1 = true */
+    arg_t->flags.com.canceled = 1; /* 1 = true */
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_R_Cancel), &context_CF_CFDP_R_Cancel, sizeof(context_CF_CFDP_R_Cancel), false);
     UT_SetDataBuffer(UT_KEY(CF_CFDP_S_Cancel), &context_CF_CFDP_S_Cancel, sizeof(context_CF_CFDP_S_Cancel), false);
@@ -8696,8 +8696,8 @@ void Test_CF_CFDP_CancelTransaction_DoesNothingBecause_flags_all_cancelled_IsAlr
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_R_Cancel, 0);
     UtAssert_STUB_COUNT(CF_CFDP_S_Cancel, 0);
-    UtAssert_True(arg_t->flags.all.canceled == 1, "t->flags.all.canceled is %d and should not have changed from 1",
-                  arg_t->flags.all.canceled);
+    UtAssert_True(arg_t->flags.com.canceled == 1, "t->flags.com.canceled is %d and should not have changed from 1",
+                  arg_t->flags.com.canceled);
 
 } /* end Test_CF_CFDP_CancelTransaction_DoesNothingBecause_flags_all_cancelled_IsAlreadyTrue */
 
@@ -8709,7 +8709,7 @@ void Test_CF_CFDP_CancelTransaction_Because_flags_all_canceled_IsFalse_CancelesT
     transaction_t *arg_t = &dummy_t;
     transaction_t *context_CF_CFDP_S_Cancel;
 
-    arg_t->flags.all.canceled = 0; /* 0 = false */
+    arg_t->flags.com.canceled = 0; /* 0 = false */
     arg_t->history            = &dummy_history;
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_S_Cancel), &context_CF_CFDP_S_Cancel, sizeof(context_CF_CFDP_S_Cancel), false);
@@ -8717,7 +8717,7 @@ void Test_CF_CFDP_CancelTransaction_Because_flags_all_canceled_IsFalse_CancelesT
     /* Arrange unstubbable: CF_CFDP_IsSender */
     uint8 send_states[2] = {CFDP_S1, CFDP_S2};
 
-    arg_t->flags.all.q_index = Any_uint8_LessThan(CF_Q_FREE); /* removes CF_Q_NUM by design */
+    arg_t->flags.com.q_index = Any_uint8_LessThan(CF_Q_FREE); /* removes CF_Q_NUM by design */
     arg_t->state             = Any_uint8_FromThese(send_states, sizeof(send_states));
 
     /* Act */
@@ -8727,8 +8727,8 @@ void Test_CF_CFDP_CancelTransaction_Because_flags_all_canceled_IsFalse_CancelesT
     UtAssert_STUB_COUNT(CF_CFDP_R_Cancel, 0);
     UtAssert_STUB_COUNT(CF_CFDP_S_Cancel, 1);
     UtAssert_ADDRESS_EQ(context_CF_CFDP_S_Cancel, arg_t);
-    UtAssert_True(arg_t->flags.all.canceled == 1, "t->flags.all.canceled is %d and should not have changed from 1",
-                  arg_t->flags.all.canceled);
+    UtAssert_True(arg_t->flags.com.canceled == 1, "t->flags.com.canceled is %d and should not have changed from 1",
+                  arg_t->flags.com.canceled);
 
 } /* end Test_CF_CFDP_CancelTransaction_Because_flags_all_canceled_IsFalse_CancelesTransaction_t_When_t_IsSender */
 
@@ -8740,7 +8740,7 @@ void Test_CF_CFDP_CancelTransaction_Because_flags_all_canceled_IsFalse_CancelesT
     transaction_t *arg_t = &dummy_t;
     transaction_t *context_CF_CFDP_R_Cancel;
 
-    arg_t->flags.all.canceled = 0; /* 0 = false */
+    arg_t->flags.com.canceled = 0; /* 0 = false */
     arg_t->history            = &dummy_history;
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_R_Cancel), &context_CF_CFDP_R_Cancel, sizeof(context_CF_CFDP_R_Cancel), false);
@@ -8748,7 +8748,7 @@ void Test_CF_CFDP_CancelTransaction_Because_flags_all_canceled_IsFalse_CancelesT
     /* Arrange unstubbable: CF_CFDP_IsSender */
     uint8 non_send_states[2] = {CFDP_S1, CFDP_S2};
 
-    arg_t->flags.all.q_index = Any_uint8_LessThan(CF_Q_FREE); /* removes CF_Q_NUM by design */
+    arg_t->flags.com.q_index = Any_uint8_LessThan(CF_Q_FREE); /* removes CF_Q_NUM by design */
     arg_t->state             = Any_uint8_ExceptThese(non_send_states, sizeof(non_send_states));
 
     /* Act */
@@ -8758,8 +8758,8 @@ void Test_CF_CFDP_CancelTransaction_Because_flags_all_canceled_IsFalse_CancelesT
     UtAssert_STUB_COUNT(CF_CFDP_R_Cancel, 1);
     UtAssert_ADDRESS_EQ(context_CF_CFDP_R_Cancel, arg_t);
     UtAssert_STUB_COUNT(CF_CFDP_S_Cancel, 0);
-    UtAssert_True(arg_t->flags.all.canceled == 1, "t->flags.all.canceled is %d and should not have changed from 1",
-                  arg_t->flags.all.canceled);
+    UtAssert_True(arg_t->flags.com.canceled == 1, "t->flags.com.canceled is %d and should not have changed from 1",
+                  arg_t->flags.com.canceled);
 
 } /* end Test_CF_CFDP_CancelTransaction_Because_flags_all_canceled_IsFalse_CancelesTransaction_t_When_t_IsNotSender */
 
