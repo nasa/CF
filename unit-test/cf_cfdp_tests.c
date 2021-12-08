@@ -4673,7 +4673,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTO_CF_CFDP_RecvPh_Returns_non0_Set_CF_AppDa
     CF_AppData.config_table                                                  = &dummy_config_table;
     CF_AppData.config_table->chan[dummy_chan_num].rx_max_messages_per_wakeup = 1; /* 1 forces for loop to run */
 
-    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), Any_CFE_Status_t_Except(CFE_SB_NO_MESSAGE));
+    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), CFE_SUCCESS);
 
     CF_AppData.engine.in.msg = (CFE_SB_Buffer_t *)&dummy_msg;
 
@@ -4711,7 +4711,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_CF_CFDP_FindTransactionBySequenceNumber_
     CF_AppData.config_table                                                  = &dummy_config_table;
     CF_AppData.config_table->chan[dummy_chan_num].rx_max_messages_per_wakeup = 1; /* 1 forces for loop to run */
 
-    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), Any_CFE_Status_t_Except(CFE_SB_NO_MESSAGE));
+    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), CFE_SUCCESS);
 
     CF_AppData.engine.in.msg = (CFE_SB_Buffer_t *)&dummy_msg;
 
@@ -4864,7 +4864,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_src_And_dst_AreNot_config_table_local_ei
     CF_AppData.config_table                                                  = &dummy_config_table;
     CF_AppData.config_table->chan[dummy_chan_num].rx_max_messages_per_wakeup = 1; /* 1 forces for loop to run */
 
-    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), Any_CFE_Status_t_Except(CFE_SB_NO_MESSAGE));
+    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), CFE_SUCCESS);
 
     CF_AppData.engine.in.msg           = (CFE_SB_Buffer_t *)&dummy_msg;
     CF_AppData.config_table->local_eid = Any_uint8(); /*TODO: change to any_cf_entity_id_t */
@@ -4956,7 +4956,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_Then_CallTo_FGV_Returns_non0_And_dst_IsN
     CF_AppData.config_table                                                  = &dummy_config_table;
     CF_AppData.config_table->chan[dummy_chan_num].rx_max_messages_per_wakeup = 1; /* 1 forces for loop to run */
 
-    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), Any_CFE_Status_t_Except(CFE_SB_NO_MESSAGE));
+    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), CFE_SUCCESS);
 
     CF_AppData.engine.in.msg           = (CFE_SB_Buffer_t *)&dummy_msg;
     CF_AppData.config_table->local_eid = Any_uint8();                        /*TODO: change to any_cf_entity_id_t */
@@ -5053,7 +5053,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_Then_bytes_received_IsLessThanExpected_A
     CF_AppData.config_table                                                  = &dummy_config_table;
     CF_AppData.config_table->chan[dummy_chan_num].rx_max_messages_per_wakeup = 1; /* 1 forces for loop to run */
 
-    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), Any_CFE_Status_t_Except(CFE_SB_NO_MESSAGE));
+    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), CFE_SUCCESS);
 
     CF_AppData.engine.in.msg           = (CFE_SB_Buffer_t *)&dummy_msg;
     CF_AppData.config_table->local_eid = Any_uint8();                        /*TODO: change to any_cf_entity_id_t */
@@ -5147,7 +5147,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_Then_directive_code_IsNotEqTo_PDU_FIN_An
     CF_AppData.config_table                                                  = &dummy_config_table;
     CF_AppData.config_table->chan[dummy_chan_num].rx_max_messages_per_wakeup = 1; /* 1 forces for loop to run */
 
-    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), Any_CFE_Status_t_Except(CFE_SB_NO_MESSAGE));
+    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), CFE_SUCCESS);
 
     CF_AppData.engine.in.msg           = (CFE_SB_Buffer_t *)&dummy_msg;
     CF_AppData.config_table->local_eid = Any_uint8();                        /*TODO: change to any_cf_entity_id_t */
@@ -5242,7 +5242,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_Then_CallTo_CF_CFDP_RecvFin_Returns_neg1
     CF_AppData.config_table                                                  = &dummy_config_table;
     CF_AppData.config_table->chan[dummy_chan_num].rx_max_messages_per_wakeup = 1; /* 1 forces for loop to run */
 
-    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), Any_CFE_Status_t_Except(CFE_SB_NO_MESSAGE));
+    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), CFE_SUCCESS);
 
     CF_AppData.engine.in.msg           = (CFE_SB_Buffer_t *)&dummy_msg;
     CF_AppData.config_table->local_eid = Any_uint8();                        /*TODO: change to any_cf_entity_id_t */
@@ -5333,7 +5333,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_Then_CallTo_CF_CFDP_RecvFin_Returns_0_In
     CF_AppData.config_table                                                  = &dummy_config_table;
     CF_AppData.config_table->chan[dummy_chan_num].rx_max_messages_per_wakeup = 1; /* 1 forces for loop to run */
 
-    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), Any_CFE_Status_t_Except(CFE_SB_NO_MESSAGE));
+    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), CFE_SUCCESS);
 
     CF_AppData.engine.in.msg           = (CFE_SB_Buffer_t *)&dummy_msg;
     CF_AppData.config_table->local_eid = Any_uint8();                        /*TODO: change to any_cf_entity_id_t */
@@ -5432,7 +5432,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_Then_CallTo_CF_CFDP_RecvFin_Returns_0_Ca
     CF_AppData.config_table                                                  = &dummy_config_table;
     CF_AppData.config_table->chan[dummy_chan_num].rx_max_messages_per_wakeup = 1; /* 1 forces for loop to run */
 
-    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), Any_CFE_Status_t_Except(CFE_SB_NO_MESSAGE));
+    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), CFE_SUCCESS);
 
     CF_AppData.engine.in.msg           = (CFE_SB_Buffer_t *)&dummy_msg;
     CF_AppData.config_table->local_eid = Any_uint8();                        /*TODO: change to any_cf_entity_id_t */
@@ -5718,7 +5718,7 @@ void Test_2CF_CFDP_ReceiveMessage_CallTo_src_IsNotEqTo_config_table_local_eid_Bu
     CF_AppData.config_table                                                  = &dummy_config_table;
     CF_AppData.config_table->chan[dummy_chan_num].rx_max_messages_per_wakeup = 1; /* 1 forces for loop to run */
 
-    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), Any_CFE_Status_t_Except(CFE_SB_NO_MESSAGE));
+    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), CFE_SUCCESS);
 
     CF_AppData.engine.in.msg           = &dummy_msg;
     CF_AppData.config_table->local_eid = Any_uint8(); /*TODO: change to any_cf_entity_id_t */
