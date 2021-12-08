@@ -1903,7 +1903,7 @@ void Test_CF_strnlen_When_end_IsNot_NULL_ReturnLengthOfGiven_s(void)
 {
     /* Arrange */
     const char arg_s[7]        = "NO NULL";
-    size_t     arg_maxlen      = 8; /* 256 is arbitrary and used for small size */
+    size_t     arg_maxlen      = 7; /* 256 is arbitrary and used for small size */
     size_t     expected_length = 7;
     size_t     local_result;
 
