@@ -419,7 +419,10 @@ uint32 Any_uint32_BetweenExcludeMax(uint32 min, uint32 max)
     uint32 difference = max - min;
 
     /* check that rand % 0 does not happen */
-    assert(difference != 0);
+    if (difference == 0)
+    {
+        UtAssert_Abort(__func__);
+    }
 
     return (uint32)((rand() % difference) + min);
 }
@@ -766,8 +769,7 @@ CFE_MSG_Size_t Any_CFE_MSG_Size_t_LessThan(size_t ceiling)
     switch (sizeof(CFE_MSG_Size_t))
     {
         case 8:
-            UtPrintf("Implementation of Any_uint64_LessThan pending");
-            assert(ERROR_RETRIEVING_ANY_VALUE); /* rand_val = (CFE_MSG_Size_t) Any_uint64_LessThan(ceiling); */
+            UtAssert_Abort("Implementation of Any_uint64_LessThan pending");
             break;
         case 4:
             rand_val = (CFE_MSG_Size_t)Any_uint32_LessThan(ceiling);
@@ -799,8 +801,8 @@ CFE_SB_MsgId_t Any_MsgId(void)
             return Any_uint16();
 
         default:
-            UtPrintf("Any_MsgId_ExceptThese unimplemented sizeof(CFE_SB_MsgId_t) = %lu", msg_id_size);
-            assert(ERROR_RETRIEVING_ANY_VALUE);
+            UtAssert_Failed("Any_MsgId_ExceptThese unimplemented sizeof(CFE_SB_MsgId_t) = %lu", msg_id_size);
+            UtAssert_Abort(__func__);
     }
 
     return (CFE_SB_MsgId_t)UT_UINT_16_DEFAULT; /* default for switch(msg_id_size) will always assert, this should not be
@@ -820,8 +822,8 @@ CFE_SB_MsgId_t Any_MsgId_ExceptThese(CFE_SB_MsgId_t exceptions[], uint8 num_exce
             return Any_uint16_ExceptThese((uint16 *)exceptions, num_exceptions);
 
         default:
-            UtPrintf("Any_MsgId_ExceptThese unimplemented sizeof(CFE_SB_MsgId_t) = %lu", msg_id_size);
-            assert(ERROR_RETRIEVING_ANY_VALUE);
+            UtAssert_Failed("Any_MsgId_ExceptThese unimplemented sizeof(CFE_SB_MsgId_t) = %lu", msg_id_size);
+            UtAssert_Abort(__func__);
     }
 
     return (CFE_SB_MsgId_t)UT_UINT_16_DEFAULT; /* default for switch(msg_id_size) will always assert, this should not be
