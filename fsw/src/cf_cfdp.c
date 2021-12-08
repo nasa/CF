@@ -398,7 +398,7 @@ pdu_header_t *CF_CFDP_MsgOutGet(const transaction_t *t, int silent)
                                                 (OS_CountSemTimedWait(c->sem_id, 0) == OS_SUCCESS)) ||
                                                (!CF_AppData.config_table->chan[t->chan_num].sem_name[0])))
             {
-                CF_AppData.engine.out.msg = CFE_SB_AllocateMessageBuffer(CF_MAX_PDU_SIZE);
+                CF_AppData.engine.out.msg = CFE_SB_AllocateMessageBuffer(offsetof(pdu_s_msg_t, ph) + CF_MAX_PDU_SIZE);
             }
 
             if (!CF_AppData.engine.out.msg)
