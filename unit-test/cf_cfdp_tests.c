@@ -8826,7 +8826,7 @@ void Test_CF_CFDP_DisableEngine_ClosesAllActiveFilesAndNoOpenPlaybackDirectories
     for (ci = 0; ci < CF_NUM_CHANNELS; ++ci)
     {
         dummy_channel[ci]       = CF_AppData.engine.channels + ci;
-        dummy_channel[ci]->pipe = Any_uint8();
+        dummy_channel[ci]->pipe = CFE_SB_PIPEID_C(CFE_ResourceId_FromInteger(1 + ci));
         for (qi = 0; qi < num_clist_node_ptrs; ++qi)
         {
             (CF_AppData.engine.channels + ci)->qs[qs_index[qi]] = malloc(sizeof(clist_node));
@@ -8916,7 +8916,7 @@ void Test_CF_CFDP_DisableEngine_ClosesAllActiveFilesAndAnyOpenPlaybackDirectorie
     for (ci = 0; ci < CF_NUM_CHANNELS; ++ci)
     {
         dummy_channel[ci]       = CF_AppData.engine.channels + ci;
-        dummy_channel[ci]->pipe = Any_uint8();
+        dummy_channel[ci]->pipe = CFE_SB_PIPEID_C(CFE_ResourceId_FromInteger(1 + ci));
         for (qi = 0; qi < num_clist_node_ptrs; ++qi)
         {
             (CF_AppData.engine.channels + ci)->qs[qs_index[qi]] = malloc(sizeof(clist_node));
@@ -9023,7 +9023,7 @@ void Test_CF_CFDP_DisableEngine_ClosesAllActiveFilesAndAllOpenPlaybackDirectorie
     for (ci = 0; ci < CF_NUM_CHANNELS; ++ci)
     {
         dummy_channel[ci]       = CF_AppData.engine.channels + ci;
-        dummy_channel[ci]->pipe = Any_uint8();
+        dummy_channel[ci]->pipe = CFE_SB_PIPEID_C(CFE_ResourceId_FromInteger(1 + ci));
         for (qi = 0; qi < num_clist_node_ptrs; ++qi)
         {
             (CF_AppData.engine.channels + ci)->qs[qs_index[qi]] = malloc(sizeof(clist_node));
