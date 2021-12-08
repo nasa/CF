@@ -28,7 +28,7 @@
 #include "cfe_tbl_filedef.h"
 #include "cf_tbldefs.h"
 
-cf_config_table_t CF_config_table = {
+CF_ConfigTable_t CF_config_table = {
     10,    /* ticks_per_second */
     16384, /* max number of bytes per wakeup to calculate r2 recv file crc */
     25,    /* temp local id */

@@ -1993,11 +1993,11 @@ static void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c)
 
     for (i = 0; i < CF_MAX_POLLING_DIR_PER_CHAN; ++i)
     {
-        CF_Poll_t    *p           = &c->poll[i];
-        int           chan_index  = (c - CF_AppData.engine.channels);
-        cf_channel_t *cc          = &CF_AppData.config_table->chan[chan_index];
-        polldir_t    *pd          = &cc->polldir[i];
-        int           count_check = 0;
+        CF_Poll_t          *p           = &c->poll[i];
+        int                 chan_index  = (c - CF_AppData.engine.channels);
+        CF_ChannelConfig_t *cc          = &CF_AppData.config_table->chan[chan_index];
+        CF_PollDir_t       *pd          = &cc->polldir[i];
+        int                 count_check = 0;
 
         if (pd->enabled && pd->interval_sec)
         {

@@ -346,7 +346,7 @@ void Test_CF_CFDP_S2_SubstateSendEof_TriggerTickProcessing(void)
 void Test_CFDP_S_SendFileData_When_ph_Is_NULL_Return_0(void)
 {
     /* Arrange */
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_History_t         dummy_history;
     CF_Transaction_t     dummy_t;
     CF_Transaction_t    *arg_t                                    = &dummy_t;
@@ -376,7 +376,7 @@ void Test_CFDP_S_SendFileData_WhenCachedPosNotEq_foffs_CallTo_CF_WrappedLseek_Re
     void)
 {
     /* Arrange */
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_History_t         dummy_history;
     CF_Transaction_t     dummy_t;
     CF_Transaction_t    *arg_t             = &dummy_t;
@@ -426,7 +426,7 @@ void Test_CFDP_S_SendFileData_WhenCachedPosNotEq_foffs_CallTo_CF_WrappedLseek_Re
 void Test_CFDP_S_SendFileData_CallTo_CF_WrappedRead_ReturnsValueNotEqTo_bytes_to_read_SendEventAndReturn_neg1(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     CF_History_t      dummy_history;
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t             = &dummy_t;
@@ -482,7 +482,7 @@ void Test_CFDP_S_SendFileData_Given_bytes_to_read_GreaterThan_outgoing_file_chun
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     CF_History_t      dummy_history;
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t             = &dummy_t;
@@ -538,7 +538,7 @@ void Test_CFDP_S_SendFileData_Given_bytes_to_read_GreaterThan_outgoing_file_chun
 void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_Returns_CF_SEND_NO_MSG_Return_0(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     CF_History_t      dummy_history;
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t             = &dummy_t;
@@ -585,7 +585,7 @@ void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_Returns_CF_SEND_NO_MSG_Retur
 void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_Returns_CF_SEND_ERROR_SendEventAndReturn_neg1(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     CF_History_t      dummy_history;
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t             = &dummy_t;
@@ -644,7 +644,7 @@ void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_Returns_CF_SEND_ERROR_SendEv
 void Test_CFDP_S_SendFileData_AssertsWhen_foffs_Plus_bytes_to_read_IsLessThanOrEqTo_t_fsize(void)
 {
     /* Arrange */
-    // cf_config_table_t     dummy_config_table;
+    // CF_ConfigTable_t     dummy_config_table;
     // CF_History_t             dummy_history;
     // CF_Transaction_t         dummy_t;
     // CF_Transaction_t*        arg_t = &dummy_t;
@@ -707,7 +707,7 @@ void Test_CFDP_S_SendFileData_AssertsWhen_foffs_Plus_bytes_to_read_IsLessThanOrE
 void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_ReturnsDontCareNoCallTo_CF_CRC_Digest_ReturnBytesToRead(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     CF_History_t      dummy_history;
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t             = &dummy_t;
@@ -766,7 +766,7 @@ void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_ReturnsDontCareNoCallTo_CF_C
 void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_ReturnsDontCareWithCallTo_CF_CRC_Digest_ReturnBytesToRead(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     CF_History_t      dummy_history;
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t             = &dummy_t;
@@ -852,7 +852,7 @@ void Test_CF_CFDP_S_SubstateSendFileData_CallTo_CFDP_S_SendFileData_Returns_0_Do
     arg_t->state_data.s.sub_state = initial_sub_state;
 
     /* Arrange unstubbable:CF_CFDP_S_SendFileData - pdu will be null err_out returns 0 */
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_CFDP_PduHeader_t *forced_return_CF_CFDP_ConstructPduHeader = NULL;
 
     CF_AppData.config_table = &dummy_config_table;
@@ -899,7 +899,7 @@ void Test_CF_CFDP_S_SubstateSendFileData_CallTo_CFDP_S_SendFileData_ReturnsGreat
     arg_t->state_data.s.sub_state = initial_sub_state;
 
     /* Arrange unstubbable:CF_CFDP_S_SendFileData - pdu will be null err_out returns 0 */
-    cf_config_table_t        dummy_config_table;
+    CF_ConfigTable_t         dummy_config_table;
     CF_CFDP_PduHeader_t      dummy_ph;
     CF_CFDP_PduHeader_t     *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
     int32                    forced_return_CF_WrappedRead             = 1;
@@ -966,7 +966,7 @@ void Test_CF_CFDP_S_SubstateSendFileData_CallTo_CFDP_S_SendFileData_ReturnsGreat
     arg_t->state_data.s.sub_state = initial_sub_state;
 
     /* Arrange unstubbable:CF_CFDP_S_SendFileData - pdu will be null err_out returns 0 */
-    cf_config_table_t        dummy_config_table;
+    CF_ConfigTable_t         dummy_config_table;
     CF_CFDP_PduHeader_t      dummy_ph;
     CF_CFDP_PduHeader_t     *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
     int32                    forced_return_CF_WrappedRead             = arg_t->fsize - arg_t->foffs;
@@ -1032,7 +1032,7 @@ void Test_CF_CFDP_S_SubstateSendFileData_CallTo_CFDP_S_SendFileData_ReturnsLessT
     arg_t->state_data.s.sub_state = initial_sub_state;
 
     /* Arrange for CF_CFDP_S_SendFileData - ph will be null err_out returns 0 */
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_CFDP_PduHeader_t  dummy_ph;
     CF_CFDP_PduHeader_t *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
     int32                forced_return_CF_WrappedLseek            = Any_uint32_Except(arg_t->foffs);
@@ -1197,7 +1197,7 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturns_non
                      sizeof(context_CF_Chunks_GetFirstChunk), false);
 
     /* Arrange for CF_CFDP_S_SendFileData - ph will be null err_out returns 0 */
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_History_t         dummy_history;
     CF_CFDP_PduHeader_t *forced_return_CF_CFDP_ConstructPduHeader = NULL;
 
@@ -1241,7 +1241,7 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturns_non
                      sizeof(context_CF_Chunks_GetFirstChunk), false);
 
     /* Arrange for CF_CFDP_S_SendFileData - fail return -1 */
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_History_t         dummy_history;
     CF_CFDP_PduHeader_t  dummy_ph;
     CF_CFDP_PduHeader_t *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
@@ -1294,7 +1294,7 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturned_no
     dummy_c->size = Any_uint8_GreaterThan(0); /* uint8 used for small size during testing */
 
     /* Arrange for CF_CFDP_S_SendFileData - fail return -1 */
-    cf_config_table_t        dummy_config_table;
+    CF_ConfigTable_t         dummy_config_table;
     CF_History_t             dummy_history;
     CF_CFDP_PduHeader_t      dummy_ph;
     CF_CFDP_PduHeader_t     *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
@@ -1388,7 +1388,7 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
     arg_t->foffs = initial_foffs;
 
     /* Arrange for CF_CFDP_S_SendFileData - ph will be null err_out returns 0 */
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_History_t         dummy_history;
     CF_CFDP_PduHeader_t *forced_return_CF_CFDP_ConstructPduHeader = NULL;
 
@@ -1494,7 +1494,7 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
     dummy_c->size   = 1;
 
     /* Arrange for CF_CFDP_S_SendFileData - ph will be null err_out returns 0 */
-    cf_config_table_t        dummy_config_table;
+    CF_ConfigTable_t         dummy_config_table;
     CF_History_t             dummy_history;
     CF_CFDP_PduHeader_t      dummy_ph;
     CF_CFDP_PduHeader_t     *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
@@ -3452,7 +3452,7 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     CF_History_t      dummy_history;
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t                    = &dummy_t;
@@ -3533,7 +3533,7 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
 {
     /* Arrange */
 
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     CF_History_t      dummy_history;
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t                    = &dummy_t;
@@ -3603,7 +3603,7 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
 {
     /* Arrange */
 
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     CF_History_t      dummy_history;
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t                    = &dummy_t;
@@ -3683,7 +3683,7 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
 {
     /* Arrange */
 
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     CF_History_t      dummy_history;
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t                    = &dummy_t;

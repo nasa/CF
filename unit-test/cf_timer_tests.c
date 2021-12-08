@@ -29,9 +29,9 @@ void cf_timer_tests_Teardown(void)
 void Test_CF_Timer_Sec2Ticks_ReturnExpectedValue(void)
 {
     /* Arrange */
-    CF_Timer_Seconds_t    arg_sec                = Any_uint32();
-    uint32            dummy_ticks_per_second = Any_uint32();
-    cf_config_table_t dummy_config_table;
+    CF_Timer_Seconds_t arg_sec                = Any_uint32();
+    uint32             dummy_ticks_per_second = Any_uint32();
+    CF_ConfigTable_t   dummy_config_table;
 
     CF_AppData.config_table                   = &dummy_config_table;
     CF_AppData.config_table->ticks_per_second = dummy_ticks_per_second;
@@ -60,8 +60,8 @@ void Test_CF_Timer_InitRelSec_ReceiveExpectedValue(void)
     CF_Timer_t *arg_t = &dummy_timer;
 
     /* Arrange unstubbalbe: CF_Timer_Sec2Ticks in same file */
-    uint32            dummy_ticks_per_second = Any_uint32();
-    cf_config_table_t dummy_config_table;
+    uint32           dummy_ticks_per_second = Any_uint32();
+    CF_ConfigTable_t dummy_config_table;
 
     CF_AppData.config_table                   = &dummy_config_table;
     CF_AppData.config_table->ticks_per_second = dummy_ticks_per_second;

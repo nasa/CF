@@ -112,7 +112,7 @@ static void CF_CheckTables(void)
 *************************************************************************/
 static int32 CF_ValidateConfigTable(void *tbl_ptr)
 {
-    cf_config_table_t *tbl = (cf_config_table_t *)tbl_ptr;
+    CF_ConfigTable_t  *tbl = (CF_ConfigTable_t *)tbl_ptr;
     int32              ret; /* initialized below */
     static const int32 no_ticks_per_second = -1;
     static const int32 crc_alignment       = -2;
@@ -159,7 +159,7 @@ static int32 CF_TableInit(void)
 {
     int32 status = CFE_SUCCESS;
 
-    status = CFE_TBL_Register(&CF_AppData.config_handle, CF_CONFIG_TABLE_NAME, sizeof(cf_config_table_t),
+    status = CFE_TBL_Register(&CF_AppData.config_handle, CF_CONFIG_TABLE_NAME, sizeof(CF_ConfigTable_t),
                               CFE_TBL_OPT_SNGL_BUFFER | CFE_TBL_OPT_LOAD_DUMP, CF_ValidateConfigTable);
     if (status != CFE_SUCCESS)
     {

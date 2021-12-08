@@ -206,7 +206,7 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED(
 /* CF_ValidateConfigTable tests specific items */
 
 /* CF_ValidateConfigTable tests specific global variables */
-cf_config_table_t dummy_table;
+CF_ConfigTable_t dummy_table;
 
 /* CF_ValidateConfigTable tests specific functions */
 void cf_config_table_tests_set_dummy_table_to_nominal(void)
@@ -230,7 +230,7 @@ void Setup_cf_config_table_tests(void)
 void Test_CF_ValidateConfigTable_FailBecauseTableTicksPerSecondIs0(void)
 {
     /* Arrange */
-    cf_config_table_t *arg_table = &dummy_table;
+    CF_ConfigTable_t *arg_table = &dummy_table;
 
     arg_table->ticks_per_second = 0;
 
@@ -244,7 +244,7 @@ void Test_CF_ValidateConfigTable_FailBecauseTableTicksPerSecondIs0(void)
 void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0(void)
 {
     /* Arrange */
-    cf_config_table_t *arg_table = &dummy_table;
+    CF_ConfigTable_t *arg_table = &dummy_table;
 
     arg_table->ticks_per_second             = 1;
     arg_table->rx_crc_calc_bytes_per_wakeup = 0;
@@ -259,7 +259,7 @@ void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0(void)
 void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIsNot1024ByteAligned(void)
 {
     /* Arrange */
-    cf_config_table_t *arg_table = &dummy_table;
+    CF_ConfigTable_t *arg_table = &dummy_table;
 
     arg_table->ticks_per_second = 1;
     arg_table->rx_crc_calc_bytes_per_wakeup =
@@ -277,7 +277,7 @@ void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIsNot1024ByteAlign
 void Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArray(void)
 {
     /* Arrange */
-    cf_config_table_t *arg_table = &dummy_table;
+    CF_ConfigTable_t *arg_table = &dummy_table;
 
     // outgoing_file_chunk_size set to greater than sizeof(CF_CFDP_PduFileDataContent_t)
     arg_table->ticks_per_second             = 1;
@@ -294,7 +294,7 @@ void Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArra
 void Test_CF_ValidateConfigTable_Success(void)
 {
     /* Arange */
-    cf_config_table_t *arg_table = &dummy_table;
+    CF_ConfigTable_t *arg_table = &dummy_table;
 
     arg_table->ticks_per_second             = 1;
     arg_table->rx_crc_calc_bytes_per_wakeup = 0x0400; /* 1024 aligned */

@@ -2081,10 +2081,10 @@ void Test_CF_CmdAbandon_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
 void Test_CF_DoEnableDisableDequeue_Set_chan_num_EnabledFlagTo_context_barg(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             arg_chan_num = Any_cf_channel();
-    bool_arg_t        dummy_context;
-    bool_arg_t       *arg_context = &dummy_context;
+    CF_ConfigTable_t dummy_config_table;
+    uint8            arg_chan_num = Any_cf_channel();
+    bool_arg_t       dummy_context;
+    bool_arg_t      *arg_context = &dummy_context;
 
     CF_AppData.config_table = &dummy_config_table;
     dummy_context.barg      = Any_bool_arg_t_barg();
@@ -2113,8 +2113,8 @@ void Test_CF_CmdEnableDequeue_Call_CmdCond_WithResultsOf_CF_DoChanAction(void)
     CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
 
     /* Arrange unstubbable: CF_DoEnableDisableDequeue via CF_DoChanAction */
-    cf_config_table_t dummy_config_table;
-    uint8             dummy_chan_num = Any_cf_channel();
+    CF_ConfigTable_t dummy_config_table;
+    uint8            dummy_chan_num = Any_cf_channel();
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2157,8 +2157,8 @@ void Test_CF_CmdDisableDequeue_Call_CmdCond_WithResultsOf_CF_DoChanAction(void)
     CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
 
     /* Arrange unstubbable: CF_DoEnableDisableDequeue via CF_DoChanAction */
-    cf_config_table_t dummy_config_table;
-    uint8             dummy_chan_num = Any_cf_channel();
+    CF_ConfigTable_t dummy_config_table;
+    uint8            dummy_chan_num = Any_cf_channel();
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2200,7 +2200,7 @@ void Test_CF_DoEnableDisablePolldir_When_ALL_CHANNELS_SetAllPolldirsInChannelEna
     CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
     bool_msg_arg_t            dummy_context;
     bool_msg_arg_t           *arg_context = &dummy_context;
-    cf_config_table_t         dummy_config_table;
+    CF_ConfigTable_t          dummy_config_table;
     uint8                     expected_enabled;
     int                       local_result;
 
@@ -2239,7 +2239,7 @@ void Test_CF_DoEnableDisablePolldir_WhenSetToSpecificPolldirSetPolldirFrom_conte
     CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
     bool_msg_arg_t            dummy_context;
     bool_msg_arg_t           *arg_context = &dummy_context;
-    cf_config_table_t         dummy_config_table;
+    CF_ConfigTable_t          dummy_config_table;
     uint8                     expected_enabled;
     int                       local_result;
 
@@ -2272,7 +2272,7 @@ void Test_CF_DoEnableDisablePolldir_FailPolldirEq_CF_MAX_POLLING_DIR_PER_CHAN_An
     CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
     bool_msg_arg_t            dummy_context;
     bool_msg_arg_t           *arg_context = &dummy_context;
-    cf_config_table_t         dummy_config_table;
+    CF_ConfigTable_t          dummy_config_table;
     int                       local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -2306,7 +2306,7 @@ void Test_CF_DoEnableDisablePolldir_FailAnyBadPolldirSendEvent(void)
     CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
     bool_msg_arg_t            dummy_context;
     bool_msg_arg_t           *arg_context = &dummy_context;
-    cf_config_table_t         dummy_config_table;
+    CF_ConfigTable_t          dummy_config_table;
     int                       local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -2341,7 +2341,7 @@ void Test_CF_DoEnableDisablePolldir_FailAnyBadPolldirSendEvent(void)
 void Test_CF_CmdEnablePolldir_SuccessWhenActionSuccess(void)
 {
     /* Arrange */
-    cf_config_table_t         dummy_config_table;
+    CF_ConfigTable_t          dummy_config_table;
     uint8                     dummy_channel = Any_cf_channel();
     uint8                     dummy_polldir = Any_cf_polldir();
     CF_UT_cmd_unionargs_buf_t utbuf;
@@ -2421,7 +2421,7 @@ void Test_CF_CmdEnablePolldir_FailWhenActionFail(void)
 void Test_CF_CmdDisablePolldir_SuccessWhenActionSuccess(void)
 {
     /* Arrange */
-    cf_config_table_t         dummy_config_table;
+    CF_ConfigTable_t          dummy_config_table;
     uint8                     dummy_channel = Any_cf_channel();
     uint8                     dummy_polldir = Any_cf_polldir();
     CF_UT_cmd_unionargs_buf_t utbuf;
@@ -4016,7 +4016,7 @@ void Test_CF_CmdSendCfgParams_Set_cfg_TimeStampAndSendMsg_AcceptCommand(void)
     /* Arrange */
     CFE_SB_Buffer_t              utbuf;
     CFE_SB_Buffer_t             *arg_msg = &utbuf;
-    cf_config_table_t            dummy_config_table;
+    CF_ConfigTable_t             dummy_config_table;
     CFE_TIME_SysTime_t           fake_time;
     CFE_SB_TransmitMsg_context_t context_CFE_SB_TransmitMsg;
 
@@ -4192,8 +4192,8 @@ void Test_CF_CmdValidateMaxOutgoing_WhenGiven_val_Is_0_But_sem_name_IsNot_NULL_R
     /* Arrange */
     uint32 arg_val      = 0;
     uint8  arg_chan_num = Any_cf_chan_num(); /* Any_cf_chan_num used here because value matters to this test */
-    cf_config_table_t dummy_config_table;
-    int               local_result;
+    CF_ConfigTable_t dummy_config_table;
+    int              local_result;
 
     CF_AppData.config_table = &dummy_config_table;
     memset(CF_AppData.config_table->chan[arg_chan_num].sem_name, (char)Any_uint8_Except(0), 1);
@@ -4211,8 +4211,8 @@ void Test_CF_CmdValidateMaxOutgoing_WhenGiven_val_Is_0_And_sem_name_Is_NULL_Retu
     /* Arrange */
     uint32 arg_val      = 0;
     uint8  arg_chan_num = Any_cf_chan_num(); /* Any_cf_chan_num used here because value matters to this test */
-    cf_config_table_t dummy_config_table;
-    int               local_result;
+    CF_ConfigTable_t dummy_config_table;
+    int              local_result;
 
     CF_AppData.config_table = &dummy_config_table;
     memset(CF_AppData.config_table->chan[arg_chan_num].sem_name, (char)0, 1);
@@ -4236,11 +4236,11 @@ void Test_CF_CmdValidateMaxOutgoing_WhenGiven_val_Is_0_And_sem_name_Is_NULL_Retu
 void Test_CF_CmdGetSetParam_When_param_id_Eq_CF_NUM_CFG_PACKET_ITEMS_FailSendEventAndRejectCmd(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             arg_is_set   = Any_uint8();
-    uint8             arg_param_id = CF_NUM_CFG_PACKET_ITEMS;
-    uint32            arg_value    = Any_uint32();
-    uint8             arg_chan_num = Any_uint8();
+    CF_ConfigTable_t dummy_config_table;
+    uint8            arg_is_set   = Any_uint8();
+    uint8            arg_param_id = CF_NUM_CFG_PACKET_ITEMS;
+    uint32           arg_value    = Any_uint32();
+    uint8            arg_chan_num = Any_uint8();
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -4269,11 +4269,11 @@ void Test_CF_CmdGetSetParam_When_param_id_Eq_CF_NUM_CFG_PACKET_ITEMS_FailSendEve
 void Test_CF_CmdGetSetParam_When_param_id_AnyGreaterThan_CF_NUM_CFG_PACKET_ITEMS_FailSendEventAndRejectCmd(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             arg_is_set   = Any_uint8();
-    uint8             arg_param_id = Any_uint8_GreaterThan(CF_NUM_CFG_PACKET_ITEMS);
-    uint32            arg_value    = Any_uint32();
-    uint8             arg_chan_num = Any_uint8();
+    CF_ConfigTable_t dummy_config_table;
+    uint8            arg_is_set   = Any_uint8();
+    uint8            arg_param_id = Any_uint8_GreaterThan(CF_NUM_CFG_PACKET_ITEMS);
+    uint32           arg_value    = Any_uint32();
+    uint8            arg_chan_num = Any_uint8();
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -4302,11 +4302,11 @@ void Test_CF_CmdGetSetParam_When_param_id_AnyGreaterThan_CF_NUM_CFG_PACKET_ITEMS
 void Test_CF_CmdGetSetParam_Given_chan_num_IsEqTo_CF_NUM_CHANNELS_ErrorOutAndCountError(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             arg_is_set   = Any_uint8();
-    uint8             arg_param_id = Any_uint8_LessThan(CF_NUM_CFG_PACKET_ITEMS);
-    uint32            arg_value    = Any_uint32();
-    uint8             arg_chan_num = CF_NUM_CHANNELS;
+    CF_ConfigTable_t dummy_config_table;
+    uint8            arg_is_set   = Any_uint8();
+    uint8            arg_param_id = Any_uint8_LessThan(CF_NUM_CFG_PACKET_ITEMS);
+    uint32           arg_value    = Any_uint32();
+    uint8            arg_chan_num = CF_NUM_CHANNELS;
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -4335,11 +4335,11 @@ void Test_CF_CmdGetSetParam_Given_chan_num_IsEqTo_CF_NUM_CHANNELS_ErrorOutAndCou
 void Test_CF_CmdGetSetParam_Given_chan_num_IsGreaterThan_CF_NUM_CHANNELS_ErrorOutAndCountError(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             arg_is_set   = Any_uint8();
-    uint8             arg_param_id = Any_uint8_LessThan(CF_NUM_CFG_PACKET_ITEMS);
-    uint32            arg_value    = Any_uint32();
-    uint8             arg_chan_num = Any_uint8_GreaterThan(CF_NUM_CHANNELS);
+    CF_ConfigTable_t dummy_config_table;
+    uint8            arg_is_set   = Any_uint8();
+    uint8            arg_param_id = Any_uint8_LessThan(CF_NUM_CFG_PACKET_ITEMS);
+    uint32           arg_value    = Any_uint32();
+    uint8            arg_chan_num = Any_uint8_GreaterThan(CF_NUM_CHANNELS);
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -4368,11 +4368,11 @@ void Test_CF_CmdGetSetParam_Given_chan_num_IsGreaterThan_CF_NUM_CHANNELS_ErrorOu
 void Test_CF_CmdGetSetParam_When_is_set_Is_0_And_param_id_Is_0_MemCopySendEventAndAcceptCommand(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             arg_is_set   = 0;
-    uint8             arg_param_id = 0;
-    uint32            arg_value    = Any_uint32();
-    uint8             arg_chan_num = Any_cf_chan_num();
+    CF_ConfigTable_t dummy_config_table;
+    uint8            arg_is_set   = 0;
+    uint8            arg_param_id = 0;
+    uint32           arg_value    = Any_uint32();
+    uint8            arg_chan_num = Any_cf_chan_num();
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -4404,11 +4404,11 @@ void Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_0_HasANull_fn_ThenC
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             arg_is_set   = 1;
-    uint8             arg_param_id = 0;
-    uint32            arg_value    = Any_uint32();
-    uint8             arg_chan_num = Any_cf_chan_num();
+    CF_ConfigTable_t dummy_config_table;
+    uint8            arg_is_set   = 1;
+    uint8            arg_param_id = 0;
+    uint32           arg_value    = Any_uint32();
+    uint8            arg_chan_num = Any_cf_chan_num();
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -4445,12 +4445,12 @@ void Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_5_Uses_SPTRFN_SendE
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             arg_is_set   = 1;
-    uint8             arg_param_id = 5;
-    uint32            arg_value    = Any_uint32_GreaterThan(sizeof(
+    CF_ConfigTable_t dummy_config_table;
+    uint8            arg_is_set   = 1;
+    uint8            arg_param_id = 5;
+    uint32           arg_value    = Any_uint32_GreaterThan(sizeof(
         CF_CFDP_PduFileDataContent_t)); /* Arrange unstubbable: CF_CmdValidateChunkSize - specific value needed */
-    uint8             arg_chan_num = Any_cf_chan_num();
+    uint8            arg_chan_num = Any_cf_chan_num();
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -4484,12 +4484,12 @@ void Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_5_Uses_SPTRFN_ThenC
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             arg_is_set   = 1;
-    uint8             arg_param_id = 5;
-    uint32            arg_value    = Any_uint32_LessThan_or_EqualTo(sizeof(
+    CF_ConfigTable_t dummy_config_table;
+    uint8            arg_is_set   = 1;
+    uint8            arg_param_id = 5;
+    uint32           arg_value    = Any_uint32_LessThan_or_EqualTo(sizeof(
         CF_CFDP_PduFileDataContent_t)); /* Arrange unstubbable: CF_CmdValidateChunkSize - specific value needed */
-    uint8             arg_chan_num = Any_cf_chan_num();
+    uint8            arg_chan_num = Any_cf_chan_num();
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -4539,7 +4539,7 @@ void Test_CF_CmdSetParam_Call_CF_CmdGetSetParam_With_cmd_key_And_cmd_value(void)
     CFE_SB_Buffer_t               *arg_msg   = &utbuf.buf;
 
     /* Arrange unstubbable: CF_CmdGetSetParam */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -4598,7 +4598,7 @@ void Test_CF_CmdGetParam_Call_CF_CmdGetSetParam_With_cmd_data_byte_0_AndConstant
     dummy_msg->chan_num = Any_cf_chan_num();
 
     /* Arrange unstubbable: CF_CmdGetSetParam */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     CF_AppData.config_table = &dummy_config_table;
 

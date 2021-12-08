@@ -426,7 +426,7 @@ void Test_CF_CFDP_R2_Complete_Given_t_Sets_send_nak_To_1_Given_ok_to_send_nak_Is
     uint8             initial_sub_state =
         Any_uint8_Except(CF_RxSubState_FILEDATA); /* uint8 used for CF_RxSubState_t because it is a small valuation
                                             right now, TODO: create any_cf_rx_sub_state */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     arg_t->history                = &dummy_history;
     arg_t->history->cc            = CF_CFDP_ConditionCode_NO_ERROR;
@@ -462,7 +462,7 @@ void Test_CF_CFDP_R2_Complete_Given_t_Sets_send_nak_To_1_Given_ok_to_send_nak_Is
     uint8             initial_sub_state =
         Any_uint8_Except(CF_RxSubState_FILEDATA); /* uint8 used for CF_RxSubState_t because it is a small valuation
                                             right now, TODO: create any_cf_rx_sub_state */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     arg_t->history                = &dummy_history;
     arg_t->history->cc            = CF_CFDP_ConditionCode_NO_ERROR;
@@ -501,7 +501,7 @@ void Test_CF_CFDP_R2_Complete_Calls_CF_Chunks_ComputeGaps_Returns_non0_Set_send_
     uint8             initial_sub_state =
         Any_uint8_Except(CF_RxSubState_FILEDATA); /* uint8 used for CF_RxSubState_t because it is a small valuation
                                             right now, TODO: create any_cf_rx_sub_state */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     arg_t->history                = &dummy_history;
     arg_t->history->cc            = CF_CFDP_ConditionCode_NO_ERROR;
@@ -542,7 +542,7 @@ void Test_CF_CFDP_R2_Complete_Calls_CF_Chunks_ComputeGaps_Returns_non0_Set_send_
     uint8             initial_sub_state =
         Any_uint8_Except(CF_RxSubState_FILEDATA); /* uint8 used for CF_RxSubState_t because it is a small valuation
                                             right now, TODO: create any_cf_rx_sub_state */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     arg_t->history                = &dummy_history;
     arg_t->history->cc            = CF_CFDP_ConditionCode_NO_ERROR;
@@ -584,7 +584,7 @@ void Test_CF_CFDP_R2_Complete_Calls_CF_Chunks_ComputeGaps_Returns_non0_Set_send_
     uint8             initial_sub_state =
         Any_uint8_Except(CF_RxSubState_FILEDATA); /* uint8 used for CF_RxSubState_t because it is a small valuation
                                             right now, TODO: create any_cf_rx_sub_state */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     arg_t->history                = &dummy_history;
     arg_t->history->cc            = CF_CFDP_ConditionCode_NO_ERROR;
@@ -1299,8 +1299,8 @@ void Test_CF_CFDP_R2_SubstateRecvEof_CallTo_CF_CFDP_R_SubstateRecvEof_Returns_R_
     arg_t->fsize                       = ((CF_CFDP_PduEof_t *)arg_ph)->size;
 
     /* Arrange for CF_CFDP_R2_Complete */
-    CF_History_t      dummy_history;
-    cf_config_table_t dummy_config_table;
+    CF_History_t     dummy_history;
+    CF_ConfigTable_t dummy_config_table;
 
     arg_t->history                     = &dummy_history;
     arg_t->history->cc                 = CF_CFDP_ConditionCode_NO_ERROR;
@@ -2321,7 +2321,7 @@ void Test_CF_CFDP_R_Init_StateIs_CFDP_R2_And_t_flags_rx_md_recv_Is_0_SendEventTh
     void)
 {
     /* Arrange */
-    cf_config_table_t              dummy_config_table;
+    CF_ConfigTable_t               dummy_config_table;
     CF_History_t                   dummy_history;
     CF_Transaction_t               dummy_t;
     CF_Transaction_t              *arg_t             = &dummy_t;
@@ -2386,7 +2386,7 @@ void Test_CF_CFDP_R2_CalcCrcChunk_Given_t_state_data_r_r2_rx_crc_calc_bytes_Is_N
     /* Arrange */
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t = &dummy_t;
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     int               local_result;
 
     arg_t->state_data.r.r2.rx_crc_calc_bytes = Any_uint32_Except(0);
@@ -2412,7 +2412,7 @@ void Test_CF_CFDP_R2_CalcCrcChunk_Given_t_state_data_r_r2_rx_crc_calc_bytes_Is_0
     /* Arrange */
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t = &dummy_t;
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     int               local_result;
 
     arg_t->state_data.r.r2.rx_crc_calc_bytes = 0;
@@ -2438,7 +2438,7 @@ void Test_CF_CFDP_R2_CalcCrcChunk_Given_t_state_data_r_r2_rx_crc_calc_bytes_Is_N
     /* Arrange */
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t = &dummy_t;
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     int               local_result;
 
     arg_t->state_data.r.r2.rx_crc_calc_bytes = Any_uint32_Except(0);
@@ -2484,7 +2484,7 @@ void Test_CF_CFDP_R2_CalcCrcChunk_Given_t_state_data_r_r2_rx_crc_calc_bytes_Is_N
     /* Arrange */
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t = &dummy_t;
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     int               local_result;
 
     arg_t->state_data.r.r2.rx_crc_calc_bytes = Any_uint32_Except(0);
@@ -2536,7 +2536,7 @@ void Test_CF_CFDP_R2_CalcCrcChunk_CAllTo_CF_WrappedLseek_ReturnsValueNotEqTo_RXC
     CF_History_t      dummy_history;
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t = &dummy_t;
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     uint16            initial_file_seek = Any_uint16();
     int               local_result;
 
@@ -2586,7 +2586,7 @@ void Test_CF_CFDP_R2_CalcCrcChunk_CAllTo_CF_WrappedLseek_ReturnsValueEqTo_RXC_cr
     CF_History_t      dummy_history;
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t = &dummy_t;
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     uint16            initial_file_read = Any_uint16();
     int               local_result;
 
@@ -2638,7 +2638,7 @@ void Test_CF_CFDP_R2_CalcCrcChunk_Given_t_state_data_r_cached_pos_IsEqTo_RXC_Cal
     CF_History_t      dummy_history;
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t = &dummy_t;
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     uint32            forced_return_CF_WrappedRead = (sizeof(uint8) * CF_R2_CRC_CHUNK_SIZE);
     uint32 initial_RXC = Any_uint32_BetweenExcludeMax(1, UINT8_MAX); /* UINT8_MAX used for reasonable test size */
     int    local_result;
@@ -2710,7 +2710,7 @@ void Test_CF_CFDP_R2_SubstateSendFin_Given_t_history_cc_IsEqTo_CC_NO_ERROR_And_t
     arg_t->flags.com.crc_calc = 0;
 
     /* Arrange for CF_CFDP_R2_CalcCrcChunk */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     arg_t->state_data.r.r2.rx_crc_calc_bytes = Any_uint32_Except(0);
 
@@ -2831,7 +2831,7 @@ void Test_CF_CFDP_R2_SubstateSendFin_CallTo_CF_CFDP_R2_CalcCrcChunk_Returns_0_Gi
     arg_t->state_data.r.sub_state = Any_uint8_Except(CF_RxSubState_WAIT_FOR_FIN_ACK);
 
     /* Arrange for CF_CFDP_R2_CalcCrcChunk */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     arg_t->state_data.r.r2.rx_crc_calc_bytes = Any_uint32_Except(0);
 
@@ -4141,7 +4141,7 @@ void Test_CF_CFDP_R_Tick_Given_t_state_IsEqTo_CFDP_R2_And_inactivity_fired_Is_1_
     arg_t->flags.com.ack_timer_armed = 0;
 
     /* Arrange for CF_CFDP_R_SubstateSendNak */
-    cf_config_table_t                    dummy_config_table;
+    CF_ConfigTable_t                     dummy_config_table;
     CF_ChunkWrapper_t                    dummy_chunks;
     CF_History_t                         dummy_history;
     CF_CFDP_PduNak_t                     dummy_nak;
@@ -4260,7 +4260,7 @@ void Test_CF_CFDP_R_Tick_Given_t_state_IsEqTo_CFDP_R2_And_inactivity_fired_Is_1_
     arg_t->flags.com.crc_calc = 0;
 
     /* Arrange for CF_CFDP_R2_CalcCrcChunk */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     arg_t->state_data.r.r2.rx_crc_calc_bytes = Any_uint32_Except(0);
 
@@ -4530,7 +4530,7 @@ void Test_CF_CFDP_R_Tick_NothingElseSet_ack_timer_armed_Is_1_CAllTo_CF_Timer_Exp
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     CF_History_t      dummy_history;
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t            = &dummy_t;

@@ -340,7 +340,7 @@ void Test_CF_CFDP_ArmAckTimer_Call_CF_Timer_InitRelSec_WithCorrectParamsAndArmsT
     /* Arrange */
     CF_Transaction_t              dummy_t;
     CF_Transaction_t             *arg_t = &dummy_t;
-    cf_config_table_t             dummy_config_table;
+    CF_ConfigTable_t              dummy_config_table;
     CF_Timer_InitRelSec_context_t context_CF_Timer_InitRelSec;
 
     CF_AppData.config_table              = &dummy_config_table;
@@ -531,7 +531,7 @@ void Test_CF_CFDP_ArmInactTimer_Call_CF_Timer_InitRelSec_WithCorrectParams(void)
     /* Arrange */
     CF_Transaction_t              dummy_t;
     CF_Transaction_t             *arg_t = &dummy_t;
-    cf_config_table_t             dummy_config_table;
+    CF_ConfigTable_t              dummy_config_table;
     CF_Timer_InitRelSec_context_t context_CF_Timer_InitRelSec;
 
     CF_AppData.config_table                     = &dummy_config_table;
@@ -681,7 +681,7 @@ void Test_CF_CFDP_DispatchRecv_WhenStateEq_CFDP_DROP_Call_CF_CFDP_RecvDrop(void)
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.recv.dropped = initial_recv_dropped;
 
     /* Arrange for CF_CFDP_ArmInactTimer */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -1385,7 +1385,7 @@ void Test_CF_CFDP_MsgOutGet_WhenChannel_max_outgoing_messages_per_wakeup_Is_0_An
     void)
 {
     /* Arrange */
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_Transaction_t     dummy_t;
     CF_Transaction_t    *arg_t                    = &dummy_t;
     uint32               initial_outgoing_counter = Any_uint32();
@@ -1420,7 +1420,7 @@ void Test_CF_CFDP_MsgOutGet_When_outgoing_counter_DoesNotEq_max_outgoing_message
     void)
 {
     /* Arrange */
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_Transaction_t     dummy_t;
     CF_Transaction_t    *arg_t = &dummy_t;
     uint32               initial_outgoing_counter;
@@ -1459,7 +1459,7 @@ void Test_CF_CFDP_MsgOutGet_When_max_outgoing_messages_per_wakeup_IsNot_0_And_ou
     void)
 {
     /* Arrange */
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_Transaction_t     dummy_t;
     CF_Transaction_t    *arg_t = &dummy_t;
     uint32               initial_outgoing_counter;
@@ -1501,7 +1501,7 @@ void Test_CF_CFDP_MsgOutGet_When_sem_name_0_Is_non0_But_CallTo_OS_CountSemTimedW
     void)
 {
     /* Arrange */
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_Transaction_t     dummy_t;
     CF_Transaction_t    *arg_t = &dummy_t;
     uint32               initial_outgoing_counter;
@@ -1553,7 +1553,7 @@ void Test_CF_CFDP_MsgOutGet_When_sem_name_0_Is_non0_But_CallTo_OS_CountSemTimedW
     void)
 {
     /* Arrange */
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_Transaction_t     dummy_t;
     CF_Transaction_t    *arg_t = &dummy_t;
     uint32               initial_outgoing_counter;
@@ -1597,7 +1597,7 @@ void Test_CF_CFDP_MsgOutGet_When_sem_name_0_Is_non0_Then_CallTo_OS_CountSemTimed
     /* Arrange */
     CF_UT_outmsg_buffer_t dummy_msg;
     CFE_SB_Buffer_t      *forced_return_CFE_SB_AllocateMessageBuffer = &dummy_msg.cfe_sb_buffer;
-    cf_config_table_t     dummy_config_table;
+    CF_ConfigTable_t      dummy_config_table;
     CF_Transaction_t      dummy_t;
     CF_Transaction_t     *arg_t = &dummy_t;
     uint32                initial_outgoing_counter;
@@ -1646,7 +1646,7 @@ void Test_CF_CFDP_MsgOutGet_When_sem_name_0_Is_0_Then_CallTo_OS_CountSemTimedWai
     /* Arrange */
     CF_UT_outmsg_buffer_t dummy_msg;
     CFE_SB_Buffer_t      *forced_return_CFE_SB_AllocateMessageBuffer = &dummy_msg.cfe_sb_buffer;
-    cf_config_table_t     dummy_config_table;
+    CF_ConfigTable_t      dummy_config_table;
     CF_Transaction_t      dummy_t;
     CF_Transaction_t     *arg_t = &dummy_t;
     uint32                initial_outgoing_counter;
@@ -1951,7 +1951,7 @@ void Test_CF_CFDP_SendMd_GetNull_pdu_header_Return_CF_SEND_NO_MSG(void)
     CF_SendRet_t      local_result;
 
     /* Arrange unstubbable: CF_CFDP_ConstructPduHeader and CF_CFDP_MsgOutGet */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     CF_AppData.config_table            = &dummy_config_table;
     arg_t->chan_num                    = Any_uint8_LessThan(CF_NUM_CHANNELS);
@@ -1984,7 +1984,7 @@ void Test_CF_CFDP_SendMd_AssertsBecause_state_NotEq_CFDP_S1_Or_CFDP_S2(void)
     //   sizeof(excepted_states)/sizeof(excepted_states[0]));
 
     // /* Arrange unstubbable: CF_CFDP_MsgOutGet */
-    // cf_config_table_t   dummy_config_table;
+    // CF_ConfigTable_t   dummy_config_table;
 
     // CF_AppData.config_table = &dummy_config_table;
     // arg_t->chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
@@ -2028,7 +2028,7 @@ void Test_CF_CFDP_SendMd_When_src_len_Eq_sizeof_src_filename_Return_CF_SEND_FAIL
     arg_t->state = Any_uint8_FromThese(passing_states, sizeof(passing_states) / sizeof(passing_states[0]));
 
     /* Arrange unstubbable: CF_CFDP_ConstructPduHeader and CF_CFDP_MsgOutGet and CF_CFDP_GetClass */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     CF_AppData.config_table            = &dummy_config_table;
     arg_t->chan_num                    = Any_uint8_LessThan(CF_NUM_CHANNELS);
@@ -2069,7 +2069,7 @@ void Test_CF_CFDP_SendMd_When_dst_len_Eq_sizeof_dst_filename_Return_CF_SEND_FAIL
     arg_t->state = Any_uint8_FromThese(passing_states, sizeof(passing_states) / sizeof(passing_states[0]));
 
     /* Arrange for CF_CFDP_ConstructPduHeader and CF_CFDP_MsgOutGet */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     CF_AppData.config_table            = &dummy_config_table;
     arg_t->chan_num                    = Any_uint8_LessThan(CF_NUM_CHANNELS);
@@ -2108,7 +2108,7 @@ void Test_CF_CFDP_SendMd_Returns_CF_SEND_ERROR_CF_CFDP_CopyDataToLv_Returns_neg1
     // arg_t->state = Any_uint8_FromThese(passing_states, sizeof(passing_states)/sizeof(passing_states[0]));
 
     // /* Arrange unstubbable: CF_CFDP_MsgOutGet */
-    // cf_config_table_t   dummy_config_table;
+    // CF_ConfigTable_t   dummy_config_table;
 
     // CF_AppData.config_table = &dummy_config_table;
     // arg_t->chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
@@ -2150,7 +2150,7 @@ void Test_CF_CFDP_SendMd_WhenCallTo_CF_CFDP_CopyDataToLv_Returns_neg1_OnThe_dst_
     // arg_t->state = Any_uint8_FromThese(passing_states, sizeof(passing_states)/sizeof(passing_states[0]));
 
     // /* Arrange unstubbable: CF_CFDP_MsgOutGet */
-    // cf_config_table_t   dummy_config_table;
+    // CF_ConfigTable_t   dummy_config_table;
 
     // CF_AppData.config_table = &dummy_config_table;
     // arg_t->chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
@@ -2194,7 +2194,7 @@ void Test_CF_CFDP_SendMd_Return_CF_SEND_SUCCESS(void)
     arg_t->state = Any_uint8_FromThese(passing_states, sizeof(passing_states) / sizeof(passing_states[0]));
 
     /* Arrange unstubbable: CF_CFDP_MsgOutGet */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     CF_AppData.config_table            = &dummy_config_table;
     arg_t->chan_num                    = Any_uint8_LessThan(CF_NUM_CHANNELS);
@@ -2282,12 +2282,12 @@ void Test_CF_CFDP_SendFd_Return_CF_SEND_SUCCESS(void)
 void Test_CF_CFDP_FinishEofAck_SetExpectedValues(void)
 {
     /* Arrange */
-    CF_CFDP_tlv_t     dummy_tlv;
-    CF_CFDP_tlv_t    *arg_tlv   = &dummy_tlv;
-    CF_EntityId_t     dummy_eid = Any_uint8();
-    cf_config_table_t dummy_config_table;
-    int               forced_return_CF_GetMemcpySize = Any_int();
-    int               local_result;
+    CF_CFDP_tlv_t    dummy_tlv;
+    CF_CFDP_tlv_t   *arg_tlv   = &dummy_tlv;
+    CF_EntityId_t    dummy_eid = Any_uint8();
+    CF_ConfigTable_t dummy_config_table;
+    int              forced_return_CF_GetMemcpySize = Any_int();
+    int              local_result;
 
     CF_AppData.config_table            = &dummy_config_table;
     CF_AppData.config_table->local_eid = dummy_eid;
@@ -2319,7 +2319,7 @@ void Test_CF_CFDP_FinishEofAck_SetExpectedValues(void)
 void Test_CF_CFDP_SendEof_Get_NULL_pdu_Return_CF_SEND_NO_MSG(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     CF_History_t      dummy_history;
     uint8             dummy_transaction_num = Any_uint8_LessThan(CF_NUM_TRANSACTIONS);
     CF_Transaction_t *arg_t                 = &CF_AppData.engine.transactions[dummy_transaction_num];
@@ -2349,7 +2349,7 @@ void Test_CF_CFDP_SendEof_SuccessWithNoError(void)
 {
     /* Arrange */
     CF_UT_outmsg_buffer_t dummy_eof;
-    cf_config_table_t     dummy_config_table;
+    CF_ConfigTable_t      dummy_config_table;
     CF_History_t          dummy_history;
     uint8                 dummy_transaction_num = Any_uint8_LessThan(CF_NUM_TRANSACTIONS);
     CF_Transaction_t     *arg_t                 = &CF_AppData.engine.transactions[dummy_transaction_num];
@@ -2383,7 +2383,7 @@ void Test_CF_CFDP_SendEof_SuccessWithError(void)
 {
     /* Arrange */
     CF_UT_outmsg_buffer_t dummy_eof;
-    cf_config_table_t     dummy_config_table;
+    CF_ConfigTable_t      dummy_config_table;
     CF_History_t          dummy_history;
     uint8                 dummy_transaction_num = Any_uint8_LessThan(CF_NUM_TRANSACTIONS);
     CF_Transaction_t     *arg_t                 = &CF_AppData.engine.transactions[dummy_transaction_num];
@@ -2428,7 +2428,7 @@ void Test_CF_CFDP_SendEof_SuccessWithError(void)
 void Test_CF_CFDP_SendAck_When_CF_CFDP_IsSender_Returns_false_Get_NULL_ph_Return_CF_SEND_NO_MSG(void)
 {
     /* Arrange */
-    cf_config_table_t       dummy_config_table;
+    CF_ConfigTable_t        dummy_config_table;
     CF_History_t            dummy_history;
     uint8                   dummy_transaction_num = Any_uint8_LessThan(CF_NUM_TRANSACTIONS);
     CF_Transaction_t       *arg_t                 = &CF_AppData.engine.transactions[dummy_transaction_num];
@@ -2466,7 +2466,7 @@ void Test_CF_CFDP_SendAck_AssertsBecauseGiven_dir_code_Is_Not_PDU_EOF_Or_PDU_FIN
 {
     // /* Arrange */
     // CF_CFDP_PduAck_t                   dummy_ack;
-    // cf_config_table_t           dummy_config_table;
+    // CF_ConfigTable_t           dummy_config_table;
     // CF_History_t                   dummy_history;
     // uint8                       dummy_transaction_num = Any_uint8_LessThan(CF_NUM_TRANSACTIONS);
     // CF_Transaction_t*              arg_t = &CF_AppData.engine.transactions[dummy_transaction_num];
@@ -2509,7 +2509,7 @@ void Test_CF_CFDP_SendAck_WhenGiven_dir_code_Is_PDU_EOF_And_CF_CFDP_IsSender_Ret
 {
     /* Arrange */
     CF_UT_outmsg_buffer_t   dummy_ack;
-    cf_config_table_t       dummy_config_table;
+    CF_ConfigTable_t        dummy_config_table;
     CF_History_t            dummy_history;
     uint8                   dummy_transaction_num = Any_uint8_LessThan(CF_NUM_TRANSACTIONS);
     CF_Transaction_t       *arg_t                 = &CF_AppData.engine.transactions[dummy_transaction_num];
@@ -2553,7 +2553,7 @@ void Test_CF_CFDP_SendAck_WhenGiven_dir_code_Is_PDU_FIN_And_CF_CFDP_IsSender_Ret
 {
     /* Arrange */
     CF_UT_outmsg_buffer_t   dummy_ack;
-    cf_config_table_t       dummy_config_table;
+    CF_ConfigTable_t        dummy_config_table;
     CF_History_t            dummy_history;
     uint8                   dummy_transaction_num = Any_uint8_LessThan(CF_NUM_TRANSACTIONS);
     CF_Transaction_t       *arg_t                 = &CF_AppData.engine.transactions[dummy_transaction_num];
@@ -2605,7 +2605,7 @@ void Test_CF_CFDP_SendAck_WhenGiven_dir_code_Is_PDU_FIN_And_CF_CFDP_IsSender_Ret
 void Test_CF_CFDP_SendFin_Get_NULL_ph_Return_CF_SEND_NO_MSG(void)
 {
     /* Arrange */
-    cf_config_table_t         dummy_config_table;
+    CF_ConfigTable_t          dummy_config_table;
     CF_History_t              dummy_history;
     uint8                     dummy_transaction_num = Any_uint8_LessThan(CF_NUM_TRANSACTIONS);
     CF_Transaction_t         *arg_t                 = &CF_AppData.engine.transactions[dummy_transaction_num];
@@ -2637,7 +2637,7 @@ void Test_CF_CFDP_SendFin_Given_cc_NotEqTo_CC_NO_ERROR_GetNull_ph_Return_CF_SEND
 {
     /* Arrange */
     CF_UT_outmsg_buffer_t     dummy_ack;
-    cf_config_table_t         dummy_config_table;
+    CF_ConfigTable_t          dummy_config_table;
     CF_History_t              dummy_history;
     uint8                     dummy_transaction_num = Any_uint8_LessThan(CF_NUM_TRANSACTIONS);
     CF_Transaction_t         *arg_t                 = &CF_AppData.engine.transactions[dummy_transaction_num];
@@ -2672,7 +2672,7 @@ void Test_CF_CFDP_SendFin_Given_cc_EqTo_CC_NO_ERROR_GetNull_ph_Return_CF_SEND_SU
 {
     /* Arrange */
     CF_UT_outmsg_buffer_t     dummy_ack;
-    cf_config_table_t         dummy_config_table;
+    CF_ConfigTable_t          dummy_config_table;
     CF_History_t              dummy_history;
     uint8                     dummy_transaction_num = Any_uint8_LessThan(CF_NUM_TRANSACTIONS);
     CF_Transaction_t         *arg_t                 = &CF_AppData.engine.transactions[dummy_transaction_num];
@@ -4070,7 +4070,7 @@ void Test_CF_CFDP_RecvIdle_CheckOf_PDU_HDR_FLAGS_TYPE_Is_true_And_PDU_HDR_FLAGS_
     UT_SetDataBuffer(UT_KEY(CF_CList_Pop), &context_CF_CList_Pop, sizeof(context_CF_CList_Pop), false);
 
     /* Arrange for CF_CFDP_DispatchRecv, CF_CFDP_ArmInactTimer */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -4134,7 +4134,7 @@ void Test_CF_CFDP_RecvIdle_CheckOf_PDU_HDR_FLAGS_TYPE_Is_true_And_PDU_HDR_FLAGS_
     UT_SetDataBuffer(UT_KEY(CF_CList_Pop), &context_CF_CList_Pop, sizeof(context_CF_CList_Pop), false);
 
     /* Arrange for CF_CFDP_DispatchRecv, CF_CFDP_ArmInactTimer */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -4594,9 +4594,9 @@ void Test_CF_CFDP_InitEngine_FirstCallTo_OS_CountSemGetIdByNamel_Returns_nonOS_S
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    int32             expectedResult = Any_int32_Except(OS_SUCCESS);
-    const char       *expected_Spec  = "CF: failed to get sem id for name %s, error=0x%08x";
+    CF_ConfigTable_t dummy_config_table;
+    int32            expectedResult = Any_int32_Except(OS_SUCCESS);
+    const char      *expected_Spec  = "CF: failed to get sem id for name %s, error=0x%08x";
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_SB_CreatePipe), CFE_SUCCESS);
 
@@ -4639,7 +4639,7 @@ void Test_CF_CFDP_InitEngine_AssertsBecause_chunk_mem_offset_Plus_CF_max_chunks_
     void)
 {
     // /* Arrange */
-    // cf_config_table_t   dummy_config_table;
+    // CF_ConfigTable_t   dummy_config_table;
     // const char*         expected_Spec = "CF: failed to get sem id for name %s, error=0x%08x";
     // uint8               i = 0;
 
@@ -4681,8 +4681,8 @@ void Test_CF_CFDP_InitEngine_AssertsBecause_chunk_mem_offset_Plus_CF_max_chunks_
 void Test_CF_CFDP_InitEngine_SuccessSet_CF_AppData_engine_enabled_To_1_AndReturn_CFE_SUCCESS(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             i = 0;
+    CF_ConfigTable_t dummy_config_table;
+    uint8            i = 0;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_SB_CreatePipe), CFE_SUCCESS);
 
@@ -4730,7 +4730,7 @@ void Test_CF_CFDP_ReceiveMessage_When_rx_max_messages_per_wakeup_For_chan_num_Is
 {
     /* Arrange */
     uint8                dummy_chan_num = Any_cf_chan_num();
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_Channel_t        *arg_c;
     CF_UT_inmsg_buffer_t dummy_msg;
 
@@ -4757,7 +4757,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTO_CFE_SB_ReceiveBuffer_Returns_CFE_SB_NO_M
 {
     /* Arrange */
     uint8                dummy_chan_num = Any_cf_chan_num();
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_Channel_t        *arg_c;
     CF_UT_inmsg_buffer_t dummy_msg;
 
@@ -4786,7 +4786,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTO_CF_CFDP_RecvPh_Returns_non0_Set_CF_AppDa
 {
     /* Arrange */
     uint8                dummy_chan_num = Any_cf_chan_num();
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_Channel_t        *arg_c;
     CF_UT_inmsg_buffer_t dummy_msg;
 
@@ -4825,7 +4825,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_CF_CFDP_FindTransactionBySequenceNumber_
 {
     /* Arrange */
     uint8                dummy_chan_num = Any_cf_chan_num();
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_Channel_t        *arg_c;
     CF_UT_inmsg_buffer_t dummy_msg;
 
@@ -4903,7 +4903,7 @@ void Test_CF_CFDP_ReceiveMessage_AssertsBecause_t_state_IsGreaterThan_CFDP_IDLE(
 {
     // /* Arrange */
     // uint8               dummy_chan_num = Any_cf_chan_num();
-    // cf_config_table_t   dummy_config_table;
+    // CF_ConfigTable_t   dummy_config_table;
     // CF_Channel_t*          arg_c;
     // CF_PduRecvMsg_t         dummy_msg;
 
@@ -4977,7 +4977,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_src_And_dst_AreNot_config_table_local_ei
 {
     /* Arrange */
     uint8                       dummy_chan_num = Any_cf_chan_num();
-    cf_config_table_t           dummy_config_table;
+    CF_ConfigTable_t            dummy_config_table;
     CF_Channel_t               *arg_c;
     CF_UT_inmsg_buffer_t        dummy_msg;
     const char                 *expected_Spec = "CF: dropping packet for invalid destination eid 0x%x";
@@ -5070,7 +5070,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_Then_CallTo_FGV_Returns_non0_And_dst_IsN
 {
     /* Arrange */
     uint8                       dummy_chan_num = Any_cf_chan_num();
-    cf_config_table_t           dummy_config_table;
+    CF_ConfigTable_t            dummy_config_table;
     CF_Channel_t               *arg_c;
     CF_UT_inmsg_buffer_t        dummy_msg;
     const char                 *expected_Spec = "CF: dropping packet for invalid destination eid 0x%x";
@@ -5164,7 +5164,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_Then_bytes_received_IsLessThanExpected_A
 {
     /* Arrange */
     uint8                dummy_chan_num = Any_cf_chan_num();
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_Channel_t        *arg_c;
     CF_UT_inmsg_buffer_t dummy_msg;
     const char          *expected_Spec = "CF: dropping packet for invalid destination eid 0x%x";
@@ -5258,7 +5258,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_Then_directive_code_IsNotEqTo_PDU_FIN_An
 {
     /* Arrange */
     uint8                dummy_chan_num = Any_cf_chan_num();
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_Channel_t        *arg_c;
     CF_UT_inmsg_buffer_t dummy_msg;
     const char          *expected_Spec = "CF: dropping packet for invalid destination eid 0x%x";
@@ -5357,7 +5357,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_Then_CallTo_CF_CFDP_RecvFin_Returns_neg1
 {
     /* Arrange */
     uint8                dummy_chan_num = Any_cf_chan_num();
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_Channel_t        *arg_c;
     CF_UT_inmsg_buffer_t dummy_msg;
 
@@ -5448,7 +5448,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_Then_CallTo_CF_CFDP_RecvFin_Returns_0_In
 {
     /* Arrange */
     uint8                dummy_chan_num = Any_cf_chan_num();
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_Channel_t        *arg_c;
     CF_UT_inmsg_buffer_t dummy_msg;
 
@@ -5548,7 +5548,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_Then_CallTo_CF_CFDP_RecvFin_Returns_0_Ca
 {
     /* Arrange */
     uint8                dummy_chan_num = Any_cf_chan_num();
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_Channel_t        *arg_c;
     CF_UT_inmsg_buffer_t dummy_msg;
 
@@ -5656,7 +5656,7 @@ void Test_CF_CFDP_ReceiveMessage_CallTo_src_IsNotEqTo_config_table_local_eid_But
 {
     // /* Arrange */
     // uint8               dummy_chan_num = Any_cf_chan_num();
-    // cf_config_table_t   dummy_config_table;
+    // CF_ConfigTable_t   dummy_config_table;
     // CF_Channel_t*          arg_c;
     // CF_PduRecvMsg_t         dummy_msg;
     // const char*         expected_Spec = "CF: dropping packet from %d transaction number 0x%08x due max RX
@@ -5749,7 +5749,7 @@ void Test_CF_CFDP_ReceiveMessage_AssertsBecause_t_Is_NULL(void)
 {
     // /* Arrange */
     // uint8               dummy_chan_num = Any_cf_chan_num();
-    // cf_config_table_t   dummy_config_table;
+    // CF_ConfigTable_t   dummy_config_table;
     // CF_Channel_t*          arg_c;
     // CF_PduRecvMsg_t         dummy_msg;
     // const char*         expected_Spec = "CF: dropping packet from %d transaction number 0x%08x due max RX
@@ -5841,7 +5841,7 @@ void Test_2CF_CFDP_ReceiveMessage_CallTo_src_IsNotEqTo_config_table_local_eid_Bu
 {
     /* Arrange */
     uint8                       dummy_chan_num = Any_cf_chan_num();
-    cf_config_table_t           dummy_config_table;
+    CF_ConfigTable_t            dummy_config_table;
     CF_Channel_t               *arg_c;
     CF_UT_inmsg_buffer_t        dummy_msg;
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
@@ -6155,8 +6155,8 @@ void Test_CF_CFDP_CycleTx_Given_node_TransactionContainer_t_flags_all_q_index_Is
 void Test_CF_CFDP_CycleTx_When_dequeue_enabled_IsTrueIn_config_table_FromGiven_c_DoNothing(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    CF_Channel_t     *arg_c;
+    CF_ConfigTable_t dummy_config_table;
+    CF_Channel_t    *arg_c;
 
     CF_AppData.config_table = &dummy_config_table;
     arg_c                   = &CF_AppData.engine.channels[Any_cf_chan_num()];
@@ -6172,9 +6172,9 @@ void Test_CF_CFDP_CycleTx_When_dequeue_enabled_IsTrueIn_config_table_FromGiven_c
 void Test_CF_CFDP_CycleTx_When_cur_FromGiven_c_Is_notNULL_Set_c_cur_To_NULL(void)
 {
     /* Arrange */
-    CF_Transaction_t  dummy_cur;
-    cf_config_table_t dummy_config_table;
-    CF_Channel_t     *arg_c;
+    CF_Transaction_t dummy_cur;
+    CF_ConfigTable_t dummy_config_table;
+    CF_Channel_t    *arg_c;
 
     CF_AppData.config_table = &dummy_config_table;
     arg_c                   = &CF_AppData.engine.channels[Any_cf_chan_num()];
@@ -6193,8 +6193,8 @@ void Test_CF_CFDP_CycleTx_When_cur_FromGiven_c_Is_notNULL_Set_c_cur_To_NULL(void
 void Test_CF_CFDP_CycleTx_When_c_qs_CF_Q_PEND_Is_NULL_CF_CList_Traverse_CalledOnlyOnce_Set_c_cur_To_NULL(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    CF_Channel_t     *arg_c;
+    CF_ConfigTable_t dummy_config_table;
+    CF_Channel_t    *arg_c;
 
     CF_AppData.config_table = &dummy_config_table;
     arg_c                   = &CF_AppData.engine.channels[Any_cf_chan_num()];
@@ -6217,8 +6217,8 @@ void Test_CF_CFDP_CycleTx_When_c_qs_CF_Q_PEND_Is_NULL_Then_CF_CList_Traverse_Cal
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    CF_Channel_t     *arg_c;
+    CF_ConfigTable_t dummy_config_table;
+    CF_Channel_t    *arg_c;
 
     CF_AppData.config_table = &dummy_config_table;
     arg_c                   = &CF_AppData.engine.channels[Any_cf_chan_num()];
@@ -6245,10 +6245,10 @@ void Test_CF_CFDP_CycleTx_EnterWhileLoopOnceAndCall_cf_move_transaction_SecondCa
     void)
 {
     /* Arrange */
-    CF_Transaction_t  dummy_cur;
-    cf_config_table_t dummy_config_table;
-    CF_Channel_t     *arg_c;
-    void             *context_CF_CList_Traverse[2];
+    CF_Transaction_t dummy_cur;
+    CF_ConfigTable_t dummy_config_table;
+    CF_Channel_t    *arg_c;
+    void            *context_CF_CList_Traverse[2];
 
     CF_AppData.config_table = &dummy_config_table;
     arg_c                   = &CF_AppData.engine.channels[Any_cf_chan_num()];
@@ -6701,7 +6701,7 @@ void Test_CF_CFDP_TxFile___SetsGivenValuesOnTransaction_cfdp_class_SetTo_CLASS_2
 void Test_CF_CFDP_TxFile_DoesNotError(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t  dummy_config_table;
     CF_History_t      dummy_history;
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t          = &dummy_t;
@@ -6923,7 +6923,7 @@ void Test_CF_CFDP_TxFile_SuccessIncrements_c_num_cmd_tx_AndSets_t_flags_tx_cmd_t
         1; /* avoid assert second call */
 
     /* Arrange for CF_CFDP_TxFile_ */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -7351,7 +7351,7 @@ void Test_CF_CFDP_ProcessPlaybackDirectory_FirstCallTo_OS_DirectoryRead_Returns_
         1; /* avoid assert second call */
 
     /* Arrange for CF_CFDP_TxFile_ */
-    cf_config_table_t dummy_config_table;
+    CF_ConfigTable_t dummy_config_table;
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -7540,10 +7540,10 @@ void Test_CF_CFDP_ProcessPlaybackDirectories_Calls_CF_CFDP_ProcessPlaybackDirect
 void Test_CF_CFDP_ProcessPollingDirectories_CallsOnly_CF_CFDP_UpdatePollPbCounted_When_pd_enabled_Is_0(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             dummy_chan_index = Any_cf_chan_num();
-    CF_Channel_t     *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
-    int               i                = 0;
+    CF_ConfigTable_t dummy_config_table;
+    uint8            dummy_chan_index = Any_cf_chan_num();
+    CF_Channel_t    *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
+    int              i                = 0;
 
     CF_AppData.hk.channel_hk[dummy_chan_index].poll_counter = CF_MAX_POLLING_DIR_PER_CHAN;
 
@@ -7569,10 +7569,10 @@ void Test_CF_CFDP_ProcessPollingDirectories_CallsOnly_CF_CFDP_UpdatePollPbCounte
 void Test_CF_CFDP_ProcessPollingDirectories_CallsOnly_CF_CFDP_UpdatePollPbCounted_When_pd_interval_sec_Is_0(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             dummy_chan_index = Any_cf_chan_num();
-    CF_Channel_t     *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
-    int               i                = 0;
+    CF_ConfigTable_t dummy_config_table;
+    uint8            dummy_chan_index = Any_cf_chan_num();
+    CF_Channel_t    *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
+    int              i                = 0;
 
     CF_AppData.hk.channel_hk[dummy_chan_index].poll_counter = CF_MAX_POLLING_DIR_PER_CHAN;
 
@@ -7600,10 +7600,10 @@ void Test_CF_CFDP_ProcessPollingDirectories_When_p_pb_busy_Is_true_PlaybackIsAct
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             dummy_chan_index = Any_cf_chan_num();
-    CF_Channel_t     *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
-    int               i                = 0;
+    CF_ConfigTable_t dummy_config_table;
+    uint8            dummy_chan_index = Any_cf_chan_num();
+    CF_Channel_t    *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
+    int              i                = 0;
 
     CF_AppData.hk.channel_hk[dummy_chan_index].poll_counter = 0;
 
@@ -7645,10 +7645,10 @@ void Test_CF_CFDP_ProcessPollingDirectories_When_p_pb_busy_Is_false_But_p_pb_num
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             dummy_chan_index = Any_cf_chan_num();
-    CF_Channel_t     *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
-    int               i                = 0;
+    CF_ConfigTable_t dummy_config_table;
+    uint8            dummy_chan_index = Any_cf_chan_num();
+    CF_Channel_t    *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
+    int              i                = 0;
 
     CF_AppData.hk.channel_hk[dummy_chan_index].poll_counter = 0;
 
@@ -7692,10 +7692,10 @@ void Test_CF_CFDP_ProcessPollingDirectories_When_p_timer_set_Is_1_And_CF_Timer_E
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             dummy_chan_index = Any_cf_chan_num();
-    CF_Channel_t     *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
-    int               i                = 0;
+    CF_ConfigTable_t dummy_config_table;
+    uint8            dummy_chan_index = Any_cf_chan_num();
+    CF_Channel_t    *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
+    int              i                = 0;
 
     CF_AppData.hk.channel_hk[dummy_chan_index].poll_counter = 0;
 
@@ -7733,10 +7733,10 @@ void Test_CF_CFDP_ProcessPollingDirectories_When_p_timer_set_Is_0_CF_Timer_Expir
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             dummy_chan_index = Any_cf_chan_num();
-    CF_Channel_t     *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
-    int               i                = 0;
+    CF_ConfigTable_t dummy_config_table;
+    uint8            dummy_chan_index = Any_cf_chan_num();
+    CF_Channel_t    *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
+    int              i                = 0;
 
     CF_AppData.hk.channel_hk[dummy_chan_index].poll_counter = 0;
 
@@ -7783,10 +7783,10 @@ void Test_CF_CFDP_ProcessPollingDirectories_When_p_timer_set_Is_0_CF_Timer_Expir
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             dummy_chan_index = Any_cf_chan_num();
-    CF_Channel_t     *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
-    int               i                = 0;
+    CF_ConfigTable_t dummy_config_table;
+    uint8            dummy_chan_index = Any_cf_chan_num();
+    CF_Channel_t    *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
+    int              i                = 0;
 
     CF_AppData.hk.channel_hk[dummy_chan_index].poll_counter = 0;
 
@@ -7833,10 +7833,10 @@ void Test_CF_CFDP_ProcessPollingDirectories_When_p_timer_set_Is_0_Calls_CF_Timer
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    uint8             dummy_chan_index = Any_cf_chan_num();
-    CF_Channel_t     *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
-    int               i                = 0;
+    CF_ConfigTable_t dummy_config_table;
+    uint8            dummy_chan_index = Any_cf_chan_num();
+    CF_Channel_t    *arg_c            = &CF_AppData.engine.channels[dummy_chan_index];
+    int              i                = 0;
 
     CF_AppData.hk.channel_hk[dummy_chan_index].poll_counter = 0;
 
@@ -7901,7 +7901,7 @@ void Test_CF_CFDP_CycleEngine_DoesNothingWhen_engine_Is_0(void)
 void Test_CF_CFDP_CycleEngine_ConsumesAllMessagesWithAllChannelsFrozen(void)
 {
     /* Arrange */
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_UT_inmsg_buffer_t dummy_msg;
     int                  i = 0;
 
@@ -7935,7 +7935,7 @@ void Test_CF_CFDP_CycleEngine_WhenOneChannelNotFrozenCalls_CF_CFDP_TickTransacti
     void)
 {
     /* Arrange */
-    cf_config_table_t    dummy_config_table;
+    CF_ConfigTable_t     dummy_config_table;
     CF_UT_inmsg_buffer_t dummy_msg;
     int                  i = 0;
 
