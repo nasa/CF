@@ -212,6 +212,9 @@ void Test_CF_CList_InsertFront_WhenNodeListIsGreaterThanTwoNodesAndTheyPointToCo
     uint8        num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
     int          i                    = 0;
 
+    dummy_second_node       = NULL;
+    dummy_next_to_last_node = NULL;
+
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
         clist_node dummy_clist_node = malloc(sizeof(*dummy_clist_node));
@@ -395,6 +398,9 @@ void Test_CF_CList_InsertBack_WhenNodeListIsGreaterThanTwoNodesAndTheyPointToCor
     clist_node   dummy_next_to_last_node;
     uint8        num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
     int          i                    = 0;
+
+    dummy_second_node       = NULL;
+    dummy_next_to_last_node = NULL;
 
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
@@ -659,6 +665,9 @@ void Test_CF_ClistRemove_RemovingHeadSetSecondNodeToHeadAndUpdateLastNode(void)
     uint8        num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
     int          i                    = 0;
 
+    dummy_second_node       = NULL;
+    dummy_next_to_last_node = NULL;
+
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
         clist_node dummy_clist_node = malloc(sizeof(*dummy_clist_node));
@@ -720,6 +729,9 @@ void Test_CF_ClistRemove_RemovingLastPointHeadAndNextToLastToEachOther(void)
     clist_node   dummy_next_to_last_node;
     uint8        num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
     int          i                    = 0;
+
+    dummy_second_node       = NULL;
+    dummy_next_to_last_node = NULL;
 
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
@@ -785,6 +797,11 @@ void Test_CF_ClistRemove_RemovingAnyNodeHasNodesPrevAndNextPointToEachOther(void
     uint8        num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
     uint8        num_of_removed_node  = Any_uint8_LessThan(num_extraneous_nodes);
     int          i                    = 0;
+
+    dummy_removed_node      = NULL;
+    arg_node                = NULL;
+    dummy_second_node       = NULL;
+    dummy_next_to_last_node = NULL;
 
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
@@ -991,6 +1008,9 @@ void Test_CF_CList_InsertAfter_WhenAnyNodeSuccess_after_IsInsertedAfter_start(vo
     uint8        insertion_point      = Any_uint8_LessThan(num_extraneous_nodes);
     int          i                    = 0;
 
+    dummy_second_node       = NULL;
+    dummy_next_to_last_node = NULL;
+
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
         clist_node dummy_clist_node = malloc(sizeof(*dummy_clist_node));
@@ -1163,6 +1183,9 @@ void Test_CF_CList_Traverse_WhenListIsManyNodesErrorIn_fn_Call(void)
     int                        i              = 0;
     Dummy_clist_fn_t_context_t context_Dummy_clist_fn_t[list_size];
 
+    arg_start  = NULL;
+    adder_node = NULL;
+
     /* set up list */
     for (i = 0; i < list_size; ++i)
     {
@@ -1237,6 +1260,9 @@ void Test_CF_CList_Traverse_WhenListIsManyNodesSuccess(void)
     uint8                      list_size   = Any_uint8_LessThan(9) + 2; /* 2 - 10 */
     int                        i           = 0;
     Dummy_clist_fn_t_context_t context_Dummy_clist_fn_t[list_size + 1];
+
+    arg_start  = NULL;
+    adder_node = NULL;
 
     /* set up list */
     for (i = 0; i < list_size; ++i)
