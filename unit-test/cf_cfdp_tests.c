@@ -1153,6 +1153,9 @@ void Test_CF_CFDP_FindTransactionBySequenceNumber__When_context_src_eid_NotEq_hi
     history_t        dummy_history;
     int              local_result;
 
+    memset(&dummy_context, 0, sizeof(dummy_context));
+    memset(&dummy_history, 0, sizeof(dummy_history));
+
     arg_n = &dummy_t.cl_node;
 
     dummy_t.history          = &dummy_history;
@@ -1242,12 +1245,18 @@ void Test_CF_CFDP_FindTransactionBySequenceNumber_DoNotFindTransaction(void)
     channel_t           *arg_c                           = &dummy_c;
     cf_transaction_seq_t arg_transaction_sequence_number = Any_uint32();
     cf_entity_id_t       arg_src_eid                     = Any_uint8();
-    clist_node           expected_ptrs[NUM_CLISTS] = {arg_c->qs[CF_Q_RX], arg_c->qs[CF_Q_PEND], arg_c->qs[CF_Q_TXA],
-                                            arg_c->qs[CF_Q_TXW]};
+    clist_node           expected_ptrs[NUM_CLISTS];
     transaction_t       *local_result;
     int                  i = 0;
 
     CF_CList_Traverse_FIND_T_BY_SEQ_NUM_context_t context_CF_CList_Traverse[NUM_CLISTS];
+
+    memset(&dummy_c, 0, sizeof(dummy_c));
+
+    expected_ptrs[0] = arg_c->qs[CF_Q_RX];
+    expected_ptrs[1] = arg_c->qs[CF_Q_PEND];
+    expected_ptrs[2] = arg_c->qs[CF_Q_TXA];
+    expected_ptrs[3] = arg_c->qs[CF_Q_TXW];
 
     type_of_context_CF_CList_Traverse = FIND_T_BY_SEQ_NUM;
 
@@ -1287,14 +1296,20 @@ void Test_CF_CFDP_FindTransactionBySequenceNumber_FindTransactionOnLastClist(voi
     channel_t           *arg_c                           = &dummy_c;
     cf_transaction_seq_t arg_transaction_sequence_number = Any_uint32();
     cf_entity_id_t       arg_src_eid                     = Any_uint8();
-    clist_node           expected_ptrs[NUM_CLISTS] = {arg_c->qs[CF_Q_RX], arg_c->qs[CF_Q_PEND], arg_c->qs[CF_Q_TXA],
-                                            arg_c->qs[CF_Q_TXW]};
+    clist_node           expected_ptrs[NUM_CLISTS];
     transaction_t        dummy_result;
     transaction_t       *expected_result = &dummy_result;
     transaction_t       *local_result;
     int                  i = 0;
 
     CF_CList_Traverse_FIND_T_BY_SEQ_NUM_context_t context_CF_CList_Traverse[NUM_CLISTS];
+
+    memset(&dummy_c, 0, sizeof(dummy_c));
+
+    expected_ptrs[0] = arg_c->qs[CF_Q_RX];
+    expected_ptrs[1] = arg_c->qs[CF_Q_PEND];
+    expected_ptrs[2] = arg_c->qs[CF_Q_TXA];
+    expected_ptrs[3] = arg_c->qs[CF_Q_TXW];
 
     type_of_context_CF_CList_Traverse = FIND_T_BY_SEQ_NUM;
 
