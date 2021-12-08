@@ -1,20 +1,30 @@
-cmake_minimum_required(VERSION 2.6.4)
-project(CFS_CF_APP C)
+project(CFS_CF C)
 
 include_directories(fsw/src)
 include_directories(fsw/mission_inc)
 include_directories(fsw/platform_inc)
 include_directories(${CFS_IO_LIB_MISSION_DIR}/fsw/public_inc)
 
-aux_source_directory(fsw/src APP_SRC_FILES)
+set(APP_SRC_FILES
+  fsw/src/cf_app.c
+  fsw/src/cf_assert.c
+  fsw/src/cf_cfdp.c
+  fsw/src/cf_cfdp_helpers.c
+  fsw/src/cf_cfdp_r.c
+  fsw/src/cf_cfdp_s.c
+  fsw/src/cf_chunk.c
+  fsw/src/cf_clist.c
+  fsw/src/cf_cmd.c
+  fsw/src/cf_crc.c
+  fsw/src/cf_timer.c
+  fsw/src/cf_utils.c
+)
 
 # Create the app module
-add_cfe_app(cf_app ${APP_SRC_FILES})
+add_cfe_app(cf ${APP_SRC_FILES})
 
-if (COMMAND add_cfe_tables)
-    aux_source_directory(fsw/tables APP_TBL_FILES)
-    add_cfe_tables(cf_app ${APP_TBL_FILES})
-endif(COMMAND add_cfe_tables)
+# configuration table
+add_cfe_tables(cf fsw/tables/cf_def_config.c)
 
 add_definitions("-D_DEFAULT_SOURCE")
 
