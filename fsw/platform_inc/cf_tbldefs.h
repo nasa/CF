@@ -27,7 +27,6 @@
 #ifndef CF_TBLDEFS__H
 #define CF_TBLDEFS__H
 
-#include "cf_types.h"
 #include "cf_platform_cfg.h"
 #include "cf_cfdp_pdu.h"
 
