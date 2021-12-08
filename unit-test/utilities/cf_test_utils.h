@@ -55,6 +55,85 @@ void Handler_CF_CFDP_ConstructPduHeader_ForceReturnOnly(void *UserObj, UT_EntryK
 
 /*******************************************************************************
 **
+**  Buffer allocation types
+**
+**  The "pdu_s_msg_t" and "pdu_r_msg_t" are only minimally-sized types, reflecting
+**  the common parts of all PDUs, without any definition of the optional/extra parts.
+**
+**  In order to call one of the CFDP functions that accept a larger buffer, the
+**  test buffer must account for and include this extra data.
+**
+**  Also this buffer should be properly aligned as a CFE_SB_Buffer_t to make it safe to
+**  assign the address to a CFE_SB_Buffer_t*.
+**
+*******************************************************************************/
+
+/* A combination of all the various CFDP secondary header types */
+typedef union
+{
+    pdu_file_directive_header_t fdirh;
+    pdu_file_data_header_t      fdatah;
+    pdu_md_t                    md;
+    pdu_eof_t                   eof;
+    pdu_ack_t                   ack;
+    pdu_fin_t                   fin;
+    pdu_nak_t                   nak;
+} pdu_any_sechdr_t;
+
+typedef struct
+{
+    /* note that technically the pdu_header_t is variably sized,
+       but for most UT test cases the extension data is not used, thus
+       the second header follows it immediately */
+    pdu_header_t     common;
+    pdu_any_sechdr_t secondary;
+
+    /* extra space just in case the pdu_header_t is longer than nominal */
+    uint8_t pad[CF_MAX_HEADER_SIZE - sizeof(pdu_header_t)];
+
+} CF_UT_fullhdr_t;
+
+typedef struct
+{
+    CFE_MSG_TelemetryHeader_t tlm;
+    CF_UT_fullhdr_t           cfdp;
+
+} CF_UT_any_outmsg_t;
+
+typedef struct
+{
+    CFE_MSG_CommandHeader_t cmd;
+    CF_UT_fullhdr_t         cfdp;
+
+} CF_UT_any_inmsg_t;
+
+typedef union
+{
+    CFE_MSG_Message_t  cfe_msg;
+    CFE_SB_Buffer_t    cfe_sb_buffer;
+    pdu_s_msg_t        pdu_s_msg;
+    CF_UT_any_outmsg_t content;
+
+    /* This ensures the buffer is large enough to store any PDU type,
+       some of which are larger than the basic CF_UT_exthdr_t (up to CF_MAX_PDU_SIZE) */
+    uint8_t bytes[offsetof(CF_UT_any_outmsg_t, cfdp) + CF_MAX_PDU_SIZE];
+
+} CF_UT_outmsg_buffer_t;
+
+typedef union
+{
+    CFE_MSG_Message_t cfe_msg;
+    CFE_SB_Buffer_t   cfe_sb_buffer;
+    pdu_r_msg_t       pdu_r_msg;
+    CF_UT_any_inmsg_t content;
+
+    /* This ensures the buffer is large enough to store any PDU type,
+       some of which are larger than the basic CF_UT_exthdr_t (up to CF_MAX_PDU_SIZE) */
+    uint8_t bytes[offsetof(CF_UT_any_inmsg_t, cfdp) + CF_MAX_PDU_SIZE];
+} CF_UT_inmsg_buffer_t;
+
+/*******************************************************************************
+**
 **  cfe stub_reporter_hook contexts
 **
 **  Some that are very frequently use include a global context.

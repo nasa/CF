@@ -232,21 +232,6 @@ typedef struct
     pdu_fd_data_t          fdd;
 } CF_PACK pdu_fd_t;
 
-#if 0
-typedef union {
-    uint8 data[CF_MAX_PDU_SIZE];
-    pdu_header_t ph;
-    pdu_file_directive_header_t fdh;
-
-    pdu_fd_t fd;
-    pdu_md_t md;
-    pdu_eof_t eof;
-    pdu_ack_t ack;
-    pdu_fin_t fin;
-    pdu_nak_t nak;
-} CF_PACK pdu_t;
-#endif
-
 /* NOTE: the use of pdu_header_t below is correct, but the pdu_r_msg_t and pdu_s_msg_t
  * structures are both longer than these definitions. They are always backed by a buffer
  * of size CF_MAX_PDU_SIZE */
@@ -254,14 +239,12 @@ typedef struct
 {
     CFE_MSG_CommandHeader_t hdr;
     pdu_header_t            ph;
-    // pdu_t pdu;
 } CF_PACK pdu_r_msg_t;
 
 typedef struct
 {
     CFE_MSG_TelemetryHeader_t hdr;
     pdu_header_t              ph;
-    // pdu_t pdu;
 } CF_PACK pdu_s_msg_t;
 
 DECLARE_FIELD(PDU_MD_SEGMENTATION_CONTROL, 1, 7)
