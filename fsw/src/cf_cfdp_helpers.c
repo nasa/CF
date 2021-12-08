@@ -187,8 +187,3 @@ int CF_HeaderSize(const pdu_header_t *ph)
     CF_Assert((eid_l > 0) && (tsn_l > 0));
     return sizeof(pdu_header_t) + (2 * eid_l) + tsn_l;
 }
-
-void *CF_EndOfHeaderPtr(const pdu_header_t *ph)
-{
-    return (void *)(((uint8 *)ph) + CF_HeaderSize(ph));
-}

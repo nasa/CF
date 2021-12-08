@@ -54,12 +54,11 @@ typedef struct
 #endif
 } CF_PACK pdu_header_t;
 
-extern int   CF_GetMemcpySize(const uint8 *num, int size);
-extern void  CF_MemcpyToBE(uint8 *dst, const uint8 *src, int src_size, int dst_size);
-extern int   CF_GetVariableHeader(void);
-extern void  CF_SetVariableHeader(cf_entity_id_t src_eid, cf_entity_id_t dst_eid, cf_transaction_seq_t tsn);
-extern void *CF_EndOfHeaderPtr(const pdu_header_t *ph);
-extern int   CF_HeaderSize(const pdu_header_t *ph);
+extern int  CF_GetMemcpySize(const uint8 *num, int size);
+extern void CF_MemcpyToBE(uint8 *dst, const uint8 *src, int src_size, int dst_size);
+extern int  CF_GetVariableHeader(void);
+extern void CF_SetVariableHeader(cf_entity_id_t src_eid, cf_entity_id_t dst_eid, cf_transaction_seq_t tsn);
+extern int  CF_HeaderSize(const pdu_header_t *ph);
 
 #define CF_MAX_HEADER_SIZE (sizeof(pdu_header_t) + (2 * sizeof(cf_entity_id_t)) + sizeof(cf_transaction_seq_t))
 #define STATIC_CAST(ph, t) ((t *)(((uint8 *)ph) + CF_HeaderSize(ph)))
