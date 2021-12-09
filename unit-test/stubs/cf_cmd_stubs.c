@@ -48,8 +48,8 @@ typedef struct
 
 typedef struct
 {
-    const cf_cmd_unionargs_t *msg;
-    uint8                     barg;
+    const CF_UnionArgsCmd_t *msg;
+    uint8                    barg;
 } bool_msg_arg_t;
 
 /************************************************************************/
@@ -187,7 +187,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_DoChanAction(cf_cmd_unionargs_t *cmd, const char *errstr, chan_action_fn_t fn, void *context)
+// static int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, chan_action_fn_t fn, void *context)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -251,7 +251,8 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(cf_transaction_seq_t ts, cf_entity_id_t eid)
+// static CF_Transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(CF_TransactionSeq_t ts, CF_EntityId_t
+// eid)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -276,7 +277,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_TsnChanAction(cf_cmd_transaction_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
+// static int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -290,7 +291,7 @@ typedef struct
 **       t must not be NULL. context must not be NULL.
 **
 *************************************************************************/
-// static void CF_DoSuspRes_(transaction_t *t, susp_res_arg_t *context)
+// static void CF_DoSuspRes_(CF_Transaction_t *t, susp_res_arg_t *context)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -308,7 +309,7 @@ typedef struct
 **       cmd must not be NULL.
 **
 *************************************************************************/
-// static void CF_DoSuspRes(cf_cmd_transaction_t *cmd, uint8 action)
+// static void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -350,7 +351,7 @@ typedef struct
 **       t must not be NULL.
 **
 *************************************************************************/
-// static void CF_CmdCancel_(transaction_t *t, void *ignored)
+// static void CF_CmdCancel_(CF_Transaction_t *t, void *ignored)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -378,7 +379,7 @@ typedef struct
 **       msg must not be NULL.
 **
 *************************************************************************/
-// static void CF_CmdAbandon_(transaction_t *t, void *ignored)
+// static void CF_CmdAbandon_(CF_Transaction_t *t, void *ignored)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -490,7 +491,7 @@ typedef struct
 **       n must not be NULL. c must not be NULL.
 **
 *************************************************************************/
-// static int CF_PurgeHistory(clist_node n, channel_t *c)
+// static int CF_PurgeHistory(CF_CListNode_t * n, CF_Channel_t *c)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -504,7 +505,7 @@ typedef struct
 **       n must not be NULL.
 **
 *************************************************************************/
-// static int CF_PurgeTransaction(clist_node n, void *ignored)
+// static int CF_PurgeTransaction(CF_CListNode_t * n, void *ignored)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -526,7 +527,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_DoPurgeQueue(uint8 chan_num, cf_cmd_unionargs_t *cmd)
+// static int CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);

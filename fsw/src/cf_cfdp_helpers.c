@@ -95,37 +95,37 @@ static void CF_MemcpyFromBE(uint8 *dst, const uint8 *src, int src_size, int dst_
 #endif
 }
 
-static int CF_GetTSNSize(const pdu_header_t *ph)
+static int CF_GetTSNSize(const CF_CFDP_PduHeader_t *ph)
 {
     uint8 field;
     int   ret;
 
     cfdp_get_uint8(field, ph->eid_tsn_lengths);
-    ret = FGV(field, PDU_LENGTHS_TRANSACTION_SEQUENCE) + 1;
+    ret = FGV(field, CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE) + 1;
 
-    if (ret > sizeof(cf_transaction_seq_t))
+    if (ret > sizeof(CF_TransactionSeq_t))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_GET_TSN_SIZE, CFE_EVS_EventType_ERROR,
                           "received TSN size %d too large for compiled max of %d", ret,
-                          (uint32)sizeof(cf_transaction_seq_t));
+                          (uint32)sizeof(CF_TransactionSeq_t));
         return -1;
     }
 
     return ret;
 }
 
-static int CF_GetEIDSize(const pdu_header_t *ph)
+static int CF_GetEIDSize(const CF_CFDP_PduHeader_t *ph)
 {
     uint8 field;
     int   ret;
 
     cfdp_get_uint8(field, ph->eid_tsn_lengths);
-    ret = FGV(field, PDU_LENGTHS_ENTITY) + 1;
+    ret = FGV(field, CF_CFDP_PduHeader_LENGTHS_ENTITY) + 1;
 
-    if (ret > sizeof(cf_entity_id_t))
+    if (ret > sizeof(CF_EntityId_t))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_GET_EID_SIZE, CFE_EVS_EventType_ERROR,
-                          "received EID size %d too large for compiled max of %d", ret, (uint32)sizeof(cf_entity_id_t));
+                          "received EID size %d too large for compiled max of %d", ret, (uint32)sizeof(CF_EntityId_t));
         return -1;
     }
 
@@ -136,33 +136,33 @@ static int CF_GetEIDSize(const pdu_header_t *ph)
 /* in.msg must be valid PDU message */
 int CF_GetVariableHeader(void)
 {
-    pdu_header_t *ph    = &((pdu_r_msg_t *)CF_AppData.engine.in.msg)->ph;
-    const int     eid_l = CF_GetEIDSize(ph);
-    const int     tsn_l = CF_GetTSNSize(ph);
-    int           offs  = sizeof(*ph);
-    int           ret   = -1;
+    CF_CFDP_PduHeader_t *ph    = &((CF_PduRecvMsg_t *)CF_AppData.engine.in.msg)->ph;
+    const int            eid_l = CF_GetEIDSize(ph);
+    const int            tsn_l = CF_GetTSNSize(ph);
+    int                  offs  = sizeof(*ph);
+    int                  ret   = -1;
 
     if ((eid_l > 0) && (tsn_l > 0))
     {
-        CF_MemcpyFromBE((uint8 *)&CF_AppData.engine.in.src, ((uint8 *)ph) + offs, eid_l, sizeof(cf_entity_id_t));
+        CF_MemcpyFromBE((uint8 *)&CF_AppData.engine.in.src, ((uint8 *)ph) + offs, eid_l, sizeof(CF_EntityId_t));
         offs += eid_l;
-        CF_MemcpyFromBE((uint8 *)&CF_AppData.engine.in.tsn, ((uint8 *)ph) + offs, tsn_l, sizeof(cf_transaction_seq_t));
+        CF_MemcpyFromBE((uint8 *)&CF_AppData.engine.in.tsn, ((uint8 *)ph) + offs, tsn_l, sizeof(CF_TransactionSeq_t));
         offs += tsn_l;
-        CF_MemcpyFromBE((uint8 *)&CF_AppData.engine.in.dst, ((uint8 *)ph) + offs, eid_l, sizeof(cf_entity_id_t));
+        CF_MemcpyFromBE((uint8 *)&CF_AppData.engine.in.dst, ((uint8 *)ph) + offs, eid_l, sizeof(CF_EntityId_t));
         ret = 0;
     }
 
     return ret;
 }
 
-void CF_SetVariableHeader(cf_entity_id_t src_eid, cf_entity_id_t dst_eid, cf_transaction_seq_t tsn)
+void CF_SetVariableHeader(CF_EntityId_t src_eid, CF_EntityId_t dst_eid, CF_TransactionSeq_t tsn)
 {
-    pdu_header_t *ph      = &((pdu_s_msg_t *)CF_AppData.engine.out.msg)->ph;
-    int           offs    = sizeof(*ph);
-    const int     eid_s_l = CF_GetMemcpySize((uint8 *)&src_eid, sizeof(src_eid));
-    const int     eid_d_l = CF_GetMemcpySize((uint8 *)&dst_eid, sizeof(dst_eid));
-    const int     tsn_l   = CF_GetMemcpySize((uint8 *)&tsn, sizeof(tsn));
-    const int     csize   = ((eid_s_l > eid_d_l) ? eid_s_l : eid_d_l);
+    CF_CFDP_PduHeader_t *ph      = &((CF_PduSendMsg_t *)CF_AppData.engine.out.msg)->ph;
+    int                  offs    = sizeof(*ph);
+    const int            eid_s_l = CF_GetMemcpySize((uint8 *)&src_eid, sizeof(src_eid));
+    const int            eid_d_l = CF_GetMemcpySize((uint8 *)&dst_eid, sizeof(dst_eid));
+    const int            tsn_l   = CF_GetMemcpySize((uint8 *)&tsn, sizeof(tsn));
+    const int            csize   = ((eid_s_l > eid_d_l) ? eid_s_l : eid_d_l);
 
     CF_MemcpyToBE(((uint8 *)ph) + offs, (uint8 *)&src_eid, sizeof(src_eid), csize);
     offs += csize;
@@ -170,20 +170,20 @@ void CF_SetVariableHeader(cf_entity_id_t src_eid, cf_entity_id_t dst_eid, cf_tra
     offs += tsn_l;
     CF_MemcpyToBE(((uint8 *)ph) + offs, (uint8 *)&dst_eid, sizeof(dst_eid), csize);
 
-    FSV(ph->eid_tsn_lengths, PDU_LENGTHS_ENTITY, csize - 1);
-    FSV(ph->eid_tsn_lengths, PDU_LENGTHS_TRANSACTION_SEQUENCE, tsn_l - 1);
+    FSV(ph->eid_tsn_lengths, CF_CFDP_PduHeader_LENGTHS_ENTITY, csize - 1);
+    FSV(ph->eid_tsn_lengths, CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE, tsn_l - 1);
 }
 
-int CF_HeaderSize(const pdu_header_t *ph)
+int CF_HeaderSize(const CF_CFDP_PduHeader_t *ph)
 {
     uint8 temp;
 
     /* NOTE: assume header size is correct here (packet already validated via CF_GetVariableHeader, or
      * set by CF for outgoing PDU */
     cfdp_ldst_uint8(temp, ph->eid_tsn_lengths);
-    const int eid_l = 1 + FGV(temp, PDU_LENGTHS_ENTITY);
-    const int tsn_l = 1 + FGV(temp, PDU_LENGTHS_TRANSACTION_SEQUENCE);
+    const int eid_l = 1 + FGV(temp, CF_CFDP_PduHeader_LENGTHS_ENTITY);
+    const int tsn_l = 1 + FGV(temp, CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE);
 
     CF_Assert((eid_l > 0) && (tsn_l > 0));
-    return sizeof(pdu_header_t) + (2 * eid_l) + tsn_l;
+    return sizeof(CF_CFDP_PduHeader_t) + (2 * eid_l) + tsn_l;
 }

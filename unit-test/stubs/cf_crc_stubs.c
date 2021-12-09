@@ -33,9 +33,9 @@
 **       c must not be NULL.
 **
 *************************************************************************/
-void CF_CRC_Start(cf_crc_t *c)
+void CF_CRC_Start(CF_Crc_t *c)
 {
-    UT_GenStub_AddParam(CF_CRC_Start, cf_crc_t *, c);
+    UT_GenStub_AddParam(CF_CRC_Start, CF_Crc_t *, c);
 
     UT_GenStub_Execute(CF_CRC_Start, Basic, NULL);
 }
@@ -51,7 +51,7 @@ void CF_CRC_Start(cf_crc_t *c)
 **       c must not be NULL.
 **
 *************************************************************************/
-void CF_CRC_Digest(cf_crc_t *c, const uint8 *data, int len)
+void CF_CRC_Digest(CF_Crc_t *c, const uint8 *data, int len)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_CRC_Digest), &c, sizeof(c));
     UT_Stub_CopyFromLocal(UT_KEY(CF_CRC_Digest), &data, sizeof(data));
@@ -72,9 +72,9 @@ void CF_CRC_Digest(cf_crc_t *c, const uint8 *data, int len)
 **       c must not be NULL.
 **
 *************************************************************************/
-void CF_CRC_Finalize(cf_crc_t *c)
+void CF_CRC_Finalize(CF_Crc_t *c)
 {
-    UT_GenStub_AddParam(CF_CRC_Finalize, cf_crc_t *, c);
+    UT_GenStub_AddParam(CF_CRC_Finalize, CF_Crc_t *, c);
 
     /* TODO: UT_Stub_CopyFromLocal being used, but should be removed in defference to handler style functions */
     UT_Stub_CopyFromLocal(UT_KEY(CF_CRC_Finalize), &c, sizeof(c));

@@ -15,17 +15,17 @@ int32 Stub_FGV(uint8 source, CF_FIELD_FIELD name);
 **
 *******************************************************************************/
 
-cfdp_send_ret_t Any_cfdp_send_ret_t(void)
+CF_SendRet_t Any_cfdp_send_ret_t(void)
 {
-    cfdp_send_ret_t random_val = Any_uint8_LessThan(CF_SEND_FAILURE + 1);
+    CF_SendRet_t random_val = Any_uint8_LessThan(CF_SendRet_FAILURE + 1);
 
     return random_val;
 }
 
-cfdp_send_ret_t Any_cfdp_send_ret_t_ExceptThese(cfdp_send_ret_t exceptions[], uint8 num_exceptions)
+CF_SendRet_t Any_cfdp_send_ret_t_ExceptThese(CF_SendRet_t exceptions[], uint8 num_exceptions)
 {
-    uint8           i          = 0;
-    cfdp_send_ret_t random_val = Any_uint8_LessThan(CF_SEND_FAILURE + 1);
+    uint8        i          = 0;
+    CF_SendRet_t random_val = Any_uint8_LessThan(CF_SendRet_FAILURE + 1);
 
     while (i != num_exceptions)
     {
@@ -34,7 +34,7 @@ cfdp_send_ret_t Any_cfdp_send_ret_t_ExceptThese(cfdp_send_ret_t exceptions[], ui
         ** never really happen - so it is not that important for test code */
         if (random_val == exceptions[i])
         {
-            random_val = Any_uint8_LessThan(CF_SEND_FAILURE + 1);
+            random_val = Any_uint8_LessThan(CF_SendRet_FAILURE + 1);
             i          = 0;
         }
         else
@@ -46,9 +46,9 @@ cfdp_send_ret_t Any_cfdp_send_ret_t_ExceptThese(cfdp_send_ret_t exceptions[], ui
     return random_val;
 }
 
-cfdp_send_ret_t Any_cfdp_send_ret_t_Except(cfdp_send_ret_t exception)
+CF_SendRet_t Any_cfdp_send_ret_t_Except(CF_SendRet_t exception)
 {
-    cfdp_send_ret_t exceptions[1] = {exception};
+    CF_SendRet_t exceptions[1] = {exception};
 
     return Any_cfdp_send_ret_t_ExceptThese(exceptions, 1);
 }
@@ -62,15 +62,15 @@ cfdp_send_ret_t Any_cfdp_send_ret_t_Except(cfdp_send_ret_t exception)
 *******************************************************************************/
 
 /* NOTE: To use new handler type function for dummy stubs -- replacement is in comment
-void Dummy_fns_CF_CFDP_S_DispatchRecv(transaction_t* t, const pdu_header_t* ph)
+void Dummy_fns_CF_CFDP_S_DispatchRecv(CF_Transaction_t* t, const CF_CFDP_PduHeader_t* ph)
 {
-    UT_GenStub_AddParam(Stub_FGV, transaction_t*, t);
-    UT_GenStub_AddParam(Stub_FGV, pdu_header_t*, ph);
+    UT_GenStub_AddParam(Stub_FGV, CF_Transaction_t*, t);
+    UT_GenStub_AddParam(Stub_FGV, CF_CFDP_PduHeader_t*, ph);
 
     UT_GenStub_Execute(Stub_FGV, Basic, NULL);
 } */
 
-void Dummy_fns_CF_CFDP_S_DispatchRecv(transaction_t *t, const pdu_header_t *pdu)
+void Dummy_fns_CF_CFDP_S_DispatchRecv(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
 {
     UT_Stub_CopyFromLocal(UT_KEY(Dummy_fns_CF_CFDP_S_DispatchRecv), &t, sizeof(t));
     UT_Stub_CopyFromLocal(UT_KEY(Dummy_fns_CF_CFDP_S_DispatchRecv), &pdu, sizeof(pdu));
@@ -128,7 +128,7 @@ void cf_cfdp_s_tests_Teardown(void)
 void Test_CF_CFDP_S_ResetCall_CF_CFDP_ResetTransaction_with_keep_history(void)
 {
     /* Arrange */
-    transaction_t                      arg_t;
+    CF_Transaction_t                   arg_t;
     CF_CFDP_ResetTransaction_context_t received_args;
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_ResetTransaction), &received_args, sizeof(CF_CFDP_ResetTransaction_context_t),
@@ -156,11 +156,11 @@ void Test_CFDP_S_SendEof_When_flag_tx_crc_calc_Is_0_Call_CF_CRC_Finalize_AndSet_
     void)
 {
     /* Arrange */
-    transaction_t             dummy_t;
-    transaction_t            *arg_t = &dummy_t;
-    cf_crc_t                 *context_CF_CRC_Finalize;
-    cfdp_send_ret_t           local_result;
-    cfdp_send_ret_t           forced_return_CF_CFDP_SendEof = Any_cfdp_send_ret_t();
+    CF_Transaction_t          dummy_t;
+    CF_Transaction_t         *arg_t = &dummy_t;
+    CF_Crc_t                 *context_CF_CRC_Finalize;
+    CF_SendRet_t              local_result;
+    CF_SendRet_t              forced_return_CF_CFDP_SendEof = Any_cfdp_send_ret_t();
     CF_CFDP_SendEof_context_t context_CF_CFDP_SendEof;
 
     arg_t->flags.com.crc_calc = 0;
@@ -190,10 +190,10 @@ void Test_CFDP_S_SendEof_When_flag_tx_crc_calc_Is_0_Call_CF_CRC_Finalize_AndSet_
 void Test_CFDP_S_SendEof_When_crc_calc_Is_1_DoNotCall_CF_CRC_Finalize_ReturnValueOfCallTo_CF_CFDP_SendEof(void)
 {
     /* Arrange */
-    transaction_t             dummy_t;
-    transaction_t            *arg_t = &dummy_t;
-    cfdp_send_ret_t           local_result;
-    cfdp_send_ret_t           forced_return_CF_CFDP_SendEof = Any_cfdp_send_ret_t();
+    CF_Transaction_t          dummy_t;
+    CF_Transaction_t         *arg_t = &dummy_t;
+    CF_SendRet_t              local_result;
+    CF_SendRet_t              forced_return_CF_CFDP_SendEof = Any_cfdp_send_ret_t();
     CF_CFDP_SendEof_context_t context_CF_CFDP_SendEof;
 
     arg_t->flags.com.crc_calc = 1;
@@ -226,11 +226,11 @@ void Test_CFDP_S_SendEof_When_crc_calc_Is_1_DoNotCall_CF_CRC_Finalize_ReturnValu
 void Test_CF_CFDP_S1_SubstateSendEof_When_S_SendEof_Is_CF_SEND_NO_MSG_DoNotCall_CF_CFDP_S_Reset(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t = &dummy_t;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t = &dummy_t;
 
     /* Arrange unstubbable: CF_CFDP_S_SendEof */
-    cfdp_send_ret_t           forced_return_CF_CFDP_SendEof = CF_SEND_NO_MSG;
+    CF_SendRet_t              forced_return_CF_CFDP_SendEof = CF_SendRet_NO_MSG;
     CF_CFDP_SendEof_context_t context_CF_CFDP_SendEof;
 
     arg_t->flags.com.crc_calc = 0;
@@ -252,11 +252,11 @@ void Test_CF_CFDP_S1_SubstateSendEof_When_S_SendEof_Is_CF_SEND_NO_MSG_DoNotCall_
 void Test_CF_CFDP_S1_SubstateSendEof_Call_CF_CFDP_S_Reset_With_t_When_CFDP_S_SendEof_IsNot_CF_SEND_NO_MSG(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t = &dummy_t;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t = &dummy_t;
 
     /* Arrange unstubbable: CF_CFDP_S_SendEof */
-    cfdp_send_ret_t           forced_return_CF_CFDP_SendEof = Any_cfdp_send_ret_t_Except(CF_SEND_NO_MSG);
+    CF_SendRet_t              forced_return_CF_CFDP_SendEof = Any_cfdp_send_ret_t_Except(CF_SendRet_NO_MSG);
     CF_CFDP_SendEof_context_t context_CF_CFDP_SendEof;
 
     arg_t->flags.com.crc_calc = 0;
@@ -278,24 +278,24 @@ void Test_CF_CFDP_S1_SubstateSendEof_Call_CF_CFDP_S_Reset_With_t_When_CFDP_S_Sen
 
 /*******************************************************************************
 **
-**  CF_CFDP_S2_SubstateSendEof tests (small) - full coverage - [unstubbables: cf_dequeue_transaction]
+**  CF_CFDP_S2_SubstateSendEof tests (small) - full coverage - [unstubbables: CF_DequeueTransaction]
 **
 *******************************************************************************/
 
 void Test_CF_CFDP_S2_SubstateSendEof_TriggerTickProcessing(void)
 {
     /* Arrange */
-    transaction_t               dummy_t;
-    transaction_t              *arg_t = &dummy_t;
+    CF_Transaction_t            dummy_t;
+    CF_Transaction_t           *arg_t = &dummy_t;
     CF_InsertSortPrio_context_t context_CF_InsertSortPrio;
 
     /* setting sub_state and ack_timer_armed not required but assists in verification */
-    arg_t->state_data.s.sub_state    = Any_uint8_Except(SEND_WAIT_FOR_EOF_ACK);
+    arg_t->state_data.s.sub_state    = Any_uint8_Except(CF_TxSubState_WAIT_FOR_EOF_ACK);
     arg_t->flags.com.ack_timer_armed = 0;
 
     UT_SetDataBuffer(UT_KEY(CF_InsertSortPrio), &context_CF_InsertSortPrio, sizeof(context_CF_InsertSortPrio), false);
 
-    /* Arrange unstubbable: cf_dequeue_transaction */
+    /* Arrange unstubbable: CF_DequeueTransaction */
     uint16                    initial_q_size_q_index = Any_uint16_GreaterThan(0);
     CF_CList_Remove_context_t context_CF_CList_Remove;
 
@@ -309,16 +309,17 @@ void Test_CF_CFDP_S2_SubstateSendEof_TriggerTickProcessing(void)
     CF_CFDP_S2_SubstateSendEof(arg_t);
 
     /* Assert */
-    UtAssert_True(arg_t->state_data.s.sub_state == SEND_WAIT_FOR_EOF_ACK,
-                  "sub_state is %u and should be %u (SEND_WAIT_FOR_EOF_ACK)", arg_t->state_data.s.sub_state,
-                  SEND_WAIT_FOR_EOF_ACK);
+    UtAssert_True(arg_t->state_data.s.sub_state == CF_TxSubState_WAIT_FOR_EOF_ACK,
+                  "sub_state is %u and should be %u (CF_TxSubState_WAIT_FOR_EOF_ACK)", arg_t->state_data.s.sub_state,
+                  CF_TxSubState_WAIT_FOR_EOF_ACK);
     UtAssert_True(arg_t->flags.com.ack_timer_armed == 1, "ack_timer_armed is %u and should be 1",
                   arg_t->flags.com.ack_timer_armed);
     UtAssert_STUB_COUNT(CF_InsertSortPrio, 1);
     UtAssert_ADDRESS_EQ(context_CF_InsertSortPrio.t, arg_t);
-    UtAssert_True(context_CF_InsertSortPrio.q == CF_Q_TXW,
-                  "CF_InsertSortPrio received q %u and should be %u (CF_Q_TXW)", context_CF_InsertSortPrio.q, CF_Q_TXW);
-    /* Assert for cf_dequeue_transaction */
+    UtAssert_True(context_CF_InsertSortPrio.q == CF_QueueIdx_TXW,
+                  "CF_InsertSortPrio received q %u and should be %u (CF_QueueIdx_TXW)", context_CF_InsertSortPrio.q,
+                  CF_QueueIdx_TXW);
+    /* Assert for CF_DequeueTransaction */
     UtAssert_STUB_COUNT(CF_CList_Remove, 1);
     UtAssert_ADDRESS_EQ(context_CF_CList_Remove.head,
                         &CF_AppData.engine.channels[arg_t->chan_num].qs[arg_t->flags.com.q_index]);
@@ -327,9 +328,9 @@ void Test_CF_CFDP_S2_SubstateSendEof_TriggerTickProcessing(void)
                       initial_q_size_q_index - 1,
                   "q_size[t->flags.com.q_index] is %u and should be 1 less than %u (value before call)",
                   CF_AppData.hk.channel_hk[arg_t->chan_num].q_size[arg_t->flags.com.q_index], initial_q_size_q_index);
-    UtAssert_True(arg_t->state_data.s.sub_state == SEND_WAIT_FOR_EOF_ACK,
-                  "t->state_data.s.sub_state is %d and should be %d (SEND_WAIT_FOR_EOF_ACK)",
-                  arg_t->state_data.s.sub_state, SEND_WAIT_FOR_EOF_ACK);
+    UtAssert_True(arg_t->state_data.s.sub_state == CF_TxSubState_WAIT_FOR_EOF_ACK,
+                  "t->state_data.s.sub_state is %d and should be %d (CF_TxSubState_WAIT_FOR_EOF_ACK)",
+                  arg_t->state_data.s.sub_state, CF_TxSubState_WAIT_FOR_EOF_ACK);
     UtAssert_True(arg_t->flags.com.ack_timer_armed == 1, "t->flags.com.ack_timer_armed is %d and should be 1",
                   arg_t->flags.com.ack_timer_armed);
 } /* end Test_CF_CFDP_S2_SubstateSendEof_TriggerTickProcessing */
@@ -345,14 +346,14 @@ void Test_CF_CFDP_S2_SubstateSendEof_TriggerTickProcessing(void)
 void Test_CFDP_S_SendFileData_When_ph_Is_NULL_Return_0(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    history_t         dummy_history;
-    transaction_t     dummy_t;
-    transaction_t    *arg_t                                    = &dummy_t;
-    uint32            arg_foffs                                = Any_uint32();
-    uint32            arg_bytes_to_read                        = Any_uint32();
-    uint8             arg_calc_crc                             = Any_uint8();
-    pdu_header_t     *forced_return_CF_CFDP_ConstructPduHeader = NULL;
+    CF_ConfigTable_t     dummy_config_table;
+    CF_History_t         dummy_history;
+    CF_Transaction_t     dummy_t;
+    CF_Transaction_t    *arg_t                                    = &dummy_t;
+    uint32               arg_foffs                                = Any_uint32();
+    uint32               arg_bytes_to_read                        = Any_uint32();
+    uint8                arg_calc_crc                             = Any_uint8();
+    CF_CFDP_PduHeader_t *forced_return_CF_CFDP_ConstructPduHeader = NULL;
 
     CF_AppData.config_table = &dummy_config_table;
     arg_t->history          = &dummy_history;
@@ -375,17 +376,17 @@ void Test_CFDP_S_SendFileData_WhenCachedPosNotEq_foffs_CallTo_CF_WrappedLseek_Re
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    history_t         dummy_history;
-    transaction_t     dummy_t;
-    transaction_t    *arg_t             = &dummy_t;
-    uint32            arg_foffs         = Any_uint32();
-    uint32            arg_bytes_to_read = Any_uint32();
-    uint8             arg_calc_crc      = Any_uint8();
-    pdu_header_t      dummy_ph;
-    pdu_header_t     *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
-    int32             forced_return_CF_WrappedLseek            = Any_uint32_Except(arg_foffs);
-    const char       *expected_Spec = "CF S%d(%u:%u): error seeking to offset 0x%08x, got 0x%08x";
+    CF_ConfigTable_t     dummy_config_table;
+    CF_History_t         dummy_history;
+    CF_Transaction_t     dummy_t;
+    CF_Transaction_t    *arg_t             = &dummy_t;
+    uint32               arg_foffs         = Any_uint32();
+    uint32               arg_bytes_to_read = Any_uint32();
+    uint8                arg_calc_crc      = Any_uint8();
+    CF_CFDP_PduHeader_t  dummy_ph;
+    CF_CFDP_PduHeader_t *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
+    int32                forced_return_CF_WrappedLseek            = Any_uint32_Except(arg_foffs);
+    const char          *expected_Spec = "CF S%d(%u:%u): error seeking to offset 0x%08x, got 0x%08x";
 
     CF_AppData.config_table = &dummy_config_table;
     arg_t->history          = &dummy_history;
@@ -425,18 +426,18 @@ void Test_CFDP_S_SendFileData_WhenCachedPosNotEq_foffs_CallTo_CF_WrappedLseek_Re
 void Test_CFDP_S_SendFileData_CallTo_CF_WrappedRead_ReturnsValueNotEqTo_bytes_to_read_SendEventAndReturn_neg1(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    history_t         dummy_history;
-    transaction_t     dummy_t;
-    transaction_t    *arg_t             = &dummy_t;
+    CF_ConfigTable_t  dummy_config_table;
+    CF_History_t      dummy_history;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t             = &dummy_t;
     uint32            arg_foffs         = Any_uint32();
     uint32            arg_bytes_to_read = Any_uint16(); /* Any_uint16_Except(0) used to limit to same type as
                                                            CF_AppData.config_table->outgoing_file_chunk_size */
-    uint8         arg_calc_crc = Any_uint8();
-    pdu_header_t  dummy_ph;
-    pdu_header_t *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
-    int32         forced_return_CF_WrappedLseek            = arg_foffs;
-    uint16        dummy_chunk_size                         = Any_uint16();
+    uint8                arg_calc_crc = Any_uint8();
+    CF_CFDP_PduHeader_t  dummy_ph;
+    CF_CFDP_PduHeader_t *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
+    int32                forced_return_CF_WrappedLseek            = arg_foffs;
+    uint16               dummy_chunk_size                         = Any_uint16();
     uint32      expected_bytes_to_read = (arg_bytes_to_read < dummy_chunk_size ? arg_bytes_to_read : dummy_chunk_size);
     int32       forced_return_CF_WrappedRead = Any_int_Except(expected_bytes_to_read);
     const char *expected_Spec                = "CF S%d(%u:%u): error reading bytes: expected 0x%08x, got 0x%08x";
@@ -462,7 +463,7 @@ void Test_CFDP_S_SendFileData_CallTo_CF_WrappedRead_ReturnsValueNotEqTo_bytes_to
     result = CF_CFDP_S_SendFileData(arg_t, arg_foffs, arg_bytes_to_read, arg_calc_crc);
 
     /* Assert */
-    UtAssert_True(result == -1, "CFDP_S_SendFileData returned %d and should be -1 (fail)", result);
+    UtAssert_True(result == -1, "CF_TxnState_S_SendFileData returned %d and should be -1 (fail)", result);
     UtAssert_STUB_COUNT(CF_WrappedLseek, 1);
     UtAssert_STUB_COUNT(CF_WrappedRead, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
@@ -481,19 +482,19 @@ void Test_CFDP_S_SendFileData_Given_bytes_to_read_GreaterThan_outgoing_file_chun
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    history_t         dummy_history;
-    transaction_t     dummy_t;
-    transaction_t    *arg_t             = &dummy_t;
+    CF_ConfigTable_t  dummy_config_table;
+    CF_History_t      dummy_history;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t             = &dummy_t;
     uint32            arg_foffs         = Any_uint32();
     uint32            arg_bytes_to_read = Any_uint16_Except(
                    0); /* Any_uint16_Except(0) used to limit to same type as CF_AppData.config_table->outgoing_file_chunk_size */
-    uint8         arg_calc_crc = Any_uint8();
-    pdu_header_t  dummy_ph;
-    pdu_header_t *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
-    uint32        expected_bytes_to_read                   = arg_bytes_to_read;
-    int32         forced_return_CF_WrappedRead             = expected_bytes_to_read;
-    const char   *expected_Spec = "CF S%d(%u:%u): error reading bytes: expected 0x%08x, got 0x%08x";
+    uint8                arg_calc_crc = Any_uint8();
+    CF_CFDP_PduHeader_t  dummy_ph;
+    CF_CFDP_PduHeader_t *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
+    uint32               expected_bytes_to_read                   = arg_bytes_to_read;
+    int32                forced_return_CF_WrappedRead             = expected_bytes_to_read;
+    const char          *expected_Spec = "CF S%d(%u:%u): error reading bytes: expected 0x%08x, got 0x%08x";
 
     dummy_config_table.outgoing_file_chunk_size =
         arg_bytes_to_read - 1; /* forces bytes_to_read to be greater than
@@ -515,7 +516,7 @@ void Test_CFDP_S_SendFileData_Given_bytes_to_read_GreaterThan_outgoing_file_chun
     result = CF_CFDP_S_SendFileData(arg_t, arg_foffs, arg_bytes_to_read, arg_calc_crc);
 
     /* Assert */
-    UtAssert_True(result == -1, "CFDP_S_SendFileData returned %d and should be -1 (fail)", result);
+    UtAssert_True(result == -1, "CF_TxnState_S_SendFileData returned %d and should be -1 (fail)", result);
     UtAssert_STUB_COUNT(CF_WrappedLseek, 0);
     UtAssert_STUB_COUNT(CF_WrappedRead, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
@@ -537,16 +538,16 @@ void Test_CFDP_S_SendFileData_Given_bytes_to_read_GreaterThan_outgoing_file_chun
 void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_Returns_CF_SEND_NO_MSG_Return_0(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    history_t         dummy_history;
-    transaction_t     dummy_t;
-    transaction_t    *arg_t             = &dummy_t;
+    CF_ConfigTable_t  dummy_config_table;
+    CF_History_t      dummy_history;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t             = &dummy_t;
     uint32            arg_foffs         = Any_uint32();
     uint32            arg_bytes_to_read = Any_uint16_Except(
                    0); /* Any_uint16_Except(0) used to limit to same type as CF_AppData.config_table->outgoing_file_chunk_size */
     uint8                    arg_calc_crc = Any_uint8();
-    pdu_header_t             dummy_ph;
-    pdu_header_t            *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
+    CF_CFDP_PduHeader_t      dummy_ph;
+    CF_CFDP_PduHeader_t     *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
     uint32                   expected_bytes_to_read                   = arg_bytes_to_read;
     int32                    forced_return_CF_WrappedRead             = expected_bytes_to_read;
     CF_CFDP_SendFd_context_t context_CF_CFDP_SendFd;
@@ -567,14 +568,14 @@ void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_Returns_CF_SEND_NO_MSG_Retur
 
     UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), stub_reporter_hook, &context_CFE_EVS_SendEvent);
 
-    context_CF_CFDP_SendFd.forced_return = CF_SEND_NO_MSG;
+    context_CF_CFDP_SendFd.forced_return = CF_SendRet_NO_MSG;
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendFd), &context_CF_CFDP_SendFd, sizeof(context_CF_CFDP_SendFd), false);
 
     /* Act */
     result = CF_CFDP_S_SendFileData(arg_t, arg_foffs, arg_bytes_to_read, arg_calc_crc);
 
     /* Assert */
-    UtAssert_True(result == 0, "CFDP_S_SendFileData returned %d and should be 0 (no bytes processed)", result);
+    UtAssert_True(result == 0, "CF_TxnState_S_SendFileData returned %d and should be 0 (no bytes processed)", result);
     UtAssert_STUB_COUNT(CF_WrappedLseek, 0);
     UtAssert_STUB_COUNT(CF_WrappedRead, 1);
     UtAssert_STUB_COUNT(CF_CFDP_SendFd, 1);
@@ -584,16 +585,16 @@ void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_Returns_CF_SEND_NO_MSG_Retur
 void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_Returns_CF_SEND_ERROR_SendEventAndReturn_neg1(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    history_t         dummy_history;
-    transaction_t     dummy_t;
-    transaction_t    *arg_t             = &dummy_t;
+    CF_ConfigTable_t  dummy_config_table;
+    CF_History_t      dummy_history;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t             = &dummy_t;
     uint32            arg_foffs         = Any_uint32();
     uint32            arg_bytes_to_read = Any_uint16_Except(
                    0); /* Any_uint16_Except(0) used to limit to same type as CF_AppData.config_table->outgoing_file_chunk_size */
     uint8                    arg_calc_crc = Any_uint8();
-    pdu_header_t             dummy_ph;
-    pdu_header_t            *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
+    CF_CFDP_PduHeader_t      dummy_ph;
+    CF_CFDP_PduHeader_t     *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
     uint32                   expected_bytes_to_read                   = arg_bytes_to_read;
     int32                    forced_return_CF_WrappedRead             = expected_bytes_to_read;
     const char              *expected_Spec                            = "CF S%d(%u:%u): error sending fd";
@@ -615,7 +616,7 @@ void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_Returns_CF_SEND_ERROR_SendEv
 
     UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), stub_reporter_hook, &context_CFE_EVS_SendEvent);
 
-    context_CF_CFDP_SendFd.forced_return = CF_SEND_ERROR;
+    context_CF_CFDP_SendFd.forced_return = CF_SendRet_ERROR;
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendFd), &context_CF_CFDP_SendFd, sizeof(context_CF_CFDP_SendFd), false);
 
     UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), stub_reporter_hook, &context_CFE_EVS_SendEvent);
@@ -624,7 +625,7 @@ void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_Returns_CF_SEND_ERROR_SendEv
     result = CF_CFDP_S_SendFileData(arg_t, arg_foffs, arg_bytes_to_read, arg_calc_crc);
 
     /* Assert */
-    UtAssert_True(result == -1, "CFDP_S_SendFileData returned %d and should be -1 (fail)", result);
+    UtAssert_True(result == -1, "CF_TxnState_S_SendFileData returned %d and should be -1 (fail)", result);
     UtAssert_STUB_COUNT(CF_WrappedLseek, 0);
     UtAssert_STUB_COUNT(CF_WrappedRead, 1);
     UtAssert_STUB_COUNT(CF_CFDP_SendFd, 1);
@@ -643,15 +644,15 @@ void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_Returns_CF_SEND_ERROR_SendEv
 void Test_CFDP_S_SendFileData_AssertsWhen_foffs_Plus_bytes_to_read_IsLessThanOrEqTo_t_fsize(void)
 {
     /* Arrange */
-    // cf_config_table_t     dummy_config_table;
-    // history_t             dummy_history;
-    // transaction_t         dummy_t;
-    // transaction_t*        arg_t = &dummy_t;
+    // CF_ConfigTable_t     dummy_config_table;
+    // CF_History_t             dummy_history;
+    // CF_Transaction_t         dummy_t;
+    // CF_Transaction_t*        arg_t = &dummy_t;
     // uint32                arg_foffs = Any_uint32();
     // uint32                arg_bytes_to_read = Any_uint16_Except(0); /* Any_uint16_Except(0) used to limit to same
     // type as CF_AppData.config_table->outgoing_file_chunk_size */ uint8                 arg_calc_crc = Any_uint8();
-    // pdu_header_t          dummy_ph;
-    // pdu_header_t*         forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
+    // CF_CFDP_PduHeader_t          dummy_ph;
+    // CF_CFDP_PduHeader_t*         forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
     // uint32                expected_bytes_to_read = arg_bytes_to_read;
     // int32                 forced_return_CF_WrappedRead = expected_bytes_to_read;
     // CF_CFDP_SendFd_context_t    context_CF_CFDP_SendFd;
@@ -671,7 +672,7 @@ void Test_CFDP_S_SendFileData_AssertsWhen_foffs_Plus_bytes_to_read_IsLessThanOrE
 
     // UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), stub_reporter_hook, &context_CFE_EVS_SendEvent);
 
-    // context_CF_CFDP_SendFd.forced_return = CF_SEND_ERROR;
+    // context_CF_CFDP_SendFd.forced_return = CF_SendRet_ERROR;
     // UT_SetDataBuffer(UT_KEY(CF_CFDP_SendFd), &context_CF_CFDP_SendFd,
     //   sizeof(context_CF_CFDP_SendFd), false);
 
@@ -683,7 +684,7 @@ void Test_CFDP_S_SendFileData_AssertsWhen_foffs_Plus_bytes_to_read_IsLessThanOrE
     /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - CF_Assert((foffs+bytes_to_read)<=t->fsize); /* sanity check */");
     // UtAssert_True(result == -1,
-    //   "CFDP_S_SendFileData returned %d and should be -1 (fail)",
+    //   "CF_TxnState_S_SendFileData returned %d and should be -1 (fail)",
     //   result);
     // UtAssert_STUB_COUNT(CF_WrappedLseek, 0);
     // UtAssert_STUB_COUNT(CF_WrappedRead, 1);
@@ -706,19 +707,19 @@ void Test_CFDP_S_SendFileData_AssertsWhen_foffs_Plus_bytes_to_read_IsLessThanOrE
 void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_ReturnsDontCareNoCallTo_CF_CRC_Digest_ReturnBytesToRead(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    history_t         dummy_history;
-    transaction_t     dummy_t;
-    transaction_t    *arg_t             = &dummy_t;
+    CF_ConfigTable_t  dummy_config_table;
+    CF_History_t      dummy_history;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t             = &dummy_t;
     uint32            arg_foffs         = Any_uint32();
     uint32            arg_bytes_to_read = Any_uint16_Except(
                    0); /* Any_uint16_Except(0) used to limit to same type as CF_AppData.config_table->outgoing_file_chunk_size */
     uint8                    arg_calc_crc = 0; /* 0 means no calc */
-    pdu_header_t             dummy_ph;
-    pdu_header_t            *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
+    CF_CFDP_PduHeader_t      dummy_ph;
+    CF_CFDP_PduHeader_t     *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
     uint32                   expected_bytes_to_read                   = arg_bytes_to_read;
     int32                    forced_return_CF_WrappedRead             = expected_bytes_to_read;
-    cfdp_send_ret_t          exceptions[2]                            = {CF_SEND_NO_MSG, CF_SEND_ERROR};
+    CF_SendRet_t             exceptions[2]                            = {CF_SendRet_NO_MSG, CF_SendRet_ERROR};
     uint64                   initial_file_data_bytes                  = Any_uint64();
     CF_CFDP_SendFd_context_t context_CF_CFDP_SendFd;
 
@@ -747,8 +748,9 @@ void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_ReturnsDontCareNoCallTo_CF_C
     result = CF_CFDP_S_SendFileData(arg_t, arg_foffs, arg_bytes_to_read, arg_calc_crc);
 
     /* Assert */
-    UtAssert_True(result == expected_bytes_to_read, "CFDP_S_SendFileData returned %d and should be %d (bytes_to_read)",
-                  result, expected_bytes_to_read);
+    UtAssert_True(result == expected_bytes_to_read,
+                  "CF_TxnState_S_SendFileData returned %d and should be %d (bytes_to_read)", result,
+                  expected_bytes_to_read);
     UtAssert_STUB_COUNT(CF_WrappedLseek, 0);
     UtAssert_STUB_COUNT(CF_WrappedRead, 1);
     UtAssert_STUB_COUNT(CF_CFDP_SendFd, 1);
@@ -764,19 +766,19 @@ void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_ReturnsDontCareNoCallTo_CF_C
 void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_ReturnsDontCareWithCallTo_CF_CRC_Digest_ReturnBytesToRead(void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    history_t         dummy_history;
-    transaction_t     dummy_t;
-    transaction_t    *arg_t             = &dummy_t;
+    CF_ConfigTable_t  dummy_config_table;
+    CF_History_t      dummy_history;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t             = &dummy_t;
     uint32            arg_foffs         = Any_uint32();
     uint32            arg_bytes_to_read = Any_uint16_Except(
                    0); /* Any_uint16_Except(0) used to limit to same type as CF_AppData.config_table->outgoing_file_chunk_size */
     uint8                    arg_calc_crc = Any_uint8_Except(0); /* any but 0 means calc */
-    pdu_header_t             dummy_ph;
-    pdu_header_t            *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
+    CF_CFDP_PduHeader_t      dummy_ph;
+    CF_CFDP_PduHeader_t     *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
     uint32                   expected_bytes_to_read                   = arg_bytes_to_read;
     int32                    forced_return_CF_WrappedRead             = expected_bytes_to_read;
-    cfdp_send_ret_t          exceptions[2]                            = {CF_SEND_NO_MSG, CF_SEND_ERROR};
+    CF_SendRet_t             exceptions[2]                            = {CF_SendRet_NO_MSG, CF_SendRet_ERROR};
     uint64                   initial_file_data_bytes                  = Any_uint64();
     CF_CFDP_SendFd_context_t context_CF_CFDP_SendFd;
 
@@ -807,8 +809,9 @@ void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_ReturnsDontCareWithCallTo_CF
     result = CF_CFDP_S_SendFileData(arg_t, arg_foffs, arg_bytes_to_read, arg_calc_crc);
 
     /* Assert */
-    UtAssert_True(result == expected_bytes_to_read, "CFDP_S_SendFileData returned %d and should be %d (bytes_to_read)",
-                  result, expected_bytes_to_read);
+    UtAssert_True(result == expected_bytes_to_read,
+                  "CF_TxnState_S_SendFileData returned %d and should be %d (bytes_to_read)", result,
+                  expected_bytes_to_read);
     UtAssert_STUB_COUNT(CF_WrappedLseek, 0);
     UtAssert_STUB_COUNT(CF_WrappedRead, 1);
     UtAssert_STUB_COUNT(CF_CFDP_SendFd, 1);
@@ -832,13 +835,14 @@ void Test_CFDP_S_SendFileData_CallTo_CF_CFDP_SendFd_ReturnsDontCareWithCallTo_CF
 void Test_CF_CFDP_S_SubstateSendFileData_CallTo_CFDP_S_SendFileData_Returns_0_DontCareSoDoNothing(void)
 {
     /* Arrange */
-    history_t      dummy_history;
-    transaction_t  dummy_t;
-    transaction_t *arg_t         = &dummy_t;
-    uint32         initial_foffs = Any_uint32();
-    uint8 initial_sub_state      = Any_uint8_Except(SEND_EOF); /* TODO: any_tx_sub_state_except would be more proper */
-    uint8 initial_cc =
-        Any_uint8_Except(CC_FILESTORE_REJECTION); /* TODO: any_condition_code_except would be more proper */
+    CF_History_t      dummy_history;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t         = &dummy_t;
+    uint32            initial_foffs = Any_uint32();
+    uint8             initial_sub_state =
+        Any_uint8_Except(CF_TxSubState_EOF); /* TODO: any_tx_sub_state_except would be more proper */
+    uint8 initial_cc = Any_uint8_Except(
+        CF_CFDP_ConditionCode_FILESTORE_REJECTION); /* TODO: any_condition_code_except would be more proper */
 
     arg_t->foffs = initial_foffs;
 
@@ -848,8 +852,8 @@ void Test_CF_CFDP_S_SubstateSendFileData_CallTo_CFDP_S_SendFileData_Returns_0_Do
     arg_t->state_data.s.sub_state = initial_sub_state;
 
     /* Arrange unstubbable:CF_CFDP_S_SendFileData - pdu will be null err_out returns 0 */
-    cf_config_table_t dummy_config_table;
-    pdu_header_t     *forced_return_CF_CFDP_ConstructPduHeader = NULL;
+    CF_ConfigTable_t     dummy_config_table;
+    CF_CFDP_PduHeader_t *forced_return_CF_CFDP_ConstructPduHeader = NULL;
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -876,13 +880,14 @@ void Test_CF_CFDP_S_SubstateSendFileData_CallTo_CFDP_S_SendFileData_ReturnsGreat
     void)
 {
     /* Arrange */
-    history_t      dummy_history;
-    transaction_t  dummy_t;
-    transaction_t *arg_t         = &dummy_t;
-    uint32         initial_foffs = Any_uint32();
-    uint8 initial_sub_state      = Any_uint8_Except(SEND_EOF); /* TODO: any_tx_sub_state_except would be more proper */
-    uint8 initial_cc =
-        Any_uint8_Except(CC_FILESTORE_REJECTION);          /* TODO: any_condition_code_except would be more proper */
+    CF_History_t      dummy_history;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t         = &dummy_t;
+    uint32            initial_foffs = Any_uint32();
+    uint8             initial_sub_state =
+        Any_uint8_Except(CF_TxSubState_EOF); /* TODO: any_tx_sub_state_except would be more proper */
+    uint8 initial_cc = Any_uint8_Except(
+        CF_CFDP_ConditionCode_FILESTORE_REJECTION);        /* TODO: any_condition_code_except would be more proper */
     uint8 dummy_bytes_received = Any_uint8_GreaterThan(1); /* uint8 used for reasonably fast size for testing */
 
     arg_t->foffs = initial_foffs;
@@ -894,11 +899,11 @@ void Test_CF_CFDP_S_SubstateSendFileData_CallTo_CFDP_S_SendFileData_ReturnsGreat
     arg_t->state_data.s.sub_state = initial_sub_state;
 
     /* Arrange unstubbable:CF_CFDP_S_SendFileData - pdu will be null err_out returns 0 */
-    cf_config_table_t        dummy_config_table;
-    pdu_header_t             dummy_ph;
-    pdu_header_t            *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
+    CF_ConfigTable_t         dummy_config_table;
+    CF_CFDP_PduHeader_t      dummy_ph;
+    CF_CFDP_PduHeader_t     *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
     int32                    forced_return_CF_WrappedRead             = 1;
-    cfdp_send_ret_t          exceptions[2]                            = {CF_SEND_NO_MSG, CF_SEND_ERROR};
+    CF_SendRet_t             exceptions[2]                            = {CF_SendRet_NO_MSG, CF_SendRet_ERROR};
     uint64                   initial_file_data_bytes                  = Any_uint64();
     CF_CFDP_SendFd_context_t context_CF_CFDP_SendFd;
 
@@ -942,13 +947,14 @@ void Test_CF_CFDP_S_SubstateSendFileData_CallTo_CFDP_S_SendFileData_ReturnsGreat
     void)
 {
     /* Arrange */
-    history_t      dummy_history;
-    transaction_t  dummy_t;
-    transaction_t *arg_t         = &dummy_t;
-    uint32         initial_foffs = Any_uint16();               /* uint16 used for reasonably fast testing */
-    uint8 initial_sub_state      = Any_uint8_Except(SEND_EOF); /* TODO: any_tx_sub_state_except would be more proper */
-    uint8 initial_cc =
-        Any_uint8_Except(CC_FILESTORE_REJECTION);     /* TODO: any_condition_code_except would be more proper */
+    CF_History_t      dummy_history;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t         = &dummy_t;
+    uint32            initial_foffs = Any_uint16(); /* uint16 used for reasonably fast testing */
+    uint8             initial_sub_state =
+        Any_uint8_Except(CF_TxSubState_EOF); /* TODO: any_tx_sub_state_except would be more proper */
+    uint8 initial_cc = Any_uint8_Except(
+        CF_CFDP_ConditionCode_FILESTORE_REJECTION);   /* TODO: any_condition_code_except would be more proper */
     uint8 dummy_bytes_received = Any_uint8_Except(0); /* uint8 used for reasonably fast size for testing */
 
     arg_t->foffs = initial_foffs;
@@ -960,11 +966,11 @@ void Test_CF_CFDP_S_SubstateSendFileData_CallTo_CFDP_S_SendFileData_ReturnsGreat
     arg_t->state_data.s.sub_state = initial_sub_state;
 
     /* Arrange unstubbable:CF_CFDP_S_SendFileData - pdu will be null err_out returns 0 */
-    cf_config_table_t        dummy_config_table;
-    pdu_header_t             dummy_ph;
-    pdu_header_t            *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
+    CF_ConfigTable_t         dummy_config_table;
+    CF_CFDP_PduHeader_t      dummy_ph;
+    CF_CFDP_PduHeader_t     *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
     int32                    forced_return_CF_WrappedRead             = arg_t->fsize - arg_t->foffs;
-    cfdp_send_ret_t          exceptions[2]                            = {CF_SEND_NO_MSG, CF_SEND_ERROR};
+    CF_SendRet_t             exceptions[2]                            = {CF_SendRet_NO_MSG, CF_SendRet_ERROR};
     uint64                   initial_file_data_bytes                  = Any_uint64();
     CF_CFDP_SendFd_context_t context_CF_CFDP_SendFd;
 
@@ -996,9 +1002,9 @@ void Test_CF_CFDP_S_SubstateSendFileData_CallTo_CFDP_S_SendFileData_ReturnsGreat
                   dummy_bytes_received, initial_foffs);
     UtAssert_True(arg_t->history->cc == initial_cc, "t->history->cc is %u and should be %u (unchanged)",
                   arg_t->history->cc, initial_cc);
-    UtAssert_True(arg_t->state_data.s.sub_state == SEND_EOF,
-                  "t->state_data.s.sub_state is %u and should be %u (SEND_EOF)", arg_t->state_data.s.sub_state,
-                  SEND_EOF);
+    UtAssert_True(arg_t->state_data.s.sub_state == CF_TxSubState_EOF,
+                  "t->state_data.s.sub_state is %u and should be %u (CF_TxSubState_EOF)", arg_t->state_data.s.sub_state,
+                  CF_TxSubState_EOF);
     /* Assert unstubbable CF_CFDP_S_SendFileData */
     UtAssert_STUB_COUNT(CF_CFDP_ConstructPduHeader, 1);
 } /* end
@@ -1009,13 +1015,14 @@ void Test_CF_CFDP_S_SubstateSendFileData_CallTo_CFDP_S_SendFileData_ReturnsLessT
     void)
 {
     /* Arrange */
-    history_t      dummy_history;
-    transaction_t  dummy_t;
-    transaction_t *arg_t         = &dummy_t;
-    uint32         initial_foffs = Any_uint32();
-    uint8 initial_sub_state      = Any_uint8_Except(SEND_EOF); /* TODO: any_tx_sub_state_except would be more proper */
-    uint8 initial_cc =
-        Any_uint8_Except(CC_FILESTORE_REJECTION); /* TODO: any_condition_code_except would be more proper */
+    CF_History_t      dummy_history;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t         = &dummy_t;
+    uint32            initial_foffs = Any_uint32();
+    uint8             initial_sub_state =
+        Any_uint8_Except(CF_TxSubState_EOF); /* TODO: any_tx_sub_state_except would be more proper */
+    uint8 initial_cc = Any_uint8_Except(
+        CF_CFDP_ConditionCode_FILESTORE_REJECTION); /* TODO: any_condition_code_except would be more proper */
 
     arg_t->foffs = initial_foffs;
 
@@ -1025,10 +1032,10 @@ void Test_CF_CFDP_S_SubstateSendFileData_CallTo_CFDP_S_SendFileData_ReturnsLessT
     arg_t->state_data.s.sub_state = initial_sub_state;
 
     /* Arrange for CF_CFDP_S_SendFileData - ph will be null err_out returns 0 */
-    cf_config_table_t dummy_config_table;
-    pdu_header_t      dummy_ph;
-    pdu_header_t     *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
-    int32             forced_return_CF_WrappedLseek            = Any_uint32_Except(arg_t->foffs);
+    CF_ConfigTable_t     dummy_config_table;
+    CF_CFDP_PduHeader_t  dummy_ph;
+    CF_CFDP_PduHeader_t *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
+    int32                forced_return_CF_WrappedLseek            = Any_uint32_Except(arg_t->foffs);
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -1046,12 +1053,12 @@ void Test_CF_CFDP_S_SubstateSendFileData_CallTo_CFDP_S_SendFileData_ReturnsLessT
     UtAssert_True(arg_t->foffs == initial_foffs,
                   "t->foffs is %u and should not have changed from %u (value before call)", arg_t->foffs,
                   initial_foffs);
-    UtAssert_True(arg_t->history->cc == CC_FILESTORE_REJECTION,
-                  "t->history->cc is %u and should be %u (CC_FILESTORE_REJECTION)", arg_t->history->cc,
-                  CC_FILESTORE_REJECTION);
-    UtAssert_True(arg_t->state_data.s.sub_state == SEND_EOF,
-                  "t->state_data.s.sub_state is %u and should be %u (SEND_EOF)", arg_t->state_data.s.sub_state,
-                  SEND_EOF);
+    UtAssert_True(arg_t->history->cc == CF_CFDP_ConditionCode_FILESTORE_REJECTION,
+                  "t->history->cc is %u and should be %u (CF_CFDP_ConditionCode_FILESTORE_REJECTION)",
+                  arg_t->history->cc, CF_CFDP_ConditionCode_FILESTORE_REJECTION);
+    UtAssert_True(arg_t->state_data.s.sub_state == CF_TxSubState_EOF,
+                  "t->state_data.s.sub_state is %u and should be %u (CF_TxSubState_EOF)", arg_t->state_data.s.sub_state,
+                  CF_TxSubState_EOF);
     /* Assert unstubbable CF_CFDP_S_SendFileData */
     UtAssert_STUB_COUNT(CF_CFDP_ConstructPduHeader, 1);
 } /* end
@@ -1069,15 +1076,15 @@ void Test_CF_CFDP_S_SubstateSendFileData_CallTo_CFDP_S_SendFileData_ReturnsLessT
 void Test_CF_CFDP_S_CheckAndRespondNak_FailsBecause_CF_CFDP_SendMd_Returns_CF_SEND_ERROR_Return_neg1(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t = &dummy_t;
-    int            local_result;
-    transaction_t *context_CF_CFDP_SendMd;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t = &dummy_t;
+    int               local_result;
+    CF_Transaction_t *context_CF_CFDP_SendMd;
 
     arg_t->flags.tx.md_need_send = 1; /* 1 = true */
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendMd), &context_CF_CFDP_SendMd, sizeof(context_CF_CFDP_SendMd), false);
-    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SEND_ERROR);
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SendRet_ERROR);
 
     /* Act */
     local_result = CF_CFDP_S_CheckAndRespondNak(arg_t);
@@ -1090,15 +1097,15 @@ void Test_CF_CFDP_S_CheckAndRespondNak_FailsBecause_CF_CFDP_SendMd_Returns_CF_SE
 void Test_CF_CFDP_S_CheckAndRespondNak_SuccessBecause_CF_CFDP_SendMd_Returns_CF_SEND_SUCCESS_Return_1(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t = &dummy_t;
-    int            local_result;
-    transaction_t *context_CF_CFDP_SendMd;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t = &dummy_t;
+    int               local_result;
+    CF_Transaction_t *context_CF_CFDP_SendMd;
 
     arg_t->flags.tx.md_need_send = 1; /* 1 = true */
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendMd), &context_CF_CFDP_SendMd, sizeof(context_CF_CFDP_SendMd), false);
-    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SEND_SUCCESS);
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SendRet_SUCCESS);
 
     /* Act */
     local_result = CF_CFDP_S_CheckAndRespondNak(arg_t);
@@ -1116,11 +1123,11 @@ void Test_CF_CFDP_S_CheckAndRespondNak_DoesNothingBecause_CF_CFDP_SendMd_DoesNot
     void)
 {
     /* Arrange */
-    transaction_t   dummy_t;
-    transaction_t  *arg_t         = &dummy_t;
-    cfdp_send_ret_t exceptions[2] = {CF_SEND_ERROR, CF_SEND_SUCCESS};
-    int             local_result;
-    transaction_t  *context_CF_CFDP_SendMd;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t         = &dummy_t;
+    CF_SendRet_t      exceptions[2] = {CF_SendRet_ERROR, CF_SendRet_SUCCESS};
+    int               local_result;
+    CF_Transaction_t *context_CF_CFDP_SendMd;
 
     arg_t->flags.tx.md_need_send = 1; /* 1 = true */
 
@@ -1144,17 +1151,17 @@ void Test_CF_CFDP_S_CheckAndRespondNak_DoesNothingBecause_CF_CFDP_SendMd_DoesNot
 void Test_CF_CFDP_S_CheckAndRespondNak_DoesNothingBecause_CF_Chunks_GetFirstChunk_Returns_NULL_Return_0(void)
 {
     /* Arrange */
-    transaction_t                     dummy_t;
-    transaction_t                    *arg_t = &dummy_t;
+    CF_Transaction_t                  dummy_t;
+    CF_Transaction_t                 *arg_t = &dummy_t;
     int                               local_result;
-    chunks_wrapper_t                  dummy_chunks;
+    CF_ChunkWrapper_t                 dummy_chunks;
     CF_Chunks_GetFirstChunk_context_t context_CF_Chunks_GetFirstChunk;
 
     arg_t->flags.tx.md_need_send = 0; /* 0 = false */
     arg_t->chunks                = &dummy_chunks;
 
     context_CF_Chunks_GetFirstChunk.forced_return = NULL;
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
+    UT_SetDataBuffer(UT_KEY(CF_ChunkList_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
                      sizeof(context_CF_Chunks_GetFirstChunk), false);
 
     /* Act */
@@ -1166,7 +1173,7 @@ void Test_CF_CFDP_S_CheckAndRespondNak_DoesNothingBecause_CF_Chunks_GetFirstChun
     UtAssert_True(arg_t->flags.tx.md_need_send == 0,
                   "CF_CFDP_S_CheckAndRespondNak did not set t->flags.tx.md_need_send %d and should be 0",
                   arg_t->flags.tx.md_need_send);
-    UtAssert_STUB_COUNT(CF_Chunks_GetFirstChunk, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_GetFirstChunk, 1);
     UtAssert_ADDRESS_EQ(context_CF_Chunks_GetFirstChunk.chunks, &arg_t->chunks->chunks);
 } /* end Test_CF_CFDP_S_CheckAndRespondNak_DoesNothingBecause_CF_Chunks_GetFirstChunk_Returns_NULL_Return_0 */
 
@@ -1174,25 +1181,25 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturns_non
     void)
 {
     /* Arrange */
-    transaction_t                     dummy_t;
-    transaction_t                    *arg_t = &dummy_t;
+    CF_Transaction_t                  dummy_t;
+    CF_Transaction_t                 *arg_t = &dummy_t;
     int                               local_result;
-    chunks_wrapper_t                  dummy_chunks;
-    chunk_t                           dummy_c_instance;
-    chunk_t                          *dummy_c = &dummy_c_instance;
+    CF_ChunkWrapper_t                 dummy_chunks;
+    CF_Chunk_t                        dummy_c_instance;
+    CF_Chunk_t                       *dummy_c = &dummy_c_instance;
     CF_Chunks_GetFirstChunk_context_t context_CF_Chunks_GetFirstChunk;
 
     arg_t->flags.tx.md_need_send = 0; /* 0 = false */
     arg_t->chunks                = &dummy_chunks;
 
     context_CF_Chunks_GetFirstChunk.forced_return = dummy_c;
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
+    UT_SetDataBuffer(UT_KEY(CF_ChunkList_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
                      sizeof(context_CF_Chunks_GetFirstChunk), false);
 
     /* Arrange for CF_CFDP_S_SendFileData - ph will be null err_out returns 0 */
-    cf_config_table_t dummy_config_table;
-    history_t         dummy_history;
-    pdu_header_t     *forced_return_CF_CFDP_ConstructPduHeader = NULL;
+    CF_ConfigTable_t     dummy_config_table;
+    CF_History_t         dummy_history;
+    CF_CFDP_PduHeader_t *forced_return_CF_CFDP_ConstructPduHeader = NULL;
 
     CF_AppData.config_table = &dummy_config_table;
     arg_t->history          = &dummy_history;
@@ -1206,7 +1213,7 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturns_non
     /* Assert */
     UtAssert_True(local_result == 0, "CF_CFDP_S_CheckAndRespondNak returned %d and should be 0", local_result);
     UtAssert_STUB_COUNT(CF_CFDP_SendMd, 0);
-    UtAssert_STUB_COUNT(CF_Chunks_GetFirstChunk, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_GetFirstChunk, 1);
     UtAssert_ADDRESS_EQ(context_CF_Chunks_GetFirstChunk.chunks, &arg_t->chunks->chunks);
     /* Assert unstubbable:CF_CFDP_S_SendFileData */
     UtAssert_STUB_COUNT(CF_CFDP_ConstructPduHeader, 1);
@@ -1218,27 +1225,27 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturns_non
     void)
 {
     /* Arrange */
-    transaction_t                     dummy_t;
-    transaction_t                    *arg_t = &dummy_t;
+    CF_Transaction_t                  dummy_t;
+    CF_Transaction_t                 *arg_t = &dummy_t;
     int                               local_result;
-    chunks_wrapper_t                  dummy_chunks;
-    chunk_t                           dummy_c_instance;
-    chunk_t                          *dummy_c = &dummy_c_instance;
+    CF_ChunkWrapper_t                 dummy_chunks;
+    CF_Chunk_t                        dummy_c_instance;
+    CF_Chunk_t                       *dummy_c = &dummy_c_instance;
     CF_Chunks_GetFirstChunk_context_t context_CF_Chunks_GetFirstChunk;
 
     arg_t->flags.tx.md_need_send = 0; /* 0 = false */
     arg_t->chunks                = &dummy_chunks;
 
     context_CF_Chunks_GetFirstChunk.forced_return = dummy_c;
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
+    UT_SetDataBuffer(UT_KEY(CF_ChunkList_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
                      sizeof(context_CF_Chunks_GetFirstChunk), false);
 
     /* Arrange for CF_CFDP_S_SendFileData - fail return -1 */
-    cf_config_table_t dummy_config_table;
-    history_t         dummy_history;
-    pdu_header_t      dummy_ph;
-    pdu_header_t     *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
-    int32             forced_return_CF_WrappedLseek            = Any_uint32_Except(arg_t->foffs);
+    CF_ConfigTable_t     dummy_config_table;
+    CF_History_t         dummy_history;
+    CF_CFDP_PduHeader_t  dummy_ph;
+    CF_CFDP_PduHeader_t *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
+    int32                forced_return_CF_WrappedLseek            = Any_uint32_Except(arg_t->foffs);
 
     CF_AppData.config_table = &dummy_config_table;
     arg_t->history          = &dummy_history;
@@ -1256,7 +1263,7 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturns_non
     // /* Assert */
     UtAssert_True(local_result == -1, "CF_CFDP_S_CheckAndRespondNak returned %d and should be -1", local_result);
     UtAssert_STUB_COUNT(CF_CFDP_SendMd, 0);
-    UtAssert_STUB_COUNT(CF_Chunks_GetFirstChunk, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_GetFirstChunk, 1);
     UtAssert_ADDRESS_EQ(context_CF_Chunks_GetFirstChunk.chunks, &arg_t->chunks->chunks);
     /* Assert unstubbable:CF_CFDP_S_SendFileData */
     UtAssert_STUB_COUNT(CF_CFDP_ConstructPduHeader, 1);
@@ -1269,30 +1276,30 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturned_no
     void)
 {
     /* Arrange */
-    transaction_t                     dummy_t;
-    transaction_t                    *arg_t = &dummy_t;
+    CF_Transaction_t                  dummy_t;
+    CF_Transaction_t                 *arg_t = &dummy_t;
     int                               local_result;
-    chunks_wrapper_t                  dummy_chunks;
-    chunk_t                           dummy_c_instance;
-    chunk_t                          *dummy_c = &dummy_c_instance;
+    CF_ChunkWrapper_t                 dummy_chunks;
+    CF_Chunk_t                        dummy_c_instance;
+    CF_Chunk_t                       *dummy_c = &dummy_c_instance;
     CF_Chunks_GetFirstChunk_context_t context_CF_Chunks_GetFirstChunk;
 
     arg_t->flags.tx.md_need_send = 0; /* 0 = false */
     arg_t->chunks                = &dummy_chunks;
 
     context_CF_Chunks_GetFirstChunk.forced_return = dummy_c;
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
+    UT_SetDataBuffer(UT_KEY(CF_ChunkList_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
                      sizeof(context_CF_Chunks_GetFirstChunk), false);
 
     dummy_c->size = Any_uint8_GreaterThan(0); /* uint8 used for small size during testing */
 
     /* Arrange for CF_CFDP_S_SendFileData - fail return -1 */
-    cf_config_table_t        dummy_config_table;
-    history_t                dummy_history;
-    pdu_header_t             dummy_ph;
-    pdu_header_t            *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
+    CF_ConfigTable_t         dummy_config_table;
+    CF_History_t             dummy_history;
+    CF_CFDP_PduHeader_t      dummy_ph;
+    CF_CFDP_PduHeader_t     *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
     int32                    forced_return_CF_WrappedRead             = dummy_c->size;
-    cfdp_send_ret_t          exceptions[2]                            = {CF_SEND_NO_MSG, CF_SEND_ERROR};
+    CF_SendRet_t             exceptions[2]                            = {CF_SendRet_NO_MSG, CF_SendRet_ERROR};
     CF_CFDP_SendFd_context_t context_CF_CFDP_SendFd;
 
     dummy_c->offset = 0; /* dummy_c->offset = 0 used so that (foffs+bytes_to_read)<=t->fsize is never false */
@@ -1317,9 +1324,9 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturned_no
     // /* Assert */
     UtAssert_True(local_result == 1, "CF_CFDP_S_CheckAndRespondNak returned %d and should be 1", local_result);
     UtAssert_STUB_COUNT(CF_CFDP_SendMd, 0);
-    UtAssert_STUB_COUNT(CF_Chunks_GetFirstChunk, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_GetFirstChunk, 1);
     UtAssert_ADDRESS_EQ(context_CF_Chunks_GetFirstChunk.chunks, &arg_t->chunks->chunks);
-    UtAssert_STUB_COUNT(CF_Chunks_RemoveFromFirst, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_RemoveFromFirst, 1);
     /* Assert unstubbable:CF_CFDP_S_SendFileData */
     UtAssert_STUB_COUNT(CF_CFDP_ConstructPduHeader, 1);
     UtAssert_STUB_COUNT(CF_WrappedLseek, 0);
@@ -1344,8 +1351,8 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturned_no
 // Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Returns_0_Call_CF_CFDP_S_SubstateSendFileData(void)
 // {
 //     //Arrange
-//     transaction_t   dummy_t;
-//     transaction_t*  arg_t = &dummy_t;
+//     CF_Transaction_t   dummy_t;
+//     CF_Transaction_t*  arg_t = &dummy_t;
 
 //     UT_SetDefaultReturnValue(CF_CFDP_S_CheckAndRespondNak, 0);
 
@@ -1363,8 +1370,8 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
     void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t = &dummy_t;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t = &dummy_t;
 
     /* Arrange for CF_CFDP_S_CheckAndRespondNak (get it to return 0)*/
     CF_Chunks_GetFirstChunk_context_t context_CF_Chunks_GetFirstChunk;
@@ -1372,7 +1379,7 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
     arg_t->flags.tx.md_need_send = 0; /* 0 = false */
 
     context_CF_Chunks_GetFirstChunk.forced_return = NULL;
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
+    UT_SetDataBuffer(UT_KEY(CF_ChunkList_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
                      sizeof(context_CF_Chunks_GetFirstChunk), false);
 
     /* Arrange for CF_CFDP_S_SubstateSendFileData */
@@ -1381,9 +1388,9 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
     arg_t->foffs = initial_foffs;
 
     /* Arrange for CF_CFDP_S_SendFileData - ph will be null err_out returns 0 */
-    cf_config_table_t dummy_config_table;
-    history_t         dummy_history;
-    pdu_header_t     *forced_return_CF_CFDP_ConstructPduHeader = NULL;
+    CF_ConfigTable_t     dummy_config_table;
+    CF_History_t         dummy_history;
+    CF_CFDP_PduHeader_t *forced_return_CF_CFDP_ConstructPduHeader = NULL;
 
     dummy_config_table.outgoing_file_chunk_size = arg_t->foffs;
     CF_AppData.config_table                     = &dummy_config_table;
@@ -1397,7 +1404,7 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
 
     /* Assert */
     /* Assert for CF_CFDP_S_CheckAndRespondNak */
-    UtAssert_STUB_COUNT(CF_Chunks_GetFirstChunk, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_GetFirstChunk, 1);
     /* Assert for CF_CFDP_S_SubstateSendFileData via CF_CFDP_S_SendFileData*/
     UtAssert_STUB_COUNT(CF_CFDP_ConstructPduHeader, 1);
 } /* end
@@ -1410,8 +1417,8 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
 // Test_CF_CFDP_S2_SubstateSendFileData_CF_CFDP_S_CheckAndRespondNak_ReturnsNegativeValue_Call_CF_CFDP_S_Reset(void)
 // {
 //     //Arrange
-//     transaction_t   dummy_t;
-//     transaction_t*  arg_t = &dummy_t;
+//     CF_Transaction_t   dummy_t;
+//     CF_Transaction_t*  arg_t = &dummy_t;
 
 //     UT_SetDefaultReturnValue(CF_CFDP_S_CheckAndRespondNak, Any_int_Negative());
 
@@ -1427,13 +1434,13 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
 void Test_CF_CFDP_S2_SubstateSendFileData_CF_CFDP_S_CheckAndRespondNak_ReturnsNegativeValue_Call_CF_CFDP_S_Reset(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t = &dummy_t;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t = &dummy_t;
 
     /* Arrange for CF_CFDP_S_CheckAndRespondNak (get it to return a negative value)*/
     arg_t->flags.tx.md_need_send = 1; /* 1 = true */
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SEND_ERROR);
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SendRet_ERROR);
 
     /* Arrange for CF_CFDP_S_Reset - none required */
 
@@ -1452,8 +1459,8 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CF_CFDP_S_CheckAndRespondNak_ReturnsNe
 // void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_ReturnsPositiveValueDoNothing(void)
 // {
 //     //Arrange
-//     transaction_t   dummy_t;
-//     transaction_t*  arg_t = &dummy_t;
+//     CF_Transaction_t   dummy_t;
+//     CF_Transaction_t*  arg_t = &dummy_t;
 
 //     UT_SetDefaultReturnValue(CF_CFDP_S_CheckAndRespondNak, Any_int_Positive());
 
@@ -1468,18 +1475,18 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CF_CFDP_S_CheckAndRespondNak_ReturnsNe
 void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_ReturnsPositiveValueDoNothing(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t = &dummy_t;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t = &dummy_t;
 
     /* Arrange for CF_CFDP_S_CheckAndRespondNak (get it to return 0)*/
-    chunk_t                           fake_c;
-    chunk_t                          *dummy_c = &fake_c;
+    CF_Chunk_t                        fake_c;
+    CF_Chunk_t                       *dummy_c = &fake_c;
     CF_Chunks_GetFirstChunk_context_t context_CF_Chunks_GetFirstChunk;
 
     arg_t->flags.tx.md_need_send = 0; /* 0 = false */
 
     context_CF_Chunks_GetFirstChunk.forced_return = dummy_c;
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
+    UT_SetDataBuffer(UT_KEY(CF_ChunkList_GetFirstChunk), &context_CF_Chunks_GetFirstChunk,
                      sizeof(context_CF_Chunks_GetFirstChunk), false);
 
     /* Arrange for CF_CFDP_S_SendFileData */
@@ -1487,10 +1494,10 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
     dummy_c->size   = 1;
 
     /* Arrange for CF_CFDP_S_SendFileData - ph will be null err_out returns 0 */
-    cf_config_table_t        dummy_config_table;
-    history_t                dummy_history;
-    pdu_header_t             dummy_ph;
-    pdu_header_t            *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
+    CF_ConfigTable_t         dummy_config_table;
+    CF_History_t             dummy_history;
+    CF_CFDP_PduHeader_t      dummy_ph;
+    CF_CFDP_PduHeader_t     *forced_return_CF_CFDP_ConstructPduHeader = &dummy_ph;
     CF_CFDP_SendFd_context_t context_CF_CFDP_SendFd;
 
     dummy_config_table.outgoing_file_chunk_size = arg_t->foffs;
@@ -1507,7 +1514,7 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
 
     UT_SetDefaultReturnValue(UT_KEY(CF_WrappedRead), dummy_c->size); /* status == bytes_to_read */
 
-    context_CF_CFDP_SendFd.forced_return = CF_SEND_SUCCESS; /* status == CF_SEND_SUCCESS */
+    context_CF_CFDP_SendFd.forced_return = CF_SendRet_SUCCESS; /* status == CF_SendRet_SUCCESS */
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendFd), &context_CF_CFDP_SendFd, sizeof(context_CF_CFDP_SendFd), false);
 
@@ -1516,7 +1523,7 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
 
     /* Assert */
     /* Assert for CF_CFDP_S_CheckAndRespondNak */
-    UtAssert_STUB_COUNT(CF_Chunks_GetFirstChunk, 1);
+    UtAssert_STUB_COUNT(CF_ChunkList_GetFirstChunk, 1);
     /* Assert for CF_CFDP_S_SubstateSendFileData via CF_CFDP_S_SendFileData*/
     UtAssert_STUB_COUNT(CF_CFDP_ConstructPduHeader, 1);
 } /* end Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_ReturnsPositiveValueDoNothing */
@@ -1532,16 +1539,17 @@ void Test_CF_CFDP_S2_SubstateSendFileData_CallTo_CF_CFDP_S_CheckAndRespondNak_Re
 void Test_CF_CFDP_S_SubstateSendMetadata_CallTo_OS_FileOpenCheck_Returns_OS_SUCCESS_Increment_fault_file_open(void)
 {
     /* Arrange */
-    history_t                   dummy_history;
-    transaction_t               dummy_t;
-    transaction_t              *arg_t                   = &dummy_t;
+    CF_History_t                dummy_history;
+    CF_Transaction_t            dummy_t;
+    CF_Transaction_t           *arg_t                   = &dummy_t;
     uint16                      initial_fault_file_open = Any_uint16();
     const char                 *expected_Spec           = "CF S%d(%u:%u): file %s already open";
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
 
-    arg_t->history     = &dummy_history;
-    arg_t->history->cc = Any_uint8_Except(
-        CC_FILESTORE_REJECTION); /* Setting arg_t->history->cc not required to set, but helps verify change */
+    arg_t->history = &dummy_history;
+    arg_t->history->cc =
+        Any_uint8_Except(CF_CFDP_ConditionCode_FILESTORE_REJECTION); /* Setting arg_t->history->cc not required to set,
+                                                                        but helps verify change */
     arg_t->fd = 0;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_FileOpenCheck), OS_SUCCESS);
@@ -1571,9 +1579,9 @@ void Test_CF_CFDP_S_SubstateSendMetadata_CallTo_OS_FileOpenCheck_Returns_OS_SUCC
                       (uint16)(initial_fault_file_open + 1),
                   "fault.file_open was incremented to %u and should be 1 more than %u (value before call)",
                   CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.file_open, initial_fault_file_open);
-    UtAssert_True(arg_t->history->cc == CC_FILESTORE_REJECTION,
-                  "t->history->cc was set to %u and should be %u (CC_FILESTORE_REJECTION)", arg_t->history->cc,
-                  CC_FILESTORE_REJECTION);
+    UtAssert_True(arg_t->history->cc == CF_CFDP_ConditionCode_FILESTORE_REJECTION,
+                  "t->history->cc was set to %u and should be %u (CF_CFDP_ConditionCode_FILESTORE_REJECTION)",
+                  arg_t->history->cc, CF_CFDP_ConditionCode_FILESTORE_REJECTION);
     /* Assert CF_CFDP_S_Reset */
     UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1);
 
@@ -1582,17 +1590,18 @@ void Test_CF_CFDP_S_SubstateSendMetadata_CallTo_OS_FileOpenCheck_Returns_OS_SUCC
 void Test_CF_CFDP_S_SubstateSendMetadata_CallTo_CF_WrappedOpen_Makes_fd_LessThan_0_Increment_fault_file_open(void)
 {
     /* Arrange */
-    history_t                      dummy_history;
-    transaction_t                  dummy_t;
-    transaction_t                 *arg_t                   = &dummy_t;
+    CF_History_t                   dummy_history;
+    CF_Transaction_t               dummy_t;
+    CF_Transaction_t              *arg_t                   = &dummy_t;
     uint16                         initial_fault_file_open = Any_uint16();
     const char                    *expected_Spec           = "CF S%d(%u:%u): failed to open file %s, error=0x%08x";
     CFE_EVS_SendEvent_context_t    context_CFE_EVS_SendEvent;
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
-    arg_t->history     = &dummy_history;
-    arg_t->history->cc = Any_uint8_Except(
-        CC_FILESTORE_REJECTION); /* Setting arg_t->history->cc not required to set, but helps verify change */
+    arg_t->history = &dummy_history;
+    arg_t->history->cc =
+        Any_uint8_Except(CF_CFDP_ConditionCode_FILESTORE_REJECTION); /* Setting arg_t->history->cc not required to set,
+                                                                        but helps verify change */
     arg_t->fd = 0;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_FileOpenCheck), Any_int32_Except(OS_SUCCESS));
@@ -1628,9 +1637,9 @@ void Test_CF_CFDP_S_SubstateSendMetadata_CallTo_CF_WrappedOpen_Makes_fd_LessThan
                       (uint16)(initial_fault_file_open + 1),
                   "fault.file_open was incremented to %u and should be 1 more than %u (value before call)",
                   CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.file_open, initial_fault_file_open);
-    UtAssert_True(arg_t->history->cc == CC_FILESTORE_REJECTION,
-                  "t->history->cc was set to %u and should be %u (CC_FILESTORE_REJECTION)", arg_t->history->cc,
-                  CC_FILESTORE_REJECTION);
+    UtAssert_True(arg_t->history->cc == CF_CFDP_ConditionCode_FILESTORE_REJECTION,
+                  "t->history->cc was set to %u and should be %u (CF_CFDP_ConditionCode_FILESTORE_REJECTION)",
+                  arg_t->history->cc, CF_CFDP_ConditionCode_FILESTORE_REJECTION);
     /* Assert CF_CFDP_S_Reset */
     UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1);
 
@@ -1640,18 +1649,19 @@ void Test_CF_CFDP_S_SubstateSendMetadata_FirstCallTo_CF_WrappedLseek_Sets_status
     void)
 {
     /* Arrange */
-    history_t                      dummy_history;
-    transaction_t                  dummy_t;
-    transaction_t                 *arg_t                         = &dummy_t;
+    CF_History_t                   dummy_history;
+    CF_Transaction_t               dummy_t;
+    CF_Transaction_t              *arg_t                         = &dummy_t;
     uint16                         initial_fault_file_seek       = Any_uint16();
     int32                          forced_return_CF_WrappedLseek = Any_int_Negative();
     const char                    *expected_Spec = "CF S%d(%u:%u): failed to seek end file %s, error=0x%08x";
     CFE_EVS_SendEvent_context_t    context_CFE_EVS_SendEvent;
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
-    arg_t->history     = &dummy_history;
-    arg_t->history->cc = Any_uint8_Except(
-        CC_FILESTORE_REJECTION); /* Setting arg_t->history->cc not required to set, but helps verify change */
+    arg_t->history = &dummy_history;
+    arg_t->history->cc =
+        Any_uint8_Except(CF_CFDP_ConditionCode_FILESTORE_REJECTION); /* Setting arg_t->history->cc not required to set,
+                                                                        but helps verify change */
     arg_t->fd = 0;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_FileOpenCheck), Any_int32_Except(OS_SUCCESS));
@@ -1690,9 +1700,9 @@ void Test_CF_CFDP_S_SubstateSendMetadata_FirstCallTo_CF_WrappedLseek_Sets_status
                       (uint16)(initial_fault_file_seek + 1),
                   "fault.file_seek was incremented to %u and should be 1 more than %u (value before call)",
                   CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.file_seek, initial_fault_file_seek);
-    UtAssert_True(arg_t->history->cc == CC_FILESTORE_REJECTION,
-                  "t->history->cc was set to %u and should be %u (CC_FILESTORE_REJECTION)", arg_t->history->cc,
-                  CC_FILESTORE_REJECTION);
+    UtAssert_True(arg_t->history->cc == CF_CFDP_ConditionCode_FILESTORE_REJECTION,
+                  "t->history->cc was set to %u and should be %u (CF_CFDP_ConditionCode_FILESTORE_REJECTION)",
+                  arg_t->history->cc, CF_CFDP_ConditionCode_FILESTORE_REJECTION);
     /* Assert CF_CFDP_S_Reset */
     UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1);
 } /* end
@@ -1702,18 +1712,19 @@ void Test_CF_CFDP_S_SubstateSendMetadata_SecondCallTo_CF_WrappedLseek_Sets_statu
     void)
 {
     /* Arrange */
-    history_t                      dummy_history;
-    transaction_t                  dummy_t;
-    transaction_t                 *arg_t                         = &dummy_t;
+    CF_History_t                   dummy_history;
+    CF_Transaction_t               dummy_t;
+    CF_Transaction_t              *arg_t                         = &dummy_t;
     uint16                         initial_fault_file_seek       = Any_uint16();
     int32                          forced_return_CF_WrappedLseek = Any_int_Negative();
     const char                    *expected_Spec = "CF S%d(%u:%u): failed to seek begin file %s, got 0x%08x";
     CFE_EVS_SendEvent_context_t    context_CFE_EVS_SendEvent;
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
 
-    arg_t->history     = &dummy_history;
-    arg_t->history->cc = Any_uint8_Except(
-        CC_FILESTORE_REJECTION); /* Setting arg_t->history->cc not required to set, but helps verify change */
+    arg_t->history = &dummy_history;
+    arg_t->history->cc =
+        Any_uint8_Except(CF_CFDP_ConditionCode_FILESTORE_REJECTION); /* Setting arg_t->history->cc not required to set,
+                                                                        but helps verify change */
     arg_t->fd = 0;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_FileOpenCheck), Any_int32_Except(OS_SUCCESS));
@@ -1752,9 +1763,9 @@ void Test_CF_CFDP_S_SubstateSendMetadata_SecondCallTo_CF_WrappedLseek_Sets_statu
                       (uint16)(initial_fault_file_seek + 1),
                   "fault.file_seek was incremented to %u and should be 1 more than %u (value before call)",
                   CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.file_seek, initial_fault_file_seek);
-    UtAssert_True(arg_t->history->cc == CC_FILESTORE_REJECTION,
-                  "t->history->cc was set to %u and should be %u (CC_FILESTORE_REJECTION)", arg_t->history->cc,
-                  CC_FILESTORE_REJECTION);
+    UtAssert_True(arg_t->history->cc == CF_CFDP_ConditionCode_FILESTORE_REJECTION,
+                  "t->history->cc was set to %u and should be %u (CF_CFDP_ConditionCode_FILESTORE_REJECTION)",
+                  arg_t->history->cc, CF_CFDP_ConditionCode_FILESTORE_REJECTION);
     /* Assert CF_CFDP_S_Reset */
     UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1);
 } /* end Test_CF_CFDP_S_SubstateSendMetadata_SecondCallTo_CF_WrappedLseek_Sets_status_ToNot_0_Increment_fault_file_seek
@@ -1763,17 +1774,18 @@ void Test_CF_CFDP_S_SubstateSendMetadata_SecondCallTo_CF_WrappedLseek_Sets_statu
 void Test_CF_CFDP_S_SubstateSendMetadata_AllFileChecksPassCallTo_CF_CFDP_SendMd_Returns_CF_SEND_ERROR_ThenErrorOut(void)
 {
     /* Arrange */
-    history_t                      dummy_history;
-    transaction_t                  dummy_t;
-    transaction_t                 *arg_t         = &dummy_t;
+    CF_History_t                   dummy_history;
+    CF_Transaction_t               dummy_t;
+    CF_Transaction_t              *arg_t         = &dummy_t;
     const char                    *expected_Spec = "CF S%d(%u:%u): failed to send md";
     CFE_EVS_SendEvent_context_t    context_CFE_EVS_SendEvent;
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
-    transaction_t                 *context_CF_CFDP_SendMd;
+    CF_Transaction_t              *context_CF_CFDP_SendMd;
 
-    arg_t->history     = &dummy_history;
-    arg_t->history->cc = Any_uint8_Except(
-        CC_FILESTORE_REJECTION); /* Setting arg_t->history->cc not required to set, but helps verify change */
+    arg_t->history = &dummy_history;
+    arg_t->history->cc =
+        Any_uint8_Except(CF_CFDP_ConditionCode_FILESTORE_REJECTION); /* Setting arg_t->history->cc not required to set,
+                                                                        but helps verify change */
     arg_t->fd = 0;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_FileOpenCheck), Any_int32_Except(OS_SUCCESS));
@@ -1785,7 +1797,7 @@ void Test_CF_CFDP_S_SubstateSendMetadata_AllFileChecksPassCallTo_CF_CFDP_SendMd_
                      false);
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendMd), &context_CF_CFDP_SendMd, sizeof(context_CF_CFDP_SendMd), false);
-    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SEND_ERROR);
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SendRet_ERROR);
 
     UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), stub_reporter, &context_CFE_EVS_SendEvent);
 
@@ -1810,9 +1822,9 @@ void Test_CF_CFDP_S_SubstateSendMetadata_AllFileChecksPassCallTo_CF_CFDP_SendMd_
     UtAssert_StrCmp(context_CFE_EVS_SendEvent.Spec, expected_Spec,
                     "CFE_EVS_SendEvent received expected Spec\n'%s' - Received\n'%s' - Expected",
                     context_CFE_EVS_SendEvent.Spec, expected_Spec);
-    UtAssert_True(arg_t->history->cc == CC_FILESTORE_REJECTION,
-                  "t->history->cc was set to %u and should be %u (CC_FILESTORE_REJECTION)", arg_t->history->cc,
-                  CC_FILESTORE_REJECTION);
+    UtAssert_True(arg_t->history->cc == CF_CFDP_ConditionCode_FILESTORE_REJECTION,
+                  "t->history->cc was set to %u and should be %u (CF_CFDP_ConditionCode_FILESTORE_REJECTION)",
+                  arg_t->history->cc, CF_CFDP_ConditionCode_FILESTORE_REJECTION);
     /* Assert CF_CFDP_S_Reset */
     UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1);
 } /* end Test_CF_CFDP_S_SubstateSendMetadata_AllFileChecksPassCallTo_CF_CFDP_SendMd_Returns_CF_SEND_ERROR_ThenErrorOut
@@ -1822,20 +1834,21 @@ void Test_CF_CFDP_S_SubstateSendMetadata_BypassedFileChecks_t_fd_IsNot_0_CallTo_
     void)
 {
     /* Arrange */
-    history_t                   dummy_history;
-    transaction_t               dummy_t;
-    transaction_t              *arg_t = &dummy_t;
-    transaction_t              *context_CF_CFDP_SendMd;
+    CF_History_t                dummy_history;
+    CF_Transaction_t            dummy_t;
+    CF_Transaction_t           *arg_t = &dummy_t;
+    CF_Transaction_t           *context_CF_CFDP_SendMd;
     const char                 *expected_Spec = "CF S%d(%u:%u): failed to send md";
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
 
-    arg_t->history     = &dummy_history;
-    arg_t->history->cc = Any_uint8_Except(
-        CC_FILESTORE_REJECTION); /* Setting arg_t->history->cc not required to set, but helps verify change */
+    arg_t->history = &dummy_history;
+    arg_t->history->cc =
+        Any_uint8_Except(CF_CFDP_ConditionCode_FILESTORE_REJECTION); /* Setting arg_t->history->cc not required to set,
+                                                                        but helps verify change */
     arg_t->fd = Any_int32_Except(0);
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendMd), &context_CF_CFDP_SendMd, sizeof(context_CF_CFDP_SendMd), false);
-    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SEND_ERROR);
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SendRet_ERROR);
 
     UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), stub_reporter, &context_CFE_EVS_SendEvent);
 
@@ -1858,9 +1871,9 @@ void Test_CF_CFDP_S_SubstateSendMetadata_BypassedFileChecks_t_fd_IsNot_0_CallTo_
     UtAssert_StrCmp(context_CFE_EVS_SendEvent.Spec, expected_Spec,
                     "CFE_EVS_SendEvent received expected Spec\n'%s' - Received\n'%s' - Expected",
                     context_CFE_EVS_SendEvent.Spec, expected_Spec);
-    UtAssert_True(arg_t->history->cc == CC_FILESTORE_REJECTION,
-                  "t->history->cc was set to %u and should be %u (CC_FILESTORE_REJECTION)", arg_t->history->cc,
-                  CC_FILESTORE_REJECTION);
+    UtAssert_True(arg_t->history->cc == CF_CFDP_ConditionCode_FILESTORE_REJECTION,
+                  "t->history->cc was set to %u and should be %u (CF_CFDP_ConditionCode_FILESTORE_REJECTION)",
+                  arg_t->history->cc, CF_CFDP_ConditionCode_FILESTORE_REJECTION);
     /* Assert CF_CFDP_S_Reset */
     UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1);
 } /* end
@@ -1871,16 +1884,16 @@ void Test_CF_CFDP_S_SubstateSendMetadata_BypassedFileChecks_t_fd_IsNot_0_CallTo_
     void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t = &dummy_t;
-    transaction_t *context_CF_CFDP_SendMd;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t = &dummy_t;
+    CF_Transaction_t *context_CF_CFDP_SendMd;
 
     arg_t->state_data.s.sub_state =
-        Any_uint8_Except(SEND_FILEDATA); /* setting sub_state is not required, but it helps verification */
+        Any_uint8_Except(CF_TxSubState_FILEDATA); /* setting sub_state is not required, but it helps verification */
     arg_t->fd = Any_int32_Except(0);
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendMd), &context_CF_CFDP_SendMd, sizeof(context_CF_CFDP_SendMd), false);
-    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SEND_SUCCESS);
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SendRet_SUCCESS);
 
     /* Act */
     CF_CFDP_S_SubstateSendMetadata(arg_t);
@@ -1888,8 +1901,9 @@ void Test_CF_CFDP_S_SubstateSendMetadata_BypassedFileChecks_t_fd_IsNot_0_CallTo_
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_SendMd, 1);
     UtAssert_ADDRESS_EQ(context_CF_CFDP_SendMd, arg_t);
-    UtAssert_True(arg_t->state_data.s.sub_state == SEND_FILEDATA,
-                  "sub_state set to %u and should be %u (SEND_FILEDATA)", arg_t->state_data.s.sub_state, SEND_FILEDATA);
+    UtAssert_True(arg_t->state_data.s.sub_state == CF_TxSubState_FILEDATA,
+                  "sub_state set to %u and should be %u (CF_TxSubState_FILEDATA)", arg_t->state_data.s.sub_state,
+                  CF_TxSubState_FILEDATA);
 
 } /* end
      Test_CF_CFDP_S_SubstateSendMetadata_BypassedFileChecks_t_fd_IsNot_0_CallTo_CF_CFDP_SendMd_Returns_CF_SEND_SUCCESS_Then_sub_state_SetTo_SEND_FILE_DATA
@@ -1899,17 +1913,17 @@ void Test_CF_CFDP_S_SubstateSendMetadata_BypassedFileChecks_t_fd_IsNot_0_CallTo_
     void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t             = &dummy_t;
-    uint8          initial_sub_state = Any_uint8();
-    transaction_t *context_CF_CFDP_SendMd;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t             = &dummy_t;
+    uint8             initial_sub_state = Any_uint8();
+    CF_Transaction_t *context_CF_CFDP_SendMd;
 
     arg_t->state_data.s.sub_state =
         initial_sub_state; /* setting sub_state is not required, but it helps verification */
     arg_t->fd = Any_int32_Except(0);
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendMd), &context_CF_CFDP_SendMd, sizeof(context_CF_CFDP_SendMd), false);
-    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SEND_NO_MSG);
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SendRet_NO_MSG);
 
     /* Act */
     CF_CFDP_S_SubstateSendMetadata(arg_t);
@@ -1937,9 +1951,9 @@ void Test_CF_CFDP_S_SubstateSendFinAck_WhenCallTo_CF_CFDP_SendAck_Returns_CF_SEN
     void)
 {
     /* Arrange */
-    history_t                 dummy_history;
-    transaction_t             dummy_t;
-    transaction_t            *arg_t = &dummy_t;
+    CF_History_t              dummy_history;
+    CF_Transaction_t          dummy_t;
+    CF_Transaction_t         *arg_t = &dummy_t;
     CF_CFDP_SendAck_context_t context_CF_CFDP_SendAck;
 
     arg_t->history                = &dummy_history;
@@ -1947,7 +1961,7 @@ void Test_CF_CFDP_S_SubstateSendFinAck_WhenCallTo_CF_CFDP_SendAck_Returns_CF_SEN
     arg_t->history->peer_eid      = Any_uint8();
     arg_t->history->seq_num       = Any_uint32();
 
-    context_CF_CFDP_SendAck.forced_return = CF_SEND_NO_MSG;
+    context_CF_CFDP_SendAck.forced_return = CF_SendRet_NO_MSG;
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendAck), &context_CF_CFDP_SendAck, sizeof(context_CF_CFDP_SendAck), false);
 
     /* Arrange unstubbable: CF_CFDP_S_Reset */
@@ -1962,12 +1976,12 @@ void Test_CF_CFDP_S_SubstateSendFinAck_WhenCallTo_CF_CFDP_SendAck_Returns_CF_SEN
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_SendAck, 1);
     UtAssert_ADDRESS_EQ(context_CF_CFDP_SendAck.t, arg_t);
-    UtAssert_True(context_CF_CFDP_SendAck.ts == ACK_TS_ACTIVE,
-                  "CF_CFDP_SendAck received ts %u and should be %u (ACK_TS_ACTIVE)", context_CF_CFDP_SendAck.ts,
-                  ACK_TS_ACTIVE);
-    UtAssert_True(context_CF_CFDP_SendAck.dir_code == PDU_FIN,
-                  "CF_CFDP_SendAck received dir_code %u and should be %u (PDU_FIN)", context_CF_CFDP_SendAck.dir_code,
-                  PDU_FIN);
+    UtAssert_True(context_CF_CFDP_SendAck.ts == CF_CFDP_AckTxnStatus_ACTIVE,
+                  "CF_CFDP_SendAck received ts %u and should be %u (CF_CFDP_AckTxnStatus_ACTIVE)",
+                  context_CF_CFDP_SendAck.ts, CF_CFDP_AckTxnStatus_ACTIVE);
+    UtAssert_True(context_CF_CFDP_SendAck.dir_code == CF_CFDP_FileDirective_FIN,
+                  "CF_CFDP_SendAck received dir_code %u and should be %u (CF_CFDP_FileDirective_FIN)",
+                  context_CF_CFDP_SendAck.dir_code, CF_CFDP_FileDirective_FIN);
     UtAssert_True(context_CF_CFDP_SendAck.cc == arg_t->state_data.s.s2.fin_cc,
                   "CF_CFDP_SendAck received cc %u and should be %u (t->state_data.s.s2.fin_cc)",
                   context_CF_CFDP_SendAck.cc, arg_t->state_data.s.s2.fin_cc);
@@ -1987,9 +2001,9 @@ void Test_CF_CFDP_S_SubstateSendFinAck_WhenCallTo_CF_CFDP_SendAck_DoesNotReturn_
     void)
 {
     /* Arrange */
-    history_t                 dummy_history;
-    transaction_t             dummy_t;
-    transaction_t            *arg_t = &dummy_t;
+    CF_History_t              dummy_history;
+    CF_Transaction_t          dummy_t;
+    CF_Transaction_t         *arg_t = &dummy_t;
     CF_CFDP_SendAck_context_t context_CF_CFDP_SendAck;
 
     arg_t->history                = &dummy_history;
@@ -1997,7 +2011,7 @@ void Test_CF_CFDP_S_SubstateSendFinAck_WhenCallTo_CF_CFDP_SendAck_DoesNotReturn_
     arg_t->history->peer_eid      = Any_uint8();
     arg_t->history->seq_num       = Any_uint32();
 
-    context_CF_CFDP_SendAck.forced_return = Any_cfdp_send_ret_t_Except(CF_SEND_NO_MSG);
+    context_CF_CFDP_SendAck.forced_return = Any_cfdp_send_ret_t_Except(CF_SendRet_NO_MSG);
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendAck), &context_CF_CFDP_SendAck, sizeof(context_CF_CFDP_SendAck), false);
 
@@ -2013,12 +2027,12 @@ void Test_CF_CFDP_S_SubstateSendFinAck_WhenCallTo_CF_CFDP_SendAck_DoesNotReturn_
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_SendAck, 1);
     UtAssert_ADDRESS_EQ(context_CF_CFDP_SendAck.t, arg_t);
-    UtAssert_True(context_CF_CFDP_SendAck.ts == ACK_TS_ACTIVE,
-                  "CF_CFDP_SendAck received ts %u and should be %u (ACK_TS_ACTIVE)", context_CF_CFDP_SendAck.ts,
-                  ACK_TS_ACTIVE);
-    UtAssert_True(context_CF_CFDP_SendAck.dir_code == PDU_FIN,
-                  "CF_CFDP_SendAck received dir_code %u and should be %u (PDU_FIN)", context_CF_CFDP_SendAck.dir_code,
-                  PDU_FIN);
+    UtAssert_True(context_CF_CFDP_SendAck.ts == CF_CFDP_AckTxnStatus_ACTIVE,
+                  "CF_CFDP_SendAck received ts %u and should be %u (CF_CFDP_AckTxnStatus_ACTIVE)",
+                  context_CF_CFDP_SendAck.ts, CF_CFDP_AckTxnStatus_ACTIVE);
+    UtAssert_True(context_CF_CFDP_SendAck.dir_code == CF_CFDP_FileDirective_FIN,
+                  "CF_CFDP_SendAck received dir_code %u and should be %u (CF_CFDP_FileDirective_FIN)",
+                  context_CF_CFDP_SendAck.dir_code, CF_CFDP_FileDirective_FIN);
     UtAssert_True(context_CF_CFDP_SendAck.cc == arg_t->state_data.s.s2.fin_cc,
                   "CF_CFDP_SendAck received cc %u and should be %u (t->state_data.s.s2.fin_cc)",
                   context_CF_CFDP_SendAck.cc, arg_t->state_data.s.s2.fin_cc);
@@ -2050,11 +2064,11 @@ void Test_CF_CFDP_S_SubstateSendFinAck_WhenCallTo_CF_CFDP_SendAck_DoesNotReturn_
 void Test_CF_CFDP_S2_EarlyFin_SendEventAndCallReset(void)
 {
     /* Arrange */
-    history_t                   dummy_history;
-    transaction_t               dummy_t;
-    transaction_t              *arg_t = &dummy_t;
-    const pdu_header_t          dummy_ph;
-    const pdu_header_t         *arg_ph        = &dummy_ph;
+    CF_History_t                dummy_history;
+    CF_Transaction_t            dummy_t;
+    CF_Transaction_t           *arg_t = &dummy_t;
+    const CF_CFDP_PduHeader_t   dummy_ph;
+    const CF_CFDP_PduHeader_t  *arg_ph        = &dummy_ph;
     const char                 *expected_Spec = "CF S%d(%u:%u): got early fin -- cancelling";
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
 
@@ -2101,12 +2115,12 @@ void Test_CF_CFDP_S2_EarlyFin_SendEventAndCallReset(void)
 void Test_CF_CFDP_S2_Fin_When_CF_CFDP_RecvFin_Returns_0_Set_fin_cc_And_sub_state(void)
 {
     /* Arrange */
-    transaction_t       dummy_t;
-    transaction_t      *arg_t       = &dummy_t;
-    uint8               dummy_flags = Any_uint8();
-    const pdu_header_t  dummy_ph;
-    const pdu_header_t *arg_ph;
-    uint8               expected_fin_cc = FGV(dummy_flags, PDU_FLAGS_CC);
+    CF_Transaction_t           dummy_t;
+    CF_Transaction_t          *arg_t       = &dummy_t;
+    uint8                      dummy_flags = Any_uint8();
+    const CF_CFDP_PduHeader_t  dummy_ph;
+    const CF_CFDP_PduHeader_t *arg_ph;
+    uint8                      expected_fin_cc = FGV(dummy_flags, CF_CFDP_PduFin_FLAGS_CC);
 
     memcpy((void *)&dummy_ph.flags, &dummy_flags, 1);
     arg_ph = &dummy_ph;
@@ -2119,11 +2133,11 @@ void Test_CF_CFDP_S2_Fin_When_CF_CFDP_RecvFin_Returns_0_Set_fin_cc_And_sub_state
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_RecvFin, 1);
     UtAssert_True(arg_t->state_data.s.s2.fin_cc == expected_fin_cc,
-                  "fin_cc is set to %u and should be %u (FGV(pdu->fin.flags, PDU_FLAGS_CC))",
+                  "fin_cc is set to %u and should be %u (FGV(pdu->fin.flags, CF_CFDP_PduFin_FLAGS_CC))",
                   arg_t->state_data.s.s2.fin_cc, expected_fin_cc);
-    UtAssert_True(arg_t->state_data.s.sub_state == SEND_SEND_FIN_ACK,
-                  "sub_state is set to %u and should be %u (SEND_SEND_FIN_ACK)", arg_t->state_data.s.sub_state,
-                  SEND_SEND_FIN_ACK);
+    UtAssert_True(arg_t->state_data.s.sub_state == CF_TxSubState_SEND_FIN_ACK,
+                  "sub_state is set to %u and should be %u (CF_TxSubState_SEND_FIN_ACK)", arg_t->state_data.s.sub_state,
+                  CF_TxSubState_SEND_FIN_ACK);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
 } /* end Test_CF_CFDP_S2_Fin_When_CF_CFDP_RecvFin_Returns_0_Set_fin_cc_And_sub_state */
@@ -2131,11 +2145,11 @@ void Test_CF_CFDP_S2_Fin_When_CF_CFDP_RecvFin_Returns_0_Set_fin_cc_And_sub_state
 void Test_CF_CFDP_S2_Fin_When_CF_CFDP_RecvFin_DoesNotReturn_0_SendEventAndCountReceiveError(void)
 {
     /* Arrange */
-    history_t                   dummy_history;
-    transaction_t               dummy_t;
-    transaction_t              *arg_t = &dummy_t;
-    const pdu_header_t          dummy_ph;
-    const pdu_header_t         *arg_ph             = &dummy_ph;
+    CF_History_t                dummy_history;
+    CF_Transaction_t            dummy_t;
+    CF_Transaction_t           *arg_t = &dummy_t;
+    const CF_CFDP_PduHeader_t   dummy_ph;
+    const CF_CFDP_PduHeader_t  *arg_ph             = &dummy_ph;
     uint32                      initial_recv_error = Any_uint32();
     const char                 *expected_Spec      = "CF S%d(%u:%u): received invalid fin pdu";
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
@@ -2181,11 +2195,11 @@ void Test_CF_CFDP_S2_Fin_When_CF_CFDP_RecvFin_DoesNotReturn_0_SendEventAndCountR
 void Test_CF_CFDP_S2_Nak_CallTo_CF_CFDP_RecvNak_Returns_neg1_SendEventAndIncrement_recv_error(void)
 {
     /* Arrange */
-    history_t                   dummy_history;
-    transaction_t               dummy_t;
-    transaction_t              *arg_t = &dummy_t;
-    pdu_nak_t                   dummy_ph;
-    pdu_header_t               *arg_ph             = (pdu_header_t *)&dummy_ph;
+    CF_History_t                dummy_history;
+    CF_Transaction_t            dummy_t;
+    CF_Transaction_t           *arg_t = &dummy_t;
+    CF_CFDP_PduNak_t            dummy_ph;
+    CF_CFDP_PduHeader_t        *arg_ph             = (CF_CFDP_PduHeader_t *)&dummy_ph;
     uint32                      initial_recv_error = Any_uint32();
     const char                 *expected_Spec      = "CF S%d(%u:%u): received invalid nak pdu";
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
@@ -2225,11 +2239,11 @@ void Test_CF_CFDP_S2_Nak_CallTo_CF_CFDP_RecvNak_Returns_neg1_SendEventAndIncreme
 void Test_CF_CFDP_S2_Nak_CallTo_CF_CFDP_RecvNak_Returns_0_Set_num_sr_to_0_SendEventAndIncrement_recv_error(void)
 {
     /* Arrange */
-    history_t                   dummy_history;
-    transaction_t               dummy_t;
-    transaction_t              *arg_t = &dummy_t;
-    pdu_nak_t                   dummy_ph;
-    pdu_header_t               *arg_ph             = (pdu_header_t *)&dummy_ph;
+    CF_History_t                dummy_history;
+    CF_Transaction_t            dummy_t;
+    CF_Transaction_t           *arg_t = &dummy_t;
+    CF_CFDP_PduNak_t            dummy_ph;
+    CF_CFDP_PduHeader_t        *arg_ph             = (CF_CFDP_PduHeader_t *)&dummy_ph;
     uint32                      initial_recv_error = Any_uint32();
     const char                 *expected_Spec      = "CF S%d(%u:%u): received invalid nak pdu";
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
@@ -2279,13 +2293,13 @@ void Test_CF_CFDP_S2_Nak_CallTo_CF_CFDP_Sets_md_need_send_To_1_When_offset_start
     void)
 {
     /* Arrange */
-    history_t      dummy_history;
-    transaction_t  dummy_t;
-    transaction_t *arg_t = &dummy_t;
-    pdu_nak_t      dummy_ph;
-    pdu_header_t  *arg_ph                                = (pdu_header_t *)&dummy_ph;
-    uint32         initial_nak_segment_requests          = Any_uint32();
-    int            context_CF_CFDP_RecvNak_forced_num_sr = 1;
+    CF_History_t         dummy_history;
+    CF_Transaction_t     dummy_t;
+    CF_Transaction_t    *arg_t = &dummy_t;
+    CF_CFDP_PduNak_t     dummy_ph;
+    CF_CFDP_PduHeader_t *arg_ph                                = (CF_CFDP_PduHeader_t *)&dummy_ph;
+    uint32               initial_nak_segment_requests          = Any_uint32();
+    int                  context_CF_CFDP_RecvNak_forced_num_sr = 1;
 
     arg_t->history  = &dummy_history;
     arg_t->chan_num = Any_cf_chan_num();
@@ -2322,11 +2336,11 @@ void Test_CF_CFDP_S2_Nak_CallTo_CF_CFDP_Sets_md_need_send_To_1_When_offset_start
 void Test_CF_CFDP_S2_Nak_SendsEventBecause_offset_end_IsLessThan_offset_start(void)
 {
     /* Arrange */
-    history_t                   dummy_history;
-    transaction_t               dummy_t;
-    transaction_t              *arg_t = &dummy_t;
-    pdu_nak_t                   dummy_ph;
-    pdu_header_t               *arg_ph = (pdu_header_t *)&dummy_ph;
+    CF_History_t                dummy_history;
+    CF_Transaction_t            dummy_t;
+    CF_Transaction_t           *arg_t = &dummy_t;
+    CF_CFDP_PduNak_t            dummy_ph;
+    CF_CFDP_PduHeader_t        *arg_ph = (CF_CFDP_PduHeader_t *)&dummy_ph;
     uint32                      dummy_offset_start;
     uint32                      dummy_offset_end;
     uint32                      initial_nak_segment_requests = Any_uint32();
@@ -2382,11 +2396,11 @@ void Test_CF_CFDP_S2_Nak_SendsEventBecause_offset_end_IsLessThan_offset_start(vo
 void Test_CF_CFDP_S2_Nak_SendsEventBecause_start_Plus_size_IsGreaterThanTransaction_fsize(void)
 {
     /* Arrange */
-    history_t                   dummy_history;
-    transaction_t               dummy_t;
-    transaction_t              *arg_t = &dummy_t;
-    pdu_nak_t                   dummy_ph;
-    pdu_header_t               *arg_ph = (pdu_header_t *)&dummy_ph;
+    CF_History_t                dummy_history;
+    CF_Transaction_t            dummy_t;
+    CF_Transaction_t           *arg_t = &dummy_t;
+    CF_CFDP_PduNak_t            dummy_ph;
+    CF_CFDP_PduHeader_t        *arg_ph = (CF_CFDP_PduHeader_t *)&dummy_ph;
     uint32                      dummy_offset_start;
     uint32                      dummy_offset_end;
     uint32                      initial_nak_segment_requests = Any_uint32();
@@ -2442,11 +2456,11 @@ void Test_CF_CFDP_S2_Nak_SendsEventBecause_start_Plus_size_IsGreaterThanTransact
 void Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsEqualToTransaction_fsize(void)
 {
     /* Arrange */
-    history_t               dummy_history;
-    transaction_t           dummy_t;
-    transaction_t          *arg_t = &dummy_t;
-    pdu_nak_t               dummy_ph;
-    pdu_header_t           *arg_ph = (pdu_header_t *)&dummy_ph;
+    CF_History_t            dummy_history;
+    CF_Transaction_t        dummy_t;
+    CF_Transaction_t       *arg_t = &dummy_t;
+    CF_CFDP_PduNak_t        dummy_ph;
+    CF_CFDP_PduHeader_t    *arg_ph = (CF_CFDP_PduHeader_t *)&dummy_ph;
     uint32                  dummy_offset_start;
     uint32                  dummy_offset_end;
     uint32                  initial_nak_segment_requests = Any_uint32();
@@ -2471,7 +2485,7 @@ void Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsEqualToTr
 
     arg_t->flags.tx.md_need_send = 0; /* setting md_need_send is not required, but assists in verification */
 
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_Add), &context_CF_Chunks_Add, sizeof(context_CF_Chunks_Add), false);
+    UT_SetDataBuffer(UT_KEY(CF_ChunkListAdd), &context_CF_Chunks_Add, sizeof(context_CF_Chunks_Add), false);
 
     /* Act */
     CF_CFDP_S2_Nak(arg_t, arg_ph);
@@ -2486,13 +2500,13 @@ void Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsEqualToTr
         context_CF_CFDP_RecvNak_forced_num_sr, initial_nak_segment_requests);
     UtAssert_True(arg_t->flags.tx.md_need_send == 0, "md_need_send is %u and should not have changed from 0",
                   arg_t->flags.tx.md_need_send);
-    UtAssert_STUB_COUNT(CF_Chunks_Add, 1);
+    UtAssert_STUB_COUNT(CF_ChunkListAdd, 1);
     UtAssert_ADDRESS_EQ(context_CF_Chunks_Add.chunks, &arg_t->chunks->chunks);
     UtAssert_True(context_CF_Chunks_Add.offset == dummy_offset_start,
-                  "CF_Chunks_Add received offset %u and should be %u (start)", context_CF_Chunks_Add.offset,
+                  "CF_ChunkListAdd received offset %u and should be %u (start)", context_CF_Chunks_Add.offset,
                   dummy_offset_start);
     UtAssert_True(context_CF_Chunks_Add.size == dummy_offset_end - dummy_offset_start,
-                  "CF_Chunks_Add received size %u and should be %u (size)", context_CF_Chunks_Add.size,
+                  "CF_ChunkListAdd received size %u and should be %u (size)", context_CF_Chunks_Add.size,
                   dummy_offset_end - dummy_offset_start);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 } /* end Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsEqualToTransaction_fsize */
@@ -2500,11 +2514,11 @@ void Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsEqualToTr
 void Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsLessThanTransaction_fsize(void)
 {
     /* Arrange */
-    history_t               dummy_history;
-    transaction_t           dummy_t;
-    transaction_t          *arg_t = &dummy_t;
-    pdu_nak_t               dummy_ph;
-    pdu_header_t           *arg_ph = (pdu_header_t *)&dummy_ph;
+    CF_History_t            dummy_history;
+    CF_Transaction_t        dummy_t;
+    CF_Transaction_t       *arg_t = &dummy_t;
+    CF_CFDP_PduNak_t        dummy_ph;
+    CF_CFDP_PduHeader_t    *arg_ph = (CF_CFDP_PduHeader_t *)&dummy_ph;
     uint32                  dummy_offset_start;
     uint32                  dummy_offset_end;
     uint32                  initial_nak_segment_requests = Any_uint32();
@@ -2529,7 +2543,7 @@ void Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsLessThanT
 
     arg_t->flags.tx.md_need_send = 0; /* setting md_need_send is not required, but assists in verification */
 
-    UT_SetDataBuffer(UT_KEY(CF_Chunks_Add), &context_CF_Chunks_Add, sizeof(context_CF_Chunks_Add), false);
+    UT_SetDataBuffer(UT_KEY(CF_ChunkListAdd), &context_CF_Chunks_Add, sizeof(context_CF_Chunks_Add), false);
 
     /* Act */
     CF_CFDP_S2_Nak(arg_t, arg_ph);
@@ -2544,13 +2558,13 @@ void Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsLessThanT
         context_CF_CFDP_RecvNak_forced_num_sr, initial_nak_segment_requests);
     UtAssert_True(arg_t->flags.tx.md_need_send == 0, "md_need_send is %u and should not have changed from 0",
                   arg_t->flags.tx.md_need_send);
-    UtAssert_STUB_COUNT(CF_Chunks_Add, 1);
+    UtAssert_STUB_COUNT(CF_ChunkListAdd, 1);
     UtAssert_ADDRESS_EQ(context_CF_Chunks_Add.chunks, &arg_t->chunks->chunks);
     UtAssert_True(context_CF_Chunks_Add.offset == dummy_offset_start,
-                  "CF_Chunks_Add received offset %u and should be %u (start)", context_CF_Chunks_Add.offset,
+                  "CF_ChunkListAdd received offset %u and should be %u (start)", context_CF_Chunks_Add.offset,
                   dummy_offset_start);
     UtAssert_True(context_CF_Chunks_Add.size == dummy_offset_end - dummy_offset_start,
-                  "CF_Chunks_Add received size %u and should be %u (size)", context_CF_Chunks_Add.size,
+                  "CF_ChunkListAdd received size %u and should be %u (size)", context_CF_Chunks_Add.size,
                   dummy_offset_end - dummy_offset_start);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 } /* end Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsLessThanTransaction_fsize */
@@ -2566,14 +2580,14 @@ void Test_CF_CFDP_S2_Nak_Calls_CF_Chunks_Add_Because_start_Plus_size_IsLessThanT
 void Test_CF_CFDP_S2_Nak_Arm_Call_CF_CFDP_ArmAckTimer_And_CF_CFDP_S2_Nak(void)
 {
     /* Arrange */
-    history_t                   dummy_history;
-    transaction_t               dummy_t;
-    transaction_t              *arg_t = &dummy_t;
-    const pdu_header_t          dummy_ph;
-    const pdu_header_t         *arg_ph                                = &dummy_ph;
+    CF_History_t                dummy_history;
+    CF_Transaction_t            dummy_t;
+    CF_Transaction_t           *arg_t = &dummy_t;
+    const CF_CFDP_PduHeader_t   dummy_ph;
+    const CF_CFDP_PduHeader_t  *arg_ph                                = &dummy_ph;
     uint32                      initial_recv_error                    = Any_uint32();
     int                         context_CF_CFDP_RecvNak_forced_num_sr = Any_int();
-    transaction_t              *context_CF_CFDP_ArmAckTimer;
+    CF_Transaction_t           *context_CF_CFDP_ArmAckTimer;
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
 
     /* Arrange unstubbable: CF_CFDP_S2_Nak */
@@ -2619,11 +2633,11 @@ void Test_CF_CFDP_S2_Nak_Arm_Call_CF_CFDP_ArmAckTimer_And_CF_CFDP_S2_Nak(void)
 void Test_CF_CFDP_S2_WaitForEofAck_CallTo_CF_CFDP_RecvAck_Returns_neg1_SendEventAndIncrement_recv_error(void)
 {
     /* Arrange */
-    history_t                   dummy_history;
-    transaction_t               dummy_t;
-    transaction_t              *arg_t = &dummy_t;
-    const pdu_header_t          dummy_ph;
-    const pdu_header_t         *arg_ph             = &dummy_ph;
+    CF_History_t                dummy_history;
+    CF_Transaction_t            dummy_t;
+    CF_Transaction_t           *arg_t = &dummy_t;
+    const CF_CFDP_PduHeader_t   dummy_ph;
+    const CF_CFDP_PduHeader_t  *arg_ph             = &dummy_ph;
     uint32                      initial_recv_error = Any_uint32();
     const char                 *expected_Spec      = "CF S%d(%u:%u): received invalid eof pdu";
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
@@ -2660,28 +2674,28 @@ void Test_CF_CFDP_S2_WaitForEofAck_CallTo_CF_CFDP_RecvAck_Returns_0_And_t_histor
     void)
 {
     /* Arrange */
-    history_t           dummy_history;
-    transaction_t       dummy_t;
-    transaction_t      *arg_t = &dummy_t;
-    const pdu_header_t  dummy_ph;
-    const pdu_header_t *arg_ph = &dummy_ph;
+    CF_History_t               dummy_history;
+    CF_Transaction_t           dummy_t;
+    CF_Transaction_t          *arg_t = &dummy_t;
+    const CF_CFDP_PduHeader_t  dummy_ph;
+    const CF_CFDP_PduHeader_t *arg_ph = &dummy_ph;
 
     arg_t->history     = &dummy_history;
-    arg_t->history->cc = CC_NO_ERROR;
+    arg_t->history->cc = CF_CFDP_ConditionCode_NO_ERROR;
 
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_RecvAck), 0); /* 0 is pass */
 
     arg_t->state_data.s.sub_state =
-        Any_uint8_Except(SEND_WAIT_FOR_FIN); /* setting sub_state not required, but helps verification */
-    arg_t->flags.com.ack_timer_armed = 1;    /* setting ack_timer_armed not required, but helps verification */
+        Any_uint8_Except(CF_TxSubState_WAIT_FOR_FIN); /* setting sub_state not required, but helps verification */
+    arg_t->flags.com.ack_timer_armed = 1;             /* setting ack_timer_armed not required, but helps verification */
 
     /* Act */
     CF_CFDP_S2_WaitForEofAck(arg_t, arg_ph);
 
     /* Assert */
-    UtAssert_True(arg_t->state_data.s.sub_state == SEND_WAIT_FOR_FIN,
-                  "sub_state was set to %u and should be %u (SEND_WAIT_FOR_FIN)", arg_t->state_data.s.sub_state,
-                  SEND_WAIT_FOR_FIN);
+    UtAssert_True(arg_t->state_data.s.sub_state == CF_TxSubState_WAIT_FOR_FIN,
+                  "sub_state was set to %u and should be %u (CF_TxSubState_WAIT_FOR_FIN)",
+                  arg_t->state_data.s.sub_state, CF_TxSubState_WAIT_FOR_FIN);
     UtAssert_True(arg_t->flags.com.ack_timer_armed == 0, "sub_state was set to %u and should be 0",
                   arg_t->flags.com.ack_timer_armed);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
@@ -2693,14 +2707,14 @@ void Test_CF_CFDP_S2_WaitForEofAck_CallTo_CF_CFDP_RecvAck_Returns_0_And_t_histor
     void)
 {
     /* Arrange */
-    history_t           dummy_history;
-    transaction_t       dummy_t;
-    transaction_t      *arg_t = &dummy_t;
-    const pdu_header_t  dummy_ph;
-    const pdu_header_t *arg_ph = &dummy_ph;
+    CF_History_t               dummy_history;
+    CF_Transaction_t           dummy_t;
+    CF_Transaction_t          *arg_t = &dummy_t;
+    const CF_CFDP_PduHeader_t  dummy_ph;
+    const CF_CFDP_PduHeader_t *arg_ph = &dummy_ph;
 
     arg_t->history     = &dummy_history;
-    arg_t->history->cc = Any_uint8_Except(CC_NO_ERROR);
+    arg_t->history->cc = Any_uint8_Except(CF_CFDP_ConditionCode_NO_ERROR);
 
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_RecvAck), 0); /* 0 is pass */
 
@@ -2726,11 +2740,11 @@ void Test_CF_CFDP_S2_WaitForEofAck_CallTo_CF_CFDP_RecvAck_Returns_0_And_t_histor
 void Test_CF_CFDP_S_DispatchRecv_Asserts_sub_state_LessThan_SEND_NUM_STATES(void)
 {
     /* Arrange */
-    // transaction_t   dummy_t;
-    // transaction_t*  arg_t = &dummy_t;
+    // CF_Transaction_t   dummy_t;
+    // CF_Transaction_t*  arg_t = &dummy_t;
     // void *          arg_fns = NULL;
 
-    // arg_t->state_data.s.sub_state = SEND_NUM_STATES;
+    // arg_t->state_data.s.sub_state = CF_TxSubState_NUM_STATES;
 
     /* Act */
     // CF_CFDP_S_DispatchRecv(arg_t, arg_fns);
@@ -2751,17 +2765,17 @@ void Test_CF_CFDP_S_DispatchRecv_Asserts_msg_in_Is_NULL(void)
 void Test_CF_CFDP_S_DispatchRecv_AlreadyHas_pdu_ph_flags_SetSoSendEvent(void)
 {
     /* Arrange */
-    history_t                   dummy_history;
+    CF_History_t                dummy_history;
     CF_UT_inmsg_buffer_t        dummy_msg;
-    transaction_t               dummy_t;
-    transaction_t              *arg_t         = &dummy_t;
+    CF_Transaction_t            dummy_t;
+    CF_Transaction_t           *arg_t         = &dummy_t;
     const char                 *expected_Spec = "CF S%d(%u:%u): received non-file directive pdu";
     void                       *arg_fns       = NULL;
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
 
     memset(&dummy_msg, 0, sizeof(dummy_msg));
 
-    arg_t->state_data.s.sub_state = Any_uint8_LessThan(SEND_NUM_STATES);
+    arg_t->state_data.s.sub_state = Any_uint8_LessThan(CF_TxSubState_NUM_STATES);
 
     CF_AppData.engine.in.msg = &dummy_msg.cfe_sb_buffer;
 
@@ -2790,12 +2804,12 @@ void Test_CF_CFDP_S_DispatchRecv_DidNotHaveFlagsSetBut_fdh_directive_code_IsEqTo
     void)
 {
     /* Arrange */
-    history_t            dummy_history;
+    CF_History_t         dummy_history;
     CF_UT_inmsg_buffer_t dummy_msg;
-    transaction_t        dummy_t;
-    transaction_t       *arg_t                 = &dummy_t;
+    CF_Transaction_t     dummy_t;
+    CF_Transaction_t    *arg_t                 = &dummy_t;
     uint8                dummy_chan_num        = Any_cf_chan_num();
-    uint8                dummy_flags           = PDU_INVALID_MAX;
+    uint8                dummy_flags           = CF_CFDP_FileDirective_INVALID_MAX;
     uint16               initial_recv_spurious = Any_uint16();
     const char          *expected_Spec = "CF S%d(%u:%u): received pdu with invalid directive code %d for sub-state %d";
     void                *arg_fns       = NULL;
@@ -2803,7 +2817,7 @@ void Test_CF_CFDP_S_DispatchRecv_DidNotHaveFlagsSetBut_fdh_directive_code_IsEqTo
 
     memset(&dummy_msg, 0, sizeof(dummy_msg));
 
-    arg_t->state_data.s.sub_state = Any_uint8_LessThan(SEND_NUM_STATES);
+    arg_t->state_data.s.sub_state = Any_uint8_LessThan(CF_TxSubState_NUM_STATES);
 
     CF_AppData.engine.in.msg = &dummy_msg.cfe_sb_buffer;
 
@@ -2843,12 +2857,12 @@ void Test_CF_CFDP_S_DispatchRecv_DidNotHaveFlagsSetBut_fdh_directive_code_IsGrea
     void)
 {
     /* Arrange */
-    history_t            dummy_history;
+    CF_History_t         dummy_history;
     CF_UT_inmsg_buffer_t dummy_msg;
-    transaction_t        dummy_t;
-    transaction_t       *arg_t                 = &dummy_t;
+    CF_Transaction_t     dummy_t;
+    CF_Transaction_t    *arg_t                 = &dummy_t;
     uint8                dummy_chan_num        = Any_cf_chan_num();
-    uint8                dummy_flags           = Any_uint8_GreaterThan(PDU_INVALID_MAX);
+    uint8                dummy_flags           = Any_uint8_GreaterThan(CF_CFDP_FileDirective_INVALID_MAX);
     uint16               initial_recv_spurious = Any_uint16();
     const char          *expected_Spec = "CF S%d(%u:%u): received pdu with invalid directive code %d for sub-state %d";
     void                *arg_fns       = NULL;
@@ -2856,7 +2870,7 @@ void Test_CF_CFDP_S_DispatchRecv_DidNotHaveFlagsSetBut_fdh_directive_code_IsGrea
 
     memset(&dummy_msg, 0, sizeof(dummy_msg));
 
-    arg_t->state_data.s.sub_state = Any_uint8_LessThan(SEND_NUM_STATES);
+    arg_t->state_data.s.sub_state = Any_uint8_LessThan(CF_TxSubState_NUM_STATES);
 
     CF_AppData.engine.in.msg = &dummy_msg.cfe_sb_buffer;
 
@@ -2897,20 +2911,21 @@ void Test_CF_CFDP_S_DispatchRecv_Received_msg_ph_As_fdh_Has_flags_LessThan_PDU_I
 {
     /* Arrange */
     CF_UT_inmsg_buffer_t dummy_msg;
-    transaction_t        dummy_t;
-    transaction_t       *arg_t                 = &dummy_t;
+    CF_Transaction_t     dummy_t;
+    CF_Transaction_t    *arg_t                 = &dummy_t;
     uint8                dummy_chan_num        = Any_cf_chan_num();
     uint8                dummy_sub_state       = 0; /* 0 = always choose Dummy_fns_CF_CFDP_S_DispatchRecv */
     uint8                dummy_flags           = 0; /* 0 = always choose Dummy_fns_CF_CFDP_S_DispatchRecv */
     uint16               initial_recv_spurious = Any_uint16();
-    void (*const arg_fns[SEND_NUM_STATES][PDU_INVALID_MAX])(transaction_t *, const pdu_header_t *) = {
+    void (*const arg_fns[CF_TxSubState_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(CF_Transaction_t *,
+                                                                                       const CF_CFDP_PduHeader_t *) = {
         {Dummy_fns_CF_CFDP_S_DispatchRecv, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-         NULL},                                                             /* SEND_METADATA */
-        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* SEND_FILEDATA */
-        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* SEND_EOF */
-        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* SEND_WAIT_FOR_EOF_ACK */
-        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* SEND_WAIT_FOR_FIN */
-        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* SEND_SEND_FIN_ACK */
+         NULL},                                                             /* CF_TxSubState_METADATA */
+        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* CF_TxSubState_FILEDATA */
+        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* CF_TxSubState_EOF */
+        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* CF_TxSubState_WAIT_FOR_EOF_ACK */
+        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* CF_TxSubState_WAIT_FOR_FIN */
+        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* CF_TxSubState_SEND_FIN_ACK */
     };
 
     memset(&dummy_msg, 0, sizeof(dummy_msg));
@@ -2942,13 +2957,14 @@ void Test_CF_CFDP_S_DispatchRecv_Received_msg_ph_As_fdh_Has_flags_LessThan_PDU_I
 {
     /* Arrange */
     CF_UT_inmsg_buffer_t dummy_msg;
-    transaction_t        dummy_t;
-    transaction_t       *arg_t                 = &dummy_t;
+    CF_Transaction_t     dummy_t;
+    CF_Transaction_t    *arg_t                 = &dummy_t;
     uint8                dummy_chan_num        = Any_cf_chan_num();
-    uint8                dummy_sub_state       = Any_uint8_LessThan(SEND_NUM_STATES);
-    uint8                dummy_flags           = Any_uint8_LessThan(PDU_INVALID_MAX);
+    uint8                dummy_sub_state       = Any_uint8_LessThan(CF_TxSubState_NUM_STATES);
+    uint8                dummy_flags           = Any_uint8_LessThan(CF_CFDP_FileDirective_INVALID_MAX);
     uint16               initial_recv_spurious = Any_uint16();
-    void (*const arg_fns[SEND_NUM_STATES][PDU_INVALID_MAX])(transaction_t *, const pdu_header_t *) = {{NULL}};
+    void (*const arg_fns[CF_TxSubState_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(
+        CF_Transaction_t *, const CF_CFDP_PduHeader_t *) = {{NULL}};
 
     memset(&dummy_msg, 0, sizeof(dummy_msg));
 
@@ -2984,14 +3000,14 @@ void Test_CF_CFDP_S_DispatchRecv_Received_msg_ph_As_fdh_Has_flags_LessThan_PDU_I
 void Test_CF_CFDP_S1_Recv_SendsAll_NULL_fns_To_CF_CFDP_S_DispatchRecv(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t = &dummy_t;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t = &dummy_t;
 
     /* Arrange for CF_CFDP_S_DispatchRecv */
     CF_UT_inmsg_buffer_t dummy_msg;
     uint8                dummy_chan_num        = Any_cf_chan_num();
-    uint8                dummy_sub_state       = Any_uint8_LessThan(SEND_NUM_STATES);
-    uint8                dummy_flags           = Any_uint8_LessThan(PDU_INVALID_MAX);
+    uint8                dummy_sub_state       = Any_uint8_LessThan(CF_TxSubState_NUM_STATES);
+    uint8                dummy_flags           = Any_uint8_LessThan(CF_CFDP_FileDirective_INVALID_MAX);
     uint16               initial_recv_spurious = Any_uint16();
 
     memset(&dummy_msg, 0, sizeof(dummy_msg));
@@ -3026,7 +3042,8 @@ void Test_CF_CFDP_S1_Recv_SendsAll_NULL_fns_To_CF_CFDP_S_DispatchRecv(void)
 **  TODO:  Another example of how the lack of isolation and bad production code desing lead to unit testing nightmares
 **         Currently (as of the writing of this comment), there is a double array created within the CF_CFDP_S2_Recv
 **         method that is passed into CF_CFDP_S_DispatchRecv, an unstubbable method.  The size of the double
-**         array is [SEND_NUM_STATES][PDU_INVALID_MAX] and is [6][11] -- or 66 different possible values that may be
+**         array is [CF_TxSubState_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX] and is [6][11] -- or 66 different
+*possible values that may be
 **         used in CF_CFDP_S_DispatchRecv.  Because it cannot be subbed, the only way to verify the array passed into
 **         the method is to run 66 tests (!!!), using each array value and then to setup the test in the way that will
 *run
@@ -3035,7 +3052,7 @@ void Test_CF_CFDP_S1_Recv_SendsAll_NULL_fns_To_CF_CFDP_S_DispatchRecv(void)
 **         SOLUTION: make CF_CFDP_S_DispatchRecv stubbable
 **                   make double array a constant that exists outside the method
 **                   now there need be 1 test, that CF_CFDP_S1_Recv calls CF_CFDP_S_DispatchRecv
-**                   with the expected t (a transaction_t*) and substate_fns (the double array)
+**                   with the expected t (a CF_Transaction_t*) and substate_fns (the double array)
 **
 *******************************************************************************/
 /* TODO: CF_CFDP_S2_Recv tests should be verifying the array built in the method, but it cannot be done without an
@@ -3044,8 +3061,8 @@ void Test_CF_CFDP_S1_Recv_SendsAll_NULL_fns_To_CF_CFDP_S_DispatchRecv(void)
 void Test_CF_CFDP_S2_Recv_Call_CF_CFDP_S_DispatchRecv(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t = &dummy_t;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t = &dummy_t;
 
     /* Arrange for CF_CFDP_S_DispatchRecv */
     CF_UT_inmsg_buffer_t dummy_msg;
@@ -3098,21 +3115,21 @@ void Test_CF_CFDP_S1_Tx_Asserts_t_sub_state_IsGreaterThan_SEND_EOF(void)
     /* Arrange */
     /* Act */
     /* Assert */
-    UtAssert_MIR("JIRA: GSFCCFS-1733 issue - t->state_data.s.sub_state<=SEND_EOF");
+    UtAssert_MIR("JIRA: GSFCCFS-1733 issue - t->state_data.s.sub_state<=CF_TxSubState_EOF");
 } /* end Test_CF_CFDP_S1_Tx_Asserts_t_sub_state_IsGreaterThan_SEND_EOF */
 
 void Test_CF_CFDP_S1_Tx_When_t_sub_state_Is_0_Call_CF_CFDP_S_SubstateSendMetadata(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t = &dummy_t;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t = &dummy_t;
 
     arg_t->state_data.s.sub_state = 0;
 
     /* Arrange unstubbable: CF_CFDP_S_SubstateSendMetadata - no t->fd, send success */
     arg_t->fd = Any_int32_Except(0);
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SEND_SUCCESS);
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SendRet_SUCCESS);
 
     /* Act */
     CF_CFDP_S1_Tx(arg_t);
@@ -3130,8 +3147,8 @@ void Test_CF_CFDP_S1_Tx_When_t_sub_state_Is_0_Call_CF_CFDP_S_SubstateSendMetadat
 // void Test_CF_CFDP_S1_Tx_When_t_sub_state_Is_1_Call_CF_CFDP_S_SubstateSendFileData(void)
 // {
 //     /* Arrange */
-//     transaction_t   dummy_t;
-//     transaction_t*  arg_t = &dummy_t;
+//     CF_Transaction_t   dummy_t;
+//     CF_Transaction_t*  arg_t = &dummy_t;
 
 //     arg_t->state_data.s.sub_state = 1;
 
@@ -3154,18 +3171,18 @@ void Test_CF_CFDP_S1_Tx_When_t_sub_state_Is_0_Call_CF_CFDP_S_SubstateSendMetadat
 // void Test_CF_CFDP_S1_Tx_When_t_sub_state_Is_2_Call_CF_CFDP_S1_SubstateSendEof(void)
 // {UtAssert_Failed("UPDATE FAIL: Uses new method CF_CFDP_EarlySendFd");
 //     // /* Arrange */
-//     // transaction_t   dummy_t;
-//     // transaction_t*  arg_t = &dummy_t;
+//     // CF_Transaction_t   dummy_t;
+//     // CF_Transaction_t*  arg_t = &dummy_t;
 
 //     // arg_t->state_data.s.sub_state = 2;
 
-//     // /* Arrange unstubbable: CF_CFDP_S1_SubstateSendEof - get back CF_SEND_NO_MSG from CF_CFDP_S_SendEof*/
+//     // /* Arrange unstubbable: CF_CFDP_S1_SubstateSendEof - get back CF_SendRet_NO_MSG from CF_CFDP_S_SendEof*/
 //     // /* Arrange unstubbable: CF_CFDP_S_SendEof -  bypass finalize just return CF_CFDP_SendEof */
 //     // CF_CFDP_SendEof_context_t   context_CF_CFDP_SendEof;
 
 //     // arg_t->flags.com.crc_calc = 1;
 
-//     // context_CF_CFDP_SendEof.forced_return = Any_uint8_Except(CF_SEND_NO_MSG);
+//     // context_CF_CFDP_SendEof.forced_return = Any_uint8_Except(CF_SendRet_NO_MSG);
 //     // UT_SetDataBuffer(UT_KEY(CF_CFDP_SendEof), &context_CF_CFDP_SendEof,
 //     //   sizeof(context_CF_CFDP_SendEof), false);
 
@@ -3203,15 +3220,15 @@ void Test_CF_CFDP_S2_Tx_Asserts_t_sub_state_IsGreaterThan_SEND_EOF(void)
 void Test_CF_CFDP_S2_Tx_When_t_sub_state_Is_0_Call_CF_CFDP_S_SubstateSendMetadata(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t = &dummy_t;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t = &dummy_t;
 
     arg_t->state_data.s.sub_state = 0;
 
     /* Arrange unstubbable: CF_CFDP_S_SubstateSendMetadata - no t->fd, send success */
     arg_t->fd = Any_int32_Except(0);
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SEND_SUCCESS);
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SendRet_SUCCESS);
 
     /* Act */
     CF_CFDP_S2_Tx(arg_t);
@@ -3229,8 +3246,8 @@ void Test_CF_CFDP_S2_Tx_When_t_sub_state_Is_0_Call_CF_CFDP_S_SubstateSendMetadat
 // void Test_CF_CFDP_S2_Tx_When_t_sub_state_Is_1_Call_CF_CFDP_S_SubstateSendFileData(void)
 // {
 //     /* Arrange */
-//     transaction_t   dummy_t;
-//     transaction_t*  arg_t = &dummy_t;
+//     CF_Transaction_t   dummy_t;
+//     CF_Transaction_t*  arg_t = &dummy_t;
 
 //     arg_t->state_data.s.sub_state = 1;
 
@@ -3253,18 +3270,18 @@ void Test_CF_CFDP_S2_Tx_When_t_sub_state_Is_0_Call_CF_CFDP_S_SubstateSendMetadat
 // void Test_CF_CFDP_S2_Tx_When_t_sub_state_Is_2_Call_CF_CFDP_S2_SubstateSendEof(void)
 // {
 //     /* Arrange */
-//     transaction_t   dummy_t;
-//     transaction_t*  arg_t = &dummy_t;
+//     CF_Transaction_t   dummy_t;
+//     CF_Transaction_t*  arg_t = &dummy_t;
 
 //     arg_t->state_data.s.sub_state = 2;
 
-//     /* Arrange unstubbable: CF_CFDP_S2_SubstateSendEof - get back CF_SEND_NO_MSG from CF_CFDP_S_SendEof*/
+//     /* Arrange unstubbable: CF_CFDP_S2_SubstateSendEof - get back CF_SendRet_NO_MSG from CF_CFDP_S_SendEof*/
 //     /* Arrange unstubbable: CF_CFDP_S_SendEof -  bypass finalize just return CF_CFDP_SendEof */
 //     CF_CFDP_SendEof_context_t   context_CF_CFDP_SendEof;
 
 //     arg_t->flags.com.crc_calc = 1;
 
-//     context_CF_CFDP_SendEof.forced_return = Any_uint8_Except(CF_SEND_NO_MSG);
+//     context_CF_CFDP_SendEof.forced_return = Any_uint8_Except(CF_SendRet_NO_MSG);
 
 //     /* Arrange unstubbable: CF_CFDP_S_Reset - confirm CF_CFDP_ResetTransaction call*/
 //     CF_CFDP_ResetTransaction_context_t   context_CF_CFDP_ResetTransaction;
@@ -3291,9 +3308,9 @@ void Test_CF_CFDP_S2_Tx_When_t_sub_state_Is_0_Call_CF_CFDP_S_SubstateSendMetadat
 void Test_CF_CFDP_S_Cancel_When_t_sub_state_IsLessThan_SEND_EOF_SetTo_SEND_EOF(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t             = &dummy_t;
-    uint8          initial_sub_state = Any_uint8_LessThan(SEND_EOF);
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t             = &dummy_t;
+    uint8             initial_sub_state = Any_uint8_LessThan(CF_TxSubState_EOF);
 
     arg_t->state_data.s.sub_state = initial_sub_state;
 
@@ -3301,34 +3318,35 @@ void Test_CF_CFDP_S_Cancel_When_t_sub_state_IsLessThan_SEND_EOF_SetTo_SEND_EOF(v
     CF_CFDP_S_Cancel(arg_t);
 
     /* Assert */
-    UtAssert_True(arg_t->state_data.s.sub_state == SEND_EOF,
-                  "t->state_data.s.sub_state is %u and was changed to %u (SEND_EOF) from %u (value before call)",
-                  arg_t->state_data.s.sub_state, SEND_EOF, initial_sub_state);
+    UtAssert_True(
+        arg_t->state_data.s.sub_state == CF_TxSubState_EOF,
+        "t->state_data.s.sub_state is %u and was changed to %u (CF_TxSubState_EOF) from %u (value before call)",
+        arg_t->state_data.s.sub_state, CF_TxSubState_EOF, initial_sub_state);
 } /* end Test_CF_CFDP_S_Cancel_When_t_sub_state_IsLessThan_SEND_EOF_SetTo_SEND_EOF */
 
 void Test_CF_CFDP_S_Cancel_When_t_sub_state_IsEqTo_SEND_EOF_DoNothing(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t = &dummy_t;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t = &dummy_t;
 
-    arg_t->state_data.s.sub_state = SEND_EOF;
+    arg_t->state_data.s.sub_state = CF_TxSubState_EOF;
 
     /* Act */
     CF_CFDP_S_Cancel(arg_t);
 
     /* Assert */
-    UtAssert_True(arg_t->state_data.s.sub_state == SEND_EOF,
-                  "t->state_data.s.sub_state is %u and is unchanged from %u (SEND_EOF - value before call)",
-                  arg_t->state_data.s.sub_state, SEND_EOF);
+    UtAssert_True(arg_t->state_data.s.sub_state == CF_TxSubState_EOF,
+                  "t->state_data.s.sub_state is %u and is unchanged from %u (CF_TxSubState_EOF - value before call)",
+                  arg_t->state_data.s.sub_state, CF_TxSubState_EOF);
 } /* end Test_CF_CFDP_S_Cancel_When_t_sub_state_IsEqTo_SEND_EOF_DoNothing */
 
 void Test_CF_CFDP_S_Cancel_When_t_sub_state_IsGreaterThan_SEND_EOF_DoNothing(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t             = &dummy_t;
-    uint8          initial_sub_state = Any_uint8_GreaterThan(SEND_EOF);
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t             = &dummy_t;
+    uint8             initial_sub_state = Any_uint8_GreaterThan(CF_TxSubState_EOF);
 
     arg_t->state_data.s.sub_state = initial_sub_state;
 
@@ -3353,11 +3371,11 @@ void Test_CF_CFDP_S_Cancel_When_t_sub_state_IsGreaterThan_SEND_EOF_DoNothing(voi
 void Test_CF_CFDP_S_Tick_When_t_state_IsNotEqTo_CFDP_S2_DoNothing(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t    = &dummy_t;
-    int           *arg_cont = NULL;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t    = &dummy_t;
+    int              *arg_cont = NULL;
 
-    arg_t->state = Any_uint8_Except(CFDP_S2);
+    arg_t->state = Any_uint8_Except(CF_TxnState_S2);
 
     /* Act */
     CF_CFDP_S_Tick(arg_t, arg_cont);
@@ -3372,18 +3390,18 @@ void Test_CF_CFDP_S_Tick_CallTo_CF_TimerExpired_Returns_1_ThenSendsEventAndCalls
     void)
 {
     /* Arrange */
-    history_t                   dummy_history;
-    transaction_t               dummy_t;
-    transaction_t              *arg_t                    = &dummy_t;
+    CF_History_t                dummy_history;
+    CF_Transaction_t            dummy_t;
+    CF_Transaction_t           *arg_t                    = &dummy_t;
     int                        *arg_cont                 = NULL;
     uint16                      initial_inactivity_timer = Any_uint16();
-    cf_timer_t                 *context_CF_Timer_Expired;
+    CF_Timer_t                 *context_CF_Timer_Expired;
     const char                 *expected_Spec = "CF S2(%u:%u): inactivity timer expired";
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
 
     arg_t->history  = &dummy_history;
     arg_t->chan_num = Any_cf_chan_num();
-    arg_t->state    = CFDP_S2;
+    arg_t->state    = CF_TxnState_S2;
 
     UT_SetDataBuffer(UT_KEY(CF_Timer_Expired), &context_CF_Timer_Expired, sizeof(context_CF_Timer_Expired), false);
     UT_SetDefaultReturnValue(UT_KEY(CF_Timer_Expired), 1);
@@ -3434,23 +3452,23 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     void)
 {
     /* Arrange */
-    cf_config_table_t dummy_config_table;
-    history_t         dummy_history;
-    transaction_t     dummy_t;
-    transaction_t    *arg_t                    = &dummy_t;
+    CF_ConfigTable_t  dummy_config_table;
+    CF_History_t      dummy_history;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t                    = &dummy_t;
     int              *arg_cont                 = NULL;
     uint16            initial_inactivity_timer = Any_uint16();
     uint16            initial_fault_ack_limit  = Any_uint16();
     uint8             dummy_ack_limit          = Any_uint8();
-    cf_timer_t       *context_CF_Timer_Expired[2];
-    cf_timer_t       *context_CF_Timer_Tick;
+    CF_Timer_t       *context_CF_Timer_Expired[2];
+    CF_Timer_t       *context_CF_Timer_Tick;
     const char       *expected_Spec = "CF S2(%u:%u), ack limit reached, no eof-ack";
 
     arg_t->history                   = &dummy_history;
     arg_t->chan_num                  = Any_cf_chan_num();
-    arg_t->state                     = CFDP_S2;
+    arg_t->state                     = CF_TxnState_S2;
     arg_t->flags.com.ack_timer_armed = 1;
-    arg_t->state_data.s.sub_state    = SEND_WAIT_FOR_EOF_ACK;
+    arg_t->state_data.s.sub_state    = CF_TxSubState_WAIT_FOR_EOF_ACK;
 
     arg_t->state_data.s.s2.counter.ack = dummy_ack_limit - 1;
 
@@ -3515,22 +3533,22 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
 {
     /* Arrange */
 
-    cf_config_table_t dummy_config_table;
-    history_t         dummy_history;
-    transaction_t     dummy_t;
-    transaction_t    *arg_t                    = &dummy_t;
+    CF_ConfigTable_t  dummy_config_table;
+    CF_History_t      dummy_history;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t                    = &dummy_t;
     int              *arg_cont                 = NULL;
     uint16            initial_inactivity_timer = Any_uint16();
     uint16            initial_fault_ack_limit  = Any_uint16();
     uint8             dummy_ack_limit          = Any_uint8();
-    cf_timer_t       *context_CF_Timer_Expired[2];
-    cf_timer_t       *context_CF_Timer_Tick;
+    CF_Timer_t       *context_CF_Timer_Expired[2];
+    CF_Timer_t       *context_CF_Timer_Tick;
 
     arg_t->history                   = &dummy_history;
     arg_t->chan_num                  = Any_cf_chan_num();
-    arg_t->state                     = CFDP_S2;
+    arg_t->state                     = CF_TxnState_S2;
     arg_t->flags.com.ack_timer_armed = 1;
-    arg_t->state_data.s.sub_state    = SEND_WAIT_FOR_EOF_ACK;
+    arg_t->state_data.s.sub_state    = CF_TxSubState_WAIT_FOR_EOF_ACK;
 
     arg_t->state_data.s.s2.counter.ack = Any_uint8_Except(dummy_ack_limit - 1);
 
@@ -3550,7 +3568,7 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
 
     arg_t->flags.com.crc_calc = 1;
 
-    context_CF_CFDP_SendEof.forced_return = CF_SEND_NO_MSG;
+    context_CF_CFDP_SendEof.forced_return = CF_SendRet_NO_MSG;
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendEof), &context_CF_CFDP_SendEof, sizeof(context_CF_CFDP_SendEof), false);
 
@@ -3585,22 +3603,22 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
 {
     /* Arrange */
 
-    cf_config_table_t dummy_config_table;
-    history_t         dummy_history;
-    transaction_t     dummy_t;
-    transaction_t    *arg_t                    = &dummy_t;
+    CF_ConfigTable_t  dummy_config_table;
+    CF_History_t      dummy_history;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t                    = &dummy_t;
     int              *arg_cont                 = NULL;
     uint16            initial_inactivity_timer = Any_uint16();
     uint16            initial_fault_ack_limit  = Any_uint16();
     uint8             dummy_ack_limit          = Any_uint8();
-    cf_timer_t       *context_CF_Timer_Expired[2];
-    cf_timer_t       *context_CF_Timer_Tick;
+    CF_Timer_t       *context_CF_Timer_Expired[2];
+    CF_Timer_t       *context_CF_Timer_Tick;
 
     arg_t->history                   = &dummy_history;
     arg_t->chan_num                  = Any_cf_chan_num();
-    arg_t->state                     = CFDP_S2;
+    arg_t->state                     = CF_TxnState_S2;
     arg_t->flags.com.ack_timer_armed = 1;
-    arg_t->state_data.s.sub_state    = SEND_WAIT_FOR_EOF_ACK;
+    arg_t->state_data.s.sub_state    = CF_TxSubState_WAIT_FOR_EOF_ACK;
 
     arg_t->state_data.s.s2.counter.ack = Any_uint8_Except(dummy_ack_limit - 1);
 
@@ -3620,7 +3638,7 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
 
     arg_t->flags.com.crc_calc = 1;
 
-    context_CF_CFDP_SendEof.forced_return = CF_SEND_ERROR;
+    context_CF_CFDP_SendEof.forced_return = CF_SendRet_ERROR;
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendEof), &context_CF_CFDP_SendEof, sizeof(context_CF_CFDP_SendEof), false);
 
@@ -3665,23 +3683,23 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
 {
     /* Arrange */
 
-    cf_config_table_t dummy_config_table;
-    history_t         dummy_history;
-    transaction_t     dummy_t;
-    transaction_t    *arg_t                    = &dummy_t;
+    CF_ConfigTable_t  dummy_config_table;
+    CF_History_t      dummy_history;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t                    = &dummy_t;
     int              *arg_cont                 = NULL;
     uint16            initial_inactivity_timer = Any_uint16();
     uint16            initial_fault_ack_limit  = Any_uint16();
     uint8             dummy_ack_limit          = Any_uint8();
-    cf_timer_t       *context_CF_Timer_Expired[2];
-    cf_timer_t       *context_CF_Timer_Tick;
-    transaction_t    *context_CF_CFDP_ArmAckTimer;
+    CF_Timer_t       *context_CF_Timer_Expired[2];
+    CF_Timer_t       *context_CF_Timer_Tick;
+    CF_Transaction_t *context_CF_CFDP_ArmAckTimer;
 
     arg_t->history                   = &dummy_history;
     arg_t->chan_num                  = Any_cf_chan_num();
-    arg_t->state                     = CFDP_S2;
+    arg_t->state                     = CF_TxnState_S2;
     arg_t->flags.com.ack_timer_armed = 1;
-    arg_t->state_data.s.sub_state    = SEND_WAIT_FOR_EOF_ACK;
+    arg_t->state_data.s.sub_state    = CF_TxSubState_WAIT_FOR_EOF_ACK;
 
     arg_t->state_data.s.s2.counter.ack = Any_uint8_Except(dummy_ack_limit - 1);
 
@@ -3700,7 +3718,7 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
                      false);
 
     /* Arrange unstubbable: CF_CFDP_S_SendEof */
-    cfdp_send_ret_t           exceptions[2] = {CF_SEND_NO_MSG, CF_SEND_ERROR};
+    CF_SendRet_t              exceptions[2] = {CF_SendRet_NO_MSG, CF_SendRet_ERROR};
     CF_CFDP_SendEof_context_t context_CF_CFDP_SendEof;
 
     arg_t->flags.com.crc_calc = 1;
@@ -3739,18 +3757,19 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
 void Test_CF_CFDP_S_Tick_ArmedTimerExpired_sub_state_NotEqTo_SEND_WAIT_FOR_EOF_ACK_DoNotArmAckOrTick(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t                    = &dummy_t;
-    int           *arg_cont                 = NULL;
-    uint16         initial_inactivity_timer = Any_uint16();
-    uint16         initial_fault_ack_limit  = Any_uint16();
-    uint8          exceptions[2]            = {SEND_WAIT_FOR_EOF_ACK,
-                           SEND_SEND_FIN_ACK}; // SEND_SEND_FIN_ACK only excepted for separate behavior 'if' block
-    cf_timer_t    *context_CF_Timer_Expired[2];
-    cf_timer_t    *context_CF_Timer_Tick;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t                    = &dummy_t;
+    int              *arg_cont                 = NULL;
+    uint16            initial_inactivity_timer = Any_uint16();
+    uint16            initial_fault_ack_limit  = Any_uint16();
+    uint8             exceptions[2]            = {
+        CF_TxSubState_WAIT_FOR_EOF_ACK,
+        CF_TxSubState_SEND_FIN_ACK}; // CF_TxSubState_SEND_FIN_ACK only excepted for separate behavior 'if' block
+    CF_Timer_t *context_CF_Timer_Expired[2];
+    CF_Timer_t *context_CF_Timer_Tick;
 
     arg_t->chan_num                  = Any_cf_chan_num();
-    arg_t->state                     = CFDP_S2;
+    arg_t->state                     = CF_TxnState_S2;
     arg_t->flags.com.ack_timer_armed = 1;
     arg_t->state_data.s.sub_state    = Any_uint8_ExceptThese(exceptions, 2);
 
@@ -3789,18 +3808,18 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpired_sub_state_NotEqTo_SEND_WAIT_FOR_EOF_A
 void Test_CF_CFDP_S_Tick_ArmedTimerNotExpiredCall_CF_Timer_Tick(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t                    = &dummy_t;
-    int           *arg_cont                 = NULL;
-    uint16         initial_inactivity_timer = Any_uint16();
-    uint16         initial_fault_ack_limit  = Any_uint16();
-    cf_timer_t    *context_CF_Timer_Expired[2];
-    cf_timer_t    *context_CF_Timer_Tick[2];
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t                    = &dummy_t;
+    int              *arg_cont                 = NULL;
+    uint16            initial_inactivity_timer = Any_uint16();
+    uint16            initial_fault_ack_limit  = Any_uint16();
+    CF_Timer_t       *context_CF_Timer_Expired[2];
+    CF_Timer_t       *context_CF_Timer_Tick[2];
 
     arg_t->chan_num                  = Any_cf_chan_num();
-    arg_t->state                     = CFDP_S2;
+    arg_t->state                     = CF_TxnState_S2;
     arg_t->flags.com.ack_timer_armed = 1;
-    arg_t->state_data.s.sub_state    = SEND_WAIT_FOR_EOF_ACK;
+    arg_t->state_data.s.sub_state    = CF_TxSubState_WAIT_FOR_EOF_ACK;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.inactivity_timer = initial_inactivity_timer;
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.ack_limit        = initial_fault_ack_limit;
@@ -3838,18 +3857,18 @@ void Test_CF_CFDP_S_Tick_ArmedTimerNotExpiredCall_CF_Timer_Tick(void)
 void Test_CF_CFDP_S_Tick_TimerNotArmedDoNotArmAckTimerOrDoTick(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t                    = &dummy_t;
-    int           *arg_cont                 = NULL;
-    uint16         initial_inactivity_timer = Any_uint16();
-    uint16         initial_fault_ack_limit  = Any_uint16();
-    cf_timer_t    *context_CF_Timer_Expired;
-    cf_timer_t    *context_CF_Timer_Tick;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t                    = &dummy_t;
+    int              *arg_cont                 = NULL;
+    uint16            initial_inactivity_timer = Any_uint16();
+    uint16            initial_fault_ack_limit  = Any_uint16();
+    CF_Timer_t       *context_CF_Timer_Expired;
+    CF_Timer_t       *context_CF_Timer_Tick;
 
     arg_t->chan_num                  = Any_cf_chan_num();
-    arg_t->state                     = CFDP_S2;
+    arg_t->state                     = CF_TxnState_S2;
     arg_t->flags.com.ack_timer_armed = 0;
-    arg_t->state_data.s.sub_state    = Any_uint8_Except(SEND_SEND_FIN_ACK);
+    arg_t->state_data.s.sub_state    = Any_uint8_Except(CF_TxSubState_SEND_FIN_ACK);
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.inactivity_timer = initial_inactivity_timer;
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.ack_limit        = initial_fault_ack_limit;
@@ -3884,20 +3903,20 @@ void Test_CF_CFDP_S_Tick_TimerNotArmedDoNotArmAckTimerOrDoTick(void)
 void Test_CF_CFDP_S_Tick_When_sub_state_IsEqTo_SEND_SEND_FIN_ACK_Call_CF_CFDP_S_SubstateSendFinAck(void)
 {
     /* Arrange */
-    history_t      dummy_history;
-    transaction_t  dummy_t;
-    transaction_t *arg_t                    = &dummy_t;
-    int           *arg_cont                 = NULL;
-    uint16         initial_inactivity_timer = Any_uint16();
-    uint16         initial_fault_ack_limit  = Any_uint16();
-    cf_timer_t    *context_CF_Timer_Expired;
-    cf_timer_t    *context_CF_Timer_Tick;
+    CF_History_t      dummy_history;
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t                    = &dummy_t;
+    int              *arg_cont                 = NULL;
+    uint16            initial_inactivity_timer = Any_uint16();
+    uint16            initial_fault_ack_limit  = Any_uint16();
+    CF_Timer_t       *context_CF_Timer_Expired;
+    CF_Timer_t       *context_CF_Timer_Tick;
 
     arg_t->history                   = &dummy_history;
     arg_t->chan_num                  = Any_cf_chan_num();
-    arg_t->state                     = CFDP_S2;
+    arg_t->state                     = CF_TxnState_S2;
     arg_t->flags.com.ack_timer_armed = 0;
-    arg_t->state_data.s.sub_state    = SEND_SEND_FIN_ACK;
+    arg_t->state_data.s.sub_state    = CF_TxSubState_SEND_FIN_ACK;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.inactivity_timer = initial_inactivity_timer;
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.ack_limit        = initial_fault_ack_limit;
@@ -3910,7 +3929,7 @@ void Test_CF_CFDP_S_Tick_When_sub_state_IsEqTo_SEND_SEND_FIN_ACK_Call_CF_CFDP_S_
     /* Arrange unstubbable: CF_CFDP_S_SubstateSendFinAck */
     CF_CFDP_SendAck_context_t context_CF_CFDP_SendAck;
 
-    context_CF_CFDP_SendAck.forced_return = CF_SEND_NO_MSG;
+    context_CF_CFDP_SendAck.forced_return = CF_SendRet_NO_MSG;
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendAck), &context_CF_CFDP_SendAck, sizeof(context_CF_CFDP_SendAck), false);
 
@@ -3935,12 +3954,12 @@ void Test_CF_CFDP_S_Tick_When_sub_state_IsEqTo_SEND_SEND_FIN_ACK_Call_CF_CFDP_S_
     /* Assert CF_CFDP_S_SubstateSendFinAck */
     UtAssert_STUB_COUNT(CF_CFDP_SendAck, 1);
     UtAssert_ADDRESS_EQ(context_CF_CFDP_SendAck.t, arg_t);
-    UtAssert_True(context_CF_CFDP_SendAck.ts == ACK_TS_ACTIVE,
-                  "CF_CFDP_SendAck received ts %u and should be %u (ACK_TS_ACTIVE)", context_CF_CFDP_SendAck.ts,
-                  ACK_TS_ACTIVE);
-    UtAssert_True(context_CF_CFDP_SendAck.dir_code == PDU_FIN,
-                  "CF_CFDP_SendAck received dir_code %u and should be %u (PDU_FIN)", context_CF_CFDP_SendAck.dir_code,
-                  PDU_FIN);
+    UtAssert_True(context_CF_CFDP_SendAck.ts == CF_CFDP_AckTxnStatus_ACTIVE,
+                  "CF_CFDP_SendAck received ts %u and should be %u (CF_CFDP_AckTxnStatus_ACTIVE)",
+                  context_CF_CFDP_SendAck.ts, CF_CFDP_AckTxnStatus_ACTIVE);
+    UtAssert_True(context_CF_CFDP_SendAck.dir_code == CF_CFDP_FileDirective_FIN,
+                  "CF_CFDP_SendAck received dir_code %u and should be %u (CF_CFDP_FileDirective_FIN)",
+                  context_CF_CFDP_SendAck.dir_code, CF_CFDP_FileDirective_FIN);
     UtAssert_True(context_CF_CFDP_SendAck.cc == arg_t->state_data.s.s2.fin_cc,
                   "CF_CFDP_SendAck received cc %u and should be %u (t->state_data.s.s2.fin_cc)",
                   context_CF_CFDP_SendAck.cc, arg_t->state_data.s.s2.fin_cc);
@@ -3965,18 +3984,18 @@ void Test_CF_CFDP_S_Tick_When_sub_state_IsEqTo_SEND_SEND_FIN_ACK_Call_CF_CFDP_S_
 void Test_CF_CFDP_S_Tick_Nak_CallTo_CF_CFDP_S_CheckAndRespondNak_DoesNotReturn_1_Given_cont_ValueNotSet(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t        = &dummy_t;
-    int            initial_cont = Any_int_Except(
-                   1); /* Any_int_Except(1) is not required, but illustrative of the fact that 1 is the value that will be set. The
-                          chance of 1 being selected randomly from all possible 'int's is practically nil. */
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t        = &dummy_t;
+    int               initial_cont = Any_int_Except(
+                      1); /* Any_int_Except(1) is not required, but illustrative of the fact that 1 is the value that will be set. The
+                             chance of 1 being selected randomly from all possible 'int's is practically nil. */
     int  dummy_cont = initial_cont;
     int *arg_cont   = &dummy_cont;
 
     /* Arrange unstubbable: CF_CFDP_S_CheckAndRespondNak */
     arg_t->flags.tx.md_need_send = 1; /* To enter first if */
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SEND_ERROR); /* to err out */
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), CF_SendRet_ERROR); /* to err out */
 
     /* Act */
     CF_CFDP_S_Tick_Nak(arg_t, arg_cont);
@@ -3990,18 +4009,18 @@ void Test_CF_CFDP_S_Tick_Nak_CallTo_CF_CFDP_S_CheckAndRespondNak_DoesNotReturn_1
 void Test_CF_CFDP_S_Tick_Nak_CallTo_CF_CFDP_S_CheckAndRespondNak_Returns_1_Given_cont_ValueSetTo_1(void)
 {
     /* Arrange */
-    transaction_t  dummy_t;
-    transaction_t *arg_t        = &dummy_t;
-    int            initial_cont = Any_int_Except(
-                   1); /* Any_int_Except(1) is not required, but illustrative of the fact that 1 is the value that will be set. The
-                          chance of 1 being selected randomly from all possible 'int's is practically nil. */
+    CF_Transaction_t  dummy_t;
+    CF_Transaction_t *arg_t        = &dummy_t;
+    int               initial_cont = Any_int_Except(
+                      1); /* Any_int_Except(1) is not required, but illustrative of the fact that 1 is the value that will be set. The
+                             chance of 1 being selected randomly from all possible 'int's is practically nil. */
     int  dummy_cont = initial_cont;
     int *arg_cont   = &dummy_cont;
 
     /* Arrange unstubbable: CF_CFDP_S_CheckAndRespondNak */
     arg_t->flags.tx.md_need_send = 1; /* To enter first if */
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), Any_uint8_Except(CF_SEND_ERROR)); /* to NOT err out */
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendMd), Any_uint8_Except(CF_SendRet_ERROR)); /* to NOT err out */
 
     /* Act */
     CF_CFDP_S_Tick_Nak(arg_t, arg_cont);
@@ -4283,7 +4302,7 @@ void add_CF_CFDP_S2_WaitForEofAck_tests(void)
         Test_CF_CFDP_S2_WaitForEofAck_CallTo_CF_CFDP_RecvAck_Returns_0_And_t_history_cc_NotEqTo_CC_NO_ERROR_Call_CF_CFDP_S_Reset,
         cf_cfdp_s_tests_Setup, cf_cfdp_s_tests_Teardown,
         "Test_CF_CFDP_S2_WaitForEofAck_CallTo_CF_CFDP_RecvAck_Returns_0_And_t_history_cc_NotEqTo_CC_NO_ERROR_Call_CF_"
-        "CFDP_S_Reset");
+        "CF_TxnState_S_Reset");
 } /* end add_CF_CFDP_S2_WaitForEofAck_tests */
 
 void add_CF_CFDP_S_DispatchRecv_tests(void)

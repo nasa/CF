@@ -71,11 +71,11 @@ int CF_GetVariableHeader(void)
  * Generated stub function for CF_HeaderSize()
  * ----------------------------------------------------
  */
-int CF_HeaderSize(const pdu_header_t *ph)
+int CF_HeaderSize(const CF_CFDP_PduHeader_t *ph)
 {
     UT_GenStub_SetupReturnBuffer(CF_HeaderSize, int);
 
-    UT_GenStub_AddParam(CF_HeaderSize, const pdu_header_t *, ph);
+    UT_GenStub_AddParam(CF_HeaderSize, const CF_CFDP_PduHeader_t *, ph);
 
     UT_GenStub_Execute(CF_HeaderSize, Basic, NULL);
 
@@ -102,11 +102,11 @@ void CF_MemcpyToBE(uint8 *dst, const uint8 *src, int src_size, int dst_size)
  * Generated stub function for CF_SetVariableHeader()
  * ----------------------------------------------------
  */
-void CF_SetVariableHeader(cf_entity_id_t src_eid, cf_entity_id_t dst_eid, cf_transaction_seq_t tsn)
+void CF_SetVariableHeader(CF_EntityId_t src_eid, CF_EntityId_t dst_eid, CF_TransactionSeq_t tsn)
 {
-    UT_GenStub_AddParam(CF_SetVariableHeader, cf_entity_id_t, src_eid);
-    UT_GenStub_AddParam(CF_SetVariableHeader, cf_entity_id_t, dst_eid);
-    UT_GenStub_AddParam(CF_SetVariableHeader, cf_transaction_seq_t, tsn);
+    UT_GenStub_AddParam(CF_SetVariableHeader, CF_EntityId_t, src_eid);
+    UT_GenStub_AddParam(CF_SetVariableHeader, CF_EntityId_t, dst_eid);
+    UT_GenStub_AddParam(CF_SetVariableHeader, CF_TransactionSeq_t, tsn);
 
     UT_GenStub_Execute(CF_SetVariableHeader, Basic, NULL);
 }

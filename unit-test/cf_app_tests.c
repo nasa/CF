@@ -206,7 +206,7 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED(
 /* CF_ValidateConfigTable tests specific items */
 
 /* CF_ValidateConfigTable tests specific global variables */
-cf_config_table_t dummy_table;
+CF_ConfigTable_t dummy_table;
 
 /* CF_ValidateConfigTable tests specific functions */
 void cf_config_table_tests_set_dummy_table_to_nominal(void)
@@ -215,8 +215,8 @@ void cf_config_table_tests_set_dummy_table_to_nominal(void)
     dummy_table.ticks_per_second = Any_uint32_Except(0);
     // all values (except 0) & 3ff == 0 are nominal (1024 byte aligned)
     dummy_table.rx_crc_calc_bytes_per_wakeup = Any_uint32_Except(0) << 10;
-    // all values less than sizeof(pdu_fd_data_t) are nominal
-    dummy_table.outgoing_file_chunk_size = Any_uint16_LessThan(sizeof(pdu_fd_data_t));
+    // all values less than sizeof(CF_CFDP_PduFileDataContent_t) are nominal
+    dummy_table.outgoing_file_chunk_size = Any_uint16_LessThan(sizeof(CF_CFDP_PduFileDataContent_t));
 } /* end cf_config_table_tests_set_dummy_table_to_nominal */
 
 void Setup_cf_config_table_tests(void)
@@ -230,7 +230,7 @@ void Setup_cf_config_table_tests(void)
 void Test_CF_ValidateConfigTable_FailBecauseTableTicksPerSecondIs0(void)
 {
     /* Arrange */
-    cf_config_table_t *arg_table = &dummy_table;
+    CF_ConfigTable_t *arg_table = &dummy_table;
 
     arg_table->ticks_per_second = 0;
 
@@ -244,7 +244,7 @@ void Test_CF_ValidateConfigTable_FailBecauseTableTicksPerSecondIs0(void)
 void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0(void)
 {
     /* Arrange */
-    cf_config_table_t *arg_table = &dummy_table;
+    CF_ConfigTable_t *arg_table = &dummy_table;
 
     arg_table->ticks_per_second             = 1;
     arg_table->rx_crc_calc_bytes_per_wakeup = 0;
@@ -259,7 +259,7 @@ void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0(void)
 void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIsNot1024ByteAligned(void)
 {
     /* Arrange */
-    cf_config_table_t *arg_table = &dummy_table;
+    CF_ConfigTable_t *arg_table = &dummy_table;
 
     arg_table->ticks_per_second = 1;
     arg_table->rx_crc_calc_bytes_per_wakeup =
@@ -277,12 +277,12 @@ void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIsNot1024ByteAlign
 void Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArray(void)
 {
     /* Arrange */
-    cf_config_table_t *arg_table = &dummy_table;
+    CF_ConfigTable_t *arg_table = &dummy_table;
 
-    // outgoing_file_chunk_size set to greater than sizeof(pdu_fd_data_t)
+    // outgoing_file_chunk_size set to greater than sizeof(CF_CFDP_PduFileDataContent_t)
     arg_table->ticks_per_second             = 1;
     arg_table->rx_crc_calc_bytes_per_wakeup = 0x0400; /* 1024 aligned */
-    arg_table->outgoing_file_chunk_size     = sizeof(pdu_fd_data_t) + 1;
+    arg_table->outgoing_file_chunk_size     = sizeof(CF_CFDP_PduFileDataContent_t) + 1;
 
     /* Act */
     result = CF_ValidateConfigTable(arg_table);
@@ -294,11 +294,11 @@ void Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArra
 void Test_CF_ValidateConfigTable_Success(void)
 {
     /* Arange */
-    cf_config_table_t *arg_table = &dummy_table;
+    CF_ConfigTable_t *arg_table = &dummy_table;
 
     arg_table->ticks_per_second             = 1;
     arg_table->rx_crc_calc_bytes_per_wakeup = 0x0400; /* 1024 aligned */
-    arg_table->outgoing_file_chunk_size     = sizeof(pdu_fd_data_t);
+    arg_table->outgoing_file_chunk_size     = sizeof(CF_CFDP_PduFileDataContent_t);
 
     /* Act */
     result = CF_ValidateConfigTable(arg_table);

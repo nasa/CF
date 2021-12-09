@@ -38,8 +38,8 @@ typedef struct
 
 typedef struct priority_arg_t
 {
-    transaction_t *t;        /* OUT: holds value of transaction with which to call CF_CList_InsertAfter on */
-    uint8          priority; /* seeking this priority */
+    CF_Transaction_t *t;        /* OUT: holds value of transaction with which to call CF_CList_InsertAfter on */
+    uint8             priority; /* seeking this priority */
 } priority_arg_t;
 
 typedef struct
@@ -67,7 +67,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_TraverseHistory(clist_node n, trav_arg_t *context)
+// static int CF_TraverseHistory(CF_CListNode_t * n, trav_arg_t *context)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -86,7 +86,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_TraverseTransactions(clist_node n, trav_arg_t *context)
+// static int CF_TraverseTransactions(CF_CListNode_t * n, trav_arg_t *context)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -104,7 +104,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-int32 CF_WriteQueueDataToFile(int32 fd, channel_t *c, cf_queue_index_t q)
+int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_WriteQueueDataToFile), &fd, sizeof(fd));
     UT_Stub_CopyFromLocal(UT_KEY(CF_WriteQueueDataToFile), &c, sizeof(c));
@@ -124,7 +124,7 @@ int32 CF_WriteQueueDataToFile(int32 fd, channel_t *c, cf_queue_index_t q)
 **  \endreturns
 **
 *************************************************************************/
-int32 CF_WriteHistoryQueueDataToFile(int32 fd, channel_t *c, direction_t dir)
+int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t dir)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_WriteHistoryQueueDataToFile), &fd, sizeof(fd));
     UT_Stub_CopyFromLocal(UT_KEY(CF_WriteHistoryQueueDataToFile), &c, sizeof(c));
@@ -148,7 +148,7 @@ int32 CF_WriteHistoryQueueDataToFile(int32 fd, channel_t *c, direction_t dir)
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_PrioSearch(clist_node node, void *context)
+// static int CF_PrioSearch(CF_CListNode_t * node, void *context)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -168,7 +168,7 @@ int32 CF_WriteHistoryQueueDataToFile(int32 fd, channel_t *c, direction_t dir)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_InsertSortPrio(transaction_t *t, cf_queue_index_t q)
+void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q)
 {
     UT_Stub_CopyFromLocal(UT_KEY(CF_InsertSortPrio), &t, sizeof(t));
     UT_Stub_CopyFromLocal(UT_KEY(CF_InsertSortPrio), &q, sizeof(q));
@@ -191,7 +191,7 @@ void CF_InsertSortPrio(transaction_t *t, cf_queue_index_t q)
 **  \endreturns
 **
 *************************************************************************/
-// static int CF_TraverseAllTransactions_(clist_node n, traverse_all_args_t *args)
+// static int CF_TraverseAllTransactions_(CF_CListNode_t * n, traverse_all_args_t *args)
 // {
 //     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
 //       __FILE__, __LINE__);
@@ -210,7 +210,7 @@ void CF_InsertSortPrio(transaction_t *t, cf_queue_index_t q)
 **  \endreturns
 **
 *************************************************************************/
-int CF_TraverseAllTransactions(channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context)
+int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context)
 {
     int forced_return;
 

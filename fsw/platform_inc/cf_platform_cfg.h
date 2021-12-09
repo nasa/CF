@@ -43,7 +43,7 @@
  ** \par Limits
  **         Must be one of uint8, uint16, uint32, uint64.
  */
-typedef uint8 cf_entity_id_t;
+typedef uint8 CF_EntityId_t;
 
 /**
  ** \cfcfg transaction sequence number size
@@ -56,7 +56,7 @@ typedef uint8 cf_entity_id_t;
  ** \par Limits
  **         Must be one of uint8, uint16, uint32, uint64.
  */
-typedef uint32 cf_transaction_seq_t;
+typedef uint32 CF_TransactionSeq_t;
 
 /**
  ** \cfcfg CF_HW_ALIGNMENT and CF_SW_ALIGNMENT

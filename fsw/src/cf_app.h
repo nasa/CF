@@ -39,17 +39,17 @@
 
 typedef struct
 {
-    cf_hk_packet_t  hk;
-    cf_cfg_packet_t cfg;
+    CF_HkPacket_t     hk;
+    CF_ConfigPacket_t cfg;
 
     uint32 run_status;
 
     CFE_SB_PipeId_t cmd_pipe;
 
-    CFE_TBL_Handle_t   config_handle;
-    cf_config_table_t *config_table;
+    CFE_TBL_Handle_t  config_handle;
+    CF_ConfigTable_t *config_table;
 
-    cfdp_engine_t engine;
+    CF_Engine_t engine;
 } CF_AppData_t;
 
 extern CF_AppData_t CF_AppData;

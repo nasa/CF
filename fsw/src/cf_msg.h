@@ -24,28 +24,28 @@
 **
 *************************************************************************/
 
-#ifndef _CF_MSG_H_
-#define _CF_MSG_H_
+#ifndef CF_MSG_H
+#define CF_MSG_H
 
 #include "cfe.h"
 #include "cf_platform_cfg.h"
 #include "cf_cfdp.h"
 #include "cf_tbldefs.h"
 
-typedef struct
+typedef struct CF_HkCmdCounters
 {
     uint16 cmd;
     uint16 err;
-} CF_PACK hk_cmd_counters_t;
+} CF_PACK CF_HkCmdCounters_t;
 
-typedef struct
+typedef struct CF_HkSent
 {
     uint64 file_data_bytes;
     uint32 pdu;
     uint32 nak_segment_requests;
-} CF_PACK hk_sent_t;
+} CF_PACK CF_HkSent_t;
 
-typedef struct
+typedef struct CF_HkRecv
 {
     uint64 file_data_bytes;
     uint32 pdu;
@@ -53,9 +53,9 @@ typedef struct
     uint16 spurious;
     uint16 dropped;
     uint32 nak_segment_requests;
-} CF_PACK hk_recv_t;
+} CF_PACK CF_HkRecv_t;
 
-typedef struct
+typedef struct CF_HkFault
 {
     uint16 file_open;
     uint16 file_read;
@@ -69,39 +69,39 @@ typedef struct
     uint16 ack_limit;
     uint16 inactivity_timer;
     uint16 spare;
-} CF_PACK hk_fault_t;
+} CF_PACK CF_HkFault_t;
 
-typedef struct
+typedef struct CF_HkCounters
 {
-    hk_sent_t  sent;
-    hk_recv_t  recv;
-    hk_fault_t fault;
-} hk_cfdp_counters_t;
+    CF_HkSent_t  sent;
+    CF_HkRecv_t  recv;
+    CF_HkFault_t fault;
+} CF_HkCounters_t;
 
-typedef struct
+typedef struct CF_HkChannel_Data
 {
-    hk_cfdp_counters_t counters;
-    uint16             q_size[CF_Q_NUM];
-    uint8              poll_counter;
-    uint8              playback_counter;
-    uint8              frozen; /* NOTE: this could be more than one flag if we ever need it */
-    uint16             spare3;
-    uint8              spare4;
-} CF_PACK hk_channel_data_t;
+    CF_HkCounters_t counters;
+    uint16          q_size[CF_QueueIdx_NUM];
+    uint8           poll_counter;
+    uint8           playback_counter;
+    uint8           frozen; /* NOTE: this could be more than one flag if we ever need it */
+    uint16          spare3;
+    uint8           spare4;
+} CF_PACK CF_HkChannel_Data_t;
 
-typedef struct
+typedef struct CF_HkPacket
 {
     CFE_MSG_TelemetryHeader_t tlm_header;
 
     /* app HK */
-    hk_cmd_counters_t counters;
+    CF_HkCmdCounters_t counters;
 
     /* per-channel HK */
-    hk_channel_data_t channel_hk[CF_NUM_CHANNELS];
-} cf_hk_packet_t;
+    CF_HkChannel_Data_t channel_hk[CF_NUM_CHANNELS];
+} CF_HkPacket_t;
 
-/* used with CF_SEND_CFG_PARAMS_CC */
-typedef struct
+/* used with CF_SendRet_CFG_PARAMS_CC */
+typedef struct CF_ConfigPacket
 {
     CFE_MSG_TelemetryHeader_t tlm_header;
 
@@ -117,10 +117,10 @@ typedef struct
     uint8  ack_limit; /* number of times to retry ACK (for ex, send fin and wait for fin-ack) */
     uint8  nak_limit; /* number of times to retry NAK before giving up (resets on a single response */
 
-    cf_entity_id_t local_eid;
+    CF_EntityId_t local_eid;
 /* must #define the number of data items in this struct for command processing */
 #define CF_NUM_CFG_PACKET_ITEMS 10
-} CF_PACK cf_cfg_packet_t;
+} CF_PACK CF_ConfigPacket_t;
 
 /****************************************
 ** CF app command packet command codes
@@ -132,20 +132,20 @@ typedef struct
 /* ANOTHER NOTE: not all of these are used, but they are here legacy from the old app */
 typedef enum
 {
-    CF_NOOP_CC            = 0,
-    CF_RESET_CC           = 1,
-    CF_TX_FILE_CC         = 2,
-    CF_PLAYBACK_DIR_CC    = 3,
-    CF_FREEZE_CC          = 4,
-    CF_THAW_CC            = 5,
-    CF_SUSPEND_CC         = 6,
-    CF_RESUME_CC          = 7,
-    CF_CANCEL_CC          = 8,
-    CF_ABANDON_CC         = 9,
-    CF_SET_MIB_PARAM_CC   = 10,
-    CF_GET_MIB_PARAM_CC   = 11,
-    CF_SEND_CFG_PARAMS_CC = 14,
-    CF_WRITE_QUEUE_CC     = 15,
+    CF_NOOP_CC               = 0,
+    CF_RESET_CC              = 1,
+    CF_TX_FILE_CC            = 2,
+    CF_PLAYBACK_DIR_CC       = 3,
+    CF_FREEZE_CC             = 4,
+    CF_THAW_CC               = 5,
+    CF_SUSPEND_CC            = 6,
+    CF_RESUME_CC             = 7,
+    CF_CANCEL_CC             = 8,
+    CF_ABANDON_CC            = 9,
+    CF_SET_MIB_PARAM_CC      = 10,
+    CF_GET_MIB_PARAM_CC      = 11,
+    CF_SendRet_CFG_PARAMS_CC = 14,
+    CF_WRITE_QUEUE_CC        = 15,
 
     /* NOTE: ENABLE/DISABLE commands should be a single command code, but legacy has them separate (ugh) */
     CF_ENABLE_DEQUEUE_CC      = 16,
@@ -161,57 +161,57 @@ typedef enum
 /****************************
 **  CF Command Formats     **
 *****************************/
-typedef struct
+typedef struct CF_NoArgsCmd
 {
     CFE_MSG_CommandHeader_t cmd_header;
-} CF_PACK cf_cmd_noargs_t;
+} CF_PACK CF_NoArgsCmd_t;
 
 /* unionargs -
  *
  * A lot of commands have a single byte arg, and the old application had 3 spare bytes after that.
  *
  * So this structure gives the flexibility of a single byte arg, 2 halfwords, or a dword, all in one declaration. */
-typedef union
+typedef union CF_UnionArgs_Payload
 {
     uint32 dword;
     uint16 hword[2];
     uint8  byte[4];
-} CF_PACK cf_cmd_unionargs_data_t;
+} CF_PACK CF_UnionArgs_Payload_t;
 
 typedef struct
 {
     CFE_MSG_CommandHeader_t cmd_header;
-    cf_cmd_unionargs_data_t data;
-} CF_PACK cf_cmd_unionargs_t;
+    CF_UnionArgs_Payload_t  data;
+} CF_PACK CF_UnionArgsCmd_t;
 
-typedef struct
+typedef struct CF_GetParamCmd
 {
     CFE_MSG_CommandHeader_t cmd_header;
     uint8                   key;
     uint8                   chan_num;
-} CF_PACK cf_cmd_get_param_args_t;
+} CF_PACK CF_GetParamCmd_t;
 
-typedef struct
+typedef struct CF_SetParamCmd
 {
     CFE_MSG_CommandHeader_t cmd_header;
     uint32                  value;
     uint8                   key;
     uint8                   chan_num;
-} CF_PACK cf_cmd_set_param_args_t;
+} CF_PACK CF_SetParamCmd_t;
 
-typedef struct
+typedef struct CF_TxFileCmd
 {
     CFE_MSG_CommandHeader_t cmd_header;
     uint8                   cfdp_class; /* 0=class 1, 1=class 2 */
     uint8                   keep;       /* if 1, then keep the file -- otherwise delete */
     uint8                   chan_num;
     uint8                   priority;
-    cf_entity_id_t          dest_id;
+    CF_EntityId_t           dest_id;
     char                    src_filename[CF_FILENAME_MAX_LEN];
     char                    dst_filename[CF_FILENAME_MAX_LEN];
-} CF_PACK cf_cmd_tx_file_t;
+} CF_PACK CF_TxFileCmd_t;
 
-typedef struct
+typedef struct CF_WriteQueueCmd
 {
     CFE_MSG_CommandHeader_t cmd_header;
     uint8                   type; /* all=0, up=1, down=2 */
@@ -219,16 +219,16 @@ typedef struct
     uint8                   queue; /* 0=pending, 1=active, 2=history, 3=all */
     uint8                   spare; /* why? */
     char                    filename[CF_FILENAME_MAX_LEN];
-} CF_PACK cf_cmd_write_q_t;
+} CF_PACK CF_WriteQueueCmd_t;
 
-typedef cf_cmd_tx_file_t cf_cmd_playback_dir_t;
+typedef CF_TxFileCmd_t CF_PlaybackDirCmd_t;
 
-typedef struct
+typedef struct CF_TransactionCmd
 {
     CFE_MSG_CommandHeader_t cmd_header;
-    cf_transaction_seq_t    ts;
-    cf_entity_id_t          eid;
+    CF_TransactionSeq_t     ts;
+    CF_EntityId_t           eid;
     uint8                   chan; /* if 254, use ts. if 255, all channels */
-} CF_PACK cf_cmd_transaction_t;
+} CF_PACK CF_TransactionCmd_t;
 
-#endif /* !_CF_MSG_H_ */
+#endif /* !CF_MSG_H */

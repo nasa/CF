@@ -24,8 +24,8 @@
 **
 *************************************************************************/
 
-#ifndef __CF_UTILS_H_
-#define __CF_UTILS_H_
+#ifndef CF_UTILS_H
+#define CF_UTILS_H
 
 #include "cf_cfdp.h"
 #include "cf_assert.h"
@@ -39,7 +39,7 @@
  * otherwise if the structure is zero'd out the queue
  * will become corrupted due to other nodes on the queue
  * pointing to an invalid node */
-static inline void cf_dequeue_transaction(transaction_t *t)
+static inline void CF_DequeueTransaction(CF_Transaction_t *t)
 {
     CF_Assert(t && (t->chan_num < CF_NUM_CHANNELS));
     CF_CList_Remove(&CF_AppData.engine.channels[t->chan_num].qs[t->flags.com.q_index], &t->cl_node);
@@ -47,7 +47,7 @@ static inline void cf_dequeue_transaction(transaction_t *t)
     --CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index];
 }
 
-static inline void cf_move_transaction(transaction_t *t, cf_queue_index_t q)
+static inline void CF_MoveTransaction(CF_Transaction_t *t, CF_QueueIdx_t q)
 {
     CF_Assert(t && (t->chan_num < CF_NUM_CHANNELS));
     CF_CList_Remove(&CF_AppData.engine.channels[t->chan_num].qs[t->flags.com.q_index], &t->cl_node);
@@ -58,33 +58,34 @@ static inline void cf_move_transaction(transaction_t *t, cf_queue_index_t q)
     ++CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index];
 }
 
-static inline void CF_CList_Remove_Ex(channel_t *c, cf_queue_index_t index, clist_node node)
+static inline void CF_CList_Remove_Ex(CF_Channel_t *c, CF_QueueIdx_t index, CF_CListNode_t *node)
 {
     CF_CList_Remove(&c->qs[index], node);
     CF_Assert(CF_AppData.hk.channel_hk[c - CF_AppData.engine.channels].q_size[index]); /* sanity check */
     --CF_AppData.hk.channel_hk[c - CF_AppData.engine.channels].q_size[index];
 }
 
-static inline void CF_CList_InsertAfter_Ex(channel_t *c, cf_queue_index_t index, clist_node start, clist_node after)
+static inline void CF_CList_InsertAfter_Ex(CF_Channel_t *c, CF_QueueIdx_t index, CF_CListNode_t *start,
+                                           CF_CListNode_t *after)
 {
     CF_CList_InsertAfter(&c->qs[index], start, after);
     ++CF_AppData.hk.channel_hk[c - CF_AppData.engine.channels].q_size[index];
 }
 
-static inline void CF_CList_InsertBack_Ex(channel_t *c, cf_queue_index_t index, clist_node node)
+static inline void CF_CList_InsertBack_Ex(CF_Channel_t *c, CF_QueueIdx_t index, CF_CListNode_t *node)
 {
     CF_CList_InsertBack(&c->qs[index], node);
     ++CF_AppData.hk.channel_hk[c - CF_AppData.engine.channels].q_size[index];
 }
 
-int32 CF_WriteQueueDataToFile(int32 fd, channel_t *c, cf_queue_index_t q);
-int32 CF_WriteHistoryQueueDataToFile(int32 fd, channel_t *c, direction_t dir);
+int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q);
+int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t dir);
 
-void CF_InsertSortPrio(transaction_t *t, cf_queue_index_t q);
+void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q);
 
-typedef void (*CF_TraverseAllTransactions_fn_t)(transaction_t *, void *);
+typedef void (*CF_TraverseAllTransactions_fn_t)(CF_Transaction_t *, void *);
 /* these return the number of transactions traversed */
-extern int CF_TraverseAllTransactions(channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *);
+extern int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *);
 extern int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *);
 
 extern int32 CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 access);
@@ -93,4 +94,4 @@ extern int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size);
 extern int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size);
 extern int32 CF_WrappedLseek(osal_id_t fd, off_t offset, int mode);
 
-#endif /* !__CF_UTILS_H_ */
+#endif /* !CF_UTILS_H */

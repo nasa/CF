@@ -48,7 +48,7 @@
 **  \endreturns
 **
 *************************************************************************/
-static inline uint32 CF_Timer_Sec2Ticks(cf_timer_sec_t sec)
+static inline uint32 CF_Timer_Sec2Ticks(CF_Timer_Seconds_t sec)
 {
     return sec * CF_AppData.config_table->ticks_per_second;
 }
@@ -60,7 +60,7 @@ static inline uint32 CF_Timer_Sec2Ticks(cf_timer_sec_t sec)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_Timer_InitRelSec(cf_timer_t *t, uint32 rel_sec)
+void CF_Timer_InitRelSec(CF_Timer_t *t, uint32 rel_sec)
 {
     t->tick = CF_Timer_Sec2Ticks(rel_sec);
 }
@@ -76,7 +76,7 @@ void CF_Timer_InitRelSec(cf_timer_t *t, uint32 rel_sec)
 **  \endreturns
 **
 *************************************************************************/
-int CF_Timer_Expired(const cf_timer_t *t)
+int CF_Timer_Expired(const CF_Timer_t *t)
 {
     return !t->tick;
 }
@@ -88,7 +88,7 @@ int CF_Timer_Expired(const cf_timer_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_Timer_Tick(cf_timer_t *t)
+void CF_Timer_Tick(CF_Timer_t *t)
 {
     CF_Assert(t->tick);
     --t->tick;

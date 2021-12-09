@@ -8,7 +8,7 @@
 **
 *******************************************************************************/
 
-int Dummy_clist_fn_t(clist_node node, void *context)
+int Dummy_clist_fn_t(CF_CListNode_t *node, void *context)
 {
     UT_Stub_CopyFromLocal(UT_KEY(Dummy_clist_fn_t), &node, sizeof(node));
     UT_Stub_CopyFromLocal(UT_KEY(Dummy_clist_fn_t), &context, sizeof(context));
@@ -17,7 +17,7 @@ int Dummy_clist_fn_t(clist_node node, void *context)
     return (int)UT_DEFAULT_IMPL(Dummy_clist_fn_t);
 }
 
-int Hook_clist_fn_t(clist_node node, void *context)
+int Hook_clist_fn_t(CF_CListNode_t *node, void *context)
 {
 
     /* Modification of node to meet n->next!=nn as true for coverage */
@@ -32,13 +32,13 @@ int Hook_clist_fn_t(clist_node node, void *context)
 }
 typedef struct
 {
-    clist_node node;
-    void      *context;
+    CF_CListNode_t *node;
+    void           *context;
 } CF_PACK Dummy_clist_fn_t_context_t;
 typedef struct
 {
-    clist_node node;
-    void      *context;
+    CF_CListNode_t *node;
+    void           *context;
 } CF_PACK Hook_clist_fn_t_context_t;
 
 /*******************************************************************************
@@ -68,7 +68,7 @@ void cf_clist_tests_Teardown(void)
 void Test_CF_CList_InitNode_PointNodeToItselfAsNextAndPrev(void)
 {
     /* Arrange */
-    clist_node_t test_node;
+    CF_CListNode_t test_node;
 
     test_node.next = NULL;
     test_node.prev = NULL;
@@ -123,10 +123,10 @@ void Test_CF_CList_InsertFront_AssertsBecauseNodePrevDoesNotPointToItself(void)
 void Test_CF_CList_InsertFront_InsertNodeIntoEmptyList(void)
 {
     /* Arrange */
-    clist_node   dummy_head = NULL;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node_t dummy_node;
-    clist_node   arg_node = &dummy_node;
+    CF_CListNode_t  *dummy_head = NULL;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t   dummy_node;
+    CF_CListNode_t  *arg_node = &dummy_node;
 
     arg_node->next = &dummy_node;
     arg_node->prev = &dummy_node;
@@ -141,11 +141,11 @@ void Test_CF_CList_InsertFront_InsertNodeIntoEmptyList(void)
 void Test_CF_CList_InsertFront_WhenHeadIsOnlyNodeAndTheyPointToEachOtherInsertNode(void)
 {
     /* Arrange */
-    clist_node_t dummy_head_node;
-    clist_node   dummy_head = &dummy_head_node;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node_t dummy_node;
-    clist_node   arg_node = &dummy_node;
+    CF_CListNode_t   dummy_head_node;
+    CF_CListNode_t  *dummy_head = &dummy_head_node;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t   dummy_node;
+    CF_CListNode_t  *arg_node = &dummy_node;
 
     (*arg_head)->next = dummy_head;
     (*arg_head)->prev = dummy_head;
@@ -168,12 +168,12 @@ void Test_CF_CList_InsertFront_WhenHeadIsOnlyNodeAndTheyPointToEachOtherInsertNo
 void Test_CF_CList_InsertFront_WhenHeadIsOneOfTwoNodesAndTheyPointToCorrectNodesInsertNode(void)
 {
     /* Arrange */
-    clist_node_t dummy_head_node;
-    clist_node   dummy_head = &dummy_head_node;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node_t dummy_node;
-    clist_node   arg_node = &dummy_node;
-    clist_node_t dummy_last_node;
+    CF_CListNode_t   dummy_head_node;
+    CF_CListNode_t  *dummy_head = &dummy_head_node;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t   dummy_node;
+    CF_CListNode_t  *arg_node = &dummy_node;
+    CF_CListNode_t   dummy_last_node;
 
     dummy_last_node.next = &dummy_head_node;
     dummy_last_node.prev = &dummy_head_node;
@@ -201,23 +201,23 @@ void Test_CF_CList_InsertFront_WhenHeadIsOneOfTwoNodesAndTheyPointToCorrectNodes
 void Test_CF_CList_InsertFront_WhenNodeListIsGreaterThanTwoNodesAndTheyPointToCorrectNodesInsertNode(void)
 {
     /* Arrange */
-    clist_node_t dummy_head_node;
-    clist_node   dummy_head = &dummy_head_node;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node_t dummy_node;
-    clist_node   arg_node = &dummy_node;
-    clist_node_t dummy_last_node;
-    clist_node   dummy_second_node;
-    clist_node   dummy_next_to_last_node;
-    uint8        num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
-    int          i                    = 0;
+    CF_CListNode_t   dummy_head_node;
+    CF_CListNode_t  *dummy_head = &dummy_head_node;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t   dummy_node;
+    CF_CListNode_t  *arg_node = &dummy_node;
+    CF_CListNode_t   dummy_last_node;
+    CF_CListNode_t  *dummy_second_node;
+    CF_CListNode_t  *dummy_next_to_last_node;
+    uint8            num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
+    int              i                    = 0;
 
     dummy_second_node       = NULL;
     dummy_next_to_last_node = NULL;
 
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
-        clist_node dummy_clist_node = malloc(sizeof(*dummy_clist_node));
+        CF_CListNode_t *dummy_clist_node = malloc(sizeof(*dummy_clist_node));
 
         if (i == 0)
         {
@@ -258,12 +258,12 @@ void Test_CF_CList_InsertFront_WhenNodeListIsGreaterThanTwoNodesAndTheyPointToCo
 
     /* removes all malloc nodes - arg_node head (not malloc) -> next is old head (not malloc) -> next is second node
      * (malloc)  */
-    clist_node free_up_node = arg_node->next->next;
+    CF_CListNode_t *free_up_node = arg_node->next->next;
 
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
-        clist_node old_free_up_node = free_up_node;
-        free_up_node                = old_free_up_node->next;
+        CF_CListNode_t *old_free_up_node = free_up_node;
+        free_up_node                     = old_free_up_node->next;
         free(old_free_up_node);
     }
 
@@ -310,10 +310,10 @@ void Test_CF_CList_InsertBack_AssertsBecauseNodePrevDoesNotPointToItself(void)
 void Test_CF_CList_InsertBack_InsertNodeIntoEmptyList(void)
 {
     /* Arrange */
-    clist_node   dummy_head = NULL;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node_t dummy_node;
-    clist_node   arg_node = &dummy_node;
+    CF_CListNode_t  *dummy_head = NULL;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t   dummy_node;
+    CF_CListNode_t  *arg_node = &dummy_node;
 
     arg_node->next = &dummy_node;
     arg_node->prev = &dummy_node;
@@ -328,11 +328,11 @@ void Test_CF_CList_InsertBack_InsertNodeIntoEmptyList(void)
 void Test_CF_CList_InsertBack_WhenHeadIsOnlyNodeAndTheyPointToEachOtherInsertNode(void)
 {
     /* Arrange */
-    clist_node_t dummy_head_node;
-    clist_node   dummy_head = &dummy_head_node;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node_t dummy_node;
-    clist_node   arg_node = &dummy_node;
+    CF_CListNode_t   dummy_head_node;
+    CF_CListNode_t  *dummy_head = &dummy_head_node;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t   dummy_node;
+    CF_CListNode_t  *arg_node = &dummy_node;
 
     (*arg_head)->next = dummy_head;
     (*arg_head)->prev = dummy_head;
@@ -355,12 +355,12 @@ void Test_CF_CList_InsertBack_WhenHeadIsOnlyNodeAndTheyPointToEachOtherInsertNod
 void Test_CF_CList_InsertBack_WhenHeadIsOneOfTwoNodesAndTheyPointToCorrectNodesInsertNode(void)
 {
     /* Arrange */
-    clist_node_t dummy_head_node;
-    clist_node   dummy_head = &dummy_head_node;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node_t dummy_node;
-    clist_node   arg_node = &dummy_node;
-    clist_node_t dummy_last_node;
+    CF_CListNode_t   dummy_head_node;
+    CF_CListNode_t  *dummy_head = &dummy_head_node;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t   dummy_node;
+    CF_CListNode_t  *arg_node = &dummy_node;
+    CF_CListNode_t   dummy_last_node;
 
     dummy_last_node.next = &dummy_head_node;
     dummy_last_node.prev = &dummy_head_node;
@@ -388,23 +388,23 @@ void Test_CF_CList_InsertBack_WhenHeadIsOneOfTwoNodesAndTheyPointToCorrectNodesI
 void Test_CF_CList_InsertBack_WhenNodeListIsGreaterThanTwoNodesAndTheyPointToCorrectNodesInsertNode(void)
 {
     /* Arrange */
-    clist_node_t dummy_head_node;
-    clist_node   dummy_head = &dummy_head_node;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node_t dummy_node;
-    clist_node   arg_node = &dummy_node;
-    clist_node_t dummy_last_node;
-    clist_node   dummy_second_node;
-    clist_node   dummy_next_to_last_node;
-    uint8        num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
-    int          i                    = 0;
+    CF_CListNode_t   dummy_head_node;
+    CF_CListNode_t  *dummy_head = &dummy_head_node;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t   dummy_node;
+    CF_CListNode_t  *arg_node = &dummy_node;
+    CF_CListNode_t   dummy_last_node;
+    CF_CListNode_t  *dummy_second_node;
+    CF_CListNode_t  *dummy_next_to_last_node;
+    uint8            num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
+    int              i                    = 0;
 
     dummy_second_node       = NULL;
     dummy_next_to_last_node = NULL;
 
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
-        clist_node dummy_clist_node = malloc(sizeof(*dummy_clist_node));
+        CF_CListNode_t *dummy_clist_node = malloc(sizeof(*dummy_clist_node));
 
         if (i == 0)
         {
@@ -444,12 +444,12 @@ void Test_CF_CList_InsertBack_WhenNodeListIsGreaterThanTwoNodesAndTheyPointToCor
     UtAssert_ADDRESS_EQ(*arg_head, dummy_head);
 
     /* removes all malloc nodes */
-    clist_node free_up_node = dummy_head->next;
+    CF_CListNode_t *free_up_node = dummy_head->next;
 
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
-        clist_node old_free_up_node = free_up_node;
-        free_up_node                = old_free_up_node->next;
+        CF_CListNode_t *old_free_up_node = free_up_node;
+        free_up_node                     = old_free_up_node->next;
         free(old_free_up_node);
     }
 
@@ -472,9 +472,9 @@ void Test_CF_CList_Pop_AssertsBecause_head_Is_NULL(void)
 void Test_CF_CList_Pop_WhenListIsEmptySuccessReturn_NULL(void)
 {
     /* Arrange */
-    clist_node  dummy_head = NULL;
-    clist_node *arg_head   = &dummy_head;
-    clist_node  local_result;
+    CF_CListNode_t  *dummy_head = NULL;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t  *local_result;
 
     /* Act */
     local_result = CF_CList_Pop(arg_head);
@@ -486,10 +486,10 @@ void Test_CF_CList_Pop_WhenListIsEmptySuccessReturn_NULL(void)
 void Test_CF_CList_Pop_WhenItIsOnlyNodePopHeadNodeAndReturn_head_(void)
 {
     /* Arrange */
-    clist_node_t dummy_head_node;
-    clist_node   dummy_head = &dummy_head_node;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node   local_result;
+    CF_CListNode_t   dummy_head_node;
+    CF_CListNode_t  *dummy_head = &dummy_head_node;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t  *local_result;
 
     /* Arrange unstubbable: CF_CList_Remove */
     dummy_head->prev = dummy_head;
@@ -505,20 +505,20 @@ void Test_CF_CList_Pop_WhenItIsOnlyNodePopHeadNodeAndReturn_head_(void)
 void Test_CF_CList_Pop_WhenListIsAnySizeGreaterThanOneSuccessPopsHeadNodeAndReturns_head(void)
 {
     /* Arrange */
-    clist_node_t dummy_head_node;
-    clist_node   dummy_head = &dummy_head_node;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node_t dummy_last_node;
-    clist_node   dummy_second_node       = &dummy_last_node;
-    clist_node   dummy_next_to_last_node = dummy_head;
-    uint8        num_extraneous_nodes    = Any_uint8_LessThan(19); // 0 to 18
-    int          i                       = 0;
-    clist_node   local_result;
+    CF_CListNode_t   dummy_head_node;
+    CF_CListNode_t  *dummy_head = &dummy_head_node;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t   dummy_last_node;
+    CF_CListNode_t  *dummy_second_node       = &dummy_last_node;
+    CF_CListNode_t  *dummy_next_to_last_node = dummy_head;
+    uint8            num_extraneous_nodes    = Any_uint8_LessThan(19); // 0 to 18
+    int              i                       = 0;
+    CF_CListNode_t  *local_result;
 
     /* Arrange unstubbable: CF_CList_Remove */
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
-        clist_node dummy_clist_node = malloc(sizeof(*dummy_clist_node));
+        CF_CListNode_t *dummy_clist_node = malloc(sizeof(*dummy_clist_node));
 
         if (i == 0)
         {
@@ -549,12 +549,12 @@ void Test_CF_CList_Pop_WhenListIsAnySizeGreaterThanOneSuccessPopsHeadNodeAndRetu
     UtAssert_ADDRESS_EQ(local_result, &dummy_head_node);
 
     /* removes all malloc nodes */
-    clist_node free_up_node = dummy_second_node;
+    CF_CListNode_t *free_up_node = dummy_second_node;
 
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
-        clist_node old_free_up_node = free_up_node;
-        free_up_node                = old_free_up_node->next;
+        CF_CListNode_t *old_free_up_node = free_up_node;
+        free_up_node                     = old_free_up_node->next;
         free(old_free_up_node);
     }
 } /* end  Test_CF_CList_Pop_WhenListIsAnySizeGreaterThanOneSuccessPopsHeadNodeAndReturns_head */
@@ -592,8 +592,8 @@ void Test_CF_CList_Remove_AssertsBecauseHeadPointedAtValueIs_NULL(void)
 void Test_CF_ClistRemove_AssertsBecauseHeadPointedAtValueIsNotNode(void)
 {
     /* Arrange */
-    clist_node_t dummy_node;
-    clist_node   arg_node = &dummy_node;
+    CF_CListNode_t  dummy_node;
+    CF_CListNode_t *arg_node = &dummy_node;
 
     arg_node->prev = arg_node;
     arg_node->next = arg_node;
@@ -608,9 +608,9 @@ void Test_CF_ClistRemove_AssertsBecauseHeadPointedAtValueIsNotNode(void)
 void Test_CF_ClistRemove_WhenOnlyNodeSetHeadTo_NULL(void)
 {
     /* Arrange */
-    clist_node_t dummy_node;
-    clist_node   arg_node = &dummy_node;
-    clist_node  *arg_head = &arg_node;
+    CF_CListNode_t   dummy_node;
+    CF_CListNode_t  *arg_node = &dummy_node;
+    CF_CListNode_t **arg_head = &arg_node;
 
     arg_node->prev = arg_node;
     arg_node->next = arg_node;
@@ -628,11 +628,11 @@ void Test_CF_ClistRemove_WhenOnlyNodeSetHeadTo_NULL(void)
 void Test_CF_ClistRemove_WhenOnlyTwoNodesAndLastIsRemovedSetHeadToPointToItself(void)
 {
     /* Arrange */
-    clist_node_t dummy_head_node;
-    clist_node   dummy_head = &dummy_head_node;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node_t dummy_arg_node;
-    clist_node   arg_node = &dummy_arg_node;
+    CF_CListNode_t   dummy_head_node;
+    CF_CListNode_t  *dummy_head = &dummy_head_node;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t   dummy_arg_node;
+    CF_CListNode_t  *arg_node = &dummy_arg_node;
 
     dummy_head_node.prev = arg_node;
     dummy_head_node.next = arg_node;
@@ -655,22 +655,22 @@ void Test_CF_ClistRemove_WhenOnlyTwoNodesAndLastIsRemovedSetHeadToPointToItself(
 void Test_CF_ClistRemove_RemovingHeadSetSecondNodeToHeadAndUpdateLastNode(void)
 {
     /* Arrange */
-    clist_node_t dummy_head_node;
-    clist_node   dummy_head = &dummy_head_node;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node   arg_node   = *arg_head;
-    clist_node_t dummy_last_node;
-    clist_node   dummy_second_node;
-    clist_node   dummy_next_to_last_node;
-    uint8        num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
-    int          i                    = 0;
+    CF_CListNode_t   dummy_head_node;
+    CF_CListNode_t  *dummy_head = &dummy_head_node;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t  *arg_node   = *arg_head;
+    CF_CListNode_t   dummy_last_node;
+    CF_CListNode_t  *dummy_second_node;
+    CF_CListNode_t  *dummy_next_to_last_node;
+    uint8            num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
+    int              i                    = 0;
 
     dummy_second_node       = NULL;
     dummy_next_to_last_node = NULL;
 
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
-        clist_node dummy_clist_node = malloc(sizeof(*dummy_clist_node));
+        CF_CListNode_t *dummy_clist_node = malloc(sizeof(*dummy_clist_node));
 
         if (i == 0)
         {
@@ -707,12 +707,12 @@ void Test_CF_ClistRemove_RemovingHeadSetSecondNodeToHeadAndUpdateLastNode(void)
 
     /* removes all malloc nodes */
     /* dummy_head is old second node (head removed) which was malloc'd */
-    clist_node free_up_node = dummy_head;
+    CF_CListNode_t *free_up_node = dummy_head;
 
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
-        clist_node old_free_up_node = free_up_node;
-        free_up_node                = old_free_up_node->next;
+        CF_CListNode_t *old_free_up_node = free_up_node;
+        free_up_node                     = old_free_up_node->next;
         free(old_free_up_node);
     }
 } /* end Test_CF_ClistRemove_RemovingHeadSetSecondNodeToHeadAndUpdateLastNode */
@@ -720,22 +720,22 @@ void Test_CF_ClistRemove_RemovingHeadSetSecondNodeToHeadAndUpdateLastNode(void)
 void Test_CF_ClistRemove_RemovingLastPointHeadAndNextToLastToEachOther(void)
 {
     /* Arrange */
-    clist_node_t dummy_head_node;
-    clist_node   dummy_head = &dummy_head_node;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node_t dummy_last_node;
-    clist_node   arg_node = &dummy_last_node;
-    clist_node   dummy_second_node;
-    clist_node   dummy_next_to_last_node;
-    uint8        num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
-    int          i                    = 0;
+    CF_CListNode_t   dummy_head_node;
+    CF_CListNode_t  *dummy_head = &dummy_head_node;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t   dummy_last_node;
+    CF_CListNode_t  *arg_node = &dummy_last_node;
+    CF_CListNode_t  *dummy_second_node;
+    CF_CListNode_t  *dummy_next_to_last_node;
+    uint8            num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
+    int              i                    = 0;
 
     dummy_second_node       = NULL;
     dummy_next_to_last_node = NULL;
 
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
-        clist_node dummy_clist_node = malloc(sizeof(*dummy_clist_node));
+        CF_CListNode_t *dummy_clist_node = malloc(sizeof(*dummy_clist_node));
 
         if (i == 0)
         {
@@ -771,12 +771,12 @@ void Test_CF_ClistRemove_RemovingLastPointHeadAndNextToLastToEachOther(void)
     UtAssert_ADDRESS_EQ(dummy_last_node.next, &dummy_last_node);
 
     /* removes all malloc nodes */
-    clist_node free_up_node = dummy_head->next;
+    CF_CListNode_t *free_up_node = dummy_head->next;
 
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
-        clist_node old_free_up_node = free_up_node;
-        free_up_node                = old_free_up_node->next;
+        CF_CListNode_t *old_free_up_node = free_up_node;
+        free_up_node                     = old_free_up_node->next;
         free(old_free_up_node);
     }
 } /* end Test_CF_ClistRemove_RemovingLastPointHeadAndNextToLastToEachOther */
@@ -784,19 +784,19 @@ void Test_CF_ClistRemove_RemovingLastPointHeadAndNextToLastToEachOther(void)
 void Test_CF_ClistRemove_RemovingAnyNodeHasNodesPrevAndNextPointToEachOther(void)
 {
     /* Arrange */
-    clist_node_t dummy_head_node;
-    clist_node   dummy_head = &dummy_head_node;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node_t dummy_last_node;
-    clist_node   dummy_removed_node;
-    clist_node   dummy_removed_node_prev;
-    clist_node   dummy_removed_node_next;
-    clist_node   arg_node;
-    clist_node   dummy_second_node;
-    clist_node   dummy_next_to_last_node;
-    uint8        num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
-    uint8        num_of_removed_node  = Any_uint8_LessThan(num_extraneous_nodes);
-    int          i                    = 0;
+    CF_CListNode_t   dummy_head_node;
+    CF_CListNode_t  *dummy_head = &dummy_head_node;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t   dummy_last_node;
+    CF_CListNode_t  *dummy_removed_node;
+    CF_CListNode_t  *dummy_removed_node_prev;
+    CF_CListNode_t  *dummy_removed_node_next;
+    CF_CListNode_t  *arg_node;
+    CF_CListNode_t  *dummy_second_node;
+    CF_CListNode_t  *dummy_next_to_last_node;
+    uint8            num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
+    uint8            num_of_removed_node  = Any_uint8_LessThan(num_extraneous_nodes);
+    int              i                    = 0;
 
     dummy_removed_node      = NULL;
     arg_node                = NULL;
@@ -805,7 +805,7 @@ void Test_CF_ClistRemove_RemovingAnyNodeHasNodesPrevAndNextPointToEachOther(void
 
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
-        clist_node dummy_clist_node = malloc(sizeof(*dummy_clist_node));
+        CF_CListNode_t *dummy_clist_node = malloc(sizeof(*dummy_clist_node));
 
         if (i == num_of_removed_node)
         {
@@ -849,14 +849,14 @@ void Test_CF_ClistRemove_RemovingAnyNodeHasNodesPrevAndNextPointToEachOther(void
     UtAssert_ADDRESS_EQ(dummy_removed_node->next, dummy_removed_node);
 
     /* removes all malloc nodes */
-    clist_node free_up_node = dummy_head->next;
+    CF_CListNode_t *free_up_node = dummy_head->next;
     /* free removed node because it was malloc'd */
     free(dummy_removed_node);
     /* subtract one because of node removal */
     for (i = 0; i < num_extraneous_nodes - 1; ++i)
     {
-        clist_node old_free_up_node = free_up_node;
-        free_up_node                = old_free_up_node->next;
+        CF_CListNode_t *old_free_up_node = free_up_node;
+        free_up_node                     = old_free_up_node->next;
         free(old_free_up_node);
     }
 
@@ -865,11 +865,11 @@ void Test_CF_ClistRemove_RemovingAnyNodeHasNodesPrevAndNextPointToEachOther(void
 void Test_CF_CList_Remove_ReceivesBad_node_Because_next_PointsTo_node_But_prev_DoesNot(void)
 {
     // /* Arrange */
-    // clist_node_t    dummy_head_node;
-    // clist_node      dummy_head = &dummy_head_node;
-    // clist_node*     arg_head = &dummy_head;
-    // clist_node_t    dummy_last_node;
-    // clist_node      arg_node = &dummy_last_node;
+    // CF_CListNode_t    dummy_head_node;
+    // CF_CListNode_t *      dummy_head = &dummy_head_node;
+    // CF_CListNode_t **     arg_head = &dummy_head;
+    // CF_CListNode_t    dummy_last_node;
+    // CF_CListNode_t *      arg_node = &dummy_last_node;
 
     // dummy_head->prev = dummy_head;
     // dummy_head->next = dummy_head;
@@ -905,9 +905,9 @@ void Test_CF_CList_Remove_ReceivesBad_node_Because_next_PointsTo_node_But_prev_D
 void Test_CF_CList_InsertAfter_AssertsBecause_head_Is_NULL(void)
 {
     /* Arrange */
-    // clist_node*     arg_head = NULL;
-    // clist_node      arg_start;
-    // clist_node      arg_after;
+    // CF_CListNode_t **     arg_head = NULL;
+    // CF_CListNode_t *      arg_start;
+    // CF_CListNode_t *      arg_after;
 
     /* Act */
     // CF_CList_InsertAfter(arg_head, arg_start, arg_after);
@@ -919,10 +919,10 @@ void Test_CF_CList_InsertAfter_AssertsBecause_head_Is_NULL(void)
 void Test_CF_CList_InsertAfter_AssertsBecauseValueAt_head_Is_NULL(void)
 {
     /* Arrange */
-    // clist_node      dummy_head = NULL;
-    // clist_node*     arg_head = &dummy_head;
-    // clist_node      arg_start;
-    // clist_node      arg_after;
+    // CF_CListNode_t *      dummy_head = NULL;
+    // CF_CListNode_t **     arg_head = &dummy_head;
+    // CF_CListNode_t *      arg_start;
+    // CF_CListNode_t *      arg_after;
 
     /* Act */
     // CF_CList_InsertAfter(arg_head, arg_start, arg_after);
@@ -934,11 +934,11 @@ void Test_CF_CList_InsertAfter_AssertsBecauseValueAt_head_Is_NULL(void)
 void Test_CF_CList_InsertAfter_AssertsBecause_start_Is_NULL(void)
 {
     /* Arrange */
-    // clist_node_t    dummy_head_node;
-    // clist_node      dummy_head = &dummy_head_node;
-    // clist_node*     arg_head = &dummy_head;
-    // clist_node      arg_start = NULL;
-    // clist_node      arg_after;
+    // CF_CListNode_t    dummy_head_node;
+    // CF_CListNode_t *      dummy_head = &dummy_head_node;
+    // CF_CListNode_t **     arg_head = &dummy_head;
+    // CF_CListNode_t *      arg_start = NULL;
+    // CF_CListNode_t *      arg_after;
 
     /* Act */
     // CF_CList_InsertAfter(arg_head, arg_start, arg_after);
@@ -950,12 +950,12 @@ void Test_CF_CList_InsertAfter_AssertsBecause_start_Is_NULL(void)
 void Test_CF_CList_InsertAfter_AssertsBecause_start_IsEqTo_after(void)
 {
     /* Arrange */
-    // clist_node_t    dummy_head_node;
-    // clist_node      dummy_head = &dummy_head_node;
-    // clist_node*     arg_head = &dummy_head;
-    // clist_node_t    dummy_start_node;
-    // clist_node      arg_start = &dummy_start_node;
-    // clist_node      arg_after = arg_start;
+    // CF_CListNode_t    dummy_head_node;
+    // CF_CListNode_t *      dummy_head = &dummy_head_node;
+    // CF_CListNode_t **     arg_head = &dummy_head;
+    // CF_CListNode_t    dummy_start_node;
+    // CF_CListNode_t *      arg_start = &dummy_start_node;
+    // CF_CListNode_t *      arg_after = arg_start;
 
     /* Act */
     // CF_CList_InsertAfter(arg_head, arg_start, arg_after);
@@ -967,12 +967,12 @@ void Test_CF_CList_InsertAfter_AssertsBecause_start_IsEqTo_after(void)
 void Test_CF_CList_InsertAfter_WhenOnlyOneNodeSuccess_after_IsInsertedAfter_start(void)
 {
     /* Arrange */
-    clist_node_t dummy_head_node;
-    clist_node   dummy_head = &dummy_head_node;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node   arg_start  = dummy_head;
-    clist_node_t dummy_after_node;
-    clist_node   arg_after = &dummy_after_node;
+    CF_CListNode_t   dummy_head_node;
+    CF_CListNode_t  *dummy_head = &dummy_head_node;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t  *arg_start  = dummy_head;
+    CF_CListNode_t   dummy_after_node;
+    CF_CListNode_t  *arg_after = &dummy_after_node;
 
     dummy_head->prev = dummy_head;
     dummy_head->next = dummy_head;
@@ -994,26 +994,26 @@ void Test_CF_CList_InsertAfter_WhenAnyNodeSuccess_after_IsInsertedAfter_start(vo
 {
     /* Arrange */
     /* Arrange */
-    clist_node_t dummy_head_node;
-    clist_node   dummy_head = &dummy_head_node;
-    clist_node  *arg_head   = &dummy_head;
-    clist_node_t dummy_last_node;
-    clist_node   dummy_second_node;
-    clist_node   dummy_next_to_last_node;
-    clist_node   arg_start;
-    clist_node_t dummy_after;
-    clist_node   arg_after = &dummy_after;
-    clist_node   dummy_after_next;
-    uint8        num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
-    uint8        insertion_point      = Any_uint8_LessThan(num_extraneous_nodes);
-    int          i                    = 0;
+    CF_CListNode_t   dummy_head_node;
+    CF_CListNode_t  *dummy_head = &dummy_head_node;
+    CF_CListNode_t **arg_head   = &dummy_head;
+    CF_CListNode_t   dummy_last_node;
+    CF_CListNode_t  *dummy_second_node;
+    CF_CListNode_t  *dummy_next_to_last_node;
+    CF_CListNode_t  *arg_start;
+    CF_CListNode_t   dummy_after;
+    CF_CListNode_t  *arg_after = &dummy_after;
+    CF_CListNode_t  *dummy_after_next;
+    uint8            num_extraneous_nodes = Any_uint8_LessThan(18) + 1; // 1 to 18
+    uint8            insertion_point      = Any_uint8_LessThan(num_extraneous_nodes);
+    int              i                    = 0;
 
     dummy_second_node       = NULL;
     dummy_next_to_last_node = NULL;
 
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
-        clist_node dummy_clist_node = malloc(sizeof(*dummy_clist_node));
+        CF_CListNode_t *dummy_clist_node = malloc(sizeof(*dummy_clist_node));
 
         if (i == 0)
         {
@@ -1058,7 +1058,7 @@ void Test_CF_CList_InsertAfter_WhenAnyNodeSuccess_after_IsInsertedAfter_start(vo
     UtAssert_ADDRESS_EQ(dummy_after_next->prev, arg_after);
 
     /* removes all malloc nodes */
-    clist_node free_up_node = dummy_head->next;
+    CF_CListNode_t *free_up_node = dummy_head->next;
 
     for (i = 0; i < num_extraneous_nodes; ++i)
     {
@@ -1068,8 +1068,8 @@ void Test_CF_CList_InsertAfter_WhenAnyNodeSuccess_after_IsInsertedAfter_start(vo
             free_up_node = free_up_node->next;
         }
 
-        clist_node old_free_up_node = free_up_node;
-        free_up_node                = old_free_up_node->next;
+        CF_CListNode_t *old_free_up_node = free_up_node;
+        free_up_node                     = old_free_up_node->next;
         free(old_free_up_node);
     }
 } /* end Test_CF_CList_InsertAfter_WhenAnyNodeSuccess_after_IsInsertedAfter_start */
@@ -1085,9 +1085,9 @@ void Test_CF_CList_InsertAfter_WhenAnyNodeSuccess_after_IsInsertedAfter_start(vo
 void Test_CF_CList_Traverse_When_start_Is_NULL_DoNothing(void)
 {
     /* Arrange */
-    clist_node arg_start   = NULL;
-    clist_fn_t arg_fn      = Dummy_clist_fn_t;
-    void      *arg_context = NULL;
+    CF_CListNode_t *arg_start   = NULL;
+    CF_CListFn_t    arg_fn      = Dummy_clist_fn_t;
+    void           *arg_context = NULL;
 
     /* Act */
     CF_CList_Traverse(arg_start, arg_fn, arg_context);
@@ -1099,9 +1099,9 @@ void Test_CF_CList_Traverse_When_start_Is_NULL_DoNothing(void)
 void Test_CF_CList_Traverse_WhenListIsMoreThanOneNodeErrorOutFirst_fn_CallFails(void)
 {
     /* Arrange */
-    clist_node_t               dummy_start;
-    clist_node                 arg_start = &dummy_start;
-    clist_fn_t                 arg_fn    = Dummy_clist_fn_t;
+    CF_CListNode_t             dummy_start;
+    CF_CListNode_t            *arg_start = &dummy_start;
+    CF_CListFn_t               arg_fn    = Dummy_clist_fn_t;
     int                        dummy_context;
     void                      *arg_context = &dummy_context;
     Dummy_clist_fn_t_context_t context_Dummy_clist_fn_t;
@@ -1123,9 +1123,9 @@ void Test_CF_CList_Traverse_WhenListIsMoreThanOneNodeErrorOutFirst_fn_CallFails(
 void Test_CF_CList_Traverse_WhenListIsOneNodeSuccess(void)
 {
     /* Arrange */
-    clist_node_t               dummy_start;
-    clist_node                 arg_start = &dummy_start;
-    clist_fn_t                 arg_fn    = Dummy_clist_fn_t;
+    CF_CListNode_t             dummy_start;
+    CF_CListNode_t            *arg_start = &dummy_start;
+    CF_CListFn_t               arg_fn    = Dummy_clist_fn_t;
     int                        dummy_context;
     void                      *arg_context = &dummy_context;
     Dummy_clist_fn_t_context_t context_Dummy_clist_fn_t;
@@ -1149,9 +1149,9 @@ void Test_CF_CList_Traverse_WhenListIsOneNodeSuccess(void)
 void Test_CF_CList_Traverse_CanActuallyGet_n_next_NotEqTo_nn_ButOnlyWithAn_fn_ThatForcesIt(void)
 {
     /* Arrange */
-    clist_node_t              dummy_start;
-    clist_node                arg_start = &dummy_start;
-    clist_fn_t                arg_fn    = Hook_clist_fn_t;
+    CF_CListNode_t            dummy_start;
+    CF_CListNode_t           *arg_start = &dummy_start;
+    CF_CListFn_t              arg_fn    = Hook_clist_fn_t;
     int                       dummy_context;
     void                     *arg_context = &dummy_context;
     Hook_clist_fn_t_context_t context_Hook_clist_fn_t;
@@ -1173,9 +1173,9 @@ void Test_CF_CList_Traverse_CanActuallyGet_n_next_NotEqTo_nn_ButOnlyWithAn_fn_Th
 void Test_CF_CList_Traverse_WhenListIsManyNodesErrorIn_fn_Call(void)
 {
     /* Arrange */
-    clist_node                 arg_start;
-    clist_node                 adder_node;
-    clist_fn_t                 arg_fn = Dummy_clist_fn_t;
+    CF_CListNode_t            *arg_start;
+    CF_CListNode_t            *adder_node;
+    CF_CListFn_t               arg_fn = Dummy_clist_fn_t;
     int                        dummy_context;
     void                      *arg_context    = &dummy_context;
     uint8                      list_size      = Any_uint8_LessThan(9) + 2;     /* 2 - 10 */
@@ -1189,7 +1189,7 @@ void Test_CF_CList_Traverse_WhenListIsManyNodesErrorIn_fn_Call(void)
     /* set up list */
     for (i = 0; i < list_size; ++i)
     {
-        clist_node dummy_clist_node = malloc(sizeof(*dummy_clist_node));
+        CF_CListNode_t *dummy_clist_node = malloc(sizeof(*dummy_clist_node));
 
         if (i == 0)
         {
@@ -1228,7 +1228,7 @@ void Test_CF_CList_Traverse_WhenListIsManyNodesErrorIn_fn_Call(void)
     UtAssert_True(context_Dummy_clist_fn_t[0].context == arg_context,
                   "context_Dummy_clist_fn_t[0].context ==  arg_context");
 
-    clist_node expected_node = arg_start->next;
+    CF_CListNode_t *expected_node = arg_start->next;
     for (i = 1; i <= error_location; ++i)
     {
         UtAssert_True(context_Dummy_clist_fn_t[i].node == expected_node,
@@ -1239,12 +1239,12 @@ void Test_CF_CList_Traverse_WhenListIsManyNodesErrorIn_fn_Call(void)
     }
 
     /* removes all malloc nodes */
-    clist_node free_up_node = arg_start;
+    CF_CListNode_t *free_up_node = arg_start;
 
     for (i = 0; i < list_size; ++i)
     {
-        clist_node old_free_up_node = free_up_node;
-        free_up_node                = old_free_up_node->next;
+        CF_CListNode_t *old_free_up_node = free_up_node;
+        free_up_node                     = old_free_up_node->next;
         free(old_free_up_node);
     }
 } /* end Test_CF_CList_Traverse_WhenListIsManyNodesErrorIn_fn_Call */
@@ -1252,9 +1252,9 @@ void Test_CF_CList_Traverse_WhenListIsManyNodesErrorIn_fn_Call(void)
 void Test_CF_CList_Traverse_WhenListIsManyNodesSuccess(void)
 {
     /* Arrange */
-    clist_node                 arg_start;
-    clist_node                 adder_node;
-    clist_fn_t                 arg_fn = Dummy_clist_fn_t;
+    CF_CListNode_t            *arg_start;
+    CF_CListNode_t            *adder_node;
+    CF_CListFn_t               arg_fn = Dummy_clist_fn_t;
     int                        dummy_context;
     void                      *arg_context = &dummy_context;
     uint8                      list_size   = Any_uint8_LessThan(9) + 2; /* 2 - 10 */
@@ -1267,7 +1267,7 @@ void Test_CF_CList_Traverse_WhenListIsManyNodesSuccess(void)
     /* set up list */
     for (i = 0; i < list_size; ++i)
     {
-        clist_node dummy_clist_node = malloc(sizeof(*dummy_clist_node));
+        CF_CListNode_t *dummy_clist_node = malloc(sizeof(*dummy_clist_node));
 
         if (i == 0)
         {
@@ -1305,7 +1305,7 @@ void Test_CF_CList_Traverse_WhenListIsManyNodesSuccess(void)
     UtAssert_True(context_Dummy_clist_fn_t[0].context == arg_context,
                   "context_Dummy_clist_fn_t[0].context ==  arg_context");
 
-    clist_node expected_node = arg_start->next;
+    CF_CListNode_t *expected_node = arg_start->next;
     for (i = 1; i < list_size; ++i)
     {
         UtAssert_True(context_Dummy_clist_fn_t[i].node == expected_node,
@@ -1316,12 +1316,12 @@ void Test_CF_CList_Traverse_WhenListIsManyNodesSuccess(void)
     }
 
     /* removes all malloc nodes */
-    clist_node free_up_node = arg_start;
+    CF_CListNode_t *free_up_node = arg_start;
 
     for (i = 0; i < list_size; ++i)
     {
-        clist_node old_free_up_node = free_up_node;
-        free_up_node                = old_free_up_node->next;
+        CF_CListNode_t *old_free_up_node = free_up_node;
+        free_up_node                     = old_free_up_node->next;
         free(old_free_up_node);
     }
 } /* end Test_CF_CList_Traverse_WhenListIsManyNodesSuccess */
@@ -1335,9 +1335,9 @@ void Test_CF_CList_Traverse_WhenListIsManyNodesSuccess(void)
 void Test_CF_CList_Traverse_R_When_end_Is_NULL_DoNothing(void)
 {
     /* Arrange */
-    clist_node arg_end     = NULL;
-    clist_fn_t arg_fn      = NULL;
-    void      *arg_context = NULL;
+    CF_CListNode_t *arg_end     = NULL;
+    CF_CListFn_t    arg_fn      = NULL;
+    void           *arg_context = NULL;
 
     /* Act */
     CF_CList_Traverse_R(arg_end, arg_fn, arg_context);
@@ -1349,11 +1349,11 @@ void Test_CF_CList_Traverse_R_When_end_Is_NULL_DoNothing(void)
 void Test_CF_CList_Traverse_R_When_end_prev_Is_NULLDoNothing(void)
 {
     /* Arrange */
-    clist_node_t dummy_end;
-    clist_node   arg_end = &dummy_end;
-    clist_fn_t   arg_fn  = Dummy_clist_fn_t;
-    int          dummy_context;
-    void        *arg_context = &dummy_context;
+    CF_CListNode_t  dummy_end;
+    CF_CListNode_t *arg_end = &dummy_end;
+    CF_CListFn_t    arg_fn  = Dummy_clist_fn_t;
+    int             dummy_context;
+    void           *arg_context = &dummy_context;
 
     arg_end->prev = NULL;
 
@@ -1367,13 +1367,13 @@ void Test_CF_CList_Traverse_R_When_end_prev_Is_NULLDoNothing(void)
 void Test_CF_CList_Traverse_R_WhenListIsMoreThanOneNodeErrorOutFirst_fn_CallFails(void)
 {
     /* Arrange */
-    clist_node_t               dummy_end;
-    clist_node                 arg_end = &dummy_end;
-    clist_fn_t                 arg_fn  = Dummy_clist_fn_t;
+    CF_CListNode_t             dummy_end;
+    CF_CListNode_t            *arg_end = &dummy_end;
+    CF_CListFn_t               arg_fn  = Dummy_clist_fn_t;
     int                        dummy_context;
     void                      *arg_context = &dummy_context;
-    clist_node_t               dummy_end_prev_node;
-    clist_node                 dummy_end_prev = &dummy_end_prev_node;
+    CF_CListNode_t             dummy_end_prev_node;
+    CF_CListNode_t            *dummy_end_prev = &dummy_end_prev_node;
     Dummy_clist_fn_t_context_t context_Dummy_clist_fn_t;
 
     arg_end->prev = dummy_end_prev;
@@ -1393,9 +1393,9 @@ void Test_CF_CList_Traverse_R_WhenListIsMoreThanOneNodeErrorOutFirst_fn_CallFail
 void Test_CF_CList_Traverse_R_PassedIn_end_IsTheOnlyNode_fn_Returned_non0(void)
 {
     /* Arrange */
-    clist_node_t               dummy_end;
-    clist_node                 arg_end = &dummy_end;
-    clist_fn_t                 arg_fn  = Dummy_clist_fn_t;
+    CF_CListNode_t             dummy_end;
+    CF_CListNode_t            *arg_end = &dummy_end;
+    CF_CListFn_t               arg_fn  = Dummy_clist_fn_t;
     int                        dummy_context;
     void                      *arg_context = &dummy_context;
     Dummy_clist_fn_t_context_t context_Dummy_clist_fn_t;
@@ -1417,10 +1417,10 @@ void Test_CF_CList_Traverse_R_PassedIn_end_IsTheOnlyNode_fn_Returned_non0(void)
 void Test_CF_CList_Traverse_R_PassedIn_end_IsNotTheOnlyNode_fn_Returned_non0_Original_end_UsedLast(void)
 {
     /* Arrange */
-    clist_node_t               dummy_node;
-    clist_node_t               dummy_end;
-    clist_node                 arg_end = &dummy_end;
-    clist_fn_t                 arg_fn  = Dummy_clist_fn_t;
+    CF_CListNode_t             dummy_node;
+    CF_CListNode_t             dummy_end;
+    CF_CListNode_t            *arg_end = &dummy_end;
+    CF_CListFn_t               arg_fn  = Dummy_clist_fn_t;
     int                        dummy_context;
     void                      *arg_context = &dummy_context;
     Dummy_clist_fn_t_context_t context_Dummy_clist_fn_t[2];
@@ -1447,9 +1447,9 @@ void Test_CF_CList_Traverse_R_PassedIn_end_IsNotTheOnlyNode_fn_Returned_non0_Ori
 void Test_CF_CList_Traverse_R_CanActuallyGet_n_next_NotEqTo_nn_ButOnlyWithAn_fn_ThatForcesIt(void)
 {
     /* Arrange */
-    clist_node_t              dummy_end;
-    clist_node                arg_end = &dummy_end;
-    clist_fn_t                arg_fn  = Hook_clist_fn_t;
+    CF_CListNode_t            dummy_end;
+    CF_CListNode_t           *arg_end = &dummy_end;
+    CF_CListFn_t              arg_fn  = Hook_clist_fn_t;
     int                       dummy_context;
     void                     *arg_context = &dummy_context;
     Hook_clist_fn_t_context_t context_Hook_clist_fn_t;

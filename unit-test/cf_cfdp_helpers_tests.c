@@ -636,12 +636,12 @@ void Test_CF_MemcpyFromBE_When_src_size_IsEqTo_dst_size_CopyAllRequisite_src_Val
 **
 *******************************************************************************/
 
-void Test_CF_GetTSNSize_When_ret_IsGreaterThan_size_of_cf_transaction_seq_t_ReturnThatValue(void)
+void Test_CF_GetTSNSize_When_ret_IsGreaterThan_size_of_CF_TransactionSeq_t_ReturnThatValue(void)
 {
     /* Arrange */
-    pdu_header_t  dummy_ph;
-    pdu_header_t *arg_ph    = &dummy_ph;
-    uint8 forced_return_FGV = sizeof(cf_transaction_seq_t); /* CUT adds +1 to this value making it greater than */
+    CF_CFDP_PduHeader_t  dummy_ph;
+    CF_CFDP_PduHeader_t *arg_ph = &dummy_ph;
+    uint8 forced_return_FGV     = sizeof(CF_TransactionSeq_t); /* CUT adds +1 to this value making it greater than */
     int   local_result;
 
     UT_SetDefaultReturnValue(UT_KEY(FGV), forced_return_FGV);
@@ -652,16 +652,16 @@ void Test_CF_GetTSNSize_When_ret_IsGreaterThan_size_of_cf_transaction_seq_t_Retu
     /* Assert */
     UtAssert_True(local_result == -1, "CF_GetTSNSize returned %d and should be -1", local_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-} /* end Test_CF_GetTSNSize_When_ret_IsGreaterThan_size_of_cf_transaction_seq_t_ReturnThatValue */
+} /* end Test_CF_GetTSNSize_When_ret_IsGreaterThan_size_of_CF_TransactionSeq_t_ReturnThatValue */
 
-void Test_CF_GetTSNSize_When_ret_Is_1_LessThan_size_of_cf_transaction_seq_t_Add_1_MakingItEqToThatSizeReturnThatValue(
+void Test_CF_GetTSNSize_When_ret_Is_1_LessThan_size_of_CF_TransactionSeq_t_Add_1_MakingItEqToThatSizeReturnThatValue(
     void)
 {
     /* Arrange */
-    pdu_header_t  dummy_ph;
-    pdu_header_t *arg_ph    = &dummy_ph;
-    uint8 forced_return_FGV = sizeof(cf_transaction_seq_t) - 1; /* CUT adds +1 to this value making it equal to */
-    int   expected_result   = forced_return_FGV + 1;
+    CF_CFDP_PduHeader_t  dummy_ph;
+    CF_CFDP_PduHeader_t *arg_ph = &dummy_ph;
+    uint8 forced_return_FGV     = sizeof(CF_TransactionSeq_t) - 1; /* CUT adds +1 to this value making it equal to */
+    int   expected_result       = forced_return_FGV + 1;
     int   local_result;
 
     UT_SetDefaultReturnValue(UT_KEY(FGV), forced_return_FGV);
@@ -671,20 +671,20 @@ void Test_CF_GetTSNSize_When_ret_Is_1_LessThan_size_of_cf_transaction_seq_t_Add_
 
     /* Assert */
     UtAssert_True(local_result == expected_result,
-                  "CF_GetTSNSize returned %d and should be %ld (sizeof(cf_transaction_seq_t))", local_result,
-                  sizeof(cf_transaction_seq_t));
+                  "CF_GetTSNSize returned %d and should be %ld (sizeof(CF_TransactionSeq_t))", local_result,
+                  sizeof(CF_TransactionSeq_t));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 } /* end
-     Test_CF_GetTSNSize_When_ret_Is_1_LessThan_size_of_cf_transaction_seq_t_Add_1_MakingItEqToThatSizeReturnThatValue */
+     Test_CF_GetTSNSize_When_ret_Is_1_LessThan_size_of_CF_TransactionSeq_t_Add_1_MakingItEqToThatSizeReturnThatValue */
 
-void Test_CF_GetTSNSize_When_ret_Is_LessThan_size_of_cf_transaction_seq_t_Add_1_AndReturnThatValue(void)
+void Test_CF_GetTSNSize_When_ret_Is_LessThan_size_of_CF_TransactionSeq_t_Add_1_AndReturnThatValue(void)
 {
     /* Arrange */
-    pdu_header_t  dummy_ph;
-    pdu_header_t *arg_ph            = &dummy_ph;
-    uint8         forced_return_FGV = Any_uint8_LessThan(sizeof(cf_transaction_seq_t)); /* CUT adds +1 to this value */
-    int           expected_result   = forced_return_FGV + 1;
-    int           local_result;
+    CF_CFDP_PduHeader_t  dummy_ph;
+    CF_CFDP_PduHeader_t *arg_ph = &dummy_ph;
+    uint8 forced_return_FGV     = Any_uint8_LessThan(sizeof(CF_TransactionSeq_t)); /* CUT adds +1 to this value */
+    int   expected_result       = forced_return_FGV + 1;
+    int   local_result;
 
     UT_SetDefaultReturnValue(UT_KEY(FGV), forced_return_FGV);
 
@@ -695,7 +695,7 @@ void Test_CF_GetTSNSize_When_ret_Is_LessThan_size_of_cf_transaction_seq_t_Add_1_
     UtAssert_True(local_result == expected_result, "CF_GetTSNSize returned %d and should be 1 more than %d (FGV)",
                   local_result, forced_return_FGV);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-} /* end Test_CF_GetTSNSize_When_ret_Is_LessThan_size_of_cf_transaction_seq_t_Add_1_AndReturnThatValue */
+} /* end Test_CF_GetTSNSize_When_ret_Is_LessThan_size_of_CF_TransactionSeq_t_Add_1_AndReturnThatValue */
 
 /* end CF_GetTSNSize tests */
 
@@ -705,13 +705,13 @@ void Test_CF_GetTSNSize_When_ret_Is_LessThan_size_of_cf_transaction_seq_t_Add_1_
 **
 *******************************************************************************/
 
-void Test_CF_GetEIDSize_When_ret_IsGreaterThan_size_of_cf_entity_id_t_ReturnThatValue(void)
+void Test_CF_GetEIDSize_When_ret_IsGreaterThan_size_of_CF_EntityId_t_ReturnThatValue(void)
 {
     /* Arrange */
-    pdu_header_t  dummy_ph;
-    pdu_header_t *arg_ph            = &dummy_ph;
-    uint8         forced_return_FGV = sizeof(cf_entity_id_t); /* CUT adds +1 to this value making it greater than */
-    int           local_result;
+    CF_CFDP_PduHeader_t  dummy_ph;
+    CF_CFDP_PduHeader_t *arg_ph = &dummy_ph;
+    uint8 forced_return_FGV     = sizeof(CF_EntityId_t); /* CUT adds +1 to this value making it greater than */
+    int   local_result;
 
     UT_SetDefaultReturnValue(UT_KEY(FGV), forced_return_FGV);
 
@@ -721,16 +721,16 @@ void Test_CF_GetEIDSize_When_ret_IsGreaterThan_size_of_cf_entity_id_t_ReturnThat
     /* Assert */
     UtAssert_True(local_result == -1, "CF_GetEIDSize returned %d and should be -1", local_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-} /* end Test_CF_GetEIDSize_When_ret_IsGreaterThan_size_of_cf_entity_id_t_ReturnThatValue */
+} /* end Test_CF_GetEIDSize_When_ret_IsGreaterThan_size_of_CF_EntityId_t_ReturnThatValue */
 
-void Test_CF_GetEIDSize_When_ret_Is_1_LessThan_size_of_cf_entity_id_t_Add_1_MakingItEqToThatSizeReturnThatValue(void)
+void Test_CF_GetEIDSize_When_ret_Is_1_LessThan_size_of_CF_EntityId_t_Add_1_MakingItEqToThatSizeReturnThatValue(void)
 {
     /* Arrange */
-    pdu_header_t  dummy_ph;
-    pdu_header_t *arg_ph            = &dummy_ph;
-    uint8         forced_return_FGV = sizeof(cf_entity_id_t) - 1; /* CUT adds +1 to this value making it equal to */
-    int           expected_result   = forced_return_FGV + 1;
-    int           local_result;
+    CF_CFDP_PduHeader_t  dummy_ph;
+    CF_CFDP_PduHeader_t *arg_ph = &dummy_ph;
+    uint8 forced_return_FGV     = sizeof(CF_EntityId_t) - 1; /* CUT adds +1 to this value making it equal to */
+    int   expected_result       = forced_return_FGV + 1;
+    int   local_result;
 
     UT_SetDefaultReturnValue(UT_KEY(FGV), forced_return_FGV);
 
@@ -739,19 +739,19 @@ void Test_CF_GetEIDSize_When_ret_Is_1_LessThan_size_of_cf_entity_id_t_Add_1_Maki
 
     /* Assert */
     UtAssert_True(local_result == expected_result,
-                  "CF_GetEIDSize returned %d and should be %ld (sizeof(cf_entity_id_t))", local_result,
-                  sizeof(cf_entity_id_t));
+                  "CF_GetEIDSize returned %d and should be %ld (sizeof(CF_EntityId_t))", local_result,
+                  sizeof(CF_EntityId_t));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-} /* end Test_CF_GetEIDSize_When_ret_Is_1_LessThan_size_of_cf_entity_id_t_Add_1_MakingItEqToThatSizeReturnThatValue */
+} /* end Test_CF_GetEIDSize_When_ret_Is_1_LessThan_size_of_CF_EntityId_t_Add_1_MakingItEqToThatSizeReturnThatValue */
 
-void Test_CF_GetEIDSize_When_ret_Is_LessThan_size_of_cf_entity_id_t_Add_1_AndReturnThatValue(void)
+void Test_CF_GetEIDSize_When_ret_Is_LessThan_size_of_CF_EntityId_t_Add_1_AndReturnThatValue(void)
 {
     /* Arrange */
-    pdu_header_t  dummy_ph;
-    pdu_header_t *arg_ph            = &dummy_ph;
-    uint8         forced_return_FGV = Any_uint8_LessThan(sizeof(cf_entity_id_t)); /* CUT adds +1 to this value */
-    int           expected_result   = forced_return_FGV + 1;
-    int           local_result;
+    CF_CFDP_PduHeader_t  dummy_ph;
+    CF_CFDP_PduHeader_t *arg_ph            = &dummy_ph;
+    uint8                forced_return_FGV = Any_uint8_LessThan(sizeof(CF_EntityId_t)); /* CUT adds +1 to this value */
+    int                  expected_result   = forced_return_FGV + 1;
+    int                  local_result;
 
     UT_SetDefaultReturnValue(UT_KEY(FGV), forced_return_FGV);
 
@@ -762,7 +762,7 @@ void Test_CF_GetEIDSize_When_ret_Is_LessThan_size_of_cf_entity_id_t_Add_1_AndRet
     UtAssert_True(local_result == expected_result, "CF_GetEIDSize returned %d and should be 1 more than %d (FGV)",
                   local_result, forced_return_FGV);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-} /* end Test_CF_GetEIDSize_When_ret_Is_LessThan_size_of_cf_entity_id_t_Add_1_AndReturnThatValue */
+} /* end Test_CF_GetEIDSize_When_ret_Is_LessThan_size_of_CF_EntityId_t_Add_1_AndReturnThatValue */
 
 /* end CF_GetEIDSize tests */
 
@@ -783,16 +783,16 @@ void Test_CF_GetVariableHeader_When_eid_l_AND_tsn_l_AreNotGreaterThan_0_DoesNotC
     CF_AppData.engine.in.msg = &dummy_ph.cfe_sb_buffer;
 
     /* Arrange for CF_GetEIDSize */
-    uint32 forced_return_FGV_from_EID = sizeof(cf_entity_id_t); /* unstubbable code adds +1 to this value */
+    uint32 forced_return_FGV_from_EID = sizeof(CF_EntityId_t); /* unstubbable code adds +1 to this value */
 
     UT_SetDeferredRetcode(UT_KEY(FGV), 1,
-                          forced_return_FGV_from_EID); /* FGV + 1 > sizeof(cf_entity_id_t) causes ret to be -1  */
+                          forced_return_FGV_from_EID); /* FGV + 1 > sizeof(CF_EntityId_t) causes ret to be -1  */
 
     /* Arrange for CF_GetTSNSize */
-    uint32 forced_return_FGV_from_TSN = sizeof(cf_transaction_seq_t); /* unstubbable code adds +1 to this value */
+    uint32 forced_return_FGV_from_TSN = sizeof(CF_TransactionSeq_t); /* unstubbable code adds +1 to this value */
 
     UT_SetDeferredRetcode(UT_KEY(FGV), 1,
-                          forced_return_FGV_from_TSN); /* FGV + 1 > sizeof(cf_transaction_seq_t) causes ret to be -1 */
+                          forced_return_FGV_from_TSN); /* FGV + 1 > sizeof(CF_TransactionSeq_t) causes ret to be -1 */
 
     /* Act */
     local_result = CF_GetVariableHeader();
@@ -814,18 +814,17 @@ void Test_CF_GetVariableHeader_WhenOnly_eid_l_IsGreaterThan_0_DoesNotCallAnyMemC
     CF_AppData.engine.in.msg = &dummy_ph.cfe_sb_buffer;
 
     /* Arrange for CF_GetEIDSize */
-    uint32 forced_return_FGV_from_EID = sizeof(cf_entity_id_t) - 1; /* unstubbable code adds +1 to this value */
+    uint32 forced_return_FGV_from_EID = sizeof(CF_EntityId_t) - 1; /* unstubbable code adds +1 to this value */
 
     UT_SetDeferredRetcode(
-        UT_KEY(FGV), 1,
-        forced_return_FGV_from_EID); /* Call to FGV returns sizeof(cf_entity_id_t) - 1 + 1 = sizeof(cf_entity_id_t)
-                                        causes ret to be sizeof(cf_entity_id_t) */
+        UT_KEY(FGV), 1, forced_return_FGV_from_EID); /* Call to FGV returns sizeof(CF_EntityId_t) - 1 + 1 =
+                                                        sizeof(CF_EntityId_t) causes ret to be sizeof(CF_EntityId_t) */
 
     /* Arrange for CF_GetTSNSize */
-    uint32 forced_return_FGV_from_TSN = sizeof(cf_transaction_seq_t); /* unstubbable code adds +1 to this value */
+    uint32 forced_return_FGV_from_TSN = sizeof(CF_TransactionSeq_t); /* unstubbable code adds +1 to this value */
 
     UT_SetDeferredRetcode(UT_KEY(FGV), 1,
-                          forced_return_FGV_from_TSN); /* FGV + 1 > sizeof(cf_transaction_seq_t) causes ret to be -1  */
+                          forced_return_FGV_from_TSN); /* FGV + 1 > sizeof(CF_TransactionSeq_t) causes ret to be -1  */
 
     /* Act */
     local_result = CF_GetVariableHeader();
@@ -847,18 +846,18 @@ void Test_CF_GetVariableHeader_WhenOnly_tsn_l_IsGreaterThan_0_DoesNotCallAnyMemC
     CF_AppData.engine.in.msg = &dummy_ph.cfe_sb_buffer;
 
     /* Arrange for CF_GetEIDSize */
-    uint32 forced_return_FGV_from_EID = sizeof(cf_entity_id_t); /* unstubbable code adds +1 to this value */
+    uint32 forced_return_FGV_from_EID = sizeof(CF_EntityId_t); /* unstubbable code adds +1 to this value */
 
     UT_SetDeferredRetcode(UT_KEY(FGV), 1,
-                          forced_return_FGV_from_EID); /* FGV + 1 > sizeof(cf_entity_id_t) causes ret to be -1  */
+                          forced_return_FGV_from_EID); /* FGV + 1 > sizeof(CF_EntityId_t) causes ret to be -1  */
 
     /* Arrange for CF_GetTSNSize */
-    uint32 forced_return_FGV_from_TSN = sizeof(cf_transaction_seq_t) - 1; /* unstubbable code adds +1 to this value */
+    uint32 forced_return_FGV_from_TSN = sizeof(CF_TransactionSeq_t) - 1; /* unstubbable code adds +1 to this value */
 
     UT_SetDeferredRetcode(
         UT_KEY(FGV), 1,
-        forced_return_FGV_from_TSN); /* Call to FGV returns sizeof(cf_transaction_seq_t) - 1 + 1 =
-                                        sizeof(cf_transaction_seq_t) causes ret to be sizeof(cf_transaction_seq_t) */
+        forced_return_FGV_from_TSN); /* Call to FGV returns sizeof(CF_TransactionSeq_t) - 1 + 1 =
+                                        sizeof(CF_TransactionSeq_t) causes ret to be sizeof(CF_TransactionSeq_t) */
 
     /* Act */
     local_result = CF_GetVariableHeader();
@@ -881,15 +880,15 @@ void Test_CF_GetVariableHeader_GetsAllThreeVariableLengthItemsOutOfHeaderAndRetu
 
     /* Arrange for CF_GetEIDSize */
     uint32 forced_return_FGV_from_EID =
-        Any_uint32_LessThan(sizeof(cf_entity_id_t)); /* unstubbable code adds +1 to this value */
+        Any_uint32_LessThan(sizeof(CF_EntityId_t)); /* unstubbable code adds +1 to this value */
 
-    UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_from_EID); /* FGV + 1 <= sizeof(cf_entity_id_t) */
+    UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_from_EID); /* FGV + 1 <= sizeof(CF_EntityId_t) */
 
     /* Arrange for CF_GetTSNSize */
     uint32 forced_return_FGV_from_TSN =
-        Any_uint32_LessThan(sizeof(cf_transaction_seq_t)); /* unstubbable code adds +1 to this value */
+        Any_uint32_LessThan(sizeof(CF_TransactionSeq_t)); /* unstubbable code adds +1 to this value */
 
-    UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_from_TSN); /* FGV + 1 <= sizeof(cf_transaction_seq_t) */
+    UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_from_TSN); /* FGV + 1 <= sizeof(CF_TransactionSeq_t) */
 
     /* Act */
     local_result = CF_GetVariableHeader();
@@ -911,9 +910,9 @@ void Test_CF_GetVariableHeader_GetsAllThreeVariableLengthItemsOutOfHeaderAndRetu
 void Test_CF_SetVariableHeader_Call_FSV_Twice(void)
 {
     /* Arrange */
-    cf_entity_id_t        arg_src_eid = 1;
-    cf_entity_id_t        arg_dst_eid = 1;
-    cf_transaction_seq_t  arg_tsn     = 1;
+    CF_EntityId_t         arg_src_eid = 1;
+    CF_EntityId_t         arg_dst_eid = 1;
+    CF_TransactionSeq_t   arg_tsn     = 1;
     CF_UT_outmsg_buffer_t dummy_msg;
 
     memset(&dummy_msg, 0, sizeof(dummy_msg));
@@ -938,8 +937,8 @@ void Test_CF_SetVariableHeader_Call_FSV_Twice(void)
 void Test_CF_HeaderSize_AssertsWhen_eid_l_IsNotGreaterThan_0(void)
 {
     // /* Arrange */
-    // pdu_header_t      dummy_ph;
-    // pdu_header_t*     arg_ph = &dummy_ph;
+    // CF_CFDP_PduHeader_t      dummy_ph;
+    // CF_CFDP_PduHeader_t*     arg_ph = &dummy_ph;
     // int32             forced_return_FGV_for_eid_l = Any_int32_Negative(); /* negative forces error */
     // int32             forced_return_FGV_for_tsn_l = Any_uint8(); /* uint8 used arbitrarily for small size */
     // int               local_result;
@@ -957,8 +956,8 @@ void Test_CF_HeaderSize_AssertsWhen_eid_l_IsNotGreaterThan_0(void)
 void Test_CF_HeaderSize_AssertsWhen_tsn_l_IsNotGreaterThan_0(void)
 {
     // /* Arrange */
-    // pdu_header_t      dummy_ph;
-    // pdu_header_t*     arg_ph = &dummy_ph;
+    // CF_CFDP_PduHeader_t      dummy_ph;
+    // CF_CFDP_PduHeader_t*     arg_ph = &dummy_ph;
     // int32             forced_return_FGV_for_eid_l = Any_uint8(); /* uint8 used arbitrarily for small size */
     // int32             forced_return_FGV_for_tsn_l = Any_int32_Negative(); /* negative forces error */
     // int               local_result;
@@ -973,14 +972,14 @@ void Test_CF_HeaderSize_AssertsWhen_tsn_l_IsNotGreaterThan_0(void)
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - (eid_l>0)&&(tsn_l>0)");
 } /* end Test_CF_HeaderSize_AssertsWhen_tsn_l_IsNotGreaterThan_0 */
 
-void Test_CF_HeaderSize_Return_sizeof_pdu_header_t_Plus_2_Times_eid_l_Plus_tsn_l(void)
+void Test_CF_HeaderSize_Return_sizeof_CF_PduHeader_t_Plus_2_Times_eid_l_Plus_tsn_l(void)
 {
     /* Arrange */
-    pdu_header_t  dummy_ph;
-    pdu_header_t *arg_ph                      = &dummy_ph;
-    int32         forced_return_FGV_for_eid_l = Any_uint8(); /* uint8 used arbitrarily for small size */
-    int32         forced_return_FGV_for_tsn_l = Any_uint8(); /* uint8 used arbitrarily for small size */
-    int           expected_result             = sizeof(pdu_header_t) + (2 * (forced_return_FGV_for_eid_l + 1)) +
+    CF_CFDP_PduHeader_t  dummy_ph;
+    CF_CFDP_PduHeader_t *arg_ph                      = &dummy_ph;
+    int32                forced_return_FGV_for_eid_l = Any_uint8(); /* uint8 used arbitrarily for small size */
+    int32                forced_return_FGV_for_tsn_l = Any_uint8(); /* uint8 used arbitrarily for small size */
+    int                  expected_result = sizeof(CF_CFDP_PduHeader_t) + (2 * (forced_return_FGV_for_eid_l + 1)) +
                           (forced_return_FGV_for_tsn_l + 1); /* each +1 added by CUT */
     int local_result;
 
@@ -995,10 +994,10 @@ void Test_CF_HeaderSize_Return_sizeof_pdu_header_t_Plus_2_Times_eid_l_Plus_tsn_l
     /* Assert */
     UtAssert_True(
         local_result == expected_result,
-        "CF_GetVariableHeader returned %d and should be %d (sizeof(pdu_header_t) + (2 * (%u + 1))) + (%u + 1))",
+        "CF_GetVariableHeader returned %d and should be %d (sizeof(CF_CFDP_PduHeader_t) + (2 * (%u + 1))) + (%u + 1))",
         local_result, expected_result, forced_return_FGV_for_eid_l, forced_return_FGV_for_tsn_l);
     UtAssert_STUB_COUNT(FGV, 2);
-} /* end Test_CF_HeaderSize_Return_sizeof_pdu_header_t_Plus_2_Times_eid_l_Plus_tsn_l */
+} /* end Test_CF_HeaderSize_Return_sizeof_CF_PduHeader_t_Plus_2_Times_eid_l_Plus_tsn_l */
 
 /* end CF_SetVariableHeader tests */
 
@@ -1090,31 +1089,31 @@ void add_CF_MemcpyFromBE_tests(void)
 
 void add_CF_GetTSNSize_tests(void)
 {
-    UtTest_Add(Test_CF_GetTSNSize_When_ret_IsGreaterThan_size_of_cf_transaction_seq_t_ReturnThatValue,
+    UtTest_Add(Test_CF_GetTSNSize_When_ret_IsGreaterThan_size_of_CF_TransactionSeq_t_ReturnThatValue,
                cf_cfdp_helpers_tests_Setup, cf_cfdp_helpers_tests_Teardown,
-               "Test_CF_GetTSNSize_When_ret_IsGreaterThan_size_of_cf_transaction_seq_t_ReturnThatValue");
+               "Test_CF_GetTSNSize_When_ret_IsGreaterThan_size_of_CF_TransactionSeq_t_ReturnThatValue");
     UtTest_Add(
-        Test_CF_GetTSNSize_When_ret_Is_1_LessThan_size_of_cf_transaction_seq_t_Add_1_MakingItEqToThatSizeReturnThatValue,
+        Test_CF_GetTSNSize_When_ret_Is_1_LessThan_size_of_CF_TransactionSeq_t_Add_1_MakingItEqToThatSizeReturnThatValue,
         cf_cfdp_helpers_tests_Setup, cf_cfdp_helpers_tests_Teardown,
-        "Test_CF_GetTSNSize_When_ret_Is_1_LessThan_size_of_cf_transaction_seq_t_Add_1_"
+        "Test_CF_GetTSNSize_When_ret_Is_1_LessThan_size_of_CF_TransactionSeq_t_Add_1_"
         "MakingItEqToThatSizeReturnThatValue");
-    UtTest_Add(Test_CF_GetTSNSize_When_ret_Is_LessThan_size_of_cf_transaction_seq_t_Add_1_AndReturnThatValue,
+    UtTest_Add(Test_CF_GetTSNSize_When_ret_Is_LessThan_size_of_CF_TransactionSeq_t_Add_1_AndReturnThatValue,
                cf_cfdp_helpers_tests_Setup, cf_cfdp_helpers_tests_Teardown,
-               "Test_CF_GetTSNSize_When_ret_Is_LessThan_size_of_cf_transaction_seq_t_Add_1_AndReturnThatValue");
+               "Test_CF_GetTSNSize_When_ret_Is_LessThan_size_of_CF_TransactionSeq_t_Add_1_AndReturnThatValue");
 } /* end add_CF_GetTSNSize_tests */
 
 void add_CF_GetEIDSize_tests(void)
 {
-    UtTest_Add(Test_CF_GetEIDSize_When_ret_IsGreaterThan_size_of_cf_entity_id_t_ReturnThatValue,
+    UtTest_Add(Test_CF_GetEIDSize_When_ret_IsGreaterThan_size_of_CF_EntityId_t_ReturnThatValue,
                cf_cfdp_helpers_tests_Setup, cf_cfdp_helpers_tests_Teardown,
-               "Test_CF_GetEIDSize_When_ret_IsGreaterThan_size_of_cf_entity_id_t_ReturnThatValue");
+               "Test_CF_GetEIDSize_When_ret_IsGreaterThan_size_of_CF_EntityId_t_ReturnThatValue");
     UtTest_Add(
-        Test_CF_GetEIDSize_When_ret_Is_1_LessThan_size_of_cf_entity_id_t_Add_1_MakingItEqToThatSizeReturnThatValue,
+        Test_CF_GetEIDSize_When_ret_Is_1_LessThan_size_of_CF_EntityId_t_Add_1_MakingItEqToThatSizeReturnThatValue,
         cf_cfdp_helpers_tests_Setup, cf_cfdp_helpers_tests_Teardown,
-        "Test_CF_GetEIDSize_When_ret_Is_1_LessThan_size_of_cf_entity_id_t_Add_1_MakingItEqToThatSizeReturnThatValue");
-    UtTest_Add(Test_CF_GetEIDSize_When_ret_Is_LessThan_size_of_cf_entity_id_t_Add_1_AndReturnThatValue,
+        "Test_CF_GetEIDSize_When_ret_Is_1_LessThan_size_of_CF_EntityId_t_Add_1_MakingItEqToThatSizeReturnThatValue");
+    UtTest_Add(Test_CF_GetEIDSize_When_ret_Is_LessThan_size_of_CF_EntityId_t_Add_1_AndReturnThatValue,
                cf_cfdp_helpers_tests_Setup, cf_cfdp_helpers_tests_Teardown,
-               "Test_CF_GetEIDSize_When_ret_Is_LessThan_size_of_cf_entity_id_t_Add_1_AndReturnThatValue");
+               "Test_CF_GetEIDSize_When_ret_Is_LessThan_size_of_CF_EntityId_t_Add_1_AndReturnThatValue");
 } /* end add_CF_GetEIDSize_tests */
 
 void add_CF_GetVariableHeader_tests(void)
@@ -1145,9 +1144,9 @@ void add_CF_HeaderSize_tests(void)
                cf_cfdp_helpers_tests_Teardown, "Test_CF_HeaderSize_AssertsWhen_eid_l_IsNotGreaterThan_0");
     UtTest_Add(Test_CF_HeaderSize_AssertsWhen_tsn_l_IsNotGreaterThan_0, cf_cfdp_helpers_tests_Setup,
                cf_cfdp_helpers_tests_Teardown, "Test_CF_HeaderSize_AssertsWhen_tsn_l_IsNotGreaterThan_0");
-    UtTest_Add(Test_CF_HeaderSize_Return_sizeof_pdu_header_t_Plus_2_Times_eid_l_Plus_tsn_l, cf_cfdp_helpers_tests_Setup,
-               cf_cfdp_helpers_tests_Teardown,
-               "Test_CF_HeaderSize_Return_sizeof_pdu_header_t_Plus_2_Times_eid_l_Plus_tsn_l");
+    UtTest_Add(Test_CF_HeaderSize_Return_sizeof_CF_PduHeader_t_Plus_2_Times_eid_l_Plus_tsn_l,
+               cf_cfdp_helpers_tests_Setup, cf_cfdp_helpers_tests_Teardown,
+               "Test_CF_HeaderSize_Return_sizeof_CF_PduHeader_t_Plus_2_Times_eid_l_Plus_tsn_l");
 } /* end add_CF_HeaderSize_tests */
 
 /* end cf_cfdp_helpers_tests UtTest_Add groups */

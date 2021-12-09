@@ -23,14 +23,14 @@
 **
 **
 *************************************************************************/
-#ifndef _cf_version_h_
-#define _cf_version_h_
+#ifndef CF_VERSION_H
+#define CF_VERSION_H
 
 #define CF_MAJOR_VERSION 3
 #define CF_MINOR_VERSION 0
 #define CF_REVISION      0
 
-#endif /* _cf_version_h_ */
+#endif /* CF_VERSION_H */
 
 /************************/
 /*  End of File Comment */

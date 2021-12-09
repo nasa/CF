@@ -24,33 +24,33 @@
 **
 *************************************************************************/
 
-#ifndef CF_TIMER__H
-#define CF_TIMER__H
+#ifndef CF_TIMER_H
+#define CF_TIMER_H
 
 #include "cfe.h"
 
 /* NOTE: We expect ticks to be 100/sec, so using uint32 for sec could have a bounds condition
  * with uint32. But, we don't expect to use more than 400,000,000 seconds for any reason so
  * let's just live with it. */
-typedef uint32 CF_Timer_Tick_t;
-typedef uint32 cf_timer_sec_t;
+typedef uint32 CF_Timer_Ticks_t;
+typedef uint32 CF_Timer_Seconds_t;
 
-typedef struct
+typedef struct CF_Timer
 {
-    CF_Timer_Tick_t tick; /* expires when reaches 0 */
-} cf_timer_t;
+    CF_Timer_Ticks_t tick; /* expires when reaches 0 */
+} CF_Timer_t;
 
 /* initialize a timer
  *
  * If the abs_sec value is greater than current time, then the timer will
  * be immediately expired. */
-extern void CF_Timer_InitRelSec(cf_timer_t *c, cf_timer_sec_t rel_sec);
+extern void CF_Timer_InitRelSec(CF_Timer_t *c, CF_Timer_Seconds_t rel_sec);
 
-extern void cf_timer_update_timebase(void);
+extern void CF_Timer_UpdateTimebase(void);
 
 /* returns 1 if expired */
-extern int CF_Timer_Expired(const cf_timer_t *t);
+extern int CF_Timer_Expired(const CF_Timer_t *t);
 
-extern void CF_Timer_Tick(cf_timer_t *t);
+extern void CF_Timer_Tick(CF_Timer_t *t);
 
-#endif /* !CF_TIMER__H */
+#endif /* !CF_TIMER_H */

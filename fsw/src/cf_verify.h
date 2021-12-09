@@ -24,8 +24,8 @@
 **
 *************************************************************************/
 
-#ifndef CF_VERIFY__H
-#define CF_VERIFY__H
+#ifndef CF_VERIFY_H
+#define CF_VERIFY_H
 
 #include "cfe.h"
 #include "cf_platform_cfg.h"
@@ -64,4 +64,4 @@
 #error Collision between CF_PERF_ID_PDURCVD and CF_PERF_ID_PDUSENT given number of channels
 #endif
 
-#endif /* !CF_VERIFY__H */
+#endif /* !CF_VERIFY_H */

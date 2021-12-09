@@ -4,9 +4,9 @@
 
 typedef struct
 {
-    const chunks_t *cs;
-    const chunk_t  *c;
-    void           *opaque;
+    const CF_ChunkList_t *cs;
+    const CF_Chunk_t     *c;
+    void                 *opaque;
 } CF_PACK                        Dummy_compute_gap_fn_t_context_t;
 Dummy_compute_gap_fn_t_context_t context_Dummy_compute_gap_fn_t;
 
@@ -39,12 +39,12 @@ void cf_chunk_tests_Teardown(void)
 **
 *******************************************************************************/
 
-index_t Any_index_t(void)
+CF_ChunkIdx_t Any_index_t(void)
 {
-    return (index_t)Any_uint32();
+    return (CF_ChunkIdx_t)Any_uint32();
 }
 
-void Dummy_compute_gap_fn_t(const chunks_t *cs, const chunk_t *c, void *opaque)
+void Dummy_compute_gap_fn_t(const CF_ChunkList_t *cs, const CF_Chunk_t *c, void *opaque)
 {
     UT_Stub_RegisterContextGenericArg(UT_KEY(Dummy_compute_gap_fn_t), cs);
     UT_Stub_RegisterContext(UT_KEY(Dummy_compute_gap_fn_t), c);
@@ -118,10 +118,10 @@ void Test_MAX_WhenItIsEqualTo_b_Returns_a(void)
 void Test_CF_Chunks_EraseRange_AssertsBecause_end_IsLessThan_start(void)
 {
     // /* Arrange */
-    // chunks_t      dummy_chunks;
-    // chunks_t*     arg_chunks = &dummy_chunks;
-    // index_t       arg_start = Any_uint32_Except(UINT32_MAX);
-    // index_t       arg_end = Any_uint32_LessThan(arg_start);
+    // CF_ChunkList_t      dummy_chunks;
+    // CF_ChunkList_t*     arg_chunks = &dummy_chunks;
+    // CF_ChunkIdx_t       arg_start = Any_uint32_Except(UINT32_MAX);
+    // CF_ChunkIdx_t       arg_end = Any_uint32_LessThan(arg_start);
 
     // /* Act */
     // CF_Chunks_EraseRange(&Test_chunks, Test_start, Test_end);
@@ -134,10 +134,10 @@ void Test_CF_Chunks_EraseRange_AssertsBecause_end_IsLessThan_start(void)
 // void Test_CF_Chunks_EraseRange_AssertsBecause_end_EqTo_start(void)
 // {
 //     /* Arrange */
-//     chunks_t      dummy_chunks;
-//     chunks_t*     arg_chunks = &dummy_chunks;
-//     index_t       arg_start = Any_uint32_Except(UINT32_MAX);
-//     index_t       arg_end = arg_start;
+//     CF_ChunkList_t      dummy_chunks;
+//     CF_ChunkList_t*     arg_chunks = &dummy_chunks;
+//     CF_ChunkIdx_t       arg_start = Any_uint32_Except(UINT32_MAX);
+//     CF_ChunkIdx_t       arg_end = arg_start;
 
 //     /* Act */
 //     //CF_Chunks_EraseRange(&Test_chunks, Test_start, Test_end);
@@ -149,15 +149,15 @@ void Test_CF_Chunks_EraseRange_AssertsBecause_end_IsLessThan_start(void)
 void Test_CF_Chunks_When_start_Is_OneMoreThan_end_MovesOneChunk_EraseRange(void)
 {
     /* Arrange */
-    chunk_t        dummy_chunk_array[2];
-    chunks_t       dummy_chunks;
-    chunks_t      *arg_chunks         = &dummy_chunks;
-    index_t        arg_start          = 0;
-    index_t        arg_end            = 1;
-    chunk_offset_t dummy_start_offset = Any_uint32();
-    chunk_size_t   dummy_start_size   = Any_uint32();
-    chunk_offset_t dummy_end_offset   = Any_uint32_Except(dummy_start_offset);
-    chunk_size_t   dummy_end_size     = Any_uint32_Except(dummy_start_size);
+    CF_Chunk_t       dummy_chunk_array[2];
+    CF_ChunkList_t   dummy_chunks;
+    CF_ChunkList_t  *arg_chunks         = &dummy_chunks;
+    CF_ChunkIdx_t    arg_start          = 0;
+    CF_ChunkIdx_t    arg_end            = 1;
+    CF_ChunkOffset_t dummy_start_offset = Any_uint32();
+    CF_ChunkSize_t   dummy_start_size   = Any_uint32();
+    CF_ChunkOffset_t dummy_end_offset   = Any_uint32_Except(dummy_start_offset);
+    CF_ChunkSize_t   dummy_end_size     = Any_uint32_Except(dummy_start_size);
 
     arg_chunks->count  = 2;
     arg_chunks->chunks = dummy_chunk_array;
@@ -178,15 +178,15 @@ void Test_CF_Chunks_When_start_Is_OneMoreThan_end_MovesOneChunk_EraseRange(void)
 void Test_CF_Chunks_When_start_IsLessThan_chunks_count_DoesNotChangeStart_EraseRange(void)
 {
     /* Arrange */
-    chunk_t        dummy_chunk_array[2];
-    chunks_t       dummy_chunks;
-    chunks_t      *arg_chunks         = &dummy_chunks;
-    index_t        arg_start          = 2;
-    index_t        arg_end            = 3;
-    chunk_offset_t dummy_start_offset = Any_uint32();
-    chunk_size_t   dummy_start_size   = Any_uint32();
-    chunk_offset_t dummy_end_offset   = Any_uint32_Except(dummy_start_offset);
-    chunk_size_t   dummy_end_size     = Any_uint32_Except(dummy_start_size);
+    CF_Chunk_t       dummy_chunk_array[2];
+    CF_ChunkList_t   dummy_chunks;
+    CF_ChunkList_t  *arg_chunks         = &dummy_chunks;
+    CF_ChunkIdx_t    arg_start          = 2;
+    CF_ChunkIdx_t    arg_end            = 3;
+    CF_ChunkOffset_t dummy_start_offset = Any_uint32();
+    CF_ChunkSize_t   dummy_start_size   = Any_uint32();
+    CF_ChunkOffset_t dummy_end_offset   = Any_uint32_Except(dummy_start_offset);
+    CF_ChunkSize_t   dummy_end_size     = Any_uint32_Except(dummy_start_size);
 
     arg_chunks->count  = 2;
     arg_chunks->chunks = dummy_chunk_array;
@@ -218,9 +218,9 @@ void Test_CF_Chunks_When_start_IsLessThan_chunks_count_DoesNotChangeStart_EraseR
 void Test_CF_Chunks_EraseChunk_AssertsBecause_Given_chunks_count_IsEqTo_0(void)
 {
     // /* Arrange */
-    // chunks_t      dummy_chunks;
-    // chunks_t*     arg_chunks = &dummy_chunks;
-    // index_t       arg_erase_index = Any_index_t();
+    // CF_ChunkList_t      dummy_chunks;
+    // CF_ChunkList_t*     arg_chunks = &dummy_chunks;
+    // CF_ChunkIdx_t       arg_erase_index = Any_index_t();
 
     // arg_chunks->count = 0;
 
@@ -234,9 +234,9 @@ void Test_CF_Chunks_EraseChunk_AssertsBecause_Given_chunks_count_IsEqTo_0(void)
 void Test_CF_Chunks_EraseChunk_AssertsBecause_Given_erase_index_IsEqTo_chunks_count(void)
 {
     // /* Arrange */
-    // chunks_t      dummy_chunks;
-    // chunks_t*     arg_chunks = &dummy_chunks;
-    // index_t       arg_erase_index;
+    // CF_ChunkList_t      dummy_chunks;
+    // CF_ChunkList_t*     arg_chunks = &dummy_chunks;
+    // CF_ChunkIdx_t       arg_erase_index;
 
     // arg_chunks->count = 1;
 
@@ -252,10 +252,10 @@ void Test_CF_Chunks_EraseChunk_AssertsBecause_Given_erase_index_IsEqTo_chunks_co
 void Test_CF_Chunks_EraseChunk_WhenThereIsOnlyOneEraseOneChunkAndDecrement_count_To_0(void)
 {
     /* Arrange */
-    chunk_t   dummy_start_chunk[1];
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   arg_erase_index;
+    CF_Chunk_t      dummy_start_chunk[1];
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   arg_erase_index;
 
     arg_chunks->count  = 1;
     arg_chunks->chunks = dummy_start_chunk;
@@ -274,15 +274,15 @@ void Test_CF_Chunks_EraseChunk_EraseOneChunkThatIsNotTheLastFrom_chunks_AndDecre
     /* Arrange */
     uint8 intial_count =
         Any_uint8_LessThan(10) + 2; /* 2-11, reasonably small count for testing and not its normal uint32 */
-    chunk_t        dummy_chunk[11] = {{0}};
-    chunks_t       dummy_chunks;
-    chunks_t      *arg_chunks = &dummy_chunks;
-    index_t        arg_erase_index;
-    uint8          i                   = 0;
-    chunk_offset_t offsets[11]         = {0};
-    chunk_size_t   sizes[11]           = {0};
-    chunk_offset_t updated_offsets[10] = {0};
-    chunk_size_t   updated_sizes[10]   = {0};
+    CF_Chunk_t       dummy_chunk[11] = {{0}};
+    CF_ChunkList_t   dummy_chunks;
+    CF_ChunkList_t  *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t    arg_erase_index;
+    uint8            i                   = 0;
+    CF_ChunkOffset_t offsets[11]         = {0};
+    CF_ChunkSize_t   sizes[11]           = {0};
+    CF_ChunkOffset_t updated_offsets[10] = {0};
+    CF_ChunkSize_t   updated_sizes[10]   = {0};
 
     arg_chunks->count  = intial_count;
     arg_chunks->chunks = dummy_chunk;
@@ -337,13 +337,13 @@ void Test_CF_Chunks_EraseChunk_ErasesLastChunkFrom_chunks_AndDecrements_count(vo
     /* Arrange */
     uint8 initial_count =
         Any_uint8_LessThan(10) + 2; /* 2-11, reasonably small count for testing and not its normal uint32 */
-    chunk_t        dummy_chunk[11] = {{0}};
-    chunks_t       dummy_chunks;
-    chunks_t      *arg_chunks      = &dummy_chunks;
-    index_t        arg_erase_index = initial_count - 1;
-    uint8          i               = 0;
-    chunk_offset_t offsets[11]     = {0};
-    chunk_size_t   sizes[11]       = {0};
+    CF_Chunk_t       dummy_chunk[11] = {{0}};
+    CF_ChunkList_t   dummy_chunks;
+    CF_ChunkList_t  *arg_chunks      = &dummy_chunks;
+    CF_ChunkIdx_t    arg_erase_index = initial_count - 1;
+    uint8            i               = 0;
+    CF_ChunkOffset_t offsets[11]     = {0};
+    CF_ChunkSize_t   sizes[11]       = {0};
 
     arg_chunks->count  = initial_count;
     arg_chunks->chunks = dummy_chunk;
@@ -395,10 +395,10 @@ void Test_CF_Chunks_EraseChunk_ErasesLastChunkFrom_chunks_AndDecrements_count(vo
 void Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsEqTo_chunks_CF_max_chunks(void)
 {
     // /* Arrange */
-    // chunks_t      dummy_chunks;
-    // chunks_t*     arg_chunks = &dummy_chunks;
-    // index_t       arg_index_before = Any_index_t();
-    // chunk_t       arg_chunk = {0};
+    // CF_ChunkList_t      dummy_chunks;
+    // CF_ChunkList_t*     arg_chunks = &dummy_chunks;
+    // CF_ChunkIdx_t       arg_index_before = Any_index_t();
+    // CF_Chunk_t       arg_chunk = {0};
 
     // arg_chunks->count = Any_uint32();
     // arg_chunks->CF_max_chunks = arg_chunks->count;
@@ -415,11 +415,11 @@ void Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsEqTo_chunks_
 // void Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsGreaterThan_chunks_CF_max_chunks(void)
 // {
 //     /* Arrange */
-//     chunks_t      dummy_chunks;
-//     chunks_t*     arg_chunks = &dummy_chunks;
-//     index_t       arg_index_before = Any_index_t();
-//     chunk_t       dummy_chunk = {0};
-//     chunk_t*      arg_chunk = &dummy_chunk;
+//     CF_ChunkList_t      dummy_chunks;
+//     CF_ChunkList_t*     arg_chunks = &dummy_chunks;
+//     CF_ChunkIdx_t       arg_index_before = Any_index_t();
+//     CF_Chunk_t       dummy_chunk = {0};
+//     CF_Chunk_t*      arg_chunk = &dummy_chunk;
 
 //     arg_chunks->count = Any_uint32_Except(UINT32_MAX);
 //     arg_chunks->CF_max_chunks = Any_uint32_GreaterThan(arg_chunks->count);
@@ -434,12 +434,12 @@ void Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsEqTo_chunks_
 void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoEmpty_chunks(void)
 {
     /* Arrange */
-    chunk_t        initial_chunks[1];
-    chunks_t       dummy_chunks;
-    chunks_t      *arg_chunks       = &dummy_chunks;
-    index_t        arg_index_before = 0;
-    chunk_t        dummy_chunk      = {0};
-    const chunk_t *arg_chunk;
+    CF_Chunk_t        initial_chunks[1];
+    CF_ChunkList_t    dummy_chunks;
+    CF_ChunkList_t   *arg_chunks       = &dummy_chunks;
+    CF_ChunkIdx_t     arg_index_before = 0;
+    CF_Chunk_t        dummy_chunk      = {0};
+    const CF_Chunk_t *arg_chunk;
 
     arg_chunks->count = 0;
     arg_chunks->CF_max_chunks =
@@ -465,13 +465,13 @@ void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoEmpty_chunks(void)
 void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoStartOfSingle_chunks(void)
 {
     /* Arrange */
-    chunk_t        initial_start_chunk;
-    chunk_t        initial_chunks[2] = {{0}};
-    chunks_t       dummy_chunks;
-    chunks_t      *arg_chunks       = &dummy_chunks;
-    index_t        arg_index_before = 0;
-    chunk_t        dummy_chunk      = {0};
-    const chunk_t *arg_chunk;
+    CF_Chunk_t        initial_start_chunk;
+    CF_Chunk_t        initial_chunks[2] = {{0}};
+    CF_ChunkList_t    dummy_chunks;
+    CF_ChunkList_t   *arg_chunks       = &dummy_chunks;
+    CF_ChunkIdx_t     arg_index_before = 0;
+    CF_Chunk_t        dummy_chunk      = {0};
+    const CF_Chunk_t *arg_chunk;
 
     initial_start_chunk.offset = Any_uint32();
     initial_start_chunk.size   = Any_uint32();
@@ -505,13 +505,13 @@ void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoStartOfSingle_chunks(void)
 void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoEndOfSingle_chunks(void)
 {
     /* Arrange */
-    chunk_t        initial_start_chunk;
-    chunk_t        initial_chunks[2] = {{0}};
-    chunks_t       dummy_chunks;
-    chunks_t      *arg_chunks       = &dummy_chunks;
-    index_t        arg_index_before = 1;
-    chunk_t        dummy_chunk      = {0};
-    const chunk_t *arg_chunk;
+    CF_Chunk_t        initial_start_chunk;
+    CF_Chunk_t        initial_chunks[2] = {{0}};
+    CF_ChunkList_t    dummy_chunks;
+    CF_ChunkList_t   *arg_chunks       = &dummy_chunks;
+    CF_ChunkIdx_t     arg_index_before = 1;
+    CF_Chunk_t        dummy_chunk      = {0};
+    const CF_Chunk_t *arg_chunk;
 
     initial_start_chunk.offset = Any_uint32();
     initial_start_chunk.size   = Any_uint32();
@@ -545,17 +545,17 @@ void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoEndOfSingle_chunks(void)
 void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoSome_chunks(void)
 {
     /* Arrange */
-    index_t initial_count =
+    CF_ChunkIdx_t initial_count =
         Any_uint8_LessThan(10) + 1; /* 1-10, reasonably small count for testing and not its normal uint32 */
-    chunk_t        initial_chunks[11] = {{0}};
-    chunks_t       dummy_chunks;
-    chunks_t      *arg_chunks       = &dummy_chunks;
-    index_t        arg_index_before = 0;
-    chunk_t        dummy_chunk      = {0};
-    const chunk_t *arg_chunk;
-    chunk_offset_t updated_offsets[10] = {0};
-    chunk_size_t   updated_sizes[10]   = {0};
-    uint8          i;
+    CF_Chunk_t        initial_chunks[11] = {{0}};
+    CF_ChunkList_t    dummy_chunks;
+    CF_ChunkList_t   *arg_chunks       = &dummy_chunks;
+    CF_ChunkIdx_t     arg_index_before = 0;
+    CF_Chunk_t        dummy_chunk      = {0};
+    const CF_Chunk_t *arg_chunk;
+    CF_ChunkOffset_t  updated_offsets[10] = {0};
+    CF_ChunkSize_t    updated_sizes[10]   = {0};
+    uint8             i;
 
     for (i = 0; i < initial_count; ++i)
     {
@@ -612,11 +612,11 @@ void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoSome_chunks(void)
 void Test_CF_Chunks_FindInsertPosition_Given_chunks_IsEmptyReturn_0(void)
 {
     /* Arrange */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks  = &dummy_chunks;
-    chunk_t   dummy_chunk = {0};
-    chunk_t  *arg_chunk   = &dummy_chunk;
-    index_t   local_result;
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks  = &dummy_chunks;
+    CF_Chunk_t      dummy_chunk = {0};
+    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_ChunkIdx_t   local_result;
 
     arg_chunks->count = 0;
 
@@ -630,12 +630,12 @@ void Test_CF_Chunks_FindInsertPosition_Given_chunks_IsEmptyReturn_0(void)
 void Test_CF_Chunks_FindInsertPosition_Given_chunks_HasOneItemAndGiven_chunk_offset_LessThanItemOffsetReturn_0(void)
 {
     /* Arrange */
-    chunk_t   initial_chunks[1] = {{0}};
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks  = &dummy_chunks;
-    chunk_t   dummy_chunk = {0};
-    chunk_t  *arg_chunk   = &dummy_chunk;
-    index_t   local_result;
+    CF_Chunk_t      initial_chunks[1] = {{0}};
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks  = &dummy_chunks;
+    CF_Chunk_t      dummy_chunk = {0};
+    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_ChunkIdx_t   local_result;
 
     initial_chunks[0].offset = Any_uint32_Except(0);
 
@@ -654,12 +654,12 @@ void Test_CF_Chunks_FindInsertPosition_Given_chunks_HasOneItemAndGiven_chunk_off
 void Test_CF_Chunks_FindInsertPosition_Given_chunks_HasOneItemAndGiven_chunk_offset_EqToItemOffsetReturn_0(void)
 {
     /* Arrange */
-    chunk_t   initial_chunks[1] = {{0}};
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks  = &dummy_chunks;
-    chunk_t   dummy_chunk = {0};
-    chunk_t  *arg_chunk   = &dummy_chunk;
-    index_t   local_result;
+    CF_Chunk_t      initial_chunks[1] = {{0}};
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks  = &dummy_chunks;
+    CF_Chunk_t      dummy_chunk = {0};
+    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_ChunkIdx_t   local_result;
 
     initial_chunks[0].offset = Any_uint32_Except(0);
 
@@ -678,12 +678,12 @@ void Test_CF_Chunks_FindInsertPosition_Given_chunks_HasOneItemAndGiven_chunk_off
 void Test_CF_Chunks_FindInsertPosition_Given_chunks_HasOneItemAndGiven_chunk_offset_GreaterThanOffsetReturn_1(void)
 {
     /* Arrange */
-    chunk_t   initial_chunks[1] = {{0}};
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks  = &dummy_chunks;
-    chunk_t   dummy_chunk = {0};
-    chunk_t  *arg_chunk   = &dummy_chunk;
-    index_t   local_result;
+    CF_Chunk_t      initial_chunks[1] = {{0}};
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks  = &dummy_chunks;
+    CF_Chunk_t      dummy_chunk = {0};
+    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_ChunkIdx_t   local_result;
 
     initial_chunks[0].offset = Any_uint32_Except(UINT32_MAX);
 
@@ -703,12 +703,12 @@ void Test_CF_Chunks_FindInsertPosition_Given_chunks_HasTwoItemsAndGiven_chunk_of
     void)
 {
     /* Arrange */
-    chunk_t   initial_chunks[2] = {{0}};
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks  = &dummy_chunks;
-    chunk_t   dummy_chunk = {0};
-    chunk_t  *arg_chunk   = &dummy_chunk;
-    index_t   local_result;
+    CF_Chunk_t      initial_chunks[2] = {{0}};
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks  = &dummy_chunks;
+    CF_Chunk_t      dummy_chunk = {0};
+    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_ChunkIdx_t   local_result;
 
     initial_chunks[0].offset = Any_uint32_BetweenExcludeMax(0, UINT32_MAX - 1);
     initial_chunks[1].offset = Any_uint32_BetweenInclusive(initial_chunks[0].offset + 2, UINT32_MAX);
@@ -729,15 +729,16 @@ void Test_CF_Chunks_FindInsertPosition_Given_chunks_HasTwoItemsAndGiven_chunk_of
 void Test_CF_Chunks_FindInsertPosition_Given_chunks_HasAnyItemsAndReturnCorrectExpectedPosition(void)
 {
     /* Arrange */
-    chunk_t  initial_chunks[20] = {{0}}; /* 20 used as a reasonably fast size for the test, but is still illustrative */
-    chunks_t dummy_chunks;
-    chunks_t *arg_chunks  = &dummy_chunks;
-    chunk_t   dummy_chunk = {0};
-    chunk_t  *arg_chunk   = &dummy_chunk;
-    index_t   local_result;
-    uint8     num_chunks_before = Any_uint8_LessThan(10);
-    uint8     num_chunks_after  = Any_uint8_LessThan(10);
-    uint8     i                 = 0;
+    CF_Chunk_t initial_chunks[20] = {
+        {0}}; /* 20 used as a reasonably fast size for the test, but is still illustrative */
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks  = &dummy_chunks;
+    CF_Chunk_t      dummy_chunk = {0};
+    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_ChunkIdx_t   local_result;
+    uint8           num_chunks_before = Any_uint8_LessThan(10);
+    uint8           num_chunks_after  = Any_uint8_LessThan(10);
+    uint8           i                 = 0;
 
     arg_chunk->offset = Any_uint32_BetweenInclusive(1, UINT32_MAX - 1);
 
@@ -772,12 +773,12 @@ void Test_CF_Chunks_FindInsertPosition_Given_chunks_HasAnyItemsAndReturnCorrectE
 void Test_CF_Chunks_CombinePrevious_Asserts_i_GivenIsEqTo_chunks_CF_max_Chunks(void)
 {
     // /* Arrange */
-    // chunks_t      dummy_chunks;
-    // chunks_t*     arg_chunks = &dummy_chunks;
-    // index_t       arg_i;
-    // chunk_t       dummy_chunk = {0};
-    // chunk_t*      arg_chunk = &dummy_chunk;
-    // index_t       local_result;
+    // CF_ChunkList_t      dummy_chunks;
+    // CF_ChunkList_t*     arg_chunks = &dummy_chunks;
+    // CF_ChunkIdx_t       arg_i;
+    // CF_Chunk_t       dummy_chunk = {0};
+    // CF_Chunk_t*      arg_chunk = &dummy_chunk;
+    // CF_ChunkIdx_t       local_result;
 
     // arg_chunks->CF_max_chunks = Any_uint32_Except(0);
     // arg_i = arg_chunks->CF_max_chunks;
@@ -793,12 +794,12 @@ void Test_CF_Chunks_CombinePrevious_Asserts_i_GivenIsEqTo_chunks_CF_max_Chunks(v
 // void Test_CF_Chunks_CombinePrevious_Asserts_i_GivenIsGreaterThan_chunks_CF_max_Chunks(void)
 // {
 //     /* Arrange */
-//     chunks_t      dummy_chunks;
-//     chunks_t*     arg_chunks = &dummy_chunks;
-//     index_t       arg_i;
-//     chunk_t       dummy_chunk = {0};
-//     chunk_t*      arg_chunk = &dummy_chunk;
-//     index_t       local_result;
+//     CF_ChunkList_t      dummy_chunks;
+//     CF_ChunkList_t*     arg_chunks = &dummy_chunks;
+//     CF_ChunkIdx_t       arg_i;
+//     CF_Chunk_t       dummy_chunk = {0};
+//     CF_Chunk_t*      arg_chunk = &dummy_chunk;
+//     CF_ChunkIdx_t       local_result;
 
 //     arg_chunks->CF_max_chunks = Any_uint32_Except(0);
 //     arg_i = Any_uint32_GreaterThan(arg_chunks->CF_max_chunks);
@@ -813,12 +814,12 @@ void Test_CF_Chunks_CombinePrevious_Asserts_i_GivenIsEqTo_chunks_CF_max_Chunks(v
 void Test_CF_Chunks_CombinePrevious_Given_i_Is_0_Return_0(void)
 {
     /* Arrange */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   arg_i;
-    chunk_t   dummy_chunk  = {0};
-    chunk_t  *arg_chunk    = &dummy_chunk;
-    int       local_result = Any_int_Except(0);
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   arg_i;
+    CF_Chunk_t      dummy_chunk  = {0};
+    CF_Chunk_t     *arg_chunk    = &dummy_chunk;
+    int             local_result = Any_int_Except(0);
 
     arg_chunks->CF_max_chunks = Any_uint32_Except(0);
     arg_i                     = 0;
@@ -834,12 +835,12 @@ void Test_CF_Chunks_CombinePrevious_Given_i_Is_0_Return_0(void)
 void Test_CF_Chunks_CombinePrevious_Given_chunks_count_Is_0_Return_0(void)
 {
     /* Arrange */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   arg_i;
-    chunk_t   dummy_chunk  = {0};
-    chunk_t  *arg_chunk    = &dummy_chunk;
-    int       local_result = Any_int_Except(0);
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   arg_i;
+    CF_Chunk_t      dummy_chunk  = {0};
+    CF_Chunk_t     *arg_chunk    = &dummy_chunk;
+    int             local_result = Any_int_Except(0);
 
     arg_chunks->CF_max_chunks = Any_uint32_Except(0);
     arg_i                     = Any_uint32_LessThan(arg_chunks->CF_max_chunks);
@@ -855,12 +856,12 @@ void Test_CF_Chunks_CombinePrevious_Given_chunks_count_Is_0_Return_0(void)
 void Test_CF_Chunks_CombinePrevious_Given_i_Is_0_And_chunks_count_Is_0_Return_0(void)
 {
     /* Arrange */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   arg_i;
-    chunk_t   dummy_chunk  = {0};
-    chunk_t  *arg_chunk    = &dummy_chunk;
-    int       local_result = Any_int_Except(0);
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   arg_i;
+    CF_Chunk_t      dummy_chunk  = {0};
+    CF_Chunk_t     *arg_chunk    = &dummy_chunk;
+    int             local_result = Any_int_Except(0);
 
     arg_chunks->CF_max_chunks = Any_uint32_Except(0);
     arg_i                     = 0;
@@ -877,18 +878,18 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
     void)
 {
     /* Arrange */
-    uint8     dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
-    chunk_t   dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   arg_i =
+    uint8           dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_Chunk_t      dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   arg_i =
         Any_uint32_LessThan(dummy_chunks_count) +
         1; /* arg_i gets +1 because the index is 0 based, but the CUT expects an i of min 1 which is the 0 element */
-    chunk_t        dummy_chunk  = {0};
-    chunk_t       *arg_chunk    = &dummy_chunk;
-    chunk_offset_t dummy_offset = Any_uint32_LessThan(UINT32_MAX / 2);
-    chunk_size_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
-    int            local_result = Any_int_Except(0);
+    CF_Chunk_t       dummy_chunk  = {0};
+    CF_Chunk_t      *arg_chunk    = &dummy_chunk;
+    CF_ChunkOffset_t dummy_offset = Any_uint32_LessThan(UINT32_MAX / 2);
+    CF_ChunkSize_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
+    int              local_result = Any_int_Except(0);
 
     arg_chunks->CF_max_chunks            = Any_uint32_GreaterThan(dummy_chunks_count);
     arg_chunks->count                    = dummy_chunks_count;
@@ -911,18 +912,18 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
     void)
 {
     /* Arrange */
-    uint8     dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
-    chunk_t   dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   arg_i =
+    uint8           dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_Chunk_t      dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   arg_i =
         Any_uint32_LessThan(dummy_chunks_count) +
         1; /* arg_i gets +1 because the index is 0 based, but the CUT expects an i of min 1 which is the 0 element */
-    chunk_t        dummy_chunk  = {0};
-    chunk_t       *arg_chunk    = &dummy_chunk;
-    chunk_offset_t dummy_offset = Any_uint32_LessThan(UINT32_MAX / 2);
-    chunk_size_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
-    int            local_result = Any_int_Except(0);
+    CF_Chunk_t       dummy_chunk  = {0};
+    CF_Chunk_t      *arg_chunk    = &dummy_chunk;
+    CF_ChunkOffset_t dummy_offset = Any_uint32_LessThan(UINT32_MAX / 2);
+    CF_ChunkSize_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
+    int              local_result = Any_int_Except(0);
 
     arg_chunks->CF_max_chunks            = Any_uint32_GreaterThan(dummy_chunks_count);
     arg_chunks->count                    = dummy_chunks_count;
@@ -946,18 +947,18 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
     void)
 {
     /* Arrange */
-    uint8     dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
-    chunk_t   dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   arg_i =
+    uint8           dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_Chunk_t      dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   arg_i =
         Any_uint32_LessThan(dummy_chunks_count) +
         1; /* arg_i gets +1 because the index is 0 based, but the CUT expects an i of min 1 which is the 0 element */
-    chunk_t        dummy_chunk  = {0};
-    chunk_t       *arg_chunk    = &dummy_chunk;
-    chunk_offset_t dummy_offset = Any_uint32_LessThan(UINT32_MAX / 2);
-    chunk_size_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
-    int            local_result = Any_int_Except(0);
+    CF_Chunk_t       dummy_chunk  = {0};
+    CF_Chunk_t      *arg_chunk    = &dummy_chunk;
+    CF_ChunkOffset_t dummy_offset = Any_uint32_LessThan(UINT32_MAX / 2);
+    CF_ChunkSize_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
+    int              local_result = Any_int_Except(0);
 
     arg_chunks->CF_max_chunks            = Any_uint32_GreaterThan(dummy_chunks_count);
     arg_chunks->count                    = dummy_chunks_count;
@@ -981,18 +982,18 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
     void)
 {
     /* Arrange */
-    uint8     dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
-    chunk_t   dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   arg_i =
+    uint8           dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_Chunk_t      dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   arg_i =
         Any_uint32_LessThan(dummy_chunks_count) +
         1; /* arg_i gets +1 because the index is 0 based, but the CUT expects an i of min 1 which is the 0 element */
-    chunk_t        dummy_chunk  = {0};
-    chunk_t       *arg_chunk    = &dummy_chunk;
-    chunk_offset_t dummy_offset = Any_uint32_LessThan(UINT32_MAX / 2);
-    chunk_size_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
-    int            local_result = Any_int_Except(0);
+    CF_Chunk_t       dummy_chunk  = {0};
+    CF_Chunk_t      *arg_chunk    = &dummy_chunk;
+    CF_ChunkOffset_t dummy_offset = Any_uint32_LessThan(UINT32_MAX / 2);
+    CF_ChunkSize_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
+    int              local_result = Any_int_Except(0);
 
     arg_chunks->CF_max_chunks            = Any_uint32_GreaterThan(dummy_chunks_count);
     arg_chunks->count                    = dummy_chunks_count;
@@ -1016,18 +1017,18 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
     void)
 {
     /* Arrange */
-    uint8     dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
-    chunk_t   dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   arg_i =
+    uint8           dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_Chunk_t      dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   arg_i =
         Any_uint32_LessThan(dummy_chunks_count) +
         1; /* arg_i gets +1 because the index is 0 based, but the CUT expects an i of min 1 which is the 0 element */
-    chunk_t        dummy_chunk  = {0};
-    chunk_t       *arg_chunk    = &dummy_chunk;
-    chunk_offset_t dummy_offset = Any_uint32_LessThan(UINT32_MAX / 2);
-    chunk_size_t   initial_size = Any_uint32_LessThan(UINT32_MAX / 2);
-    int            local_result = Any_int_Except(0);
+    CF_Chunk_t       dummy_chunk  = {0};
+    CF_Chunk_t      *arg_chunk    = &dummy_chunk;
+    CF_ChunkOffset_t dummy_offset = Any_uint32_LessThan(UINT32_MAX / 2);
+    CF_ChunkSize_t   initial_size = Any_uint32_LessThan(UINT32_MAX / 2);
+    int              local_result = Any_int_Except(0);
 
     arg_chunks->CF_max_chunks            = Any_uint32_GreaterThan(dummy_chunks_count);
     arg_chunks->count                    = dummy_chunks_count;
@@ -1060,12 +1061,12 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
 void Test_CF_Chunks_CombineNext_Given_i_IsEqTo_Given_chunks_count_Return_0(void)
 {
     /* Arrange */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   arg_i;
-    chunk_t   dummy_chunk;
-    chunk_t  *arg_chunk    = &dummy_chunk;
-    int       local_result = Any_int_Except(0);
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   arg_i;
+    CF_Chunk_t      dummy_chunk;
+    CF_Chunk_t     *arg_chunk    = &dummy_chunk;
+    int             local_result = Any_int_Except(0);
 
     arg_chunks->count = Any_uint32();
     arg_i             = arg_chunks->count;
@@ -1081,12 +1082,12 @@ void Test_CF_Chunks_CombineNext_Given_i_IsNotEqTo_Given_chunks_count_AssertsBeca
     void)
 {
     // /* Arrange */
-    // chunk_t       dummy_chunks_chunks = {0};
-    // chunks_t      dummy_chunks;
-    // chunks_t*     arg_chunks = &dummy_chunks;
-    // index_t       arg_i;
-    // chunk_t       dummy_chunk = {0};
-    // chunk_t*      arg_chunk = &dummy_chunk;
+    // CF_Chunk_t       dummy_chunks_chunks = {0};
+    // CF_ChunkList_t      dummy_chunks;
+    // CF_ChunkList_t*     arg_chunks = &dummy_chunks;
+    // CF_ChunkIdx_t       arg_i;
+    // CF_Chunk_t       dummy_chunk = {0};
+    // CF_Chunk_t*      arg_chunk = &dummy_chunk;
     // int           local_result = Any_int_Except(0);
 
     // arg_chunks->count = Any_uint32();
@@ -1105,14 +1106,14 @@ void Test_CF_Chunks_CombineNext_Given_i_IsNotEqTo_Given_chunks_count_Given_chunk
     void)
 {
     /* Arrange */
-    uint8     dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
-    chunk_t   dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   arg_i;
-    chunk_t   dummy_chunk  = {0};
-    chunk_t  *arg_chunk    = &dummy_chunk;
-    int       local_result = Any_int_Except(0);
+    uint8           dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_Chunk_t      dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   arg_i;
+    CF_Chunk_t      dummy_chunk  = {0};
+    CF_Chunk_t     *arg_chunk    = &dummy_chunk;
+    int             local_result = Any_int_Except(0);
 
     arg_chunks->count = dummy_chunks_count;
     arg_i             = Any_uint32_LessThan(arg_chunks->count);
@@ -1136,14 +1137,14 @@ void Test_CF_Chunks_CombineNext_Given_chunks_chunks_offset_IsLessThan_chunk_end_
     void)
 {
     /* Arrange */
-    uint8     dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
-    chunk_t   dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   arg_i;
-    chunk_t   dummy_chunk  = {0};
-    chunk_t  *arg_chunk    = &dummy_chunk;
-    int       local_result = Any_int_Except(0);
+    uint8           dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_Chunk_t      dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   arg_i;
+    CF_Chunk_t      dummy_chunk  = {0};
+    CF_Chunk_t     *arg_chunk    = &dummy_chunk;
+    int             local_result = Any_int_Except(0);
 
     arg_chunks->count = dummy_chunks_count;
     arg_i             = Any_uint32_LessThan(arg_chunks->count);
@@ -1169,16 +1170,16 @@ void Test_CF_Chunks_CombineNext_Given_i_IsEqToGiven_chunks_count_BreaksBReplaceE
     void)
 {
     /* Arrange */
-    uint8     dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
-    chunk_t   dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   arg_i;
-    chunk_t   dummy_chunk = {0};
-    chunk_t  *arg_chunk   = &dummy_chunk;
-    uint32    expected_num_chunks_combined;
-    uint8     j            = 0;
-    int       local_result = Any_int_Except(0);
+    uint8           dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_Chunk_t      dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   arg_i;
+    CF_Chunk_t      dummy_chunk = {0};
+    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    uint32          expected_num_chunks_combined;
+    uint8           j            = 0;
+    int             local_result = Any_int_Except(0);
 
     arg_chunks->count = dummy_chunks_count;
     arg_i =
@@ -1212,14 +1213,14 @@ void Test_CF_Chunks_CombineNext_Given_i_IsEqToGiven_chunks_count_ReplaceEverythi
     void)
 {
     /* Arrange */
-    uint8     dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
-    chunk_t   dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   arg_i;
-    chunk_t   dummy_chunk  = {0};
-    chunk_t  *arg_chunk    = &dummy_chunk;
-    int       local_result = Any_int_Except(0);
+    uint8           dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_Chunk_t      dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   arg_i;
+    CF_Chunk_t      dummy_chunk  = {0};
+    CF_Chunk_t     *arg_chunk    = &dummy_chunk;
+    int             local_result = Any_int_Except(0);
 
     arg_chunks->count = dummy_chunks_count;
     arg_i =
@@ -1252,9 +1253,9 @@ void Test_CF_Chunks_CombineNext_Given_i_IsEqToGiven_chunks_count_ReplaceEverythi
 void Test_CF_Chunks_FindSmallestSize_Given_chunks_IsEmptyReturn_0(void)
 {
     /* Arrange */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   local_result;
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   local_result;
 
     arg_chunks->count = 0;
 
@@ -1268,10 +1269,10 @@ void Test_CF_Chunks_FindSmallestSize_Given_chunks_IsEmptyReturn_0(void)
 void Test_CF_Chunks_FindSmallestSize_Given_chunks_HasOneChunkReturn_0(void)
 {
     /* Arrange */
-    chunk_t   initial_chunks[1] = {{0}};
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   local_result;
+    CF_Chunk_t      initial_chunks[1] = {{0}};
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   local_result;
 
     initial_chunks[0].size = Any_uint32();
 
@@ -1288,11 +1289,11 @@ void Test_CF_Chunks_FindSmallestSize_Given_chunks_HasOneChunkReturn_0(void)
 void Test_CF_Chunks_FindSmallestSize_Given_chunks_HasTwoChunksReturnsCorrectIndexOfSmallest(void)
 {
     /* Arrange */
-    chunk_t   initial_chunks[2] = {{0}};
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
-    index_t   expected_result;
-    index_t   local_result;
+    CF_Chunk_t      initial_chunks[2] = {{0}};
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   expected_result;
+    CF_ChunkIdx_t   local_result;
 
     initial_chunks[0].size = Any_uint32_Except(0);
     initial_chunks[1].size = Any_uint32_Except(initial_chunks[0].size);
@@ -1319,13 +1320,13 @@ void Test_CF_Chunks_FindSmallestSize_Given_chunks_HasTwoChunksReturnsCorrectInde
 void Test_CF_Chunks_FindSmallestSize_Given_chunks_HasManyChunksReturnsCorrectIndexOfSmallest(void)
 {
     /* Arrange */
-    uint8     dummy_count        = 25;
-    chunk_t   initial_chunks[25] = {{0}}; /* 25 for initial_chunks is arbitrary, small for speed */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks      = &dummy_chunks;
-    index_t   expected_result = Any_uint8_LessThan(25);
-    index_t   local_result;
-    uint8     i = 0;
+    uint8           dummy_count        = 25;
+    CF_Chunk_t      initial_chunks[25] = {{0}}; /* 25 for initial_chunks is arbitrary, small for speed */
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks      = &dummy_chunks;
+    CF_ChunkIdx_t   expected_result = Any_uint8_LessThan(25);
+    CF_ChunkIdx_t   local_result;
+    uint8           i = 0;
 
     for (i = 0; i < dummy_count; ++i)
     {
@@ -1371,17 +1372,17 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_non0_CallTo_CF_C
     void)
 {
     /* Arrange */
-    chunks_t *arg_chunks;
-    index_t   initial_i;
-    index_t   arg_i;
-    chunk_t   dummy_chunk = {0};
-    chunk_t  *arg_chunk   = &dummy_chunk;
+    CF_ChunkList_t *arg_chunks;
+    CF_ChunkIdx_t   initial_i;
+    CF_ChunkIdx_t   arg_i;
+    CF_Chunk_t      dummy_chunk = {0};
+    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
 
     /* Arrange for CF_Chunks_CombineNext to return 1 */
     /* Arrange for CF_Chunks_CombinePrevious to return 0 */
-    uint8    dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
-    chunk_t  dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
-    chunks_t dummy_chunks;
+    uint8          dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_Chunk_t     dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
+    CF_ChunkList_t dummy_chunks;
 
     arg_chunks                = &dummy_chunks;
     arg_chunks->CF_max_chunks = UINT32_MAX;
@@ -1411,16 +1412,16 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_non0_CallTo_CF_C
 void Test_CF_Chunks_Insert_CombinesNextSuccessButCombinePreviousSuccessCalls_CF_Chunks_EraseChunk(void)
 {
     /* Arrange */
-    chunks_t *arg_chunks;
-    index_t   arg_i;
-    chunk_t   dummy_chunk = {0};
-    chunk_t  *arg_chunk   = &dummy_chunk;
+    CF_ChunkList_t *arg_chunks;
+    CF_ChunkIdx_t   arg_i;
+    CF_Chunk_t      dummy_chunk = {0};
+    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
 
     /* Arrange for CF_Chunks_CombineNext to return 1 */
     /* Arrange for CF_Chunks_CombinePrevious to return 1 */
-    uint8    dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
-    chunk_t  dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
-    chunks_t dummy_chunks;
+    uint8          dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_Chunk_t     dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
+    CF_ChunkList_t dummy_chunks;
 
     arg_chunks                = &dummy_chunks;
     arg_chunks->CF_max_chunks = UINT32_MAX;
@@ -1449,15 +1450,15 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     void)
 {
     /* Arrange */
-    chunks_t *arg_chunks;
-    index_t   arg_i;
-    chunk_t   dummy_chunk = {0};
-    chunk_t  *arg_chunk   = &dummy_chunk;
+    CF_ChunkList_t *arg_chunks;
+    CF_ChunkIdx_t   arg_i;
+    CF_Chunk_t      dummy_chunk = {0};
+    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
 
     /* Arrange for CF_Chunks_CombineNext to return 0 and CF_Chunks_CombinePrevious to return 1 */
-    uint8    dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
-    chunk_t  dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
-    chunks_t dummy_chunks;
+    uint8          dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_Chunk_t     dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
+    CF_ChunkList_t dummy_chunks;
 
     arg_chunks                = &dummy_chunks;
     arg_chunks->CF_max_chunks = UINT32_MAX;
@@ -1488,15 +1489,15 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     void)
 {
     /* Arrange */
-    chunks_t *arg_chunks;
-    index_t   arg_i;
-    chunk_t   dummy_chunk = {0};
-    chunk_t  *arg_chunk   = &dummy_chunk;
+    CF_ChunkList_t *arg_chunks;
+    CF_ChunkIdx_t   arg_i;
+    CF_Chunk_t      dummy_chunk = {0};
+    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
 
     /* Arrange for CF_Chunks_CombineNext to return 0 and CF_Chunks_CombinePrevious to return 0 */
-    uint8    dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
-    chunk_t  dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
-    chunks_t dummy_chunks;
+    uint8          dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_Chunk_t     dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
+    CF_ChunkList_t dummy_chunks;
 
     arg_chunks                = &dummy_chunks;
     arg_chunks->CF_max_chunks = UINT32_MAX;
@@ -1528,15 +1529,15 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     void)
 {
     /* Arrange */
-    chunks_t *arg_chunks;
-    index_t   arg_i;
-    chunk_t   dummy_chunk = {0};
-    chunk_t  *arg_chunk   = &dummy_chunk;
+    CF_ChunkList_t *arg_chunks;
+    CF_ChunkIdx_t   arg_i;
+    CF_Chunk_t      dummy_chunk = {0};
+    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
 
     /* Arrange for CF_Chunks_CombineNext to return 0 and CF_Chunks_CombinePrevious to return 0 */
-    uint8    dummy_chunks_count      = 3;     /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
-    chunk_t  dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
-    chunks_t dummy_chunks;
+    uint8          dummy_chunks_count      = 3;     /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_Chunk_t     dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
+    CF_ChunkList_t dummy_chunks;
 
     arg_chunks                = &dummy_chunks;
     arg_chunks->CF_max_chunks = 3;
@@ -1571,15 +1572,15 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     void)
 {
     /* Arrange */
-    chunks_t *arg_chunks;
-    index_t   arg_i;
-    chunk_t   dummy_chunk = {0};
-    chunk_t  *arg_chunk   = &dummy_chunk;
+    CF_ChunkList_t *arg_chunks;
+    CF_ChunkIdx_t   arg_i;
+    CF_Chunk_t      dummy_chunk = {0};
+    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
 
     /* Arrange for CF_Chunks_CombineNext to return 0 and CF_Chunks_CombinePrevious to return 0 */
-    uint8    dummy_chunks_count      = 3;     /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
-    chunk_t  dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
-    chunks_t dummy_chunks;
+    uint8          dummy_chunks_count      = 3;     /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_Chunk_t     dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
+    CF_ChunkList_t dummy_chunks;
 
     arg_chunks                = &dummy_chunks;
     arg_chunks->CF_max_chunks = 3;
@@ -1616,19 +1617,19 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
 
 /*******************************************************************************
 **
-**  CF_Chunks_Add tests
+**  CF_ChunkListAdd tests
 **
 *******************************************************************************/
 void Test_CF_Chunks_Add_Asserts_WhenGiven_offset_Plus_size_IsLessThanGiven_offset(void)
 {
     // /* Arrange */
-    // chunk_offset_t     arg_offset = UINT32_MAX;
-    // chunk_size_t       arg_size = 1;
-    // chunk_t            initial_chunks[20] = { {0} }; /* 20 used as a reasonably fast size for the test, but is still
-    // illustrative */ chunks_t           dummy_chunks; chunks_t*          arg_chunks = &dummy_chunks;
+    // CF_ChunkOffset_t     arg_offset = UINT32_MAX;
+    // CF_ChunkSize_t       arg_size = 1;
+    // CF_Chunk_t            initial_chunks[20] = { {0} }; /* 20 used as a reasonably fast size for the test, but is
+    // still illustrative */ CF_ChunkList_t           dummy_chunks; CF_ChunkList_t*          arg_chunks = &dummy_chunks;
 
     // /* Arrange for CF_Chunks_FindInsertPosition */
-    // chunk_t       dummy_chunk = {0};
+    // CF_Chunk_t       dummy_chunk = {0};
     // uint8         num_chunks_before = Any_uint8_LessThan(10);
     // uint8         num_chunks_after = Any_uint8_LessThan(10);
     // uint8         i = 0;
@@ -1649,7 +1650,7 @@ void Test_CF_Chunks_Add_Asserts_WhenGiven_offset_Plus_size_IsLessThanGiven_offse
     // arg_chunks->chunks = initial_chunks;
 
     // /* Act */
-    // CF_Chunks_Add(arg_chunks, arg_offset, arg_size);
+    // CF_ChunkListAdd(arg_chunks, arg_offset, arg_size);
 
     /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert");
@@ -1659,13 +1660,13 @@ void Test_CF_Chunks_Add_Asserts_WhenInsertPositionIsNotEqualToGiven_chunks_count
     void)
 {
     // /* Arrange */
-    // chunk_offset_t     arg_offset = 1;
-    // chunk_size_t       arg_size = 1;
-    // chunk_t            initial_chunks[20] = { {0} }; /* 20 used as a reasonably fast size for the test, but is still
-    // illustrative */ chunks_t           dummy_chunks; chunks_t*          arg_chunks = &dummy_chunks;
+    // CF_ChunkOffset_t     arg_offset = 1;
+    // CF_ChunkSize_t       arg_size = 1;
+    // CF_Chunk_t            initial_chunks[20] = { {0} }; /* 20 used as a reasonably fast size for the test, but is
+    // still illustrative */ CF_ChunkList_t           dummy_chunks; CF_ChunkList_t*          arg_chunks = &dummy_chunks;
 
     // /* Arrange for CF_Chunks_FindInsertPosition */
-    // chunk_t       dummy_chunk = {0};
+    // CF_Chunk_t       dummy_chunk = {0};
     // uint8         num_chunks_before = Any_uint8_LessThan(10);
     // uint8         num_chunks_after = Any_uint8_LessThan(10);
     // uint8         i = 0;
@@ -1687,7 +1688,7 @@ void Test_CF_Chunks_Add_Asserts_WhenInsertPositionIsNotEqualToGiven_chunks_count
 
     // /* Act */
     // /* NOTE: unsure how to set this up to hit the assert. */
-    // CF_Chunks_Add(arg_chunks, arg_offset, arg_size);
+    // CF_ChunkListAdd(arg_chunks, arg_offset, arg_size);
 
     // /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert");
@@ -1698,17 +1699,18 @@ void Test_CF_Chunks_Add_Asserts_WhenInsertPositionIsNotEqualToGiven_chunks_count
 void Test_CF_Chunks_Add_WhenNotAtEndCall_CF_Chunks_Insert(void)
 {
     /* Arrange */
-    chunk_offset_t arg_offset   = 0;
-    chunk_size_t   arg_size     = 0;
-    chunk_t  initial_chunks[20] = {{0}}; /* 20 used as a reasonably fast size for the test, but is still illustrative */
-    chunks_t dummy_chunks;
-    chunks_t *arg_chunks = &dummy_chunks;
+    CF_ChunkOffset_t arg_offset         = 0;
+    CF_ChunkSize_t   arg_size           = 0;
+    CF_Chunk_t       initial_chunks[20] = {
+        {0}}; /* 20 used as a reasonably fast size for the test, but is still illustrative */
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
 
     /* Arrange for CF_Chunks_FindInsertPosition */
-    chunk_t dummy_chunk       = {0};
-    uint8   num_chunks_before = Any_uint8_LessThan(10);
-    uint8   num_chunks_after  = Any_uint8_LessThan(10);
-    uint8   i                 = 0;
+    CF_Chunk_t dummy_chunk       = {0};
+    uint8      num_chunks_before = Any_uint8_LessThan(10);
+    uint8      num_chunks_after  = Any_uint8_LessThan(10);
+    uint8      i                 = 0;
 
     dummy_chunk.offset = Any_uint32_BetweenInclusive(1, UINT32_MAX - 1);
 
@@ -1726,7 +1728,7 @@ void Test_CF_Chunks_Add_WhenNotAtEndCall_CF_Chunks_Insert(void)
     arg_chunks->chunks = initial_chunks;
 
     /* Act */
-    CF_Chunks_Add(arg_chunks, arg_offset, arg_size);
+    CF_ChunkListAdd(arg_chunks, arg_offset, arg_size);
 
     /* Assert */
     /* NOTE: find a way to verify results in this test */
@@ -1738,11 +1740,11 @@ void Test_CF_Chunks_Add_WhenNotAtEndCall_CF_Chunks_Insert(void)
 void Test_CF_Chunks_Add_WhenAtEndCall_CF_Chunks_Insert(void)
 {
     /* Arrange */
-    chunk_offset_t arg_offset        = 10;
-    chunk_size_t   arg_size          = 5;
-    chunk_t        initial_chunks[2] = {{0}};
-    chunks_t       dummy_chunks;
-    chunks_t      *arg_chunks = &dummy_chunks;
+    CF_ChunkOffset_t arg_offset        = 10;
+    CF_ChunkSize_t   arg_size          = 5;
+    CF_Chunk_t       initial_chunks[2] = {{0}};
+    CF_ChunkList_t   dummy_chunks;
+    CF_ChunkList_t  *arg_chunks = &dummy_chunks;
 
     /* Arrange for CF_Chunks_FindInsertPosition */
 
@@ -1752,7 +1754,7 @@ void Test_CF_Chunks_Add_WhenAtEndCall_CF_Chunks_Insert(void)
     arg_chunks->chunks     = initial_chunks;
 
     /* Act */
-    CF_Chunks_Add(arg_chunks, arg_offset, arg_size);
+    CF_ChunkListAdd(arg_chunks, arg_offset, arg_size);
 
     /* Assert */
     /* NOTE: find a way to verify results in this test */
@@ -1761,11 +1763,11 @@ void Test_CF_Chunks_Add_WhenAtEndCall_CF_Chunks_Insert(void)
         "Nothing is able to be asserted on here, success is measured by test not segfaulting and coverage check.");
 } /* end Test_CF_Chunks_Add_WhenAtEndCall_CF_Chunks_Insert */
 
-/* end CF_Chunks_Add tests */
+/* end CF_ChunkListAdd tests */
 
 /*******************************************************************************
 **
-**  CF_Chunks_RemoveFromFirst tests
+**  CF_ChunkList_RemoveFromFirst tests
 **
 *******************************************************************************/
 
@@ -1773,11 +1775,11 @@ void Test_CF_Chunks_RemoveFromFirst_When_chunks_HasOnlyOneChunkAndIts_size_IsEqT
     void)
 {
     /* Arrange */
-    chunks_t       dummy_chunks;
-    chunks_t      *arg_chunks                   = &dummy_chunks;
-    chunk_offset_t initial_chunks_chunks_offset = Any_uint32();
-    chunk_size_t   arg_size                     = Any_uint32_Except(0);
-    chunk_t        dummy_chunks_chunks;
+    CF_ChunkList_t   dummy_chunks;
+    CF_ChunkList_t  *arg_chunks                   = &dummy_chunks;
+    CF_ChunkOffset_t initial_chunks_chunks_offset = Any_uint32();
+    CF_ChunkSize_t   arg_size                     = Any_uint32_Except(0);
+    CF_Chunk_t       dummy_chunks_chunks;
 
     arg_chunks->count            = 1;
     arg_chunks->chunks           = &dummy_chunks_chunks;
@@ -1785,7 +1787,7 @@ void Test_CF_Chunks_RemoveFromFirst_When_chunks_HasOnlyOneChunkAndIts_size_IsEqT
     arg_chunks->chunks[0].size   = arg_size;
 
     /* Act */
-    CF_Chunks_RemoveFromFirst(arg_chunks, arg_size);
+    CF_ChunkList_RemoveFromFirst(arg_chunks, arg_size);
 
     /* Assert */
     /* Assert Unstubbable: CF_Chunks_EraseChunk */
@@ -1799,12 +1801,12 @@ void Test_CF_Chunks_RemoveFromFirst_When_chunks_HasOnlyOneChunkAndIts_size_IsSma
     void)
 {
     /* Arrange */
-    chunks_t       dummy_chunks;
-    chunks_t      *arg_chunks                   = &dummy_chunks;
-    chunk_offset_t initial_chunks_chunks_offset = Any_uint32();
-    chunk_size_t   arg_size                     = Any_uint32_Except(UINT32_MAX - 1) + 2; /* from 2 to UINT_32_MAX */
-    chunk_size_t   dummy_chunk_size             = Any_uint32_LessThan(arg_size);
-    chunk_t        dummy_chunks_chunks;
+    CF_ChunkList_t   dummy_chunks;
+    CF_ChunkList_t  *arg_chunks                   = &dummy_chunks;
+    CF_ChunkOffset_t initial_chunks_chunks_offset = Any_uint32();
+    CF_ChunkSize_t   arg_size                     = Any_uint32_Except(UINT32_MAX - 1) + 2; /* from 2 to UINT_32_MAX */
+    CF_ChunkSize_t   dummy_chunk_size             = Any_uint32_LessThan(arg_size);
+    CF_Chunk_t       dummy_chunks_chunks;
 
     arg_chunks->count            = 1;
     arg_chunks->chunks           = &dummy_chunks_chunks;
@@ -1812,7 +1814,7 @@ void Test_CF_Chunks_RemoveFromFirst_When_chunks_HasOnlyOneChunkAndIts_size_IsSma
     arg_chunks->chunks[0].size   = dummy_chunk_size;
 
     /* Act */
-    CF_Chunks_RemoveFromFirst(arg_chunks, arg_size);
+    CF_ChunkList_RemoveFromFirst(arg_chunks, arg_size);
 
     /* Assert */
     /* Assert Unstubbable: CF_Chunks_EraseChunk */
@@ -1827,12 +1829,12 @@ void Test_CF_Chunks_RemoveFromFirst_When_chunks_size_IsGreaterThanGiven_size_Add
     void)
 {
     /* Arrange */
-    chunks_t       dummy_chunks;
-    chunks_t      *arg_chunks                   = &dummy_chunks;
-    chunk_offset_t initial_chunks_chunks_offset = Any_uint32();
-    chunk_size_t   arg_size                     = Any_uint32_Except(0); /* from 2 to UINT_32_MAX */
-    chunk_size_t   dummy_chunk_size             = Any_uint32_GreaterThan(arg_size);
-    chunk_t        dummy_chunks_chunks;
+    CF_ChunkList_t   dummy_chunks;
+    CF_ChunkList_t  *arg_chunks                   = &dummy_chunks;
+    CF_ChunkOffset_t initial_chunks_chunks_offset = Any_uint32();
+    CF_ChunkSize_t   arg_size                     = Any_uint32_Except(0); /* from 2 to UINT_32_MAX */
+    CF_ChunkSize_t   dummy_chunk_size             = Any_uint32_GreaterThan(arg_size);
+    CF_Chunk_t       dummy_chunks_chunks;
 
     arg_chunks->count            = 1;
     arg_chunks->chunks           = &dummy_chunks_chunks;
@@ -1840,7 +1842,7 @@ void Test_CF_Chunks_RemoveFromFirst_When_chunks_size_IsGreaterThanGiven_size_Add
     arg_chunks->chunks[0].size   = dummy_chunk_size;
 
     /* Act */
-    CF_Chunks_RemoveFromFirst(arg_chunks, arg_size);
+    CF_ChunkList_RemoveFromFirst(arg_chunks, arg_size);
 
     /* Assert */
     UtAssert_UINT32_EQ(arg_chunks->count, 1);
@@ -1850,25 +1852,25 @@ void Test_CF_Chunks_RemoveFromFirst_When_chunks_size_IsGreaterThanGiven_size_Add
      Test_CF_Chunks_RemoveFromFirst_When_chunks_size_IsGreaterThanGiven_size_AddGiven_size_To_chunks_chunks_0_offset_AndSet_chunks_chunks_size_To_0
    */
 
-/* end CF_Chunks_RemoveFromFirst tests */
+/* end CF_ChunkList_RemoveFromFirst tests */
 
 /*******************************************************************************
 **
-**  CF_Chunks_GetFirstChunk tests
+**  CF_ChunkList_GetFirstChunk tests
 **
 *******************************************************************************/
 
 void Test_CF_Chunks_GetFirstChunk_WhenGiven_chunks_count_Is_0_Return_NULL(void)
 {
     /* Arrange */
-    chunks_t       dummy_chunks;
-    chunks_t      *arg_chunks = &dummy_chunks;
-    const chunk_t *local_result;
+    CF_ChunkList_t    dummy_chunks;
+    CF_ChunkList_t   *arg_chunks = &dummy_chunks;
+    const CF_Chunk_t *local_result;
 
     arg_chunks->count = 0;
 
     /* Act */
-    local_result = CF_Chunks_GetFirstChunk(arg_chunks);
+    local_result = CF_ChunkList_GetFirstChunk(arg_chunks);
 
     /* Assert */
     UtAssert_NULL(local_result);
@@ -1877,16 +1879,16 @@ void Test_CF_Chunks_GetFirstChunk_WhenGiven_chunks_count_Is_0_Return_NULL(void)
 void Test_CF_Chunks_GetFirstChunk_WhenGiven_chunks_count_Is_1_ReturnOnlyChunk(void)
 {
     /* Arrange */
-    chunks_t       dummy_chunks = {0};
-    chunks_t      *arg_chunks   = &dummy_chunks;
-    chunk_t        only_chunk;
-    const chunk_t *local_result;
+    CF_ChunkList_t    dummy_chunks = {0};
+    CF_ChunkList_t   *arg_chunks   = &dummy_chunks;
+    CF_Chunk_t        only_chunk;
+    const CF_Chunk_t *local_result;
 
     arg_chunks->count  = 1;
     arg_chunks->chunks = &only_chunk;
 
     /* Act */
-    local_result = CF_Chunks_GetFirstChunk(arg_chunks);
+    local_result = CF_ChunkList_GetFirstChunk(arg_chunks);
 
     /* Assert */
     UtAssert_ADDRESS_EQ(local_result, &arg_chunks->chunks[0]);
@@ -1896,40 +1898,40 @@ void Test_CF_Chunks_GetFirstChunk_WhenGiven_chunks_count_Is_1_ReturnOnlyChunk(vo
 void Test_CF_Chunks_GetFirstChunk_WhenGiven_chunks_count_Is_Any_index_t_ReturnFirstChunk(void)
 {
     /* Arrange */
-    chunks_t       dummy_chunks = {0};
-    chunks_t      *arg_chunks   = &dummy_chunks;
-    chunk_t        first_chunk;
-    const chunk_t *local_result;
+    CF_ChunkList_t    dummy_chunks = {0};
+    CF_ChunkList_t   *arg_chunks   = &dummy_chunks;
+    CF_Chunk_t        first_chunk;
+    const CF_Chunk_t *local_result;
 
     arg_chunks->count  = Any_index_t();
     arg_chunks->chunks = &first_chunk;
 
     /* Act */
-    local_result = CF_Chunks_GetFirstChunk(arg_chunks);
+    local_result = CF_ChunkList_GetFirstChunk(arg_chunks);
 
     /* Assert */
     UtAssert_ADDRESS_EQ(local_result, &arg_chunks->chunks[0]);
     UtAssert_ADDRESS_EQ(local_result, &first_chunk);
 } /* end Test_CF_Chunks_GetFirstChunk_WhenGiven_chunks_count_Is_Any_index_t_ReturnFirstChunk */
 
-/* CF_Chunks_GetFirstChunk tests */
+/* CF_ChunkList_GetFirstChunk tests */
 
 /*******************************************************************************
 **
-**  CF_Chunks_Init tests
+**  CF_ChunkListInit tests
 **
 *******************************************************************************/
 
 void Test_CF_Chunks_Init_AssertsBecauseGiven_CF_max_chunks_Is_0(void)
 {
     // /* Arrange */
-    // chunks_t        dummy_chunks;
-    // chunks_t*       arg_chunks = &dummy_chunks;
-    // index_t         arg_CF_max_chunks = Any_uint16() + 2; /* 2-65537, uint16 is used instead of index_t to have a
-    // reasonably decent size for the test without being too large (segfault) */ chunk_t*        arg_chunks_mem;
+    // CF_ChunkList_t        dummy_chunks;
+    // CF_ChunkList_t*       arg_chunks = &dummy_chunks;
+    // CF_ChunkIdx_t         arg_CF_max_chunks = Any_uint16() + 2; /* 2-65537, uint16 is used instead of CF_ChunkIdx_t
+    // to have a reasonably decent size for the test without being too large (segfault) */ CF_Chunk_t* arg_chunks_mem;
 
     // /* Act */
-    // CF_Chunks_Init(arg_chunks, arg_CF_max_chunks, arg_chunks_mem);
+    // CF_ChunkListInit(arg_chunks, arg_CF_max_chunks, arg_chunks_mem);
 
     // /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert");
@@ -1938,64 +1940,66 @@ void Test_CF_Chunks_Init_AssertsBecauseGiven_CF_max_chunks_Is_0(void)
 void Test_CF_Chunks_Init_SetGiven_chunks_CF_max_chunks_ToGiven_CF_max_chunks(void)
 {
     /* Arrange */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks        = &dummy_chunks;
-    index_t   arg_CF_max_chunks = Any_uint16() + 2; /* 2-65537, uint8 is used instead of index_t to have a reasonably
-                                                       decent size for the test without being too large (segfault) */
-    chunk_t arg_chunks_mem[arg_CF_max_chunks];
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   arg_CF_max_chunks =
+        Any_uint16() + 2; /* 2-65537, uint8 is used instead of CF_ChunkIdx_t to have a reasonably
+                       decent size for the test without being too large (segfault) */
+    CF_Chunk_t arg_chunks_mem[arg_CF_max_chunks];
 
     arg_chunks->count = 0;
 
     /* Act */
-    CF_Chunks_Init(arg_chunks, arg_CF_max_chunks, arg_chunks_mem);
+    CF_ChunkListInit(arg_chunks, arg_CF_max_chunks, arg_chunks_mem);
 
     /* Assert */
     UtAssert_UINT32_EQ(arg_chunks->CF_max_chunks, arg_CF_max_chunks);
     UtAssert_ADDRESS_EQ(arg_chunks->chunks, arg_chunks_mem);
-    /* Assert Unstubbable - CF_ChunksReset */
+    /* Assert Unstubbable - CF_ChunkListReset */
     UtAssert_ZERO(arg_chunks->count);
     UtAssert_MemCmpValue(arg_chunks->chunks, 0x00, sizeof(*arg_chunks->chunks) * arg_CF_max_chunks,
                          "The chunks, %lu bytes (sizeof(*chunks->chunks)*chunks->CF_max_chunks), were all set to 0",
-                         sizeof(chunk_t) * arg_CF_max_chunks);
+                         sizeof(CF_Chunk_t) * arg_CF_max_chunks);
 } /* end Test_CF_Chunks_Init_SetGiven_chunks_CF_max_chunks_ToGiven_CF_max_chunks */
 
-/* CF_Chunks_Init tests */
+/* CF_ChunkListInit tests */
 
 /*******************************************************************************
 **
-**  CF_ChunksReset tests
+**  CF_ChunkListReset tests
 **
 *******************************************************************************/
 
 void Test_CF_ChunksReset_Set_count_To_0_Keeps_CF_max_chunks_AndMemsets_chunks_ToAll_0(void)
 {
     /* Arrange */
-    chunks_t  dummy_chunks;
-    chunks_t *arg_chunks          = &dummy_chunks;
-    index_t initial_CF_max_chunks = Any_uint16() + 2; /* 2-65537, uint8 is used instead of index_t to have a reasonably
-                                                         decent size for the test without being too large (segfault) */
-    chunk_t dummy_chunks_chunks[initial_CF_max_chunks];
+    CF_ChunkList_t  dummy_chunks;
+    CF_ChunkList_t *arg_chunks = &dummy_chunks;
+    CF_ChunkIdx_t   initial_CF_max_chunks =
+        Any_uint16() + 2; /* 2-65537, uint8 is used instead of CF_ChunkIdx_t to have a reasonably
+                       decent size for the test without being too large (segfault) */
+    CF_Chunk_t dummy_chunks_chunks[initial_CF_max_chunks];
 
     arg_chunks->count         = Any_index_t();
     arg_chunks->CF_max_chunks = initial_CF_max_chunks;
     arg_chunks->chunks        = dummy_chunks_chunks;
 
     /* Act */
-    CF_ChunksReset(arg_chunks);
+    CF_ChunkListReset(arg_chunks);
 
     /* Assert */
     UtAssert_ZERO(arg_chunks->count);
     UtAssert_UINT32_EQ(arg_chunks->CF_max_chunks, initial_CF_max_chunks);
-    UtAssert_MemCmpValue(arg_chunks->chunks, 0x00, sizeof(chunk_t) * initial_CF_max_chunks,
-                         "The chunks, %lu bytes (sizeof(chunk_t)*chunks->CF_max_chunks), were all set to 0",
-                         sizeof(chunk_t) * initial_CF_max_chunks);
+    UtAssert_MemCmpValue(arg_chunks->chunks, 0x00, sizeof(CF_Chunk_t) * initial_CF_max_chunks,
+                         "The chunks, %lu bytes (sizeof(CF_Chunk_t)*chunks->CF_max_chunks), were all set to 0",
+                         sizeof(CF_Chunk_t) * initial_CF_max_chunks);
 } /* end Test_CF_ChunksReset_Set_count_To_0_Keeps_CF_max_chunks_AndMemsets_chunks_ToAll_0 */
 
-/* CF_ChunksReset tests */
+/* CF_ChunkListReset tests */
 
 /*******************************************************************************
 **
-**  CF_Chunks_ComputeGaps tests (large) - Full coverage - NOTE: This is not a great example of good unit testing.  In
+**  CF_ChunkList_ComputeGaps tests (large) - Full coverage - NOTE: This is not a great example of good unit testing.  In
 *the quest for speed and full coverage, liberties with values were taken to find ones that achieved the desired coverage
 *in the CUT.  Values should be more robust and be more indicative of the kind of values that will actually be
 *encountered during operation.  Not enough time could be spent on deciphering intent and the creator of that intent is
@@ -2006,16 +2010,16 @@ void Test_CF_ChunksReset_Set_count_To_0_Keeps_CF_max_chunks_AndMemsets_chunks_To
 void Test_CF_Chunks_ComputeGaps_AssertsBecauseGiven_total_Is_0(void)
 {
     // /* Arrange */
-    // chunks_t          dummy_chunks;
-    // chunks_t*         arg_chunks = &dummy_chunks;
-    // index_t           arg_max_gaps = Any_uint32();
-    // chunk_size_t      arg_total = 0;
-    // chunk_offset_t    arg_start = Any_uint32();
-    // compute_gap_fn_t  arg_compute_gap_fn = Dummy_compute_gap_fn_t;
+    // CF_ChunkList_t          dummy_chunks;
+    // CF_ChunkList_t*         arg_chunks = &dummy_chunks;
+    // CF_ChunkIdx_t           arg_max_gaps = Any_uint32();
+    // CF_ChunkSize_t      arg_total = 0;
+    // CF_ChunkOffset_t    arg_start = Any_uint32();
+    // CF_ChunkList_ComputeGapFn_t  arg_compute_gap_fn = Dummy_compute_gap_fn_t;
     // void*             arg_opaque = NULL;
 
     // /* Act */
-    // CF_Chunks_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
+    // CF_ChunkList_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
 
     // /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert");
@@ -2024,16 +2028,16 @@ void Test_CF_Chunks_ComputeGaps_AssertsBecauseGiven_total_Is_0(void)
 void Test_CF_Chunks_ComputeGaps_AssertsBecauseGiven_start_IsGreaterThanGiven_total(void)
 {
     // /* Arrange */
-    // chunks_t          dummy_chunks;
-    // chunks_t*         arg_chunks = &dummy_chunks;
-    // index_t           arg_max_gaps = Any_uint32();
-    // chunk_size_t      arg_total = Any_uint32_Except(UINT32_MAX - 1) + 1; /* from 1 to (UINT32_MAX - 1) */
-    // chunk_offset_t    arg_start = Any_uint32_GreaterThan(arg_total);
-    // compute_gap_fn_t  arg_compute_gap_fn = Dummy_compute_gap_fn_t;
+    // CF_ChunkList_t          dummy_chunks;
+    // CF_ChunkList_t*         arg_chunks = &dummy_chunks;
+    // CF_ChunkIdx_t           arg_max_gaps = Any_uint32();
+    // CF_ChunkSize_t      arg_total = Any_uint32_Except(UINT32_MAX - 1) + 1; /* from 1 to (UINT32_MAX - 1) */
+    // CF_ChunkOffset_t    arg_start = Any_uint32_GreaterThan(arg_total);
+    // CF_ChunkList_ComputeGapFn_t  arg_compute_gap_fn = Dummy_compute_gap_fn_t;
     // void*             arg_opaque = NULL;
 
     // /* Act */
-    // CF_Chunks_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
+    // CF_ChunkList_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
 
     // /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert");
@@ -2042,16 +2046,16 @@ void Test_CF_Chunks_ComputeGaps_AssertsBecauseGiven_start_IsGreaterThanGiven_tot
 void Test_CF_Chunks_ComputeGaps_AssertsBecauseGiven_start_IsEqToGiven_total(void)
 {
     // /* Arrange */
-    // chunks_t          dummy_chunks;
-    // chunks_t*         arg_chunks = &dummy_chunks;
-    // index_t           arg_max_gaps = Any_uint32();
-    // chunk_size_t      arg_total = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
-    // chunk_offset_t    arg_start = arg_total;
-    // compute_gap_fn_t  arg_compute_gap_fn = Dummy_compute_gap_fn_t;
+    // CF_ChunkList_t          dummy_chunks;
+    // CF_ChunkList_t*         arg_chunks = &dummy_chunks;
+    // CF_ChunkIdx_t           arg_max_gaps = Any_uint32();
+    // CF_ChunkSize_t      arg_total = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
+    // CF_ChunkOffset_t    arg_start = arg_total;
+    // CF_ChunkList_ComputeGapFn_t  arg_compute_gap_fn = Dummy_compute_gap_fn_t;
     // void*             arg_opaque = NULL;
 
     // /* Act */
-    // CF_Chunks_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
+    // CF_ChunkList_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
 
     // /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert");
@@ -2061,18 +2065,18 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_0_And_compute_gap_fn_Is_NU
     void)
 {
     /* Arrange */
-    chunks_t         dummy_chunks;
-    chunks_t        *arg_chunks         = &dummy_chunks;
-    index_t          arg_max_gaps       = Any_uint32();
-    chunk_size_t     arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
-    chunk_offset_t   arg_start          = arg_total - 1;
-    compute_gap_fn_t arg_compute_gap_fn = NULL;
-    void            *arg_opaque         = NULL;
+    CF_ChunkList_t              dummy_chunks;
+    CF_ChunkList_t             *arg_chunks         = &dummy_chunks;
+    CF_ChunkIdx_t               arg_max_gaps       = Any_uint32();
+    CF_ChunkSize_t              arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
+    CF_ChunkOffset_t            arg_start          = arg_total - 1;
+    CF_ChunkList_ComputeGapFn_t arg_compute_gap_fn = NULL;
+    void                       *arg_opaque         = NULL;
 
     arg_chunks->count = 0;
 
     /* Act */
-    result = CF_Chunks_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
+    result = CF_ChunkList_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
 
     /* Assert */
     UtAssert_STUB_COUNT(Dummy_compute_gap_fn_t, 0);
@@ -2084,18 +2088,18 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_0_And_compute_gap_fn_Is_NU
 void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_0_And_compute_gap_fn_Is_NULL_Return_1(void)
 {
     /* Arrange */
-    chunks_t         dummy_chunks;
-    chunks_t        *arg_chunks         = &dummy_chunks;
-    index_t          arg_max_gaps       = Any_uint32();
-    chunk_size_t     arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
-    chunk_offset_t   arg_start          = Any_uint32_LessThan(arg_total);
-    compute_gap_fn_t arg_compute_gap_fn = NULL;
-    void            *arg_opaque         = NULL;
+    CF_ChunkList_t              dummy_chunks;
+    CF_ChunkList_t             *arg_chunks         = &dummy_chunks;
+    CF_ChunkIdx_t               arg_max_gaps       = Any_uint32();
+    CF_ChunkSize_t              arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
+    CF_ChunkOffset_t            arg_start          = Any_uint32_LessThan(arg_total);
+    CF_ChunkList_ComputeGapFn_t arg_compute_gap_fn = NULL;
+    void                       *arg_opaque         = NULL;
 
     arg_chunks->count = 0;
 
     /* Act */
-    result = CF_Chunks_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
+    result = CF_ChunkList_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
 
     /* Assert */
     UtAssert_STUB_COUNT(Dummy_compute_gap_fn_t, 0);
@@ -2106,12 +2110,12 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_0_And_compute_gap_fn_IsNot
     void)
 {
     /* Arrange */
-    chunks_t                         dummy_chunks;
-    chunks_t                        *arg_chunks         = &dummy_chunks;
-    index_t                          arg_max_gaps       = Any_uint32();
-    chunk_size_t                     arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
-    chunk_offset_t                   arg_start          = Any_uint32_LessThan(arg_total);
-    compute_gap_fn_t                 arg_compute_gap_fn = Dummy_compute_gap_fn_t;
+    CF_ChunkList_t                   dummy_chunks;
+    CF_ChunkList_t                  *arg_chunks         = &dummy_chunks;
+    CF_ChunkIdx_t                    arg_max_gaps       = Any_uint32();
+    CF_ChunkSize_t                   arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
+    CF_ChunkOffset_t                 arg_start          = Any_uint32_LessThan(arg_total);
+    CF_ChunkList_ComputeGapFn_t      arg_compute_gap_fn = Dummy_compute_gap_fn_t;
     void                            *arg_opaque         = NULL;
     Dummy_compute_gap_fn_t_context_t context_Dummy_compute_gap_fn_t;
 
@@ -2120,7 +2124,7 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_0_And_compute_gap_fn_IsNot
     UT_SetHookFunction(UT_KEY(Dummy_compute_gap_fn_t), stub_reporter_hook, &context_Dummy_compute_gap_fn_t);
 
     /* Act */
-    result = CF_Chunks_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
+    result = CF_ChunkList_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
 
     /* Assert */
     UtAssert_STUB_COUNT(Dummy_compute_gap_fn_t, 1);
@@ -2141,13 +2145,13 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_0_And_compute_gap_fn_IsNot
 void Test_CF_Chunks_ComputeGaps_Given_max_gaps_Is_0_Return_0(void)
 {
     /* Arrange */
-    chunk_t                          dummy_chunks_chunks[1] = {{0}};
-    chunks_t                         dummy_chunks;
-    chunks_t                        *arg_chunks         = &dummy_chunks;
-    index_t                          arg_max_gaps       = 0;
-    chunk_size_t                     arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
-    chunk_offset_t                   arg_start          = Any_uint32_LessThan(arg_total);
-    compute_gap_fn_t                 arg_compute_gap_fn = Dummy_compute_gap_fn_t;
+    CF_Chunk_t                       dummy_chunks_chunks[1] = {{0}};
+    CF_ChunkList_t                   dummy_chunks;
+    CF_ChunkList_t                  *arg_chunks         = &dummy_chunks;
+    CF_ChunkIdx_t                    arg_max_gaps       = 0;
+    CF_ChunkSize_t                   arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
+    CF_ChunkOffset_t                 arg_start          = Any_uint32_LessThan(arg_total);
+    CF_ChunkList_ComputeGapFn_t      arg_compute_gap_fn = Dummy_compute_gap_fn_t;
     void                            *arg_opaque         = NULL;
     Dummy_compute_gap_fn_t_context_t context_Dummy_compute_gap_fn_t;
 
@@ -2160,7 +2164,7 @@ void Test_CF_Chunks_ComputeGaps_Given_max_gaps_Is_0_Return_0(void)
     UT_SetHookFunction(UT_KEY(Dummy_compute_gap_fn_t), stub_reporter_hook, &context_Dummy_compute_gap_fn_t);
 
     /* Act */
-    result = CF_Chunks_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
+    result = CF_ChunkList_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
 
     /* Assert */
     UtAssert_STUB_COUNT(Dummy_compute_gap_fn_t, 0);
@@ -2170,13 +2174,13 @@ void Test_CF_Chunks_ComputeGaps_Given_max_gaps_Is_0_Return_0(void)
 void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_gap_start_IsEqTo_total_BreakAndReturn_0(void)
 {
     /* Arrange */
-    chunk_t                          dummy_chunks_chunks[1] = {{0}};
-    chunks_t                         dummy_chunks;
-    chunks_t                        *arg_chunks         = &dummy_chunks;
-    index_t                          arg_max_gaps       = Any_uint32();
-    chunk_size_t                     arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
-    chunk_offset_t                   arg_start          = Any_uint32_LessThan(arg_total);
-    compute_gap_fn_t                 arg_compute_gap_fn = Dummy_compute_gap_fn_t;
+    CF_Chunk_t                       dummy_chunks_chunks[1] = {{0}};
+    CF_ChunkList_t                   dummy_chunks;
+    CF_ChunkList_t                  *arg_chunks         = &dummy_chunks;
+    CF_ChunkIdx_t                    arg_max_gaps       = Any_uint32();
+    CF_ChunkSize_t                   arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
+    CF_ChunkOffset_t                 arg_start          = Any_uint32_LessThan(arg_total);
+    CF_ChunkList_ComputeGapFn_t      arg_compute_gap_fn = Dummy_compute_gap_fn_t;
     void                            *arg_opaque         = NULL;
     Dummy_compute_gap_fn_t_context_t context_Dummy_compute_gap_fn_t;
 
@@ -2189,7 +2193,7 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_gap_start_IsEqTo_tot
     UT_SetHookFunction(UT_KEY(Dummy_compute_gap_fn_t), stub_reporter_hook, &context_Dummy_compute_gap_fn_t);
 
     /* Act */
-    result = CF_Chunks_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
+    result = CF_ChunkList_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
 
     /* Assert */
     UtAssert_STUB_COUNT(Dummy_compute_gap_fn_t, 0);
@@ -2199,15 +2203,15 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_gap_start_IsEqTo_tot
 void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_gap_start_IsGreaterThan_total_BreakAndReturn_0(void)
 {
     /* Arrange */
-    chunk_t                          dummy_chunks_chunks[1] = {{0}};
-    chunks_t                         dummy_chunks;
-    chunks_t                        *arg_chunks         = &dummy_chunks;
-    index_t                          arg_max_gaps       = Any_uint32();
-    chunk_size_t                     arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
-    chunk_offset_t                   arg_start          = Any_uint32_LessThan(arg_total);
-    compute_gap_fn_t                 arg_compute_gap_fn = Dummy_compute_gap_fn_t;
+    CF_Chunk_t                       dummy_chunks_chunks[1] = {{0}};
+    CF_ChunkList_t                   dummy_chunks;
+    CF_ChunkList_t                  *arg_chunks         = &dummy_chunks;
+    CF_ChunkIdx_t                    arg_max_gaps       = Any_uint32();
+    CF_ChunkSize_t                   arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
+    CF_ChunkOffset_t                 arg_start          = Any_uint32_LessThan(arg_total);
+    CF_ChunkList_ComputeGapFn_t      arg_compute_gap_fn = Dummy_compute_gap_fn_t;
     void                            *arg_opaque         = NULL;
-    chunk_offset_t                   dummy_gap_start    = Any_uint32_GreaterThan(arg_total);
+    CF_ChunkOffset_t                 dummy_gap_start    = Any_uint32_GreaterThan(arg_total);
     Dummy_compute_gap_fn_t_context_t context_Dummy_compute_gap_fn_t;
 
     arg_chunks->count             = 1;
@@ -2218,7 +2222,7 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_gap_start_IsGreaterT
     UT_SetHookFunction(UT_KEY(Dummy_compute_gap_fn_t), stub_reporter_hook, &context_Dummy_compute_gap_fn_t);
 
     /* Act */
-    result = CF_Chunks_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
+    result = CF_ChunkList_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
 
     /* Assert */
     UtAssert_STUB_COUNT(Dummy_compute_gap_fn_t, 0);
@@ -2229,14 +2233,14 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_gap_start_IsLessThan
     void)
 {
     /* Arrange */
-    chunk_t          dummy_chunks_chunks[1] = {{0}};
-    chunks_t         dummy_chunks;
-    chunks_t        *arg_chunks   = &dummy_chunks;
-    index_t          arg_max_gaps = UINT32_MAX; /* UINT32_MAX used to show this will not come into play for this test */
-    chunk_size_t     arg_total;
-    chunk_offset_t   arg_start          = 0;
-    compute_gap_fn_t arg_compute_gap_fn = Dummy_compute_gap_fn_t;
-    void            *arg_opaque         = NULL;
+    CF_Chunk_t       dummy_chunks_chunks[1] = {{0}};
+    CF_ChunkList_t   dummy_chunks;
+    CF_ChunkList_t  *arg_chunks   = &dummy_chunks;
+    CF_ChunkIdx_t    arg_max_gaps = UINT32_MAX; /* UINT32_MAX used to show this will not come into play for this test */
+    CF_ChunkSize_t   arg_total;
+    CF_ChunkOffset_t arg_start                          = 0;
+    CF_ChunkList_ComputeGapFn_t      arg_compute_gap_fn = Dummy_compute_gap_fn_t;
+    void                            *arg_opaque         = NULL;
     Dummy_compute_gap_fn_t_context_t context_Dummy_compute_gap_fn_t;
 
     arg_chunks->count = 1;
@@ -2252,7 +2256,7 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_gap_start_IsLessThan
     UT_SetHookFunction(UT_KEY(Dummy_compute_gap_fn_t), stub_reporter_hook, &context_Dummy_compute_gap_fn_t);
 
     /* Act */
-    result = CF_Chunks_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
+    result = CF_ChunkList_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
 
     /* Assert */
     UtAssert_STUB_COUNT(Dummy_compute_gap_fn_t, 1);
@@ -2265,14 +2269,14 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_c_offset_Plus_c_size
     void)
 {
     /* Arrange */
-    chunk_t          dummy_chunks_chunks[1] = {{0}};
-    chunks_t         dummy_chunks;
-    chunks_t        *arg_chunks   = &dummy_chunks;
-    index_t          arg_max_gaps = UINT32_MAX; /* UINT32_MAX used to show this will not come into play for this test */
-    chunk_size_t     arg_total;
-    chunk_offset_t   arg_start;
-    compute_gap_fn_t arg_compute_gap_fn = Dummy_compute_gap_fn_t;
-    void            *arg_opaque         = NULL;
+    CF_Chunk_t       dummy_chunks_chunks[1] = {{0}};
+    CF_ChunkList_t   dummy_chunks;
+    CF_ChunkList_t  *arg_chunks   = &dummy_chunks;
+    CF_ChunkIdx_t    arg_max_gaps = UINT32_MAX; /* UINT32_MAX used to show this will not come into play for this test */
+    CF_ChunkSize_t   arg_total;
+    CF_ChunkOffset_t arg_start;
+    CF_ChunkList_ComputeGapFn_t      arg_compute_gap_fn = Dummy_compute_gap_fn_t;
+    void                            *arg_opaque         = NULL;
     Dummy_compute_gap_fn_t_context_t context_Dummy_compute_gap_fn_t;
 
     arg_chunks->count = 1;
@@ -2290,7 +2294,7 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_c_offset_Plus_c_size
     UT_SetHookFunction(UT_KEY(Dummy_compute_gap_fn_t), stub_reporter_hook, &context_Dummy_compute_gap_fn_t);
 
     /* Act */
-    result = CF_Chunks_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
+    result = CF_ChunkList_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
 
     /* Assert */
     UtAssert_STUB_COUNT(Dummy_compute_gap_fn_t, 1);
@@ -2303,14 +2307,14 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_c_offset_Plus_c_size
     void)
 {
     /* Arrange */
-    chunk_t          dummy_chunks_chunks[2] = {{0}};
-    chunks_t         dummy_chunks;
-    chunks_t        *arg_chunks   = &dummy_chunks;
-    index_t          arg_max_gaps = UINT32_MAX; /* UINT32_MAX used to show this will not come into play for this test */
-    chunk_size_t     arg_total;
-    chunk_offset_t   arg_start;
-    compute_gap_fn_t arg_compute_gap_fn = NULL;
-    void            *arg_opaque         = NULL;
+    CF_Chunk_t       dummy_chunks_chunks[2] = {{0}};
+    CF_ChunkList_t   dummy_chunks;
+    CF_ChunkList_t  *arg_chunks   = &dummy_chunks;
+    CF_ChunkIdx_t    arg_max_gaps = UINT32_MAX; /* UINT32_MAX used to show this will not come into play for this test */
+    CF_ChunkSize_t   arg_total;
+    CF_ChunkOffset_t arg_start;
+    CF_ChunkList_ComputeGapFn_t      arg_compute_gap_fn = NULL;
+    void                            *arg_opaque         = NULL;
     Dummy_compute_gap_fn_t_context_t context_Dummy_compute_gap_fn_t;
 
     arg_chunks->count = 2;
@@ -2329,7 +2333,7 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_c_offset_Plus_c_size
     UT_SetHookFunction(UT_KEY(Dummy_compute_gap_fn_t), stub_reporter_hook, &context_Dummy_compute_gap_fn_t);
 
     /* Act */
-    result = CF_Chunks_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
+    result = CF_ChunkList_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
 
     /* Assert */
     UtAssert_UINT32_EQ(result, 1);
@@ -2342,14 +2346,14 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_c_offset_Plus_c_size
     void)
 {
     /* Arrange */
-    chunk_t          dummy_chunks_chunks[3] = {{0}};
-    chunks_t         dummy_chunks;
-    chunks_t        *arg_chunks   = &dummy_chunks;
-    index_t          arg_max_gaps = UINT32_MAX; /* UINT32_MAX used to show this will not come into play for this test */
-    chunk_size_t     arg_total;
-    chunk_offset_t   arg_start;
-    compute_gap_fn_t arg_compute_gap_fn = NULL;
-    void            *arg_opaque         = NULL;
+    CF_Chunk_t       dummy_chunks_chunks[3] = {{0}};
+    CF_ChunkList_t   dummy_chunks;
+    CF_ChunkList_t  *arg_chunks   = &dummy_chunks;
+    CF_ChunkIdx_t    arg_max_gaps = UINT32_MAX; /* UINT32_MAX used to show this will not come into play for this test */
+    CF_ChunkSize_t   arg_total;
+    CF_ChunkOffset_t arg_start;
+    CF_ChunkList_ComputeGapFn_t      arg_compute_gap_fn = NULL;
+    void                            *arg_opaque         = NULL;
     Dummy_compute_gap_fn_t_context_t context_Dummy_compute_gap_fn_t;
 
     arg_chunks->count = 3;
@@ -2372,7 +2376,7 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_c_offset_Plus_c_size
     UT_SetHookFunction(UT_KEY(Dummy_compute_gap_fn_t), stub_reporter_hook, &context_Dummy_compute_gap_fn_t);
 
     /* Act */
-    result = CF_Chunks_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
+    result = CF_ChunkList_ComputeGaps(arg_chunks, arg_max_gaps, arg_total, arg_start, arg_compute_gap_fn, arg_opaque);
 
     /* Assert */
     UtAssert_UINT32_EQ(result, 2);
@@ -2381,7 +2385,7 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_c_offset_Plus_c_size
      Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_c_offset_Plus_c_size_IsLessThanStart_And_started_Is_0_ButNextLoop_started_Is_1_And_compute_gap_fn_Is_NULL_Return_1
    */
 
-/* end CF_Chunks_ComputeGaps tests */
+/* end CF_ChunkList_ComputeGaps tests */
 
 /*******************************************************************************
 **
