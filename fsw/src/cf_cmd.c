@@ -434,13 +434,13 @@ static int CF_TsnChanAction(cf_cmd_transaction_t *cmd, const char *cmdstr, CF_Ts
 static void CF_DoSuspRes_(transaction_t *t, susp_res_arg_t *context)
 {
     CF_Assert(t);
-    if (t->flags.all.suspended == context->action)
+    if (t->flags.com.suspended == context->action)
     {
         context->same = 1;
     }
     else
     {
-        t->flags.all.suspended = context->action;
+        t->flags.com.suspended = context->action;
     }
 }
 

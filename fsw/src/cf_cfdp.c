@@ -86,7 +86,7 @@ typedef struct
 void CF_CFDP_ArmAckTimer(transaction_t *t)
 {
     CF_Timer_InitRelSec(&t->ack_timer, CF_AppData.config_table->ack_timer_s);
-    t->flags.all.ack_timer_armed = 1;
+    t->flags.com.ack_timer_armed = 1;
 }
 
 /************************************************************************/
@@ -102,7 +102,7 @@ void CF_CFDP_ArmAckTimer(transaction_t *t)
 *************************************************************************/
 static inline cfdp_class_t CF_CFDP_GetClass(const transaction_t *ti)
 {
-    CF_Assert(ti->flags.all.q_index != CF_Q_FREE);
+    CF_Assert(ti->flags.com.q_index != CF_Q_FREE);
     return !!((ti->state == CFDP_S2) || (ti->state == CFDP_R2));
 }
 
@@ -119,7 +119,7 @@ static inline cfdp_class_t CF_CFDP_GetClass(const transaction_t *ti)
 *************************************************************************/
 static inline int CF_CFDP_IsSender(transaction_t *ti)
 {
-    CF_Assert(ti->flags.all.q_index != CF_Q_FREE);
+    CF_Assert(ti->flags.com.q_index != CF_Q_FREE);
     /* the state could actually be CFDP_IDLE, which is still not a sender. This would
      * be an unused transaction in the RX (CF_CFDP_ReceiveMessage) path. */
     return !!((ti->state == CFDP_S1) || (ti->state == CFDP_S2));
@@ -278,7 +278,7 @@ static void CF_CFDP_FreeTransaction(transaction_t *t)
 {
     uint8 c = t->chan_num;
     memset(t, 0, sizeof(*t));
-    t->flags.all.q_index = CF_Q_FREE;
+    t->flags.com.q_index = CF_Q_FREE;
     t->fd                = OS_OBJECT_ID_UNDEFINED;
     t->chan_num          = c;
     t->state             = CFDP_IDLE; /* NOTE: this is redundant as long as CFDP_IDLE == 0 */
@@ -391,7 +391,7 @@ pdu_header_t *CF_CFDP_MsgOutGet(const transaction_t *t, int silent)
             goto error_out;
         }
 
-        if (!CF_AppData.hk.channel_hk[t->chan_num].frozen && !t->flags.all.suspended)
+        if (!CF_AppData.hk.channel_hk[t->chan_num].frozen && !t->flags.com.suspended)
         {
             /* first, check if there's room in the pipe for the message we want to build */
             if (!CF_AppData.engine.out.msg && ((CF_AppData.config_table->chan[t->chan_num].sem_name[0] &&
@@ -1444,7 +1444,7 @@ static void CF_CFDP_ReceiveMessage(channel_t *c)
                         t->state_data.r.r2.dc = FIN_INCOMPLETE;
                         t->state_data.r.r2.fs = FIN_DISCARDED;
 
-                        CF_CList_InsertBack_Ex(c, (t->flags.all.q_index = CF_Q_RX), &t->cl_node);
+                        CF_CList_InsertBack_Ex(c, (t->flags.com.q_index = CF_Q_RX), &t->cl_node);
                         CF_CFDP_DispatchRecv(t); /* will enter idle state */
                     }
                 }
@@ -1484,18 +1484,18 @@ static int CF_CFDP_CycleTx_(clist_node node, void *context)
     transaction_t          *t    = container_of(node, transaction_t, cl_node);
     int                     ret  = 1; /* default option is exit traversal */
 
-    if (t->flags.all.suspended)
+    if (t->flags.com.suspended)
     {
         ret = 0; /* suspended, so move on to next */
         goto err_out;
     }
 
-    CF_Assert(t->flags.all.q_index == CF_Q_TXA); /* huh? */
+    CF_Assert(t->flags.com.q_index == CF_Q_TXA); /* huh? */
 
     /* if no more messages, then c->cur will be set.
      * If the transaction sent the last filedata pdu and eof, it will move itself
      * off the active queue. Run until either of these occur. */
-    while (!args->c->cur && t->flags.all.q_index == CF_Q_TXA)
+    while (!args->c->cur && t->flags.com.q_index == CF_Q_TXA)
     {
         CFE_ES_PerfLogEntry(CF_PERF_ID_PDUSENT(t->chan_num));
         CF_CFDP_DispatchTx(t);
@@ -1576,7 +1576,7 @@ static int CF_CFDP_DoTick(clist_node node, void *context)
     {
         /* found where we left off, so clear that and move on */
         args->c->cur = NULL;
-        if (!t->flags.all.suspended)
+        if (!t->flags.com.suspended)
         {
             args->fn(t, &args->cont);
         }
@@ -2203,9 +2203,9 @@ int CF_CFDP_CopyDataFromLv(uint8 buf[CF_FILENAME_MAX_LEN], const lv_t *src_lv)
 void CF_CFDP_CancelTransaction(transaction_t *t)
 {
     void (*fns[2])(transaction_t * t) = {CF_CFDP_R_Cancel, CF_CFDP_S_Cancel};
-    if (!t->flags.all.canceled)
+    if (!t->flags.com.canceled)
     {
-        t->flags.all.canceled = 1;
+        t->flags.com.canceled = 1;
         t->history->cc        = CC_CANCEL_REQUEST_RECEIVED;
         fns[!!CF_CFDP_IsSender(t)](t);
     }

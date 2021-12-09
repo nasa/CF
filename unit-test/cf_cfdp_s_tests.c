@@ -163,7 +163,7 @@ void Test_CFDP_S_SendEof_When_flag_tx_crc_calc_Is_0_Call_CF_CRC_Finalize_AndSet_
     cfdp_send_ret_t           forced_return_CF_CFDP_SendEof = Any_cfdp_send_ret_t();
     CF_CFDP_SendEof_context_t context_CF_CFDP_SendEof;
 
-    arg_t->flags.tx.crc_calc = 0;
+    arg_t->flags.com.crc_calc = 0;
 
     UT_SetDataBuffer(UT_KEY(CF_CRC_Finalize), &context_CF_CRC_Finalize, sizeof(context_CF_CRC_Finalize), false);
 
@@ -179,8 +179,8 @@ void Test_CFDP_S_SendEof_When_flag_tx_crc_calc_Is_0_Call_CF_CRC_Finalize_AndSet_
                   forced_return_CF_CFDP_SendEof);
     UtAssert_STUB_COUNT(CF_CRC_Finalize, 1);
     UtAssert_ADDRESS_EQ(context_CF_CRC_Finalize, &arg_t->crc);
-    UtAssert_True(arg_t->flags.tx.crc_calc == 1, "t->flags.tx.crc_calc was changed to %d and should be 1",
-                  arg_t->flags.tx.crc_calc);
+    UtAssert_True(arg_t->flags.com.crc_calc == 1, "t->flags.com.crc_calc was changed to %d and should be 1",
+                  arg_t->flags.com.crc_calc);
     UtAssert_STUB_COUNT(CF_CFDP_SendEof, 1);
     UtAssert_ADDRESS_EQ(context_CF_CFDP_SendEof.t, arg_t);
 } /* end
@@ -196,7 +196,7 @@ void Test_CFDP_S_SendEof_When_crc_calc_Is_1_DoNotCall_CF_CRC_Finalize_ReturnValu
     cfdp_send_ret_t           forced_return_CF_CFDP_SendEof = Any_cfdp_send_ret_t();
     CF_CFDP_SendEof_context_t context_CF_CFDP_SendEof;
 
-    arg_t->flags.tx.crc_calc = 1;
+    arg_t->flags.com.crc_calc = 1;
 
     context_CF_CFDP_SendEof.forced_return = forced_return_CF_CFDP_SendEof;
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendEof), &context_CF_CFDP_SendEof, sizeof(context_CF_CFDP_SendEof), false);
@@ -209,8 +209,8 @@ void Test_CFDP_S_SendEof_When_crc_calc_Is_1_DoNotCall_CF_CRC_Finalize_ReturnValu
                   "CF_CFDP_S_SendEof returned %u and should be %u (value returned from CF_CFDP_SendEof)", local_result,
                   forced_return_CF_CFDP_SendEof);
     UtAssert_STUB_COUNT(CF_CRC_Finalize, 0);
-    UtAssert_True(arg_t->flags.tx.crc_calc == 1, "t->flags.tx.crc_calc is %d and should be 1 (unchanged)",
-                  arg_t->flags.tx.crc_calc);
+    UtAssert_True(arg_t->flags.com.crc_calc == 1, "t->flags.com.crc_calc is %d and should be 1 (unchanged)",
+                  arg_t->flags.com.crc_calc);
     UtAssert_STUB_COUNT(CF_CFDP_SendEof, 1);
     UtAssert_ADDRESS_EQ(context_CF_CFDP_SendEof.t, arg_t);
 } /* end Test_CFDP_S_SendEof_When_crc_calc_Is_1_DoNotCall_CF_CRC_Finalize_ReturnValueOfCallTo_CF_CFDP_SendEof */
@@ -233,7 +233,7 @@ void Test_CF_CFDP_S1_SubstateSendEof_When_S_SendEof_Is_CF_SEND_NO_MSG_DoNotCall_
     cfdp_send_ret_t           forced_return_CF_CFDP_SendEof = CF_SEND_NO_MSG;
     CF_CFDP_SendEof_context_t context_CF_CFDP_SendEof;
 
-    arg_t->flags.tx.crc_calc = 0;
+    arg_t->flags.com.crc_calc = 0;
 
     context_CF_CFDP_SendEof.forced_return = forced_return_CF_CFDP_SendEof;
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendEof), &context_CF_CFDP_SendEof, sizeof(context_CF_CFDP_SendEof), false);
@@ -259,7 +259,7 @@ void Test_CF_CFDP_S1_SubstateSendEof_Call_CF_CFDP_S_Reset_With_t_When_CFDP_S_Sen
     cfdp_send_ret_t           forced_return_CF_CFDP_SendEof = Any_cfdp_send_ret_t_Except(CF_SEND_NO_MSG);
     CF_CFDP_SendEof_context_t context_CF_CFDP_SendEof;
 
-    arg_t->flags.tx.crc_calc = 0;
+    arg_t->flags.com.crc_calc = 0;
 
     context_CF_CFDP_SendEof.forced_return = forced_return_CF_CFDP_SendEof;
     UT_SetDataBuffer(UT_KEY(CF_CFDP_SendEof), &context_CF_CFDP_SendEof, sizeof(context_CF_CFDP_SendEof), false);
@@ -290,8 +290,8 @@ void Test_CF_CFDP_S2_SubstateSendEof_TriggerTickProcessing(void)
     CF_InsertSortPrio_context_t context_CF_InsertSortPrio;
 
     /* setting sub_state and ack_timer_armed not required but assists in verification */
-    arg_t->state_data.s.sub_state   = Any_uint8_Except(SEND_WAIT_FOR_EOF_ACK);
-    arg_t->flags.tx.ack_timer_armed = 0;
+    arg_t->state_data.s.sub_state    = Any_uint8_Except(SEND_WAIT_FOR_EOF_ACK);
+    arg_t->flags.com.ack_timer_armed = 0;
 
     UT_SetDataBuffer(UT_KEY(CF_InsertSortPrio), &context_CF_InsertSortPrio, sizeof(context_CF_InsertSortPrio), false);
 
@@ -301,7 +301,7 @@ void Test_CF_CFDP_S2_SubstateSendEof_TriggerTickProcessing(void)
 
     arg_t->chan_num = Any_cf_chan_num();
 
-    CF_AppData.hk.channel_hk[arg_t->chan_num].q_size[arg_t->flags.all.q_index] = initial_q_size_q_index;
+    CF_AppData.hk.channel_hk[arg_t->chan_num].q_size[arg_t->flags.com.q_index] = initial_q_size_q_index;
 
     UT_SetDataBuffer(UT_KEY(CF_CList_Remove), &context_CF_CList_Remove, sizeof(context_CF_CList_Remove), false);
 
@@ -312,8 +312,8 @@ void Test_CF_CFDP_S2_SubstateSendEof_TriggerTickProcessing(void)
     UtAssert_True(arg_t->state_data.s.sub_state == SEND_WAIT_FOR_EOF_ACK,
                   "sub_state is %u and should be %u (SEND_WAIT_FOR_EOF_ACK)", arg_t->state_data.s.sub_state,
                   SEND_WAIT_FOR_EOF_ACK);
-    UtAssert_True(arg_t->flags.tx.ack_timer_armed == 1, "ack_timer_armed is %u and should be 1",
-                  arg_t->flags.tx.ack_timer_armed);
+    UtAssert_True(arg_t->flags.com.ack_timer_armed == 1, "ack_timer_armed is %u and should be 1",
+                  arg_t->flags.com.ack_timer_armed);
     UtAssert_STUB_COUNT(CF_InsertSortPrio, 1);
     UtAssert_ADDRESS_EQ(context_CF_InsertSortPrio.t, arg_t);
     UtAssert_True(context_CF_InsertSortPrio.q == CF_Q_TXW,
@@ -321,17 +321,17 @@ void Test_CF_CFDP_S2_SubstateSendEof_TriggerTickProcessing(void)
     /* Assert for cf_dequeue_transaction */
     UtAssert_STUB_COUNT(CF_CList_Remove, 1);
     UtAssert_ADDRESS_EQ(context_CF_CList_Remove.head,
-                        &CF_AppData.engine.channels[arg_t->chan_num].qs[arg_t->flags.all.q_index]);
+                        &CF_AppData.engine.channels[arg_t->chan_num].qs[arg_t->flags.com.q_index]);
     UtAssert_ADDRESS_EQ(context_CF_CList_Remove.node, &arg_t->cl_node);
-    UtAssert_True(CF_AppData.hk.channel_hk[arg_t->chan_num].q_size[arg_t->flags.all.q_index] ==
+    UtAssert_True(CF_AppData.hk.channel_hk[arg_t->chan_num].q_size[arg_t->flags.com.q_index] ==
                       initial_q_size_q_index - 1,
-                  "q_size[t->flags.all.q_index] is %u and should be 1 less than %u (value before call)",
-                  CF_AppData.hk.channel_hk[arg_t->chan_num].q_size[arg_t->flags.all.q_index], initial_q_size_q_index);
+                  "q_size[t->flags.com.q_index] is %u and should be 1 less than %u (value before call)",
+                  CF_AppData.hk.channel_hk[arg_t->chan_num].q_size[arg_t->flags.com.q_index], initial_q_size_q_index);
     UtAssert_True(arg_t->state_data.s.sub_state == SEND_WAIT_FOR_EOF_ACK,
                   "t->state_data.s.sub_state is %d and should be %d (SEND_WAIT_FOR_EOF_ACK)",
                   arg_t->state_data.s.sub_state, SEND_WAIT_FOR_EOF_ACK);
-    UtAssert_True(arg_t->flags.tx.ack_timer_armed == 1, "t->flags.tx.ack_timer_armed is %d and should be 1",
-                  arg_t->flags.tx.ack_timer_armed);
+    UtAssert_True(arg_t->flags.com.ack_timer_armed == 1, "t->flags.com.ack_timer_armed is %d and should be 1",
+                  arg_t->flags.com.ack_timer_armed);
 } /* end Test_CF_CFDP_S2_SubstateSendEof_TriggerTickProcessing */
 
 /* end CF_CFDP_S2_SubstateSendEof tests */
@@ -2673,7 +2673,7 @@ void Test_CF_CFDP_S2_WaitForEofAck_CallTo_CF_CFDP_RecvAck_Returns_0_And_t_histor
 
     arg_t->state_data.s.sub_state =
         Any_uint8_Except(SEND_WAIT_FOR_FIN); /* setting sub_state not required, but helps verification */
-    arg_t->flags.tx.ack_timer_armed = 1;     /* setting ack_timer_armed not required, but helps verification */
+    arg_t->flags.com.ack_timer_armed = 1;    /* setting ack_timer_armed not required, but helps verification */
 
     /* Act */
     CF_CFDP_S2_WaitForEofAck(arg_t, arg_ph);
@@ -2682,8 +2682,8 @@ void Test_CF_CFDP_S2_WaitForEofAck_CallTo_CF_CFDP_RecvAck_Returns_0_And_t_histor
     UtAssert_True(arg_t->state_data.s.sub_state == SEND_WAIT_FOR_FIN,
                   "sub_state was set to %u and should be %u (SEND_WAIT_FOR_FIN)", arg_t->state_data.s.sub_state,
                   SEND_WAIT_FOR_FIN);
-    UtAssert_True(arg_t->flags.tx.ack_timer_armed == 0, "sub_state was set to %u and should be 0",
-                  arg_t->flags.tx.ack_timer_armed);
+    UtAssert_True(arg_t->flags.com.ack_timer_armed == 0, "sub_state was set to %u and should be 0",
+                  arg_t->flags.com.ack_timer_armed);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 } /* end
      Test_CF_CFDP_S2_WaitForEofAck_CallTo_CF_CFDP_RecvAck_Returns_0_And_t_history_cc_EqTo_CC_NO_ERROR_Set_sub_state_To_SEND_WAIT_FOR_FIN_And_ack_time_armed_To_0
@@ -3163,7 +3163,7 @@ void Test_CF_CFDP_S1_Tx_When_t_sub_state_Is_0_Call_CF_CFDP_S_SubstateSendMetadat
 //     // /* Arrange unstubbable: CF_CFDP_S_SendEof -  bypass finalize just return CF_CFDP_SendEof */
 //     // CF_CFDP_SendEof_context_t   context_CF_CFDP_SendEof;
 
-//     // arg_t->flags.tx.crc_calc = 1;
+//     // arg_t->flags.com.crc_calc = 1;
 
 //     // context_CF_CFDP_SendEof.forced_return = Any_uint8_Except(CF_SEND_NO_MSG);
 //     // UT_SetDataBuffer(UT_KEY(CF_CFDP_SendEof), &context_CF_CFDP_SendEof,
@@ -3262,7 +3262,7 @@ void Test_CF_CFDP_S2_Tx_When_t_sub_state_Is_0_Call_CF_CFDP_S_SubstateSendMetadat
 //     /* Arrange unstubbable: CF_CFDP_S_SendEof -  bypass finalize just return CF_CFDP_SendEof */
 //     CF_CFDP_SendEof_context_t   context_CF_CFDP_SendEof;
 
-//     arg_t->flags.tx.crc_calc = 1;
+//     arg_t->flags.com.crc_calc = 1;
 
 //     context_CF_CFDP_SendEof.forced_return = Any_uint8_Except(CF_SEND_NO_MSG);
 
@@ -3446,11 +3446,11 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     cf_timer_t       *context_CF_Timer_Tick;
     const char       *expected_Spec = "CF S2(%u:%u), ack limit reached, no eof-ack";
 
-    arg_t->history                  = &dummy_history;
-    arg_t->chan_num                 = Any_cf_chan_num();
-    arg_t->state                    = CFDP_S2;
-    arg_t->flags.tx.ack_timer_armed = 1;
-    arg_t->state_data.s.sub_state   = SEND_WAIT_FOR_EOF_ACK;
+    arg_t->history                   = &dummy_history;
+    arg_t->chan_num                  = Any_cf_chan_num();
+    arg_t->state                     = CFDP_S2;
+    arg_t->flags.com.ack_timer_armed = 1;
+    arg_t->state_data.s.sub_state    = SEND_WAIT_FOR_EOF_ACK;
 
     arg_t->state_data.s.s2.counter.ack = dummy_ack_limit - 1;
 
@@ -3526,11 +3526,11 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     cf_timer_t       *context_CF_Timer_Expired[2];
     cf_timer_t       *context_CF_Timer_Tick;
 
-    arg_t->history                  = &dummy_history;
-    arg_t->chan_num                 = Any_cf_chan_num();
-    arg_t->state                    = CFDP_S2;
-    arg_t->flags.tx.ack_timer_armed = 1;
-    arg_t->state_data.s.sub_state   = SEND_WAIT_FOR_EOF_ACK;
+    arg_t->history                   = &dummy_history;
+    arg_t->chan_num                  = Any_cf_chan_num();
+    arg_t->state                     = CFDP_S2;
+    arg_t->flags.com.ack_timer_armed = 1;
+    arg_t->state_data.s.sub_state    = SEND_WAIT_FOR_EOF_ACK;
 
     arg_t->state_data.s.s2.counter.ack = Any_uint8_Except(dummy_ack_limit - 1);
 
@@ -3548,7 +3548,7 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     /* Arrange unstubbable: CF_CFDP_S_SendEof */
     CF_CFDP_SendEof_context_t context_CF_CFDP_SendEof;
 
-    arg_t->flags.tx.crc_calc = 1;
+    arg_t->flags.com.crc_calc = 1;
 
     context_CF_CFDP_SendEof.forced_return = CF_SEND_NO_MSG;
 
@@ -3596,11 +3596,11 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     cf_timer_t       *context_CF_Timer_Expired[2];
     cf_timer_t       *context_CF_Timer_Tick;
 
-    arg_t->history                  = &dummy_history;
-    arg_t->chan_num                 = Any_cf_chan_num();
-    arg_t->state                    = CFDP_S2;
-    arg_t->flags.tx.ack_timer_armed = 1;
-    arg_t->state_data.s.sub_state   = SEND_WAIT_FOR_EOF_ACK;
+    arg_t->history                   = &dummy_history;
+    arg_t->chan_num                  = Any_cf_chan_num();
+    arg_t->state                     = CFDP_S2;
+    arg_t->flags.com.ack_timer_armed = 1;
+    arg_t->state_data.s.sub_state    = SEND_WAIT_FOR_EOF_ACK;
 
     arg_t->state_data.s.s2.counter.ack = Any_uint8_Except(dummy_ack_limit - 1);
 
@@ -3618,7 +3618,7 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     /* Arrange unstubbable: CF_CFDP_S_SendEof */
     CF_CFDP_SendEof_context_t context_CF_CFDP_SendEof;
 
-    arg_t->flags.tx.crc_calc = 1;
+    arg_t->flags.com.crc_calc = 1;
 
     context_CF_CFDP_SendEof.forced_return = CF_SEND_ERROR;
 
@@ -3677,11 +3677,11 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     cf_timer_t       *context_CF_Timer_Tick;
     transaction_t    *context_CF_CFDP_ArmAckTimer;
 
-    arg_t->history                  = &dummy_history;
-    arg_t->chan_num                 = Any_cf_chan_num();
-    arg_t->state                    = CFDP_S2;
-    arg_t->flags.tx.ack_timer_armed = 1;
-    arg_t->state_data.s.sub_state   = SEND_WAIT_FOR_EOF_ACK;
+    arg_t->history                   = &dummy_history;
+    arg_t->chan_num                  = Any_cf_chan_num();
+    arg_t->state                     = CFDP_S2;
+    arg_t->flags.com.ack_timer_armed = 1;
+    arg_t->state_data.s.sub_state    = SEND_WAIT_FOR_EOF_ACK;
 
     arg_t->state_data.s.s2.counter.ack = Any_uint8_Except(dummy_ack_limit - 1);
 
@@ -3703,7 +3703,7 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     cfdp_send_ret_t           exceptions[2] = {CF_SEND_NO_MSG, CF_SEND_ERROR};
     CF_CFDP_SendEof_context_t context_CF_CFDP_SendEof;
 
-    arg_t->flags.tx.crc_calc = 1;
+    arg_t->flags.com.crc_calc = 1;
 
     context_CF_CFDP_SendEof.forced_return = Any_cfdp_send_ret_t_ExceptThese(exceptions, 2);
 
@@ -3749,10 +3749,10 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpired_sub_state_NotEqTo_SEND_WAIT_FOR_EOF_A
     cf_timer_t    *context_CF_Timer_Expired[2];
     cf_timer_t    *context_CF_Timer_Tick;
 
-    arg_t->chan_num                 = Any_cf_chan_num();
-    arg_t->state                    = CFDP_S2;
-    arg_t->flags.tx.ack_timer_armed = 1;
-    arg_t->state_data.s.sub_state   = Any_uint8_ExceptThese(exceptions, 2);
+    arg_t->chan_num                  = Any_cf_chan_num();
+    arg_t->state                     = CFDP_S2;
+    arg_t->flags.com.ack_timer_armed = 1;
+    arg_t->state_data.s.sub_state    = Any_uint8_ExceptThese(exceptions, 2);
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.inactivity_timer = initial_inactivity_timer;
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.ack_limit        = initial_fault_ack_limit;
@@ -3797,10 +3797,10 @@ void Test_CF_CFDP_S_Tick_ArmedTimerNotExpiredCall_CF_Timer_Tick(void)
     cf_timer_t    *context_CF_Timer_Expired[2];
     cf_timer_t    *context_CF_Timer_Tick[2];
 
-    arg_t->chan_num                 = Any_cf_chan_num();
-    arg_t->state                    = CFDP_S2;
-    arg_t->flags.tx.ack_timer_armed = 1;
-    arg_t->state_data.s.sub_state   = SEND_WAIT_FOR_EOF_ACK;
+    arg_t->chan_num                  = Any_cf_chan_num();
+    arg_t->state                     = CFDP_S2;
+    arg_t->flags.com.ack_timer_armed = 1;
+    arg_t->state_data.s.sub_state    = SEND_WAIT_FOR_EOF_ACK;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.inactivity_timer = initial_inactivity_timer;
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.ack_limit        = initial_fault_ack_limit;
@@ -3846,10 +3846,10 @@ void Test_CF_CFDP_S_Tick_TimerNotArmedDoNotArmAckTimerOrDoTick(void)
     cf_timer_t    *context_CF_Timer_Expired;
     cf_timer_t    *context_CF_Timer_Tick;
 
-    arg_t->chan_num                 = Any_cf_chan_num();
-    arg_t->state                    = CFDP_S2;
-    arg_t->flags.tx.ack_timer_armed = 0;
-    arg_t->state_data.s.sub_state   = Any_uint8_Except(SEND_SEND_FIN_ACK);
+    arg_t->chan_num                  = Any_cf_chan_num();
+    arg_t->state                     = CFDP_S2;
+    arg_t->flags.com.ack_timer_armed = 0;
+    arg_t->state_data.s.sub_state    = Any_uint8_Except(SEND_SEND_FIN_ACK);
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.inactivity_timer = initial_inactivity_timer;
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.ack_limit        = initial_fault_ack_limit;
@@ -3893,11 +3893,11 @@ void Test_CF_CFDP_S_Tick_When_sub_state_IsEqTo_SEND_SEND_FIN_ACK_Call_CF_CFDP_S_
     cf_timer_t    *context_CF_Timer_Expired;
     cf_timer_t    *context_CF_Timer_Tick;
 
-    arg_t->history                  = &dummy_history;
-    arg_t->chan_num                 = Any_cf_chan_num();
-    arg_t->state                    = CFDP_S2;
-    arg_t->flags.tx.ack_timer_armed = 0;
-    arg_t->state_data.s.sub_state   = SEND_SEND_FIN_ACK;
+    arg_t->history                   = &dummy_history;
+    arg_t->chan_num                  = Any_cf_chan_num();
+    arg_t->state                     = CFDP_S2;
+    arg_t->flags.com.ack_timer_armed = 0;
+    arg_t->state_data.s.sub_state    = SEND_SEND_FIN_ACK;
 
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.inactivity_timer = initial_inactivity_timer;
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.ack_limit        = initial_fault_ack_limit;

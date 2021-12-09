@@ -122,17 +122,18 @@ typedef struct
     uint16               num_ts; /* number of transactions -- 16 bit should be enough */
     uint8                priority;
     cf_entity_id_t       dest_id;
-    unsigned             busy : 1;
-    unsigned             diropen : 1;
-    unsigned             keep : 1;
-    unsigned             counted : 1;
+
+    bool busy;
+    bool diropen;
+    bool keep;
+    bool counted;
 } playback_t;
 
 typedef struct
 {
     playback_t pb;
     cf_timer_t interval_timer;
-    unsigned   timer_set : 1;
+    bool       timer_set;
 } poll_t;
 
 typedef union
@@ -176,47 +177,38 @@ typedef struct
 
 typedef struct
 {
-    unsigned q_index : 3; /* which Q is this in? */
-    unsigned ack_timer_armed : 1;
-    unsigned suspended : 1;
-    unsigned canceled : 1;
-    unsigned crc_calc : 1;
+    uint8 q_index; /* which Q is this in? */
+    bool  ack_timer_armed;
+    bool  suspended;
+    bool  canceled;
+    bool  crc_calc;
 } flags_all_t;
 
 typedef struct
 {
-    unsigned q_index : 3; /* which Q is this in? */
-    unsigned ack_timer_armed : 1;
-    unsigned suspended : 1;
-    unsigned canceled : 1;
-    unsigned crc_calc : 1;
+    flags_all_t com;
 
-    unsigned md_recv : 1; /* md received for r state */
-    unsigned eof_recv : 1;
-    unsigned send_nak : 1;
-    unsigned send_fin : 1;
-    unsigned send_ack : 1;
-    unsigned inactivity_fired : 1; /* used for r2 */
-    unsigned complete : 1;         /* r2 */
-    unsigned fd_nak_sent : 1;      /* latches that at least one nak has been sent for file data */
+    bool md_recv; /* md received for r state */
+    bool eof_recv;
+    bool send_nak;
+    bool send_fin;
+    bool send_ack;
+    bool inactivity_fired; /* used for r2 */
+    bool complete;         /* r2 */
+    bool fd_nak_sent;      /* latches that at least one nak has been sent for file data */
 } flags_rx_t;
 
 typedef struct
 {
-    unsigned q_index : 3; /* which Q is this in? */
-    unsigned ack_timer_armed : 1;
-    unsigned suspended : 1;
-    unsigned canceled : 1;
-    unsigned crc_calc : 1;
+    flags_all_t com;
 
-    unsigned md_need_send : 1;
-    unsigned cmd_tx : 1; /* indicates transaction is commanded (ground) tx */
+    bool md_need_send;
+    bool cmd_tx; /* indicates transaction is commanded (ground) tx */
 } flags_tx_t;
 
 typedef union
 {
-    uint16      flags;
-    flags_all_t all;
+    flags_all_t com;
     flags_rx_t  rx;
     flags_tx_t  tx;
 } state_flags_t;

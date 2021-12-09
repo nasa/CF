@@ -42,20 +42,20 @@
 static inline void cf_dequeue_transaction(transaction_t *t)
 {
     CF_Assert(t && (t->chan_num < CF_NUM_CHANNELS));
-    CF_CList_Remove(&CF_AppData.engine.channels[t->chan_num].qs[t->flags.all.q_index], &t->cl_node);
-    CF_Assert(CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.all.q_index]); /* sanity check */
-    --CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.all.q_index];
+    CF_CList_Remove(&CF_AppData.engine.channels[t->chan_num].qs[t->flags.com.q_index], &t->cl_node);
+    CF_Assert(CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index]); /* sanity check */
+    --CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index];
 }
 
 static inline void cf_move_transaction(transaction_t *t, cf_queue_index_t q)
 {
     CF_Assert(t && (t->chan_num < CF_NUM_CHANNELS));
-    CF_CList_Remove(&CF_AppData.engine.channels[t->chan_num].qs[t->flags.all.q_index], &t->cl_node);
-    CF_Assert(CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.all.q_index]); /* sanity check */
-    --CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.all.q_index];
+    CF_CList_Remove(&CF_AppData.engine.channels[t->chan_num].qs[t->flags.com.q_index], &t->cl_node);
+    CF_Assert(CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index]); /* sanity check */
+    --CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index];
     CF_CList_InsertBack(&CF_AppData.engine.channels[t->chan_num].qs[q], &t->cl_node);
-    t->flags.all.q_index = q;
-    ++CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.all.q_index];
+    t->flags.com.q_index = q;
+    ++CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index];
 }
 
 static inline void CF_CList_Remove_Ex(channel_t *c, cf_queue_index_t index, clist_node node)

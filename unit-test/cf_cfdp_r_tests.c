@@ -152,7 +152,7 @@ void Test_CFDP_R2_Reset_WhenTransactionSubStateIs_RECV_WAIT_FOR_FIN_ACK_Call_CF_
     arg_t.state_data.r.sub_state = RECV_WAIT_FOR_FIN_ACK;
     arg_t.state_data.r.r2.eof_cc = CC_NO_ERROR;
     arg_t.history->cc            = CC_NO_ERROR;
-    arg_t.flags.rx.canceled      = 0;
+    arg_t.flags.com.canceled     = 0;
     arg_t.flags.rx.send_fin      = 0;
 
     /* Act */
@@ -175,7 +175,7 @@ void Test_CFDP_R2_Reset_When_r_r2_eof_cc_IsErrorConditionCall_CF_CFDP_R1_Reset(v
     arg_t.state_data.r.sub_state = RECV_FILEDATA;            // TODO: Any_rx_sub_state_Except(RECV_WAIT_FOR_FIN_ACK);
     arg_t.state_data.r.r2.eof_cc = CC_POS_ACK_LIMIT_REACHED; // TODO: Any_condition_code_t_Except(CC_NO_ERROR);
     arg_t.history->cc            = CC_NO_ERROR;
-    arg_t.flags.rx.canceled      = 0;
+    arg_t.flags.com.canceled     = 0;
     arg_t.flags.rx.send_fin      = 0;
 
     /* Act */
@@ -198,7 +198,7 @@ void Test_CFDP_R2_Reset_When_t_history_cc_IsErrorConditionCall_CF_CFDP_R1_Reset(
     arg_t.state_data.r.sub_state = RECV_FILEDATA; // TODO: Any_rx_sub_state_Except(RECV_WAIT_FOR_FIN_ACK);
     arg_t.state_data.r.r2.eof_cc = CC_NO_ERROR;
     arg_t.history->cc            = CC_POS_ACK_LIMIT_REACHED; // TODO: Any_condition_code_t_Except(CC_NO_ERROR);;
-    arg_t.flags.rx.canceled      = 0;
+    arg_t.flags.com.canceled     = 0;
     arg_t.flags.rx.send_fin      = 0;
 
     /* Act */
@@ -221,7 +221,7 @@ void Test_CFDP_R2_Reset_When_t_flags_rx_cancelled_Is_1_Call_CF_CFDP_R1_Reset(voi
     arg_t.state_data.r.sub_state = RECV_FILEDATA; // TODO: Any_rx_sub_state_Except(RECV_WAIT_FOR_FIN_ACK);
     arg_t.state_data.r.r2.eof_cc = CC_NO_ERROR;
     arg_t.history->cc            = CC_NO_ERROR;
-    arg_t.flags.rx.canceled      = 1; // TODO Any but 0?
+    arg_t.flags.com.canceled     = 1; // TODO Any but 0?
     arg_t.flags.rx.send_fin      = 0;
 
     /* Act */
@@ -244,7 +244,7 @@ void Test_CFDP_R2_Reset_Set_flags_rx_send_fin_To_1(void)
     arg_t.state_data.r.sub_state = RECV_FILEDATA; // TODO: Any_rx_sub_state_Except(RECV_WAIT_FOR_FIN_ACK);
     arg_t.state_data.r.r2.eof_cc = CC_NO_ERROR;
     arg_t.history->cc            = CC_NO_ERROR;
-    arg_t.flags.rx.canceled      = 0;
+    arg_t.flags.com.canceled     = 0;
     arg_t.flags.rx.send_fin      = 0;
 
     /* Act */
@@ -2431,7 +2431,7 @@ void Test_CF_CFDP_R2_CalcCrcChunk_Given_t_state_data_r_r2_rx_crc_calc_bytes_Is_N
 
     arg_t->fsize = arg_t->state_data.r.r2.rx_crc_calc_bytes;
 
-    arg_t->flags.rx.crc_calc = 0;
+    arg_t->flags.com.crc_calc = 0;
 
     /* Arrange for CF_CFDP_R_CheckCrc */
     history_t dummy_history;
@@ -2451,8 +2451,8 @@ void Test_CF_CFDP_R2_CalcCrcChunk_Given_t_state_data_r_r2_rx_crc_calc_bytes_Is_N
     /* Assert */
     UtAssert_True(local_result == 0, "CF_CFDP_R2_SubstateSendFin returned %d and should be 0", local_result);
     UtAssert_STUB_COUNT(CF_CRC_Start, 0);
-    UtAssert_True(arg_t->flags.rx.crc_calc == 1, "t->flags.rx.crc_calc is %u and should be 1",
-                  arg_t->flags.rx.crc_calc);
+    UtAssert_True(arg_t->flags.com.crc_calc == 1, "t->flags.com.crc_calc is %u and should be 1",
+                  arg_t->flags.com.crc_calc);
     /* Assert for CF_CFDP_R2_SetCc */
     UtAssert_True(arg_t->flags.rx.send_fin == 1, "t->flags.rx.send_fin is %u and should be 1",
                   arg_t->flags.rx.send_fin);
@@ -2481,7 +2481,7 @@ void Test_CF_CFDP_R2_CalcCrcChunk_Given_t_state_data_r_r2_rx_crc_calc_bytes_Is_N
 
     arg_t->state_data.r.r2.dc = Any_uint8_Except(FIN_COMPLETE);
     arg_t->state_data.r.r2.fs = Any_uint8_Except(FIN_RETAINED);
-    arg_t->flags.rx.crc_calc  = 0;
+    arg_t->flags.com.crc_calc = 0;
 
     /* Arrange for CF_CFDP_R_CheckCrc */
     history_t dummy_history;
@@ -2505,8 +2505,8 @@ void Test_CF_CFDP_R2_CalcCrcChunk_Given_t_state_data_r_r2_rx_crc_calc_bytes_Is_N
     UtAssert_True(arg_t->state_data.r.r2.fs == FIN_RETAINED,
                   "t->state_data.r.r2.fs is %u and should be %u (FIN_RETAINED)", arg_t->state_data.r.r2.fs,
                   FIN_RETAINED);
-    UtAssert_True(arg_t->flags.rx.crc_calc == 1, "t->flags.rx.crc_calc is %u and should be 1",
-                  arg_t->flags.rx.crc_calc);
+    UtAssert_True(arg_t->flags.com.crc_calc == 1, "t->flags.com.crc_calc is %u and should be 1",
+                  arg_t->flags.com.crc_calc);
 } /* end
      Test_CF_CFDP_R2_CalcCrcChunk_Given_t_state_data_r_r2_rx_crc_calc_bytes_Is_Non0_And_IsEqTo_t_fsize_CallTo_CF_CFDP_R_CheckCrc_Return_0_Set_t_keep_To_1_And_t_state_data_r_r2_cc_To_FIN_COMPLETE_And_t_state_data_r_r2_fs_To_FIN_RETAINED_t_flags_rx_crc_calc_To_1_Return_0
    */
@@ -2552,7 +2552,7 @@ void Test_CF_CFDP_R2_CalcCrcChunk_CAllTo_CF_WrappedLseek_ReturnsValueNotEqTo_RXC
                   "CFE_EVS_SendEvent receive event id %u and should receive %u (CF_EID_ERR_CFDP_R_SEEK_CRC)", EventID,
                   CF_EID_ERR_CFDP_R_SEEK_CRC);
     UtAssert_True(arg_t->history->cc == CC_FILE_SIZE_ERROR,
-                  "t->flags.rx.crc_calc is %u and should be %u (CC_FILE_SIZE_ERROR)", arg_t->history->cc,
+                  "t->flags.com.crc_calc is %u and should be %u (CC_FILE_SIZE_ERROR)", arg_t->history->cc,
                   CC_FILE_SIZE_ERROR);
     UtAssert_True(CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.file_seek == (uint16)(initial_file_seek + 1),
                   "fault.file_seek is %u and should be 1 more than %u (value before call)",
@@ -2604,7 +2604,7 @@ void Test_CF_CFDP_R2_CalcCrcChunk_CAllTo_CF_WrappedLseek_ReturnsValueEqTo_RXC_cr
                   "CFE_EVS_SendEvent receive event id %u and should receive %u (CF_EID_ERR_CFDP_R_READ)", EventID,
                   CF_EID_ERR_CFDP_R_READ);
     UtAssert_True(arg_t->history->cc == CC_FILE_SIZE_ERROR,
-                  "t->flags.rx.crc_calc is %u and should be %u (CC_FILE_SIZE_ERROR)", arg_t->history->cc,
+                  "t->flags.com.crc_calc is %u and should be %u (CC_FILE_SIZE_ERROR)", arg_t->history->cc,
                   CC_FILE_SIZE_ERROR);
     UtAssert_True(CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.file_read == (uint16)(initial_file_read + 1),
                   "fault.file_seek is %u and should be 1 more than %u (value before call)",
@@ -2687,9 +2687,9 @@ void Test_CF_CFDP_R2_SubstateSendFin_Given_t_history_cc_IsEqTo_CC_NO_ERROR_And_t
     transaction_t *arg_t = &dummy_t;
     int            local_result;
 
-    arg_t->history           = &dummy_history;
-    arg_t->history->cc       = CC_NO_ERROR;
-    arg_t->flags.rx.crc_calc = 0;
+    arg_t->history            = &dummy_history;
+    arg_t->history->cc        = CC_NO_ERROR;
+    arg_t->flags.com.crc_calc = 0;
 
     /* Arrange for CF_CFDP_R2_CalcCrcChunk */
     cf_config_table_t dummy_config_table;
@@ -2723,7 +2723,7 @@ void Test_CF_CFDP_R2_SubstateSendFin_AssertsBecauseCallTo_CF_CFDP_SendFin_Return
 
     // arg_t->history = &dummy_history;
     // arg_t->history->cc = Any_uint8_Except(CC_NO_ERROR);
-    // arg_t->flags.rx.crc_calc = 0;
+    // arg_t->flags.com.crc_calc = 0;
 
     // UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendFin), CF_SEND_ERROR);
 
@@ -2744,9 +2744,9 @@ void Test_CF_CFDP_R2_SubstateSendFin_Given_t_history_cc_IsEqTo_CC_NO_ERROR_CallT
     uint8          exceptions[2] = {CF_SEND_ERROR, CF_SEND_SUCCESS};
     int            local_result;
 
-    arg_t->history           = &dummy_history;
-    arg_t->history->cc       = Any_uint8_Except(CC_NO_ERROR);
-    arg_t->flags.rx.crc_calc = 0;
+    arg_t->history            = &dummy_history;
+    arg_t->history->cc        = Any_uint8_Except(CC_NO_ERROR);
+    arg_t->flags.com.crc_calc = 0;
 
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendFin), Any_uint8_ExceptThese(exceptions, 2));
 
@@ -2774,9 +2774,9 @@ void Test_CF_CFDP_R2_SubstateSendFin_Given_t_flags_rx_crc_calc_Is_1_CallTo_CF_CF
     transaction_t *arg_t = &dummy_t;
     int            local_result;
 
-    arg_t->history           = &dummy_history;
-    arg_t->history->cc       = CC_NO_ERROR;
-    arg_t->flags.rx.crc_calc = 1;
+    arg_t->history            = &dummy_history;
+    arg_t->history->cc        = CC_NO_ERROR;
+    arg_t->flags.com.crc_calc = 1;
 
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendFin), CF_SEND_SUCCESS);
 
@@ -2804,9 +2804,9 @@ void Test_CF_CFDP_R2_SubstateSendFin_CallTo_CF_CFDP_R2_CalcCrcChunk_Returns_0_Gi
     transaction_t *arg_t = &dummy_t;
     int            local_result;
 
-    arg_t->history           = &dummy_history;
-    arg_t->history->cc       = CC_NO_ERROR;
-    arg_t->flags.rx.crc_calc = 0;
+    arg_t->history            = &dummy_history;
+    arg_t->history->cc        = CC_NO_ERROR;
+    arg_t->flags.com.crc_calc = 0;
 
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendFin), CF_SEND_SUCCESS);
 
@@ -2823,7 +2823,7 @@ void Test_CF_CFDP_R2_SubstateSendFin_CallTo_CF_CFDP_R2_CalcCrcChunk_Returns_0_Gi
 
     arg_t->fsize = arg_t->state_data.r.r2.rx_crc_calc_bytes;
 
-    arg_t->flags.rx.crc_calc = 0;
+    arg_t->flags.com.crc_calc = 0;
 
     /* Arrange for CF_CFDP_R_CheckCrc */
     arg_t->state_data.r.r2.eof_crc = Any_uint32();
@@ -2908,7 +2908,7 @@ void Test_CF_CFDP_R2_Recv_fin_ack_GetsValidFinAckFrom_CF_CFDP_RecvAck_Calls_CFDP
     arg_t->state_data.r.sub_state = Any_uint8_Except(RECV_WAIT_FOR_FIN_ACK);
     arg_t->state_data.r.r2.eof_cc = CC_NO_ERROR;
     arg_t->history->cc            = CC_NO_ERROR;
-    arg_t->flags.rx.canceled      = 0;
+    arg_t->flags.com.canceled     = 0;
 
     arg_t->flags.rx.send_fin = 0; /* set to see it turn to 1 in CF_CFDP_R2_Reset */
 
@@ -3871,7 +3871,7 @@ void Test_CF_CFDP_R_Tick_Given_t_state_IsEqTo_CFDP_R2_But_inactivity_fired_Is_1_
 
     arg_t->flags.rx.send_fin = 0;
 
-    arg_t->flags.rx.ack_timer_armed = 0;
+    arg_t->flags.com.ack_timer_armed = 0;
 
     /* Act */
     CF_CFDP_R_Tick(arg_t, arg_cont);
@@ -3906,7 +3906,7 @@ void Test_CF_CFDP_R_Tick_Given_t_state_IsEqTo_CFDP_R2_And_inactivity_fired_Is_0_
 
     arg_t->flags.rx.send_fin = 0;
 
-    arg_t->flags.rx.ack_timer_armed = 0;
+    arg_t->flags.com.ack_timer_armed = 0;
 
     /* Act */
     CF_CFDP_R_Tick(arg_t, arg_cont);
@@ -3940,7 +3940,7 @@ void Test_CF_CFDP_R_Tick_Given_t_state_IsEqTo_CFDP_R2_And_inactivity_fired_Is_0_
 
     arg_t->flags.rx.send_fin = 0;
 
-    arg_t->flags.rx.ack_timer_armed = 0;
+    arg_t->flags.com.ack_timer_armed = 0;
 
     /* Arrange for CF_CFDP_R_SendInactivityEvent */
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
@@ -3990,7 +3990,7 @@ void Test_CF_CFDP_R_Tick_Given_t_state_IsEqTo_CFDP_R2_And_inactivity_fired_Is_1_
 
     // arg_t->flags.rx.send_fin = 0;
 
-    // arg_t->flags.rx.ack_timer_armed = 0;
+    // arg_t->flags.com.ack_timer_armed = 0;
 
     // /* Arrange for CF_CFDP_R_SendInactivityEvent */
     // UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID,
@@ -4033,7 +4033,7 @@ void Test_CF_CFDP_R_Tick_Given_t_state_IsEqTo_CFDP_R2_And_inactivity_fired_Is_1_
 
     arg_t->flags.rx.send_fin = Any_0_or_1();
 
-    arg_t->flags.rx.ack_timer_armed = 0;
+    arg_t->flags.com.ack_timer_armed = 0;
 
     /* Act */
     CF_CFDP_R_Tick(arg_t, arg_cont);
@@ -4075,7 +4075,7 @@ void Test_CF_CFDP_R_Tick_Given_t_state_IsEqTo_CFDP_R2_And_inactivity_fired_Is_1_
 
     arg_t->flags.rx.send_fin = Any_0_or_1();
 
-    arg_t->flags.rx.ack_timer_armed = 0;
+    arg_t->flags.com.ack_timer_armed = 0;
 
     /* Act */
     CF_CFDP_R_Tick(arg_t, arg_cont);
@@ -4111,7 +4111,7 @@ void Test_CF_CFDP_R_Tick_Given_t_state_IsEqTo_CFDP_R2_And_inactivity_fired_Is_1_
 
     arg_t->flags.rx.send_fin = Any_0_or_1();
 
-    arg_t->flags.rx.ack_timer_armed = 0;
+    arg_t->flags.com.ack_timer_armed = 0;
 
     /* Arrange for CF_CFDP_R_SubstateSendNak */
     cf_config_table_t                    dummy_config_table;
@@ -4173,7 +4173,7 @@ void Test_CF_CFDP_R_Tick_Given_t_state_IsEqTo_CFDP_R2_And_inactivity_fired_Is_1_
 
     arg_t->flags.rx.send_fin = Any_0_or_1();
 
-    arg_t->flags.rx.ack_timer_armed = 0;
+    arg_t->flags.com.ack_timer_armed = 0;
 
     /* Arrange for CF_CFDP_R_SubstateSendNak */
     history_t                            dummy_history;
@@ -4223,14 +4223,14 @@ void Test_CF_CFDP_R_Tick_Given_t_state_IsEqTo_CFDP_R2_And_inactivity_fired_Is_1_
 
     arg_t->flags.rx.send_fin = 1;
 
-    arg_t->flags.rx.ack_timer_armed = 0;
+    arg_t->flags.com.ack_timer_armed = 0;
 
     /* Arrange for CF_CFDP_R2_SubstateSendFin*/
     history_t dummy_history;
 
-    arg_t->history           = &dummy_history;
-    arg_t->history->cc       = CC_NO_ERROR;
-    arg_t->flags.rx.crc_calc = 0;
+    arg_t->history            = &dummy_history;
+    arg_t->history->cc        = CC_NO_ERROR;
+    arg_t->flags.com.crc_calc = 0;
 
     /* Arrange for CF_CFDP_R2_CalcCrcChunk */
     cf_config_table_t dummy_config_table;
@@ -4278,14 +4278,14 @@ void Test_CF_CFDP_R_Tick_Given_t_state_IsEqTo_CFDP_R2_And_inactivity_fired_Is_1_
 
     arg_t->flags.rx.send_fin = 1;
 
-    arg_t->flags.rx.ack_timer_armed = 0;
+    arg_t->flags.com.ack_timer_armed = 0;
 
     /* Arrange for CF_CFDP_R2_SubstateSendFin*/
     history_t dummy_history;
 
-    arg_t->history           = &dummy_history;
-    arg_t->history->cc       = CC_NO_ERROR;
-    arg_t->flags.rx.crc_calc = 1;
+    arg_t->history            = &dummy_history;
+    arg_t->history->cc        = CC_NO_ERROR;
+    arg_t->flags.com.crc_calc = 1;
 
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_SendFin), CF_SEND_SUCCESS);
 
@@ -4328,7 +4328,7 @@ void Test_CF_CFDP_R_Tick_NothingElseSet_ack_timer_armed_Is_1_CAllTo_CF_Timer_Exp
 
     arg_t->flags.rx.send_fin = 0;
 
-    arg_t->flags.rx.ack_timer_armed = 1;
+    arg_t->flags.com.ack_timer_armed = 1;
 
     UT_SetDefaultReturnValue(UT_KEY(CF_Timer_Expired), 0);
 
@@ -4368,7 +4368,7 @@ void Test_CF_CFDP_R_Tick_NothingElseSet_ack_timer_armed_Is_1_CAllTo_CF_Timer_Exp
 
     arg_t->flags.rx.send_fin = 0;
 
-    arg_t->flags.rx.ack_timer_armed = 1;
+    arg_t->flags.com.ack_timer_armed = 1;
 
     UT_SetDefaultReturnValue(UT_KEY(CF_Timer_Expired), Any_int_Except(0));
 
@@ -4414,7 +4414,7 @@ void Test_CF_CFDP_R_Tick_NothingElseSet_ack_timer_armed_Is_1_CAllTo_CF_Timer_Exp
 
     arg_t->flags.rx.send_fin = 0;
 
-    arg_t->flags.rx.ack_timer_armed = 1;
+    arg_t->flags.com.ack_timer_armed = 1;
 
     UT_SetDefaultReturnValue(UT_KEY(CF_Timer_Expired), Any_int_Except(0));
 
@@ -4466,7 +4466,7 @@ void Test_CF_CFDP_R_Tick_NothingElseSet_ack_timer_armed_Is_1_CAllTo_CF_Timer_Exp
 
     arg_t->flags.rx.send_fin = 0;
 
-    arg_t->flags.rx.ack_timer_armed = 1;
+    arg_t->flags.com.ack_timer_armed = 1;
 
     UT_SetDefaultReturnValue(UT_KEY(CF_Timer_Expired), Any_int_Except(0));
 
@@ -4521,7 +4521,7 @@ void Test_CF_CFDP_R_Tick_NothingElseSet_ack_timer_armed_Is_1_CAllTo_CF_Timer_Exp
 
     arg_t->flags.rx.send_fin = 0;
 
-    arg_t->flags.rx.ack_timer_armed = 1;
+    arg_t->flags.com.ack_timer_armed = 1;
 
     UT_SetDefaultReturnValue(UT_KEY(CF_Timer_Expired), Any_int_Except(0));
 

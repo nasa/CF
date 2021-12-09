@@ -1605,7 +1605,7 @@ void Test_CF_DoSuspRes__Set_context_same_To_1_suspended_Eq_action(void)
     arg_context->same   = 0;
     arg_context->action = AnyCoinFlip();
 
-    arg_t->flags.all.suspended = arg_context->action;
+    arg_t->flags.com.suspended = arg_context->action;
 
     /* Act */
     CF_DoSuspRes_(arg_t, arg_context);
@@ -1628,15 +1628,15 @@ void Test_CF_DoSuspRes__When_suspended_NotEqTo_action_Set_suspended_To_action(vo
     arg_context->same   = 0;
     arg_context->action = AnyCoinFlip();
 
-    arg_t->flags.all.suspended = !arg_context->action;
+    arg_t->flags.com.suspended = !arg_context->action;
 
     /* Act */
     CF_DoSuspRes_(arg_t, arg_context);
 
     /* Assert */
-    UtAssert_True(arg_t->flags.all.suspended == arg_context->action,
-                  "CF_DoSuspRes_ set arg_t->flags.all.suspended to %d and should be %d (context->action)",
-                  arg_t->flags.all.suspended, arg_context->action);
+    UtAssert_True(arg_t->flags.com.suspended == arg_context->action,
+                  "CF_DoSuspRes_ set arg_t->flags.com.suspended to %d and should be %d (context->action)",
+                  arg_t->flags.com.suspended, arg_context->action);
 } /* end Test_CF_DoSuspRes__When_suspended_NotEqTo_action_Set_suspended_To_action */
 
 /*******************************************************************************
@@ -1668,7 +1668,7 @@ void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasChange
                      sizeof(context_CF_CFDP_FindTransactionBySequenceNumber), false);
 
     /* Arrange unstubbable: CF_DoSuspRes_ */
-    dummy_t->flags.all.suspended = arg_action;
+    dummy_t->flags.com.suspended = arg_action;
 
     /* Arrange unstubbable: CF_CmdRej */
     uint16 initial_hk_err_counter = Any_uint16();
@@ -1809,7 +1809,7 @@ void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasNotCha
                      sizeof(context_CF_TraverseAllTransactions_All_Channels), false);
 
     /* Arrange unstubbable: CF_DoSuspRes_ */
-    dummy_t->flags.all.suspended = arg_action;
+    dummy_t->flags.com.suspended = arg_action;
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_cmd_counter = Any_uint16();

@@ -89,7 +89,7 @@ static inline void CF_CFDP_R1_Reset(transaction_t *t)
 static void CF_CFDP_R2_Reset(transaction_t *t)
 {
     if ((t->state_data.r.sub_state == RECV_WAIT_FOR_FIN_ACK) || (t->state_data.r.r2.eof_cc != CC_NO_ERROR) ||
-        (t->history->cc != CC_NO_ERROR) || t->flags.rx.canceled)
+        (t->history->cc != CC_NO_ERROR) || t->flags.com.canceled)
     {
         CF_CFDP_R1_Reset(t); /* it's done */
     }
@@ -758,7 +758,7 @@ static int CF_CFDP_R2_CalcCrcChunk(transaction_t *t)
             CF_CFDP_R2_SetCc(t, CC_FILE_CHECKSUM_FAILURE);
         }
 
-        t->flags.rx.crc_calc = 1;
+        t->flags.com.crc_calc = 1;
 
         ret = 0;
     }
@@ -783,7 +783,7 @@ static int CF_CFDP_R2_SubstateSendFin(transaction_t *t)
     cfdp_send_ret_t sret;
     int             ret = -1;
 
-    if (t->history->cc == CC_NO_ERROR && !t->flags.rx.crc_calc)
+    if (t->history->cc == CC_NO_ERROR && !t->flags.com.crc_calc)
     {
         /* no error, and haven't checked crc -- so start checking it */
         if (CF_CFDP_R2_CalcCrcChunk(t))
@@ -1126,7 +1126,7 @@ void CF_CFDP_R_Tick(transaction_t *t, int *cont /* unused */)
             /* don't care about any other cases */
         }
 
-        if (t->flags.rx.ack_timer_armed)
+        if (t->flags.com.ack_timer_armed)
         {
             if (CF_Timer_Expired(&t->ack_timer))
             {
