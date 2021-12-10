@@ -1303,8 +1303,10 @@ void Test_CF_CFDP_S_CheckAndRespondNak_CallTo_CF_Chunks_GetFirstChunkReturned_no
     CF_CFDP_SendFd_context_t context_CF_CFDP_SendFd;
 
     dummy_c->offset = 0; /* dummy_c->offset = 0 used so that (foffs+bytes_to_read)<=t->fsize is never false */
+    arg_t->fsize    = 512;
+    arg_t->foffs    = 0;
 
-    dummy_config_table.outgoing_file_chunk_size = arg_t->foffs;
+    dummy_config_table.outgoing_file_chunk_size = dummy_c->size;
     CF_AppData.config_table                     = &dummy_config_table;
     arg_t->history                              = &dummy_history;
 
@@ -3470,7 +3472,7 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     arg_t->flags.com.ack_timer_armed = 1;
     arg_t->state_data.s.sub_state    = CF_TxSubState_WAIT_FOR_EOF_ACK;
 
-    arg_t->state_data.s.s2.counter.ack = dummy_ack_limit - 1;
+    arg_t->state_data.s.s2.acknak_count = dummy_ack_limit - 1;
 
     CF_AppData.config_table                                                   = &dummy_config_table;
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.inactivity_timer = initial_inactivity_timer;
@@ -3540,7 +3542,7 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     int              *arg_cont                 = NULL;
     uint16            initial_inactivity_timer = Any_uint16();
     uint16            initial_fault_ack_limit  = Any_uint16();
-    uint8             dummy_ack_limit          = Any_uint8();
+    uint8             dummy_ack_limit          = 5;
     CF_Timer_t       *context_CF_Timer_Expired[2];
     CF_Timer_t       *context_CF_Timer_Tick;
 
@@ -3550,7 +3552,7 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     arg_t->flags.com.ack_timer_armed = 1;
     arg_t->state_data.s.sub_state    = CF_TxSubState_WAIT_FOR_EOF_ACK;
 
-    arg_t->state_data.s.s2.counter.ack = Any_uint8_Except(dummy_ack_limit - 1);
+    arg_t->state_data.s.s2.acknak_count = 0;
 
     CF_AppData.config_table                                                   = &dummy_config_table;
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.inactivity_timer = initial_inactivity_timer;
@@ -3620,7 +3622,7 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     arg_t->flags.com.ack_timer_armed = 1;
     arg_t->state_data.s.sub_state    = CF_TxSubState_WAIT_FOR_EOF_ACK;
 
-    arg_t->state_data.s.s2.counter.ack = Any_uint8_Except(dummy_ack_limit - 1);
+    arg_t->state_data.s.s2.acknak_count = Any_uint8_Except(dummy_ack_limit - 1);
 
     CF_AppData.config_table                                                   = &dummy_config_table;
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.inactivity_timer = initial_inactivity_timer;
@@ -3701,7 +3703,7 @@ void Test_CF_CFDP_S_Tick_ArmedTimerExpiredAnd_sub_state_EqTo_SEND_WAIT_FOR_EOF_A
     arg_t->flags.com.ack_timer_armed = 1;
     arg_t->state_data.s.sub_state    = CF_TxSubState_WAIT_FOR_EOF_ACK;
 
-    arg_t->state_data.s.s2.counter.ack = Any_uint8_Except(dummy_ack_limit - 1);
+    arg_t->state_data.s.s2.acknak_count = Any_uint8_Except(dummy_ack_limit - 1);
 
     CF_AppData.config_table                                                   = &dummy_config_table;
     CF_AppData.hk.channel_hk[arg_t->chan_num].counters.fault.inactivity_timer = initial_inactivity_timer;
