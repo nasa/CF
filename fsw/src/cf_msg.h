@@ -36,14 +36,14 @@ typedef struct CF_HkCmdCounters
 {
     uint16 cmd;
     uint16 err;
-} CF_PACK CF_HkCmdCounters_t;
+} CF_HkCmdCounters_t;
 
 typedef struct CF_HkSent
 {
     uint64 file_data_bytes;
     uint32 pdu;
     uint32 nak_segment_requests;
-} CF_PACK CF_HkSent_t;
+} CF_HkSent_t;
 
 typedef struct CF_HkRecv
 {
@@ -53,7 +53,7 @@ typedef struct CF_HkRecv
     uint16 spurious;
     uint16 dropped;
     uint32 nak_segment_requests;
-} CF_PACK CF_HkRecv_t;
+} CF_HkRecv_t;
 
 typedef struct CF_HkFault
 {
@@ -69,7 +69,7 @@ typedef struct CF_HkFault
     uint16 ack_limit;
     uint16 inactivity_timer;
     uint16 spare;
-} CF_PACK CF_HkFault_t;
+} CF_HkFault_t;
 
 typedef struct CF_HkCounters
 {
@@ -85,9 +85,8 @@ typedef struct CF_HkChannel_Data
     uint8           poll_counter;
     uint8           playback_counter;
     uint8           frozen; /* NOTE: this could be more than one flag if we ever need it */
-    uint16          spare3;
-    uint8           spare4;
-} CF_PACK CF_HkChannel_Data_t;
+    uint8           spare[3];
+} CF_HkChannel_Data_t;
 
 typedef struct CF_HkPacket
 {
@@ -120,7 +119,7 @@ typedef struct CF_ConfigPacket
     CF_EntityId_t local_eid;
 /* must #define the number of data items in this struct for command processing */
 #define CF_NUM_CFG_PACKET_ITEMS 10
-} CF_PACK CF_ConfigPacket_t;
+} CF_ConfigPacket_t;
 
 /****************************************
 ** CF app command packet command codes
@@ -164,7 +163,7 @@ typedef enum
 typedef struct CF_NoArgsCmd
 {
     CFE_MSG_CommandHeader_t cmd_header;
-} CF_PACK CF_NoArgsCmd_t;
+} CF_NoArgsCmd_t;
 
 /* unionargs -
  *
@@ -176,20 +175,20 @@ typedef union CF_UnionArgs_Payload
     uint32 dword;
     uint16 hword[2];
     uint8  byte[4];
-} CF_PACK CF_UnionArgs_Payload_t;
+} CF_UnionArgs_Payload_t;
 
 typedef struct
 {
     CFE_MSG_CommandHeader_t cmd_header;
     CF_UnionArgs_Payload_t  data;
-} CF_PACK CF_UnionArgsCmd_t;
+} CF_UnionArgsCmd_t;
 
 typedef struct CF_GetParamCmd
 {
     CFE_MSG_CommandHeader_t cmd_header;
     uint8                   key;
     uint8                   chan_num;
-} CF_PACK CF_GetParamCmd_t;
+} CF_GetParamCmd_t;
 
 typedef struct CF_SetParamCmd
 {
@@ -197,7 +196,7 @@ typedef struct CF_SetParamCmd
     uint32                  value;
     uint8                   key;
     uint8                   chan_num;
-} CF_PACK CF_SetParamCmd_t;
+} CF_SetParamCmd_t;
 
 typedef struct CF_TxFileCmd
 {
@@ -209,7 +208,7 @@ typedef struct CF_TxFileCmd
     CF_EntityId_t           dest_id;
     char                    src_filename[CF_FILENAME_MAX_LEN];
     char                    dst_filename[CF_FILENAME_MAX_LEN];
-} CF_PACK CF_TxFileCmd_t;
+} CF_TxFileCmd_t;
 
 typedef struct CF_WriteQueueCmd
 {
@@ -219,7 +218,7 @@ typedef struct CF_WriteQueueCmd
     uint8                   queue; /* 0=pending, 1=active, 2=history, 3=all */
     uint8                   spare; /* why? */
     char                    filename[CF_FILENAME_MAX_LEN];
-} CF_PACK CF_WriteQueueCmd_t;
+} CF_WriteQueueCmd_t;
 
 typedef CF_TxFileCmd_t CF_PlaybackDirCmd_t;
 
@@ -229,6 +228,6 @@ typedef struct CF_TransactionCmd
     CF_TransactionSeq_t     ts;
     CF_EntityId_t           eid;
     uint8                   chan; /* if 254, use ts. if 255, all channels */
-} CF_PACK CF_TransactionCmd_t;
+} CF_TransactionCmd_t;
 
 #endif /* !CF_MSG_H */
