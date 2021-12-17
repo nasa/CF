@@ -433,9 +433,9 @@ void Test_CF_CFDP_R2_Complete_Given_t_Sets_send_nak_To_1_Given_ok_to_send_nak_Is
     arg_t->state_data.r.sub_state = initial_sub_state;
     arg_t->flags.rx.md_recv       = 0;
 
-    CF_AppData.config_table            = &dummy_config_table;
-    CF_AppData.config_table->nak_limit = Any_uint8_Except(0);
-    arg_t->state_data.r.r2.counter.nak = CF_AppData.config_table->nak_limit - 1;
+    CF_AppData.config_table             = &dummy_config_table;
+    CF_AppData.config_table->nak_limit  = Any_uint8_Except(0);
+    arg_t->state_data.r.r2.acknak_count = CF_AppData.config_table->nak_limit - 1;
 
     /* Act */
     CF_CFDP_R2_Complete(arg_t, arg_ok_to_send_nak);
@@ -470,9 +470,9 @@ void Test_CF_CFDP_R2_Complete_Given_t_Sets_send_nak_To_1_Given_ok_to_send_nak_Is
     arg_t->flags.rx.md_recv       = 0;
     arg_t->flags.rx.send_nak      = 0;
 
-    CF_AppData.config_table            = &dummy_config_table;
-    CF_AppData.config_table->nak_limit = Any_uint8_GreaterThan(1);
-    arg_t->state_data.r.r2.counter.nak = CF_AppData.config_table->nak_limit - 2;
+    CF_AppData.config_table             = &dummy_config_table;
+    CF_AppData.config_table->nak_limit  = Any_uint8_GreaterThan(1);
+    arg_t->state_data.r.r2.acknak_count = CF_AppData.config_table->nak_limit - 2;
 
     /* Act */
     CF_CFDP_R2_Complete(arg_t, arg_ok_to_send_nak);
@@ -511,9 +511,9 @@ void Test_CF_CFDP_R2_Complete_Calls_CF_Chunks_ComputeGaps_Returns_non0_Set_send_
 
     UT_SetDefaultReturnValue(UT_KEY(CF_ChunkList_ComputeGaps), Any_int_Except(0));
 
-    CF_AppData.config_table            = &dummy_config_table;
-    CF_AppData.config_table->nak_limit = Any_uint8_GreaterThan(1);
-    arg_t->state_data.r.r2.counter.nak = CF_AppData.config_table->nak_limit - 2;
+    CF_AppData.config_table             = &dummy_config_table;
+    CF_AppData.config_table->nak_limit  = Any_uint8_GreaterThan(1);
+    arg_t->state_data.r.r2.acknak_count = CF_AppData.config_table->nak_limit - 2;
 
     /* Act */
     CF_CFDP_R2_Complete(arg_t, arg_ok_to_send_nak);
@@ -553,9 +553,9 @@ void Test_CF_CFDP_R2_Complete_Calls_CF_Chunks_ComputeGaps_Returns_non0_Set_send_
     UT_SetDefaultReturnValue(UT_KEY(CF_ChunkList_ComputeGaps), 0);
     arg_t->flags.rx.eof_recv = 0;
 
-    CF_AppData.config_table            = &dummy_config_table;
-    CF_AppData.config_table->nak_limit = Any_uint8_GreaterThan(1);
-    arg_t->state_data.r.r2.counter.nak = CF_AppData.config_table->nak_limit - 2;
+    CF_AppData.config_table             = &dummy_config_table;
+    CF_AppData.config_table->nak_limit  = Any_uint8_GreaterThan(1);
+    arg_t->state_data.r.r2.acknak_count = CF_AppData.config_table->nak_limit - 2;
 
     /* Act */
     CF_CFDP_R2_Complete(arg_t, arg_ok_to_send_nak);
@@ -596,9 +596,9 @@ void Test_CF_CFDP_R2_Complete_Calls_CF_Chunks_ComputeGaps_Returns_non0_Set_send_
     UT_SetDefaultReturnValue(UT_KEY(CF_ChunkList_ComputeGaps), 0);
     arg_t->flags.rx.eof_recv = 1;
 
-    CF_AppData.config_table            = &dummy_config_table;
-    CF_AppData.config_table->nak_limit = Any_uint8_GreaterThan(1);
-    arg_t->state_data.r.r2.counter.nak = CF_AppData.config_table->nak_limit - 2;
+    CF_AppData.config_table             = &dummy_config_table;
+    CF_AppData.config_table->nak_limit  = Any_uint8_GreaterThan(1);
+    arg_t->state_data.r.r2.acknak_count = CF_AppData.config_table->nak_limit - 2;
 
     /* Act */
     CF_CFDP_R2_Complete(arg_t, arg_ok_to_send_nak);
@@ -1302,13 +1302,13 @@ void Test_CF_CFDP_R2_SubstateRecvEof_CallTo_CF_CFDP_R_SubstateRecvEof_Returns_R_
     CF_History_t     dummy_history;
     CF_ConfigTable_t dummy_config_table;
 
-    arg_t->history                     = &dummy_history;
-    arg_t->history->cc                 = CF_CFDP_ConditionCode_NO_ERROR;
-    arg_t->flags.rx.md_recv            = 0;
-    arg_t->state_data.r.r2.counter.nak = 0;
-    CF_AppData.config_table            = &dummy_config_table;
-    CF_AppData.config_table->nak_limit = UINT8_MAX;
-    arg_t->state_data.r.sub_state      = Any_uint8_Except(CF_RxSubState_FILEDATA);
+    arg_t->history                      = &dummy_history;
+    arg_t->history->cc                  = CF_CFDP_ConditionCode_NO_ERROR;
+    arg_t->flags.rx.md_recv             = 0;
+    arg_t->state_data.r.r2.acknak_count = 0;
+    CF_AppData.config_table             = &dummy_config_table;
+    CF_AppData.config_table->nak_limit  = UINT8_MAX;
+    arg_t->state_data.r.sub_state       = Any_uint8_Except(CF_RxSubState_FILEDATA);
 
     /* Act */
     CF_CFDP_R2_SubstateRecvEof(arg_t, arg_ph);
@@ -1555,7 +1555,7 @@ void Test_CF_CFDP_R2_SubstateRecvFileData_t_flags_rx_fd_nak_sent_Is_0_And_t_flag
 
     UT_SetHandlerFunction(UT_KEY(CF_CFDP_RecvFd), Handler_int_ForcedReturnOnly, &forced_return_CF_CFDP_RecvFd);
 
-    arg_t->state_data.r.r2.counter.nak = Any_uint8_Except(0);
+    arg_t->state_data.r.r2.acknak_count = Any_uint8_Except(0);
 
     arg_t->flags.rx.fd_nak_sent = 0;
 
@@ -1598,8 +1598,7 @@ void Test_CF_CFDP_R2_SubstateRecvFileData_t_flags_rx_fd_nak_sent_Is_0_And_t_flag
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_RecvFd, 1);
     UtAssert_STUB_COUNT(CF_ChunkListAdd, 1);
-    UtAssert_True(arg_t->state_data.r.r2.counter.nak == 0, "t->state_data.r.r2.counter.nak is %u and should be 0",
-                  arg_t->state_data.r.r2.counter.nak);
+    UtAssert_ZERO(arg_t->state_data.r.r2.acknak_count);
     /* Assert for CF_CFDP_R_ProcessFd - 3 calls, one in function two in STATIC_CAST */
     UtAssert_STUB_COUNT(CF_HeaderSize, 3);
     /* Assert for CF_CFDP_R2_Reset via CF_CFDP_R1_Reset */
@@ -1620,7 +1619,7 @@ void Test_CF_CFDP_R2_SubstateRecvFileData_t_flags_rx_fd_nak_sent_Is_1_Call_CF_CF
 
     UT_SetHandlerFunction(UT_KEY(CF_CFDP_RecvFd), Handler_int_ForcedReturnOnly, &forced_return_CF_CFDP_RecvFd);
 
-    arg_t->state_data.r.r2.counter.nak = Any_uint8_Except(0);
+    arg_t->state_data.r.r2.acknak_count = Any_uint8_Except(0);
 
     arg_t->flags.rx.fd_nak_sent = 1;
 
@@ -1666,8 +1665,7 @@ void Test_CF_CFDP_R2_SubstateRecvFileData_t_flags_rx_fd_nak_sent_Is_1_Call_CF_CF
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_RecvFd, 1);
     UtAssert_STUB_COUNT(CF_ChunkListAdd, 1);
-    UtAssert_True(arg_t->state_data.r.r2.counter.nak == 0, "t->state_data.r.r2.counter.nak is %u and should be 0",
-                  arg_t->state_data.r.r2.counter.nak);
+    UtAssert_ZERO(arg_t->state_data.r.r2.acknak_count);
     /* Assert for CF_CFDP_R_ProcessFd - 3 calls, one in function two in STATIC_CAST */
     UtAssert_STUB_COUNT(CF_HeaderSize, 3);
     /* Assert for CF_CFDP_R2_Reset via CF_CFDP_R1_Reset */
@@ -1688,7 +1686,7 @@ void Test_CF_CFDP_R2_SubstateRecvFileData_t_flags_rx_fd_nak_sent_Is_0_And_t_flag
 
     UT_SetHandlerFunction(UT_KEY(CF_CFDP_RecvFd), Handler_int_ForcedReturnOnly, &forced_return_CF_CFDP_RecvFd);
 
-    arg_t->state_data.r.r2.counter.nak = Any_uint8_Except(0);
+    arg_t->state_data.r.r2.acknak_count = Any_uint8_Except(0);
 
     arg_t->flags.rx.fd_nak_sent = 0;
 
@@ -1732,8 +1730,7 @@ void Test_CF_CFDP_R2_SubstateRecvFileData_t_flags_rx_fd_nak_sent_Is_0_And_t_flag
     UtAssert_STUB_COUNT(CF_CFDP_RecvFd, 1);
     UtAssert_STUB_COUNT(CF_ChunkListAdd, 1);
     UtAssert_STUB_COUNT(CF_CFDP_ArmAckTimer, 1);
-    UtAssert_True(arg_t->state_data.r.r2.counter.nak == 0, "t->state_data.r.r2.counter.nak is %u and should be 0",
-                  arg_t->state_data.r.r2.counter.nak);
+    UtAssert_ZERO(arg_t->state_data.r.r2.acknak_count);
     /* Assert for CF_CFDP_R_ProcessFd - 3 calls, one in function two in STATIC_CAST */
     UtAssert_STUB_COUNT(CF_HeaderSize, 3);
     /* Assert for CF_CFDP_R2_Reset via CF_CFDP_R1_Reset */
@@ -3206,8 +3203,8 @@ void Test_CF_CFDP_R2_RecvMd_Given_t_flags_rx_md_recv_Is_0_CallTo_CF_CFDP_RecvMd_
     UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
                      false);
 
-    arg_t->flags.rx.md_recv            = 0;
-    arg_t->state_data.r.r2.counter.nak = Any_uint8_Except(0);
+    arg_t->flags.rx.md_recv             = 0;
+    arg_t->state_data.r.r2.acknak_count = Any_uint8_Except(0);
 
     /* Arrange for CF_CFDP_R2_Complete */
     arg_t->history->cc            = CF_CFDP_ConditionCode_NO_ERROR;
@@ -3224,8 +3221,7 @@ void Test_CF_CFDP_R2_RecvMd_Given_t_flags_rx_md_recv_Is_0_CallTo_CF_CFDP_RecvMd_
     UtAssert_STUB_COUNT(CF_WrappedOpenCreate, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_True(arg_t->flags.rx.md_recv == 1, "t->flags.rx.md_recv is %u and should be 1", arg_t->flags.rx.md_recv);
-    UtAssert_True(arg_t->state_data.r.r2.counter.nak == 0, "t->state_data.r.r2.counter.nak is %u and should be 0",
-                  arg_t->state_data.r.r2.counter.nak);
+    UtAssert_ZERO(arg_t->state_data.r.r2.acknak_count);
     /* Assert for CF_CFDP_R2_Complete */
     UtAssert_True(arg_t->state_data.r.sub_state == CF_RxSubState_FILEDATA,
                   "t->state_data.r.sub_state is %u and should be %u (CF_RxSubState_FILEDATA)",
@@ -4499,7 +4495,8 @@ void Test_CF_CFDP_R_Tick_NothingElseSet_ack_timer_armed_Is_1_CAllTo_CF_Timer_Exp
 
     arg_t->flags.rx.complete = 1;
 
-    arg_t->state_data.r.sub_state = CF_RxSubState_WAIT_FOR_FIN_ACK;
+    arg_t->state_data.r.sub_state       = CF_RxSubState_WAIT_FOR_FIN_ACK;
+    arg_t->state_data.r.r2.acknak_count = 0;
 
     /* Arrange for CF_CFDP_R2_Complete */
     CF_History_t dummy_history;
@@ -4560,7 +4557,7 @@ void Test_CF_CFDP_R_Tick_NothingElseSet_ack_timer_armed_Is_1_CAllTo_CF_Timer_Exp
 
     CF_AppData.config_table->ack_limit = Any_uint8_Except(0); /* Any_uint8 used for small value in test */
 
-    arg_t->state_data.r.r2.counter.ack = CF_AppData.config_table->ack_limit - 1; /* - 1 code increases value */
+    arg_t->state_data.r.r2.acknak_count = CF_AppData.config_table->ack_limit - 1; /* - 1 code increases value */
 
     UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
     arg_t->history = &dummy_history;

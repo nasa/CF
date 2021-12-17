@@ -181,7 +181,7 @@ static void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
 
     if (send_nak && ok_to_send_nak)
     {
-        if (++t->state_data.r.r2.counter.nak == CF_AppData.config_table->nak_limit)
+        if (++t->state_data.r.r2.acknak_count >= CF_AppData.config_table->nak_limit)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_NAK_LIMIT, CFE_EVS_EventType_ERROR, "CF R%d(%u:%u): nak limited reach",
                               (t->state == CF_TxnState_R2), t->history->src_eid, t->history->seq_num);
@@ -189,7 +189,7 @@ static void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.nak_limit;
             t->history->cc = CF_CFDP_ConditionCode_NAK_LIMIT_REACHED; /* don't use CF_CFDP_R2_SetCc because many places
                                                                          in this function set send_fin */
-            t->state_data.r.r2.counter.nak = 0;                       /* reset for fin/ack */
+            t->state_data.r.r2.acknak_count = 0;                      /* reset for fin/ack */
         }
         else
         {
@@ -493,7 +493,7 @@ static void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, const CF_CFDP_P
         CF_CFDP_ArmAckTimer(t); /* re-arm ack timer, since we got data */
     }
 
-    t->state_data.r.r2.counter.nak = 0;
+    t->state_data.r.r2.acknak_count = 0;
 
     return;
 
@@ -916,9 +916,9 @@ static void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph
                 }
             }
 
-            t->flags.rx.md_recv            = 1;
-            t->state_data.r.r2.counter.nak = 0; /* in case part of nak */
-            CF_CFDP_R2_Complete(t, 1);          /* check for completion now that md is received */
+            t->flags.rx.md_recv             = 1;
+            t->state_data.r.r2.acknak_count = 0; /* in case part of nak */
+            CF_CFDP_R2_Complete(t, 1);           /* check for completion now that md is received */
         }
         else
         {
@@ -1147,7 +1147,7 @@ void CF_CFDP_R_Tick(CF_Transaction_t *t, int *cont /* unused */)
                 }
                 else if (t->state_data.r.sub_state == CF_RxSubState_WAIT_FOR_FIN_ACK)
                 {
-                    if (++t->state_data.r.r2.counter.ack == CF_AppData.config_table->ack_limit)
+                    if (++t->state_data.r.r2.acknak_count >= CF_AppData.config_table->ack_limit)
                     {
                         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_ACK_LIMIT, CFE_EVS_EventType_ERROR,
                                           "CF R2(%u:%u): ack limit reached, no fin-ack", t->history->src_eid,

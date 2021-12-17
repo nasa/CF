@@ -791,7 +791,7 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
                 {
                     if (t->state_data.s.sub_state == CF_TxSubState_WAIT_FOR_EOF_ACK)
                     {
-                        if (++t->state_data.s.s2.counter.ack == CF_AppData.config_table->ack_limit)
+                        if (++t->state_data.s.s2.acknak_count >= CF_AppData.config_table->ack_limit)
                         {
                             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_ACK_LIMIT, CFE_EVS_EventType_ERROR,
                                               "CF S2(%u:%u), ack limit reached, no eof-ack", t->history->src_eid,

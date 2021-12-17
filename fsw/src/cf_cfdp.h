@@ -134,16 +134,10 @@ typedef struct CF_Poll
     bool          timer_set;
 } CF_Poll_t;
 
-typedef union CF_RxTxCounters
-{
-    unsigned ack;
-    uint8    nak;
-} CF_RxTxCounters_t;
-
 typedef struct CF_TxS2_Data
 {
-    uint8             fin_cc; /* remember the cc in the received fin pdu to echo in eof-fin */
-    CF_RxTxCounters_t counter;
+    uint8 fin_cc; /* remember the cc in the received fin pdu to echo in eof-fin */
+    uint8 acknak_count;
 } CF_TxS2_Data_t;
 
 typedef struct CF_TxState_Data
@@ -162,7 +156,7 @@ typedef struct CF_RxS2_Data
     CF_CFDP_FinDeliveryCode_t dc;
     CF_CFDP_FinFileStatus_t   fs;
     uint8                     eof_cc; /* remember the cc in the received eof pdu to echo in eof-ack */
-    CF_RxTxCounters_t         counter;
+    uint8                     acknak_count;
 } CF_RxS2_Data_t;
 
 typedef struct CF_RxState_Data
