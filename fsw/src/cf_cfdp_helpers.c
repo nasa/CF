@@ -134,13 +134,12 @@ static int CF_GetEIDSize(const CF_CFDP_PduHeader_t *ph)
 
 /* get the variable length header items out of the PDU header and store as incoming data */
 /* in.msg must be valid PDU message */
-int CF_GetVariableHeader(void)
+int CF_GetVariableHeader(CF_CFDP_PduHeader_t *ph)
 {
-    CF_CFDP_PduHeader_t *ph    = &((CF_PduRecvMsg_t *)CF_AppData.engine.in.msg)->ph;
-    const int            eid_l = CF_GetEIDSize(ph);
-    const int            tsn_l = CF_GetTSNSize(ph);
-    int                  offs  = sizeof(*ph);
-    int                  ret   = -1;
+    const int eid_l = CF_GetEIDSize(ph);
+    const int tsn_l = CF_GetTSNSize(ph);
+    int       offs  = sizeof(*ph);
+    int       ret   = -1;
 
     if ((eid_l > 0) && (tsn_l > 0))
     {
@@ -155,14 +154,14 @@ int CF_GetVariableHeader(void)
     return ret;
 }
 
-void CF_SetVariableHeader(CF_EntityId_t src_eid, CF_EntityId_t dst_eid, CF_TransactionSeq_t tsn)
+void CF_SetVariableHeader(CF_CFDP_PduHeader_t *ph, CF_EntityId_t src_eid, CF_EntityId_t dst_eid,
+                          CF_TransactionSeq_t tsn)
 {
-    CF_CFDP_PduHeader_t *ph      = &((CF_PduSendMsg_t *)CF_AppData.engine.out.msg)->ph;
-    int                  offs    = sizeof(*ph);
-    const int            eid_s_l = CF_GetMemcpySize((uint8 *)&src_eid, sizeof(src_eid));
-    const int            eid_d_l = CF_GetMemcpySize((uint8 *)&dst_eid, sizeof(dst_eid));
-    const int            tsn_l   = CF_GetMemcpySize((uint8 *)&tsn, sizeof(tsn));
-    const int            csize   = ((eid_s_l > eid_d_l) ? eid_s_l : eid_d_l);
+    int       offs    = sizeof(*ph);
+    const int eid_s_l = CF_GetMemcpySize((uint8 *)&src_eid, sizeof(src_eid));
+    const int eid_d_l = CF_GetMemcpySize((uint8 *)&dst_eid, sizeof(dst_eid));
+    const int tsn_l   = CF_GetMemcpySize((uint8 *)&tsn, sizeof(tsn));
+    const int csize   = ((eid_s_l > eid_d_l) ? eid_s_l : eid_d_l);
 
     CF_MemcpyToBE(((uint8 *)ph) + offs, (uint8 *)&src_eid, sizeof(src_eid), csize);
     offs += csize;

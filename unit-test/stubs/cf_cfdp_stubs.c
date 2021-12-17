@@ -442,7 +442,7 @@ CF_CFDP_PduHeader_t *CF_CFDP_EarlySendFd(CF_Transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-CF_SendRet_t CF_CFDP_SendFd(CF_Transaction_t *t, uint32 offset, int len)
+CF_SendRet_t CF_CFDP_SendFd(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph, uint32 offset, int len)
 {
     CF_SendRet_t forced_return;
 
@@ -575,7 +575,7 @@ CF_SendRet_t CF_CFDP_SendFin(CF_Transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, 
 **  \endreturns
 **
 *************************************************************************/
-CF_SendRet_t CF_CFDP_SendNak(CF_Transaction_t *t, int num_segment_requests)
+CF_SendRet_t CF_CFDP_SendNak(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph, int num_segment_requests)
 {
 
     CF_SendRet_t forced_return;
@@ -642,7 +642,7 @@ CF_CFDP_PduHeader_t *CF_CFDP_EarlySendNak(CF_Transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-int CF_CFDP_RecvMd(CF_Transaction_t *t)
+int CF_CFDP_RecvMd(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvMd, int32);
 
@@ -666,7 +666,7 @@ int CF_CFDP_RecvMd(CF_Transaction_t *t)
 **
 *************************************************************************/
 
-int CF_CFDP_RecvFd(CF_Transaction_t *t)
+int CF_CFDP_RecvFd(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     int forced_return = __INT_MAX__;
 
@@ -693,7 +693,7 @@ int CF_CFDP_RecvFd(CF_Transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-int CF_CFDP_RecvEof(void)
+int CF_CFDP_RecvEof(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     return (int)UT_DEFAULT_IMPL(CF_CFDP_RecvEof);
 }
@@ -710,7 +710,7 @@ int CF_CFDP_RecvEof(void)
 **  \endreturns
 **
 *************************************************************************/
-int CF_CFDP_RecvAck(void)
+int CF_CFDP_RecvAck(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     return (int)UT_DEFAULT_IMPL(CF_CFDP_RecvAck);
 }
@@ -727,7 +727,7 @@ int CF_CFDP_RecvAck(void)
 **  \endreturns
 **
 *************************************************************************/
-int CF_CFDP_RecvFin(void)
+int CF_CFDP_RecvFin(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     return UT_DEFAULT_IMPL(CF_CFDP_RecvFin);
 }
@@ -744,7 +744,7 @@ int CF_CFDP_RecvFin(void)
 **  \endreturns
 **
 *************************************************************************/
-int CF_CFDP_RecvNak(int *num_segment_requests)
+int CF_CFDP_RecvNak(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph, int *num_segment_requests)
 {
     UT_Stub_CopyToLocal(UT_KEY(CF_CFDP_RecvNak), num_segment_requests, sizeof(int));
 

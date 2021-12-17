@@ -70,7 +70,7 @@ void Dummy_fns_CF_CFDP_S_DispatchRecv(CF_Transaction_t* t, const CF_CFDP_PduHead
     UT_GenStub_Execute(Stub_FGV, Basic, NULL);
 } */
 
-void Dummy_fns_CF_CFDP_S_DispatchRecv(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
+void Dummy_fns_CF_CFDP_S_DispatchRecv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *pdu)
 {
     UT_Stub_CopyFromLocal(UT_KEY(Dummy_fns_CF_CFDP_S_DispatchRecv), &t, sizeof(t));
     UT_Stub_CopyFromLocal(UT_KEY(Dummy_fns_CF_CFDP_S_DispatchRecv), &pdu, sizeof(pdu));
@@ -2069,8 +2069,8 @@ void Test_CF_CFDP_S2_EarlyFin_SendEventAndCallReset(void)
     CF_History_t                dummy_history;
     CF_Transaction_t            dummy_t;
     CF_Transaction_t           *arg_t = &dummy_t;
-    const CF_CFDP_PduHeader_t   dummy_ph;
-    const CF_CFDP_PduHeader_t  *arg_ph        = &dummy_ph;
+    CF_CFDP_PduHeader_t         dummy_ph;
+    CF_CFDP_PduHeader_t        *arg_ph        = &dummy_ph;
     const char                 *expected_Spec = "CF S%d(%u:%u): got early fin -- cancelling";
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
 
@@ -2117,12 +2117,12 @@ void Test_CF_CFDP_S2_EarlyFin_SendEventAndCallReset(void)
 void Test_CF_CFDP_S2_Fin_When_CF_CFDP_RecvFin_Returns_0_Set_fin_cc_And_sub_state(void)
 {
     /* Arrange */
-    CF_Transaction_t           dummy_t;
-    CF_Transaction_t          *arg_t       = &dummy_t;
-    uint8                      dummy_flags = Any_uint8();
-    const CF_CFDP_PduHeader_t  dummy_ph;
-    const CF_CFDP_PduHeader_t *arg_ph;
-    uint8                      expected_fin_cc = FGV(dummy_flags, CF_CFDP_PduFin_FLAGS_CC);
+    CF_Transaction_t     dummy_t;
+    CF_Transaction_t    *arg_t       = &dummy_t;
+    uint8                dummy_flags = Any_uint8();
+    CF_CFDP_PduHeader_t  dummy_ph;
+    CF_CFDP_PduHeader_t *arg_ph;
+    uint8                expected_fin_cc = FGV(dummy_flags, CF_CFDP_PduFin_FLAGS_CC);
 
     memcpy((void *)&dummy_ph.flags, &dummy_flags, 1);
     arg_ph = &dummy_ph;
@@ -2150,8 +2150,8 @@ void Test_CF_CFDP_S2_Fin_When_CF_CFDP_RecvFin_DoesNotReturn_0_SendEventAndCountR
     CF_History_t                dummy_history;
     CF_Transaction_t            dummy_t;
     CF_Transaction_t           *arg_t = &dummy_t;
-    const CF_CFDP_PduHeader_t   dummy_ph;
-    const CF_CFDP_PduHeader_t  *arg_ph             = &dummy_ph;
+    CF_CFDP_PduHeader_t         dummy_ph;
+    CF_CFDP_PduHeader_t        *arg_ph             = &dummy_ph;
     uint32                      initial_recv_error = Any_uint32();
     const char                 *expected_Spec      = "CF S%d(%u:%u): received invalid fin pdu";
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
@@ -2200,12 +2200,14 @@ void Test_CF_CFDP_S2_Nak_CallTo_CF_CFDP_RecvNak_Returns_neg1_SendEventAndIncreme
     CF_History_t                dummy_history;
     CF_Transaction_t            dummy_t;
     CF_Transaction_t           *arg_t = &dummy_t;
-    CF_CFDP_PduNak_t            dummy_ph;
-    CF_CFDP_PduHeader_t        *arg_ph             = (CF_CFDP_PduHeader_t *)&dummy_ph;
+    CF_UT_inmsg_buffer_t        dummy_msg;
+    CF_CFDP_PduHeader_t        *arg_ph             = &dummy_msg.pdu_r_msg.ph;
     uint32                      initial_recv_error = Any_uint32();
     const char                 *expected_Spec      = "CF S%d(%u:%u): received invalid nak pdu";
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
     int                         context_CF_CFDP_RecvNak_forced_num_sr = Any_int();
+
+    memset(&dummy_msg, 0, sizeof(dummy_msg));
 
     arg_t->history  = &dummy_history;
     arg_t->chan_num = Any_cf_chan_num();
@@ -2244,12 +2246,14 @@ void Test_CF_CFDP_S2_Nak_CallTo_CF_CFDP_RecvNak_Returns_0_Set_num_sr_to_0_SendEv
     CF_History_t                dummy_history;
     CF_Transaction_t            dummy_t;
     CF_Transaction_t           *arg_t = &dummy_t;
-    CF_CFDP_PduNak_t            dummy_ph;
-    CF_CFDP_PduHeader_t        *arg_ph             = (CF_CFDP_PduHeader_t *)&dummy_ph;
+    CF_UT_inmsg_buffer_t        dummy_msg;
+    CF_CFDP_PduHeader_t        *arg_ph             = &dummy_msg.pdu_r_msg.ph;
     uint32                      initial_recv_error = Any_uint32();
     const char                 *expected_Spec      = "CF S%d(%u:%u): received invalid nak pdu";
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
     int                         context_CF_CFDP_RecvNak_forced_num_sr = 0;
+
+    memset(&dummy_msg, 0, sizeof(dummy_msg));
 
     arg_t->history  = &dummy_history;
     arg_t->chan_num = Any_cf_chan_num();
@@ -2585,8 +2589,8 @@ void Test_CF_CFDP_S2_Nak_Arm_Call_CF_CFDP_ArmAckTimer_And_CF_CFDP_S2_Nak(void)
     CF_History_t                dummy_history;
     CF_Transaction_t            dummy_t;
     CF_Transaction_t           *arg_t = &dummy_t;
-    const CF_CFDP_PduHeader_t   dummy_ph;
-    const CF_CFDP_PduHeader_t  *arg_ph                                = &dummy_ph;
+    CF_CFDP_PduHeader_t         dummy_ph;
+    CF_CFDP_PduHeader_t        *arg_ph                                = &dummy_ph;
     uint32                      initial_recv_error                    = Any_uint32();
     int                         context_CF_CFDP_RecvNak_forced_num_sr = Any_int();
     CF_Transaction_t           *context_CF_CFDP_ArmAckTimer;
@@ -2638,8 +2642,8 @@ void Test_CF_CFDP_S2_WaitForEofAck_CallTo_CF_CFDP_RecvAck_Returns_neg1_SendEvent
     CF_History_t                dummy_history;
     CF_Transaction_t            dummy_t;
     CF_Transaction_t           *arg_t = &dummy_t;
-    const CF_CFDP_PduHeader_t   dummy_ph;
-    const CF_CFDP_PduHeader_t  *arg_ph             = &dummy_ph;
+    CF_CFDP_PduHeader_t         dummy_ph;
+    CF_CFDP_PduHeader_t        *arg_ph             = &dummy_ph;
     uint32                      initial_recv_error = Any_uint32();
     const char                 *expected_Spec      = "CF S%d(%u:%u): received invalid eof pdu";
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
@@ -2676,11 +2680,11 @@ void Test_CF_CFDP_S2_WaitForEofAck_CallTo_CF_CFDP_RecvAck_Returns_0_And_t_histor
     void)
 {
     /* Arrange */
-    CF_History_t               dummy_history;
-    CF_Transaction_t           dummy_t;
-    CF_Transaction_t          *arg_t = &dummy_t;
-    const CF_CFDP_PduHeader_t  dummy_ph;
-    const CF_CFDP_PduHeader_t *arg_ph = &dummy_ph;
+    CF_History_t         dummy_history;
+    CF_Transaction_t     dummy_t;
+    CF_Transaction_t    *arg_t = &dummy_t;
+    CF_CFDP_PduHeader_t  dummy_ph;
+    CF_CFDP_PduHeader_t *arg_ph = &dummy_ph;
 
     arg_t->history     = &dummy_history;
     arg_t->history->cc = CF_CFDP_ConditionCode_NO_ERROR;
@@ -2709,11 +2713,11 @@ void Test_CF_CFDP_S2_WaitForEofAck_CallTo_CF_CFDP_RecvAck_Returns_0_And_t_histor
     void)
 {
     /* Arrange */
-    CF_History_t               dummy_history;
-    CF_Transaction_t           dummy_t;
-    CF_Transaction_t          *arg_t = &dummy_t;
-    const CF_CFDP_PduHeader_t  dummy_ph;
-    const CF_CFDP_PduHeader_t *arg_ph = &dummy_ph;
+    CF_History_t         dummy_history;
+    CF_Transaction_t     dummy_t;
+    CF_Transaction_t    *arg_t = &dummy_t;
+    CF_CFDP_PduHeader_t  dummy_ph;
+    CF_CFDP_PduHeader_t *arg_ph = &dummy_ph;
 
     arg_t->history     = &dummy_history;
     arg_t->history->cc = Any_uint8_Except(CF_CFDP_ConditionCode_NO_ERROR);
@@ -2767,19 +2771,18 @@ void Test_CF_CFDP_S_DispatchRecv_Asserts_msg_in_Is_NULL(void)
 void Test_CF_CFDP_S_DispatchRecv_AlreadyHas_pdu_ph_flags_SetSoSendEvent(void)
 {
     /* Arrange */
-    CF_History_t                dummy_history;
-    CF_UT_inmsg_buffer_t        dummy_msg;
-    CF_Transaction_t            dummy_t;
-    CF_Transaction_t           *arg_t         = &dummy_t;
-    const char                 *expected_Spec = "CF S%d(%u:%u): received non-file directive pdu";
-    void                       *arg_fns       = NULL;
-    CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
+    CF_History_t                          dummy_history;
+    CF_UT_inmsg_buffer_t                  dummy_msg;
+    CF_Transaction_t                      dummy_t;
+    CF_Transaction_t                     *arg_t         = &dummy_t;
+    const char                           *expected_Spec = "CF S%d(%u:%u): received non-file directive pdu";
+    CF_CFDP_S_SubstateRecvDispatchTable_t arg_fns       = {{NULL}};
+    CFE_EVS_SendEvent_context_t           context_CFE_EVS_SendEvent;
 
     memset(&dummy_msg, 0, sizeof(dummy_msg));
 
+    dummy_msg.pdu_r_msg.ph.flags  = 0x10; /* pdu_type bit */
     arg_t->state_data.s.sub_state = Any_uint8_LessThan(CF_TxSubState_NUM_STATES);
-
-    CF_AppData.engine.in.msg = &dummy_msg.cfe_sb_buffer;
 
     UT_SetDefaultReturnValue(UT_KEY(FGV), 1);
 
@@ -2787,7 +2790,7 @@ void Test_CF_CFDP_S_DispatchRecv_AlreadyHas_pdu_ph_flags_SetSoSendEvent(void)
     arg_t->history = &dummy_history;
 
     /* Act */
-    CF_CFDP_S_DispatchRecv(arg_t, arg_fns);
+    CF_CFDP_S_DispatchRecv(arg_t, &dummy_msg.pdu_r_msg.ph, &arg_fns);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
@@ -2814,14 +2817,12 @@ void Test_CF_CFDP_S_DispatchRecv_DidNotHaveFlagsSetBut_fdh_directive_code_IsEqTo
     uint8                dummy_flags           = CF_CFDP_FileDirective_INVALID_MAX;
     uint16               initial_recv_spurious = Any_uint16();
     const char          *expected_Spec = "CF S%d(%u:%u): received pdu with invalid directive code %d for sub-state %d";
-    void                *arg_fns       = NULL;
-    CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
+    CF_CFDP_S_SubstateRecvDispatchTable_t arg_fns = {{NULL}};
+    CFE_EVS_SendEvent_context_t           context_CFE_EVS_SendEvent;
 
     memset(&dummy_msg, 0, sizeof(dummy_msg));
 
     arg_t->state_data.s.sub_state = Any_uint8_LessThan(CF_TxSubState_NUM_STATES);
-
-    CF_AppData.engine.in.msg = &dummy_msg.cfe_sb_buffer;
 
     UT_SetDefaultReturnValue(UT_KEY(FGV), 0);
 
@@ -2834,7 +2835,7 @@ void Test_CF_CFDP_S_DispatchRecv_DidNotHaveFlagsSetBut_fdh_directive_code_IsEqTo
     arg_t->history = &dummy_history;
 
     /* Act */
-    CF_CFDP_S_DispatchRecv(arg_t, arg_fns);
+    CF_CFDP_S_DispatchRecv(arg_t, &dummy_msg.pdu_r_msg.ph, &arg_fns);
 
     /* Assert */
     UtAssert_True(CF_AppData.hk.channel_hk[dummy_chan_num].counters.recv.spurious ==
@@ -2867,14 +2868,12 @@ void Test_CF_CFDP_S_DispatchRecv_DidNotHaveFlagsSetBut_fdh_directive_code_IsGrea
     uint8                dummy_flags           = Any_uint8_GreaterThan(CF_CFDP_FileDirective_INVALID_MAX);
     uint16               initial_recv_spurious = Any_uint16();
     const char          *expected_Spec = "CF S%d(%u:%u): received pdu with invalid directive code %d for sub-state %d";
-    void                *arg_fns       = NULL;
-    CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
+    CF_CFDP_S_SubstateRecvDispatchTable_t arg_fns = {{NULL}};
+    CFE_EVS_SendEvent_context_t           context_CFE_EVS_SendEvent;
 
     memset(&dummy_msg, 0, sizeof(dummy_msg));
 
     arg_t->state_data.s.sub_state = Any_uint8_LessThan(CF_TxSubState_NUM_STATES);
-
-    CF_AppData.engine.in.msg = &dummy_msg.cfe_sb_buffer;
 
     UT_SetDefaultReturnValue(UT_KEY(FGV), 0);
 
@@ -2887,7 +2886,7 @@ void Test_CF_CFDP_S_DispatchRecv_DidNotHaveFlagsSetBut_fdh_directive_code_IsGrea
     arg_t->history = &dummy_history;
 
     /* Act */
-    CF_CFDP_S_DispatchRecv(arg_t, arg_fns);
+    CF_CFDP_S_DispatchRecv(arg_t, &dummy_msg.pdu_r_msg.ph, &arg_fns);
 
     /* Assert */
     UtAssert_True(CF_AppData.hk.channel_hk[dummy_chan_num].counters.recv.spurious ==
@@ -2912,28 +2911,18 @@ void Test_CF_CFDP_S_DispatchRecv_Received_msg_ph_As_fdh_Has_flags_LessThan_PDU_I
     void)
 {
     /* Arrange */
-    CF_UT_inmsg_buffer_t dummy_msg;
-    CF_Transaction_t     dummy_t;
-    CF_Transaction_t    *arg_t                 = &dummy_t;
-    uint8                dummy_chan_num        = Any_cf_chan_num();
-    uint8                dummy_sub_state       = 0; /* 0 = always choose Dummy_fns_CF_CFDP_S_DispatchRecv */
-    uint8                dummy_flags           = 0; /* 0 = always choose Dummy_fns_CF_CFDP_S_DispatchRecv */
-    uint16               initial_recv_spurious = Any_uint16();
-    void (*const arg_fns[CF_TxSubState_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(CF_Transaction_t *,
-                                                                                       const CF_CFDP_PduHeader_t *) = {
-        {Dummy_fns_CF_CFDP_S_DispatchRecv, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-         NULL},                                                             /* CF_TxSubState_METADATA */
-        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* CF_TxSubState_FILEDATA */
-        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* CF_TxSubState_EOF */
-        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* CF_TxSubState_WAIT_FOR_EOF_ACK */
-        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* CF_TxSubState_WAIT_FOR_FIN */
-        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, /* CF_TxSubState_SEND_FIN_ACK */
-    };
+    CF_UT_inmsg_buffer_t                  dummy_msg;
+    CF_Transaction_t                      dummy_t;
+    CF_Transaction_t                     *arg_t           = &dummy_t;
+    uint8                                 dummy_chan_num  = Any_cf_chan_num();
+    uint8                                 dummy_sub_state = 0; /* 0 = always choose Dummy_fns_CF_CFDP_S_DispatchRecv */
+    uint8                                 dummy_flags     = 0; /* 0 = always choose Dummy_fns_CF_CFDP_S_DispatchRecv */
+    uint16                                initial_recv_spurious = Any_uint16();
+    CF_CFDP_FileDirectiveDispatchTable_t  fd_tbl  = {.fdirective = {[0] = Dummy_fns_CF_CFDP_S_DispatchRecv}};
+    CF_CFDP_S_SubstateRecvDispatchTable_t arg_fns = {.substate = {[0] = &fd_tbl}};
 
     memset(&dummy_msg, 0, sizeof(dummy_msg));
     arg_t->state_data.s.sub_state = dummy_sub_state;
-
-    CF_AppData.engine.in.msg = &dummy_msg.cfe_sb_buffer;
 
     UT_SetDefaultReturnValue(UT_KEY(FGV), 0);
 
@@ -2943,7 +2932,7 @@ void Test_CF_CFDP_S_DispatchRecv_Received_msg_ph_As_fdh_Has_flags_LessThan_PDU_I
     CF_AppData.hk.channel_hk[dummy_chan_num].counters.recv.spurious = initial_recv_spurious;
 
     /* Act */
-    CF_CFDP_S_DispatchRecv(arg_t, arg_fns);
+    CF_CFDP_S_DispatchRecv(arg_t, &dummy_msg.pdu_r_msg.ph, &arg_fns);
 
     /* Assert */
     UtAssert_STUB_COUNT(Dummy_fns_CF_CFDP_S_DispatchRecv, 1);
@@ -2958,21 +2947,18 @@ void Test_CF_CFDP_S_DispatchRecv_Received_msg_ph_As_fdh_Has_flags_LessThan_PDU_I
 void Test_CF_CFDP_S_DispatchRecv_Received_msg_ph_As_fdh_Has_flags_LessThan_PDU_INVALID_MAX_But_fns_NULL_DoNothing(void)
 {
     /* Arrange */
-    CF_UT_inmsg_buffer_t dummy_msg;
-    CF_Transaction_t     dummy_t;
-    CF_Transaction_t    *arg_t                 = &dummy_t;
-    uint8                dummy_chan_num        = Any_cf_chan_num();
-    uint8                dummy_sub_state       = Any_uint8_LessThan(CF_TxSubState_NUM_STATES);
-    uint8                dummy_flags           = Any_uint8_LessThan(CF_CFDP_FileDirective_INVALID_MAX);
-    uint16               initial_recv_spurious = Any_uint16();
-    void (*const arg_fns[CF_TxSubState_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(
-        CF_Transaction_t *, const CF_CFDP_PduHeader_t *) = {{NULL}};
+    CF_UT_inmsg_buffer_t                  dummy_msg;
+    CF_Transaction_t                      dummy_t;
+    CF_Transaction_t                     *arg_t                 = &dummy_t;
+    uint8                                 dummy_chan_num        = Any_cf_chan_num();
+    uint8                                 dummy_sub_state       = Any_uint8_LessThan(CF_TxSubState_NUM_STATES);
+    uint8                                 dummy_flags           = Any_uint8_LessThan(CF_CFDP_FileDirective_INVALID_MAX);
+    uint16                                initial_recv_spurious = Any_uint16();
+    CF_CFDP_S_SubstateRecvDispatchTable_t arg_fns               = {{NULL}};
 
     memset(&dummy_msg, 0, sizeof(dummy_msg));
 
     arg_t->state_data.s.sub_state = dummy_sub_state;
-
-    CF_AppData.engine.in.msg = &dummy_msg.cfe_sb_buffer;
 
     UT_SetDefaultReturnValue(UT_KEY(FGV), 0);
 
@@ -2982,7 +2968,7 @@ void Test_CF_CFDP_S_DispatchRecv_Received_msg_ph_As_fdh_Has_flags_LessThan_PDU_I
     CF_AppData.hk.channel_hk[dummy_chan_num].counters.recv.spurious = initial_recv_spurious;
 
     /* Act */
-    CF_CFDP_S_DispatchRecv(arg_t, arg_fns);
+    CF_CFDP_S_DispatchRecv(arg_t, &dummy_msg.pdu_r_msg.ph, &arg_fns);
 
     /* Assert */
     UtAssert_True(CF_AppData.hk.channel_hk[dummy_chan_num].counters.recv.spurious == initial_recv_spurious,
@@ -3016,8 +3002,6 @@ void Test_CF_CFDP_S1_Recv_SendsAll_NULL_fns_To_CF_CFDP_S_DispatchRecv(void)
 
     arg_t->state_data.s.sub_state = dummy_sub_state;
 
-    CF_AppData.engine.in.msg = &dummy_msg.cfe_sb_buffer;
-
     UT_SetDefaultReturnValue(UT_KEY(FGV), 0);
 
     dummy_msg.pdu_r_msg.ph.flags = dummy_flags;
@@ -3026,7 +3010,7 @@ void Test_CF_CFDP_S1_Recv_SendsAll_NULL_fns_To_CF_CFDP_S_DispatchRecv(void)
     CF_AppData.hk.channel_hk[dummy_chan_num].counters.recv.spurious = initial_recv_spurious;
 
     /* Act */
-    CF_CFDP_S1_Recv(arg_t);
+    CF_CFDP_S1_Recv(arg_t, &dummy_msg.pdu_r_msg.ph);
 
     /* Assert */
     /* Assert for CF_CFDP_S_DispatchRecv */
@@ -3077,8 +3061,6 @@ void Test_CF_CFDP_S2_Recv_Call_CF_CFDP_S_DispatchRecv(void)
 
     arg_t->state_data.s.sub_state = dummy_sub_state;
 
-    CF_AppData.engine.in.msg = &dummy_msg.cfe_sb_buffer;
-
     UT_SetDefaultReturnValue(UT_KEY(FGV), 0);
 
     dummy_msg.pdu_r_msg.ph.flags = dummy_flags;
@@ -3087,7 +3069,7 @@ void Test_CF_CFDP_S2_Recv_Call_CF_CFDP_S_DispatchRecv(void)
     CF_AppData.hk.channel_hk[dummy_chan_num].counters.recv.spurious = initial_recv_spurious;
 
     /* Act */
-    CF_CFDP_S2_Recv(arg_t);
+    CF_CFDP_S2_Recv(arg_t, &dummy_msg.pdu_r_msg.ph);
 
     /* Assert */
     /* Assert for CF_CFDP_S_DispatchRecv */

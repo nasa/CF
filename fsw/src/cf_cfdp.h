@@ -329,6 +329,67 @@ typedef struct CF_Engine
     uint8  enabled;
 } CF_Engine_t;
 
+/**
+ * @brief A function for dispatching actions to a handler, without existing PDU data
+ *
+ * This allows quick delegation to handler functions using dispatch tables.  This version is
+ * used on the transmit side, where a PDU will likely be generated/sent by the handler being
+ * invoked.
+ *
+ * @param[inout] t  The transaction object
+ */
+typedef void (*CF_CFDP_StateSendFunc_t)(CF_Transaction_t *t);
+
+/**
+ * @brief A function for dispatching actions to a handler, with existing PDU data
+ *
+ * This allows quick delegation of PDUs to handler functions using dispatch tables.  This version is
+ * used on the receive side where a PDU buffer is associated with the activity, which is then
+ * interpreted by the handler being invoked.
+ *
+ * @param[inout] t  The transaction object
+ * @param[inout] ph The PDU buffer currently being received/processed
+ */
+typedef void (*CF_CFDP_StateRecvFunc_t)(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph);
+
+/**
+ * @brief A table of receive handler functions based on file directive code
+ *
+ * For PDUs identified as a "file directive" type - generally anything other
+ * than file data - this provides a table to branch to a different handler
+ * function depending on the value of the file directive code.
+ */
+typedef struct
+{
+    /* a separate recv handler for each possible file directive PDU in this state */
+    CF_CFDP_StateRecvFunc_t fdirective[CF_CFDP_FileDirective_INVALID_MAX];
+} CF_CFDP_FileDirectiveDispatchTable_t;
+
+/**
+ * @brief A table of transmit handler functions based on transaction state
+ *
+ * This reflects the main dispatch table for the transmit side of a transaction.
+ * Each possible state has a corresponding function pointer in the table to implement
+ * the PDU transmit action(s) associated with that state.
+ */
+typedef struct
+{
+    CF_CFDP_StateSendFunc_t tx[CF_TxnState_INVALID];
+} CF_CFDP_TxnSendDispatchTable_t;
+
+/**
+ * @brief A table of receive handler functions based on transaction state
+ *
+ * This reflects the main dispatch table for the receive side of a transaction.
+ * Each possible state has a corresponding function pointer in the table to implement
+ * the PDU receive action(s) associated with that state.
+ */
+typedef struct
+{
+    /* a separate recv handler for each possible file directive PDU in this state */
+    CF_CFDP_StateRecvFunc_t rx[CF_TxnState_INVALID];
+} CF_CFDP_TxnRecvDispatchTable_t;
+
 /* NOTE: functions grouped together on contiguous lines are in groups that are described by
  * a simple comment at the top. Other comments below that apply to the whole group. */
 /* reset functions */
@@ -354,9 +415,8 @@ extern CF_CFDP_PduHeader_t *CF_CFDP_ConstructPduHeader(const CF_Transaction_t *t
                                                        CF_EntityId_t src_eid, CF_EntityId_t dst_eid,
                                                        uint8 towards_sender, CF_TransactionSeq_t tsn, int silent);
 extern CF_SendRet_t         CF_CFDP_SendMd(CF_Transaction_t *t);
-extern CF_SendRet_t         CF_CFDP_SendFd(CF_Transaction_t *t, uint32 offset, int len);
-
-extern CF_SendRet_t CF_CFDP_SendEof(CF_Transaction_t *t);
+extern CF_SendRet_t         CF_CFDP_SendFd(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph, uint32 offset, int len);
+extern CF_SendRet_t         CF_CFDP_SendEof(CF_Transaction_t *t);
 /* NOTE: CF_CFDP_SendAck() takes a CF_TransactionSeq_t instead of getting it from transaction history because
  * of the special case where a FIN-ACK must be sent for an unknown transaction. It's better for
  * long term maintenance to not build an incomplete CF_History_t for it.
@@ -365,22 +425,22 @@ extern CF_SendRet_t CF_CFDP_SendAck(CF_Transaction_t *t, CF_CFDP_AckTxnStatus_t 
                                     CF_CFDP_ConditionCode_t cc, CF_EntityId_t peer_eid, CF_TransactionSeq_t tsn);
 extern CF_SendRet_t CF_CFDP_SendFin(CF_Transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, CF_CFDP_FinFileStatus_t fs,
                                     CF_CFDP_ConditionCode_t cc);
-extern CF_SendRet_t CF_CFDP_SendNak(CF_Transaction_t *t, int num_segment_requests);
+extern CF_SendRet_t CF_CFDP_SendNak(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph, int num_segment_requests);
 
 /* PDU receive functions */
 /* returns 0 on success */
-extern int CF_CFDP_RecvMd(CF_Transaction_t *t);
-extern int CF_CFDP_RecvFd(CF_Transaction_t *t);
-extern int CF_CFDP_RecvEof(void);
-extern int CF_CFDP_RecvAck(void);
-extern int CF_CFDP_RecvFin(void);
-extern int CF_CFDP_RecvNak(int *num_segment_requests);
+extern int CF_CFDP_RecvMd(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph);
+extern int CF_CFDP_RecvFd(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph);
+extern int CF_CFDP_RecvEof(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph);
+extern int CF_CFDP_RecvAck(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph);
+extern int CF_CFDP_RecvFin(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph);
+extern int CF_CFDP_RecvNak(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph, int *num_segment_requests);
 
 /* Engine functional dispatch. These are all implemented in cf_cfdp_r.c or cf_cfdp_s.c */
-extern void CF_CFDP_S1_Recv(CF_Transaction_t *t);
-extern void CF_CFDP_R1_Recv(CF_Transaction_t *t);
-extern void CF_CFDP_S2_Recv(CF_Transaction_t *t);
-extern void CF_CFDP_R2_Recv(CF_Transaction_t *t);
+extern void CF_CFDP_S1_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph);
+extern void CF_CFDP_R1_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph);
+extern void CF_CFDP_S2_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph);
+extern void CF_CFDP_R2_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph);
 extern void CF_CFDP_S1_Tx(CF_Transaction_t *t);
 extern void CF_CFDP_S2_Tx(CF_Transaction_t *t);
 extern void CF_CFDP_R_Tick(CF_Transaction_t *t, int *cont);

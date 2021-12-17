@@ -426,7 +426,7 @@ void CF_CFDP_R_Init(CF_Transaction_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CFDP_R1_Recv(CF_Transaction_t *t)
+void CF_CFDP_R1_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     UT_GenStub_AddParam(CF_CFDP_R_Init, CF_Transaction_t *, t);
 
@@ -440,7 +440,7 @@ void CF_CFDP_R1_Recv(CF_Transaction_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CFDP_R2_Recv(CF_Transaction_t *t)
+void CF_CFDP_R2_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     UT_GenStub_AddParam(CF_CFDP_R2_Recv, CF_Transaction_t *, t);
 

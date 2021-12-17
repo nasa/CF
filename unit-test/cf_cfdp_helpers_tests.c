@@ -780,8 +780,6 @@ void Test_CF_GetVariableHeader_When_eid_l_AND_tsn_l_AreNotGreaterThan_0_DoesNotC
 
     memset(&dummy_ph, 0, sizeof(dummy_ph));
 
-    CF_AppData.engine.in.msg = &dummy_ph.cfe_sb_buffer;
-
     /* Arrange for CF_GetEIDSize */
     uint32 forced_return_FGV_from_EID = sizeof(CF_EntityId_t); /* unstubbable code adds +1 to this value */
 
@@ -795,7 +793,7 @@ void Test_CF_GetVariableHeader_When_eid_l_AND_tsn_l_AreNotGreaterThan_0_DoesNotC
                           forced_return_FGV_from_TSN); /* FGV + 1 > sizeof(CF_TransactionSeq_t) causes ret to be -1 */
 
     /* Act */
-    local_result = CF_GetVariableHeader();
+    local_result = CF_GetVariableHeader(&dummy_ph.pdu_r_msg.ph);
 
     /* Assert */
     UtAssert_True(local_result == -1, "CF_GetVariableHeader returned %d and should be -1 (fail)", local_result);
@@ -811,8 +809,6 @@ void Test_CF_GetVariableHeader_WhenOnly_eid_l_IsGreaterThan_0_DoesNotCallAnyMemC
 
     memset(&dummy_ph, 0, sizeof(dummy_ph));
 
-    CF_AppData.engine.in.msg = &dummy_ph.cfe_sb_buffer;
-
     /* Arrange for CF_GetEIDSize */
     uint32 forced_return_FGV_from_EID = sizeof(CF_EntityId_t) - 1; /* unstubbable code adds +1 to this value */
 
@@ -827,7 +823,7 @@ void Test_CF_GetVariableHeader_WhenOnly_eid_l_IsGreaterThan_0_DoesNotCallAnyMemC
                           forced_return_FGV_from_TSN); /* FGV + 1 > sizeof(CF_TransactionSeq_t) causes ret to be -1  */
 
     /* Act */
-    local_result = CF_GetVariableHeader();
+    local_result = CF_GetVariableHeader(&dummy_ph.pdu_r_msg.ph);
 
     /* Assert */
     UtAssert_True(local_result == -1, "CF_GetVariableHeader returned %d and should be -1 (fail)", local_result);
@@ -842,8 +838,6 @@ void Test_CF_GetVariableHeader_WhenOnly_tsn_l_IsGreaterThan_0_DoesNotCallAnyMemC
     int                  local_result;
 
     memset(&dummy_ph, 0, sizeof(dummy_ph));
-
-    CF_AppData.engine.in.msg = &dummy_ph.cfe_sb_buffer;
 
     /* Arrange for CF_GetEIDSize */
     uint32 forced_return_FGV_from_EID = sizeof(CF_EntityId_t); /* unstubbable code adds +1 to this value */
@@ -860,7 +854,7 @@ void Test_CF_GetVariableHeader_WhenOnly_tsn_l_IsGreaterThan_0_DoesNotCallAnyMemC
                                         sizeof(CF_TransactionSeq_t) causes ret to be sizeof(CF_TransactionSeq_t) */
 
     /* Act */
-    local_result = CF_GetVariableHeader();
+    local_result = CF_GetVariableHeader(&dummy_ph.pdu_r_msg.ph);
 
     /* Assert */
     UtAssert_True(local_result == -1, "CF_GetVariableHeader returned %d and should be -1 (fail)", local_result);
@@ -876,8 +870,6 @@ void Test_CF_GetVariableHeader_GetsAllThreeVariableLengthItemsOutOfHeaderAndRetu
 
     memset(&dummy_ph, 0, sizeof(dummy_ph));
 
-    CF_AppData.engine.in.msg = &dummy_ph.cfe_sb_buffer;
-
     /* Arrange for CF_GetEIDSize */
     uint32 forced_return_FGV_from_EID =
         Any_uint32_LessThan(sizeof(CF_EntityId_t)); /* unstubbable code adds +1 to this value */
@@ -891,7 +883,7 @@ void Test_CF_GetVariableHeader_GetsAllThreeVariableLengthItemsOutOfHeaderAndRetu
     UT_SetDeferredRetcode(UT_KEY(FGV), 1, forced_return_FGV_from_TSN); /* FGV + 1 <= sizeof(CF_TransactionSeq_t) */
 
     /* Act */
-    local_result = CF_GetVariableHeader();
+    local_result = CF_GetVariableHeader(&dummy_ph.pdu_r_msg.ph);
 
     /* Assert */
     UtAssert_True(local_result == 0, "CF_GetVariableHeader returned %d and should be 0 (success)", local_result);
@@ -917,10 +909,8 @@ void Test_CF_SetVariableHeader_Call_FSV_Twice(void)
 
     memset(&dummy_msg, 0, sizeof(dummy_msg));
 
-    CF_AppData.engine.out.msg = &dummy_msg.cfe_sb_buffer;
-
     /* Act */
-    CF_SetVariableHeader(arg_src_eid, arg_dst_eid, arg_tsn);
+    CF_SetVariableHeader(&dummy_msg.pdu_s_msg.ph, arg_src_eid, arg_dst_eid, arg_tsn);
 
     /* Assert */
     UtAssert_STUB_COUNT(FSV, 2);
