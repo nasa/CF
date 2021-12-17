@@ -65,12 +65,27 @@ static void CF_HkCmd(void)
 *************************************************************************/
 static void CF_CheckTables(void)
 {
+    CFE_Status_t status;
+
+    /* check the table for an update only if engine is disabled */
     if (!CF_AppData.engine.enabled)
     {
-        /* check the table for an update only if engine is disabled */
-        int32 status = CFE_TBL_ReleaseAddress(CF_AppData.config_handle);
-
-        if (status != CFE_SUCCESS)
+        /*
+         * NOTE: As of CFE 7.0 (Caelum), some the CFE TBL APIs return success codes
+         * other than CFE_SUCCESS, so it is not sufficient to check for only this
+         * result here.  For example they may return something like CFE_TBL_INFO_UPDATED.
+         * But from the standpoint of this routine, they are all success, because the
+         * function still did its expected job.
+         *
+         * For now, the safest way to check is to check for negative values,
+         * as the alt-success codes are in the positive range by design, and
+         * error codes are all in the negative range of CFE_Status_t.
+         *
+         * This should continue to work even if CFE TBL APIs change to
+         * remove the problematic alt-success codes at some point.
+         */
+        status = CFE_TBL_ReleaseAddress(CF_AppData.config_handle);
+        if (status < CFE_SUCCESS)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_CHECK_REL, CFE_EVS_EventType_ERROR,
                               "CF: error in CFE_TBL_ReleaseAddress (check), returned 0x%08x", status);
@@ -78,7 +93,7 @@ static void CF_CheckTables(void)
         }
 
         status = CFE_TBL_Manage(CF_AppData.config_handle);
-        if (status != CFE_SUCCESS)
+        if (status < CFE_SUCCESS)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_CHECK_MAN, CFE_EVS_EventType_ERROR,
                               "CF: error in CFE_TBL_Manage (check), returned 0x%08x", status);
@@ -86,7 +101,7 @@ static void CF_CheckTables(void)
         }
 
         status = CFE_TBL_GetAddress((void *)&CF_AppData.config_table, CF_AppData.config_handle);
-        if ((status != CFE_SUCCESS) && (status != CFE_TBL_INFO_UPDATED))
+        if (status < CFE_SUCCESS)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_CHECK_GA, CFE_EVS_EventType_ERROR,
                               "CF: failed to get table address (check), returned 0x%08x", status);
