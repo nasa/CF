@@ -1,5 +1,5 @@
 /************************************************************************
-** File: cf_app.h
+** File: cf_cfdp_sbintf.h
 **
 ** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
 ** Application version 3.0.0”
@@ -17,50 +17,16 @@
 ** limitations under the License.
 **
 **
-** Purpose:
-**  The CF Application main application header file
 **
 *************************************************************************/
 
-#ifndef CF_APP__H
-#define CF_APP__H
+#ifndef CF_CFDP_SBINTF_H
+#define CF_CFDP_SBINTF_H
 
-#include "cfe.h"
+#include "cf_cfdp_types.h"
 
-#include "cf_msg.h"
-#include "cf_msgids.h"
-#include "cf_tbldefs.h"
-#include "cf_platform_cfg.h"
-#include "cf_cfdp.h"
-#include "cf_clist.h"
+CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent);
+void                    CF_CFDP_Send(uint8 chan_num, const CF_Logical_PduBuffer_t *ph);
+void                    CF_CFDP_ReceiveMessage(CF_Channel_t *c);
 
-#define CF_PIPE_NAME           "CF_CMD_PIPE"
-#define CF_CHANNEL_PIPE_PREFIX "CF_CHAN_"
-
-typedef struct
-{
-    CF_HkPacket_t     hk;
-    CF_ConfigPacket_t cfg;
-
-    uint32 run_status;
-
-    CFE_SB_PipeId_t cmd_pipe;
-
-    CFE_TBL_Handle_t  config_handle;
-    CF_ConfigTable_t *config_table;
-
-    CF_Engine_t engine;
-} CF_AppData_t;
-
-void  CF_HkCmd(void);
-void  CF_CheckTables(void);
-int32 CF_ValidateConfigTable(void *tbl_ptr);
-int32 CF_TableInit(void);
-int32 CF_Init(void);
-void  CF_WakeUp(void);
-void  CF_ProcessMsg(CFE_SB_Buffer_t *msg);
-void  CF_AppMain(void);
-
-extern CF_AppData_t CF_AppData;
-
-#endif /* !CF_APP__H */
+#endif /* !CF_CFDP_SBINTF_H */

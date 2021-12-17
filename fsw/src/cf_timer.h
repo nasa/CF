@@ -44,13 +44,13 @@ typedef struct CF_Timer
  *
  * If the abs_sec value is greater than current time, then the timer will
  * be immediately expired. */
-extern void CF_Timer_InitRelSec(CF_Timer_t *c, CF_Timer_Seconds_t rel_sec);
-
-extern void CF_Timer_UpdateTimebase(void);
+void CF_Timer_InitRelSec(CF_Timer_t *c, CF_Timer_Seconds_t rel_sec);
 
 /* returns 1 if expired */
-extern int CF_Timer_Expired(const CF_Timer_t *t);
+int CF_Timer_Expired(const CF_Timer_t *t);
 
-extern void CF_Timer_Tick(CF_Timer_t *t);
+void CF_Timer_Tick(CF_Timer_t *t);
+
+uint32 CF_Timer_Sec2Ticks(CF_Timer_Seconds_t sec);
 
 #endif /* !CF_TIMER_H */

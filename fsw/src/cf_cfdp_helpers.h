@@ -29,6 +29,9 @@
 
 /* this file is intended to be included by cf_cfdp.h */
 
+/* the "pdu" header defines the CFDP protocol types, e.g. CF_CFDP_uint[8/16/32/64]_t */
+#include "cf_cfdp_pdu.h"
+
 #if ENDIAN == _EL
 #define CF_BSWAP16(x) ((uint16)((((x) >> 8) & 0xff) | (((x)&0xff) << 8)))
 #define CF_BSWAP32(x)                                                                           \
@@ -80,24 +83,115 @@
     } while (0)
 #endif
 
-/* NOTE: get/set will handle endianess if necessary */
-#define cfdp_set_uint8(dst, src) \
-    do                           \
-    {                            \
-        (dst) = (src);           \
-    } while (0)
-#define cfdp_set_uint16(dst, src) DECL_LDST(uint16, dst, src, CF_HTOBE16)
-#define cfdp_set_uint32(dst, src) DECL_LDST(uint32, dst, src, CF_HTOBE32)
-#define cfdp_set_uint64(dst, src) DECL_LDST(uint64, dst, src, CF_HTOBE64)
+/* NOTE: get/set will handle endianess */
+/*
+ * ALSO NOTE: These store/set inline functions/macros are used with
+ * literal integers as well as variables.  So they operate on value, where
+ * the load/get functions operate by reference
+ */
+static inline void cfdp_store_uint8(CF_CFDP_uint8_t *pdst, uint8 val)
+{
+    pdst->octets[0] = val;
+}
+#define cfdp_set_uint8(dst, src) cfdp_store_uint8(&(dst), src)
 
-#define cfdp_get_uint8(dst, src) \
-    do                           \
-    {                            \
-        (dst) = (src);           \
-    } while (0)
-#define cfdp_get_uint16(dst, src) DECL_LDST(uint16, dst, src, CF_BE16TOH)
-#define cfdp_get_uint32(dst, src) DECL_LDST(uint32, dst, src, CF_BE32TOH)
-#define cfdp_get_uint64(dst, src) DECL_LDST(uint64, dst, src, CF_BE64TOH)
+static inline void cfdp_store_uint16(CF_CFDP_uint16_t *pdst, uint16 val)
+{
+    pdst->octets[1] = val & 0xFF;
+    val >>= 8;
+    pdst->octets[0] = val & 0xFF;
+}
+#define cfdp_set_uint16(dst, src) cfdp_store_uint16(&(dst), src)
+
+static inline void cfdp_store_uint32(CF_CFDP_uint32_t *pdst, uint32 val)
+{
+    pdst->octets[3] = val & 0xFF;
+    val >>= 8;
+    pdst->octets[2] = val & 0xFF;
+    val >>= 8;
+    pdst->octets[1] = val & 0xFF;
+    val >>= 8;
+    pdst->octets[0] = val & 0xFF;
+}
+#define cfdp_set_uint32(dst, src) cfdp_store_uint32(&(dst), src)
+
+static inline void cfdp_store_uint64(CF_CFDP_uint64_t *pdst, uint64 val)
+{
+    pdst->octets[7] = val & 0xFF;
+    val >>= 8;
+    pdst->octets[6] = val & 0xFF;
+    val >>= 8;
+    pdst->octets[5] = val & 0xFF;
+    val >>= 8;
+    pdst->octets[4] = val & 0xFF;
+    val >>= 8;
+    pdst->octets[3] = val & 0xFF;
+    val >>= 8;
+    pdst->octets[2] = val & 0xFF;
+    val >>= 8;
+    pdst->octets[1] = val & 0xFF;
+    val >>= 8;
+    pdst->octets[0] = val & 0xFF;
+}
+#define cfdp_set_uint64(dst, src) cfdp_store_uint64(&(dst), src)
+
+static inline void cfdp_load_uint8(uint8 *pdst, const CF_CFDP_uint8_t *psrc)
+{
+    *pdst = psrc->octets[0];
+}
+#define cfdp_get_uint8(dst, src) cfdp_load_uint8(&(dst), &(src))
+
+static inline void cfdp_load_uint16(uint16 *pdst, const CF_CFDP_uint16_t *psrc)
+{
+    uint16 val = 0;
+
+    val |= psrc->octets[0];
+    val <<= 8;
+    val |= psrc->octets[1];
+
+    *pdst = val;
+}
+#define cfdp_get_uint16(dst, src) cfdp_load_uint16(&(dst), &(src))
+
+static inline void cfdp_load_uint32(uint32 *pdst, const CF_CFDP_uint32_t *psrc)
+{
+    uint32 val = 0;
+
+    val |= psrc->octets[0];
+    val <<= 8;
+    val |= psrc->octets[1];
+    val <<= 8;
+    val |= psrc->octets[2];
+    val <<= 8;
+    val |= psrc->octets[3];
+
+    *pdst = val;
+}
+#define cfdp_get_uint32(dst, src) cfdp_load_uint32(&(dst), &(src))
+
+static inline void cfdp_load_uint64(uint64 *pdst, const CF_CFDP_uint64_t *psrc)
+{
+    uint64 val = 0;
+
+    val |= psrc->octets[0];
+    val <<= 8;
+    val |= psrc->octets[1];
+    val <<= 8;
+    val |= psrc->octets[2];
+    val <<= 8;
+    val |= psrc->octets[3];
+    val <<= 8;
+    val |= psrc->octets[4];
+    val <<= 8;
+    val |= psrc->octets[5];
+    val <<= 8;
+    val |= psrc->octets[6];
+    val <<= 8;
+    val |= psrc->octets[7];
+
+    *pdst = val;
+}
+#define cfdp_get_uint64(dst, src) cfdp_load_uint64(&(dst), &(src))
 
 #define cfdp_ldst_uint8(dst, src) \
     do                            \
@@ -107,5 +201,8 @@
 #define cfdp_ldst_uint16(dst, src) DECL_LDST_NOSWAP(uint16, dst, src)
 #define cfdp_ldst_uint32(dst, src) DECL_LDST_NOSWAP(uint32, dst, src)
 #define cfdp_ldst_uint64(dst, src) DECL_LDST_NOSWAP(uint64, dst, src)
+
+extern uint8 CF_GetNumberMinSize(uint64 Value);
+extern void  CF_CopyNumberMinSize(void *DestBuffer, uint64 Value, uint8 Size);
 
 #endif /* !CF_CFDP_HELPERS__H */

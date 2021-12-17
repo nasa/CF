@@ -31,6 +31,7 @@
 #include "cf_perfids.h"
 #include "cf_cfdp.h"
 #include "cf_version.h"
+#include "cf_cmd.h"
 
 #include <string.h>
 
@@ -47,7 +48,7 @@ CF_AppData_t CF_AppData;
 **       None
 **
 *************************************************************************/
-static void CF_HkCmd(void)
+void CF_HkCmd(void)
 {
     CFE_MSG_SetMsgTime(&CF_AppData.hk.tlm_header.Msg, CFE_TIME_GetTime());
     /* return value ignored */ CFE_SB_TransmitMsg(&CF_AppData.hk.tlm_header.Msg, true);
@@ -63,7 +64,7 @@ static void CF_HkCmd(void)
 **       None
 **
 *************************************************************************/
-static void CF_CheckTables(void)
+void CF_CheckTables(void)
 {
     CFE_Status_t status;
 
@@ -125,7 +126,7 @@ static void CF_CheckTables(void)
 **  \endreturns
 **
 *************************************************************************/
-static int32 CF_ValidateConfigTable(void *tbl_ptr)
+int32 CF_ValidateConfigTable(void *tbl_ptr)
 {
     CF_ConfigTable_t  *tbl = (CF_ConfigTable_t *)tbl_ptr;
     int32              ret; /* initialized below */
@@ -170,7 +171,7 @@ static int32 CF_ValidateConfigTable(void *tbl_ptr)
 **  \endreturns
 **
 *************************************************************************/
-static int32 CF_TableInit(void)
+int32 CF_TableInit(void)
 {
     int32 status = CFE_SUCCESS;
 
@@ -232,7 +233,7 @@ err_out:
 **  \endreturns
 **
 *************************************************************************/
-static int32 CF_Init(void)
+int32 CF_Init(void)
 {
     static CFE_EVS_BinFilter_t cf_event_filters[] = {
         {CF_EID_ERR_ASSERT, 0x0000},
@@ -410,7 +411,7 @@ err_out:
 **       None
 **
 *************************************************************************/
-static void CF_WakeUp(void)
+void CF_WakeUp(void)
 {
     CFE_ES_PerfLogEntry(CF_PERF_ID_CYCLE_ENG);
     CF_CFDP_CycleEngine();
@@ -428,7 +429,7 @@ static void CF_WakeUp(void)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_ProcessMsg(CFE_SB_Buffer_t *msg)
+void CF_ProcessMsg(CFE_SB_Buffer_t *msg)
 {
     CFE_SB_MsgId_t msg_id;
 

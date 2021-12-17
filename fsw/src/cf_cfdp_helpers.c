@@ -36,153 +36,16 @@
 #include <string.h>
 #include "cf_assert.h"
 
-int CF_GetMemcpySize(const uint8 *num, int size)
+uint8 CF_GetNumberMinSize(uint64 Value)
 {
-    int i;
+    uint8  MinSize;
+    uint64 Limit = 0x100;
 
-#if ENDIAN == _EL
-    for (i = size - 1; i > 0; --i)
-        if (num[i])
-            break;
-    ++i;
-#elif ENDIAN == _EB
-    for (i = 0; i < (size - 1); ++i)
-        if (num[i])
-            break;
-    i = size - i;
-#else
-#error define ENDIAN
-#endif
-
-    return i;
-}
-
-void CF_MemcpyToBE(uint8 *dst, const uint8 *src, int src_size, int dst_size)
-{
-    CF_Assert((src_size > 0) && (dst_size > 0));
-    CF_Assert(src_size >= dst_size);
-
-#if ENDIAN == _EL
-    dst += (dst_size - 1);
-    while (dst_size--)
-        *dst-- = *src++;
-#elif ENDIAN == _EB
-    src += (src_size - dst_size);
-    while (dst_size--)
-        *dst++ = *src++;
-#else
-#error define ENDIAN
-#endif
-}
-
-/* copies bytes in big-endian order from a byte source */
-static void CF_MemcpyFromBE(uint8 *dst, const uint8 *src, int src_size, int dst_size)
-{
-    CF_Assert((src_size > 0) && (dst_size > 0));
-    CF_Assert(dst_size >= src_size);
-
-    memset(dst, 0, dst_size);
-#if ENDIAN == _EL
-    src += (src_size - 1);
-    while (src_size--)
-        *dst++ = *src--;
-#elif ENDIAN == _EB
-    dst += (dst_size - src_size);
-    while (src_size--)
-        *dst++ = *src++;
-#else
-#error define ENDIAN
-#endif
-}
-
-static int CF_GetTSNSize(const CF_CFDP_PduHeader_t *ph)
-{
-    uint8 field;
-    int   ret;
-
-    cfdp_get_uint8(field, ph->eid_tsn_lengths);
-    ret = FGV(field, CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE) + 1;
-
-    if (ret > sizeof(CF_TransactionSeq_t))
+    Limit = 0x100;
+    for (MinSize = 1; MinSize < 8 && Value >= Limit; ++MinSize)
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_PDU_GET_TSN_SIZE, CFE_EVS_EventType_ERROR,
-                          "received TSN size %d too large for compiled max of %d", ret,
-                          (uint32)sizeof(CF_TransactionSeq_t));
-        return -1;
+        Limit <<= 8;
     }
 
-    return ret;
-}
-
-static int CF_GetEIDSize(const CF_CFDP_PduHeader_t *ph)
-{
-    uint8 field;
-    int   ret;
-
-    cfdp_get_uint8(field, ph->eid_tsn_lengths);
-    ret = FGV(field, CF_CFDP_PduHeader_LENGTHS_ENTITY) + 1;
-
-    if (ret > sizeof(CF_EntityId_t))
-    {
-        CFE_EVS_SendEvent(CF_EID_ERR_PDU_GET_EID_SIZE, CFE_EVS_EventType_ERROR,
-                          "received EID size %d too large for compiled max of %d", ret, (uint32)sizeof(CF_EntityId_t));
-        return -1;
-    }
-
-    return ret;
-}
-
-/* get the variable length header items out of the PDU header and store as incoming data */
-/* in.msg must be valid PDU message */
-int CF_GetVariableHeader(CF_CFDP_PduHeader_t *ph)
-{
-    const int eid_l = CF_GetEIDSize(ph);
-    const int tsn_l = CF_GetTSNSize(ph);
-    int       offs  = sizeof(*ph);
-    int       ret   = -1;
-
-    if ((eid_l > 0) && (tsn_l > 0))
-    {
-        CF_MemcpyFromBE((uint8 *)&CF_AppData.engine.in.src, ((uint8 *)ph) + offs, eid_l, sizeof(CF_EntityId_t));
-        offs += eid_l;
-        CF_MemcpyFromBE((uint8 *)&CF_AppData.engine.in.tsn, ((uint8 *)ph) + offs, tsn_l, sizeof(CF_TransactionSeq_t));
-        offs += tsn_l;
-        CF_MemcpyFromBE((uint8 *)&CF_AppData.engine.in.dst, ((uint8 *)ph) + offs, eid_l, sizeof(CF_EntityId_t));
-        ret = 0;
-    }
-
-    return ret;
-}
-
-void CF_SetVariableHeader(CF_CFDP_PduHeader_t *ph, CF_EntityId_t src_eid, CF_EntityId_t dst_eid,
-                          CF_TransactionSeq_t tsn)
-{
-    int       offs    = sizeof(*ph);
-    const int eid_s_l = CF_GetMemcpySize((uint8 *)&src_eid, sizeof(src_eid));
-    const int eid_d_l = CF_GetMemcpySize((uint8 *)&dst_eid, sizeof(dst_eid));
-    const int tsn_l   = CF_GetMemcpySize((uint8 *)&tsn, sizeof(tsn));
-    const int csize   = ((eid_s_l > eid_d_l) ? eid_s_l : eid_d_l);
-
-    CF_MemcpyToBE(((uint8 *)ph) + offs, (uint8 *)&src_eid, sizeof(src_eid), csize);
-    offs += csize;
-    CF_MemcpyToBE(((uint8 *)ph) + offs, (uint8 *)&tsn, sizeof(tsn), tsn_l);
-    offs += tsn_l;
-    CF_MemcpyToBE(((uint8 *)ph) + offs, (uint8 *)&dst_eid, sizeof(dst_eid), csize);
-
-    FSV(ph->eid_tsn_lengths, CF_CFDP_PduHeader_LENGTHS_ENTITY, csize - 1);
-    FSV(ph->eid_tsn_lengths, CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE, tsn_l - 1);
-}
-
-int CF_HeaderSize(const CF_CFDP_PduHeader_t *ph)
-{
-    uint8 temp;
-
-    /* NOTE: assume header size is correct here (packet already validated via CF_GetVariableHeader, or
-     * set by CF for outgoing PDU */
-    cfdp_ldst_uint8(temp, ph->eid_tsn_lengths);
-    const int eid_l = 1 + FGV(temp, CF_CFDP_PduHeader_LENGTHS_ENTITY);
-    const int tsn_l = 1 + FGV(temp, CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE);
-
-    CF_Assert((eid_l > 0) && (tsn_l > 0));
-    return sizeof(CF_CFDP_PduHeader_t) + (2 * eid_l) + tsn_l;
+    return MinSize;
 }

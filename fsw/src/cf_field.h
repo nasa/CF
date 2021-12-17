@@ -31,18 +31,6 @@
 
 #include <stdint.h>
 
-#define inc_subfield(TYPE, field, mask, shift) \
-    do                                         \
-    {                                          \
-        TYPE old = *(field) & (mask);          \
-        old >>= (shift);                       \
-        ++old;                                 \
-        old &= (mask);                         \
-        old <<= (shift);                       \
-        *(field) &= ~(mask);                   \
-        *(field) |= old;                       \
-    } while (0)
-
 typedef struct CF_FIELD_FIELD
 {
     uint32 shift;
@@ -50,34 +38,34 @@ typedef struct CF_FIELD_FIELD
 } CF_FIELD_FIELD;
 
 /* NBITS == number of bits */
-
+#ifdef CF_DO_DECLARE_FIELDS
 #define DECLARE_FIELD(NAME, NBITS, SHIFT) \
     static const CF_FIELD_FIELD NAME = {.shift = (SHIFT), .mask = ((1 << NBITS) - 1)};
-#define FIELD_GET_VAL(SRC, NAME) (((SRC) >> (NAME).shift) & ((NAME).mask))
-#define FIELD_SET_VAL(DEST, NAME, VAL)                         \
-    do                                                         \
-    {                                                          \
-        (DEST) &= ~(((NAME).mask) << ((NAME).shift));          \
-        (DEST) |= (((VAL) & ((NAME).mask)) << ((NAME).shift)); \
-    } while (0)
-#define FIELD_ADD_VAL(DEST, NAME, VAL)            \
-    do                                            \
-    {                                             \
-        uint32 noise = FIELD_GET_VAL(DEST, NAME); \
-        noise += VAL;                             \
-        FIELD_SET_VAL(DEST, NAME, noise);         \
-    } while (0)
-#define FIELD_INC_VAL(DEST, NAME) FIELD_ADD_VAL(DEST, NAME, 1)
+#else
+#define DECLARE_FIELD(NAME, NBITS, SHIFT)
+#endif
+
+/*
+ * All CFDP sub-fields are fewer than 8 bits in size
+ */
+static inline uint8 CF_FieldGetVal(const uint8 *src, uint8 shift, uint8 mask)
+{
+    return (*src >> shift) & mask;
+}
+
+static inline void CF_FieldSetVal(uint8 *dest, uint8 shift, uint8 mask, uint8 val)
+{
+    *dest &= ~(mask << shift);
+    *dest |= ((val & mask) << shift);
+}
 
 /* FGV, FSV, and FAV are just simple shortenings of the field macros.
  *
  * FGV == field get val
  * FSV == field set val
- * FAV == field add val
  */
 
-#define FGV FIELD_GET_VAL
-#define FSV FIELD_SET_VAL
-#define FAV FIELD_ADD_VAL
+#define FGV(SRC, NAME)       CF_FieldGetVal((SRC).octets, (NAME).shift, (NAME).mask)
+#define FSV(DEST, NAME, VAL) CF_FieldSetVal((DEST).octets, (NAME).shift, (NAME).mask, VAL)
 
 #endif /* !CF_FIELD_COMMON__H */

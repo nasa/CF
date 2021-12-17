@@ -44,8 +44,6 @@
 #include "cf_assert.h"
 #include "cf_chunk.h"
 
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-
 /************************************************************************/
 /** \brief Erase a range of chunks.
 **
@@ -53,7 +51,7 @@
 **       chunks must not be NULL.
 **
 *************************************************************************/
-static void CF_Chunks_EraseRange(CF_ChunkList_t *chunks, CF_ChunkIdx_t start, CF_ChunkIdx_t end)
+void CF_Chunks_EraseRange(CF_ChunkList_t *chunks, CF_ChunkIdx_t start, CF_ChunkIdx_t end)
 {
     CF_Assert(end >= start);
     if (start < chunks->count)
@@ -70,7 +68,7 @@ static void CF_Chunks_EraseRange(CF_ChunkList_t *chunks, CF_ChunkIdx_t start, CF
 **       chunks must not be NULL.
 **
 *************************************************************************/
-static void CF_Chunks_EraseChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t erase_index)
+void CF_Chunks_EraseChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t erase_index)
 {
     CF_Assert(chunks->count > 0);
     CF_Assert(erase_index < chunks->count);
@@ -88,7 +86,7 @@ static void CF_Chunks_EraseChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t erase_ind
 **       chunks must not be NULL. chunk must not be NULL.
 **
 *************************************************************************/
-static void CF_Chunks_InsertChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t index_before, const CF_Chunk_t *chunk)
+void CF_Chunks_InsertChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t index_before, const CF_Chunk_t *chunk)
 {
     CF_Assert(chunks->count < chunks->CF_max_chunks);
     CF_Assert(index_before <= chunks->count);
@@ -117,7 +115,7 @@ static void CF_Chunks_InsertChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t index_be
 **  \endreturns
 **
 *************************************************************************/
-static CF_ChunkIdx_t CF_Chunks_FindInsertPosition(CF_ChunkList_t *chunks, const CF_Chunk_t *chunk)
+CF_ChunkIdx_t CF_Chunks_FindInsertPosition(CF_ChunkList_t *chunks, const CF_Chunk_t *chunk)
 {
     CF_ChunkIdx_t first = 0;
     CF_ChunkIdx_t i;
@@ -154,7 +152,7 @@ static CF_ChunkIdx_t CF_Chunks_FindInsertPosition(CF_ChunkList_t *chunks, const 
 **  \endreturns
 **
 *************************************************************************/
-static int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
+int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
     int ret = 0;
     CF_Assert(i <= chunks->CF_max_chunks);
@@ -189,7 +187,7 @@ static int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, co
 **  \endreturns
 **
 *************************************************************************/
-static int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
+int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
     /* check if not at the end */
     int ret = 0;
@@ -217,13 +215,13 @@ static int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const 
             if (combined_i != chunks->count)
             {
                 /* not at the end */
-                new_end = MAX(chunks->chunks[combined_i].offset + chunks->chunks[combined_i].size, chunk_end);
+                new_end = CF_Chunk_MAX(chunks->chunks[combined_i].offset + chunks->chunks[combined_i].size, chunk_end);
             }
             else
             {
                 /* new chunk replaces everything until the end */
-                new_end =
-                    MAX(chunks->chunks[chunks->count - 1].offset + chunks->chunks[chunks->count - 1].size, chunk_end);
+                new_end = CF_Chunk_MAX(
+                    chunks->chunks[chunks->count - 1].offset + chunks->chunks[chunks->count - 1].size, chunk_end);
             }
 
             chunks->chunks[i].size   = new_end - chunk->offset;
@@ -251,7 +249,7 @@ static int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const 
 **  \endreturns
 **
 *************************************************************************/
-static CF_ChunkIdx_t CF_Chunks_FindSmallestSize(const CF_ChunkList_t *chunks)
+CF_ChunkIdx_t CF_Chunks_FindSmallestSize(const CF_ChunkList_t *chunks)
 {
     CF_ChunkIdx_t i;
     CF_ChunkIdx_t smallest = 0;
@@ -278,7 +276,7 @@ static CF_ChunkIdx_t CF_Chunks_FindSmallestSize(const CF_ChunkList_t *chunks)
 **       chunks must not be NULL. chunk must not be NULL.
 **
 *************************************************************************/
-static void CF_Chunks_Insert(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
+void CF_Chunks_Insert(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
     int n = CF_Chunks_CombineNext(chunks, i, chunk);
     if (n)
