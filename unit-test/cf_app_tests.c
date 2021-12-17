@@ -104,7 +104,7 @@ void Test_CF_CheckTables_DoNotReleaseAddressBecauseEngineIsEnabled(void)
 void Test_CF_CheckTables_CallTo_CFE_TBL_ReleaseAddress_ReturnsNot_CFE_SUCCESS_SendEvent(void)
 {
     /* Arrange */
-    int32 forced_return_CFE_TBL_ReleaseAddress = Any_int32_Except(CFE_SUCCESS);
+    int32 forced_return_CFE_TBL_ReleaseAddress = CFE_STATUS_EXTERNAL_RESOURCE_FAIL; /* any generic failure */
 
     /* CF_AppData.engine.enabled being 0 runs code in CUT */
     CF_AppData.engine.enabled = 0;
@@ -122,7 +122,7 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_ReleaseAddress_ReturnsNot_CFE_SUCCESS_Se
 void Test_CF_CheckTables_CallTo_CFE_TBL_Manage_ReturnsNot_CFE_SUCCESS_SendEvent(void)
 {
     /* Arrange */
-    int32 forced_return_CFE_TBL_Manage = Any_int32_Except(CFE_SUCCESS);
+    int32 forced_return_CFE_TBL_Manage = CFE_STATUS_EXTERNAL_RESOURCE_FAIL; /* any generic failure */
 
     /* CF_AppData.engine.enabled being 0 runs code in CUT */
     CF_AppData.engine.enabled = 0;
@@ -141,8 +141,7 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_Manage_ReturnsNot_CFE_SUCCESS_SendEvent(
 void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_ReturnsNot_CFE_SUCCESS_Or_CFE_TBL_INFO_UPDATED_SendEvent(void)
 {
     /* Arrange */
-    int32 exceptions[2]                    = {CFE_SUCCESS, CFE_TBL_INFO_UPDATED};
-    int32 forced_return_CFE_TBL_GetAddress = Any_int32_ExceptThese(exceptions, 2);
+    int32 forced_return_CFE_TBL_GetAddress = CFE_STATUS_EXTERNAL_RESOURCE_FAIL; /* any generic failure */
 
     /* CF_AppData.engine.enabled being 0 runs code in CUT */
     CF_AppData.engine.enabled = 0;
