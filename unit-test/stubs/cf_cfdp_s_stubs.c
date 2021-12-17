@@ -325,7 +325,7 @@
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CFDP_S1_Recv(CF_Transaction_t *t)
+void CF_CFDP_S1_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
     exit(-86);
@@ -338,7 +338,7 @@ void CF_CFDP_S1_Recv(CF_Transaction_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CFDP_S2_Recv(CF_Transaction_t *t)
+void CF_CFDP_S2_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
     exit(-86);

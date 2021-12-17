@@ -106,8 +106,9 @@ DECLARE_FIELD(CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE, 3, 0)
 
 extern int  CF_GetMemcpySize(const uint8 *num, int size);
 extern void CF_MemcpyToBE(uint8 *dst, const uint8 *src, int src_size, int dst_size);
-extern int  CF_GetVariableHeader(void);
-extern void CF_SetVariableHeader(CF_EntityId_t src_eid, CF_EntityId_t dst_eid, CF_TransactionSeq_t tsn);
+extern int  CF_GetVariableHeader(CF_CFDP_PduHeader_t *ph);
+extern void CF_SetVariableHeader(CF_CFDP_PduHeader_t *ph, CF_EntityId_t src_eid, CF_EntityId_t dst_eid,
+                                 CF_TransactionSeq_t tsn);
 extern int  CF_HeaderSize(const CF_CFDP_PduHeader_t *ph);
 
 #define CF_MAX_HEADER_SIZE (sizeof(CF_CFDP_PduHeader_t) + (2 * sizeof(CF_EntityId_t)) + sizeof(CF_TransactionSeq_t))

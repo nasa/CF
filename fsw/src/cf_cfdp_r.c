@@ -46,6 +46,17 @@ typedef struct
     uint32               gap_counter;
 } gap_compute_args_t;
 
+/**
+ * @brief A dispatch table for receive file transactions, recieve side
+ *
+ * This is used for "receive file" transactions upon receipt of a directive PDU.
+ * Depending on the sub-state of the transaction, a different action may be taken.
+ */
+typedef struct
+{
+    const CF_CFDP_FileDirectiveDispatchTable_t *state[CF_RxSubState_NUM_STATES];
+} CF_CFDP_R_SubstateDispatchTable_t;
+
 /************************************************************************/
 /** \brief Helper function to store condition code set send_fin flag.
 **
@@ -220,10 +231,9 @@ err_out:;
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_R_ProcessFd(CF_Transaction_t *t, CFE_MSG_Size_t *bytes_received)
+static int CF_CFDP_R_ProcessFd(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph, CFE_MSG_Size_t *bytes_received)
 {
-    CF_CFDP_PduHeader_t *ph = &((CF_PduRecvMsg_t *)CF_AppData.engine.in.msg)->ph;
-    *bytes_received         = CF_AppData.engine.in.bytes_received;
+    *bytes_received = CF_AppData.engine.in.bytes_received;
 
     int ret = -1;
 
@@ -299,11 +309,11 @@ err_out:
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph)
+static int CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     int ret = CF_RxEofRet_SUCCESS;
 
-    if (!CF_CFDP_RecvEof())
+    if (!CF_CFDP_RecvEof(t, ph))
     {
         uint32 size;
 
@@ -346,7 +356,7 @@ err_out:
 **  \endreturns
 **
 *************************************************************************/
-static void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph)
+static void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     int    ret = CF_CFDP_R_SubstateRecvEof(t, ph);
     uint32 crc;
@@ -379,7 +389,7 @@ static void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, const CF_CFDP_PduHea
 **  \endreturns
 **
 *************************************************************************/
-static void CF_CFDP_R2_SubstateRecvEof(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph)
+static void CF_CFDP_R2_SubstateRecvEof(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     if (!t->flags.rx.eof_recv)
     {
@@ -435,12 +445,12 @@ static void CF_CFDP_R2_SubstateRecvEof(CF_Transaction_t *t, const CF_CFDP_PduHea
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R1_SubstateRecvFileData(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph)
+static void CF_CFDP_R1_SubstateRecvFileData(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     CFE_MSG_Size_t bytes_received; /* initialized in CF_CFDP_R_ProcessFd() */
 
     /* got file data pdu? */
-    if (CF_CFDP_RecvFd(t) || CF_CFDP_R_ProcessFd(t, &bytes_received))
+    if (CF_CFDP_RecvFd(t, ph) || CF_CFDP_R_ProcessFd(t, ph, &bytes_received))
     {
         goto err_out;
     }
@@ -468,13 +478,13 @@ err_out:
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph)
+static void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     CFE_MSG_Size_t bytes_received; /* initialized in CF_CFDP_R_ProcessFd() */
     uint32         offset;
 
     /* got file data pdu? */
-    if (CF_CFDP_RecvFd(t) || CF_CFDP_R_ProcessFd(t, &bytes_received))
+    if (CF_CFDP_RecvFd(t, ph) || CF_CFDP_R_ProcessFd(t, ph, &bytes_received))
     {
         goto err_out;
     }
@@ -583,7 +593,7 @@ static int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
             {
                 /* gaps are present, so let's send the nak pdu */
                 cfdp_ldst_uint32(nak->scope_end, 0);
-                sret                    = CF_CFDP_SendNak(t, cret);
+                sret                    = CF_CFDP_SendNak(t, ph, cret);
                 t->flags.rx.fd_nak_sent = 1;         /* latch that at least one nak has been sent requesting filedata */
                 CF_Assert(sret != CF_SendRet_ERROR); /* NOTE: this CF_Assert is here because CF_CFDP_SendNak() does not
                                                      return CF_SendRet_ERROR, so if it's ever added to that function we
@@ -607,7 +617,7 @@ static int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
             cfdp_ldst_uint32(nak->scope_end, 0);
             cfdp_ldst_uint32(nak->segment_requests[0].offset_start, 0);
             cfdp_ldst_uint32(nak->segment_requests[0].offset_end, 0);
-            sret = CF_CFDP_SendNak(t, 1);
+            sret = CF_CFDP_SendNak(t, ph, 1);
             CF_Assert(sret != CF_SendRet_ERROR); /* this CF_Assert is here because CF_CFDP_SendNak() does not return
                                                     CF_SendRet_ERROR */
             if (sret == CF_SendRet_SUCCESS)
@@ -822,9 +832,9 @@ err_out:
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R2_Recv_fin_ack(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph)
+static void CF_CFDP_R2_Recv_fin_ack(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
-    if (!CF_CFDP_RecvAck())
+    if (!CF_CFDP_RecvAck(t, ph))
     {
         /* got fin ack, so time to close the state */
         CF_CFDP_R2_Reset(t);
@@ -851,7 +861,7 @@ static void CF_CFDP_R2_Recv_fin_ack(CF_Transaction_t *t, const CF_CFDP_PduHeader
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph)
+static void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     /* it isn't an error to get another MD pdu, right? */
     if (!t->flags.rx.md_recv)
@@ -866,7 +876,7 @@ static void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph
         strcpy(
             fname,
             t->history->fnames.dst_filename); /* strcpy is ok, since fname is CF_FILENAME_MAX_LEN like dst_filename */
-        status = CF_CFDP_RecvMd(t);
+        status = CF_CFDP_RecvMd(t, ph);
         if (!status)
         {
             /* successfully obtained md pdu */
@@ -944,15 +954,13 @@ err_out:;
 **       t must not be NULL. fns must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R_DispatchRecv(CF_Transaction_t *t,
-                                   void (*const fns[CF_RxSubState_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(
-                                       CF_Transaction_t *, const CF_CFDP_PduHeader_t *),
-                                   void (*const fd_fn)(CF_Transaction_t *, const CF_CFDP_PduHeader_t *))
+static void CF_CFDP_R_DispatchRecv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph,
+                                   const CF_CFDP_R_SubstateDispatchTable_t *dispatch, CF_CFDP_StateRecvFunc_t fd_fn)
 {
     CF_Assert(t->state_data.r.sub_state < CF_RxSubState_NUM_STATES);
-    CF_Assert(CF_AppData.engine.in.msg);
+    CF_CFDP_StateRecvFunc_t selected_handler;
 
-    CF_CFDP_PduHeader_t *ph = &((CF_PduRecvMsg_t *)CF_AppData.engine.in.msg)->ph;
+    selected_handler = NULL;
 
     /* the 2d jump table is only used with file directive pdu */
     if (!FGV(ph->flags, CF_CFDP_PduHeader_FLAGS_TYPE))
@@ -960,9 +968,9 @@ static void CF_CFDP_R_DispatchRecv(CF_Transaction_t *t,
         CF_CFDP_PduFileDirectiveHeader_t *fdh = STATIC_CAST(ph, CF_CFDP_PduFileDirectiveHeader_t);
         if (fdh->directive_code < CF_CFDP_FileDirective_INVALID_MAX)
         {
-            if (fns[t->state_data.r.sub_state][fdh->directive_code])
+            if (dispatch->state[t->state_data.r.sub_state] != NULL)
             {
-                fns[t->state_data.r.sub_state][fdh->directive_code](t, ph);
+                selected_handler = dispatch->state[t->state_data.r.sub_state]->fdirective[fdh->directive_code];
             }
         }
         else
@@ -978,12 +986,21 @@ static void CF_CFDP_R_DispatchRecv(CF_Transaction_t *t,
     {
         if (t->history->cc == CF_CFDP_ConditionCode_NO_ERROR)
         {
-            fd_fn(t, ph); /* if history shows error, drop filedata pdu on the floor */
+            selected_handler = fd_fn;
         }
         else
         {
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.dropped;
         }
+    }
+
+    /*
+     * NOTE: if no handler is selected, this will drop packets on the floor here,
+     * without incrementing any counter.  This was existing behavior.
+     */
+    if (selected_handler != NULL)
+    {
+        selected_handler(t, ph);
     }
 }
 
@@ -994,19 +1011,16 @@ static void CF_CFDP_R_DispatchRecv(CF_Transaction_t *t,
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CFDP_R1_Recv(CF_Transaction_t *t)
+void CF_CFDP_R1_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
-    static void (*const substate_fns[CF_RxSubState_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(
-        CF_Transaction_t * t, const CF_CFDP_PduHeader_t *) = {
-        {NULL, NULL, NULL, NULL, CF_CFDP_R1_SubstateRecvEof, NULL, NULL, NULL, NULL, NULL,
-         NULL}, /* CF_RxSubState_FILEDATA */
-        {NULL, NULL, NULL, NULL, CF_CFDP_R1_SubstateRecvEof, NULL, NULL, NULL, NULL, NULL,
-         NULL}, /* CF_RxSubState_EOF */
-        {NULL, NULL, NULL, NULL, CF_CFDP_R1_SubstateRecvEof, NULL, NULL, NULL, NULL, NULL,
-         NULL}, /* CF_RxSubState_WAIT_FOR_FIN_ACK */
-    };
+    static const CF_CFDP_FileDirectiveDispatchTable_t r1_fdir_handlers = {
+        .fdirective = {[CF_CFDP_FileDirective_EOF] = CF_CFDP_R1_SubstateRecvEof}};
+    static const CF_CFDP_R_SubstateDispatchTable_t substate_fns = {
+        .state = {[CF_RxSubState_FILEDATA]         = &r1_fdir_handlers,
+                  [CF_RxSubState_EOF]              = &r1_fdir_handlers,
+                  [CF_RxSubState_WAIT_FOR_FIN_ACK] = &r1_fdir_handlers}};
 
-    CF_CFDP_R_DispatchRecv(t, substate_fns, CF_CFDP_R1_SubstateRecvFileData);
+    CF_CFDP_R_DispatchRecv(t, ph, &substate_fns, CF_CFDP_R1_SubstateRecvFileData);
 }
 
 /************************************************************************/
@@ -1016,19 +1030,24 @@ void CF_CFDP_R1_Recv(CF_Transaction_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CFDP_R2_Recv(CF_Transaction_t *t)
+void CF_CFDP_R2_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
-    static void (*const substate_fns[CF_RxSubState_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(
-        CF_Transaction_t * t, const CF_CFDP_PduHeader_t *) = {
-        {NULL, NULL, NULL, NULL, CF_CFDP_R2_SubstateRecvEof, NULL, NULL, CF_CFDP_R2_RecvMd, NULL, NULL,
-         NULL}, /* CF_RxSubState_FILEDATA */
-        {NULL, NULL, NULL, NULL, CF_CFDP_R2_SubstateRecvEof, NULL, NULL, CF_CFDP_R2_RecvMd, NULL, NULL,
-         NULL}, /* CF_RxSubState_EOF */
-        {NULL, NULL, NULL, NULL, CF_CFDP_R2_SubstateRecvEof, NULL, CF_CFDP_R2_Recv_fin_ack, NULL, NULL, NULL,
-         NULL}, /* CF_RxSubState_WAIT_FOR_FIN_ACK */
-    };
+    static const CF_CFDP_FileDirectiveDispatchTable_t r2_fdir_handlers_normal = {
+        .fdirective = {
+            [CF_CFDP_FileDirective_EOF]      = CF_CFDP_R2_SubstateRecvEof,
+            [CF_CFDP_FileDirective_METADATA] = CF_CFDP_R2_RecvMd,
+        }};
+    static const CF_CFDP_FileDirectiveDispatchTable_t r2_fdir_handlers_finack = {
+        .fdirective = {
+            [CF_CFDP_FileDirective_EOF] = CF_CFDP_R2_SubstateRecvEof,
+            [CF_CFDP_FileDirective_ACK] = CF_CFDP_R2_Recv_fin_ack,
+        }};
+    static const CF_CFDP_R_SubstateDispatchTable_t substate_fns = {
+        .state = {[CF_RxSubState_FILEDATA]         = &r2_fdir_handlers_normal,
+                  [CF_RxSubState_EOF]              = &r2_fdir_handlers_normal,
+                  [CF_RxSubState_WAIT_FOR_FIN_ACK] = &r2_fdir_handlers_finack}};
 
-    CF_CFDP_R_DispatchRecv(t, substate_fns, CF_CFDP_R2_SubstateRecvFileData);
+    CF_CFDP_R_DispatchRecv(t, ph, &substate_fns, CF_CFDP_R2_SubstateRecvFileData);
 }
 
 /************************************************************************/

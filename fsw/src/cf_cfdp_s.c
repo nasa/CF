@@ -39,6 +39,28 @@
 #include <string.h>
 #include "cf_assert.h"
 
+/**
+ * @brief A dispatch table for send file transactions, receive side
+ *
+ * This is used for "send file" transactions upon receipt of a directive PDU.
+ * Depending on the sub-state of the transaction, a different action may be taken.
+ */
+typedef struct
+{
+    const CF_CFDP_FileDirectiveDispatchTable_t *substate[CF_TxSubState_NUM_STATES];
+} CF_CFDP_S_SubstateRecvDispatchTable_t;
+
+/**
+ * @brief A dispatch table for send file transactions, transmit side
+ *
+ * This is used for "send file" transactions to generate the next PDU to be sent.
+ * Depending on the sub-state of the transaction, a different action may be taken.
+ */
+typedef struct
+{
+    CF_CFDP_StateSendFunc_t substate[CF_TxSubState_NUM_STATES];
+} CF_CFDP_S_SubstateSendDispatchTable_t;
+
 /************************************************************************/
 /** \brief CFDP S1 transaction reset function.
 **
@@ -178,7 +200,7 @@ static int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 by
     }
 
     t->state_data.s.cached_pos += status;
-    status = CF_CFDP_SendFd(t, foffs, bytes_to_read);
+    status = CF_CFDP_SendFd(t, ph, foffs, bytes_to_read);
     if (status == CF_SendRet_NO_MSG)
     {
         ret = 0; /* no bytes were processed */
@@ -455,7 +477,7 @@ static void CF_CFDP_S_SubstateSendFinAck(CF_Transaction_t *t)
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_S2_EarlyFin(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph)
+static void CF_CFDP_S2_EarlyFin(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     /* received early fin, so just cancel */
     CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_EARLY_FIN, CFE_EVS_EventType_ERROR,
@@ -471,9 +493,9 @@ static void CF_CFDP_S2_EarlyFin(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_S2_Fin(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph)
+static void CF_CFDP_S2_Fin(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
-    if (!CF_CFDP_RecvFin())
+    if (!CF_CFDP_RecvFin(t, ph))
     {
         t->state_data.s.s2.fin_cc = FGV(STATIC_CAST(ph, CF_CFDP_PduFin_t)->flags, CF_CFDP_PduFin_FLAGS_CC);
         t->state_data.s.sub_state = CF_TxSubState_SEND_FIN_ACK;
@@ -498,14 +520,14 @@ static void CF_CFDP_S2_Fin(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph)
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_S2_Nak(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph)
+static void CF_CFDP_S2_Nak(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     /* temporary function to respond to naks */
     int counter;
     int num_sr;
     int bad_sr = 0;
 
-    if (!CF_CFDP_RecvNak(&num_sr) && num_sr)
+    if (!CF_CFDP_RecvNak(t, ph, &num_sr) && num_sr)
     {
         CF_CFDP_PduNak_t *nak = STATIC_CAST(ph, CF_CFDP_PduNak_t);
         CF_Assert(num_sr <= CF_NAK_MAX_SEGMENTS); // sanity check
@@ -568,7 +590,7 @@ static void CF_CFDP_S2_Nak(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph)
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph)
+static void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     CF_CFDP_ArmAckTimer(t);
     CF_CFDP_S2_Nak(t, ph);
@@ -585,9 +607,9 @@ static void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *p
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *ph)
+static void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
-    if (!CF_CFDP_RecvAck())
+    if (!CF_CFDP_RecvAck(t, ph))
     {
         /* don't send fin if error. Don't check the eof CC, just go with
          * the stored one we sent before */
@@ -621,30 +643,27 @@ static void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *t, const CF_CFDP_PduHeade
 **       t must not be NULL. fns must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_S_DispatchRecv(CF_Transaction_t *t,
-                                   void (*const fns[CF_TxSubState_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(
-                                       CF_Transaction_t *, const CF_CFDP_PduHeader_t *))
+static void CF_CFDP_S_DispatchRecv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph,
+                                   const CF_CFDP_S_SubstateRecvDispatchTable_t *dispatch)
 {
     CF_Assert(t->state_data.s.sub_state < CF_TxSubState_NUM_STATES);
-    CF_Assert(CF_AppData.engine.in.msg);
+    const CF_CFDP_FileDirectiveDispatchTable_t *substate_tbl;
+    CF_CFDP_StateRecvFunc_t                     selected_handler;
+    CF_CFDP_PduFileDirectiveHeader_t           *fdh;
 
-    /* at this point, pdu header for recv message is unmarshaled */
-    CF_CFDP_PduHeader_t *ph = &((CF_PduRecvMsg_t *)CF_AppData.engine.in.msg)->ph;
+    selected_handler = NULL;
+
     /* send state, so we only care about file directive PDU */
     if (!FGV(ph->flags, CF_CFDP_PduHeader_FLAGS_TYPE))
     {
-        CF_CFDP_PduFileDirectiveHeader_t *fdh = STATIC_CAST(ph, CF_CFDP_PduFileDirectiveHeader_t);
+        fdh = STATIC_CAST(ph, CF_CFDP_PduFileDirectiveHeader_t);
         if (fdh->directive_code < CF_CFDP_FileDirective_INVALID_MAX)
         {
-            /* check that there's a valid function pointer. if there isn't,
-             * then silently ignore. We may want to discuss if it's worth
-             * shutting down the whole transation if a PDU is received
-             * that doesn't make sense to be received (For example,
-             * class 1 CFDP receiving a NAK PDU) but for now, we silently
-             * ignore the received packet and keep chugging along. */
-            if (fns[t->state_data.s.sub_state][fdh->directive_code])
+            /* This should be silent (no event) if no handler is defined in the table */
+            substate_tbl = dispatch->substate[t->state_data.s.sub_state];
+            if (substate_tbl != NULL)
             {
-                fns[t->state_data.s.sub_state][fdh->directive_code](t, ph);
+                selected_handler = substate_tbl->fdirective[fdh->directive_code];
             }
         }
         else
@@ -662,6 +681,17 @@ static void CF_CFDP_S_DispatchRecv(CF_Transaction_t *t,
                           "CF S%d(%u:%u): received non-file directive pdu", (t->state == CF_TxnState_S2),
                           t->history->src_eid, t->history->seq_num);
     }
+
+    /* check that there's a valid function pointer. if there isn't,
+     * then silently ignore. We may want to discuss if it's worth
+     * shutting down the whole transation if a PDU is received
+     * that doesn't make sense to be received (For example,
+     * class 1 CFDP receiving a NAK PDU) but for now, we silently
+     * ignore the received packet and keep chugging along. */
+    if (selected_handler)
+    {
+        selected_handler(t, ph);
+    }
 }
 
 /************************************************************************/
@@ -671,12 +701,11 @@ static void CF_CFDP_S_DispatchRecv(CF_Transaction_t *t,
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CFDP_S1_Recv(CF_Transaction_t *t)
+void CF_CFDP_S1_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
     /* s1 doesn't need to receive anything */
-    static void (*const substate_fns[CF_TxSubState_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(
-        CF_Transaction_t *, const CF_CFDP_PduHeader_t *) = {{NULL}};
-    CF_CFDP_S_DispatchRecv(t, substate_fns);
+    static const CF_CFDP_S_SubstateRecvDispatchTable_t substate_fns = {{NULL}};
+    CF_CFDP_S_DispatchRecv(t, ph, &substate_fns);
 }
 
 /************************************************************************/
@@ -686,22 +715,52 @@ void CF_CFDP_S1_Recv(CF_Transaction_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CFDP_S2_Recv(CF_Transaction_t *t)
+void CF_CFDP_S2_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 {
-    static void (*const substate_fns[CF_TxSubState_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(
-        CF_Transaction_t *, const CF_CFDP_PduHeader_t *) = {
-        {NULL, NULL, NULL, NULL, NULL, CF_CFDP_S2_EarlyFin, NULL, NULL, NULL, NULL, NULL}, /* CF_TxSubState_METADATA */
-        {NULL, NULL, NULL, NULL, NULL, CF_CFDP_S2_EarlyFin, NULL, NULL, CF_CFDP_S2_Nak, NULL,
-         NULL}, /* CF_TxSubState_FILEDATA */
-        {NULL, NULL, NULL, NULL, NULL, CF_CFDP_S2_EarlyFin, NULL, NULL, CF_CFDP_S2_Nak, NULL,
-         NULL}, /* CF_TxSubState_EOF */
-        {NULL, NULL, NULL, NULL, NULL, CF_CFDP_S2_Fin, CF_CFDP_S2_WaitForEofAck, NULL, CF_CFDP_S2_Nak_Arm, NULL,
-         NULL}, /* CF_TxSubState_WAIT_FOR_EOF_ACK */
-        {NULL, NULL, NULL, NULL, NULL, CF_CFDP_S2_Fin, NULL, NULL, CF_CFDP_S2_Nak_Arm, NULL,
-         NULL},                                                                       /* CF_TxSubState_WAIT_FOR_FIN */
-        {NULL, NULL, NULL, NULL, NULL, CF_CFDP_S2_Fin, NULL, NULL, NULL, NULL, NULL}, /* CF_TxSubState_SEND_FIN_ACK */
-    };
-    CF_CFDP_S_DispatchRecv(t, substate_fns);
+    static const CF_CFDP_FileDirectiveDispatchTable_t s2_meta      = {.fdirective = {
+                                                                     [CF_CFDP_FileDirective_FIN] = CF_CFDP_S2_EarlyFin,
+                                                                 }};
+    static const CF_CFDP_FileDirectiveDispatchTable_t s2_fd_or_eof = {
+        .fdirective = {
+            [CF_CFDP_FileDirective_FIN] = CF_CFDP_S2_EarlyFin, [CF_CFDP_FileDirective_NAK] = CF_CFDP_S2_Nak}};
+    static const CF_CFDP_FileDirectiveDispatchTable_t s2_wait_eof_ack = {
+        .fdirective = {[CF_CFDP_FileDirective_FIN] = CF_CFDP_S2_Fin,
+                       [CF_CFDP_FileDirective_ACK] = CF_CFDP_S2_WaitForEofAck,
+                       [CF_CFDP_FileDirective_NAK] = CF_CFDP_S2_Nak_Arm}};
+    static const CF_CFDP_FileDirectiveDispatchTable_t s2_wait_fin = {
+        .fdirective = {[CF_CFDP_FileDirective_FIN] = CF_CFDP_S2_Fin, [CF_CFDP_FileDirective_NAK] = CF_CFDP_S2_Nak_Arm}};
+    static const CF_CFDP_FileDirectiveDispatchTable_t s2_fin_ack = {
+        .fdirective = {[CF_CFDP_FileDirective_FIN] = CF_CFDP_S2_Fin}};
+
+    static const CF_CFDP_S_SubstateRecvDispatchTable_t substate_fns = {
+        .substate = {
+            [CF_TxSubState_METADATA]         = &s2_meta,
+            [CF_TxSubState_FILEDATA]         = &s2_fd_or_eof,
+            [CF_TxSubState_EOF]              = &s2_fd_or_eof,
+            [CF_TxSubState_WAIT_FOR_EOF_ACK] = &s2_wait_eof_ack,
+            [CF_TxSubState_WAIT_FOR_FIN]     = &s2_wait_fin,
+            [CF_TxSubState_SEND_FIN_ACK]     = &s2_fin_ack,
+        }};
+
+    CF_CFDP_S_DispatchRecv(t, ph, &substate_fns);
+}
+
+/************************************************************************/
+/** \brief Transmit pdu processing.
+**
+**  \par Assumptions, External Events, and Notes:
+**       t must not be NULL.
+**
+*************************************************************************/
+static void CF_CFDP_S_DispatchTransmit(CF_Transaction_t *t, const CF_CFDP_S_SubstateSendDispatchTable_t *dispatch)
+{
+    CF_CFDP_StateSendFunc_t selected_handler;
+
+    selected_handler = dispatch->substate[t->state_data.s.sub_state];
+    if (selected_handler != NULL)
+    {
+        selected_handler(t);
+    }
 }
 
 /************************************************************************/
@@ -713,11 +772,14 @@ void CF_CFDP_S2_Recv(CF_Transaction_t *t)
 *************************************************************************/
 void CF_CFDP_S1_Tx(CF_Transaction_t *t)
 {
-    static void (*const substate_fns[CF_TxSubState_EOF + 1])(CF_Transaction_t * t) = {
-        CF_CFDP_S_SubstateSendMetadata, CF_CFDP_S_SubstateSendFileData, CF_CFDP_S1_SubstateSendEof};
+    static const CF_CFDP_S_SubstateSendDispatchTable_t substate_fns = {
+        .substate = {
+            [CF_TxSubState_METADATA] = CF_CFDP_S_SubstateSendMetadata,
+            [CF_TxSubState_FILEDATA] = CF_CFDP_S_SubstateSendFileData,
+            [CF_TxSubState_EOF]      = CF_CFDP_S1_SubstateSendEof,
+        }};
 
-    CF_Assert(t->state_data.s.sub_state <= CF_TxSubState_EOF);
-    substate_fns[t->state_data.s.sub_state](t);
+    CF_CFDP_S_DispatchTransmit(t, &substate_fns);
 }
 
 /************************************************************************/
@@ -729,11 +791,14 @@ void CF_CFDP_S1_Tx(CF_Transaction_t *t)
 *************************************************************************/
 void CF_CFDP_S2_Tx(CF_Transaction_t *t)
 {
-    static void (*const substate_fns[CF_TxSubState_EOF + 1])(CF_Transaction_t * t) = {
-        CF_CFDP_S_SubstateSendMetadata, CF_CFDP_S2_SubstateSendFileData, CF_CFDP_S2_SubstateSendEof};
+    static const CF_CFDP_S_SubstateSendDispatchTable_t substate_fns = {
+        .substate = {
+            [CF_TxSubState_METADATA] = CF_CFDP_S_SubstateSendMetadata,
+            [CF_TxSubState_FILEDATA] = CF_CFDP_S2_SubstateSendFileData,
+            [CF_TxSubState_EOF]      = CF_CFDP_S2_SubstateSendEof,
+        }};
 
-    CF_Assert(t->state_data.s.sub_state <= CF_TxSubState_EOF);
-    substate_fns[t->state_data.s.sub_state](t);
+    CF_CFDP_S_DispatchTransmit(t, &substate_fns);
 }
 
 /************************************************************************/

@@ -57,7 +57,7 @@ int CF_GetMemcpySize(const uint8_t *num, int size)
  * Generated stub function for CF_GetVariableHeader()
  * ----------------------------------------------------
  */
-int CF_GetVariableHeader(void)
+int CF_GetVariableHeader(CF_CFDP_PduHeader_t *ph)
 {
     UT_GenStub_SetupReturnBuffer(CF_GetVariableHeader, int);
 
@@ -102,7 +102,8 @@ void CF_MemcpyToBE(uint8 *dst, const uint8 *src, int src_size, int dst_size)
  * Generated stub function for CF_SetVariableHeader()
  * ----------------------------------------------------
  */
-void CF_SetVariableHeader(CF_EntityId_t src_eid, CF_EntityId_t dst_eid, CF_TransactionSeq_t tsn)
+void CF_SetVariableHeader(CF_CFDP_PduHeader_t *ph, CF_EntityId_t src_eid, CF_EntityId_t dst_eid,
+                          CF_TransactionSeq_t tsn)
 {
     UT_GenStub_AddParam(CF_SetVariableHeader, CF_EntityId_t, src_eid);
     UT_GenStub_AddParam(CF_SetVariableHeader, CF_EntityId_t, dst_eid);
