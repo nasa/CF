@@ -1,247 +1,59 @@
 /************************************************************************
-** File: cf_chunk_stubs.c
+** File: cf_chunk.h
 **
-** %LICENSE_START
-** %LICENSE_STOP
+** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
+** Application version 3.0.0”
+** Copyright © 2019 United States Government as represented by the
+** Administrator of the National Aeronautics and Space Administration.
+** All Rights Reserved.
+** Licensed under the Apache License, Version 2.0 (the "License"); you may
+** not use this file except in compliance with the License. You may obtain
+** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+**
+** Unless required by applicable law or agreed to in writing, software
+** distributed under the License is distributed on an "AS IS" BASIS,
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+** See the License for the specific language governing permissions and
+** limitations under the License.
+**
 **
 ** Purpose:
-**  Stubs file for the CF Application chunks (sparse gap tracking) logic file
+**  The CF Application chunks (spare gap tracking) header file
 **
-**  This class handles the complexity of sparse gap tracking so that
-**  the CFDP engine doesn't need to worry about it. Information is given
-**  to the class and when needed calculations are made internally to
-**  help the engine build NAK packets. Received NAK segmnent requests
-**  are stored in this class as well and used for re-transmit processing.
 **
-**  This is intended to be mostly a generic purpose class used by CF.
 **
-** Revision 1.0 2020/08/04 asgibso1
-**  Initial revision
 *************************************************************************/
 
-/* Most of this was originally written by Stephen Newell stephen@sjnewell.com
- * who wrote it responding to my asking him about the problem. He wrote it
- * in C++ and I (Steven Seeger) ported it to C and fixed a couple bugs and
- * added some stuff.
+/**
+ * @file
  *
- * This is a pretty generic implemenation of a solution to the problem of
- * sparse gap tracking over a linear range. */
-#include <string.h>
-#include "cf_verify.h"
-#include "cf_assert.h"
-#include "cf_chunk.h"
+ * Auto-Generated stub implementations for functions defined in cf_chunk header
+ */
 
-/* UT includes */
-#include "uttest.h"
-#include "utstubs.h"
-#include "uttools.h"
+#include "cf_chunk.h"
 #include "utgenstub.h"
 
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+extern void UT_DefaultHandler_CF_ChunkList_GetFirstChunk(void *, UT_EntryKey_t, const UT_StubContext_t *);
 
-/************************************************************************/
-/** \brief Erase a range of chunks.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL.
-**
-*************************************************************************/
-// static void CF_Chunks_EraseRange(CF_ChunkList_t *chunks, CF_ChunkIdx_t start, CF_ChunkIdx_t end)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Erase a single chunk.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL.
-**
-*************************************************************************/
-// static void CF_Chunks_EraseChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t erase_index)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Insert a chunk before index_before.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL. chunk must not be NULL.
-**
-*************************************************************************/
-// static void CF_Chunks_InsertChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t index_before, const CF_Chunk_t *chunk)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Finds where a chunk should be inserted in the chunks.
-**
-**  \par Description
-**       This is a C version of std::lower_bound from C++ algorithms.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL. chunk must not be NULL.
-**
-**  \returns
-**  \retstmt Returns an index to the first chunk that is greater than or equal to the requested's offset. \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static CF_ChunkIdx_t CF_Chunks_FindInsertPosition(CF_ChunkList_t *chunks, const CF_Chunk_t *chunk)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Possibly combines the given chunk with the previous chunk.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL. chunk must not be NULL.
-**
-**  \returns
-**  \retstmt Returns 1 if combined with another chunk; otherwise 0. \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Possibly combines the given chunk with the next chunk.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL. chunk must not be NULL.
-**
-**  \returns
-**  \retstmt Returns 1 if combined with another chunk; otherwise 0. \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Finds the smallest size out of all chunks.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL.
-**
-**  \returns
-**  \retstmt The smallest size out of all the chunks. \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static CF_ChunkIdx_t CF_Chunks_FindSmallestSize(const CF_ChunkList_t *chunks)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Insert a chunk.
-**
-**  \par Description
-**       Finds the correct insertion point for a chunk. May combine with
-**       an existing chunk if contiguous.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL. chunk must not be NULL.
-**
-*************************************************************************/
-// static void CF_Chunks_Insert(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Public function to add a chunk.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL.
-**
-*************************************************************************/
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_ChunkListAdd()
+ * ----------------------------------------------------
+ */
 void CF_ChunkListAdd(CF_ChunkList_t *chunks, CF_ChunkOffset_t offset, CF_ChunkSize_t size)
 {
-    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkListAdd), &chunks, sizeof(chunks));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkListAdd), &offset, sizeof(offset));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkListAdd), &size, sizeof(size));
+    UT_GenStub_AddParam(CF_ChunkListAdd, CF_ChunkList_t *, chunks);
+    UT_GenStub_AddParam(CF_ChunkListAdd, CF_ChunkOffset_t, offset);
+    UT_GenStub_AddParam(CF_ChunkListAdd, CF_ChunkSize_t, size);
 
-    UT_DEFAULT_IMPL(CF_ChunkListAdd);
+    UT_GenStub_Execute(CF_ChunkListAdd, Basic, NULL);
 }
 
-/************************************************************************/
-/** \brief Public function to remove some amount of size from the first chunk.
-**
-**  \par Description
-**       This may remove the chunk entirely. This function is to satisfy the
-**       use-case where data is retrieved from the structure in-order and
-**       once consumed should be removed.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL.
-**
-*************************************************************************/
-void CF_ChunkList_RemoveFromFirst(CF_ChunkList_t *chunks, CF_ChunkSize_t size)
-{
-    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_RemoveFromFirst), &chunks, sizeof(chunks));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_RemoveFromFirst), &size, sizeof(size));
-
-    UT_DEFAULT_IMPL(CF_ChunkList_RemoveFromFirst);
-}
-
-/************************************************************************/
-/** \brief Public function to remove some amount of size from the first chunk.
-**
-**  \par Description
-**       This may remove the chunk entirely. This function is to satisfy the
-**       use-case where data is retrieved from the structure in-order and
-**       once consumed should be removed.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL.
-**
-*************************************************************************/
-const CF_Chunk_t *CF_ChunkList_GetFirstChunk(const CF_ChunkList_t *chunks)
-{
-    CF_Chunk_t *forced_return;
-
-    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_GetFirstChunk), &chunks, sizeof(chunks));
-
-    UT_DEFAULT_IMPL(CF_ChunkList_GetFirstChunk);
-
-    UT_Stub_CopyToLocal(UT_KEY(CF_ChunkList_GetFirstChunk), &forced_return, sizeof(forced_return));
-
-    return forced_return;
-}
-
-/************************************************************************/
-/** \brief Initialize a chunks structure.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL. chunks_mem must not be NULL.
-**
-*************************************************************************/
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_ChunkListInit()
+ * ----------------------------------------------------
+ */
 void CF_ChunkListInit(CF_ChunkList_t *chunks, CF_ChunkIdx_t CF_max_chunks, CF_Chunk_t *chunks_mem)
 {
     UT_GenStub_AddParam(CF_ChunkListInit, CF_ChunkList_t *, chunks);
@@ -251,43 +63,189 @@ void CF_ChunkListInit(CF_ChunkList_t *chunks, CF_ChunkIdx_t CF_max_chunks, CF_Ch
     UT_GenStub_Execute(CF_ChunkListInit, Basic, NULL);
 }
 
-/************************************************************************/
-/** \brief Resets a chunks structure.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL.
-**
-*************************************************************************/
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_ChunkListReset()
+ * ----------------------------------------------------
+ */
 void CF_ChunkListReset(CF_ChunkList_t *chunks)
 {
-    UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
-    exit(-86);
+    UT_GenStub_AddParam(CF_ChunkListReset, CF_ChunkList_t *, chunks);
+
+    UT_GenStub_Execute(CF_ChunkListReset, Basic, NULL);
 }
 
-/************************************************************************/
-/** \brief Compute gaps between chunks, and call a callback for each.
-**
-**  \par Description
-**       This function walks over all chunks and computes the gaps between.
-**       It can exit early if the calculated gap start is larger than the
-**       desired total.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL. compute_gap_fn is a valid function address.
-**
-**  \returns
-**  \retstmt The number of computed gaps. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_ChunkList_ComputeGaps()
+ * ----------------------------------------------------
+ */
 uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_gaps, CF_ChunkSize_t total,
                                 CF_ChunkOffset_t start, CF_ChunkList_ComputeGapFn_t compute_gap_fn, void *opaque)
 {
-    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_ComputeGaps), &chunks, sizeof(chunks));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_ComputeGaps), &max_gaps, sizeof(max_gaps));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_ComputeGaps), &total, sizeof(total));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_ComputeGaps), &compute_gap_fn, sizeof(compute_gap_fn));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_ChunkList_ComputeGaps), &opaque, sizeof(opaque));
+    UT_GenStub_SetupReturnBuffer(CF_ChunkList_ComputeGaps, uint32);
 
-    return UT_DEFAULT_IMPL(CF_ChunkList_ComputeGaps);
+    UT_GenStub_AddParam(CF_ChunkList_ComputeGaps, const CF_ChunkList_t *, chunks);
+    UT_GenStub_AddParam(CF_ChunkList_ComputeGaps, CF_ChunkIdx_t, max_gaps);
+    UT_GenStub_AddParam(CF_ChunkList_ComputeGaps, CF_ChunkSize_t, total);
+    UT_GenStub_AddParam(CF_ChunkList_ComputeGaps, CF_ChunkOffset_t, start);
+    UT_GenStub_AddParam(CF_ChunkList_ComputeGaps, CF_ChunkList_ComputeGapFn_t, compute_gap_fn);
+    UT_GenStub_AddParam(CF_ChunkList_ComputeGaps, void *, opaque);
+
+    UT_GenStub_Execute(CF_ChunkList_ComputeGaps, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_ChunkList_ComputeGaps, uint32);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_ChunkList_GetFirstChunk()
+ * ----------------------------------------------------
+ */
+const CF_Chunk_t *CF_ChunkList_GetFirstChunk(const CF_ChunkList_t *chunks)
+{
+    UT_GenStub_SetupReturnBuffer(CF_ChunkList_GetFirstChunk, const CF_Chunk_t *);
+
+    UT_GenStub_AddParam(CF_ChunkList_GetFirstChunk, const CF_ChunkList_t *, chunks);
+
+    UT_GenStub_Execute(CF_ChunkList_GetFirstChunk, Basic, UT_DefaultHandler_CF_ChunkList_GetFirstChunk);
+
+    return UT_GenStub_GetReturnValue(CF_ChunkList_GetFirstChunk, const CF_Chunk_t *);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_ChunkList_RemoveFromFirst()
+ * ----------------------------------------------------
+ */
+void CF_ChunkList_RemoveFromFirst(CF_ChunkList_t *chunks, CF_ChunkSize_t size)
+{
+    UT_GenStub_AddParam(CF_ChunkList_RemoveFromFirst, CF_ChunkList_t *, chunks);
+    UT_GenStub_AddParam(CF_ChunkList_RemoveFromFirst, CF_ChunkSize_t, size);
+
+    UT_GenStub_Execute(CF_ChunkList_RemoveFromFirst, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_Chunks_CombineNext()
+ * ----------------------------------------------------
+ */
+int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
+{
+    UT_GenStub_SetupReturnBuffer(CF_Chunks_CombineNext, int);
+
+    UT_GenStub_AddParam(CF_Chunks_CombineNext, CF_ChunkList_t *, chunks);
+    UT_GenStub_AddParam(CF_Chunks_CombineNext, CF_ChunkIdx_t, i);
+    UT_GenStub_AddParam(CF_Chunks_CombineNext, const CF_Chunk_t *, chunk);
+
+    UT_GenStub_Execute(CF_Chunks_CombineNext, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_Chunks_CombineNext, int);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_Chunks_CombinePrevious()
+ * ----------------------------------------------------
+ */
+int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
+{
+    UT_GenStub_SetupReturnBuffer(CF_Chunks_CombinePrevious, int);
+
+    UT_GenStub_AddParam(CF_Chunks_CombinePrevious, CF_ChunkList_t *, chunks);
+    UT_GenStub_AddParam(CF_Chunks_CombinePrevious, CF_ChunkIdx_t, i);
+    UT_GenStub_AddParam(CF_Chunks_CombinePrevious, const CF_Chunk_t *, chunk);
+
+    UT_GenStub_Execute(CF_Chunks_CombinePrevious, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_Chunks_CombinePrevious, int);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_Chunks_EraseChunk()
+ * ----------------------------------------------------
+ */
+void CF_Chunks_EraseChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t erase_index)
+{
+    UT_GenStub_AddParam(CF_Chunks_EraseChunk, CF_ChunkList_t *, chunks);
+    UT_GenStub_AddParam(CF_Chunks_EraseChunk, CF_ChunkIdx_t, erase_index);
+
+    UT_GenStub_Execute(CF_Chunks_EraseChunk, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_Chunks_EraseRange()
+ * ----------------------------------------------------
+ */
+void CF_Chunks_EraseRange(CF_ChunkList_t *chunks, CF_ChunkIdx_t start, CF_ChunkIdx_t end)
+{
+    UT_GenStub_AddParam(CF_Chunks_EraseRange, CF_ChunkList_t *, chunks);
+    UT_GenStub_AddParam(CF_Chunks_EraseRange, CF_ChunkIdx_t, start);
+    UT_GenStub_AddParam(CF_Chunks_EraseRange, CF_ChunkIdx_t, end);
+
+    UT_GenStub_Execute(CF_Chunks_EraseRange, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_Chunks_FindInsertPosition()
+ * ----------------------------------------------------
+ */
+CF_ChunkIdx_t CF_Chunks_FindInsertPosition(CF_ChunkList_t *chunks, const CF_Chunk_t *chunk)
+{
+    UT_GenStub_SetupReturnBuffer(CF_Chunks_FindInsertPosition, CF_ChunkIdx_t);
+
+    UT_GenStub_AddParam(CF_Chunks_FindInsertPosition, CF_ChunkList_t *, chunks);
+    UT_GenStub_AddParam(CF_Chunks_FindInsertPosition, const CF_Chunk_t *, chunk);
+
+    UT_GenStub_Execute(CF_Chunks_FindInsertPosition, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_Chunks_FindInsertPosition, CF_ChunkIdx_t);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_Chunks_FindSmallestSize()
+ * ----------------------------------------------------
+ */
+CF_ChunkIdx_t CF_Chunks_FindSmallestSize(const CF_ChunkList_t *chunks)
+{
+    UT_GenStub_SetupReturnBuffer(CF_Chunks_FindSmallestSize, CF_ChunkIdx_t);
+
+    UT_GenStub_AddParam(CF_Chunks_FindSmallestSize, const CF_ChunkList_t *, chunks);
+
+    UT_GenStub_Execute(CF_Chunks_FindSmallestSize, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_Chunks_FindSmallestSize, CF_ChunkIdx_t);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_Chunks_Insert()
+ * ----------------------------------------------------
+ */
+void CF_Chunks_Insert(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
+{
+    UT_GenStub_AddParam(CF_Chunks_Insert, CF_ChunkList_t *, chunks);
+    UT_GenStub_AddParam(CF_Chunks_Insert, CF_ChunkIdx_t, i);
+    UT_GenStub_AddParam(CF_Chunks_Insert, const CF_Chunk_t *, chunk);
+
+    UT_GenStub_Execute(CF_Chunks_Insert, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_Chunks_InsertChunk()
+ * ----------------------------------------------------
+ */
+void CF_Chunks_InsertChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t index_before, const CF_Chunk_t *chunk)
+{
+    UT_GenStub_AddParam(CF_Chunks_InsertChunk, CF_ChunkList_t *, chunks);
+    UT_GenStub_AddParam(CF_Chunks_InsertChunk, CF_ChunkIdx_t, index_before);
+    UT_GenStub_AddParam(CF_Chunks_InsertChunk, const CF_Chunk_t *, chunk);
+
+    UT_GenStub_Execute(CF_Chunks_InsertChunk, Basic, NULL);
 }

@@ -52,7 +52,15 @@ typedef struct
     CF_Engine_t engine;
 } CF_AppData_t;
 
+void  CF_HkCmd(void);
+void  CF_CheckTables(void);
+int32 CF_ValidateConfigTable(void *tbl_ptr);
+int32 CF_TableInit(void);
+int32 CF_Init(void);
+void  CF_WakeUp(void);
+void  CF_ProcessMsg(CFE_SB_Buffer_t *msg);
+void  CF_AppMain(void);
+
 extern CF_AppData_t CF_AppData;
 
-extern void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg);
 #endif /* !CF_APP__H */

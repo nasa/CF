@@ -13,55 +13,83 @@
 #define HEADS true
 #define TAILS false
 
-int32  result;
-uint16 EventID;
+static uint16 UT_CF_CapturedEventIDs[4];
 
-type_of_context_CF_CList_Traverse_t type_of_context_CF_CList_Traverse;
+void *UT_CF_GetContextBufferImpl(UT_EntryKey_t FuncKey, size_t ReqSize)
+{
+    void  *TempPtr;
+    size_t ActualSize;
+    size_t Position;
+    void  *Val;
 
-CFE_EVS_SendEvent_context_t  context_CFE_EVS_SendEvent;
-CFE_MSG_GetMsgId_context_t   context_CFE_MSG_GetMsgId;
-CFE_MSG_SetMsgTime_context_t context_CFE_MSG_SetMsgTime;
+    UT_GetDataBuffer(FuncKey, &TempPtr, &ActualSize, &Position);
 
-const char *ut_default_const_char = "!WARNING! - UNSET CONST CHAR";
-const uint8 ut_default_uint8      = UT_UINT_8_DEFAULT;
-/* default_ptr changes per run, but value pointed at if not set correctly in test will always
- * be default_uint8 (UT_UINT_8_DEFAULT).  When it is suspected that there is a default ptr issue with
- * a test, output it as a uint8 and if the test has not set it correctly it will == UT_UINT_8_DEFAULT */
-const void *ut_default_ptr = &ut_default_uint8;
+    if (TempPtr != NULL && (ActualSize % ReqSize) != 0)
+    {
+        UtAssert_Failed("Setup Error: Actual context buffer size (%lu) does not match required size (%lu)",
+                        (unsigned long)ActualSize, (unsigned long)ReqSize);
+        TempPtr = NULL;
+    }
 
-UT_HookFunc_t stub_reporter = &stub_reporter_hook;
+    if (TempPtr != NULL)
+    {
+        TempPtr = ((uint8 *)TempPtr) + Position;
+
+        /* This is just a roundabout way to increment the position, because
+         * UT assert does not currently have an API call to do so */
+        while (ReqSize >= sizeof(Val))
+        {
+            UT_Stub_CopyToLocal(FuncKey, &Val, sizeof(Val));
+            ReqSize -= sizeof(Val);
+        }
+
+        if (ReqSize > 0)
+        {
+            UT_Stub_CopyToLocal(FuncKey, &Val, ReqSize);
+        }
+    }
+
+    return TempPtr;
+}
+
+void UT_CF_ResetEventCapture(UT_EntryKey_t FuncKey)
+{
+    /* set up the buffer to store the generated event ID */
+    memset(UT_CF_CapturedEventIDs, 0, sizeof(UT_CF_CapturedEventIDs));
+    if (FuncKey)
+    {
+        UT_ResetState(FuncKey);
+        UT_SetDataBuffer(FuncKey, UT_CF_CapturedEventIDs, sizeof(UT_CF_CapturedEventIDs), false);
+    }
+}
+
+void UT_CF_CheckEventID_Impl(uint16 ExpectedID, const char *EventIDStr)
+{
+    /* check if the event exists anywhere in the buffer */
+    bool   found;
+    uint16 i;
+
+    found = false;
+    for (i = 0; !found && i < (sizeof(UT_CF_CapturedEventIDs) / sizeof(UT_CF_CapturedEventIDs[0])); ++i)
+    {
+        found = (UT_CF_CapturedEventIDs[i] == ExpectedID);
+    }
+
+    UtAssert_True(found, "Generated event: %s (%u)", EventIDStr, (unsigned int)ExpectedID);
+}
 
 /******************************************************************************
  * The Setup and Teardown
  ******************************************************************************/
 
-/* TODO: set_context_const is just an alias for memcpy, should I just macro this? */
-void set_default_ptr(void *dest);
-void set_default_ptr(void *dest)
-{
-    memcpy(dest, &ut_default_ptr, sizeof(ut_default_ptr));
-}
-
 void cf_tests_Setup(void)
 {
     UT_ResetState(0);
 
-    /* reset global test variables */
-    result  = UT_INT_32_DEFAULT;
-    EventID = UT_INT_16_DEFAULT;
-
-    context_CFE_EVS_SendEvent.EventID   = UT_UINT_16_DEFAULT;
-    context_CFE_EVS_SendEvent.EventType = UT_UINT_16_DEFAULT;
-    set_default_ptr(&context_CFE_EVS_SendEvent.Spec);
-
-    set_default_ptr(&context_CFE_MSG_GetMsgId.MsgPtr);
-    set_default_ptr(&context_CFE_MSG_GetMsgId.returned_MsgId);
-
-    set_default_ptr(&context_CFE_MSG_SetMsgTime.MsgPtr);
-    context_CFE_MSG_SetMsgTime.Time.Seconds    = UT_INT_32_DEFAULT;
-    context_CFE_MSG_SetMsgTime.Time.Subseconds = UT_INT_32_DEFAULT;
-
-    type_of_context_CF_CList_Traverse = NOT_YET_SET;
+    /* make sure to clear any stored event ID between tests */
+    /* Note This cannot set up for CFE_EVS_SendEvent, although it is commonly
+       used/needed, not every unit uses it */
+    UT_CF_ResetEventCapture(0);
 }
 
 void cf_tests_Teardown(void)
@@ -72,12 +100,6 @@ void cf_tests_Teardown(void)
 /******************************************************************************
  * ut utility functions that we may want to add to ut_assert
  ******************************************************************************/
-
-void unimplemented(const char *func, const char *file, int line)
-{
-    UtPrintf("NOT YET IMPLEMENTED stub for function '%s' in \n%s:line #%d\n", func, file, line);
-    exit(-86);
-}
 
 void TestUtil_InitializeRandomSeed(void)
 {
@@ -100,19 +122,6 @@ void TestUtil_InitMsg(CFE_MSG_Message_t *MsgPtr, CFE_SB_MsgId_t MsgId, CFE_MSG_S
 {
     // CFE_MSG_Init(MsgPtr, MsgId, Size);
     UtAssert_Abort("using TestUtil_InitMsg!!");
-}
-
-/******************************************************************************
- * cf central handler functions for stub behavior modification
- ******************************************************************************/
-
-void Handler_int_ForcedReturnOnly(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
-{
-    int forced_return;
-
-    memcpy(&forced_return, UserObj, sizeof(forced_return));
-
-    UT_Stub_SetReturnValue(FuncKey, forced_return);
 }
 
 /******************************************************************************

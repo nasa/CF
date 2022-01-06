@@ -48,7 +48,7 @@
 **  \endreturns
 **
 *************************************************************************/
-static inline uint32 CF_Timer_Sec2Ticks(CF_Timer_Seconds_t sec)
+uint32 CF_Timer_Sec2Ticks(CF_Timer_Seconds_t sec)
 {
     return sec * CF_AppData.config_table->ticks_per_second;
 }

@@ -1,684 +1,553 @@
 /************************************************************************
-** File: cf_cmd_stubs.c
+** File: cf_cmd.h
 **
-** %LICENSE_START
-** %LICENSE_STOP
+** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
+** Application version 3.0.0”
+** Copyright © 2019 United States Government as represented by the
+** Administrator of the National Aeronautics and Space Administration.
+** All Rights Reserved.
+** Licensed under the Apache License, Version 2.0 (the "License"); you may
+** not use this file except in compliance with the License. You may obtain
+** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 **
-** Purpose:
-**  The CF Application command handling stubs file
+** Unless required by applicable law or agreed to in writing, software
+** distributed under the License is distributed on an "AS IS" BASIS,
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+** See the License for the specific language governing permissions and
+** limitations under the License.
 **
-**  All ground commands are processed in this file. All supporting functions
-**  necessary to process the commands are also here.
 **
-** Revision 1.0 2020/08/04 asgibso1
-**  Initial revision
 *************************************************************************/
 
-#include "cf_app.h"
-#include "cf_verify.h"
-#include "cf_events.h"
-#include "cf_perfids.h"
-#include "cf_utils.h"
+/**
+ * @file
+ *
+ * Auto-Generated stub implementations for functions defined in cf_cmd header
+ */
 
-#include "cf_cfdp.h"
+#include "cf_cmd.h"
+#include "utgenstub.h"
 
-#include <string.h>
+extern void UT_DefaultHandler_CF_ProcessGroundCommand(void *, UT_EntryKey_t, const UT_StubContext_t *);
 
-/* UT includes */
-#include "uttest.h"
-#include "utstubs.h"
-
-#define ALL_CHANNELS 255
-#define COMPOUND_KEY 254
-
-typedef int (*chan_action_fn_t)(uint8 chan_num, void *context);
-
-typedef struct
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdAbandon()
+ * ----------------------------------------------------
+ */
+void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
 {
-    uint8 barg;
-} bool_arg_t;
+    UT_GenStub_AddParam(CF_CmdAbandon, CFE_SB_Buffer_t *, msg);
 
-typedef CF_TraverseAllTransactions_fn_t CF_TsnChanAction_fn_t;
+    UT_GenStub_Execute(CF_CmdAbandon, Basic, NULL);
+}
 
-typedef struct
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdAbandon_()
+ * ----------------------------------------------------
+ */
+void CF_CmdAbandon_(CF_Transaction_t *t, void *ignored)
 {
-    int   same; /* out param -- indicates at least one action was set to its current value */
-    uint8 action;
-} susp_res_arg_t;
+    UT_GenStub_AddParam(CF_CmdAbandon_, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CmdAbandon_, void *, ignored);
 
-typedef struct
+    UT_GenStub_Execute(CF_CmdAbandon_, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdCancel()
+ * ----------------------------------------------------
+ */
+void CF_CmdCancel(CFE_SB_Buffer_t *msg)
 {
-    const CF_UnionArgsCmd_t *msg;
-    uint8                    barg;
-} bool_msg_arg_t;
+    UT_GenStub_AddParam(CF_CmdCancel, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Increment the command accepted counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
-// static void CF_CmdAcc(void)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdCancel, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Increment the command rejected counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
-// static void CF_CmdRej(void)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdCancel_()
+ * ----------------------------------------------------
+ */
+void CF_CmdCancel_(CF_Transaction_t *t, void *ignored)
+{
+    UT_GenStub_AddParam(CF_CmdCancel_, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CmdCancel_, void *, ignored);
 
-/************************************************************************/
-/** \brief Conditionally increment the command accept or reject counters.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
-// static void CF_CmdCond(int cond)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdCancel_, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief The no-operation command.
-**
-**  \par Description
-**       This function has a signature the same of all cmd_ functions.
-**       This function simply prints an event message.
-**       Increments the command accept counter.
-**       The msg parameter is ignored in this one.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
-// static void CF_CmdNoop(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdDisableDequeue()
+ * ----------------------------------------------------
+ */
+void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdDisableDequeue, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief The reset counters command.
-**
-**  \par Description
-**       This function has a signature the same of all cmd_ functions.
-**       Resets the given counter, or all.
-**       Increments the command accept or reject counter. If the command
-**       counters are reset, then there is no increment.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdReset(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdDisableDequeue, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Ground command to start a file transfer.
-**
-**  \par Description
-**       This function has a signature the same of all cmd_ functions.
-**       Increments the command accept or reject counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdTxFile(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdDisableEngine()
+ * ----------------------------------------------------
+ */
+void CF_CmdDisableEngine(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdDisableEngine, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Ground command to start directory playback.
-**
-**  \par Description
-**       This function has a signature the same of all cmd_ functions.
-**       Increments the command accept or reject counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdPlaybackDir(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdDisableEngine, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Common logic for all channel-based commands.
-**
-**  \par Description
-**       All the commands that act on channels or have the special
-**       "all channels" parameter come through this function. This puts
-**       all common logic in one place. It does not handle the command
-**       accept or reject counters.
-**
-**  \par Assumptions, External Events, and Notes:
-**       cmd must not be NULL. errstr must not be NULL. fn must be a valid function. context may be NULL.
-**
-**  \returns
-**  \retstmt The return value from the given function. \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, chan_action_fn_t fn, void *context)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdDisablePolldir()
+ * ----------------------------------------------------
+ */
+void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdDisablePolldir, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Channel action to set the frozen bit for a channel.
-**
-**  \par Assumptions, External Events, and Notes:
-**       context must not be NULL.
-**
-**  \returns
-**  \retstmt Always succeeds, so returns 0. \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static int CF_DoFreezeThaw(uint8 chan_num, const bool_arg_t *context)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdDisablePolldir, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Freeze a channel.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdFreeze(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdEnableDequeue()
+ * ----------------------------------------------------
+ */
+void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdEnableDequeue, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Thaw a channel.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdThaw(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdEnableDequeue, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Search for a transaction across all channels.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-**  \returns
-**  \retstmt The transaction, if found. Otherwise NULL. \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static CF_Transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(CF_TransactionSeq_t ts, CF_EntityId_t
-// eid)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdEnableEngine()
+ * ----------------------------------------------------
+ */
+void CF_CmdEnableEngine(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdEnableEngine, CFE_SB_Buffer_t *, msg);
 
-/* CF_TsnChanAction() returns the number of transactions acted upon */
-/************************************************************************/
-/** \brief Common logic for all transaction sequence number and channel commands.
-**
-**  \par Description
-**       All the commands that on a transaction on a particular channel come
-**       through this function. This puts all common logic in one place. It
-**       does handle the command accept or reject counters.
-**
-**  \par Assumptions, External Events, and Notes:
-**       cmd must not be NULL. fn must be a valid function. context may be NULL.
-**
-**  \returns
-**  \retcode #CFE_SUCCESS \retdesc \copydoc CFE_SUCCESSS \endcode
-**  \retstmt Returns anything else on error.             \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdEnableEngine, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Set the suspended bit in a transaction.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. context must not be NULL.
-**
-*************************************************************************/
-// static void CF_DoSuspRes_(CF_Transaction_t *t, susp_res_arg_t *context)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdEnablePolldir()
+ * ----------------------------------------------------
+ */
+void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdEnablePolldir, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Handle transaction suspend and resume commands.
-**
-**  \par Description
-**       This is called for both suspend and resume ground commands.
-**       It uses the CF_TsnChanAction() function to perform the command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       cmd must not be NULL.
-**
-*************************************************************************/
-// static void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdEnablePolldir, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Handle transaction suspend command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdSuspend(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdFreeze()
+ * ----------------------------------------------------
+ */
+void CF_CmdFreeze(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdFreeze, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Handle transaction resume command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdResume(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdFreeze, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief tsn chan action to cancel a transaction.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdCancel_(CF_Transaction_t *t, void *ignored)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdGetParam()
+ * ----------------------------------------------------
+ */
+void CF_CmdGetParam(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdGetParam, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Handle a cancel ground command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdCancel(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdGetParam, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief tsn chan action to abandon a transaction.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdAbandon_(CF_Transaction_t *t, void *ignored)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdGetSetParam()
+ * ----------------------------------------------------
+ */
+void CF_CmdGetSetParam(uint8 is_set, uint8 param_id, uint32 value, uint8 chan_num)
+{
+    UT_GenStub_AddParam(CF_CmdGetSetParam, uint8, is_set);
+    UT_GenStub_AddParam(CF_CmdGetSetParam, uint8, param_id);
+    UT_GenStub_AddParam(CF_CmdGetSetParam, uint32, value);
+    UT_GenStub_AddParam(CF_CmdGetSetParam, uint8, chan_num);
 
-/************************************************************************/
-/** \brief Handle an abandon ground command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdAbandon(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdGetSetParam, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Sets the dequeue enable/disable flag for a channel.
-**
-**  \par Assumptions, External Events, and Notes:
-**       context must not be NULL.
-**
-*************************************************************************/
-// static void CF_DoEnableDisableDequeue(uint8 chan_num, const bool_arg_t *context)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdNoop()
+ * ----------------------------------------------------
+ */
+void CF_CmdNoop(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdNoop, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Handle an enable dequeue ground command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdEnableDequeue(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdNoop, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Handle a disable dequeue ground command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdDisableDequeue(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdPlaybackDir()
+ * ----------------------------------------------------
+ */
+void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdPlaybackDir, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Sets the enable/disable flag for the specified polling directory.
-**
-**  \par Assumptions, External Events, and Notes:
-**       context must not be NULL.
-**
-*************************************************************************/
-// static int CF_DoEnableDisablePolldir(uint8 chan_num, const bool_msg_arg_t *context)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdPlaybackDir, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Enable a polling dir ground command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdEnablePolldir(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdPurgeQueue()
+ * ----------------------------------------------------
+ */
+void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdPurgeQueue, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Disable a polling dir ground command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdDisablePolldir(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdPurgeQueue, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Purge the history queue for the given channel.
-**
-**  \par Assumptions, External Events, and Notes:
-**       n must not be NULL. c must not be NULL.
-**
-*************************************************************************/
-// static int CF_PurgeHistory(CF_CListNode_t * n, CF_Channel_t *c)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdReset()
+ * ----------------------------------------------------
+ */
+void CF_CmdReset(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdReset, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Purge the pending transaction queue.
-**
-**  \par Assumptions, External Events, and Notes:
-**       n must not be NULL.
-**
-*************************************************************************/
-// static int CF_PurgeTransaction(CF_CListNode_t * n, void *ignored)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdReset, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Channel action command to perform purge queue operations.
-**
-**  \par Description
-**       Determines from the command parameters which queues to traverse
-**       and purge state.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-**  \returns
-**  \retstmt 0 on success; anything else on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static int CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdResume()
+ * ----------------------------------------------------
+ */
+void CF_CmdResume(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdResume, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Ground command to purge either the history or pending queues.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdPurgeQueue(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdResume, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Ground command to write a file with queue information.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdWriteQueue(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdSendCfgParams()
+ * ----------------------------------------------------
+ */
+void CF_CmdSendCfgParams(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdSendCfgParams, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Ground command to send configuration parameters.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdSendCfgParams(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdSendCfgParams, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Checks if the value is less than or equal to the max pdu size.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-**  \returns
-**  \retstmt 0 if success, 1 if failed. \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static int CF_CmdValidateChunkSize(uint32 val, uint8 chan_num /* ignored */)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdSetParam()
+ * ----------------------------------------------------
+ */
+void CF_CmdSetParam(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdSetParam, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Perform a configuration get/set operation.
-**
-**  \par Description
-**       Combine get and set in one function with common logic.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
-/* combine getset into a single function with a branch to avoid wasted memory footprint with duplicate
- * logic for finding the parameter */
-// static void CF_CmdGetSetParam(uint8 is_set, uint8 param_id, uint32 value, uint8 chan_num)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdSetParam, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Ground command to set a configuration parameter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdSetParam(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdSuspend()
+ * ----------------------------------------------------
+ */
+void CF_CmdSuspend(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdSuspend, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Ground command to set a configuration parameter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdGetParam(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdSuspend, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Ground command enable engine.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdEnableEngine(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdThaw()
+ * ----------------------------------------------------
+ */
+void CF_CmdThaw(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdThaw, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief Ground command disable engine.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_CmdDisableEngine(CFE_SB_Buffer_t* msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CmdThaw, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Process any ground command contained in the given message.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdTxFile()
+ * ----------------------------------------------------
+ */
+void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdTxFile, CFE_SB_Buffer_t *, msg);
+
+    UT_GenStub_Execute(CF_CmdTxFile, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdValidateChunkSize()
+ * ----------------------------------------------------
+ */
+int CF_CmdValidateChunkSize(uint32 val, uint8 chan_num)
+{
+    UT_GenStub_SetupReturnBuffer(CF_CmdValidateChunkSize, int);
+
+    UT_GenStub_AddParam(CF_CmdValidateChunkSize, uint32, val);
+    UT_GenStub_AddParam(CF_CmdValidateChunkSize, uint8, chan_num);
+
+    UT_GenStub_Execute(CF_CmdValidateChunkSize, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_CmdValidateChunkSize, int);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdValidateMaxOutgoing()
+ * ----------------------------------------------------
+ */
+int CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
+{
+    UT_GenStub_SetupReturnBuffer(CF_CmdValidateMaxOutgoing, int);
+
+    UT_GenStub_AddParam(CF_CmdValidateMaxOutgoing, uint32, val);
+    UT_GenStub_AddParam(CF_CmdValidateMaxOutgoing, uint8, chan_num);
+
+    UT_GenStub_Execute(CF_CmdValidateMaxOutgoing, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_CmdValidateMaxOutgoing, int);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CmdWriteQueue()
+ * ----------------------------------------------------
+ */
+void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_CmdWriteQueue, CFE_SB_Buffer_t *, msg);
+
+    UT_GenStub_Execute(CF_CmdWriteQueue, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_DoChanAction()
+ * ----------------------------------------------------
+ */
+int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, chan_action_fn_t fn, void *context)
+{
+    UT_GenStub_SetupReturnBuffer(CF_DoChanAction, int);
+
+    UT_GenStub_AddParam(CF_DoChanAction, CF_UnionArgsCmd_t *, cmd);
+    UT_GenStub_AddParam(CF_DoChanAction, const char *, errstr);
+    UT_GenStub_AddParam(CF_DoChanAction, chan_action_fn_t, fn);
+    UT_GenStub_AddParam(CF_DoChanAction, void *, context);
+
+    UT_GenStub_Execute(CF_DoChanAction, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_DoChanAction, int);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_DoEnableDisableDequeue()
+ * ----------------------------------------------------
+ */
+int CF_DoEnableDisableDequeue(uint8 chan_num, const bool_arg_t *context)
+{
+    UT_GenStub_SetupReturnBuffer(CF_DoEnableDisableDequeue, int);
+
+    UT_GenStub_AddParam(CF_DoEnableDisableDequeue, uint8, chan_num);
+    UT_GenStub_AddParam(CF_DoEnableDisableDequeue, const bool_arg_t *, context);
+
+    UT_GenStub_Execute(CF_DoEnableDisableDequeue, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_DoEnableDisableDequeue, int);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_DoEnableDisablePolldir()
+ * ----------------------------------------------------
+ */
+int CF_DoEnableDisablePolldir(uint8 chan_num, const bool_msg_arg_t *context)
+{
+    UT_GenStub_SetupReturnBuffer(CF_DoEnableDisablePolldir, int);
+
+    UT_GenStub_AddParam(CF_DoEnableDisablePolldir, uint8, chan_num);
+    UT_GenStub_AddParam(CF_DoEnableDisablePolldir, const bool_msg_arg_t *, context);
+
+    UT_GenStub_Execute(CF_DoEnableDisablePolldir, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_DoEnableDisablePolldir, int);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_DoFreezeThaw()
+ * ----------------------------------------------------
+ */
+int CF_DoFreezeThaw(uint8 chan_num, const bool_arg_t *context)
+{
+    UT_GenStub_SetupReturnBuffer(CF_DoFreezeThaw, int);
+
+    UT_GenStub_AddParam(CF_DoFreezeThaw, uint8, chan_num);
+    UT_GenStub_AddParam(CF_DoFreezeThaw, const bool_arg_t *, context);
+
+    UT_GenStub_Execute(CF_DoFreezeThaw, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_DoFreezeThaw, int);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_DoPurgeQueue()
+ * ----------------------------------------------------
+ */
+int CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
+{
+    UT_GenStub_SetupReturnBuffer(CF_DoPurgeQueue, int);
+
+    UT_GenStub_AddParam(CF_DoPurgeQueue, uint8, chan_num);
+    UT_GenStub_AddParam(CF_DoPurgeQueue, CF_UnionArgsCmd_t *, cmd);
+
+    UT_GenStub_Execute(CF_DoPurgeQueue, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_DoPurgeQueue, int);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_DoSuspRes()
+ * ----------------------------------------------------
+ */
+void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
+{
+    UT_GenStub_AddParam(CF_DoSuspRes, CF_TransactionCmd_t *, cmd);
+    UT_GenStub_AddParam(CF_DoSuspRes, uint8, action);
+
+    UT_GenStub_Execute(CF_DoSuspRes, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_DoSuspRes_()
+ * ----------------------------------------------------
+ */
+void CF_DoSuspRes_(CF_Transaction_t *t, susp_res_arg_t *context)
+{
+    UT_GenStub_AddParam(CF_DoSuspRes_, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_DoSuspRes_, susp_res_arg_t *, context);
+
+    UT_GenStub_Execute(CF_DoSuspRes_, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_FindTransactionBySequenceNumberAllChannels()
+ * ----------------------------------------------------
+ */
+CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSeq_t ts, CF_EntityId_t eid)
+{
+    UT_GenStub_SetupReturnBuffer(CF_FindTransactionBySequenceNumberAllChannels, CF_Transaction_t *);
+
+    UT_GenStub_AddParam(CF_FindTransactionBySequenceNumberAllChannels, CF_TransactionSeq_t, ts);
+    UT_GenStub_AddParam(CF_FindTransactionBySequenceNumberAllChannels, CF_EntityId_t, eid);
+
+    UT_GenStub_Execute(CF_FindTransactionBySequenceNumberAllChannels, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_FindTransactionBySequenceNumberAllChannels, CF_Transaction_t *);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_ProcessGroundCommand()
+ * ----------------------------------------------------
+ */
 void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
 {
-    UT_Stub_CopyFromLocal(UT_KEY(CF_ProcessGroundCommand), &msg, sizeof(msg));
+    UT_GenStub_AddParam(CF_ProcessGroundCommand, CFE_SB_Buffer_t *, msg);
 
-    UT_DEFAULT_IMPL(CF_ProcessGroundCommand);
+    UT_GenStub_Execute(CF_ProcessGroundCommand, Basic, UT_DefaultHandler_CF_ProcessGroundCommand);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_PurgeHistory()
+ * ----------------------------------------------------
+ */
+int CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c)
+{
+    UT_GenStub_SetupReturnBuffer(CF_PurgeHistory, int);
+
+    UT_GenStub_AddParam(CF_PurgeHistory, CF_CListNode_t *, n);
+    UT_GenStub_AddParam(CF_PurgeHistory, CF_Channel_t *, c);
+
+    UT_GenStub_Execute(CF_PurgeHistory, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_PurgeHistory, int);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_PurgeTransaction()
+ * ----------------------------------------------------
+ */
+int CF_PurgeTransaction(CF_CListNode_t *n, void *ignored)
+{
+    UT_GenStub_SetupReturnBuffer(CF_PurgeTransaction, int);
+
+    UT_GenStub_AddParam(CF_PurgeTransaction, CF_CListNode_t *, n);
+    UT_GenStub_AddParam(CF_PurgeTransaction, void *, ignored);
+
+    UT_GenStub_Execute(CF_PurgeTransaction, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_PurgeTransaction, int);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_TsnChanAction()
+ * ----------------------------------------------------
+ */
+int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
+{
+    UT_GenStub_SetupReturnBuffer(CF_TsnChanAction, int);
+
+    UT_GenStub_AddParam(CF_TsnChanAction, CF_TransactionCmd_t *, cmd);
+    UT_GenStub_AddParam(CF_TsnChanAction, const char *, cmdstr);
+    UT_GenStub_AddParam(CF_TsnChanAction, CF_TsnChanAction_fn_t, fn);
+    UT_GenStub_AddParam(CF_TsnChanAction, void *, context);
+
+    UT_GenStub_Execute(CF_TsnChanAction, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_TsnChanAction, int);
 }

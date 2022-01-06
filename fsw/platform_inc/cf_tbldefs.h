@@ -68,9 +68,9 @@ typedef struct CF_ConfigTable
 
     CF_ChannelConfig_t chan[CF_NUM_CHANNELS];
 
-    uint32             ack_timer_s;        /* in seconds */
-    uint32             nak_timer_s;        /* in seconds */
-    uint32             inactivity_timer_s; /* in seconds */
+    uint32 ack_timer_s;        /* in seconds */
+    uint32 nak_timer_s;        /* in seconds */
+    uint32 inactivity_timer_s; /* in seconds */
 
     uint8 ack_limit; /* number of times to retry ACK (for ex, send fin and wait for fin-ack) */
     uint8 nak_limit; /* number of times to retry NAK before giving up (resets on a single response */

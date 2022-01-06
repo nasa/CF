@@ -1,9 +1,14 @@
 /* cf testing includes */
 #include "cf_test_utils.h"
-#include "cf_utils.c"
+#include "cf_test_alt_handler.h"
+#include "cf_utils.h"
+#include "cf_events.h"
 
-/* cf_utils_tests globals */
-extern type_of_context_CF_CList_Traverse_t type_of_context_CF_CList_Traverse;
+typedef struct
+{
+    CF_Transaction_t *t;
+    void             *context;
+} UT_Callback_CF_TraverseAllTransactions_context_t;
 
 /*******************************************************************************
 **
@@ -58,12 +63,37 @@ void local_handler_OS_close(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubC
 **
 *******************************************************************************/
 
-void DummyFunctionFor_CF_TraverseAllTransactions_(CF_Transaction_t *t, void *context)
+/*----------------------------------------------------------------
+ *
+ * Function: UT_Callback_CF_TraverseAllTransactions
+ *
+ * A UT-specific callback that can be used with CF_TraverseAllTransactions
+ *
+ *-----------------------------------------------------------------*/
+static void UT_Callback_CF_TraverseAllTransactions(CF_Transaction_t *t, void *context)
 {
-    UT_Stub_CopyFromLocal(UT_KEY(DummyFunctionFor_CF_TraverseAllTransactions_), &t, sizeof(t));
-    UT_Stub_CopyFromLocal(UT_KEY(DummyFunctionFor_CF_TraverseAllTransactions_), &context, sizeof(context));
+    UT_Callback_CF_TraverseAllTransactions_context_t *ctxt = UT_CF_GetContextBuffer(
+        UT_KEY(UT_Callback_CF_TraverseAllTransactions), UT_Callback_CF_TraverseAllTransactions_context_t);
 
-    UT_DEFAULT_IMPL(DummyFunctionFor_CF_TraverseAllTransactions_);
+    if (ctxt)
+    {
+        ctxt->t       = t;
+        ctxt->context = context;
+    }
+}
+
+/*----------------------------------------------------------------
+ *
+ * Function: UT_AltHandler_CF_CList_Traverse_SeqArg_SetTxn
+ *
+ * A simple handler that just sets the "t" output in the state object
+ *
+ *-----------------------------------------------------------------*/
+static void UT_AltHandler_CF_CList_Traverse_SeqArg_SetTxn(void *UserObj, UT_EntryKey_t FuncKey,
+                                                          const UT_StubContext_t *Context)
+{
+    trans_seq_arg_t *arg = UT_Hook_GetArgValueByName(Context, "context", trans_seq_arg_t *);
+    arg->t               = UserObj;
 }
 
 /*******************************************************************************
@@ -71,6 +101,138 @@ void DummyFunctionFor_CF_TraverseAllTransactions_(CF_Transaction_t *t, void *con
 **  cf_utils.h function tests
 **
 *******************************************************************************/
+
+void Test_CF_ResetHistory(void)
+{
+    /* Test case for:
+     * void CF_ResetHistory(CF_Channel_t *c, CF_History_t *h)
+     */
+    CF_History_t h;
+
+    memset(&h, 0, sizeof(h));
+
+    CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_HIST] = 4;
+
+    /* nominal call */
+    UtAssert_VOIDCALL(CF_ResetHistory(&CF_AppData.engine.channels[UT_CFDP_CHANNEL], &h));
+}
+
+void Test_CF_FindUnusedTransaction(void)
+{
+    /* Test case for:
+     * CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c)
+     */
+    CF_Channel_t    *c;
+    CF_Transaction_t txn;
+    CF_History_t     hist;
+
+    memset(&hist, 0, sizeof(hist));
+    memset(&txn, 0, sizeof(txn));
+    memset(&CF_AppData, 0, sizeof(CF_AppData));
+    c                                                                  = &CF_AppData.engine.channels[UT_CFDP_CHANNEL];
+    CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_FREE] = 2;
+    CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_HIST_FREE] = 1;
+    CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_HIST]      = 1;
+
+    UtAssert_NULL(CF_FindUnusedTransaction(c));
+
+    c->qs[CF_QueueIdx_FREE]      = &txn.cl_node;
+    c->qs[CF_QueueIdx_HIST_FREE] = &hist.cl_node;
+    c->qs[CF_QueueIdx_HIST]      = NULL;
+    UtAssert_ADDRESS_EQ(CF_FindUnusedTransaction(c), &txn);
+    UtAssert_ADDRESS_EQ(txn.history, &hist);
+
+    c->qs[CF_QueueIdx_FREE]      = &txn.cl_node;
+    c->qs[CF_QueueIdx_HIST_FREE] = NULL;
+    c->qs[CF_QueueIdx_HIST]      = &hist.cl_node;
+    UtAssert_ADDRESS_EQ(CF_FindUnusedTransaction(c), &txn);
+    UtAssert_ADDRESS_EQ(txn.history, &hist);
+}
+
+void Test_CF_FreeTransaction(void)
+{
+    /* Test case for:
+     * void CF_FreeTransaction(CF_Transaction_t *t)
+     */
+    CF_Transaction_t *t;
+
+    memset(&CF_AppData, 0, sizeof(CF_AppData));
+    t = &CF_AppData.engine.transactions[UT_CFDP_CHANNEL];
+
+    UtAssert_VOIDCALL(CF_FreeTransaction(t));
+
+    UtAssert_UINT32_EQ(t->state, CF_TxnState_IDLE);
+    UtAssert_UINT32_EQ(t->flags.com.q_index, CF_QueueIdx_FREE);
+}
+
+void Test_CF_FindTransactionBySequenceNumber_(void)
+{
+    /* Test case for:
+     * int CF_FindTransactionBySequenceNumber_(CF_CListNode_t *n, trans_seq_arg_t *context)
+     */
+    trans_seq_arg_t  ctxt;
+    CF_Transaction_t txn;
+    CF_History_t     hist;
+
+    memset(&txn, 0, sizeof(txn));
+    memset(&hist, 0, sizeof(hist));
+    memset(&ctxt, 0, sizeof(ctxt));
+
+    txn.history = &hist;
+
+    /* non-matching eid and non-matching sequence */
+    hist.src_eid                     = 12;
+    ctxt.src_eid                     = 34;
+    hist.seq_num                     = 56;
+    ctxt.transaction_sequence_number = 78;
+    UtAssert_INT32_EQ(CF_FindTransactionBySequenceNumber_(&txn.cl_node, &ctxt), 0);
+    UtAssert_NULL(ctxt.t);
+
+    /* matching eid and non-matching sequence */
+    hist.src_eid                     = 13;
+    ctxt.src_eid                     = 13;
+    hist.seq_num                     = 56;
+    ctxt.transaction_sequence_number = 78;
+    UtAssert_INT32_EQ(CF_FindTransactionBySequenceNumber_(&txn.cl_node, &ctxt), 0);
+    UtAssert_NULL(ctxt.t);
+
+    /* non-matching eid and matching sequence */
+    hist.src_eid                     = 12;
+    ctxt.src_eid                     = 34;
+    hist.seq_num                     = 57;
+    ctxt.transaction_sequence_number = 57;
+    UtAssert_INT32_EQ(CF_FindTransactionBySequenceNumber_(&txn.cl_node, &ctxt), 0);
+    UtAssert_NULL(ctxt.t);
+
+    /* matching eid and matching sequence */
+    hist.src_eid                     = 23;
+    ctxt.src_eid                     = 23;
+    hist.seq_num                     = 67;
+    ctxt.transaction_sequence_number = 67;
+    UtAssert_INT32_EQ(CF_FindTransactionBySequenceNumber_(&txn.cl_node, &ctxt), 1);
+    UtAssert_ADDRESS_EQ(ctxt.t, &txn);
+}
+
+void Test_CF_FindTransactionBySequenceNumber(void)
+{
+    /* Test case for:
+     * CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_TransactionSeq_t
+     * transaction_sequence_number, CF_EntityId_t src_eid)
+     */
+
+    CF_Transaction_t *t;
+    CF_Channel_t     *c;
+
+    memset(&CF_AppData, 0, sizeof(CF_AppData));
+    c = &CF_AppData.engine.channels[UT_CFDP_CHANNEL];
+
+    UtAssert_NULL(CF_FindTransactionBySequenceNumber(c, 12, 34));
+    UtAssert_STUB_COUNT(CF_CList_Traverse, 4); /* this checks 4 different queues */
+
+    t = &CF_AppData.engine.transactions[UT_CFDP_CHANNEL];
+    UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_SeqArg_SetTxn, t);
+    UtAssert_ADDRESS_EQ(CF_FindTransactionBySequenceNumber(c, 12, 34), t);
+}
 
 /* CF_DequeueTransaction tests */
 
@@ -128,7 +290,7 @@ void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
     CF_CListNode_t  *expected_cl_node;
     uint16           initial_q_size = Any_uint16_Except(0); /* 0 will CF_Assert */
 
-    CF_Clist_Remove_context_t context_clist_remove;
+    CF_CList_Remove_context_t context_clist_remove;
     UT_SetDataBuffer(UT_KEY(CF_CList_Remove), &context_clist_remove, sizeof(context_clist_remove), false);
 
     arg_t.chan_num   = dummy_chan_num;
@@ -199,7 +361,7 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
 
     arg_t->chan_num = dummy_chan_num;
 
-    CF_Clist_Remove_context_t context_clist_remove;
+    CF_CList_Remove_context_t context_clist_remove;
     UT_SetDataBuffer(UT_KEY(CF_CList_Remove), &context_clist_remove, sizeof(context_clist_remove), false);
 
     expected_remove_head = &CF_AppData.engine.channels[arg_t->chan_num].qs[arg_t->flags.com.q_index];
@@ -271,7 +433,7 @@ void Test_CF_CList_Remove_Ex_Call_CF_CList_Remove_AndDecrement_q_size(void)
     CF_CListNode_t  *expected_remove_node;
     uint16           initial_q_size = Any_uint16_Except(0);
 
-    CF_Clist_Remove_context_t context_clist_remove;
+    CF_CList_Remove_context_t context_clist_remove;
     UT_SetDataBuffer(UT_KEY(CF_CList_Remove), &context_clist_remove, sizeof(context_clist_remove), false);
 
     expected_remove_head = &arg_c->qs[arg_index];
@@ -419,7 +581,7 @@ void Test_CF_TraverseHistory_When_CF_WrappedWrite_FailsFirstCallReturn_CLIST_EXI
     /* ensures dummy_context.result change to 1 was done */
     dummy_context.result = 0;
 
-    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
 
     /* Arrange for CF_WrappedWrite in same file as CF_TraverseHistory */
     dummy_len = strlen(dummy_h.fnames.src_filename) + strlen(src_colon_str);
@@ -429,9 +591,7 @@ void Test_CF_TraverseHistory_When_CF_WrappedWrite_FailsFirstCallReturn_CLIST_EXI
     local_result = CF_TraverseHistory(arg_n, arg_context);
 
     /* Assert */
-    UtAssert_True(EventID == CF_EID_ERR_CMD_WHIST_WRITE,
-                  "CFE_EVS_SendEvent event id is 0x%04X and should be 0x%04X (CF_EID_ERR_CMD_WHIST_WRITE)", EventID,
-                  CF_EID_ERR_CMD_WHIST_WRITE);
+    UT_CF_AssertEventID(CF_EID_ERR_CMD_WHIST_WRITE);
     UtAssert_True(arg_context->result == 1, "CF_TraverseHistory set context.result to %d and should be 1",
                   arg_context->result);
     UtAssert_True(local_result == CF_CLIST_EXIT,
@@ -462,7 +622,7 @@ void Test_CF_TraverseHistory_When_CF_WrappedWrite_FailsSecondCallReturn_CLIST_EX
     /* ensures dummy_context.result change to 1 was done */
     dummy_context.result = 0;
 
-    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
 
     /* Arrange for CF_WrappedWrite in same file as CF_TraverseHistory */
     dummy_len_src = strlen(dummy_h.fnames.src_filename) + strlen(src_colon_str);
@@ -474,9 +634,7 @@ void Test_CF_TraverseHistory_When_CF_WrappedWrite_FailsSecondCallReturn_CLIST_EX
     local_result = CF_TraverseHistory(arg_n, arg_context);
 
     /* Assert */
-    UtAssert_True(EventID == CF_EID_ERR_CMD_WHIST_WRITE,
-                  "CFE_EVS_SendEvent event id is 0x%04X and should be 0x%04X (CF_EID_ERR_CMD_WHIST_WRITE)", EventID,
-                  CF_EID_ERR_CMD_WHIST_WRITE);
+    UT_CF_AssertEventID(CF_EID_ERR_CMD_WHIST_WRITE);
     UtAssert_True(arg_context->result == 1, "CF_TraverseHistory set context.result to %d and should be 1",
                   arg_context->result);
     UtAssert_True(local_result == CF_CLIST_EXIT,
@@ -507,7 +665,7 @@ void Test_CF_TraverseHistory_WhenBothWrappedWritesSuccessfulReturn_CLIST_CONT(vo
     /* ensures dummy_context.result change to 1 was done */
     dummy_context.result = 0;
 
-    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
 
     /* Arrange for CF_WrappedWrite in same file as CF_TraverseHistory */
     dummy_len_src = strlen(dummy_h.fnames.src_filename) + strlen(src_colon_str);
@@ -629,14 +787,15 @@ void Test_CF_WriteQueueDataToFile_Call_CF_CList_Traverse_AndReturn_arg_result(vo
     CF_CListNode_t  dummy_node;
     CF_CListNode_t *expected_start = &dummy_node;
     CF_CListFn_t    expected_fn    = (CF_CListFn_t)CF_TraverseTransactions;
+    int32           result;
 
     CF_CList_Traverse_TRAV_ARG_T_context_t context_clist_traverse;
 
     dummy_c.qs[arg_q] = expected_start;
 
     context_clist_traverse.context_result = Any_int32();
-    UT_SetDataBuffer(UT_KEY(CF_CList_Traverse), &context_clist_traverse, sizeof(context_clist_traverse), false);
-    type_of_context_CF_CList_Traverse = TRAV_ARG_T;
+    UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_TRAV_ARG_T,
+                          &context_clist_traverse);
 
     /* Act */
     result = CF_WriteQueueDataToFile(arg_fd, arg_c, arg_q);
@@ -672,14 +831,15 @@ void Test_CF_WriteHistoryQueueDataToFile_Call_CF_CList_Traverse_AndReturn_arg_re
     CF_CListNode_t  dummy_node;
     CF_CListNode_t *expected_start = &dummy_node;
     CF_CListFn_t    expected_fn    = (CF_CListFn_t)CF_TraverseHistory;
+    int32           result;
 
     CF_CList_Traverse_TRAV_ARG_T_context_t context_clist_traverse;
 
     dummy_c.qs[CF_QueueIdx_HIST] = expected_start;
 
     context_clist_traverse.context_result = Any_int32();
-    UT_SetDataBuffer(UT_KEY(CF_CList_Traverse), &context_clist_traverse, sizeof(context_clist_traverse), false);
-    type_of_context_CF_CList_Traverse = TRAV_ARG_T;
+    UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_TRAV_ARG_T,
+                          &context_clist_traverse);
 
     /* Act */
     result = CF_WriteHistoryQueueDataToFile(arg_fd, arg_c, arg_dir);
@@ -714,6 +874,7 @@ void Test_CF_PrioSearch_When_t_PrioIsGreaterThanContextPrioReturn_CLIST_CONT(voi
     CF_CListNode_t  *arg_node = &dummy_t.cl_node;
     priority_arg_t   dummy_p;
     void            *arg_context = (void *)&dummy_p;
+    int32            result;
 
     dummy_t.priority = Any_uint8_Except(0);
     dummy_p.priority = Any_uint8_LessThan(dummy_t.priority);
@@ -734,6 +895,7 @@ void Test_CF_PrioSearch_When_t_PrioIsEqToContextPrio_Set_context_t_To_t_AndRetur
     CF_CListNode_t  *arg_node = &dummy_t.cl_node;
     priority_arg_t   dummy_p;
     void            *arg_context = (void *)&dummy_p;
+    int32            result;
 
     /* NOTE: these are inverted from previous test! */
     dummy_t.priority = Any_uint8_Except(0);
@@ -756,6 +918,7 @@ void Test_CF_PrioSearch_When_t_PrioIsLessThanContextPrio_Set_context_t_To_t_AndR
     CF_CListNode_t  *arg_node = &dummy_t.cl_node;
     priority_arg_t   dummy_p;
     void            *arg_context = (void *)&dummy_p;
+    int32            result;
 
     /* NOTE: these are inverted from previous test! */
     dummy_p.priority = Any_uint8_Except(0);
@@ -852,8 +1015,8 @@ void Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q(voi
     CF_CListNode_t  **expected_insert_after_after;
 
     CF_CList_Traverse_R_context_t context_cf_clist_traverse_r;
-    UT_SetDataBuffer(UT_KEY(CF_CList_Traverse_R), &context_cf_clist_traverse_r, sizeof(context_cf_clist_traverse_r),
-                     false);
+    UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse_R), UT_AltHandler_CF_CList_Traverse_R_PRIO,
+                          &context_cf_clist_traverse_r);
 
     /* dummy_t settings to bypass CF_Assert */
     dummy_t.chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
@@ -970,8 +1133,9 @@ void Test_CF_TraverseAllTransactions__GetContainer_t_Call_args_fn_AndAdd_1_ToCou
     int                  initial_args_counter = Any_int();
     CF_Transaction_t    *expected_t;
     void                *expected_context;
+    int32                result;
 
-    dummy_args.fn      = DummyFunctionFor_CF_TraverseAllTransactions_;
+    dummy_args.fn      = UT_Callback_CF_TraverseAllTransactions;
     dummy_args.context = dummy_context;
     dummy_args.counter = initial_args_counter;
 
@@ -981,15 +1145,14 @@ void Test_CF_TraverseAllTransactions__GetContainer_t_Call_args_fn_AndAdd_1_ToCou
     expected_t       = &dummy_t;
     expected_context = dummy_context;
 
-    DummyFunctionFor_CF_TraverseAllTransactions__context_t func_ptr_context;
-    UT_SetDataBuffer(UT_KEY(DummyFunctionFor_CF_TraverseAllTransactions_), &func_ptr_context, sizeof(func_ptr_context),
+    UT_Callback_CF_TraverseAllTransactions_context_t func_ptr_context;
+    UT_SetDataBuffer(UT_KEY(UT_Callback_CF_TraverseAllTransactions), &func_ptr_context, sizeof(func_ptr_context),
                      false);
 
     /* Act */
     result = CF_TraverseAllTransactions_(arg_n, arg_args);
 
     /* Assert */
-    UtAssert_STUB_COUNT(DummyFunctionFor_CF_TraverseAllTransactions_, 1);
     UtAssert_ADDRESS_EQ(func_ptr_context.t, expected_t);
     UtAssert_ADDRESS_EQ(func_ptr_context.context, expected_context);
     UtAssert_True(arg_args->counter == initial_args_counter + 1,
@@ -1015,8 +1178,9 @@ void Test_CF_TraverseAllTransactions_CallOtherFunction_CF_Q_RX_TimesAndReturn_ar
     void           *arg_context    = &dummy_context;
     uint8           expected_count = CF_QueueIdx_RX - CF_QueueIdx_PEND + 1;
     CF_CListNode_t *expected_qs_nodes[expected_count];
+    int32           result;
 
-    CF_TraverseAllTransactions_fn_t arg_fn = DummyFunctionFor_CF_TraverseAllTransactions_;
+    CF_TraverseAllTransactions_fn_t arg_fn = UT_Callback_CF_TraverseAllTransactions;
 
     int i = 0;
     for (i = 0; i < expected_count; ++i)
@@ -1026,10 +1190,10 @@ void Test_CF_TraverseAllTransactions_CallOtherFunction_CF_Q_RX_TimesAndReturn_ar
 
     /* set context */
     CF_CList_Traverse_TRAVERSE_ALL_ARGS_T_context_t contexts_cf_clist_traverse[expected_count];
-    UT_SetDataBuffer(UT_KEY(CF_CList_Traverse), &contexts_cf_clist_traverse, sizeof(contexts_cf_clist_traverse), false);
 
-    /* set correct context type for CF_CList_Traverse stub */
-    type_of_context_CF_CList_Traverse = TRAVERSE_ALL_ARGS_T;
+    /* this must use data buffer hack to pass multiple contexts */
+    UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_TRAVERSE_ALL_ARGS_T, NULL);
+    UT_SetDataBuffer(UT_KEY(CF_CList_Traverse), contexts_cf_clist_traverse, sizeof(contexts_cf_clist_traverse), false);
 
     /* finalize arguments */
     arg_c = &dummy_c;
@@ -1043,8 +1207,8 @@ void Test_CF_TraverseAllTransactions_CallOtherFunction_CF_Q_RX_TimesAndReturn_ar
         UtAssert_ADDRESS_EQ(contexts_cf_clist_traverse[i].start, (CF_CListNode_t *)&expected_qs_nodes[i]);
         UtAssert_True(contexts_cf_clist_traverse[i].fn == (CF_CListFn_t)CF_TraverseAllTransactions_,
                       "contexts_cf_clist_traverse[i].fn ==  (CF_CListFn_t ) CF_TraverseAllTransactions_");
-        UtAssert_True(contexts_cf_clist_traverse[i].context_fn == DummyFunctionFor_CF_TraverseAllTransactions_,
-                      "contexts_cf_clist_traverse[i].context_fn ==  DummyFunctionFor_CF_TraverseAllTransactions_");
+        UtAssert_True(contexts_cf_clist_traverse[i].context_fn == UT_Callback_CF_TraverseAllTransactions,
+                      "contexts_cf_clist_traverse[i].context_fn ==  UT_Callback_CF_TraverseAllTransactions");
         UtAssert_ADDRESS_EQ(contexts_cf_clist_traverse[i].context_context, arg_context);
         /* NOTE: checking the context count really only verifies
         ** CF_CList_Traverse stub works properly -- this could be removed,
@@ -1074,10 +1238,7 @@ void Test_CF_TraverseAllTransactions_All_Channels_ReturnTotalTraversals(void)
     int   expected_result   = per_channel_count * CF_NUM_CHANNELS;
 
     CF_TraverseAllTransactions_fn_t arg_fn = NULL;
-
-    /* Arrange for CF_TraverseAllTransactions */
-    /* set correct context type for CF_CList_Traverse stub */
-    type_of_context_CF_CList_Traverse = TRAVERSE_ALL_ARGS_T;
+    UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_TRAVERSE_ALL_ARGS_T, NULL);
 
     /* Act */
     local_result = CF_TraverseAllTransactions_All_Channels(arg_fn, arg_context);
@@ -1107,6 +1268,7 @@ void Test_CF_WrappedOpen_Call_OS_OpenCreate_WithGivenArgumentsAndReturnItsReturn
     int32      arg_flags                   = Any_uint32();
     int32      arg_access                  = Any_uint32();
     int32      forced_return_OS_OpenCreate = Any_int32();
+    int32      result;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_OpenCreate), forced_return_OS_OpenCreate);
 
@@ -1255,6 +1417,15 @@ void Test_CF_WrappedLseek_Call_OS_lseek_WithGivenArgumentsAndReturnItsReturnValu
 
 void add_cf_utils_h_tests(void)
 {
+    UtTest_Add(Test_CF_ResetHistory, cf_utils_tests_Setup, cf_utils_tests_Teardown, "CF_ResetHistory");
+    UtTest_Add(Test_CF_FindUnusedTransaction, cf_utils_tests_Setup, cf_utils_tests_Teardown,
+               "CF_FindUnusedTransaction");
+    UtTest_Add(Test_CF_FreeTransaction, cf_utils_tests_Setup, cf_utils_tests_Teardown, "CF_FreeTransaction");
+    UtTest_Add(Test_CF_FindTransactionBySequenceNumber_, cf_utils_tests_Setup, cf_utils_tests_Teardown,
+               "Test_CF_FindTransactionBySequenceNumber_");
+    UtTest_Add(Test_CF_FindTransactionBySequenceNumber, cf_utils_tests_Setup, cf_utils_tests_Teardown,
+               "CF_FindTransactionBySequenceNumber");
+
     /* CF_DequeueTransaction tests */
     UtTest_Add(Test_cf_dequeue_transaction_AssertsBecause_t_IsNull, cf_utils_tests_Setup, cf_utils_tests_Teardown,
                "Test_cf_dequeue_transaction_AssertsBecause_t_IsNull");

@@ -1,6 +1,6 @@
 /* cf testing includes */
 #include "cf_test_utils.h"
-#include "cf_clist.c"
+#include "cf_clist.h"
 
 /*******************************************************************************
 **
@@ -8,10 +8,25 @@
 **
 *******************************************************************************/
 
+typedef struct
+{
+    CF_CListNode_t *node;
+    void           *context;
+} Dummy_clist_fn_t_context_t;
+
+typedef struct
+{
+    CF_CListNode_t *node;
+    void           *context;
+} Hook_clist_fn_t_context_t;
+
 int Dummy_clist_fn_t(CF_CListNode_t *node, void *context)
 {
-    UT_Stub_CopyFromLocal(UT_KEY(Dummy_clist_fn_t), &node, sizeof(node));
-    UT_Stub_CopyFromLocal(UT_KEY(Dummy_clist_fn_t), &context, sizeof(context));
+    Dummy_clist_fn_t_context_t my_ctxt;
+
+    my_ctxt.node    = node;
+    my_ctxt.context = context;
+    UT_Stub_CopyFromLocal(UT_KEY(Dummy_clist_fn_t), &my_ctxt, sizeof(my_ctxt));
 
     /* UT_DEFAULT_IMPL returns uint32 */
     return (int)UT_DEFAULT_IMPL(Dummy_clist_fn_t);
@@ -19,27 +34,15 @@ int Dummy_clist_fn_t(CF_CListNode_t *node, void *context)
 
 int Hook_clist_fn_t(CF_CListNode_t *node, void *context)
 {
+    Hook_clist_fn_t_context_t my_ctxt;
 
-    /* Modification of node to meet n->next!=nn as true for coverage */
-    node->next = NULL;
-    node->prev = NULL;
-
-    UT_Stub_CopyFromLocal(UT_KEY(Hook_clist_fn_t), &node, sizeof(node));
-    UT_Stub_CopyFromLocal(UT_KEY(Hook_clist_fn_t), &context, sizeof(context));
+    my_ctxt.node    = node;
+    my_ctxt.context = context;
+    UT_Stub_CopyFromLocal(UT_KEY(Hook_clist_fn_t), &my_ctxt, sizeof(my_ctxt));
 
     /* UT_DEFAULT_IMPL returns uint32 */
     return (int)UT_DEFAULT_IMPL(Hook_clist_fn_t);
 }
-typedef struct
-{
-    CF_CListNode_t *node;
-    void           *context;
-} CF_PACK Dummy_clist_fn_t_context_t;
-typedef struct
-{
-    CF_CListNode_t *node;
-    void           *context;
-} CF_PACK Hook_clist_fn_t_context_t;
 
 /*******************************************************************************
 **

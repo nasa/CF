@@ -28,7 +28,37 @@
 #define CF_UTILS_H
 
 #include "cf_cfdp.h"
+#include "cf_app.h"
 #include "cf_assert.h"
+
+typedef struct trans_seq_arg_t
+{
+    CF_TransactionSeq_t transaction_sequence_number;
+    CF_EntityId_t       src_eid;
+    CF_Transaction_t   *t; /* out param */
+} trans_seq_arg_t;
+
+typedef struct
+{
+    osal_id_t fd;
+    int32     result;
+    int32     counter;
+} trav_arg_t;
+
+typedef void (*CF_TraverseAllTransactions_fn_t)(CF_Transaction_t *t, void *context);
+
+typedef struct
+{
+    CF_TraverseAllTransactions_fn_t fn;
+    void                           *context;
+    int                             counter;
+} traverse_all_args_t;
+
+typedef struct priority_arg_t
+{
+    CF_Transaction_t *t;        /* OUT: holds value of transaction with which to call CF_CList_InsertAfter on */
+    uint8             priority; /* seeking this priority */
+} priority_arg_t;
 
 /* free a transaction from the queue it's on.
  * NOTE: this leaves the transaction in a bad state,
@@ -78,20 +108,83 @@ static inline void CF_CList_InsertBack_Ex(CF_Channel_t *c, CF_QueueIdx_t index, 
     ++CF_AppData.hk.channel_hk[c - CF_AppData.engine.channels].q_size[index];
 }
 
+/************************************************************************/
+/** \brief Find an unused transaction on a channel.
+**
+**  \par Assumptions, External Events, and Notes:
+**       c must not be NULL.
+**
+**  \returns
+**  \retstmt Returns a free transaction, or NULL if none are available. \endcode
+**  \endreturns
+**
+*************************************************************************/
+/* finds an unused transaction and returns with it on no Q */
+CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c);
+
+/************************************************************************/
+/** \brief Returns a history structure back to its unused state.
+**
+**  \par Description
+**       There's nothing to do currently other than remove the history
+**       from its current queue and put it back on CF_QueueIdx_HIST_FREE.
+**
+**  \par Assumptions, External Events, and Notes:
+**       c must not be NULL. h must not be NULL.
+**
+*************************************************************************/
+void CF_ResetHistory(CF_Channel_t *c, CF_History_t *h);
+
+/************************************************************************/
+/** \brief Frees and resets a transaction and returns it for later use.
+**
+**  \par Assumptions, External Events, and Notes:
+**       t must not be NULL.
+**
+*************************************************************************/
+void CF_FreeTransaction(CF_Transaction_t *t);
+
+/************************************************************************/
+/** \brief Finds an active transaction by sequence number.
+**
+**  \par Description
+**       This function traverses the active rx, pending, txa, and txw
+**       transaction and looks for the requested transaction.
+**
+**  \par Assumptions, External Events, and Notes:
+**       c must not be NULL.
+**
+**  \returns
+**  \retstmt The given transaction is returned if found, otherwise NULL. \endcode
+**  \endreturns
+**
+*************************************************************************/
+CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_TransactionSeq_t transaction_sequence_number,
+                                                     CF_EntityId_t src_eid);
+
+int CF_FindTransactionBySequenceNumber_(CF_CListNode_t *n, trans_seq_arg_t *context);
+
 int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q);
 int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t dir);
 
 void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q);
 
-typedef void (*CF_TraverseAllTransactions_fn_t)(CF_Transaction_t *, void *);
 /* these return the number of transactions traversed */
-extern int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *);
-extern int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *);
+int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context);
+int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context);
 
-extern int32 CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 access);
-extern void  CF_WrappedClose(osal_id_t fd);
-extern int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size);
-extern int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size);
-extern int32 CF_WrappedLseek(osal_id_t fd, off_t offset, int mode);
+int CF_TraverseAllTransactions_(CF_CListNode_t *n, traverse_all_args_t *args);
+int CF_TraverseHistory(CF_CListNode_t *n, trav_arg_t *context);
+int CF_TraverseTransactions(CF_CListNode_t *n, trav_arg_t *context);
+
+int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q);
+int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t dir);
+int   CF_PrioSearch(CF_CListNode_t *node, void *context);
+
+int32 CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 access);
+void  CF_WrappedClose(osal_id_t fd);
+int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size);
+int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size);
+int32 CF_WrappedLseek(osal_id_t fd, off_t offset, int mode);
 
 #endif /* !CF_UTILS_H */

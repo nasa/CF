@@ -1,183 +1,132 @@
 /************************************************************************
-** File: cf_app_stubs.c
+** File: cf_app.h
 **
-** %LICENSE_START
-** %LICENSE_STOP
+** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
+** Application version 3.0.0”
+** Copyright © 2019 United States Government as represented by the
+** Administrator of the National Aeronautics and Space Administration.
+** All Rights Reserved.
+** Licensed under the Apache License, Version 2.0 (the "License"); you may
+** not use this file except in compliance with the License. You may obtain
+** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+**
+** Unless required by applicable law or agreed to in writing, software
+** distributed under the License is distributed on an "AS IS" BASIS,
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+** See the License for the specific language governing permissions and
+** limitations under the License.
+**
 **
 ** Purpose:
-**  The CF Application main application stubs file for unit tests
+**  The CF Application main application header file
 **
-**  This file contains the stubs for the functions that initialize the
-**  application and link all logic and functionality to the CFS.
-**
-** Revision 1.0 2020/08/04 agibso1
-**  Initial revision
 *************************************************************************/
 
-#include "cfe.h"
-#include "cf_verify.h"
+/**
+ * @file
+ *
+ * Auto-Generated stub implementations for functions defined in cf_app header
+ */
+
 #include "cf_app.h"
-#include "cf_events.h"
-#include "cf_perfids.h"
-#include "cf_cfdp.h"
+#include "utgenstub.h"
 
-#include <string.h>
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_AppMain()
+ * ----------------------------------------------------
+ */
+void CF_AppMain(void)
+{
 
-/* UT includes */
-#include "uttest.h"
-#include "utstubs.h"
-#include "uttools.h"
+    UT_GenStub_Execute(CF_AppMain, Basic, NULL);
+}
 
-CF_AppData_t CF_AppData;
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CheckTables()
+ * ----------------------------------------------------
+ */
+void CF_CheckTables(void)
+{
 
-/************************************************************************/
-/** \brief Send CF housekeeping packet
-**
-**  \par Description
-**       The command to send the CF housekeeping packet comes in on
-**       the software bus. This function sends the message.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
-// static void CF_HkCmd(void)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_CheckTables, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Checks to see if a table update is pending, and perform it.
-**
-**  \par Description
-**       Updates the table if the engine is disabled.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
-// static void CF_CheckTables(void)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_HkCmd()
+ * ----------------------------------------------------
+ */
+void CF_HkCmd(void)
+{
 
-/************************************************************************/
-/** \brief Validation function for config table.
-**
-**  \par Description
-**       Checks that the config table being loaded has correct data.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-**  \returns
-**  \retcode #CFE_SUCCESS \retdesc \copydoc CFE_SUCCESSS \endcode
-**  \retstmt Returns anything else on error.             \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static int32 CF_ValidateConfigTable(void *tbl_ptr)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_HkCmd, Basic, NULL);
+}
 
-/************************************************************************/
-/** \brief Load the table on application start
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-**  \returns
-**  \retcode #CFE_SUCCESS \retdesc \copydoc CFE_SUCCESSS \endcode
-**  \retstmt Returns anything else on error.             \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static int32 CF_TableInit(void)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_Init()
+ * ----------------------------------------------------
+ */
+int32 CF_Init(void)
+{
+    UT_GenStub_SetupReturnBuffer(CF_Init, int32);
 
-/************************************************************************/
-/** \brief CF app init function
-**
-**  \par Description
-**       Initializes all aspects of the CF application. Messages,
-**       pipes, events, table, and the cfdp engine.
-**
-**  \par Assumptions, External Events, and Notes:
-**       This must only be called once.
-**
-**  \returns
-**  \retcode #CFE_SUCCESS \retdesc \copydoc CFE_SUCCESSS \endcode
-**  \retstmt Returns anything else on error.             \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static int32 CF_Init(void)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_Init, Basic, NULL);
 
-/************************************************************************/
-/** \brief CF wakeup function
-**
-**  \par Description
-**       Performs a single engine cycle for each wakeup
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
-// static void CF_WakeUp(void)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    return UT_GenStub_GetReturnValue(CF_Init, int32);
+}
 
-/************************************************************************/
-/** \brief CF message processing function
-**
-**  \par Description
-**       Initializes all aspects of the CF application. Messages,
-**       pipes, events, table, and the cfdp engine.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
-// static void CF_ProcessMsg(CFE_SB_Buffer_t msg)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_ProcessMsg()
+ * ----------------------------------------------------
+ */
+void CF_ProcessMsg(CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_ProcessMsg, CFE_SB_Buffer_t *, msg);
 
-/************************************************************************/
-/** \brief CF app entry point
-**
-**  \par Description
-**       Main entry point of CF application.
-**       Calls the init function and manages the app run loop.
-**
-**  \par Assumptions, External Events, and Notes:
-**       This must only be called once.
-**
-*************************************************************************/
-// void CF_AppMain(void)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+    UT_GenStub_Execute(CF_ProcessMsg, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_TableInit()
+ * ----------------------------------------------------
+ */
+int32 CF_TableInit(void)
+{
+    UT_GenStub_SetupReturnBuffer(CF_TableInit, int32);
+
+    UT_GenStub_Execute(CF_TableInit, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_TableInit, int32);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_ValidateConfigTable()
+ * ----------------------------------------------------
+ */
+int32 CF_ValidateConfigTable(void *tbl_ptr)
+{
+    UT_GenStub_SetupReturnBuffer(CF_ValidateConfigTable, int32);
+
+    UT_GenStub_AddParam(CF_ValidateConfigTable, void *, tbl_ptr);
+
+    UT_GenStub_Execute(CF_ValidateConfigTable, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_ValidateConfigTable, int32);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_WakeUp()
+ * ----------------------------------------------------
+ */
+void CF_WakeUp(void)
+{
+
+    UT_GenStub_Execute(CF_WakeUp, Basic, NULL);
+}

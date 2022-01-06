@@ -32,30 +32,14 @@
 #include "cf_events.h"
 #include "cf_perfids.h"
 #include "cf_cfdp.h"
-#include "cf_cfdp_helpers.h"
 #include "cf_utils.h"
+
+#include "cf_cfdp_r.h"
+#include "cf_cfdp_dispatch.h"
 
 #include <stdio.h>
 #include <string.h>
 #include "cf_assert.h"
-
-typedef struct
-{
-    CF_Transaction_t    *t;
-    CF_CFDP_PduHeader_t *ph;
-    uint32               gap_counter;
-} gap_compute_args_t;
-
-/**
- * @brief A dispatch table for receive file transactions, recieve side
- *
- * This is used for "receive file" transactions upon receipt of a directive PDU.
- * Depending on the sub-state of the transaction, a different action may be taken.
- */
-typedef struct
-{
-    const CF_CFDP_FileDirectiveDispatchTable_t *state[CF_RxSubState_NUM_STATES];
-} CF_CFDP_R_SubstateDispatchTable_t;
 
 /************************************************************************/
 /** \brief Helper function to store condition code set send_fin flag.
@@ -64,7 +48,7 @@ typedef struct
 **       t must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R2_SetCc(CF_Transaction_t *t, CF_CFDP_ConditionCode_t cc)
+void CF_CFDP_R2_SetCc(CF_Transaction_t *t, CF_CFDP_ConditionCode_t cc)
 {
     t->history->cc       = cc;
     t->flags.rx.send_fin = 1;
@@ -82,7 +66,7 @@ static void CF_CFDP_R2_SetCc(CF_Transaction_t *t, CF_CFDP_ConditionCode_t cc)
 **       t must not be NULL.
 **
 *************************************************************************/
-static inline void CF_CFDP_R1_Reset(CF_Transaction_t *t)
+void CF_CFDP_R1_Reset(CF_Transaction_t *t)
 {
     CF_CFDP_ResetTransaction(t, 1);
 }
@@ -97,7 +81,7 @@ static inline void CF_CFDP_R1_Reset(CF_Transaction_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R2_Reset(CF_Transaction_t *t)
+void CF_CFDP_R2_Reset(CF_Transaction_t *t)
 {
     if ((t->state_data.r.sub_state == CF_RxSubState_WAIT_FOR_FIN_ACK) ||
         (t->state_data.r.r2.eof_cc != CF_CFDP_ConditionCode_NO_ERROR) ||
@@ -123,7 +107,7 @@ static void CF_CFDP_R2_Reset(CF_Transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_R_CheckCrc(CF_Transaction_t *t, uint32 expected_crc)
+int CF_CFDP_R_CheckCrc(CF_Transaction_t *t, uint32 expected_crc)
 {
     int ret = 0;
     CF_CRC_Finalize(&t->crc);
@@ -156,7 +140,7 @@ static int CF_CFDP_R_CheckCrc(CF_Transaction_t *t, uint32 expected_crc)
 **       t must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
+void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
 {
     int send_nak = 0;
     int send_fin = 0;
@@ -231,63 +215,50 @@ err_out:;
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_R_ProcessFd(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph, CFE_MSG_Size_t *bytes_received)
+int CF_CFDP_R_ProcessFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    *bytes_received = CF_AppData.engine.in.bytes_received;
+    const CF_Logical_PduFileDataHeader_t *fd;
+    int32                                 fret;
+    int                                   ret;
 
-    int ret = -1;
+    /* this function is only entered for data PDUs */
+    fd  = &ph->int_header.fd;
+    ret = -1;
 
-    /* take out the variable PDU header size */
-    *bytes_received -= CF_HeaderSize(ph);
+    /*
+     * NOTE: The decode routine should have left a direct pointer to the data and actual data length
+     * within the PDU.  The length has already been verified, too.  Should not need to make any
+     * adjustments here, just write it.
+     */
 
-    /* if crc field is present in the pdu header, subtract that from bytes_received */
-    if (FGV(ph->flags, CF_CFDP_PduHeader_FLAGS_CRC))
+    if (t->state_data.r.cached_pos != fd->offset)
     {
-        *bytes_received -= 4;
-    }
-
-    /* bytes_received now contains the number of bytes of file data in the pdu */
-    if (*bytes_received > sizeof(CF_CFDP_PduFileDataHeader_t))
-    {
-        CF_CFDP_PduFd_t *fd = STATIC_CAST(ph, CF_CFDP_PduFd_t);
-        int              fret;
-        uint32           offset;
-        cfdp_ldst_uint32(offset, fd->fdh.offset);
-        if (t->state_data.r.cached_pos != offset)
+        fret = CF_WrappedLseek(t->fd, fd->offset, OS_SEEK_SET);
+        if (fret != fd->offset)
         {
-            fret = CF_WrappedLseek(t->fd, offset, OS_SEEK_SET);
-            if (fret != offset)
-            {
-                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_SEEK_FD, CFE_EVS_EventType_ERROR,
-                                  "CF R%d(%u:%u): failed to seek offset %u, got 0x%08x", (t->state == CF_TxnState_R2),
-                                  t->history->src_eid, t->history->seq_num, offset, fret);
-                t->history->cc = CF_CFDP_ConditionCode_FILE_SIZE_ERROR;
-                ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_seek;
-                goto err_out; /* connection will reset in caller */
-            }
-        }
-
-        *bytes_received -= sizeof(CF_CFDP_PduFileDataHeader_t);
-        fret = CF_WrappedWrite(t->fd, fd->fdd.data, *bytes_received);
-        if (fret != *bytes_received)
-        {
-            CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_WRITE, CFE_EVS_EventType_ERROR,
-                              "CF R%d(%u:%u): OS_write returned 0x%08x, got 0x%08x", (t->state == CF_TxnState_R2),
-                              t->history->src_eid, t->history->seq_num, offset, fret);
-            ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_write;
-            t->history->cc = CF_CFDP_ConditionCode_FILESTORE_REJECTION;
+            CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_SEEK_FD, CFE_EVS_EventType_ERROR,
+                              "CF R%d(%u:%u): failed to seek offset %ld, got %ld", (t->state == CF_TxnState_R2),
+                              t->history->src_eid, t->history->seq_num, (long)fd->offset, (long)fret);
+            t->history->cc = CF_CFDP_ConditionCode_FILE_SIZE_ERROR;
+            ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_seek;
             goto err_out; /* connection will reset in caller */
         }
+    }
 
-        t->state_data.r.cached_pos = (*bytes_received + offset);
-        CF_AppData.hk.channel_hk[t->chan_num].counters.recv.file_data_bytes += *bytes_received;
-        ret = 0;
-    }
-    else
+    fret = CF_WrappedWrite(t->fd, fd->data_ptr, fd->data_len);
+    if (fret != fd->data_len)
     {
-        /* file data PDU has 0 bytes -- so drop it */
-        ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.dropped;
+        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_WRITE, CFE_EVS_EventType_ERROR,
+                          "CF R%d(%u:%u): OS_write expected %ld, got %ld", (t->state == CF_TxnState_R2),
+                          t->history->src_eid, t->history->seq_num, (long)fd->data_len, (long)fret);
+        ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_write;
+        t->history->cc = CF_CFDP_ConditionCode_FILESTORE_REJECTION;
+        goto err_out; /* connection will reset in caller */
     }
+
+    t->state_data.r.cached_pos = fd->data_len + fd->offset;
+    CF_AppData.hk.channel_hk[t->chan_num].counters.recv.file_data_bytes += fd->data_len;
+    ret = 0;
 
 err_out:
     return ret;
@@ -309,21 +280,23 @@ err_out:
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
+int CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    int ret = CF_RxEofRet_SUCCESS;
+    int                        ret = CF_RxEofRet_SUCCESS;
+    const CF_Logical_PduEof_t *eof;
 
     if (!CF_CFDP_RecvEof(t, ph))
     {
-        uint32 size;
+        /* this function is only entered for PDUs identified as EOF type */
+        eof = &ph->int_header.eof;
 
-        cfdp_ldst_uint32(size, STATIC_CAST(ph, CF_CFDP_PduEof_t)->size);
         /* only check size if MD received, otherwise it's still OK */
-        if (t->flags.rx.md_recv && (size != t->fsize))
+        if (t->flags.rx.md_recv && (eof->size != t->fsize))
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_SIZE_MISMATCH, CFE_EVS_EventType_ERROR,
-                              "CF R%d(%u:%u): eof file size mismatch: got %u expected %u", (t->state == CF_TxnState_R2),
-                              t->history->src_eid, t->history->seq_num, size, t->fsize);
+                              "CF R%d(%u:%u): eof file size mismatch: got %lu expected %lu",
+                              (t->state == CF_TxnState_R2), (unsigned int)t->history->src_eid,
+                              (unsigned int)t->history->seq_num, (unsigned long)eof->size, (unsigned long)t->fsize);
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_size_mismatch;
             ret = CF_RxEofRet_FSIZE_MISMATCH;
             goto err_out;
@@ -356,12 +329,16 @@ err_out:
 **  \endreturns
 **
 *************************************************************************/
-static void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
+void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    int    ret = CF_CFDP_R_SubstateRecvEof(t, ph);
-    uint32 crc;
+    int                        ret = CF_CFDP_R_SubstateRecvEof(t, ph);
+    uint32                     crc;
+    const CF_Logical_PduEof_t *eof;
 
-    cfdp_ldst_uint32(crc, STATIC_CAST(ph, CF_CFDP_PduEof_t)->crc);
+    /* this function is only entered for PDUs identified as EOF type */
+    eof = &ph->int_header.eof;
+    crc = eof->crc;
+
     if ((ret == CF_RxEofRet_SUCCESS) && !CF_CFDP_R_CheckCrc(t, crc))
     {
         /* successfully processed the file */
@@ -389,24 +366,28 @@ static void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, CF_CFDP_PduHeader_t 
 **  \endreturns
 **
 *************************************************************************/
-static void CF_CFDP_R2_SubstateRecvEof(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
+void CF_CFDP_R2_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
+    const CF_Logical_PduEof_t *eof;
+    int                        ret;
+
     if (!t->flags.rx.eof_recv)
     {
-        int ret = CF_CFDP_R_SubstateRecvEof(t, ph);
+        ret = CF_CFDP_R_SubstateRecvEof(t, ph);
 
         /* did receiving eof succeed? */
         if (ret == CF_RxEofRet_SUCCESS)
         {
-            CF_CFDP_PduEof_t *eof = STATIC_CAST(ph, CF_CFDP_PduEof_t);
-            t->flags.rx.eof_recv  = 1;
+            eof = &ph->int_header.eof;
+
+            t->flags.rx.eof_recv = 1;
 
             /* need to remember the eof crc for later */
-            cfdp_ldst_uint32(t->state_data.r.r2.eof_crc, eof->crc);
-            cfdp_ldst_uint32(t->state_data.r.r2.eof_size, eof->size);
+            t->state_data.r.r2.eof_crc  = eof->crc;
+            t->state_data.r.r2.eof_size = eof->size;
 
             /* always ack the EOF, even if we're not done */
-            t->state_data.r.r2.eof_cc = FGV(eof->cc, CF_CFDP_PduEof_FLAGS_CC);
+            t->state_data.r.r2.eof_cc = eof->cc;
             t->flags.rx.send_ack      = 1; /* defer sending ack to tick handling */
 
             /* only check for complete if EOF with no errors */
@@ -445,18 +426,16 @@ static void CF_CFDP_R2_SubstateRecvEof(CF_Transaction_t *t, CF_CFDP_PduHeader_t 
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R1_SubstateRecvFileData(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
+void CF_CFDP_R1_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    CFE_MSG_Size_t bytes_received; /* initialized in CF_CFDP_R_ProcessFd() */
-
     /* got file data pdu? */
-    if (CF_CFDP_RecvFd(t, ph) || CF_CFDP_R_ProcessFd(t, ph, &bytes_received))
+    if (CF_CFDP_RecvFd(t, ph) || CF_CFDP_R_ProcessFd(t, ph))
     {
         goto err_out;
     }
 
     /* class 1 digests crc */
-    CF_CRC_Digest(&t->crc, STATIC_CAST(ph, CF_CFDP_PduFd_t)->fdd.data, (uint32)bytes_received);
+    CF_CRC_Digest(&t->crc, ph->int_header.fd.data_ptr, ph->int_header.fd.data_len);
 
     return;
 
@@ -478,20 +457,21 @@ err_out:
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
+void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    CFE_MSG_Size_t bytes_received; /* initialized in CF_CFDP_R_ProcessFd() */
-    uint32         offset;
+    const CF_Logical_PduFileDataHeader_t *fd;
+
+    /* this function is only entered for data PDUs */
+    fd = &ph->int_header.fd;
 
     /* got file data pdu? */
-    if (CF_CFDP_RecvFd(t, ph) || CF_CFDP_R_ProcessFd(t, ph, &bytes_received))
+    if (CF_CFDP_RecvFd(t, ph) || CF_CFDP_R_ProcessFd(t, ph))
     {
         goto err_out;
     }
 
-    cfdp_ldst_uint32(offset, STATIC_CAST(ph, CF_CFDP_PduFd_t)->fdh.offset);
     /* class 2 does crc at FIN, but track gaps */
-    CF_ChunkListAdd(&t->chunks->chunks, offset, (uint32)bytes_received);
+    CF_ChunkListAdd(&t->chunks->chunks, fd->offset, fd->data_len);
 
     if (t->flags.rx.fd_nak_sent)
     {
@@ -525,20 +505,30 @@ err_out:
 **  \endreturns
 **
 *************************************************************************/
-static void CF_CFDP_R2_GapCompute(const CF_ChunkList_t *chunks, const CF_Chunk_t *c, void *opaque)
+void CF_CFDP_R2_GapCompute(const CF_ChunkList_t *chunks, const CF_Chunk_t *c, void *opaque)
 {
-    gap_compute_args_t *args = (gap_compute_args_t *)opaque;
-    CF_CFDP_PduNak_t   *nak  = STATIC_CAST(args->ph, CF_CFDP_PduNak_t);
+    CF_GapComputeArgs_t         *args = (CF_GapComputeArgs_t *)opaque;
+    CF_Logical_SegmentRequest_t *pseg;
+    CF_Logical_SegmentList_t    *pseglist;
+    CF_Logical_PduNak_t         *nak;
 
+    /* This function is only invoked for NAK types */
+    nak      = args->nak;
+    pseglist = &nak->segment_list;
     CF_Assert(c->size > 0);
 
     /* it seems that scope in the old engine is not used the way I read it in the spec, so
      * leave this code here for now for future reference */
 
-    cfdp_ldst_uint32(nak->segment_requests[args->gap_counter].offset_start, (c->offset - nak->scope_start));
-    cfdp_ldst_uint32(nak->segment_requests[args->gap_counter].offset_end,
-                     (nak->segment_requests[args->gap_counter].offset_start + c->size));
-    ++args->gap_counter;
+    if (pseglist->num_segments < CF_PDU_MAX_SEGMENTS)
+    {
+        pseg = &pseglist->segments[pseglist->num_segments];
+
+        pseg->offset_start = c->offset - nak->scope_start;
+        pseg->offset_end   = pseg->offset_start + c->size;
+
+        ++pseglist->num_segments;
+    }
 }
 
 /************************************************************************/
@@ -559,29 +549,32 @@ static void CF_CFDP_R2_GapCompute(const CF_ChunkList_t *chunks, const CF_Chunk_t
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
+int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
 {
-    CF_CFDP_PduHeader_t *ph  = CF_CFDP_ConstructPduHeader(t, CF_CFDP_FileDirective_NAK, t->history->peer_eid,
-                                                          CF_AppData.config_table->local_eid, 1, t->history->seq_num, 1);
-    CF_CFDP_PduNak_t    *nak = STATIC_CAST(ph, CF_CFDP_PduNak_t);
+    CF_Logical_PduBuffer_t *ph =
+        CF_CFDP_ConstructPduHeader(t, CF_CFDP_FileDirective_NAK, t->history->peer_eid,
+                                   CF_AppData.config_table->local_eid, 1, t->history->seq_num, 1);
+    CF_Logical_PduNak_t *nak;
     CF_SendRet_t         sret;
 
     int ret = -1;
 
     if (ph)
     {
+        nak = &ph->int_header.nak;
+
         if (t->flags.rx.md_recv)
         {
             /* we have metadata, so send valid nak */
-            gap_compute_args_t args = {t, ph, 0};
-            uint32             cret;
+            CF_GapComputeArgs_t args = {t, nak};
+            uint32              cret;
 
-            cfdp_ldst_uint32(nak->scope_start, 0);
-            cret = CF_ChunkList_ComputeGaps(&t->chunks->chunks,
+            nak->scope_start = 0;
+            cret             = CF_ChunkList_ComputeGaps(&t->chunks->chunks,
                                             (t->chunks->chunks.count < t->chunks->chunks.CF_max_chunks)
-                                                ? t->chunks->chunks.CF_max_chunks
-                                                : (t->chunks->chunks.CF_max_chunks - 1),
-                                            t->fsize, 0, CF_CFDP_R2_GapCompute, &args);
+                                                            ? t->chunks->chunks.CF_max_chunks
+                                                            : (t->chunks->chunks.CF_max_chunks - 1),
+                                                        t->fsize, 0, CF_CFDP_R2_GapCompute, &args);
 
             if (!cret)
             {
@@ -592,8 +585,8 @@ static int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
             else
             {
                 /* gaps are present, so let's send the nak pdu */
-                cfdp_ldst_uint32(nak->scope_end, 0);
-                sret                    = CF_CFDP_SendNak(t, ph, cret);
+                nak->scope_end          = 0;
+                sret                    = CF_CFDP_SendNak(t, ph);
                 t->flags.rx.fd_nak_sent = 1;         /* latch that at least one nak has been sent requesting filedata */
                 CF_Assert(sret != CF_SendRet_ERROR); /* NOTE: this CF_Assert is here because CF_CFDP_SendNak() does not
                                                      return CF_SendRet_ERROR, so if it's ever added to that function we
@@ -613,11 +606,13 @@ static int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
                               "CF R%d(%u:%u): requesting MD", (t->state == CF_TxnState_R2), t->history->src_eid,
                               t->history->seq_num);
             /* scope start/end, and sr[0] start/end == 0 special value to request metadata */
-            cfdp_ldst_uint32(nak->scope_start, 0);
-            cfdp_ldst_uint32(nak->scope_end, 0);
-            cfdp_ldst_uint32(nak->segment_requests[0].offset_start, 0);
-            cfdp_ldst_uint32(nak->segment_requests[0].offset_end, 0);
-            sret = CF_CFDP_SendNak(t, ph, 1);
+            nak->scope_start                           = 0;
+            nak->scope_end                             = 0;
+            nak->segment_list.segments[0].offset_start = 0;
+            nak->segment_list.segments[0].offset_end   = 0;
+            nak->segment_list.num_segments             = 1;
+
+            sret = CF_CFDP_SendNak(t, ph);
             CF_Assert(sret != CF_SendRet_ERROR); /* this CF_Assert is here because CF_CFDP_SendNak() does not return
                                                     CF_SendRet_ERROR */
             if (sret == CF_SendRet_SUCCESS)
@@ -706,32 +701,46 @@ void CF_CFDP_R_Init(CF_Transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t)
+int CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t)
 {
-    int ret = -1;
-
     uint8  buf[CF_R2_CRC_CHUNK_SIZE];
-    uint32 count_bytes = 0;
-#define RXC t->state_data.r.r2.rx_crc_calc_bytes
-    if (!RXC)
+    size_t count_bytes;
+    size_t want_offs_size;
+    size_t read_size;
+    int    fret;
+    int    ret;
+
+    count_bytes = 0;
+    ret         = -1;
+
+    if (t->state_data.r.r2.rx_crc_calc_bytes == 0)
     {
         CF_CRC_Start(&t->crc);
     }
 
-    while ((count_bytes < CF_AppData.config_table->rx_crc_calc_bytes_per_wakeup) && (RXC < t->fsize))
+    while ((count_bytes < CF_AppData.config_table->rx_crc_calc_bytes_per_wakeup) &&
+           (t->state_data.r.r2.rx_crc_calc_bytes < t->fsize))
     {
-        const uint32 want_offs_size = (RXC + sizeof(buf));
-        const uint32 read_size      = (want_offs_size > t->fsize ? (t->fsize - RXC) : sizeof(buf));
-        int          fret;
+        want_offs_size = t->state_data.r.r2.rx_crc_calc_bytes + sizeof(buf);
 
-        if (t->state_data.r.cached_pos != RXC)
+        if (want_offs_size > t->fsize)
         {
-            fret = CF_WrappedLseek(t->fd, RXC, OS_SEEK_SET);
-            if (fret != RXC)
+            read_size = t->fsize - t->state_data.r.r2.rx_crc_calc_bytes;
+        }
+        else
+        {
+            read_size = sizeof(buf);
+        }
+
+        if (t->state_data.r.cached_pos != t->state_data.r.r2.rx_crc_calc_bytes)
+        {
+            fret = CF_WrappedLseek(t->fd, t->state_data.r.r2.rx_crc_calc_bytes, OS_SEEK_SET);
+            if (fret != t->state_data.r.r2.rx_crc_calc_bytes)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_SEEK_CRC, CFE_EVS_EventType_ERROR,
-                                  "CF R%d(%u:%u): failed to seek offset %u, got 0x%08x", (t->state == CF_TxnState_R2),
-                                  t->history->src_eid, t->history->seq_num, RXC, fret);
+                                  "CF R%d(%u:%u): failed to seek offset %lu, got 0x%08x", (t->state == CF_TxnState_R2),
+                                  t->history->src_eid, t->history->seq_num,
+                                  (unsigned long)t->state_data.r.r2.rx_crc_calc_bytes, fret);
                 t->history->cc = CF_CFDP_ConditionCode_FILE_SIZE_ERROR; /* should be ok to use this one */
                 ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_seek;
                 goto err_out;
@@ -742,19 +751,21 @@ static int CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t)
         if (fret != read_size)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_READ, CFE_EVS_EventType_ERROR,
-                              "CF R%d(%u:%u): failed to read file expected %u, got 0x%08x",
-                              (t->state == CF_TxnState_R2), t->history->src_eid, t->history->seq_num, read_size, fret);
+                              "CF R%d(%u:%u): failed to read file expected %lu, got 0x%08x",
+                              (t->state == CF_TxnState_R2), t->history->src_eid, t->history->seq_num,
+                              (unsigned long)read_size, fret);
             t->history->cc = CF_CFDP_ConditionCode_FILE_SIZE_ERROR; /* should be ok to use this one */
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_read;
             goto err_out;
         }
 
         CF_CRC_Digest(&t->crc, buf, read_size);
-        RXC += read_size;
-        t->state_data.r.cached_pos = RXC; /* should only call Lseek once */
+        t->state_data.r.r2.rx_crc_calc_bytes += read_size;
+        t->state_data.r.cached_pos = t->state_data.r.r2.rx_crc_calc_bytes;
+        count_bytes += read_size;
     }
 
-    if (RXC == t->fsize)
+    if (t->state_data.r.r2.rx_crc_calc_bytes == t->fsize)
     {
         /* all bytes calculated, so now check */
         if (!CF_CFDP_R_CheckCrc(t, t->state_data.r.r2.eof_crc))
@@ -791,7 +802,7 @@ err_out:
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CFDP_R2_SubstateSendFin(CF_Transaction_t *t)
+int CF_CFDP_R2_SubstateSendFin(CF_Transaction_t *t)
 {
     CF_SendRet_t sret;
     int          ret = -1;
@@ -832,7 +843,7 @@ err_out:
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R2_Recv_fin_ack(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
+void CF_CFDP_R2_Recv_fin_ack(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     if (!CF_CFDP_RecvAck(t, ph))
     {
@@ -861,7 +872,7 @@ static void CF_CFDP_R2_Recv_fin_ack(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph
 **       t must not be NULL. ph must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
+void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     /* it isn't an error to get another MD pdu, right? */
     if (!t->flags.rx.md_recv)
@@ -943,75 +954,13 @@ err_out:;
 }
 
 /************************************************************************/
-/** \brief Dispatch function for all received packets.
-**
-**  \par Description
-**       For either R1 or R2 this function handles common logic for
-**       state processing based on current sub-state and the received
-**       pdu type.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. fns must not be NULL.
-**
-*************************************************************************/
-static void CF_CFDP_R_DispatchRecv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph,
-                                   const CF_CFDP_R_SubstateDispatchTable_t *dispatch, CF_CFDP_StateRecvFunc_t fd_fn)
-{
-    CF_Assert(t->state_data.r.sub_state < CF_RxSubState_NUM_STATES);
-    CF_CFDP_StateRecvFunc_t selected_handler;
-
-    selected_handler = NULL;
-
-    /* the 2d jump table is only used with file directive pdu */
-    if (!FGV(ph->flags, CF_CFDP_PduHeader_FLAGS_TYPE))
-    {
-        CF_CFDP_PduFileDirectiveHeader_t *fdh = STATIC_CAST(ph, CF_CFDP_PduFileDirectiveHeader_t);
-        if (fdh->directive_code < CF_CFDP_FileDirective_INVALID_MAX)
-        {
-            if (dispatch->state[t->state_data.r.sub_state] != NULL)
-            {
-                selected_handler = dispatch->state[t->state_data.r.sub_state]->fdirective[fdh->directive_code];
-            }
-        }
-        else
-        {
-            ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.spurious;
-            CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_DC_INV, CFE_EVS_EventType_ERROR,
-                              "CF R%d(%u:%u): received pdu with invalid directive code %d for sub-state %d",
-                              (t->state == CF_TxnState_R2), t->history->src_eid, t->history->seq_num,
-                              fdh->directive_code, t->state_data.r.sub_state);
-        }
-    }
-    else
-    {
-        if (t->history->cc == CF_CFDP_ConditionCode_NO_ERROR)
-        {
-            selected_handler = fd_fn;
-        }
-        else
-        {
-            ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.dropped;
-        }
-    }
-
-    /*
-     * NOTE: if no handler is selected, this will drop packets on the floor here,
-     * without incrementing any counter.  This was existing behavior.
-     */
-    if (selected_handler != NULL)
-    {
-        selected_handler(t, ph);
-    }
-}
-
-/************************************************************************/
 /** \brief R1 receive pdu processing.
 **
 **  \par Assumptions, External Events, and Notes:
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CFDP_R1_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
+void CF_CFDP_R1_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     static const CF_CFDP_FileDirectiveDispatchTable_t r1_fdir_handlers = {
         .fdirective = {[CF_CFDP_FileDirective_EOF] = CF_CFDP_R1_SubstateRecvEof}};
@@ -1030,7 +979,7 @@ void CF_CFDP_R1_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CFDP_R2_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
+void CF_CFDP_R2_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     static const CF_CFDP_FileDirectiveDispatchTable_t r2_fdir_handlers_normal = {
         .fdirective = {
@@ -1077,7 +1026,7 @@ void CF_CFDP_R_Cancel(CF_Transaction_t *t)
 **       t must not be NULL.
 **
 *************************************************************************/
-static inline void CF_CFDP_R_SendInactivityEvent(CF_Transaction_t *t)
+void CF_CFDP_R_SendInactivityEvent(CF_Transaction_t *t)
 {
     CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_INACT_TIMER, CFE_EVS_EventType_ERROR, "CF R%d(%u:%u): inactivity timer expired",
                       (t->state == CF_TxnState_R2), t->history->src_eid, t->history->seq_num);

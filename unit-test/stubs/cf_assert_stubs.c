@@ -1,44 +1,49 @@
 /************************************************************************
-** File: cf_assert_stubs.c
+** File: CF_Assert.h
 **
-** %LICENSE_START
-** %LICENSE_STOP
+** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
+** Application version 3.0.0”
+** Copyright © 2019 United States Government as represented by the
+** Administrator of the National Aeronautics and Space Administration.
+** All Rights Reserved.
+** Licensed under the Apache License, Version 2.0 (the "License"); you may
+** not use this file except in compliance with the License. You may obtain
+** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+**
+** Unless required by applicable law or agreed to in writing, software
+** distributed under the License is distributed on an "AS IS" BASIS,
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+** See the License for the specific language governing permissions and
+** limitations under the License.
+**
 **
 ** Purpose:
-**  File contains stubs for the CF Application CF_Assertion macro file
+**  The CF Application CF_Assert macro
 **
-** Revision 1.0 2020/08/04 agibso1
-**  Initial revision
+** Revision 1.0 2020/07/15 sseeger
+**
 *************************************************************************/
 
+/**
+ * @file
+ *
+ * Auto-Generated stub implementations for functions defined in cf_assert header
+ */
+
 #include "cf_assert.h"
-#include "cf_verify.h"
-#include "cf_events.h"
+#include "utgenstub.h"
 
-/* UT includes */
-#include "utassert.h"
-#include "uttest.h"
-#include "utstubs.h"
+extern void UT_DefaultHandler_CF_HandleAssert(void *, UT_EntryKey_t, const UT_StubContext_t *);
 
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_HandleAssert()
+ * ----------------------------------------------------
+ */
 void CF_HandleAssert(const char *file, int line)
 {
-    /*
-     * NOTE: These args are out of order so that Arg[0] and Arg[1] will
-     * be the same as they are for other EVS calls.  This keeps it
-     * compatible with old/existing UT hook routines.
-     * Newly-implemented hooks should use the name-based argument
-     * retrieval so it is independent of the order.
-     */
-    UtAssert_Failed("CF_HandleAssert was called issue");
-    // UT_Stub_RegisterContext(UT_KEY(CF_HandleAssert), file);
-    // UT_Stub_RegisterContextGenericArg(UT_KEY(CF_HandleAssert), line);
+    UT_GenStub_AddParam(CF_HandleAssert, const char *, file);
+    UT_GenStub_AddParam(CF_HandleAssert, int, line);
 
-    // UT_DEFAULT_IMPL(CF_HandleAssert);
-    //
-    // if (status >= 0)
-    // {
-    //     UT_Stub_CopyFromLocal(UT_KEY(CF_HandleAssert), (uint8*)&EventID, sizeof(EventID));
-    // }
-
-    // UtAssert_EndTest();
+    UT_GenStub_Execute(CF_HandleAssert, Basic, UT_DefaultHandler_CF_HandleAssert);
 }

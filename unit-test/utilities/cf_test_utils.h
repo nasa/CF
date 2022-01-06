@@ -9,7 +9,6 @@
 #include "common_types.h"
 
 /* cf includes */
-#include "cf_cfdp_helpers.h"
 #include "cf_platform_cfg.h"
 #include "cf_cfdp_pdu.h"
 #include "cf_app.h"
@@ -32,6 +31,9 @@
 
 #define MAX_INT 2147484647 /* Set at 32bit for now,  pow(2, 31) - 1 */
 
+#define ALL_CHANNELS 255
+#define COMPOUND_KEY 254
+
 #define ERROR_RETRIEVING_ANY_VALUE -86
 
 #ifndef RANDOM_VALUES_SEED
@@ -42,177 +44,15 @@
 #define SECOND_CALL 2
 #define NEXT_CALL   1
 
-extern int32  result;
-extern uint16 EventID;
+#define UT_CFDP_CHANNEL 0
 
-extern const char   *ut_default_const_char;
-extern const uint8   ut_default_uint8;
-extern const void   *ut_default_ptr;
-extern UT_HookFunc_t stub_reporter;
-
-void Handler_CF_CFDP_ConstructPduHeader_ForceReturnOnly(void *UserObj, UT_EntryKey_t FuncKey,
-                                                        const UT_StubContext_t *Context);
-
-/*******************************************************************************
-**
-**  Buffer allocation types
-**
-**  The "CF_PduSendMsg_t" and "CF_PduRecvMsg_t" are only minimally-sized types, reflecting
-**  the common parts of all PDUs, without any definition of the optional/extra parts.
-**
-**  In order to call one of the CFDP functions that accept a larger buffer, the
-**  test buffer must account for and include this extra data.
-**
-**  Also this buffer should be properly aligned as a CFE_SB_Buffer_t to make it safe to
-**  assign the address to a CFE_SB_Buffer_t*.
-**
-*******************************************************************************/
-
-/* A combination of all the various CFDP secondary header types */
-typedef union
+typedef enum
 {
-    CF_CFDP_PduFileDirectiveHeader_t fdirh;
-    CF_CFDP_PduFileDataHeader_t      fdatah;
-    CF_CFDP_PduMd_t                  md;
-    CF_CFDP_PduEof_t                 eof;
-    CF_CFDP_PduAck_t                 ack;
-    CF_CFDP_PduFin_t                 fin;
-    CF_CFDP_PduNak_t                 nak;
-} pdu_any_sechdr_t;
+    UT_CF_Setup_NONE,
+    UT_CF_Setup_TX,
+    UT_CF_Setup_RX
 
-typedef struct
-{
-    /* note that technically the CF_CFDP_PduHeader_t is variably sized,
-       but for most UT test cases the extension data is not used, thus
-       the second header follows it immediately */
-    CF_CFDP_PduHeader_t common;
-    pdu_any_sechdr_t    secondary;
-
-    /* extra space just in case the CF_CFDP_PduHeader_t is longer than nominal */
-    uint8_t pad[CF_MAX_HEADER_SIZE - sizeof(CF_CFDP_PduHeader_t)];
-
-} CF_UT_fullhdr_t;
-
-typedef struct
-{
-    CFE_MSG_TelemetryHeader_t tlm;
-    CF_UT_fullhdr_t           cfdp;
-
-} CF_UT_any_outmsg_t;
-
-typedef struct
-{
-    CFE_MSG_CommandHeader_t cmd;
-    CF_UT_fullhdr_t         cfdp;
-
-} CF_UT_any_inmsg_t;
-
-typedef union
-{
-    CFE_MSG_Message_t  cfe_msg;
-    CFE_SB_Buffer_t    cfe_sb_buffer;
-    CF_PduSendMsg_t    pdu_s_msg;
-    CF_UT_any_outmsg_t content;
-
-    /* This ensures the buffer is large enough to store any PDU type,
-       some of which are larger than the basic CF_UT_exthdr_t (up to CF_MAX_PDU_SIZE) */
-    uint8_t bytes[offsetof(CF_UT_any_outmsg_t, cfdp) + CF_MAX_PDU_SIZE];
-
-} CF_UT_outmsg_buffer_t;
-
-typedef union
-{
-    CFE_MSG_Message_t cfe_msg;
-    CFE_SB_Buffer_t   cfe_sb_buffer;
-    CF_PduRecvMsg_t   pdu_r_msg;
-    CF_UT_any_inmsg_t content;
-
-    /* This ensures the buffer is large enough to store any PDU type,
-       some of which are larger than the basic CF_UT_exthdr_t (up to CF_MAX_PDU_SIZE) */
-    uint8_t bytes[offsetof(CF_UT_any_inmsg_t, cfdp) + CF_MAX_PDU_SIZE];
-} CF_UT_inmsg_buffer_t;
-
-/*******************************************************************************
-**
-**  cfe stub_reporter_hook contexts
-**
-**  Some that are very frequently use include a global context.
-**
-**  CF_PACK required to make sure things end up in the proper locations for
-**  storage of arguments passed to functions.
-**
-*******************************************************************************/
-
-typedef struct
-{
-    CF_Transaction_t *t;
-    int               num_segment_requests;
-    CF_SendRet_t      forced_return;
-} CF_PACK CF_CFDP_SendNak_context_t;
-
-typedef struct
-{
-    const CF_Transaction_t *t;
-    uint8                   directive_code;
-    CF_EntityId_t           src_eid;
-    CF_EntityId_t           dst_eid;
-    uint8                   towards_sender;
-    CF_TransactionSeq_t     tsn;
-    int                     silent;
-    CF_CFDP_PduHeader_t    *forced_return;
-} CF_PACK CF_CFDP_ConstructPduHeader_context_t;
-
-typedef struct
-{
-    CFE_MSG_Message_t *MsgPtr;
-    CFE_TIME_SysTime_t Time;
-} CF_PACK                           CFE_MSG_SetMsgTime_context_t;
-extern CFE_MSG_SetMsgTime_context_t context_CFE_MSG_SetMsgTime;
-
-typedef struct
-{
-    const CFE_MSG_Message_t *MsgPtr;
-    CFE_SB_MsgId_t          *returned_MsgId;
-} CF_PACK                         CFE_MSG_GetMsgId_context_t;
-extern CFE_MSG_GetMsgId_context_t context_CFE_MSG_GetMsgId;
-
-typedef struct
-{
-    uint16      EventID;
-    uint16      EventType;
-    const char *Spec;
-} CF_PACK                          CFE_EVS_SendEvent_context_t;
-extern CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
-
-typedef struct
-{
-    const CFE_MSG_Message_t *MsgPtr;
-    CFE_MSG_Size_t          *Size;
-} CF_PACK CFE_MSG_GetSize_context_t;
-
-typedef struct
-{
-    CFE_MSG_Message_t *MsgPtr;
-    CFE_SB_MsgId_t     MsgId;
-} CF_PACK CFE_MSG_SetMsgId_context_t;
-
-typedef struct
-{
-    CFE_MSG_Message_t *MsgPtr;
-    bool               IncrementSequenceCount;
-} CF_PACK CFE_SB_TransmitMsg_context_t;
-
-typedef struct
-{
-    const CFE_MSG_Message_t *MsgPtr;
-    CFE_MSG_FcnCode_t       *FcnCode;
-} CF_PACK CFE_MSG_GetFcnCode_context_t;
-
-typedef struct
-{
-    CFE_MSG_Message_t *MsgPtr;
-    CFE_MSG_Size_t     Size;
-} CF_PACK CFE_MSG_SetSize_context_t;
+} UT_CF_Setup_t;
 
 /*******************************************************************************
 **
@@ -225,25 +65,25 @@ typedef struct
 
 typedef struct
 {
-    const char      src_filename[CF_FILENAME_MAX_LEN];
-    const char      dst_filename[CF_FILENAME_MAX_LEN];
+    char            src_filename[CF_FILENAME_MAX_LEN];
+    char            dst_filename[CF_FILENAME_MAX_LEN];
     CF_CFDP_Class_t cfdp_class;
     uint8           keep;
     uint8           chan;
     uint8           priority;
     CF_EntityId_t   dest_id;
-} CF_PACK CF_CFDP_TxFile_context_t;
+} CF_CFDP_TxFile_context_t;
 
 typedef struct
 {
-    const char      src_filename[CF_FILENAME_MAX_LEN];
-    const char      dst_filename[CF_FILENAME_MAX_LEN];
+    char            src_filename[CF_FILENAME_MAX_LEN];
+    char            dst_filename[CF_FILENAME_MAX_LEN];
     CF_CFDP_Class_t cfdp_class;
     uint8           keep;
     uint8           chan;
     uint8           priority;
     CF_EntityId_t   dest_id;
-} CF_PACK CF_CFDP_PlaybackDir_context_t;
+} CF_CFDP_PlaybackDir_context_t;
 
 typedef struct
 {
@@ -251,47 +91,47 @@ typedef struct
     CF_TransactionSeq_t transaction_sequence_number;
     CF_EntityId_t       src_eid;
     CF_Transaction_t   *forced_return;
-} CF_PACK CF_CFDP_FindTransactionBySequenceNumber_context_t;
+} CF_FindTransactionBySequenceNumber_context_t;
 
 typedef struct
 {
     CF_TraverseAllTransactions_fn_t fn;
     void                           *context;
     int                             forced_return;
-} CF_PACK CF_TraverseAllTransactions_All_Channels_context_t;
+} CF_TraverseAllTransactions_All_Channels_context_t;
 
 typedef struct
 {
     CF_Transaction_t *t;
     int               keep_history;
-} CF_PACK CF_CFDP_ResetTransaction_context_t;
+} CF_CFDP_ResetTransaction_context_t;
 
 typedef struct
 {
     CF_Channel_t *c;
     CF_History_t *h;
-} CF_PACK CF_CFDP_ResetHistory_context_t;
+} CF_CFDP_ResetHistory_context_t;
 
 typedef struct
 {
     CF_CListNode_t *start;
     CF_CListFn_t    fn;
     void           *context;
-} CF_PACK CF_CList_Traverse_POINTER_context_t;
+} CF_CList_Traverse_POINTER_context_t;
 
 typedef struct
 {
     int32         fd;
     CF_Channel_t *c;
     CF_QueueIdx_t q;
-} CF_PACK CF_WriteQueueDataToFile_context_t;
+} CF_WriteQueueDataToFile_context_t;
 
 typedef struct
 {
     int32          fd;
     CF_Channel_t  *c;
     CF_Direction_t dir;
-} CF_PACK CF_WriteHistoryQueueDataToFile_context_t;
+} CF_WriteHistoryQueueDataToFile_context_t;
 
 typedef struct
 {
@@ -299,48 +139,7 @@ typedef struct
     CF_TraverseAllTransactions_fn_t fn;
     void                           *context;
     /* TODO: add forced return? Stub is kinda using it but not from context */
-} CF_PACK CF_TraverseAllTransactions_context_t;
-
-typedef struct
-{
-    CF_Transaction_t *t;
-    CF_QueueIdx_t     q;
-} CF_PACK CF_InsertSortPrio_context_t;
-
-typedef struct
-{
-    CF_Transaction_t *t;
-    CF_SendRet_t      forced_return;
-} CF_PACK CF_CFDP_SendEof_context_t;
-
-typedef struct
-{
-    CF_Transaction_t    *t;
-    int                  silent;
-    CF_CFDP_PduHeader_t *forced_return;
-} CF_PACK CF_CFDP_MsgOutGet_context_t;
-
-typedef struct
-{
-    osal_id_t fd;
-    off_t     offset;
-    int       mode;
-    int       forced_return;
-} CF_PACK CF_WrappedLseek_context_t;
-
-typedef struct
-{
-    osal_id_t fd;
-    void     *buf;
-    size_t    read_size;
-    int       forced_return;
-} CF_PACK CF_WrappedRead_context_t;
-
-typedef struct
-{
-    const CF_ChunkList_t *chunks;
-    const CF_Chunk_t     *forced_return;
-} CF_PACK CF_Chunks_GetFirstChunk_context_t;
+} CF_TraverseAllTransactions_context_t;
 
 typedef struct
 {
@@ -349,99 +148,32 @@ typedef struct
     int32       flags;
     int32       access;
     int32       forced_return;
-} CF_PACK CF_WrappedOpenCreate_context_t;
-
-typedef struct
-{
-    CF_Transaction_t       *t;
-    CF_CFDP_AckTxnStatus_t  ts;
-    CF_CFDP_FileDirective_t dir_code;
-    CF_CFDP_ConditionCode_t cc;
-    CF_EntityId_t           peer_eid;
-    CF_TransactionSeq_t     tsn;
-    CF_SendRet_t            forced_return;
-} CF_PACK CF_CFDP_SendAck_context_t;
-
-typedef struct
-{
-    CF_ChunkList_t  *chunks;
-    CF_ChunkOffset_t offset;
-    CF_ChunkSize_t   size;
-} CF_PACK CF_Chunks_Add_context_t;
+} CF_WrappedOpenCreate_context_t;
 
 typedef struct
 {
     CF_CListNode_t **head;
     CF_CListNode_t  *node;
-} CF_PACK CF_CList_Remove_context_t;
-
-typedef struct
-{
-    CF_Transaction_t *t;
-    uint32            offset;
-    int               len;
-    CF_SendRet_t      forced_return;
-} CF_PACK CF_CFDP_SendFd_context_t;
-
-typedef struct
-{
-    CF_Crc_t    *c;
-    const uint8 *data;
-    int          len;
-} CF_PACK CF_CRC_Digest_context_t;
-
-typedef struct
-{
-    CF_ChunkList_t *chunks;
-    CF_ChunkSize_t  size;
-} CF_PACK CF_Chunks_RemoveFromFirst_context_t;
-
-typedef struct
-{
-    CF_Timer_t *t;
-    uint32      rel_sec;
-} CF_PACK CF_Timer_InitRelSec_context_t;
+} CF_CList_Remove_context_t;
 
 typedef struct
 {
     CF_CListNode_t **head;
     CF_CListNode_t  *forced_return;
-} CF_PACK CF_CList_Pop_context_t;
+} CF_CList_Pop_context_t;
 
 typedef struct
 {
     CF_CListNode_t **head;
     CF_CListNode_t  *node;
-} CF_PACK CF_CList_InsertBack_context_t;
-
-typedef struct
-{
-    CF_CListNode_t     *start;
-    CF_CListFn_t        fn;
-    CF_TransactionSeq_t context_transaction_sequence_number;
-    CF_EntityId_t       context_src_eid;
-    CF_Transaction_t   *context_forced_t; /* out param */
-} CF_PACK CF_CList_Traverse_FIND_T_BY_SEQ_NUM_context_t;
-
-typedef struct
-{
-    CF_CListNode_t *start;
-    CF_CListFn_t    fn;
-    void           *context;
-} CF_PACK CF_CList_Traverse_CLOSE_FILES_context_t;
-
-typedef struct
-{
-    CF_CListNode_t **head;
-    CF_CListNode_t  *node;
-} CF_PACK CF_Clist_Remove_context_t;
+} CF_CList_InsertBack_context_t;
 
 typedef struct
 {
     CF_CListNode_t **head;
     CF_CListNode_t  *start;
     CF_CListNode_t  *after;
-} CF_PACK CF_CList_InsertAfter_context_t;
+} CF_CList_InsertAfter_context_t;
 
 typedef struct
 {
@@ -450,7 +182,7 @@ typedef struct
     int32           context_fd;
     int32           context_result;
     int32           context_counter;
-} CF_PACK CF_CList_Traverse_TRAV_ARG_T_context_t;
+} CF_CList_Traverse_TRAV_ARG_T_context_t;
 
 typedef struct
 {
@@ -459,60 +191,35 @@ typedef struct
     CF_TraverseAllTransactions_fn_t context_fn;
     void                           *context_context;
     int                             context_counter;
-} CF_PACK CF_CList_Traverse_TRAVERSE_ALL_ARGS_T_context_t;
+} CF_CList_Traverse_TRAVERSE_ALL_ARGS_T_context_t;
 
 typedef struct
 {
     CF_CListNode_t   *end;
     CF_CListFn_t      fn;
     CF_Transaction_t *context_t;
-} CF_PACK CF_CList_Traverse_R_context_t;
+} CF_CList_Traverse_R_context_t;
 
-typedef struct
-{
-    CF_Transaction_t *t;
-    void             *context;
-} CF_PACK DummyFunctionFor_CF_TraverseAllTransactions__context_t;
+void *UT_CF_GetContextBufferImpl(UT_EntryKey_t FuncKey, size_t ReqSize);
+#define UT_CF_GetContextBuffer(key, type) ((type *)UT_CF_GetContextBufferImpl(key, sizeof(type)))
 
-typedef struct
-{
-    CF_Transaction_t    *t;
-    CF_CFDP_PduHeader_t *pdu;
-} CF_PACK Dummy_fd_fn_context_t;
-
-typedef struct
-{
-    CF_Transaction_t    *t;
-    CF_CFDP_PduHeader_t *pdu;
-} CF_PACK Dummy_fns_context_t;
-
-typedef struct
-{
-    CF_Transaction_t          *t;
-    const CF_CFDP_PduHeader_t *pdu;
-} CF_PACK Dummy_fns_CF_CFDP_S_DispatchRecv_context_t;
+/*
+ * Helper functions for capturing and checking generated event IDs.
+ *
+ * Provides a simplified way to capture and check for calls to CFE_EVS_SendEvent.
+ *
+ */
+void UT_CF_ResetEventCapture(UT_EntryKey_t FuncKey);
+void UT_CF_CheckEventID_Impl(uint16 ExpectedID, const char *EventIDStr);
+#define UT_CF_AssertEventID(eid) UT_CF_CheckEventID_Impl(eid, #eid)
 
 /* bottom */
-
-typedef enum
-{
-    NOT_YET_SET,
-    TRAV_ARG_T,
-    TRAVERSE_ALL_ARGS_T,
-    POINTER,
-    FIND_T_BY_SEQ_NUM,
-    CLOSE_FILES,
-    MAX_TYPE_OF_CONTEXT_CF_CLIST_TRAVERSE
-} type_of_context_CF_CList_Traverse_t;
 
 void cf_tests_Setup(void);
 void cf_tests_Teardown(void);
 
-void unimplemented(const char *func, const char *file, int line);
 void TestUtil_InitializeRandomSeed(void);
 void TestUtil_InitMsg(CFE_MSG_Message_t *MsgPtr, CFE_SB_MsgId_t MsgId, CFE_MSG_Size_t Size);
-
-void Handler_int_ForcedReturnOnly(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context);
 
 unsigned int AnyCoinFlip(void);
 

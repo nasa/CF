@@ -9,11 +9,13 @@ set(APP_SRC_FILES
   fsw/src/cf_app.c
   fsw/src/cf_assert.c
   fsw/src/cf_cfdp.c
-  fsw/src/cf_cfdp_helpers.c
   fsw/src/cf_cfdp_r.c
   fsw/src/cf_cfdp_s.c
+  fsw/src/cf_cfdp_sbintf.c
+  fsw/src/cf_cfdp_dispatch.c
   fsw/src/cf_chunk.c
   fsw/src/cf_clist.c
+  fsw/src/cf_codec.c
   fsw/src/cf_cmd.c
   fsw/src/cf_crc.c
   fsw/src/cf_timer.c

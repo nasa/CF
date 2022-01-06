@@ -35,70 +35,13 @@
 #include "cf_version.h"
 
 #include "cf_cfdp.h"
+#include "cf_cmd.h"
 
 #include <string.h>
 
 #define ALL_CHANNELS 255
 #define ALL_POLLDIRS ALL_CHANNELS
 #define COMPOUND_KEY 254
-
-typedef int (*chan_action_fn_t)(uint8 chan_num, void *context);
-
-typedef struct
-{
-    uint8 barg;
-} bool_arg_t;
-
-typedef CF_TraverseAllTransactions_fn_t CF_TsnChanAction_fn_t;
-
-typedef struct
-{
-    int   same; /* out param -- indicates at least one action was set to its current value */
-    uint8 action;
-} susp_res_arg_t;
-
-typedef struct
-{
-    const CF_UnionArgsCmd_t *msg;
-    uint8                    barg;
-} bool_msg_arg_t;
-
-/************************************************************************/
-/** \brief Increment the command accepted counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
-static inline void CF_CmdAcc(void)
-{
-    ++CF_AppData.hk.counters.cmd;
-}
-
-/************************************************************************/
-/** \brief Increment the command rejected counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
-static inline void CF_CmdRej(void)
-{
-    ++CF_AppData.hk.counters.err;
-}
-
-/************************************************************************/
-/** \brief Conditionally increment the command accept or reject counters.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
-static inline void CF_CmdCond(int cond)
-{
-    static void (*const fns[])(void) = {CF_CmdAcc, CF_CmdRej};
-    fns[!!cond]();
-}
 
 /************************************************************************/
 /** \brief The no-operation command.
@@ -113,7 +56,7 @@ static inline void CF_CmdCond(int cond)
 **       None
 **
 *************************************************************************/
-static void CF_CmdNoop(CFE_SB_Buffer_t *msg)
+void CF_CmdNoop(CFE_SB_Buffer_t *msg)
 {
     CFE_EVS_SendEvent(CF_EID_INF_CMD_NOOP, CFE_EVS_EventType_INFORMATION, "CF: No-Op received, Version %d.%d.%d",
                       CF_MAJOR_VERSION, CF_MINOR_VERSION, CF_REVISION);
@@ -133,7 +76,7 @@ static void CF_CmdNoop(CFE_SB_Buffer_t *msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdReset(CFE_SB_Buffer_t *msg)
+void CF_CmdReset(CFE_SB_Buffer_t *msg)
 {
     static const int counters_command = 1;
     static const int counters_fault   = 2;
@@ -209,7 +152,7 @@ err_out:;
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
+void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
 {
     CF_TxFileCmd_t *tx = (CF_TxFileCmd_t *)msg;
 
@@ -232,7 +175,7 @@ static void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
+void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
 {
     CF_PlaybackDirCmd_t *tx = (CF_PlaybackDirCmd_t *)msg;
 
@@ -261,7 +204,7 @@ static void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, chan_action_fn_t fn, void *context)
+int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, chan_action_fn_t fn, void *context)
 {
     int ret = 0;
 
@@ -301,7 +244,7 @@ static int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, chan_acti
 **  \endreturns
 **
 *************************************************************************/
-static int CF_DoFreezeThaw(uint8 chan_num, const bool_arg_t *context)
+int CF_DoFreezeThaw(uint8 chan_num, const bool_arg_t *context)
 {
     /* no need to bounds check chan_num, done in caller */
     CF_AppData.hk.channel_hk[chan_num].frozen = context->barg;
@@ -315,7 +258,7 @@ static int CF_DoFreezeThaw(uint8 chan_num, const bool_arg_t *context)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdFreeze(CFE_SB_Buffer_t *msg)
+void CF_CmdFreeze(CFE_SB_Buffer_t *msg)
 {
     bool_arg_t barg = {1}; /* param is frozen, so 1 means freeze */
     CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "freeze", (chan_action_fn_t)CF_DoFreezeThaw, &barg));
@@ -328,7 +271,7 @@ static void CF_CmdFreeze(CFE_SB_Buffer_t *msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdThaw(CFE_SB_Buffer_t *msg)
+void CF_CmdThaw(CFE_SB_Buffer_t *msg)
 {
     bool_arg_t barg = {0}; /* param is frozen, so 0 means thawed */
     CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "thaw", (chan_action_fn_t)CF_DoFreezeThaw, &barg));
@@ -345,7 +288,7 @@ static void CF_CmdThaw(CFE_SB_Buffer_t *msg)
 **  \endreturns
 **
 *************************************************************************/
-static CF_Transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(CF_TransactionSeq_t ts, CF_EntityId_t eid)
+CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSeq_t ts, CF_EntityId_t eid)
 {
     int               i;
     CF_Transaction_t *ret = NULL;
@@ -357,7 +300,7 @@ static CF_Transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(CF_T
      * to suspend, we need to search across all channels for it. */
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
-        ret = CF_CFDP_FindTransactionBySequenceNumber(CF_AppData.engine.channels + i, ts, eid);
+        ret = CF_FindTransactionBySequenceNumber(CF_AppData.engine.channels + i, ts, eid);
         if (ret)
         {
             break;
@@ -385,7 +328,7 @@ static CF_Transaction_t *CF_CFDP_FindTransactionBySequenceNumberAllChannels(CF_T
 **  \endreturns
 **
 *************************************************************************/
-static int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
+int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
 {
     int ret = -1;
 
@@ -393,7 +336,7 @@ static int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_Tsn
     {
         /* special value 254 means to use the compound key (cmd->eid, cmd->ts) to find the transaction
          * to act upon */
-        CF_Transaction_t *t = CF_CFDP_FindTransactionBySequenceNumberAllChannels(cmd->ts, cmd->eid);
+        CF_Transaction_t *t = CF_FindTransactionBySequenceNumberAllChannels(cmd->ts, cmd->eid);
         if (t)
         {
             fn(t, context);
@@ -431,7 +374,7 @@ static int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_Tsn
 **       t must not be NULL. context must not be NULL.
 **
 *************************************************************************/
-static void CF_DoSuspRes_(CF_Transaction_t *t, susp_res_arg_t *context)
+void CF_DoSuspRes_(CF_Transaction_t *t, susp_res_arg_t *context)
 {
     CF_Assert(t);
     if (t->flags.com.suspended == context->action)
@@ -455,7 +398,7 @@ static void CF_DoSuspRes_(CF_Transaction_t *t, susp_res_arg_t *context)
 **       cmd must not be NULL.
 **
 *************************************************************************/
-static void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
+void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
 {
     /* ok to not bounds check action, because the caller is using it in two places with constant values 0 or 1 */
     static const char *msgstr[] = {"resume", "suspend"};
@@ -487,7 +430,7 @@ static void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdSuspend(CFE_SB_Buffer_t *msg)
+void CF_CmdSuspend(CFE_SB_Buffer_t *msg)
 {
     CF_DoSuspRes((CF_TransactionCmd_t *)msg, 1);
 }
@@ -499,7 +442,7 @@ static void CF_CmdSuspend(CFE_SB_Buffer_t *msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdResume(CFE_SB_Buffer_t *msg)
+void CF_CmdResume(CFE_SB_Buffer_t *msg)
 {
     CF_DoSuspRes((CF_TransactionCmd_t *)msg, 0);
 }
@@ -511,7 +454,7 @@ static void CF_CmdResume(CFE_SB_Buffer_t *msg)
 **       t must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdCancel_(CF_Transaction_t *t, void *ignored)
+void CF_CmdCancel_(CF_Transaction_t *t, void *ignored)
 {
     CF_CFDP_CancelTransaction(t);
 }
@@ -523,7 +466,7 @@ static void CF_CmdCancel_(CF_Transaction_t *t, void *ignored)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdCancel(CFE_SB_Buffer_t *msg)
+void CF_CmdCancel(CFE_SB_Buffer_t *msg)
 {
     CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "cancel", CF_CmdCancel_, NULL));
 }
@@ -535,7 +478,7 @@ static void CF_CmdCancel(CFE_SB_Buffer_t *msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdAbandon_(CF_Transaction_t *t, void *ignored)
+void CF_CmdAbandon_(CF_Transaction_t *t, void *ignored)
 {
     CF_CFDP_ResetTransaction(t, 0);
 }
@@ -547,7 +490,7 @@ static void CF_CmdAbandon_(CF_Transaction_t *t, void *ignored)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
+void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
 {
     CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "abandon", CF_CmdAbandon_, NULL));
 }
@@ -563,7 +506,7 @@ static void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_DoEnableDisableDequeue(uint8 chan_num, const bool_arg_t *context)
+int CF_DoEnableDisableDequeue(uint8 chan_num, const bool_arg_t *context)
 {
     /* no need to bounds check chan_num, done in caller */
     CF_AppData.config_table->chan[chan_num].dequeue_enabled = context->barg;
@@ -577,7 +520,7 @@ static int CF_DoEnableDisableDequeue(uint8 chan_num, const bool_arg_t *context)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
+void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
 {
     bool_arg_t barg = {1};
     CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "enable_dequeue", (chan_action_fn_t)CF_DoEnableDisableDequeue,
@@ -591,7 +534,7 @@ static void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg)
+void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg)
 {
     bool_arg_t barg = {0};
     CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "disable_dequeue", (chan_action_fn_t)CF_DoEnableDisableDequeue,
@@ -605,7 +548,7 @@ static void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg)
 **       context must not be NULL.
 **
 *************************************************************************/
-static int CF_DoEnableDisablePolldir(uint8 chan_num, const bool_msg_arg_t *context)
+int CF_DoEnableDisablePolldir(uint8 chan_num, const bool_msg_arg_t *context)
 {
     int ret = 0;
     /* no need to bounds check chan_num, done in caller */
@@ -638,7 +581,7 @@ static int CF_DoEnableDisablePolldir(uint8 chan_num, const bool_msg_arg_t *conte
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
+void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
 {
     bool_msg_arg_t barg = {(CF_UnionArgsCmd_t *)msg, 1};
     CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "enable_polldir", (chan_action_fn_t)CF_DoEnableDisablePolldir,
@@ -652,7 +595,7 @@ static void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
+void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
 {
     bool_msg_arg_t barg = {(CF_UnionArgsCmd_t *)msg, 0};
     CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "disable_polldir", (chan_action_fn_t)CF_DoEnableDisablePolldir,
@@ -666,10 +609,10 @@ static void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
 **       n must not be NULL. c must not be NULL.
 **
 *************************************************************************/
-static int CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c)
+int CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c)
 {
     CF_History_t *h = container_of(n, CF_History_t, cl_node);
-    CF_CFDP_ResetHistory(c, h); /* ok to reset transaction since it's in PEND it hasn't started yet */
+    CF_ResetHistory(c, h); /* ok to reset transaction since it's in PEND it hasn't started yet */
     return CF_CLIST_CONT;
 }
 
@@ -680,7 +623,7 @@ static int CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c)
 **       n must not be NULL.
 **
 *************************************************************************/
-static int CF_PurgeTransaction(CF_CListNode_t *n, void *ignored)
+int CF_PurgeTransaction(CF_CListNode_t *n, void *ignored)
 {
     CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
     CF_CFDP_ResetTransaction(t, 0);
@@ -702,7 +645,7 @@ static int CF_PurgeTransaction(CF_CListNode_t *n, void *ignored)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
+int CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
 {
     int ret = 0;
     /* no need to bounds check chan_num, done in caller */
@@ -753,7 +696,7 @@ static int CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
+void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
 {
     CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "purge_queue", (chan_action_fn_t)CF_DoPurgeQueue, msg));
 }
@@ -765,7 +708,7 @@ static void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
+void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
 {
     /* a type value of 0 means to process both type_up and type_down */
     static const int    type_up   = 1;
@@ -893,7 +836,7 @@ bail:
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdSendCfgParams(CFE_SB_Buffer_t *msg)
+void CF_CmdSendCfgParams(CFE_SB_Buffer_t *msg)
 {
     CF_AppData.cfg.ticks_per_second             = CF_AppData.config_table->ticks_per_second;
     CF_AppData.cfg.rx_crc_calc_bytes_per_wakeup = CF_AppData.config_table->rx_crc_calc_bytes_per_wakeup;
@@ -922,7 +865,7 @@ static void CF_CmdSendCfgParams(CFE_SB_Buffer_t *msg)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CmdValidateChunkSize(uint32 val, uint8 chan_num /* ignored */)
+int CF_CmdValidateChunkSize(uint32 val, uint8 chan_num /* ignored */)
 {
     int ret = 0;
     if (val > sizeof(CF_CFDP_PduFileDataContent_t))
@@ -943,7 +886,7 @@ static int CF_CmdValidateChunkSize(uint32 val, uint8 chan_num /* ignored */)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
+int CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
 {
     int ret = 0;
 
@@ -968,7 +911,7 @@ static int CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
 *************************************************************************/
 /* combine getset into a single function with a branch to avoid wasted memory footprint with duplicate
  * logic for finding the parameter */
-static void CF_CmdGetSetParam(uint8 is_set, uint8 param_id, uint32 value, uint8 chan_num)
+void CF_CmdGetSetParam(uint8 is_set, uint8 param_id, uint32 value, uint8 chan_num)
 {
     /* These macros define entries into the paramater array. The mapping of the array is
      * ground parameter to configuration parameter. This logic allows a simple access
@@ -1074,7 +1017,7 @@ err_out:
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdSetParam(CFE_SB_Buffer_t *msg)
+void CF_CmdSetParam(CFE_SB_Buffer_t *msg)
 {
     CF_SetParamCmd_t *cmd = (CF_SetParamCmd_t *)msg;
     CF_CmdGetSetParam(1, cmd->key, cmd->value, cmd->chan_num);
@@ -1087,7 +1030,7 @@ static void CF_CmdSetParam(CFE_SB_Buffer_t *msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdGetParam(CFE_SB_Buffer_t *msg)
+void CF_CmdGetParam(CFE_SB_Buffer_t *msg)
 {
     CF_GetParamCmd_t *cmd = (CF_GetParamCmd_t *)msg;
     CF_CmdGetSetParam(0, cmd->key, 0, cmd->chan_num);
@@ -1100,7 +1043,7 @@ static void CF_CmdGetParam(CFE_SB_Buffer_t *msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdEnableEngine(CFE_SB_Buffer_t *msg)
+void CF_CmdEnableEngine(CFE_SB_Buffer_t *msg)
 {
     if (!CF_AppData.engine.enabled)
     {
@@ -1130,7 +1073,7 @@ static void CF_CmdEnableEngine(CFE_SB_Buffer_t *msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-static void CF_CmdDisableEngine(CFE_SB_Buffer_t *msg)
+void CF_CmdDisableEngine(CFE_SB_Buffer_t *msg)
 {
     if (CF_AppData.engine.enabled)
     {

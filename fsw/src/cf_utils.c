@@ -35,27 +35,163 @@
 
 #include "cf_assert.h"
 
-typedef struct
-{
-    osal_id_t fd;
-    int32     result;
-    int32     counter;
-} trav_arg_t;
-
-typedef struct priority_arg_t
-{
-    CF_Transaction_t *t;        /* OUT: holds value of transaction with which to call CF_CList_InsertAfter on */
-    uint8             priority; /* seeking this priority */
-} priority_arg_t;
-
-typedef struct
-{
-    CF_TraverseAllTransactions_fn_t fn;
-    void                           *context;
-    int                             counter;
-} traverse_all_args_t;
-
 #define LINEBUF_LEN ((CF_FILENAME_MAX_LEN * 2) + 128)
+
+/************************************************************************/
+/** \brief Find an unused transaction on a channel.
+**
+**  \par Assumptions, External Events, and Notes:
+**       c must not be NULL.
+**
+**  \returns
+**  \retstmt Returns a free transaction, or NULL if none are available. \endcode
+**  \endreturns
+**
+*************************************************************************/
+/* finds an unused transaction and returns with it on no Q */
+CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c)
+{
+    CF_Assert(c);
+
+    if (c->qs[CF_QueueIdx_FREE])
+    {
+        int       q_index; /* initialized below in if */
+        const int chan_index = (c - CF_AppData.engine.channels);
+
+        CF_CListNode_t   *n = c->qs[CF_QueueIdx_FREE];
+        CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
+
+        CF_CList_Remove_Ex(c, CF_QueueIdx_FREE, &t->cl_node);
+
+        /* now that a transaction is acquired, must also acquire a history slot to go along with it */
+        if (c->qs[CF_QueueIdx_HIST_FREE])
+        {
+            CF_Assert(CF_AppData.hk.channel_hk[chan_index].q_size[CF_QueueIdx_HIST] <
+                      CF_NUM_HISTORIES_PER_CHANNEL); /* sanity check */
+            q_index = CF_QueueIdx_HIST_FREE;
+        }
+        else
+        {
+            /* no free history, so take the oldest one from the channel's history queue */
+            CF_Assert(c->qs[CF_QueueIdx_HIST]);
+            q_index = CF_QueueIdx_HIST;
+        }
+
+        t->history      = container_of(c->qs[q_index], CF_History_t, cl_node);
+        t->history->dir = CF_Direction_NUM; /* start with no direction */
+
+        CF_CList_Remove_Ex(c, q_index, &t->history->cl_node);
+
+        return t;
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+/************************************************************************/
+/** \brief Returns a history structure back to its unused state.
+**
+**  \par Description
+**       There's nothing to do currently other than remove the history
+**       from its current queue and put it back on CF_QueueIdx_HIST_FREE.
+**
+**  \par Assumptions, External Events, and Notes:
+**       c must not be NULL. h must not be NULL.
+**
+*************************************************************************/
+void CF_ResetHistory(CF_Channel_t *c, CF_History_t *h)
+{
+    CF_CList_Remove_Ex(c, CF_QueueIdx_HIST, &h->cl_node);
+    CF_CList_InsertBack_Ex(c, CF_QueueIdx_HIST_FREE, &h->cl_node);
+}
+
+/************************************************************************/
+/** \brief Frees and resets a transaction and returns it for later use.
+**
+**  \par Assumptions, External Events, and Notes:
+**       t must not be NULL.
+**
+*************************************************************************/
+void CF_FreeTransaction(CF_Transaction_t *t)
+{
+    uint8 c = t->chan_num;
+    memset(t, 0, sizeof(*t));
+    t->flags.com.q_index = CF_QueueIdx_FREE;
+    t->fd                = OS_OBJECT_ID_UNDEFINED;
+    t->chan_num          = c;
+    t->state             = CF_TxnState_IDLE; /* NOTE: this is redundant as long as CF_TxnState_IDLE == 0 */
+    CF_CList_InitNode(&t->cl_node);
+    CF_CList_InsertBack_Ex(&CF_AppData.engine.channels[c], CF_QueueIdx_FREE, &t->cl_node);
+}
+
+/************************************************************************/
+/** \brief List traversal function to check if the desired sequence number matches.
+**
+**  \par Assumptions, External Events, and Notes:
+**       context must not be NULL. n must not be NULL.
+**
+**  \returns
+**  \retcode 1 when it's found, which terminates list traversal \endcode
+**  \retcode 0 when it isn't found, which causes list traversal to continue \endcode
+**  \endreturns
+**
+*************************************************************************/
+int CF_FindTransactionBySequenceNumber_(CF_CListNode_t *n, trans_seq_arg_t *context)
+{
+    CF_Transaction_t *t   = container_of(n, CF_Transaction_t, cl_node);
+    int               ret = 0;
+
+    if ((t->history->src_eid == context->src_eid) && (t->history->seq_num == context->transaction_sequence_number))
+    {
+        context->t = t;
+        ret        = 1; /* exit early */
+    }
+
+    return ret;
+}
+
+/************************************************************************/
+/** \brief Finds an active transaction by sequence number.
+**
+**  \par Description
+**       This function traverses the active rx, pending, txa, and txw
+**       transaction and looks for the requested transaction.
+**
+**  \par Assumptions, External Events, and Notes:
+**       c must not be NULL.
+**
+**  \returns
+**  \retstmt The given transaction is returned if found, otherwise NULL. \endcode
+**  \endreturns
+**
+*************************************************************************/
+CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_TransactionSeq_t transaction_sequence_number,
+                                                     CF_EntityId_t src_eid)
+{
+    /* need to find transaction by sequence number. It will either be the active transaction (front of Q_PEND),
+     * or on Q_TX or Q_RX. Once a transaction moves to history, then it's done.
+     *
+     * Let's put CF_QueueIdx_RX up front, because most RX packets will be file data PDUs */
+    trans_seq_arg_t   ctx    = {transaction_sequence_number, src_eid, NULL};
+    CF_CListNode_t   *ptrs[] = {c->qs[CF_QueueIdx_RX], c->qs[CF_QueueIdx_PEND], c->qs[CF_QueueIdx_TXA],
+                              c->qs[CF_QueueIdx_TXW]};
+    int               i;
+    CF_Transaction_t *ret = NULL;
+
+    for (i = 0; i < (sizeof(ptrs) / sizeof(ptrs[0])); ++i)
+    {
+        CF_CList_Traverse(ptrs[i], (CF_CListFn_t)CF_FindTransactionBySequenceNumber_, &ctx);
+        if (ctx.t)
+        {
+            ret = ctx.t;
+            break;
+        }
+    }
+
+    return ret;
+}
 
 /************************************************************************/
 /** \brief Walks through a history queue and builds a human readable representation of it.
@@ -73,7 +209,7 @@ typedef struct
 **  \endreturns
 **
 *************************************************************************/
-static int CF_TraverseHistory(CF_CListNode_t *n, trav_arg_t *context)
+int CF_TraverseHistory(CF_CListNode_t *n, trav_arg_t *context)
 {
     static const char *dstr[] = {"RX", "TX"};
     int                i;
@@ -115,7 +251,7 @@ static int CF_TraverseHistory(CF_CListNode_t *n, trav_arg_t *context)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_TraverseTransactions(CF_CListNode_t *n, trav_arg_t *context)
+int CF_TraverseTransactions(CF_CListNode_t *n, trav_arg_t *context)
 {
     CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
 
@@ -184,7 +320,7 @@ int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t d
 **  \endreturns
 **
 *************************************************************************/
-static int CF_PrioSearch(CF_CListNode_t *node, void *context)
+int CF_PrioSearch(CF_CListNode_t *node, void *context)
 {
     CF_Transaction_t *t = container_of(node, CF_Transaction_t, cl_node);
     priority_arg_t   *p = (priority_arg_t *)context;
@@ -266,7 +402,7 @@ void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_TraverseAllTransactions_(CF_CListNode_t *n, traverse_all_args_t *args)
+int CF_TraverseAllTransactions_(CF_CListNode_t *n, traverse_all_args_t *args)
 {
     CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
     args->fn(t, args->context);
