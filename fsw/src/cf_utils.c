@@ -55,8 +55,7 @@ CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c)
 
     if (c->qs[CF_QueueIdx_FREE])
     {
-        int       q_index; /* initialized below in if */
-        const int chan_index = (c - CF_AppData.engine.channels);
+        int q_index; /* initialized below in if */
 
         CF_CListNode_t   *n = c->qs[CF_QueueIdx_FREE];
         CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
@@ -66,8 +65,6 @@ CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c)
         /* now that a transaction is acquired, must also acquire a history slot to go along with it */
         if (c->qs[CF_QueueIdx_HIST_FREE])
         {
-            CF_Assert(CF_AppData.hk.channel_hk[chan_index].q_size[CF_QueueIdx_HIST] <
-                      CF_NUM_HISTORIES_PER_CHANNEL); /* sanity check */
             q_index = CF_QueueIdx_HIST_FREE;
         }
         else
