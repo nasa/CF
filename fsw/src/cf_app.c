@@ -342,12 +342,14 @@ int32 CF_Init(void)
         {CF_EID_ERR_CMD_WHIST_WRITE, 0x0000},
     };
 
-    int32 status = CFE_SUCCESS;
+    int32                            status       = CFE_SUCCESS;
+    static const CFE_SB_MsgId_Atom_t MID_VALUES[] = {CF_CMD_MID, CF_SEND_HK_MID, CF_WAKE_UP_MID};
+    uint32                           i;
 
     CF_AppData.run_status = CFE_ES_RunStatus_APP_RUN;
 
-    CFE_MSG_Init(&CF_AppData.hk.tlm_header.Msg, CF_HK_TLM_MID, sizeof(CF_AppData.hk));
-    CFE_MSG_Init(&CF_AppData.cfg.tlm_header.Msg, CF_CONFIG_TLM_MID, sizeof(CF_AppData.cfg));
+    CFE_MSG_Init(&CF_AppData.hk.tlm_header.Msg, CFE_SB_ValueToMsgId(CF_HK_TLM_MID), sizeof(CF_AppData.hk));
+    CFE_MSG_Init(&CF_AppData.cfg.tlm_header.Msg, CFE_SB_ValueToMsgId(CF_CONFIG_TLM_MID), sizeof(CF_AppData.cfg));
 
     if ((status = CFE_EVS_Register(cf_event_filters, sizeof(cf_event_filters) / sizeof(*cf_event_filters),
                                    CFE_EVS_EventFilter_BINARY)) != CFE_SUCCESS)
@@ -362,17 +364,13 @@ int32 CF_Init(void)
         goto err_out;
     }
 
+    for (i = 0; i < (sizeof(MID_VALUES) / sizeof(MID_VALUES[0])); ++i)
     {
-        const CFE_SB_MsgId_t mids[] = {CF_CMD_MID, CF_SEND_HK_MID, CF_WAKE_UP_MID};
-        int                  i;
-
-        for (i = 0; i < (sizeof(mids) / sizeof(*mids)); ++i)
+        if ((status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(MID_VALUES[i]), CF_AppData.cmd_pipe)) != CFE_SUCCESS)
         {
-            if ((status = CFE_SB_Subscribe(mids[i], CF_AppData.cmd_pipe)) != CFE_SUCCESS)
-            {
-                CFE_ES_WriteToSysLog("CF app: failed to subscribe to MID 0x%04x, returned 0x%08x", mids[i], status);
-                goto err_out;
-            }
+            CFE_ES_WriteToSysLog("CF app: failed to subscribe to MID 0x%04lx, returned 0x%08lx",
+                                 (unsigned long)MID_VALUES[i], (unsigned long)status);
+            goto err_out;
         }
     }
 
@@ -435,7 +433,7 @@ void CF_ProcessMsg(CFE_SB_Buffer_t *msg)
 
     CFE_MSG_GetMsgId(&msg->Msg, &msg_id);
 
-    switch (msg_id)
+    switch (CFE_SB_MsgIdToValue(msg_id))
     {
         case CF_CMD_MID:
             CF_ProcessGroundCommand(msg);
@@ -453,7 +451,7 @@ void CF_ProcessMsg(CFE_SB_Buffer_t *msg)
         default:
             ++CF_AppData.hk.counters.err;
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_CMD_LENGTH, CFE_EVS_EventType_ERROR,
-                              "CF: invalid command packet id=0x%02x", msg_id);
+                              "CF: invalid command packet id=0x%lx", (unsigned long)CFE_SB_MsgIdToValue(msg_id));
             break;
     }
 }
