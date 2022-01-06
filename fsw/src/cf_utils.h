@@ -162,6 +162,8 @@ void CF_FreeTransaction(CF_Transaction_t *t);
 CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_TransactionSeq_t transaction_sequence_number,
                                                      CF_EntityId_t src_eid);
 
+int CF_FindTransactionBySequenceNumber_(CF_CListNode_t *n, trans_seq_arg_t *context);
+
 int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q);
 int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t dir);
 

@@ -1,6 +1,6 @@
 /* cf testing includes */
 #include "cf_test_utils.h"
-#include "cf_timer.c"
+#include "cf_timer.h"
 
 /*******************************************************************************
 **
@@ -32,6 +32,7 @@ void Test_CF_Timer_Sec2Ticks_ReturnExpectedValue(void)
     CF_Timer_Seconds_t arg_sec                = Any_uint32();
     uint32             dummy_ticks_per_second = Any_uint32();
     CF_ConfigTable_t   dummy_config_table;
+    int32              result;
 
     CF_AppData.config_table                   = &dummy_config_table;
     CF_AppData.config_table->ticks_per_second = dummy_ticks_per_second;

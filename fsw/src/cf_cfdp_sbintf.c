@@ -255,7 +255,9 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
                             CF_EID_ERR_CFDP_RX_DROPPED, CFE_EVS_EventType_ERROR,
                             "CF: dropping packet from %lu transaction number 0x%08lx due max RX transactions reached",
                             (unsigned long)ph->pdu_header.source_eid, (unsigned long)ph->pdu_header.sequence_num);
-                        ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.dropped;
+
+                        /* NOTE: as there is no transaction (t) associated with this, there is no known channel,
+                            and therefore no known counter to account it to (because dropped is per-chan) */
                     }
                     else
                     {

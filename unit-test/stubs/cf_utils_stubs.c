@@ -1,371 +1,258 @@
 /************************************************************************
-** File: cf_utils_stubs.c
+** File: cf_utils.h
 **
-** %LICENSE_START
-** %LICENSE_STOP
+** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
+** Application version 3.0.0”
+** Copyright © 2019 United States Government as represented by the
+** Administrator of the National Aeronautics and Space Administration.
+** All Rights Reserved.
+** Licensed under the Apache License, Version 2.0 (the "License"); you may
+** not use this file except in compliance with the License. You may obtain
+** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+**
+** Unless required by applicable law or agreed to in writing, software
+** distributed under the License is distributed on an "AS IS" BASIS,
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+** See the License for the specific language governing permissions and
+** limitations under the License.
+**
 **
 ** Purpose:
-**  The CF Application general utility functions stubs file
+**  The CF Application utils header file
 **
-**  Various odds and ends are put here.
 **
-** Revision 1.0 2020/05/01 sseeger
-**  Initial revision
+**
 *************************************************************************/
 
-#include "cf_app.h"
-#include "cf_verify.h"
-#include "cf_cfdp.h"
+/**
+ * @file
+ *
+ * Auto-Generated stub implementations for functions defined in cf_utils header
+ */
+
 #include "cf_utils.h"
-#include "cf_events.h"
-#include "cf_perfids.h"
-
-#include "cf_assert.h"
-
-/* UT includes */
-#include "uttest.h"
-#include "utstubs.h"
 #include "utgenstub.h"
 
-#include "cf_test_utils.h"
+extern void UT_DefaultHandler_CF_FindTransactionBySequenceNumber(void *, UT_EntryKey_t, const UT_StubContext_t *);
+extern void UT_DefaultHandler_CF_FindUnusedTransaction(void *, UT_EntryKey_t, const UT_StubContext_t *);
+extern void UT_DefaultHandler_CF_ResetHistory(void *, UT_EntryKey_t, const UT_StubContext_t *);
+extern void UT_DefaultHandler_CF_TraverseAllTransactions(void *, UT_EntryKey_t, const UT_StubContext_t *);
+extern void UT_DefaultHandler_CF_TraverseAllTransactions_All_Channels(void *, UT_EntryKey_t, const UT_StubContext_t *);
+extern void UT_DefaultHandler_CF_WrappedOpenCreate(void *, UT_EntryKey_t, const UT_StubContext_t *);
+extern void UT_DefaultHandler_CF_WriteHistoryQueueDataToFile(void *, UT_EntryKey_t, const UT_StubContext_t *);
+extern void UT_DefaultHandler_CF_WriteQueueDataToFile(void *, UT_EntryKey_t, const UT_StubContext_t *);
 
-typedef struct
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_FindTransactionBySequenceNumber()
+ * ----------------------------------------------------
+ */
+CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_TransactionSeq_t transaction_sequence_number,
+                                                     CF_EntityId_t src_eid)
 {
-    int32 fd;
-    int32 result;
-    int32 counter;
-} trav_arg_t;
+    UT_GenStub_SetupReturnBuffer(CF_FindTransactionBySequenceNumber, CF_Transaction_t *);
 
-typedef struct priority_arg_t
-{
-    CF_Transaction_t *t;        /* OUT: holds value of transaction with which to call CF_CList_InsertAfter on */
-    uint8             priority; /* seeking this priority */
-} priority_arg_t;
+    UT_GenStub_AddParam(CF_FindTransactionBySequenceNumber, CF_Channel_t *, c);
+    UT_GenStub_AddParam(CF_FindTransactionBySequenceNumber, CF_TransactionSeq_t, transaction_sequence_number);
+    UT_GenStub_AddParam(CF_FindTransactionBySequenceNumber, CF_EntityId_t, src_eid);
 
-typedef struct
-{
-    CF_TraverseAllTransactions_fn_t fn;
-    void                           *context;
-    int                             counter;
-} traverse_all_args_t;
+    UT_GenStub_Execute(CF_FindTransactionBySequenceNumber, Basic, UT_DefaultHandler_CF_FindTransactionBySequenceNumber);
 
-#define LINEBUF_LEN ((CF_FILENAME_MAX_LEN * 2) + 128)
-
-/************************************************************************/
-/** \brief Walks through a history queue and builds a human readable representation of it.
-**
-**  \par Description
-**       This function is used as both a list traversal function and a direct
-**       function call.
-**
-**  \par Assumptions, External Events, and Notes:
-**       n must not be NULL. context must not be NULL.
-**
-**  \returns
-**  \retcode 1 when it's found, which terminates list traversal \endcode
-**  \retcode 0 when it isn't found, which causes list traversal to continue \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static int CF_TraverseHistory(CF_CListNode_t * n, trav_arg_t *context)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Walk over all transactions and print information from their history.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-**  \returns
-**  \retcode 1 when it's found, which terminates list traversal \endcode
-**  \retcode 0 when it isn't found, which causes list traversal to continue \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static int CF_TraverseTransactions(CF_CListNode_t * n, trav_arg_t *context)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Write a transaction-based queue's transaction history to a file.
-**
-**  \par Assumptions, External Events, and Notes:
-**       c must not be NULL.
-**
-**  \returns
-**  \retstmt 0 on success; 1 on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
-int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q)
-{
-    UT_Stub_CopyFromLocal(UT_KEY(CF_WriteQueueDataToFile), &fd, sizeof(fd));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_WriteQueueDataToFile), &c, sizeof(c));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_WriteQueueDataToFile), &q, sizeof(q));
-
-    return UT_DEFAULT_IMPL(CF_WriteQueueDataToFile);
+    return UT_GenStub_GetReturnValue(CF_FindTransactionBySequenceNumber, CF_Transaction_t *);
 }
 
-/************************************************************************/
-/** \brief Write a history-based queue's transaction history to a file.
-**
-**  \par Assumptions, External Events, and Notes:
-**       c must not be NULL.
-**
-**  \returns
-**  \retstmt 0 on success; 1 on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
-int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t dir)
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_FindTransactionBySequenceNumber_()
+ * ----------------------------------------------------
+ */
+int CF_FindTransactionBySequenceNumber_(CF_CListNode_t *n, trans_seq_arg_t *context)
 {
-    UT_Stub_CopyFromLocal(UT_KEY(CF_WriteHistoryQueueDataToFile), &fd, sizeof(fd));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_WriteHistoryQueueDataToFile), &c, sizeof(c));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_WriteHistoryQueueDataToFile), &dir, sizeof(dir));
+    UT_GenStub_SetupReturnBuffer(CF_FindTransactionBySequenceNumber_, int);
 
-    return UT_DEFAULT_IMPL(CF_WriteHistoryQueueDataToFile);
+    UT_GenStub_AddParam(CF_FindTransactionBySequenceNumber_, CF_CListNode_t *, n);
+    UT_GenStub_AddParam(CF_FindTransactionBySequenceNumber_, trans_seq_arg_t *, context);
+
+    UT_GenStub_Execute(CF_FindTransactionBySequenceNumber_, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_FindTransactionBySequenceNumber_, int);
 }
 
-/************************************************************************/
-/** \brief Searches for the first transaction with a lower priority than given.
-**
-**  \par Description
-**        that the config table being loaded has correct data.
-**
-**  \par Assumptions, External Events, and Notes:
-**       node must not be NULL. context must not be NULL.
-**
-**  \returns
-**  \retcode 1 when it's found, which terminates list traversal \endcode
-**  \retcode 0 when it isn't found, which causes list traversal to continue \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static int CF_PrioSearch(CF_CListNode_t * node, void *context)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_FindUnusedTransaction()
+ * ----------------------------------------------------
+ */
+CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c)
+{
+    UT_GenStub_SetupReturnBuffer(CF_FindUnusedTransaction, CF_Transaction_t *);
 
-/************************************************************************/
-/** \brief Insert a transaction into a priority sorted transaction queue.
-**
-**  \par Description
-**       This function works by walking the queue in reverse to find a
-**       transaction with a higher priority than the given transaction.
-**       The given transaction is then inserted after that one, since it
-**       would be the next lower priority.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+    UT_GenStub_AddParam(CF_FindUnusedTransaction, CF_Channel_t *, c);
+
+    UT_GenStub_Execute(CF_FindUnusedTransaction, Basic, UT_DefaultHandler_CF_FindUnusedTransaction);
+
+    return UT_GenStub_GetReturnValue(CF_FindUnusedTransaction, CF_Transaction_t *);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_FreeTransaction()
+ * ----------------------------------------------------
+ */
+void CF_FreeTransaction(CF_Transaction_t *t)
+{
+    UT_GenStub_AddParam(CF_FreeTransaction, CF_Transaction_t *, t);
+
+    UT_GenStub_Execute(CF_FreeTransaction, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_InsertSortPrio()
+ * ----------------------------------------------------
+ */
 void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q)
 {
-    UT_Stub_CopyFromLocal(UT_KEY(CF_InsertSortPrio), &t, sizeof(t));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_InsertSortPrio), &q, sizeof(q));
+    UT_GenStub_AddParam(CF_InsertSortPrio, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_InsertSortPrio, CF_QueueIdx_t, q);
 
-    UT_DEFAULT_IMPL(CF_InsertSortPrio);
+    UT_GenStub_Execute(CF_InsertSortPrio, Basic, NULL);
 }
 
-/************************************************************************/
-/** \brief List traversal function performs operation on every active transaction.
-**
-**  \par Description
-**       Called on every transaction via list traversal. Calls another function
-**       on that transaction.
-**
-**  \par Assumptions, External Events, and Notes:
-**       n must not be NULL. args must not be NULL.
-**
-**  \returns
-**  \retstmt Always 0 for do not exit early. \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static int CF_TraverseAllTransactions_(CF_CListNode_t * n, traverse_all_args_t *args)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_PrioSearch()
+ * ----------------------------------------------------
+ */
+int CF_PrioSearch(CF_CListNode_t *node, void *context)
+{
+    UT_GenStub_SetupReturnBuffer(CF_PrioSearch, int);
 
-/************************************************************************/
-/** \brief Traverses all transactions on all active queues and performs an operation on them.
-**
-**  \par Assumptions, External Events, and Notes:
-**       c must not be NULL. fn must be a valid function. context must not be NULL.
-**
-**  \returns
-**  \retcode #CFE_SUCCESS \retdesc \copydoc CFE_SUCCESSS \endcode
-**  \retstmt Returns anything else on error.             \endcode
-**  \endreturns
-**
-*************************************************************************/
+    UT_GenStub_AddParam(CF_PrioSearch, CF_CListNode_t *, node);
+    UT_GenStub_AddParam(CF_PrioSearch, void *, context);
+
+    UT_GenStub_Execute(CF_PrioSearch, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_PrioSearch, int);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_ResetHistory()
+ * ----------------------------------------------------
+ */
+void CF_ResetHistory(CF_Channel_t *c, CF_History_t *h)
+{
+    UT_GenStub_AddParam(CF_ResetHistory, CF_Channel_t *, c);
+    UT_GenStub_AddParam(CF_ResetHistory, CF_History_t *, h);
+
+    UT_GenStub_Execute(CF_ResetHistory, Basic, UT_DefaultHandler_CF_ResetHistory);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_TraverseAllTransactions()
+ * ----------------------------------------------------
+ */
 int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context)
 {
-    int forced_return;
+    UT_GenStub_SetupReturnBuffer(CF_TraverseAllTransactions, int);
 
-    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions), &c, sizeof(c));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions), &fn, sizeof(fn));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions), &context, sizeof(context));
+    UT_GenStub_AddParam(CF_TraverseAllTransactions, CF_Channel_t *, c);
+    UT_GenStub_AddParam(CF_TraverseAllTransactions, CF_TraverseAllTransactions_fn_t, fn);
+    UT_GenStub_AddParam(CF_TraverseAllTransactions, void *, context);
 
-    forced_return = UT_DEFAULT_IMPL(CF_TraverseAllTransactions);
+    UT_GenStub_Execute(CF_TraverseAllTransactions, Basic, UT_DefaultHandler_CF_TraverseAllTransactions);
 
-    return forced_return;
+    return UT_GenStub_GetReturnValue(CF_TraverseAllTransactions, int);
 }
 
-/************************************************************************/
-/** \brief Traverses all transactions on all channels and performs an operation on them.
-**
-**  \par Assumptions, External Events, and Notes:
-**       fn must be a valid function. context must not be NULL.
-**
-**  \returns
-**  \retcode #CFE_SUCCESS \retdesc \copydoc CFE_SUCCESSS \endcode
-**  \retstmt Returns anything else on error.             \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_TraverseAllTransactions_()
+ * ----------------------------------------------------
+ */
+int CF_TraverseAllTransactions_(CF_CListNode_t *n, traverse_all_args_t *args)
+{
+    UT_GenStub_SetupReturnBuffer(CF_TraverseAllTransactions_, int);
+
+    UT_GenStub_AddParam(CF_TraverseAllTransactions_, CF_CListNode_t *, n);
+    UT_GenStub_AddParam(CF_TraverseAllTransactions_, traverse_all_args_t *, args);
+
+    UT_GenStub_Execute(CF_TraverseAllTransactions_, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_TraverseAllTransactions_, int);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_TraverseAllTransactions_All_Channels()
+ * ----------------------------------------------------
+ */
 int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context)
 {
-    int forced_return;
+    UT_GenStub_SetupReturnBuffer(CF_TraverseAllTransactions_All_Channels, int);
 
-    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions_All_Channels), &fn, sizeof(fn));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_TraverseAllTransactions_All_Channels), &context, sizeof(context));
+    UT_GenStub_AddParam(CF_TraverseAllTransactions_All_Channels, CF_TraverseAllTransactions_fn_t, fn);
+    UT_GenStub_AddParam(CF_TraverseAllTransactions_All_Channels, void *, context);
 
-    UT_DEFAULT_IMPL(CF_TraverseAllTransactions_All_Channels);
+    UT_GenStub_Execute(CF_TraverseAllTransactions_All_Channels, Basic,
+                       UT_DefaultHandler_CF_TraverseAllTransactions_All_Channels);
 
-    UT_Stub_CopyToLocal(UT_KEY(CF_TraverseAllTransactions_All_Channels), &forced_return, sizeof(forced_return));
-
-    /* TODO: setting the context here by using a specified force_return value is NOT the way to do things, this MUST be
-     * turned into a hook function */
-    if (forced_return == 0xDCDCDCDC)
-    {
-        forced_return     = -1;
-        *((int *)context) = 1;
-    }
-    if (forced_return == 0xDC0000DC)
-    {
-        forced_return     = -1;
-        *((int *)context) = 0;
-    }
-
-    return forced_return;
+    return UT_GenStub_GetReturnValue(CF_TraverseAllTransactions_All_Channels, int);
 }
 
-/************************************************************************/
-/** \brief Wrap the filesystem open call with a perf counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       fname must not be NULL.
-**
-**  \returns
-**  \retstmt Valid file descriptor, or anything else on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
-int32 CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 access)
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_TraverseHistory()
+ * ----------------------------------------------------
+ */
+int CF_TraverseHistory(CF_CListNode_t *n, trav_arg_t *context)
 {
-    int forced_return;
+    UT_GenStub_SetupReturnBuffer(CF_TraverseHistory, int);
 
-    UT_Stub_CopyFromLocal(UT_KEY(CF_WrappedOpenCreate), &fd, sizeof(fd));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_WrappedOpenCreate), &fname, sizeof(fname));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_WrappedOpenCreate), &flags, sizeof(flags));
-    UT_Stub_CopyFromLocal(UT_KEY(CF_WrappedOpenCreate), &access, sizeof(access));
+    UT_GenStub_AddParam(CF_TraverseHistory, CF_CListNode_t *, n);
+    UT_GenStub_AddParam(CF_TraverseHistory, trav_arg_t *, context);
 
-    UT_DEFAULT_IMPL(CF_WrappedOpenCreate);
+    UT_GenStub_Execute(CF_TraverseHistory, Basic, NULL);
 
-    UT_Stub_CopyToLocal(UT_KEY(CF_WrappedOpenCreate), &forced_return, sizeof(forced_return));
-
-    return forced_return;
+    return UT_GenStub_GetReturnValue(CF_TraverseHistory, int);
 }
 
-/************************************************************************/
-/** \brief Wrap the filesystem close call with a perf counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_TraverseTransactions()
+ * ----------------------------------------------------
+ */
+int CF_TraverseTransactions(CF_CListNode_t *n, trav_arg_t *context)
+{
+    UT_GenStub_SetupReturnBuffer(CF_TraverseTransactions, int);
+
+    UT_GenStub_AddParam(CF_TraverseTransactions, CF_CListNode_t *, n);
+    UT_GenStub_AddParam(CF_TraverseTransactions, trav_arg_t *, context);
+
+    UT_GenStub_Execute(CF_TraverseTransactions, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_TraverseTransactions, int);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_WrappedClose()
+ * ----------------------------------------------------
+ */
 void CF_WrappedClose(osal_id_t fd)
 {
-    UT_Stub_CopyFromLocal(UT_KEY(CF_WrappedClose), &fd, sizeof(fd));
+    UT_GenStub_AddParam(CF_WrappedClose, osal_id_t, fd);
 
-    UT_DEFAULT_IMPL(CF_WrappedClose);
+    UT_GenStub_Execute(CF_WrappedClose, Basic, NULL);
 }
 
-/************************************************************************/
-/** \brief Wrap the filesystem read call with a perf counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       buf must not be NULL.
-**
-**  \returns
-**  \retstmt >=0 number of bytes read on success \endcode
-**  \retstmt <0 on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
-int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size)
-{
-    UT_GenStub_SetupReturnBuffer(CF_WrappedRead, int32);
-
-    UT_GenStub_AddParam(CF_WrappedRead, osal_id_t, fd);
-    UT_GenStub_AddParam(CF_WrappedRead, const char *, buf);
-    UT_GenStub_AddParam(CF_WrappedRead, uint16, read_size);
-
-    UT_GenStub_Execute(CF_WrappedRead, Basic, NULL);
-
-    return UT_GenStub_GetReturnValue(CF_WrappedRead, int32);
-}
-
-/************************************************************************/
-/** \brief Wrap the filesystem write call with a perf counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       buf must not be NULL.
-**
-**  \returns
-**  \retstmt >=0 number of bytes read on success \endcode
-**  \retstmt <0 on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
-int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size)
-{
-    UT_GenStub_SetupReturnBuffer(CF_WrappedWrite, int32);
-
-    UT_GenStub_AddParam(CF_WrappedWrite, osal_id_t, fd);
-    UT_GenStub_AddParam(CF_WrappedWrite, const char *, buf);
-    UT_GenStub_AddParam(CF_WrappedWrite, uint16, write_size);
-
-    UT_GenStub_Execute(CF_WrappedWrite, Basic, NULL);
-
-    return UT_GenStub_GetReturnValue(CF_WrappedWrite, int32);
-}
-
-/************************************************************************/
-/** \brief Wrap the filesystem lseek call with a perf counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       fname must not be NULL.
-**
-**  \returns
-**  \retstmt >=0 the current file position in bytes. \endcode
-**  \retstmt <0 on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
-
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_WrappedLseek()
+ * ----------------------------------------------------
+ */
 int32 CF_WrappedLseek(osal_id_t fd, off_t offset, int mode)
 {
     UT_GenStub_SetupReturnBuffer(CF_WrappedLseek, int32);
@@ -377,4 +264,95 @@ int32 CF_WrappedLseek(osal_id_t fd, off_t offset, int mode)
     UT_GenStub_Execute(CF_WrappedLseek, Basic, NULL);
 
     return UT_GenStub_GetReturnValue(CF_WrappedLseek, int32);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_WrappedOpenCreate()
+ * ----------------------------------------------------
+ */
+int32 CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 access)
+{
+    UT_GenStub_SetupReturnBuffer(CF_WrappedOpenCreate, int32);
+
+    UT_GenStub_AddParam(CF_WrappedOpenCreate, osal_id_t *, fd);
+    UT_GenStub_AddParam(CF_WrappedOpenCreate, const char *, fname);
+    UT_GenStub_AddParam(CF_WrappedOpenCreate, int32, flags);
+    UT_GenStub_AddParam(CF_WrappedOpenCreate, int32, access);
+
+    UT_GenStub_Execute(CF_WrappedOpenCreate, Basic, UT_DefaultHandler_CF_WrappedOpenCreate);
+
+    return UT_GenStub_GetReturnValue(CF_WrappedOpenCreate, int32);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_WrappedRead()
+ * ----------------------------------------------------
+ */
+int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size)
+{
+    UT_GenStub_SetupReturnBuffer(CF_WrappedRead, int32);
+
+    UT_GenStub_AddParam(CF_WrappedRead, osal_id_t, fd);
+    UT_GenStub_AddParam(CF_WrappedRead, void *, buf);
+    UT_GenStub_AddParam(CF_WrappedRead, size_t, read_size);
+
+    UT_GenStub_Execute(CF_WrappedRead, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_WrappedRead, int32);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_WrappedWrite()
+ * ----------------------------------------------------
+ */
+int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size)
+{
+    UT_GenStub_SetupReturnBuffer(CF_WrappedWrite, int32);
+
+    UT_GenStub_AddParam(CF_WrappedWrite, osal_id_t, fd);
+    UT_GenStub_AddParam(CF_WrappedWrite, const void *, buf);
+    UT_GenStub_AddParam(CF_WrappedWrite, size_t, write_size);
+
+    UT_GenStub_Execute(CF_WrappedWrite, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_WrappedWrite, int32);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_WriteHistoryQueueDataToFile()
+ * ----------------------------------------------------
+ */
+int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t dir)
+{
+    UT_GenStub_SetupReturnBuffer(CF_WriteHistoryQueueDataToFile, int32);
+
+    UT_GenStub_AddParam(CF_WriteHistoryQueueDataToFile, int32, fd);
+    UT_GenStub_AddParam(CF_WriteHistoryQueueDataToFile, CF_Channel_t *, c);
+    UT_GenStub_AddParam(CF_WriteHistoryQueueDataToFile, CF_Direction_t, dir);
+
+    UT_GenStub_Execute(CF_WriteHistoryQueueDataToFile, Basic, UT_DefaultHandler_CF_WriteHistoryQueueDataToFile);
+
+    return UT_GenStub_GetReturnValue(CF_WriteHistoryQueueDataToFile, int32);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_WriteQueueDataToFile()
+ * ----------------------------------------------------
+ */
+int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q)
+{
+    UT_GenStub_SetupReturnBuffer(CF_WriteQueueDataToFile, int32);
+
+    UT_GenStub_AddParam(CF_WriteQueueDataToFile, int32, fd);
+    UT_GenStub_AddParam(CF_WriteQueueDataToFile, CF_Channel_t *, c);
+    UT_GenStub_AddParam(CF_WriteQueueDataToFile, CF_QueueIdx_t, q);
+
+    UT_GenStub_Execute(CF_WriteQueueDataToFile, Basic, UT_DefaultHandler_CF_WriteQueueDataToFile);
+
+    return UT_GenStub_GetReturnValue(CF_WriteQueueDataToFile, int32);
 }

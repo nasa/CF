@@ -1,6 +1,7 @@
 /* cf testing includes */
-#include "cf_assert.c"
 #include "cf_test_utils.h"
+#include "cf_events.h"
+#include "cf_app.h"
 
 /*******************************************************************************
 **
@@ -29,12 +30,11 @@ void cf_assert_tests_Teardown(void)
 void Test_CF_HandleAssert_SendEventAndExitWithNegativeOne(void)
 {
     /* Arrange */
-    const char *arg_file         = AnyRandomStringOfLettersOfLength(10);
-    int         arg_line         = Any_int();
-    uint16      expected_EventID = CF_EID_ERR_ASSERT;
+    const char *arg_file = AnyRandomStringOfLettersOfLength(10);
+    int         arg_line = Any_int();
     uint32      context_CFE_ES_ExitApp_ExitStatus;
 
-    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
     UT_SetDataBuffer(UT_KEY(CFE_ES_ExitApp), &context_CFE_ES_ExitApp_ExitStatus,
                      sizeof(context_CFE_ES_ExitApp_ExitStatus), false);
 
@@ -42,8 +42,7 @@ void Test_CF_HandleAssert_SendEventAndExitWithNegativeOne(void)
     CF_HandleAssert(arg_file, arg_line);
 
     /* Assert */
-    UtAssert_True((uint16)EventID == expected_EventID, "CFE_EVS_SendEvent received %u and should have received %u",
-                  (int16)EventID, expected_EventID);
+    UT_CF_AssertEventID(CF_EID_ERR_ASSERT);
     UtAssert_True(context_CFE_ES_ExitApp_ExitStatus == -1, "CFE_ES_ExitApp received %d and should have recieved -1",
                   context_CFE_ES_ExitApp_ExitStatus);
 } /* end Test_CF_HandleAssert_SendEventAndExitWithNegativeOne */

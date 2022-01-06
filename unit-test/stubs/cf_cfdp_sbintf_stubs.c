@@ -1,5 +1,5 @@
 /************************************************************************
-** File: cf_crc.h
+** File: cf_cfdp_sbintf.h
 **
 ** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
 ** Application version 3.0.0”
@@ -17,56 +17,58 @@
 ** limitations under the License.
 **
 **
-** Purpose:
-**  The CF Application CRC calculation header file
-**
-**
 **
 *************************************************************************/
 
 /**
  * @file
  *
- * Auto-Generated stub implementations for functions defined in cf_crc header
+ * Auto-Generated stub implementations for functions defined in cf_cfdp_sbintf header
  */
 
-#include "cf_crc.h"
+#include "cf_cfdp_sbintf.h"
 #include "utgenstub.h"
 
+extern void UT_DefaultHandler_CF_CFDP_MsgOutGet(void *, UT_EntryKey_t, const UT_StubContext_t *);
+
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CRC_Digest()
+ * Generated stub function for CF_CFDP_MsgOutGet()
  * ----------------------------------------------------
  */
-void CF_CRC_Digest(CF_Crc_t *c, const uint8 *data, int len)
+CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent)
 {
-    UT_GenStub_AddParam(CF_CRC_Digest, CF_Crc_t *, c);
-    UT_GenStub_AddParam(CF_CRC_Digest, const uint8 *, data);
-    UT_GenStub_AddParam(CF_CRC_Digest, int, len);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_MsgOutGet, CF_Logical_PduBuffer_t *);
 
-    UT_GenStub_Execute(CF_CRC_Digest, Basic, NULL);
+    UT_GenStub_AddParam(CF_CFDP_MsgOutGet, const CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_MsgOutGet, bool, silent);
+
+    UT_GenStub_Execute(CF_CFDP_MsgOutGet, Basic, UT_DefaultHandler_CF_CFDP_MsgOutGet);
+
+    return UT_GenStub_GetReturnValue(CF_CFDP_MsgOutGet, CF_Logical_PduBuffer_t *);
 }
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CRC_Finalize()
+ * Generated stub function for CF_CFDP_ReceiveMessage()
  * ----------------------------------------------------
  */
-void CF_CRC_Finalize(CF_Crc_t *c)
+void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
 {
-    UT_GenStub_AddParam(CF_CRC_Finalize, CF_Crc_t *, c);
+    UT_GenStub_AddParam(CF_CFDP_ReceiveMessage, CF_Channel_t *, c);
 
-    UT_GenStub_Execute(CF_CRC_Finalize, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_ReceiveMessage, Basic, NULL);
 }
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CRC_Start()
+ * Generated stub function for CF_CFDP_Send()
  * ----------------------------------------------------
  */
-void CF_CRC_Start(CF_Crc_t *c)
+void CF_CFDP_Send(uint8 chan_num, const CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_AddParam(CF_CRC_Start, CF_Crc_t *, c);
+    UT_GenStub_AddParam(CF_CFDP_Send, uint8, chan_num);
+    UT_GenStub_AddParam(CF_CFDP_Send, const CF_Logical_PduBuffer_t *, ph);
 
-    UT_GenStub_Execute(CF_CRC_Start, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_Send, Basic, NULL);
 }

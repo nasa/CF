@@ -1,6 +1,5 @@
 /* cf testing includes */
 #include "cf_test_utils.h"
-#include "cf_crc.c"
 
 /*******************************************************************************
 **

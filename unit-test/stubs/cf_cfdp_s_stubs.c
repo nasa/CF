@@ -1,425 +1,310 @@
 /************************************************************************
-** File: cf_cfdp_s_stubs.c
+** File: cf_cfdp.h
 **
-** %LICENSE_START
-** %LICENSE_STOP
+** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
+** Application version 3.0.0”
+** Copyright © 2019 United States Government as represented by the
+** Administrator of the National Aeronautics and Space Administration.
+** All Rights Reserved.
+** Licensed under the Apache License, Version 2.0 (the "License"); you may
+** not use this file except in compliance with the License. You may obtain
+** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+**
+** Unless required by applicable law or agreed to in writing, software
+** distributed under the License is distributed on an "AS IS" BASIS,
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+** See the License for the specific language governing permissions and
+** limitations under the License.
+**
 **
 ** Purpose:
-**  The CF Application CFDP send logic stubs file
+**  The CF Application cfdp engine and packet parsing header file
 **
-**  Stub file for all CFDP engine functionality specific to TX transactions.
 **
-** Revision 1.0 2020/08/04 asgibso1
-**  Initial revision
+**
 *************************************************************************/
 
-#include "cfe.h"
-#include "cf_verify.h"
-#include "cf_app.h"
-#include "cf_events.h"
-#include "cf_perfids.h"
-#include "cf_cfdp.h"
-#include "cf_utils.h"
-#include "cf_cfdp_helpers.h"
+/**
+ * @file
+ *
+ * Auto-Generated stub implementations for functions defined in cf_cfdp_s header
+ */
 
-#include <stdio.h>
-#include <string.h>
-#include "cf_assert.h"
-
-/* UT includes */
-#include "uttest.h"
-#include "utstubs.h"
-#include "uttools.h"
+#include "cf_cfdp_s.h"
 #include "utgenstub.h"
 
-/************************************************************************/
-/** \brief CFDP S1 transaction reset function.
-**
-**  \par Description
-**       All S transactions use this call to indicate the transaction
-**       state can be returned to the system. While this function currently
-**       only calls CF_CFDP_ResetTransaction(), it is here as a placeholder.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
-// static void CF_CFDP_S_Reset(CF_Transaction_t *t)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Send an eof pdu.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-**  \returns
-**  \retcode CF_SendRet_SUCCESS on success. \endcode
-**  \retcode CF_SendRet_NO_MSG if message buffer cannot be obtained. \endcode
-**  \retcode CF_SendRet_ERROR if an error occurred while building the packet. \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static CF_SendRet_t CF_CFDP_S_SendEof(CF_Transaction_t *t)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Sends an eof for S1.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
-// static void CF_CFDP_S1_SubstateSendEof(CF_Transaction_t *t)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Triggers tick processing to send an EOF and wait for EOF-ACK for S2
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
-// static void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *t)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Helper function to populate the pdu with file data and send it.
-**
-**  \par Description
-**       This function checks the file offset cache and if the desired
-**       location is where the file offset is, it can skip a seek() call.
-**       The file is read into the filedata pdu and then the pdu is sent.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-**  \returns
-**  \retcode #CFE_SUCCESS \retdesc \copydoc CFE_SUCCESSS \endcode
-**  \retstmt Returns anything else on error.             \endcode
-**  \endreturns
-**
-*************************************************************************/
-/* if bytes_to_read is 0, then read max possible */
-// static int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Standard state function to send the next file data PDU for active transaction.
-**
-**  \par Description
-**       During the transfer of active transaction file data pdus, the file
-**       offset is saved. This function sends the next chunk of data. If
-**       the file offset equals the file size, then transition to the EOF
-**       state.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
-/* regular filedata send
- * based on t->foffs for current offset
- * checks for EOF and changes state if necessary */
-// static void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *t)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Respond to a nak by sending filedata pdus as response.
-**
-**  \par Description
-**       Checks to see if a metadata pdu or filedata re-transmits must
-**       occur.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-**  \returns
-**  \retstmt 0 if no NAK processed. 1 if NAK processed. <0 if error. \endcode
-**  \endreturns
-**
-*************************************************************************/
-// static int CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Send filedata handling for S2.
-**
-**  \par Description
-**       S2 will either respond to a NAK by sending retransmits, or in
-**       absence of a NAK, it will send more of the original file data.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
-// static void CF_CFDP_S2_SubstateSendFileData(CF_Transaction_t *t)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Send metadata PDU.
-**
-**  \par Description
-**       Construct and send a metadata PDU. This function determines the
-**       size of the file to put in the metadata PDU.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
-// static void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Send FIN-ACK packet for S2.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
-// static void CF_CFDP_S_SubstateSendFinAck(CF_Transaction_t *t)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief A fin was received before file complete, so abandon the transaction.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. pdu must not be NULL.
-**
-*************************************************************************/
-// static void CF_CFDP_S2_EarlyFin(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief S2 received FIN, so set flag to send FIN-ACK.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. pdu must not be NULL.
-**
-*************************************************************************/
-// static void CF_CFDP_S2_Fin(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief S2 NAK pdu received handling.
-**
-**  \par Description
-**       Stores the segment requests from the NAK packet in the chunks
-**       structure. These can be used to generate re-transmit filedata
-**       PDUs.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. pdu must not be NULL.
-**
-*************************************************************************/
-// static void CF_CFDP_S2_Nak(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief S2 NAK handling but with arming the NAK timer.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. pdu must not be NULL.
-**
-*************************************************************************/
-// static void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief S2 received ack pdu in wait for EOF-ACK state.
-**
-**  \par Description
-**       This function will trigger a state transition to CF_TxSubState_WAIT_FOR_FIN,
-**       which waits for a FIN pdu.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. pdu must not be NULL.
-**
-*************************************************************************/
-// static void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *t, const CF_CFDP_PduHeader_t *pdu)
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief Dispatch function for all received packets.
-**
-**  \par Description
-**       For either S1 or S2 this function handles common logic for
-**       state processing based on current sub-state and the received
-**       pdu type.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. fns must not be NULL.
-**
-*************************************************************************/
-// static void CF_CFDP_S_DispatchRecv(CF_Transaction_t *t, void (*const
-// fns[CF_TxSubState_NUM_STATES][CF_CFDP_FileDirective_INVALID_MAX])(CF_Transaction_t*, const CF_CFDP_PduHeader_t*))
-// {
-//     UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n",
-//       __FILE__, __LINE__);
-//     exit(-86);
-// }
-
-/************************************************************************/
-/** \brief S1 receive pdu processing.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
-void CF_CFDP_S1_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S1_Recv()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_S1_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
-    exit(-86);
+    UT_GenStub_AddParam(CF_CFDP_S1_Recv, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_S1_Recv, CF_Logical_PduBuffer_t *, ph);
+
+    UT_GenStub_Execute(CF_CFDP_S1_Recv, Basic, NULL);
 }
 
-/************************************************************************/
-/** \brief S2 receive pdu processing.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
-void CF_CFDP_S2_Recv(CF_Transaction_t *t, CF_CFDP_PduHeader_t *ph)
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S1_SubstateSendEof()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_S1_SubstateSendEof(CF_Transaction_t *t)
 {
-    UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
-    exit(-86);
+    UT_GenStub_AddParam(CF_CFDP_S1_SubstateSendEof, CF_Transaction_t *, t);
+
+    UT_GenStub_Execute(CF_CFDP_S1_SubstateSendEof, Basic, NULL);
 }
 
-/************************************************************************/
-/** \brief S1 dispatch function.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S1_Tx()
+ * ----------------------------------------------------
+ */
 void CF_CFDP_S1_Tx(CF_Transaction_t *t)
 {
     UT_GenStub_AddParam(CF_CFDP_S1_Tx, CF_Transaction_t *, t);
-    UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_S1_Tx), &t, sizeof(t));
 
     UT_GenStub_Execute(CF_CFDP_S1_Tx, Basic, NULL);
 }
 
-/************************************************************************/
-/** \brief S2 dispatch function.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S2_EarlyFin()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_S2_EarlyFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+{
+    UT_GenStub_AddParam(CF_CFDP_S2_EarlyFin, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_S2_EarlyFin, CF_Logical_PduBuffer_t *, ph);
+
+    UT_GenStub_Execute(CF_CFDP_S2_EarlyFin, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S2_Fin()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_S2_Fin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+{
+    UT_GenStub_AddParam(CF_CFDP_S2_Fin, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_S2_Fin, CF_Logical_PduBuffer_t *, ph);
+
+    UT_GenStub_Execute(CF_CFDP_S2_Fin, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S2_Nak()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_S2_Nak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+{
+    UT_GenStub_AddParam(CF_CFDP_S2_Nak, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_S2_Nak, CF_Logical_PduBuffer_t *, ph);
+
+    UT_GenStub_Execute(CF_CFDP_S2_Nak, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S2_Nak_Arm()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+{
+    UT_GenStub_AddParam(CF_CFDP_S2_Nak_Arm, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_S2_Nak_Arm, CF_Logical_PduBuffer_t *, ph);
+
+    UT_GenStub_Execute(CF_CFDP_S2_Nak_Arm, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S2_Recv()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_S2_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+{
+    UT_GenStub_AddParam(CF_CFDP_S2_Recv, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_S2_Recv, CF_Logical_PduBuffer_t *, ph);
+
+    UT_GenStub_Execute(CF_CFDP_S2_Recv, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S2_SubstateSendEof()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *t)
+{
+    UT_GenStub_AddParam(CF_CFDP_S2_SubstateSendEof, CF_Transaction_t *, t);
+
+    UT_GenStub_Execute(CF_CFDP_S2_SubstateSendEof, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S2_SubstateSendFileData()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_S2_SubstateSendFileData(CF_Transaction_t *t)
+{
+    UT_GenStub_AddParam(CF_CFDP_S2_SubstateSendFileData, CF_Transaction_t *, t);
+
+    UT_GenStub_Execute(CF_CFDP_S2_SubstateSendFileData, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S2_Tx()
+ * ----------------------------------------------------
+ */
 void CF_CFDP_S2_Tx(CF_Transaction_t *t)
 {
-    UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_S2_Tx), &t, sizeof(t));
+    UT_GenStub_AddParam(CF_CFDP_S2_Tx, CF_Transaction_t *, t);
 
-    UT_DEFAULT_IMPL(CF_CFDP_S2_Tx);
+    UT_GenStub_Execute(CF_CFDP_S2_Tx, Basic, NULL);
 }
 
-/************************************************************************/
-/** \brief Cancel an S transaction.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S2_WaitForEofAck()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+{
+    UT_GenStub_AddParam(CF_CFDP_S2_WaitForEofAck, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_S2_WaitForEofAck, CF_Logical_PduBuffer_t *, ph);
+
+    UT_GenStub_Execute(CF_CFDP_S2_WaitForEofAck, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S_Cancel()
+ * ----------------------------------------------------
+ */
 void CF_CFDP_S_Cancel(CF_Transaction_t *t)
 {
-    UT_Stub_CopyFromLocal(UT_KEY(CF_CFDP_S_Cancel), &t, sizeof(t));
+    UT_GenStub_AddParam(CF_CFDP_S_Cancel, CF_Transaction_t *, t);
 
-    UT_DEFAULT_IMPL(CF_CFDP_S_Cancel);
+    UT_GenStub_Execute(CF_CFDP_S_Cancel, Basic, NULL);
 }
 
-/************************************************************************/
-/** \brief Perform tick (time-based) processing for S transactions.
-**
-**  \par Description
-**       This function is called on every transaction by the engine on
-**       every CF wakeup. This is where flags are checked to send EOF or
-**       FIN-ACK. If nothing else is sent, it checks to see if a NAK
-**       retransmit must occur.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
-void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S_CheckAndRespondNak()
+ * ----------------------------------------------------
+ */
+int CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
 {
-    UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
-    exit(-86);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_S_CheckAndRespondNak, int);
+
+    UT_GenStub_AddParam(CF_CFDP_S_CheckAndRespondNak, CF_Transaction_t *, t);
+
+    UT_GenStub_Execute(CF_CFDP_S_CheckAndRespondNak, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_CFDP_S_CheckAndRespondNak, int);
 }
 
-/************************************************************************/
-/** \brief Perform NAK response for TX transactions
-**
-**  \par Description
-**       This function is called at tick processing time to send pending
-**       NAK responses. It indicates "cont" is 1 if there are more responses
-**       left to send.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. cont must not be NULL.
-**
-*************************************************************************/
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S_SendEof()
+ * ----------------------------------------------------
+ */
+CF_SendRet_t CF_CFDP_S_SendEof(CF_Transaction_t *t)
+{
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_S_SendEof, CF_SendRet_t);
+
+    UT_GenStub_AddParam(CF_CFDP_S_SendEof, CF_Transaction_t *, t);
+
+    UT_GenStub_Execute(CF_CFDP_S_SendEof, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_CFDP_S_SendEof, CF_SendRet_t);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S_SendFileData()
+ * ----------------------------------------------------
+ */
+int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc)
+{
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_S_SendFileData, int32);
+
+    UT_GenStub_AddParam(CF_CFDP_S_SendFileData, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_S_SendFileData, uint32, foffs);
+    UT_GenStub_AddParam(CF_CFDP_S_SendFileData, uint32, bytes_to_read);
+    UT_GenStub_AddParam(CF_CFDP_S_SendFileData, uint8, calc_crc);
+
+    UT_GenStub_Execute(CF_CFDP_S_SendFileData, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_CFDP_S_SendFileData, int32);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S_SubstateSendFileData()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *t)
+{
+    UT_GenStub_AddParam(CF_CFDP_S_SubstateSendFileData, CF_Transaction_t *, t);
+
+    UT_GenStub_Execute(CF_CFDP_S_SubstateSendFileData, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S_SubstateSendFinAck()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_S_SubstateSendFinAck(CF_Transaction_t *t)
+{
+    UT_GenStub_AddParam(CF_CFDP_S_SubstateSendFinAck, CF_Transaction_t *, t);
+
+    UT_GenStub_Execute(CF_CFDP_S_SubstateSendFinAck, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S_SubstateSendMetadata()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
+{
+    UT_GenStub_AddParam(CF_CFDP_S_SubstateSendMetadata, CF_Transaction_t *, t);
+
+    UT_GenStub_Execute(CF_CFDP_S_SubstateSendMetadata, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S_Tick()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont)
+{
+    UT_GenStub_AddParam(CF_CFDP_S_Tick, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_S_Tick, int *, cont);
+
+    UT_GenStub_Execute(CF_CFDP_S_Tick, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_S_Tick_Nak()
+ * ----------------------------------------------------
+ */
 void CF_CFDP_S_Tick_Nak(CF_Transaction_t *t, int *cont)
 {
-    UtPrintf("NOT YET IMPLEMENTED stub in \n%s:line #%d\n", __FILE__, __LINE__);
-    exit(-86);
+    UT_GenStub_AddParam(CF_CFDP_S_Tick_Nak, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_S_Tick_Nak, int *, cont);
+
+    UT_GenStub_Execute(CF_CFDP_S_Tick_Nak, Basic, NULL);
 }

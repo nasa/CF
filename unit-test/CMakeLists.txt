@@ -28,62 +28,65 @@
 #
 ##################################################################
 
-# Use the UT assert public API, and allow direct
-# inclusion of source files that are normally private
-# ${osal_MISSION_DIR}/ut_assert/inc is location of ut_assert headers and is required
-include_directories(${osal_MISSION_DIR}/ut_assert/inc)
-# ${CMAKE_CURRENT_SOURCE_DIR}/utilities is location of app's unit test utilities
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/utilities)
-# ${CMAKE_CURRENT_SOURCE_DIR}/stubs is location of app's source stub files
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/stubs)
+# cf_internal is a stub library for all of the internal calls within CF
+# The "utilities" files are just some common helper code and hooks that are useful for
+# many test cases, so they are also put in here (just a convenient spot to do so).
+# All "stubs" files in here should be auto-generated using UtAssert generate_stubs.pl tool
+# From the top-level directory of CF these can be regenerated with a command like:
+#   ../../osal/ut_assert/scripts/generate_stubs.pl ./unit-test/stubs fsw/src/*.h
+add_cfe_coverage_stubs(cf_internal
+  utilities/cf_test_utils.c
+  utilities/cf_test_alt_handler.c
+  utilities/ut_utils_cfe_hooks.c
 
-# Get all the source filenames from stub subdirectory for app unit tests
-set(app_stub_files)
-set(app_stub_and_utility_filenames)
-aux_source_directory("${CMAKE_CURRENT_SOURCE_DIR}/stubs" app_stub_files)
-foreach(SOURCE_FILE ${app_stub_files})
-  list(APPEND app_stub_and_utility_filenames "${SOURCE_FILE}")
-endforeach()
+  stubs/cf_app_global.c
+  stubs/cf_app_stubs.c
+  stubs/cf_assert_handlers.c
+  stubs/cf_assert_stubs.c
+  stubs/cf_cfdp_handlers.c
+  stubs/cf_cfdp_dispatch_stubs.c
+  stubs/cf_cfdp_r_stubs.c
+  stubs/cf_cfdp_s_stubs.c
+  stubs/cf_cfdp_stubs.c
+  stubs/cf_cfdp_sbintf_handlers.c
+  stubs/cf_cfdp_sbintf_stubs.c
+  stubs/cf_chunk_handlers.c
+  stubs/cf_chunk_stubs.c
+  stubs/cf_clist_handlers.c
+  stubs/cf_clist_stubs.c
+  stubs/cf_cmd_handlers.c
+  stubs/cf_cmd_stubs.c
+  stubs/cf_codec_handlers.c
+  stubs/cf_codec_stubs.c
+  stubs/cf_crc_stubs.c
+  stubs/cf_timer_stubs.c
+  stubs/cf_utils_handlers.c
+  stubs/cf_utils_stubs.c
+)
 
-# Get the source filenames in the application's unit-test/utilities directory
-# utility files are prepended by design, this ensures the correct build order for CF only - other milage may vary
-set(app_ut_utility_files)
-set(app_ut_utility_filenames)
-aux_source_directory("${PROJECT_SOURCE_DIR}/unit-test/utilities" app_ut_utility_files)
-foreach(SOURCE_FILE ${app_ut_utility_files})
-  list(INSERT app_stub_and_utility_filenames 0 ${SOURCE_FILE})
-endforeach()
-
-# add both utility and stubs to the coverage stubs
-# TODO: currently adding both is considered a work-around
-# utilities should be added separately when a method for it is devised
-add_cfe_coverage_stubs(cf ${app_stub_and_utility_filenames})
+target_link_libraries(coverage-cf_internal-stubs core_api ut_assert)
+target_include_directories(coverage-cf_internal-stubs PUBLIC utilities)
 
 # Generate a dedicated "testrunner" executable for each test file
 # Accomplish this by cycling through all the app's source files,
 # there must be a *_tests file for each
-set(source_files_under_test)
-aux_source_directory("${PROJECT_SOURCE_DIR}/fsw/src" source_files_under_test)
-foreach(SRCFILE ${source_files_under_test})
+foreach(SRCFILE ${APP_SRC_FILES})
 
     # Get the base sourcefile name as a module name without path or the
     # extension, this will be used as the base name of the unit test file.
-    get_filename_component(MODULE_NAME "${SRCFILE}" NAME_WE)
+    get_filename_component(UNIT_NAME "${SRCFILE}" NAME_WE)
 
     # Use the module name to make the tests' name by adding _tests to the end
-    set(TESTS_NAME "${MODULE_NAME}_tests")
+    set(TESTS_NAME "${UNIT_NAME}_tests")
 
     # Get the tests' sourcefile name with unit test path and extension
     set(TESTS_SOURCE_FILE "${PROJECT_SOURCE_DIR}/unit-test/${TESTS_NAME}.c")
 
-    # build test, but CF includes the .c in the test's source therefore
-    # the TESTCASE_SRC is left empty, while the UT_SRC is passed in as the
-    # combined test and source (currently done to access 'static' functions)
-    # without doing it like this the coverage reports will not be created
-    add_cfe_coverage_test(cf "${TESTS_NAME}" "/" "${TESTS_SOURCE_FILE}")
+    # Create the coverage test executable
+    # Note: This renders a target named "coverage-cf-${UNIT_NAME}-testrunner"
+    add_cfe_coverage_test(cf "${UNIT_NAME}" "${TESTS_SOURCE_FILE}" "${CFS_CF_SOURCE_DIR}/${SRCFILE}")
 
-    # give the dependencies of cf_app to the test, this ensures
-    # app_stub_and_utility_filenames are used when building (TODO: ? is this comment correct?)
-    add_cfe_coverage_dependency(cf "${TESTS_NAME}" cf)
+    # CF test cases should be linked with stubs for other internal CF units
+    add_cfe_coverage_dependency(cf "${UNIT_NAME}" cf_internal)
 
 endforeach()

@@ -33,6 +33,5 @@ add_definitions("-D_DEFAULT_SOURCE")
 add_definitions(-D_DEFAULT_SOURCE=1)
 add_definitions(-D_EL -DENDIAN=_EL -DSOFTWARE_BIG_BIT_ORDER)
 if (ENABLE_UNIT_TESTS)
-  #PENDING: unit test still needs update in this version, does not build
-  #add_subdirectory(unit-test)
+  add_subdirectory(unit-test)
 endif (ENABLE_UNIT_TESTS)

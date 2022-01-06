@@ -33,6 +33,12 @@
 #include "cf_codec.h"
 #include "utgenstub.h"
 
+extern void UT_DefaultHandler_CF_CFDP_CodecCheckSize(void *, UT_EntryKey_t, const UT_StubContext_t *);
+extern void UT_DefaultHandler_CF_CFDP_DoDecodeChunk(void *, UT_EntryKey_t, const UT_StubContext_t *);
+extern void UT_DefaultHandler_CF_CFDP_DoEncodeChunk(void *, UT_EntryKey_t, const UT_StubContext_t *);
+extern void UT_DefaultHandler_CF_CFDP_GetValueEncodedSize(void *, UT_EntryKey_t, const UT_StubContext_t *);
+extern void UT_DefaultHandler_CF_DecodeIntegerInSize(void *, UT_EntryKey_t, const UT_StubContext_t *);
+
 /*
  * ----------------------------------------------------
  * Generated stub function for CF_CFDP_CodecCheckSize()
@@ -45,7 +51,7 @@ bool CF_CFDP_CodecCheckSize(CF_CodecState_t *state, size_t chunksize)
     UT_GenStub_AddParam(CF_CFDP_CodecCheckSize, CF_CodecState_t *, state);
     UT_GenStub_AddParam(CF_CFDP_CodecCheckSize, size_t, chunksize);
 
-    UT_GenStub_Execute(CF_CFDP_CodecCheckSize, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_CodecCheckSize, Basic, UT_DefaultHandler_CF_CFDP_CodecCheckSize);
 
     return UT_GenStub_GetReturnValue(CF_CFDP_CodecCheckSize, bool);
 }
@@ -122,12 +128,10 @@ void CF_CFDP_DecodeEof(CF_DecoderState_t *state, CF_Logical_PduEof_t *pleof)
  * Generated stub function for CF_CFDP_DecodeFileDataHeader()
  * ----------------------------------------------------
  */
-void CF_CFDP_DecodeFileDataHeader(CF_DecoderState_t *state, bool with_meta, bool with_crc,
-                                  CF_Logical_PduFileDataHeader_t *plfd)
+void CF_CFDP_DecodeFileDataHeader(CF_DecoderState_t *state, bool with_meta, CF_Logical_PduFileDataHeader_t *plfd)
 {
     UT_GenStub_AddParam(CF_CFDP_DecodeFileDataHeader, CF_DecoderState_t *, state);
     UT_GenStub_AddParam(CF_CFDP_DecodeFileDataHeader, bool, with_meta);
-    UT_GenStub_AddParam(CF_CFDP_DecodeFileDataHeader, bool, with_crc);
     UT_GenStub_AddParam(CF_CFDP_DecodeFileDataHeader, CF_Logical_PduFileDataHeader_t *, plfd);
 
     UT_GenStub_Execute(CF_CFDP_DecodeFileDataHeader, Basic, NULL);
@@ -249,7 +253,7 @@ const void *CF_CFDP_DoDecodeChunk(CF_DecoderState_t *state, size_t chunksize)
     UT_GenStub_AddParam(CF_CFDP_DoDecodeChunk, CF_DecoderState_t *, state);
     UT_GenStub_AddParam(CF_CFDP_DoDecodeChunk, size_t, chunksize);
 
-    UT_GenStub_Execute(CF_CFDP_DoDecodeChunk, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_DoDecodeChunk, Basic, UT_DefaultHandler_CF_CFDP_DoDecodeChunk);
 
     return UT_GenStub_GetReturnValue(CF_CFDP_DoDecodeChunk, const void *);
 }
@@ -266,7 +270,7 @@ void *CF_CFDP_DoEncodeChunk(CF_EncoderState_t *state, size_t chunksize)
     UT_GenStub_AddParam(CF_CFDP_DoEncodeChunk, CF_EncoderState_t *, state);
     UT_GenStub_AddParam(CF_CFDP_DoEncodeChunk, size_t, chunksize);
 
-    UT_GenStub_Execute(CF_CFDP_DoEncodeChunk, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_DoEncodeChunk, Basic, UT_DefaultHandler_CF_CFDP_DoEncodeChunk);
 
     return UT_GenStub_GetReturnValue(CF_CFDP_DoEncodeChunk, void *);
 }
@@ -315,10 +319,10 @@ void CF_CFDP_EncodeAllTlv(CF_EncoderState_t *state, CF_Logical_TlvList_t *pltlv)
  * Generated stub function for CF_CFDP_EncodeCrc()
  * ----------------------------------------------------
  */
-void CF_CFDP_EncodeCrc(CF_EncoderState_t *state, uint32 *pcrc)
+void CF_CFDP_EncodeCrc(CF_EncoderState_t *state, uint32 *plcrc)
 {
     UT_GenStub_AddParam(CF_CFDP_EncodeCrc, CF_EncoderState_t *, state);
-    UT_GenStub_AddParam(CF_CFDP_EncodeCrc, uint32 *, pcrc);
+    UT_GenStub_AddParam(CF_CFDP_EncodeCrc, uint32 *, plcrc);
 
     UT_GenStub_Execute(CF_CFDP_EncodeCrc, Basic, NULL);
 }
@@ -341,12 +345,10 @@ void CF_CFDP_EncodeEof(CF_EncoderState_t *state, CF_Logical_PduEof_t *pleof)
  * Generated stub function for CF_CFDP_EncodeFileDataHeader()
  * ----------------------------------------------------
  */
-void CF_CFDP_EncodeFileDataHeader(CF_EncoderState_t *state, bool with_meta, bool with_crc,
-                                  CF_Logical_PduFileDataHeader_t *plfd)
+void CF_CFDP_EncodeFileDataHeader(CF_EncoderState_t *state, bool with_meta, CF_Logical_PduFileDataHeader_t *plfd)
 {
     UT_GenStub_AddParam(CF_CFDP_EncodeFileDataHeader, CF_EncoderState_t *, state);
     UT_GenStub_AddParam(CF_CFDP_EncodeFileDataHeader, bool, with_meta);
-    UT_GenStub_AddParam(CF_CFDP_EncodeFileDataHeader, bool, with_crc);
     UT_GenStub_AddParam(CF_CFDP_EncodeFileDataHeader, CF_Logical_PduFileDataHeader_t *, plfd);
 
     UT_GenStub_Execute(CF_CFDP_EncodeFileDataHeader, Basic, NULL);
@@ -376,6 +378,19 @@ void CF_CFDP_EncodeFin(CF_EncoderState_t *state, CF_Logical_PduFin_t *plfin)
     UT_GenStub_AddParam(CF_CFDP_EncodeFin, CF_Logical_PduFin_t *, plfin);
 
     UT_GenStub_Execute(CF_CFDP_EncodeFin, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_EncodeHeaderFinalSize()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_EncodeHeaderFinalSize(CF_EncoderState_t *state, CF_Logical_PduHeader_t *plh)
+{
+    UT_GenStub_AddParam(CF_CFDP_EncodeHeaderFinalSize, CF_EncoderState_t *, state);
+    UT_GenStub_AddParam(CF_CFDP_EncodeHeaderFinalSize, CF_Logical_PduHeader_t *, plh);
+
+    UT_GenStub_Execute(CF_CFDP_EncodeHeaderFinalSize, Basic, NULL);
 }
 
 /*
@@ -458,6 +473,22 @@ void CF_CFDP_EncodeTLV(CF_EncoderState_t *state, CF_Logical_Tlv_t *pltlv)
 
 /*
  * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_GetValueEncodedSize()
+ * ----------------------------------------------------
+ */
+uint8 CF_CFDP_GetValueEncodedSize(uint64 Value)
+{
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_GetValueEncodedSize, uint8);
+
+    UT_GenStub_AddParam(CF_CFDP_GetValueEncodedSize, uint64, Value);
+
+    UT_GenStub_Execute(CF_CFDP_GetValueEncodedSize, Basic, UT_DefaultHandler_CF_CFDP_GetValueEncodedSize);
+
+    return UT_GenStub_GetReturnValue(CF_CFDP_GetValueEncodedSize, uint8);
+}
+
+/*
+ * ----------------------------------------------------
  * Generated stub function for CF_DecodeIntegerInSize()
  * ----------------------------------------------------
  */
@@ -468,7 +499,7 @@ uint64 CF_DecodeIntegerInSize(CF_DecoderState_t *state, uint8 decode_size)
     UT_GenStub_AddParam(CF_DecodeIntegerInSize, CF_DecoderState_t *, state);
     UT_GenStub_AddParam(CF_DecodeIntegerInSize, uint8, decode_size);
 
-    UT_GenStub_Execute(CF_DecodeIntegerInSize, Basic, NULL);
+    UT_GenStub_Execute(CF_DecodeIntegerInSize, Basic, UT_DefaultHandler_CF_DecodeIntegerInSize);
 
     return UT_GenStub_GetReturnValue(CF_DecodeIntegerInSize, uint64);
 }

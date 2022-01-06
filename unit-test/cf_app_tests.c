@@ -1,6 +1,8 @@
 /* cf testing includes */
 #include "cf_test_utils.h"
-#include "cf_app.c"
+#include "cf_events.h"
+#include "cf_app.h"
+#include "cf_cmd.h"
 
 /*******************************************************************************
 **
@@ -53,12 +55,13 @@ void Test_CF_HkCmd_TimestampAndSendMessageWith_CF_AppData_hk(void)
     /* Arrange */
     CFE_TIME_SysTime_t           fake_time;
     CFE_SB_TransmitMsg_context_t context_CFE_SB_TransmitMsg;
+    CFE_MSG_SetMsgTime_context_t context_CFE_MSG_SetMsgTime;
 
     Any_CFE_TIME_SysTime_Set(&fake_time);
 
     UT_SetDataBuffer(UT_KEY(CFE_TIME_GetTime), &fake_time, sizeof(fake_time), false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_SetMsgTime), stub_reporter, &context_CFE_MSG_SetMsgTime);
-    UT_SetHookFunction(UT_KEY(CFE_SB_TransmitMsg), stub_reporter, &context_CFE_SB_TransmitMsg);
+    UT_SetHookFunction(UT_KEY(CFE_MSG_SetMsgTime), UT_Hook_CFE_MSG_SetMsgTime, &context_CFE_MSG_SetMsgTime);
+    UT_SetHookFunction(UT_KEY(CFE_SB_TransmitMsg), UT_Hook_CFE_SB_TransmitMsg, &context_CFE_SB_TransmitMsg);
 
     /* Act */
     CF_HkCmd();
@@ -230,6 +233,7 @@ void Test_CF_ValidateConfigTable_FailBecauseTableTicksPerSecondIs0(void)
 {
     /* Arrange */
     CF_ConfigTable_t *arg_table = &dummy_table;
+    int32             result;
 
     arg_table->ticks_per_second = 0;
 
@@ -244,6 +248,7 @@ void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0(void)
 {
     /* Arrange */
     CF_ConfigTable_t *arg_table = &dummy_table;
+    int32             result;
 
     arg_table->ticks_per_second             = 1;
     arg_table->rx_crc_calc_bytes_per_wakeup = 0;
@@ -259,6 +264,7 @@ void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIsNot1024ByteAlign
 {
     /* Arrange */
     CF_ConfigTable_t *arg_table = &dummy_table;
+    int32             result;
 
     arg_table->ticks_per_second = 1;
     arg_table->rx_crc_calc_bytes_per_wakeup =
@@ -277,6 +283,7 @@ void Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArra
 {
     /* Arrange */
     CF_ConfigTable_t *arg_table = &dummy_table;
+    int32             result;
 
     // outgoing_file_chunk_size set to greater than sizeof(CF_CFDP_PduFileDataContent_t)
     arg_table->ticks_per_second             = 1;
@@ -294,6 +301,7 @@ void Test_CF_ValidateConfigTable_Success(void)
 {
     /* Arange */
     CF_ConfigTable_t *arg_table = &dummy_table;
+    int32             result;
 
     arg_table->ticks_per_second             = 1;
     arg_table->rx_crc_calc_bytes_per_wakeup = 0x0400; /* 1024 aligned */
@@ -317,11 +325,11 @@ void Test_CF_ValidateConfigTable_Success(void)
 void Test_CF_TableInit_FailBecause_CFE_TBL_Register_DidNotReturnSuccess(void)
 {
     /* Arrange */
-    uint16 expected_EventID = CF_EID_ERR_INIT_TBL_REG;
-    int32  expected_result  = Any_int32_Except(CFE_SUCCESS);
+    int32 expected_result = Any_int32_Except(CFE_SUCCESS);
+    int32 result;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_Register), expected_result);
-    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
 
     /* Act */
     result = CF_TableInit();
@@ -330,19 +338,18 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_Register_DidNotReturnSuccess(void)
     UtAssert_True(result == expected_result, "CF_TableInit should have returned 0x%08X and was 0x%08X", result,
                   expected_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UtAssert_True((uint16)EventID == expected_EventID, "CFE_EVS_SendEvent received %u and should have received %u",
-                  (uint16)EventID, expected_EventID);
+    UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_REG);
     /* TODO: CFE_EVS_SendEvent needs to check all context values! */
 } /* end Test_CF_TableInit_FailBecause_CFE_TBL_Register_DidNotReturnSuccess */
 
 void Test_CF_TableInit_FailBecause_CFE_TBL_Load_DidNotReturnSuccess(void)
 {
     /* Arrange */
-    uint16 expected_EventID = CF_EID_ERR_INIT_TBL_LOAD;
-    int32  expected_result  = Any_int32_Except(CFE_SUCCESS);
+    int32 expected_result = Any_int32_Except(CFE_SUCCESS);
+    int32 result;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_Load), expected_result);
-    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
 
     /* Act */
     result = CF_TableInit();
@@ -350,19 +357,18 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_Load_DidNotReturnSuccess(void)
     /* Assert */
     UtAssert_True(result == expected_result, "CF_TableInit returned 0x%08X and was 0x%08X", result, expected_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UtAssert_True((uint16)EventID == expected_EventID, "CFE_EVS_SendEvent received %u and should have received %u",
-                  (uint16)EventID, expected_EventID);
+    UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_LOAD);
     /* TODO: CFE_EVS_SendEvent needs to check all context values! */
 } /* end Test_CF_TableInit_FailBecause_CFE_TBL_Load_DidNotReturnSuccess */
 
 void Test_CF_TableInit_FailBecause_CFE_TBL_Manage_DidNotReturnSuccess(void)
 {
     /* Arrange */
-    uint16 expected_EventID = CF_EID_ERR_INIT_TBL_MANAGE;
-    int32  expected_result  = Any_int32_Except(CFE_SUCCESS);
+    int32 expected_result = Any_int32_Except(CFE_SUCCESS);
+    int32 result;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_Manage), expected_result);
-    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
 
     /* Act */
     result = CF_TableInit();
@@ -371,21 +377,20 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_Manage_DidNotReturnSuccess(void)
     UtAssert_True(result == expected_result, "CF_TableInit should have returned 0x%08X and was 0x%08X", result,
                   expected_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UtAssert_True((uint16)EventID == expected_EventID, "CFE_EVS_SendEvent received %u and should have received %u",
-                  (uint16)EventID, expected_EventID);
+    UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_MANAGE);
     /* TODO: CFE_EVS_SendEvent needs to check all context values! */
 } /* end Test_CF_TableInit_FailBecause_CFE_TBL_Manage_DidNotReturnSuccess */
 
 void Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess(void)
 {
     /* Arrange */
-    uint16 expected_EventID            = CF_EID_ERR_INIT_TBL_GETADDR;
-    int32  possible_success_results[2] = {CFE_SUCCESS, CFE_TBL_INFO_UPDATED};
-    int32  expected_result = Any_int32_ExceptThese(possible_success_results, sizeof(possible_success_results) /
-                                                                                 sizeof(possible_success_results[0]));
+    int32 possible_success_results[2] = {CFE_SUCCESS, CFE_TBL_INFO_UPDATED};
+    int32 expected_result = Any_int32_ExceptThese(possible_success_results, sizeof(possible_success_results) /
+                                                                                sizeof(possible_success_results[0]));
+    int32 result;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_GetAddress), expected_result);
-    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &EventID, sizeof(EventID), false);
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
 
     /* Act */
     result = CF_TableInit();
@@ -394,14 +399,15 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess(void)
     UtAssert_True(result == expected_result, "CF_TableInit should have returned 0x%08X and was 0x%08X", result,
                   expected_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UtAssert_True((uint16)EventID == expected_EventID, "CFE_EVS_SendEvent received %u and should have received %u",
-                  (uint16)EventID, expected_EventID);
+    UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_GETADDR);
     /* TODO: CFE_EVS_SendEvent needs to check all context values! */
 } /* end Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess */
 
 void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_SUCCESS_SuccessAndDoNotSendEvent(void)
 {
     /* Arrange */
+    int32 result;
+
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_GetAddress), CFE_SUCCESS);
 
     /* Act */
@@ -416,6 +422,8 @@ void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_SUCCESS_SuccessAndDoN
 void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED_SuccessAndDoNotSendEvent(void)
 {
     /* Arrange */
+    int32 result;
+
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_GetAddress), CFE_TBL_INFO_UPDATED);
 
     /* Act */
@@ -439,6 +447,7 @@ void Test_CF_Init_CallTo_CFE_EVS_Register_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_Wri
 {
     /* Arrange */
     int32 forced_return_CFE_MSG_Init = Any_int32_Except(CFE_SUCCESS);
+    int32 result;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_EVS_Register), forced_return_CFE_MSG_Init);
 
@@ -456,6 +465,7 @@ void Test_CF_Init_CallTo_CFE_SB_CreatePipe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_Wr
 {
     /* Arrange */
     int32 forced_return_CFE_SB_CreatePipe = Any_int32_Except(CFE_SUCCESS);
+    int32 result;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_SB_CreatePipe), forced_return_CFE_SB_CreatePipe);
 
@@ -474,6 +484,7 @@ void Test_CF_Init_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_E
 {
     /* Arrange */
     int32 forced_return_CFE_SB_Subscribe = Any_int32_Except(CFE_SUCCESS);
+    int32 result;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_SB_Subscribe), forced_return_CFE_SB_Subscribe);
 
@@ -494,6 +505,7 @@ void Test_CF_Init_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_E
 void Test_CF_Init_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus(void)
 {
     /* Arrange */
+    int32 result;
 
     /* Arrange unstubbable: CF_TableInit */
     int32 forced_return_CFE_TBL_Register = Any_int32_Except(CFE_SUCCESS);
@@ -515,6 +527,7 @@ void Test_CF_Init_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus(v
 void Test_CF_Init_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus(void)
 {
     /* Arrange */
+    int32 result;
     int32 forced_return_CF_CFDP_InitEngine = Any_int32_Except(CFE_SUCCESS);
 
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_InitEngine), forced_return_CF_CFDP_InitEngine);
@@ -536,6 +549,7 @@ void Test_CF_Init_CallTo_CFE_EVS_SendEvent_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_Wr
 {
     /* Arrange */
     int32 force_return_CFE_EVS_SendEvent = Any_int32_Except(CFE_SUCCESS);
+    int32 result;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_EVS_SendEvent), force_return_CFE_EVS_SendEvent);
 
@@ -556,6 +570,7 @@ void Test_CF_Init_CallTo_CFE_EVS_SendEvent_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_Wr
 void Test_CF_Init_Success(void)
 {
     /* Arrange */
+    int32 result;
 
     /* Act */
     result = CF_Init();
@@ -594,14 +609,15 @@ void Test_CF_WakeUp(void)
 void Test_CF_ProcessMsg_ProcessGroundCommand(void)
 {
     /* Arrange */
-    CFE_SB_Buffer_t  dummy_msg;
-    CFE_SB_Buffer_t *arg_msg      = &dummy_msg;
-    CFE_SB_MsgId_t   forced_MsgID = CF_CMD_MID;
-    CFE_SB_Buffer_t *context_CF_ProcessGroundCommand_msg;
+    CFE_SB_Buffer_t            dummy_msg;
+    CFE_SB_Buffer_t           *arg_msg      = &dummy_msg;
+    CFE_SB_MsgId_t             forced_MsgID = CF_CMD_MID;
+    CFE_SB_Buffer_t           *context_CF_ProcessGroundCommand_msg;
+    CFE_MSG_GetMsgId_context_t context_CFE_MSG_GetMsgId;
 
     /* CFE_MSG_GetMsgId uses return by ref */
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &forced_MsgID, sizeof(forced_MsgID), false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetMsgId), stub_reporter, &context_CFE_MSG_GetMsgId);
+    UT_SetHookFunction(UT_KEY(CFE_MSG_GetMsgId), UT_Hook_CFE_MSG_GetMsgId, &context_CFE_MSG_GetMsgId);
 
     UT_SetDataBuffer(UT_KEY(CF_ProcessGroundCommand), &context_CF_ProcessGroundCommand_msg,
                      sizeof(context_CF_ProcessGroundCommand_msg), false);
@@ -619,13 +635,14 @@ void Test_CF_ProcessMsg_ProcessGroundCommand(void)
 void Test_CF_ProcessMsg_WakeUp(void)
 {
     /* Arrange */
-    CFE_SB_Buffer_t  dummy_msg;
-    CFE_SB_Buffer_t *arg_msg      = &dummy_msg;
-    CFE_SB_MsgId_t   forced_MsgID = CF_WAKE_UP_MID;
+    CFE_SB_Buffer_t            dummy_msg;
+    CFE_SB_Buffer_t           *arg_msg      = &dummy_msg;
+    CFE_SB_MsgId_t             forced_MsgID = CF_WAKE_UP_MID;
+    CFE_MSG_GetMsgId_context_t context_CFE_MSG_GetMsgId;
 
     /* CFE_MSG_GetMsgId uses return by ref */
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &forced_MsgID, sizeof(forced_MsgID), false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetMsgId), stub_reporter, &context_CFE_MSG_GetMsgId);
+    UT_SetHookFunction(UT_KEY(CFE_MSG_GetMsgId), UT_Hook_CFE_MSG_GetMsgId, &context_CFE_MSG_GetMsgId);
 
     /* Act */
     CF_ProcessMsg(arg_msg);
@@ -643,18 +660,19 @@ void Test_CF_ProcessMsg_SendHk(void)
     /* TODO: figure out if message is required here - not used at time of writing this */
     // CFE_MSG_Message_t   dummy_Msg;
     // CFE_SB_Buffer_t     dummy_msg;
-    CFE_SB_Buffer_t *arg_msg      = NULL;
-    CFE_SB_MsgId_t   forced_MsgID = CF_SEND_HK_MID;
+    CFE_SB_Buffer_t           *arg_msg      = NULL;
+    CFE_SB_MsgId_t             forced_MsgID = CF_SEND_HK_MID;
+    CFE_MSG_GetMsgId_context_t context_CFE_MSG_GetMsgId;
 
     /* CFE_MSG_GetMsgId uses return by ref */
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &forced_MsgID, sizeof(forced_MsgID), false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetMsgId), stub_reporter, &context_CFE_MSG_GetMsgId);
+    UT_SetHookFunction(UT_KEY(CFE_MSG_GetMsgId), UT_Hook_CFE_MSG_GetMsgId, &context_CFE_MSG_GetMsgId);
     /* CFE_MSG_GetMsgId return value ignored in code! Therefore no setup of return value requried */
 
     /* Arrange unstubbable: CF_HkCmd exists in same source file */
     CFE_SB_TransmitMsg_context_t context_CFE_SB_TransmitMsg;
 
-    UT_SetHookFunction(UT_KEY(CFE_SB_TransmitMsg), stub_reporter, &context_CFE_SB_TransmitMsg);
+    UT_SetHookFunction(UT_KEY(CFE_SB_TransmitMsg), UT_Hook_CFE_SB_TransmitMsg, &context_CFE_SB_TransmitMsg);
 
     /* Act */
     CF_ProcessMsg(arg_msg);
@@ -669,16 +687,18 @@ void Test_CF_ProcessMsg_SendHk(void)
 void Test_CF_ProcessMsg_UnrecognizedCommandEnterDefaultPath(void)
 {
     /* Arrange */
-    uint16           initial_err_count   = CF_AppData.hk.counters.err;
-    CFE_SB_MsgId_t   excepted_msg_ids[3] = {CF_CMD_MID, CF_WAKE_UP_MID, CF_SEND_HK_MID};
-    CFE_SB_MsgId_t   forced_MsgID        = Any_MsgId_ExceptThese(excepted_msg_ids, 3);
-    CFE_SB_Buffer_t *arg_msg             = NULL;
-    const char      *expected_Spec       = "CF: invalid command packet id=0x%02x";
+    uint16                      initial_err_count   = CF_AppData.hk.counters.err;
+    CFE_SB_MsgId_t              excepted_msg_ids[3] = {CF_CMD_MID, CF_WAKE_UP_MID, CF_SEND_HK_MID};
+    CFE_SB_MsgId_t              forced_MsgID        = Any_MsgId_ExceptThese(excepted_msg_ids, 3);
+    CFE_SB_Buffer_t            *arg_msg             = NULL;
+    const char                 *expected_Spec       = "CF: invalid command packet id=0x%02x";
+    CFE_MSG_GetMsgId_context_t  context_CFE_MSG_GetMsgId;
+    CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &forced_MsgID, sizeof(forced_MsgID), false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetMsgId), stub_reporter, &context_CFE_MSG_GetMsgId);
-
-    UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), stub_reporter, &context_CFE_EVS_SendEvent);
+    UT_SetHookFunction(UT_KEY(CFE_MSG_GetMsgId), UT_Hook_CFE_MSG_GetMsgId, &context_CFE_MSG_GetMsgId);
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), UT_Hook_CFE_EVS_SendEvent, &context_CFE_EVS_SendEvent);
 
     /* Act */
     CF_ProcessMsg(arg_msg);
@@ -689,9 +709,7 @@ void Test_CF_ProcessMsg_UnrecognizedCommandEnterDefaultPath(void)
                   initial_err_count);
     /* TODO: event sent not checked, does it need to be? found 1/19/21 */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UtAssert_True(context_CFE_EVS_SendEvent.EventID == CF_EID_ERR_INIT_CMD_LENGTH,
-                  "CFE_EVS_SendEvent received EventID %u and should have received %u (CF_EID_ERR_INIT_CMD_LENGTH)",
-                  context_CFE_EVS_SendEvent.EventID, CF_EID_ERR_INIT_CMD_LENGTH);
+    UT_CF_AssertEventID(CF_EID_ERR_INIT_CMD_LENGTH);
     UtAssert_True(context_CFE_EVS_SendEvent.EventType == CFE_EVS_EventType_ERROR,
                   "CFE_EVS_SendEvent received EventType %u and should have received %u (CFE_EVS_EventType_ERROR)",
                   context_CFE_EVS_SendEvent.EventType, CFE_EVS_EventType_ERROR);

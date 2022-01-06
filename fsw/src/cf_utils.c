@@ -138,7 +138,7 @@ void CF_FreeTransaction(CF_Transaction_t *t)
 **  \endreturns
 **
 *************************************************************************/
-static int CF_FindTransactionBySequenceNumber_(CF_CListNode_t *n, trans_seq_arg_t *context)
+int CF_FindTransactionBySequenceNumber_(CF_CListNode_t *n, trans_seq_arg_t *context)
 {
     CF_Transaction_t *t   = container_of(n, CF_Transaction_t, cl_node);
     int               ret = 0;
