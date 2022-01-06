@@ -336,6 +336,12 @@ void Test_CF_CFDP_RecvFd(void)
     ph->int_header.fd.data_len = sizeof(CF_CFDP_uint32_t) - 1;
     UtAssert_INT32_EQ(CF_CFDP_RecvFd(t, ph), -1);
     UtAssert_BOOL_FALSE(CF_CODEC_IS_OK(ph->pdec));
+
+    /* with segment metadata (unimplemented) */
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
+    ph->pdu_header.segment_meta_flag = 1;
+    UtAssert_INT32_EQ(CF_CFDP_RecvFd(t, ph), -1);
+    UT_CF_AssertEventID(CF_EID_ERR_PDU_FD_UNSUPPORTED);
 }
 
 void Test_CF_CFDP_RecvEof(void)
