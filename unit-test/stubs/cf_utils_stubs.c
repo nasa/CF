@@ -63,19 +63,19 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_Transac
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_FindTransactionBySequenceNumber_()
+ * Generated stub function for CF_FindTransactionBySequenceNumber_Impl()
  * ----------------------------------------------------
  */
-int CF_FindTransactionBySequenceNumber_(CF_CListNode_t *n, trans_seq_arg_t *context)
+int CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Traverse_TransSeqArg_t *context)
 {
-    UT_GenStub_SetupReturnBuffer(CF_FindTransactionBySequenceNumber_, int);
+    UT_GenStub_SetupReturnBuffer(CF_FindTransactionBySequenceNumber_Impl, int);
 
-    UT_GenStub_AddParam(CF_FindTransactionBySequenceNumber_, CF_CListNode_t *, n);
-    UT_GenStub_AddParam(CF_FindTransactionBySequenceNumber_, trans_seq_arg_t *, context);
+    UT_GenStub_AddParam(CF_FindTransactionBySequenceNumber_Impl, CF_CListNode_t *, n);
+    UT_GenStub_AddParam(CF_FindTransactionBySequenceNumber_Impl, CF_Traverse_TransSeqArg_t *, context);
 
-    UT_GenStub_Execute(CF_FindTransactionBySequenceNumber_, Basic, NULL);
+    UT_GenStub_Execute(CF_FindTransactionBySequenceNumber_Impl, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_FindTransactionBySequenceNumber_, int);
+    return UT_GenStub_GetReturnValue(CF_FindTransactionBySequenceNumber_Impl, int);
 }
 
 /*
@@ -169,23 +169,6 @@ int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t 
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_TraverseAllTransactions_()
- * ----------------------------------------------------
- */
-int CF_TraverseAllTransactions_(CF_CListNode_t *n, traverse_all_args_t *args)
-{
-    UT_GenStub_SetupReturnBuffer(CF_TraverseAllTransactions_, int);
-
-    UT_GenStub_AddParam(CF_TraverseAllTransactions_, CF_CListNode_t *, n);
-    UT_GenStub_AddParam(CF_TraverseAllTransactions_, traverse_all_args_t *, args);
-
-    UT_GenStub_Execute(CF_TraverseAllTransactions_, Basic, NULL);
-
-    return UT_GenStub_GetReturnValue(CF_TraverseAllTransactions_, int);
-}
-
-/*
- * ----------------------------------------------------
  * Generated stub function for CF_TraverseAllTransactions_All_Channels()
  * ----------------------------------------------------
  */
@@ -204,15 +187,32 @@ int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, 
 
 /*
  * ----------------------------------------------------
+ * Generated stub function for CF_TraverseAllTransactions_Impl()
+ * ----------------------------------------------------
+ */
+int CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *args)
+{
+    UT_GenStub_SetupReturnBuffer(CF_TraverseAllTransactions_Impl, int);
+
+    UT_GenStub_AddParam(CF_TraverseAllTransactions_Impl, CF_CListNode_t *, n);
+    UT_GenStub_AddParam(CF_TraverseAllTransactions_Impl, CF_TraverseAll_Arg_t *, args);
+
+    UT_GenStub_Execute(CF_TraverseAllTransactions_Impl, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_TraverseAllTransactions_Impl, int);
+}
+
+/*
+ * ----------------------------------------------------
  * Generated stub function for CF_TraverseHistory()
  * ----------------------------------------------------
  */
-int CF_TraverseHistory(CF_CListNode_t *n, trav_arg_t *context)
+int CF_TraverseHistory(CF_CListNode_t *n, CF_Traverse_WriteFileArg_t *context)
 {
     UT_GenStub_SetupReturnBuffer(CF_TraverseHistory, int);
 
     UT_GenStub_AddParam(CF_TraverseHistory, CF_CListNode_t *, n);
-    UT_GenStub_AddParam(CF_TraverseHistory, trav_arg_t *, context);
+    UT_GenStub_AddParam(CF_TraverseHistory, CF_Traverse_WriteFileArg_t *, context);
 
     UT_GenStub_Execute(CF_TraverseHistory, Basic, NULL);
 
@@ -224,12 +224,12 @@ int CF_TraverseHistory(CF_CListNode_t *n, trav_arg_t *context)
  * Generated stub function for CF_TraverseTransactions()
  * ----------------------------------------------------
  */
-int CF_TraverseTransactions(CF_CListNode_t *n, trav_arg_t *context)
+int CF_TraverseTransactions(CF_CListNode_t *n, CF_Traverse_WriteFileArg_t *context)
 {
     UT_GenStub_SetupReturnBuffer(CF_TraverseTransactions, int);
 
     UT_GenStub_AddParam(CF_TraverseTransactions, CF_CListNode_t *, n);
-    UT_GenStub_AddParam(CF_TraverseTransactions, trav_arg_t *, context);
+    UT_GenStub_AddParam(CF_TraverseTransactions, CF_Traverse_WriteFileArg_t *, context);
 
     UT_GenStub_Execute(CF_TraverseTransactions, Basic, NULL);
 

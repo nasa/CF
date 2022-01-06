@@ -979,10 +979,10 @@ static int32 Ut_Hook_StateHandler_SetQIndex(void *UserObj, int32 StubRetcode, ui
     return StubRetcode;
 }
 
-void Test_CF_CFDP_CycleTx_(void)
+void Test_CF_CFDP_CycleTxFirstActive(void)
 {
     /* Test case for:
-       int CF_CFDP_CycleTx_(CF_CListNode_t *node, void *context);
+       int CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context);
      */
     CF_CFDP_CycleTx_args_t args;
     CF_Transaction_t      *t;
@@ -992,13 +992,13 @@ void Test_CF_CFDP_CycleTx_(void)
     /* suspended, should return 0 */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
     t->flags.com.suspended = 1;
-    UtAssert_INT32_EQ(CF_CFDP_CycleTx_(&t->cl_node, &args), 0);
+    UtAssert_INT32_EQ(CF_CFDP_CycleTxFirstActive(&t->cl_node, &args), 0);
 
     /* nominal, with c->cur set non-null, should skip loop and return 1 */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &args.c, NULL, &t, NULL);
     t->flags.com.q_index = CF_QueueIdx_TXA; /* must be this */
     args.c->cur          = t;
-    UtAssert_INT32_EQ(CF_CFDP_CycleTx_(&t->cl_node, &args), 1);
+    UtAssert_INT32_EQ(CF_CFDP_CycleTxFirstActive(&t->cl_node, &args), 1);
     UtAssert_BOOL_TRUE(args.ran_one);
 
     /* nominal, with c->cur set null, should do loop and return 1 */
@@ -1009,7 +1009,7 @@ void Test_CF_CFDP_CycleTx_(void)
     t->flags.com.q_index = CF_QueueIdx_TXA; /* must be this */
     args.c->cur          = NULL;
     UT_SetHookFunction(UT_KEY(CF_CFDP_TxStateDispatch), Ut_Hook_StateHandler_SetQIndex, NULL);
-    UtAssert_INT32_EQ(CF_CFDP_CycleTx_(&t->cl_node, &args), 1);
+    UtAssert_INT32_EQ(CF_CFDP_CycleTxFirstActive(&t->cl_node, &args), 1);
 }
 
 static void DoTickFnClearCont(CF_Transaction_t *t, int *cont)
@@ -1027,9 +1027,9 @@ void Test_CF_CFDP_DoTick(void)
     /* Test case for:
      * int CF_CFDP_DoTick(CF_CListNode_t *node, void *context);
      */
-    CF_Transaction_t *t;
-    CF_Transaction_t  t2;
-    tick_args_t       args;
+    CF_Transaction_t   *t;
+    CF_Transaction_t    t2;
+    CF_CFDP_Tick_args_t args;
 
     memset(&args, 0, sizeof(args));
     memset(&t2, 0, sizeof(t2));
@@ -1101,7 +1101,7 @@ void Test_CF_CFDP_ProcessPollingDirectories(void)
     UtAssert_BOOL_TRUE(poll->pb.busy);
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].poll_counter, 1);
 
-    /* make an error occur in CF_CFDP_PlaybackDir_() */
+    /* make an error occur in CF_CFDP_PlaybackDir_Initiate() */
     poll->pb.busy   = false; /* above would have set it true */
     poll->timer_set = true;
     UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, true);
@@ -1203,7 +1203,7 @@ void Test_CF_CFDP_ProcessPlaybackDirectory(void)
 static int32 Ut_Hook_TickTransactions_SetEarlyExit(void *UserObj, int32 StubRetcode, uint32 CallCount,
                                                    const UT_StubContext_t *Context)
 {
-    tick_args_t *args = UT_Hook_GetArgValueByName(Context, "context", tick_args_t *);
+    CF_CFDP_Tick_args_t *args = UT_Hook_GetArgValueByName(Context, "context", CF_CFDP_Tick_args_t *);
 
     /* set flag on the second call */
     if ((CallCount & 1) == 1)
@@ -1217,7 +1217,7 @@ static int32 Ut_Hook_TickTransactions_SetEarlyExit(void *UserObj, int32 StubRetc
 static int32 Ut_Hook_TickTransactions_SetCont(void *UserObj, int32 StubRetcode, uint32 CallCount,
                                               const UT_StubContext_t *Context)
 {
-    tick_args_t *args = UT_Hook_GetArgValueByName(Context, "context", tick_args_t *);
+    CF_CFDP_Tick_args_t *args = UT_Hook_GetArgValueByName(Context, "context", CF_CFDP_Tick_args_t *);
 
     /* every other call do not set "cont" flag */
     if ((CallCount & 1) == 0)
@@ -1414,7 +1414,8 @@ void UtTest_Setup(void)
     UtTest_Add(Test_CF_CFDP_ProcessPollingDirectories, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown,
                "Test_CF_CFDP_ProcessPollingDirectories");
     UtTest_Add(Test_CF_CFDP_CycleTx, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "Test_CF_CFDP_CycleTx");
-    UtTest_Add(Test_CF_CFDP_CycleTx_, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "Test_CF_CFDP_CycleTx_");
+    UtTest_Add(Test_CF_CFDP_CycleTxFirstActive, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown,
+               "Test_CF_CFDP_CycleTxFirstActive");
     UtTest_Add(Test_CF_CFDP_DoTick, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_DoTick");
     UtTest_Add(Test_CF_CFDP_TickTransactions, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_TickTransactions");
     UtTest_Add(Test_CF_CFDP_ResetTransaction, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_ResetTransaction");
