@@ -43,7 +43,7 @@
  ** \par Limits
  **         Must be one of uint8, uint16, uint32, uint64.
  */
-typedef uint8 CF_EntityId_t;
+typedef uint32 CF_EntityId_t;
 
 /**
  ** \cfcfg transaction sequence number size
