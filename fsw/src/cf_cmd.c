@@ -1,31 +1,30 @@
 /************************************************************************
-** File: cf_cmd.c
-**
-** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
-** Application version 3.0.0”
-** Copyright © 2019 United States Government as represented by the
-** Administrator of the National Aeronautics and Space Administration.
-** All Rights Reserved.
-** Licensed under the Apache License, Version 2.0 (the "License"); you may
-** not use this file except in compliance with the License. You may obtain
-** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software
-** distributed under the License is distributed on an "AS IS" BASIS,
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-** See the License for the specific language governing permissions and
-** limitations under the License.
-**
-**
-** Purpose:
-**  The CF Application command handling source file
-**
-**  All ground commands are processed in this file. All supporting functions
-**  necessary to process the commands are also here.
-**
-**
-**
-*************************************************************************/
+ *
+ * NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
+ * Application version 3.0.0”
+ * Copyright © 2019 United States Government as represented by the
+ * Administrator of the National Aeronautics and Space Administration.
+ * All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License. You may obtain
+ * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ************************************************************************/
+
+/**
+ * @file
+ *
+ *  The CF Application command handling source file
+ *
+ *  All ground commands are processed in this file. All supporting functions
+ *  necessary to process the commands are also here.
+ */
 
 #include "cf_app.h"
 #include "cf_verify.h"
@@ -43,19 +42,14 @@
 #define ALL_POLLDIRS ALL_CHANNELS
 #define COMPOUND_KEY 254
 
-/************************************************************************/
-/** \brief The no-operation command.
-**
-**  \par Description
-**       This function has a signature the same of all cmd_ functions.
-**       This function simply prints an event message.
-**       Increments the command accept counter.
-**       The msg parameter is ignored in this one.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdNoop
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdNoop(CFE_SB_Buffer_t *msg)
 {
     CFE_EVS_SendEvent(CF_EID_INF_CMD_NOOP, CFE_EVS_EventType_INFORMATION, "CF: No-Op received, Version %d.%d.%d",
@@ -63,19 +57,14 @@ void CF_CmdNoop(CFE_SB_Buffer_t *msg)
     CF_CmdAcc();
 }
 
-/************************************************************************/
-/** \brief The reset counters command.
-**
-**  \par Description
-**       This function has a signature the same of all cmd_ functions.
-**       Resets the given counter, or all.
-**       Increments the command accept or reject counter. If the command
-**       counters are reset, then there is no increment.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdReset
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdReset(CFE_SB_Buffer_t *msg)
 {
     static const int counters_command = 1;
@@ -141,17 +130,14 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
 err_out:;
 }
 
-/************************************************************************/
-/** \brief Ground command to start a file transfer.
-**
-**  \par Description
-**       This function has a signature the same of all cmd_ functions.
-**       Increments the command accept or reject counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdTxFile
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
 {
     CF_TxFileCmd_t *tx = (CF_TxFileCmd_t *)msg;
@@ -164,17 +150,14 @@ void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
                               tx->dest_id));
 }
 
-/************************************************************************/
-/** \brief Ground command to start directory playback.
-**
-**  \par Description
-**       This function has a signature the same of all cmd_ functions.
-**       Increments the command accept or reject counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdPlaybackDir
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
 {
     CF_PlaybackDirCmd_t *tx = (CF_PlaybackDirCmd_t *)msg;
@@ -187,23 +170,14 @@ void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
                                    tx->priority, tx->dest_id));
 }
 
-/************************************************************************/
-/** \brief Common logic for all channel-based commands.
-**
-**  \par Description
-**       All the commands that act on channels or have the special
-**       "all channels" parameter come through this function. This puts
-**       all common logic in one place. It does not handle the command
-**       accept or reject counters.
-**
-**  \par Assumptions, External Events, and Notes:
-**       cmd must not be NULL. errstr must not be NULL. fn must be a valid function. context may be NULL.
-**
-**  \returns
-**  \retstmt The return value from the given function. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_DoChanAction
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_ChanActionFn_t fn, void *context)
 {
     int ret = 0;
@@ -233,17 +207,14 @@ int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_ChanActionFn_
     return ret;
 }
 
-/************************************************************************/
-/** \brief Channel action to set the frozen bit for a channel.
-**
-**  \par Assumptions, External Events, and Notes:
-**       context must not be NULL.
-**
-**  \returns
-**  \retstmt Always succeeds, so returns 0. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_DoFreezeThaw
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_DoFreezeThaw(uint8 chan_num, const CF_ChanAction_BoolArg_t *context)
 {
     /* no need to bounds check chan_num, done in caller */
@@ -251,43 +222,42 @@ int CF_DoFreezeThaw(uint8 chan_num, const CF_ChanAction_BoolArg_t *context)
     return 0;
 }
 
-/************************************************************************/
-/** \brief Freeze a channel.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdFreeze
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdFreeze(CFE_SB_Buffer_t *msg)
 {
     CF_ChanAction_BoolArg_t barg = {1}; /* param is frozen, so 1 means freeze */
     CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "freeze", (CF_ChanActionFn_t)CF_DoFreezeThaw, &barg));
 }
 
-/************************************************************************/
-/** \brief Thaw a channel.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdThaw
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdThaw(CFE_SB_Buffer_t *msg)
 {
     CF_ChanAction_BoolArg_t barg = {0}; /* param is frozen, so 0 means thawed */
     CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "thaw", (CF_ChanActionFn_t)CF_DoFreezeThaw, &barg));
 }
 
-/************************************************************************/
-/** \brief Search for a transaction across all channels.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-**  \returns
-**  \retstmt The transaction, if found. Otherwise NULL. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_FindTransactionBySequenceNumberAllChannels
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSeq_t ts, CF_EntityId_t eid)
 {
     int               i;
@@ -310,24 +280,14 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSe
     return ret;
 }
 
-/* CF_TsnChanAction() returns the number of transactions acted upon */
-/************************************************************************/
-/** \brief Common logic for all transaction sequence number and channel commands.
-**
-**  \par Description
-**       All the commands that on a transaction on a particular channel come
-**       through this function. This puts all common logic in one place. It
-**       does handle the command accept or reject counters.
-**
-**  \par Assumptions, External Events, and Notes:
-**       cmd must not be NULL. fn must be a valid function. context may be NULL.
-**
-**  \returns
-**  \retcode #CFE_SUCCESS \retdesc \copydoc CFE_SUCCESSS \endcode
-**  \retstmt Returns anything else on error.             \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_TsnChanAction
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
 {
     int ret = -1;
@@ -367,13 +327,14 @@ int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAct
     return ret;
 }
 
-/************************************************************************/
-/** \brief Set the suspended bit in a transaction.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. context must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_DoSuspRes_Txn
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_DoSuspRes_Txn(CF_Transaction_t *t, CF_ChanAction_SuspResArg_t *context)
 {
     CF_Assert(t);
@@ -387,17 +348,14 @@ void CF_DoSuspRes_Txn(CF_Transaction_t *t, CF_ChanAction_SuspResArg_t *context)
     }
 }
 
-/************************************************************************/
-/** \brief Handle transaction suspend and resume commands.
-**
-**  \par Description
-**       This is called for both suspend and resume ground commands.
-**       It uses the CF_TsnChanAction() function to perform the command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       cmd must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_DoSuspRes
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
 {
     /* ok to not bounds check action, because the caller is using it in two places with constant values 0 or 1 */
@@ -423,89 +381,92 @@ void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
     }
 }
 
-/************************************************************************/
-/** \brief Handle transaction suspend command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdSuspend
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdSuspend(CFE_SB_Buffer_t *msg)
 {
     CF_DoSuspRes((CF_TransactionCmd_t *)msg, 1);
 }
 
-/************************************************************************/
-/** \brief Handle transaction resume command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdResume
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdResume(CFE_SB_Buffer_t *msg)
 {
     CF_DoSuspRes((CF_TransactionCmd_t *)msg, 0);
 }
 
-/************************************************************************/
-/** \brief tsn chan action to cancel a transaction.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdCancel_Txn
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdCancel_Txn(CF_Transaction_t *t, void *ignored)
 {
     CF_CFDP_CancelTransaction(t);
 }
 
-/************************************************************************/
-/** \brief Handle a cancel ground command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdCancel
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdCancel(CFE_SB_Buffer_t *msg)
 {
     CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "cancel", CF_CmdCancel_Txn, NULL));
 }
 
-/************************************************************************/
-/** \brief tsn chan action to abandon a transaction.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdAbandon_Txn
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdAbandon_Txn(CF_Transaction_t *t, void *ignored)
 {
     CF_CFDP_ResetTransaction(t, 0);
 }
 
-/************************************************************************/
-/** \brief Handle an abandon ground command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdAbandon
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
 {
     CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "abandon", CF_CmdAbandon_Txn, NULL));
 }
 
-/************************************************************************/
-/** \brief Sets the dequeue enable/disable flag for a channel.
-**
-**  \par Assumptions, External Events, and Notes:
-**       context must not be NULL.
-**
-**  \returns
-**  \retstmt Always succeeds, so returns 0. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_DoEnableDisableDequeue
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_DoEnableDisableDequeue(uint8 chan_num, const CF_ChanAction_BoolArg_t *context)
 {
     /* no need to bounds check chan_num, done in caller */
@@ -513,13 +474,14 @@ int CF_DoEnableDisableDequeue(uint8 chan_num, const CF_ChanAction_BoolArg_t *con
     return 0;
 }
 
-/************************************************************************/
-/** \brief Handle an enable dequeue ground command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdEnableDequeue
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
 {
     CF_ChanAction_BoolArg_t barg = {1};
@@ -527,13 +489,14 @@ void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
                                &barg));
 }
 
-/************************************************************************/
-/** \brief Handle a disable dequeue ground command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdDisableDequeue
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg)
 {
     CF_ChanAction_BoolArg_t barg = {0};
@@ -541,13 +504,14 @@ void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg)
                                (CF_ChanActionFn_t)CF_DoEnableDisableDequeue, &barg));
 }
 
-/************************************************************************/
-/** \brief Sets the enable/disable flag for the specified polling directory.
-**
-**  \par Assumptions, External Events, and Notes:
-**       context must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_DoEnableDisablePolldir
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolMsgArg_t *context)
 {
     int ret = 0;
@@ -574,13 +538,14 @@ int CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolMsgArg_t *
     return ret;
 }
 
-/************************************************************************/
-/** \brief Enable a polling dir ground command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdEnablePolldir
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
 {
     CF_ChanAction_BoolMsgArg_t barg = {(CF_UnionArgsCmd_t *)msg, 1};
@@ -588,13 +553,14 @@ void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
                                &barg));
 }
 
-/************************************************************************/
-/** \brief Disable a polling dir ground command.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdDisablePolldir
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
 {
     CF_ChanAction_BoolMsgArg_t barg = {(CF_UnionArgsCmd_t *)msg, 0};
@@ -602,13 +568,14 @@ void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
                                (CF_ChanActionFn_t)CF_DoEnableDisablePolldir, &barg));
 }
 
-/************************************************************************/
-/** \brief Purge the history queue for the given channel.
-**
-**  \par Assumptions, External Events, and Notes:
-**       n must not be NULL. c must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_PurgeHistory
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c)
 {
     CF_History_t *h = container_of(n, CF_History_t, cl_node);
@@ -616,13 +583,14 @@ int CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c)
     return CF_CLIST_CONT;
 }
 
-/************************************************************************/
-/** \brief Purge the pending transaction queue.
-**
-**  \par Assumptions, External Events, and Notes:
-**       n must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_PurgeTransaction
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_PurgeTransaction(CF_CListNode_t *n, void *ignored)
 {
     CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
@@ -630,21 +598,14 @@ int CF_PurgeTransaction(CF_CListNode_t *n, void *ignored)
     return CF_CLIST_CONT;
 }
 
-/************************************************************************/
-/** \brief Channel action command to perform purge queue operations.
-**
-**  \par Description
-**       Determines from the command parameters which queues to traverse
-**       and purge state.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-**  \returns
-**  \retstmt 0 on success; anything else on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_DoPurgeQueue
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
 {
     int ret = 0;
@@ -689,25 +650,27 @@ int CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
     return ret;
 }
 
-/************************************************************************/
-/** \brief Ground command to purge either the history or pending queues.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdPurgeQueue
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
 {
     CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "purge_queue", (CF_ChanActionFn_t)CF_DoPurgeQueue, msg));
 }
 
-/************************************************************************/
-/** \brief Ground command to write a file with queue information.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdWriteQueue
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
 {
     /* a type value of 0 means to process both type_up and type_down */
@@ -829,13 +792,14 @@ bail:
     CF_CmdRej();
 }
 
-/************************************************************************/
-/** \brief Ground command to send configuration parameters.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdSendCfgParams
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdSendCfgParams(CFE_SB_Buffer_t *msg)
 {
     CF_AppData.cfg.ticks_per_second             = CF_AppData.config_table->ticks_per_second;
@@ -854,17 +818,14 @@ void CF_CmdSendCfgParams(CFE_SB_Buffer_t *msg)
     CF_CmdAcc();
 }
 
-/************************************************************************/
-/** \brief Checks if the value is less than or equal to the max pdu size.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-**  \returns
-**  \retstmt 0 if success, 1 if failed. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdValidateChunkSize
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_CmdValidateChunkSize(uint32 val, uint8 chan_num /* ignored */)
 {
     int ret = 0;
@@ -875,17 +836,14 @@ int CF_CmdValidateChunkSize(uint32 val, uint8 chan_num /* ignored */)
     return ret;
 }
 
-/************************************************************************/
-/** \brief Checks if the value is
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-**  \returns
-**  \retstmt 0 if success, 1 if failed. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdValidateMaxOutgoing
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
 {
     int ret = 0;
@@ -899,18 +857,14 @@ int CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
     return ret;
 }
 
-/************************************************************************/
-/** \brief Perform a configuration get/set operation.
-**
-**  \par Description
-**       Combine get and set in one function with common logic.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
-/* combine getset into a single function with a branch to avoid wasted memory footprint with duplicate
- * logic for finding the parameter */
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdGetSetParam
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num)
 {
     CF_ConfigTable_t *config;
@@ -1066,39 +1020,42 @@ err_out:
     CF_CmdCond(acc);
 }
 
-/************************************************************************/
-/** \brief Ground command to set a configuration parameter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdSetParam
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdSetParam(CFE_SB_Buffer_t *msg)
 {
     CF_SetParamCmd_t *cmd = (CF_SetParamCmd_t *)msg;
     CF_CmdGetSetParam(1, cmd->key, cmd->value, cmd->chan_num);
 }
 
-/************************************************************************/
-/** \brief Ground command to set a configuration parameter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdGetParam
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdGetParam(CFE_SB_Buffer_t *msg)
 {
     CF_GetParamCmd_t *cmd = (CF_GetParamCmd_t *)msg;
     CF_CmdGetSetParam(0, cmd->key, 0, cmd->chan_num);
 }
 
-/************************************************************************/
-/** \brief Ground command enable engine.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdEnableEngine
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdEnableEngine(CFE_SB_Buffer_t *msg)
 {
     if (!CF_AppData.engine.enabled)
@@ -1122,13 +1079,14 @@ void CF_CmdEnableEngine(CFE_SB_Buffer_t *msg)
     }
 }
 
-/************************************************************************/
-/** \brief Ground command disable engine.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CmdDisableEngine
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CmdDisableEngine(CFE_SB_Buffer_t *msg)
 {
     if (CF_AppData.engine.enabled)
@@ -1144,13 +1102,14 @@ void CF_CmdDisableEngine(CFE_SB_Buffer_t *msg)
     }
 }
 
-/************************************************************************/
-/** \brief Process any ground command contained in the given message.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_ProcessGroundCommand
+ *
+ * Application-scope internal function
+ * See description in cf_cmd.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
 {
     static void (*const fns[CF_NUM_COMMANDS])(CFE_SB_Buffer_t *) = {

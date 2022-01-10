@@ -361,7 +361,7 @@ void Test_CF_Chunks_EraseChunk_ErasesLastChunkFrom_chunks_AndDecrements_count(vo
 /* NOTE: memmove should be wrapped for stubbing, but proving problematic.
  * CF_Chunks_InsertChunk tests will use the memmove call for now */
 
-void Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsEqTo_chunks_CF_max_chunks(void)
+void Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsEqTo_chunks_max_chunks(void)
 {
     // /* Arrange */
     // CF_ChunkList_t      dummy_chunks;
@@ -370,18 +370,18 @@ void Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsEqTo_chunks_
     // CF_Chunk_t       arg_chunk = {0};
 
     // arg_chunks->count = Any_uint32();
-    // arg_chunks->CF_max_chunks = arg_chunks->count;
+    // arg_chunks->max_chunks = arg_chunks->count;
 
     // /* Act */
     // CF_Chunks_InsertChunk(arg_chunks, arg_index_before, arg_chunk);
 
     // /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert");
-} /* end Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsEqTo_chunks_CF_max_chunks */
+} /* end Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsEqTo_chunks_max_chunks */
 
-/* NOTE: Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsGreaterThan_chunks_CF_max_chunks not required
+/* NOTE: Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsGreaterThan_chunks_max_chunks not required
  * but desired */
-// void Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsGreaterThan_chunks_CF_max_chunks(void)
+// void Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsGreaterThan_chunks_max_chunks(void)
 // {
 //     /* Arrange */
 //     CF_ChunkList_t      dummy_chunks;
@@ -391,14 +391,14 @@ void Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsEqTo_chunks_
 //     CF_Chunk_t*      arg_chunk = &dummy_chunk;
 
 //     arg_chunks->count = Any_uint32_Except(UINT32_MAX);
-//     arg_chunks->CF_max_chunks = Any_uint32_GreaterThan(arg_chunks->count);
+//     arg_chunks->max_chunks = Any_uint32_GreaterThan(arg_chunks->count);
 
 //     /* Act */
 //     //CF_Chunks_InsertChunk(arg_chunks, arg_index_before, arg_chunk);
 
 //     /* Assert */
 //     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert");
-// } /* end Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsGreaterThan_chunks_CF_max_chunks */
+// } /* end Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsGreaterThan_chunks_max_chunks */
 
 void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoEmpty_chunks(void)
 {
@@ -411,7 +411,7 @@ void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoEmpty_chunks(void)
     const CF_Chunk_t *arg_chunk;
 
     arg_chunks->count = 0;
-    arg_chunks->CF_max_chunks =
+    arg_chunks->max_chunks =
         UINT32_MAX; /* UINT32_MAX maybe unresonable but keeps it out of the way with the CF_Assert */
     arg_chunks->chunks = initial_chunks;
 
@@ -447,7 +447,7 @@ void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoStartOfSingle_chunks(void)
     initial_chunks[0]          = initial_start_chunk;
 
     arg_chunks->count = 1;
-    arg_chunks->CF_max_chunks =
+    arg_chunks->max_chunks =
         UINT32_MAX; /* UINT32_MAX maybe unresonable but keeps it out of the way with the CF_Assert */
     arg_chunks->chunks = initial_chunks;
 
@@ -487,7 +487,7 @@ void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoEndOfSingle_chunks(void)
     initial_chunks[0]          = initial_start_chunk;
 
     arg_chunks->count = 1;
-    arg_chunks->CF_max_chunks =
+    arg_chunks->max_chunks =
         UINT32_MAX; /* UINT32_MAX maybe unresonable but keeps it out of the way with the CF_Assert */
     arg_chunks->chunks = initial_chunks;
 
@@ -544,7 +544,7 @@ void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoSome_chunks(void)
     }
 
     arg_chunks->count = initial_count;
-    arg_chunks->CF_max_chunks =
+    arg_chunks->max_chunks =
         UINT32_MAX; /* UINT32_MAX maybe unresonable but keeps it out of the way with the CF_Assert */
     arg_chunks->chunks = initial_chunks;
 
@@ -749,8 +749,8 @@ void Test_CF_Chunks_CombinePrevious_Asserts_i_GivenIsEqTo_chunks_CF_max_Chunks(v
     // CF_Chunk_t*      arg_chunk = &dummy_chunk;
     // CF_ChunkIdx_t       local_result;
 
-    // arg_chunks->CF_max_chunks = Any_uint32_Except(0);
-    // arg_i = arg_chunks->CF_max_chunks;
+    // arg_chunks->max_chunks = Any_uint32_Except(0);
+    // arg_i = arg_chunks->max_chunks;
 
     // /* Act */
     // local_result = CF_Chunks_CombinePrevious(arg_chunks, arg_i, arg_chunk);
@@ -770,8 +770,8 @@ void Test_CF_Chunks_CombinePrevious_Asserts_i_GivenIsEqTo_chunks_CF_max_Chunks(v
 //     CF_Chunk_t*      arg_chunk = &dummy_chunk;
 //     CF_ChunkIdx_t       local_result;
 
-//     arg_chunks->CF_max_chunks = Any_uint32_Except(0);
-//     arg_i = Any_uint32_GreaterThan(arg_chunks->CF_max_chunks);
+//     arg_chunks->max_chunks = Any_uint32_Except(0);
+//     arg_i = Any_uint32_GreaterThan(arg_chunks->max_chunks);
 
 //     /* Act */
 //     //local_result = CF_Chunks_CombinePrevious(arg_chunks, arg_i, arg_chunk);
@@ -790,9 +790,9 @@ void Test_CF_Chunks_CombinePrevious_Given_i_Is_0_Return_0(void)
     CF_Chunk_t     *arg_chunk    = &dummy_chunk;
     int             local_result = Any_int_Except(0);
 
-    arg_chunks->CF_max_chunks = Any_uint32_Except(0);
-    arg_i                     = 0;
-    arg_chunks->count         = Any_uint32_GreaterThan(0);
+    arg_chunks->max_chunks = Any_uint32_Except(0);
+    arg_i                  = 0;
+    arg_chunks->count      = Any_uint32_GreaterThan(0);
 
     /* Act */
     local_result = CF_Chunks_CombinePrevious(arg_chunks, arg_i, arg_chunk);
@@ -811,9 +811,9 @@ void Test_CF_Chunks_CombinePrevious_Given_chunks_count_Is_0_Return_0(void)
     CF_Chunk_t     *arg_chunk    = &dummy_chunk;
     int             local_result = Any_int_Except(0);
 
-    arg_chunks->CF_max_chunks = Any_uint32_Except(0);
-    arg_i                     = Any_uint32_LessThan(arg_chunks->CF_max_chunks);
-    arg_chunks->count         = 0;
+    arg_chunks->max_chunks = Any_uint32_Except(0);
+    arg_i                  = Any_uint32_LessThan(arg_chunks->max_chunks);
+    arg_chunks->count      = 0;
 
     /* Act */
     local_result = CF_Chunks_CombinePrevious(arg_chunks, arg_i, arg_chunk);
@@ -832,9 +832,9 @@ void Test_CF_Chunks_CombinePrevious_Given_i_Is_0_And_chunks_count_Is_0_Return_0(
     CF_Chunk_t     *arg_chunk    = &dummy_chunk;
     int             local_result = Any_int_Except(0);
 
-    arg_chunks->CF_max_chunks = Any_uint32_Except(0);
-    arg_i                     = 0;
-    arg_chunks->count         = 0;
+    arg_chunks->max_chunks = Any_uint32_Except(0);
+    arg_i                  = 0;
+    arg_chunks->count      = 0;
 
     /* Act */
     local_result = CF_Chunks_CombinePrevious(arg_chunks, arg_i, arg_chunk);
@@ -860,7 +860,7 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
     CF_ChunkSize_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
     int              local_result = Any_int_Except(0);
 
-    arg_chunks->CF_max_chunks            = Any_uint32_GreaterThan(dummy_chunks_count);
+    arg_chunks->max_chunks               = Any_uint32_GreaterThan(dummy_chunks_count);
     arg_chunks->count                    = dummy_chunks_count;
     arg_chunks->chunks                   = dummy_chunks_chunks;
     arg_chunks->chunks[arg_i - 1].offset = dummy_offset;
@@ -894,7 +894,7 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
     CF_ChunkSize_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
     int              local_result = Any_int_Except(0);
 
-    arg_chunks->CF_max_chunks            = Any_uint32_GreaterThan(dummy_chunks_count);
+    arg_chunks->max_chunks               = Any_uint32_GreaterThan(dummy_chunks_count);
     arg_chunks->count                    = dummy_chunks_count;
     arg_chunks->chunks                   = dummy_chunks_chunks;
     arg_chunks->chunks[arg_i - 1].offset = dummy_offset;
@@ -929,7 +929,7 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
     CF_ChunkSize_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
     int              local_result = Any_int_Except(0);
 
-    arg_chunks->CF_max_chunks            = Any_uint32_GreaterThan(dummy_chunks_count);
+    arg_chunks->max_chunks               = Any_uint32_GreaterThan(dummy_chunks_count);
     arg_chunks->count                    = dummy_chunks_count;
     arg_chunks->chunks                   = dummy_chunks_chunks;
     arg_chunks->chunks[arg_i - 1].offset = dummy_offset;
@@ -964,7 +964,7 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
     CF_ChunkSize_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
     int              local_result = Any_int_Except(0);
 
-    arg_chunks->CF_max_chunks            = Any_uint32_GreaterThan(dummy_chunks_count);
+    arg_chunks->max_chunks               = Any_uint32_GreaterThan(dummy_chunks_count);
     arg_chunks->count                    = dummy_chunks_count;
     arg_chunks->chunks                   = dummy_chunks_chunks;
     arg_chunks->chunks[arg_i - 1].offset = dummy_offset;
@@ -999,7 +999,7 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
     CF_ChunkSize_t   initial_size = Any_uint32_LessThan(UINT32_MAX / 2);
     int              local_result = Any_int_Except(0);
 
-    arg_chunks->CF_max_chunks            = Any_uint32_GreaterThan(dummy_chunks_count);
+    arg_chunks->max_chunks               = Any_uint32_GreaterThan(dummy_chunks_count);
     arg_chunks->count                    = dummy_chunks_count;
     arg_chunks->chunks                   = dummy_chunks_chunks;
     arg_chunks->chunks[arg_i - 1].offset = dummy_offset;
@@ -1353,8 +1353,8 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_non0_CallTo_CF_C
     CF_Chunk_t     dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
     CF_ChunkList_t dummy_chunks;
 
-    arg_chunks                = &dummy_chunks;
-    arg_chunks->CF_max_chunks = UINT32_MAX;
+    arg_chunks             = &dummy_chunks;
+    arg_chunks->max_chunks = UINT32_MAX;
 
     arg_chunks->count = dummy_chunks_count;
     initial_i         = Any_uint32_LessThan(arg_chunks->count);
@@ -1392,8 +1392,8 @@ void Test_CF_Chunks_Insert_CombinesNextSuccessButCombinePreviousSuccessCalls_CF_
     CF_Chunk_t     dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
     CF_ChunkList_t dummy_chunks;
 
-    arg_chunks                = &dummy_chunks;
-    arg_chunks->CF_max_chunks = UINT32_MAX;
+    arg_chunks             = &dummy_chunks;
+    arg_chunks->max_chunks = UINT32_MAX;
 
     arg_chunks->count = dummy_chunks_count;
     arg_i             = Any_uint32_LessThan(arg_chunks->count - 1) + 1; /* -1 then +1 to ensure at least 1 */
@@ -1429,8 +1429,8 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     CF_Chunk_t     dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
     CF_ChunkList_t dummy_chunks;
 
-    arg_chunks                = &dummy_chunks;
-    arg_chunks->CF_max_chunks = UINT32_MAX;
+    arg_chunks             = &dummy_chunks;
+    arg_chunks->max_chunks = UINT32_MAX;
 
     arg_chunks->count = dummy_chunks_count;
     arg_i             = arg_chunks->count;
@@ -1468,8 +1468,8 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     CF_Chunk_t     dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
     CF_ChunkList_t dummy_chunks;
 
-    arg_chunks                = &dummy_chunks;
-    arg_chunks->CF_max_chunks = UINT32_MAX;
+    arg_chunks             = &dummy_chunks;
+    arg_chunks->max_chunks = UINT32_MAX;
 
     arg_chunks->count = dummy_chunks_count;
     arg_i             = arg_chunks->count;
@@ -1494,7 +1494,7 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
      Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_chunks_count_IsLessThan_chunks_CF_max_Chunks_Call_CF_Chunks_InsertChunk
    */
 
-void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_chunks_count_IsGreaterThan_CF_max_chunks_And_smallest_c_size_IsGreaterThan_chunk_size_DoNothing(
+void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_chunks_count_IsGreaterThan_max_chunks_And_smallest_c_size_IsGreaterThan_chunk_size_DoNothing(
     void)
 {
     /* Arrange */
@@ -1508,8 +1508,8 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     CF_Chunk_t     dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
     CF_ChunkList_t dummy_chunks;
 
-    arg_chunks                = &dummy_chunks;
-    arg_chunks->CF_max_chunks = 3;
+    arg_chunks             = &dummy_chunks;
+    arg_chunks->max_chunks = 3;
 
     arg_chunks->count = dummy_chunks_count;
     arg_i             = arg_chunks->count;
@@ -1534,10 +1534,10 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     UtAssert_True(arg_chunks->count == dummy_chunks_count, "chunks->count is %u and should be %u (value before call)",
                   arg_chunks->count, dummy_chunks_count);
 } /* end
-     Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_chunks_count_IsGreaterThan_CF_max_chunks_And_smallest_c_size_IsGreaterThan_chunk_size_DoNothing
+     Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_chunks_count_IsGreaterThan_max_chunks_And_smallest_c_size_IsGreaterThan_chunk_size_DoNothing
    */
 
-void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_chunks_count_IsGreaterThan_CF_max_chunks_And_smallest_c_size_IsLessThan_chunk_size_Call_CF_Chunks_EraseChunk_And_CF_Chunks_InsertChunk(
+void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_chunks_count_IsGreaterThan_max_chunks_And_smallest_c_size_IsLessThan_chunk_size_Call_CF_Chunks_EraseChunk_And_CF_Chunks_InsertChunk(
     void)
 {
     /* Arrange */
@@ -1551,8 +1551,8 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     CF_Chunk_t     dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
     CF_ChunkList_t dummy_chunks;
 
-    arg_chunks                = &dummy_chunks;
-    arg_chunks->CF_max_chunks = 3;
+    arg_chunks             = &dummy_chunks;
+    arg_chunks->max_chunks = 3;
 
     arg_chunks->count = dummy_chunks_count;
     arg_i             = arg_chunks->count;
@@ -1579,7 +1579,7 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     UtAssert_True(arg_chunks->count == dummy_chunks_count, "chunks->count is %u and should be %u (value before call)",
                   arg_chunks->count, dummy_chunks_count);
 } /* end
-     Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_chunks_count_IsGreaterThan_CF_max_chunks_And_smallest_c_size_IsLessThan_chunk_size_Call_CF_Chunks_EraseChunk_And_CF_Chunks_InsertChunk
+     Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_chunks_count_IsGreaterThan_max_chunks_And_smallest_c_size_IsLessThan_chunk_size_Call_CF_Chunks_EraseChunk_And_CF_Chunks_InsertChunk
    */
 
 /* end CF_Chunks_Insert tests */
@@ -1891,45 +1891,45 @@ void Test_CF_Chunks_GetFirstChunk_WhenGiven_chunks_count_Is_Any_index_t_ReturnFi
 **
 *******************************************************************************/
 
-void Test_CF_Chunks_Init_AssertsBecauseGiven_CF_max_chunks_Is_0(void)
+void Test_CF_Chunks_Init_AssertsBecauseGiven_max_chunks_Is_0(void)
 {
     // /* Arrange */
     // CF_ChunkList_t        dummy_chunks;
     // CF_ChunkList_t*       arg_chunks = &dummy_chunks;
-    // CF_ChunkIdx_t         arg_CF_max_chunks = Any_uint16() + 2; /* 2-65537, uint16 is used instead of CF_ChunkIdx_t
+    // CF_ChunkIdx_t         arg_max_chunks = Any_uint16() + 2; /* 2-65537, uint16 is used instead of CF_ChunkIdx_t
     // to have a reasonably decent size for the test without being too large (segfault) */ CF_Chunk_t* arg_chunks_mem;
 
     // /* Act */
-    // CF_ChunkListInit(arg_chunks, arg_CF_max_chunks, arg_chunks_mem);
+    // CF_ChunkListInit(arg_chunks, arg_max_chunks, arg_chunks_mem);
 
     // /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert");
-} /* end Test_CF_Chunks_Init_AssertsBecauseGiven_CF_max_chunks_Is_0 */
+} /* end Test_CF_Chunks_Init_AssertsBecauseGiven_max_chunks_Is_0 */
 
-void Test_CF_Chunks_Init_SetGiven_chunks_CF_max_chunks_ToGiven_CF_max_chunks(void)
+void Test_CF_Chunks_Init_SetGiven_chunks_max_chunks_ToGiven_max_chunks(void)
 {
     /* Arrange */
     CF_ChunkList_t  dummy_chunks;
     CF_ChunkList_t *arg_chunks = &dummy_chunks;
-    CF_ChunkIdx_t   arg_CF_max_chunks =
+    CF_ChunkIdx_t   arg_max_chunks =
         Any_uint16() + 2; /* 2-65537, uint8 is used instead of CF_ChunkIdx_t to have a reasonably
                        decent size for the test without being too large (segfault) */
-    CF_Chunk_t arg_chunks_mem[arg_CF_max_chunks];
+    CF_Chunk_t arg_chunks_mem[arg_max_chunks];
 
     arg_chunks->count = 0;
 
     /* Act */
-    CF_ChunkListInit(arg_chunks, arg_CF_max_chunks, arg_chunks_mem);
+    CF_ChunkListInit(arg_chunks, arg_max_chunks, arg_chunks_mem);
 
     /* Assert */
-    UtAssert_UINT32_EQ(arg_chunks->CF_max_chunks, arg_CF_max_chunks);
+    UtAssert_UINT32_EQ(arg_chunks->max_chunks, arg_max_chunks);
     UtAssert_ADDRESS_EQ(arg_chunks->chunks, arg_chunks_mem);
     /* Assert Unstubbable - CF_ChunkListReset */
     UtAssert_ZERO(arg_chunks->count);
-    UtAssert_MemCmpValue(arg_chunks->chunks, 0x00, sizeof(*arg_chunks->chunks) * arg_CF_max_chunks,
-                         "The chunks, %lu bytes (sizeof(*chunks->chunks)*chunks->CF_max_chunks), were all set to 0",
-                         sizeof(CF_Chunk_t) * arg_CF_max_chunks);
-} /* end Test_CF_Chunks_Init_SetGiven_chunks_CF_max_chunks_ToGiven_CF_max_chunks */
+    UtAssert_MemCmpValue(arg_chunks->chunks, 0x00, sizeof(*arg_chunks->chunks) * arg_max_chunks,
+                         "The chunks, %lu bytes (sizeof(*chunks->chunks)*chunks->max_chunks), were all set to 0",
+                         sizeof(CF_Chunk_t) * arg_max_chunks);
+} /* end Test_CF_Chunks_Init_SetGiven_chunks_max_chunks_ToGiven_max_chunks */
 
 /* CF_ChunkListInit tests */
 
@@ -1939,30 +1939,30 @@ void Test_CF_Chunks_Init_SetGiven_chunks_CF_max_chunks_ToGiven_CF_max_chunks(voi
 **
 *******************************************************************************/
 
-void Test_CF_ChunksReset_Set_count_To_0_Keeps_CF_max_chunks_AndMemsets_chunks_ToAll_0(void)
+void Test_CF_ChunksReset_Set_count_To_0_Keeps_max_chunks_AndMemsets_chunks_ToAll_0(void)
 {
     /* Arrange */
     CF_ChunkList_t  dummy_chunks;
     CF_ChunkList_t *arg_chunks = &dummy_chunks;
-    CF_ChunkIdx_t   initial_CF_max_chunks =
+    CF_ChunkIdx_t   initial_max_chunks =
         Any_uint16() + 2; /* 2-65537, uint8 is used instead of CF_ChunkIdx_t to have a reasonably
                        decent size for the test without being too large (segfault) */
-    CF_Chunk_t dummy_chunks_chunks[initial_CF_max_chunks];
+    CF_Chunk_t dummy_chunks_chunks[initial_max_chunks];
 
-    arg_chunks->count         = Any_index_t();
-    arg_chunks->CF_max_chunks = initial_CF_max_chunks;
-    arg_chunks->chunks        = dummy_chunks_chunks;
+    arg_chunks->count      = Any_index_t();
+    arg_chunks->max_chunks = initial_max_chunks;
+    arg_chunks->chunks     = dummy_chunks_chunks;
 
     /* Act */
     CF_ChunkListReset(arg_chunks);
 
     /* Assert */
     UtAssert_ZERO(arg_chunks->count);
-    UtAssert_UINT32_EQ(arg_chunks->CF_max_chunks, initial_CF_max_chunks);
-    UtAssert_MemCmpValue(arg_chunks->chunks, 0x00, sizeof(CF_Chunk_t) * initial_CF_max_chunks,
-                         "The chunks, %lu bytes (sizeof(CF_Chunk_t)*chunks->CF_max_chunks), were all set to 0",
-                         sizeof(CF_Chunk_t) * initial_CF_max_chunks);
-} /* end Test_CF_ChunksReset_Set_count_To_0_Keeps_CF_max_chunks_AndMemsets_chunks_ToAll_0 */
+    UtAssert_UINT32_EQ(arg_chunks->max_chunks, initial_max_chunks);
+    UtAssert_MemCmpValue(arg_chunks->chunks, 0x00, sizeof(CF_Chunk_t) * initial_max_chunks,
+                         "The chunks, %lu bytes (sizeof(CF_Chunk_t)*chunks->max_chunks), were all set to 0",
+                         sizeof(CF_Chunk_t) * initial_max_chunks);
+} /* end Test_CF_ChunksReset_Set_count_To_0_Keeps_max_chunks_AndMemsets_chunks_ToAll_0 */
 
 /* CF_ChunkListReset tests */
 
@@ -2394,12 +2394,12 @@ void add_CF_Chunks_EraseChunk_tests(void)
 
 void add_CF_Chunks_InsertChunk_tests(void)
 {
-    UtTest_Add(Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsEqTo_chunks_CF_max_chunks,
+    UtTest_Add(Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsEqTo_chunks_max_chunks,
                cf_chunk_tests_Setup, cf_chunk_tests_Teardown,
-               "Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsEqTo_chunks_CF_max_chunks");
-    // UtTest_Add(Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsGreaterThan_chunks_CF_max_chunks,
+               "Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsEqTo_chunks_max_chunks");
+    // UtTest_Add(Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsGreaterThan_chunks_max_chunks,
     //   cf_chunk_tests_Setup, cf_chunk_tests_Teardown,
-    //   "Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsGreaterThan_chunks_CF_max_chunks");
+    //   "Test_CF_Chunks_InsertChunk_AssertsBecause_Given_chunks_count_IsGreaterThan_chunks_max_chunks");
     UtTest_Add(Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoEmpty_chunks, cf_chunk_tests_Setup,
                cf_chunk_tests_Teardown, "Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoEmpty_chunks");
     UtTest_Add(Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoStartOfSingle_chunks, cf_chunk_tests_Setup,
@@ -2541,15 +2541,15 @@ void add_CF_Chunks_Insert_tests(void)
         "Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_"
         "chunks_count_IsLessThan_chunks_CF_max_Chunks_Call_CF_Chunks_InsertChunk");
     UtTest_Add(
-        Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_chunks_count_IsGreaterThan_CF_max_chunks_And_smallest_c_size_IsGreaterThan_chunk_size_DoNothing,
+        Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_chunks_count_IsGreaterThan_max_chunks_And_smallest_c_size_IsGreaterThan_chunk_size_DoNothing,
         cf_chunk_tests_Setup, cf_chunk_tests_Teardown,
         "Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_"
-        "chunks_count_IsGreaterThan_CF_max_chunks_And_smallest_c_size_IsGreaterThan_chunk_size_DoNothing");
+        "chunks_count_IsGreaterThan_max_chunks_And_smallest_c_size_IsGreaterThan_chunk_size_DoNothing");
     UtTest_Add(
-        Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_chunks_count_IsGreaterThan_CF_max_chunks_And_smallest_c_size_IsLessThan_chunk_size_Call_CF_Chunks_EraseChunk_And_CF_Chunks_InsertChunk,
+        Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_chunks_count_IsGreaterThan_max_chunks_And_smallest_c_size_IsLessThan_chunk_size_Call_CF_Chunks_EraseChunk_And_CF_Chunks_InsertChunk,
         cf_chunk_tests_Setup, cf_chunk_tests_Teardown,
         "Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chunks_CombinePrevious_Returns_0_And_"
-        "chunks_count_IsGreaterThan_CF_max_chunks_And_smallest_c_size_IsLessThan_chunk_size_Call_CF_Chunks_EraseChunk_"
+        "chunks_count_IsGreaterThan_max_chunks_And_smallest_c_size_IsLessThan_chunk_size_Call_CF_Chunks_EraseChunk_"
         "And_CF_Chunks_InsertChunk");
 } /* end add_CF_Chunks_Insert_tests */
 
@@ -2600,17 +2600,17 @@ void add_CF_Chunks_GetFirstChunk_tests(void)
 
 void add_CF_Chunks_Init_tests(void)
 {
-    UtTest_Add(Test_CF_Chunks_Init_AssertsBecauseGiven_CF_max_chunks_Is_0, cf_chunk_tests_Setup,
-               cf_chunk_tests_Teardown, "Test_CF_Chunks_Init_AssertsBecauseGiven_CF_max_chunks_Is_0");
-    UtTest_Add(Test_CF_Chunks_Init_SetGiven_chunks_CF_max_chunks_ToGiven_CF_max_chunks, cf_chunk_tests_Setup,
-               cf_chunk_tests_Teardown, "Test_CF_Chunks_Init_SetGiven_chunks_CF_max_chunks_ToGiven_CF_max_chunks");
+    UtTest_Add(Test_CF_Chunks_Init_AssertsBecauseGiven_max_chunks_Is_0, cf_chunk_tests_Setup, cf_chunk_tests_Teardown,
+               "Test_CF_Chunks_Init_AssertsBecauseGiven_max_chunks_Is_0");
+    UtTest_Add(Test_CF_Chunks_Init_SetGiven_chunks_max_chunks_ToGiven_max_chunks, cf_chunk_tests_Setup,
+               cf_chunk_tests_Teardown, "Test_CF_Chunks_Init_SetGiven_chunks_max_chunks_ToGiven_max_chunks");
 } /* end add_CF_Chunks_Init_tests */
 
 void add_CF_ChunksReset_tests(void)
 {
-    UtTest_Add(Test_CF_ChunksReset_Set_count_To_0_Keeps_CF_max_chunks_AndMemsets_chunks_ToAll_0, cf_chunk_tests_Setup,
+    UtTest_Add(Test_CF_ChunksReset_Set_count_To_0_Keeps_max_chunks_AndMemsets_chunks_ToAll_0, cf_chunk_tests_Setup,
                cf_chunk_tests_Teardown,
-               "Test_CF_ChunksReset_Set_count_To_0_Keeps_CF_max_chunks_AndMemsets_chunks_ToAll_0");
+               "Test_CF_ChunksReset_Set_count_To_0_Keeps_max_chunks_AndMemsets_chunks_ToAll_0");
 } /* end add_CF_ChunksReset_tests */
 
 void add_CF_Chunks_ComputeGaps_tests(void)

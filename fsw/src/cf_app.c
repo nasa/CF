@@ -1,28 +1,28 @@
 /************************************************************************
-** File: cf_app.c
-**
-** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
-** Application version 3.0.0”
-** Copyright © 2019 United States Government as represented by the
-** Administrator of the National Aeronautics and Space Administration.
-** All Rights Reserved.
-** Licensed under the Apache License, Version 2.0 (the "License"); you may
-** not use this file except in compliance with the License. You may obtain
-** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software
-** distributed under the License is distributed on an "AS IS" BASIS,
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-** See the License for the specific language governing permissions and
-** limitations under the License.
-**
-** Purpose:
-**  The CF Application main application source file
-**
-**  This file contains the functions that initialize the application and link
-**  all logic and functionality to the CFS.
-**
-*************************************************************************/
+ * File: cf_app.c
+ *
+ * NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
+ * Application version 3.0.0”
+ * Copyright © 2019 United States Government as represented by the
+ * Administrator of the National Aeronautics and Space Administration.
+ * All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License. You may obtain
+ * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Purpose:
+ *  The CF Application main application source file
+ *
+ *  This file contains the functions that initialize the application and link
+ *  all logic and functionality to the CFS.
+ *
+ ************************************************************************/
 
 #include "cfe.h"
 #include "cf_verify.h"
@@ -37,33 +37,28 @@
 
 CF_AppData_t CF_AppData;
 
-/************************************************************************/
-/** \brief Send CF housekeeping packet
-**
-**  \par Description
-**       The command to send the CF housekeeping packet comes in on
-**       the software bus. This function sends the message.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_HkCmd
+ *
+ * Application-scope internal function
+ * See description in cf_app.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_HkCmd(void)
 {
     CFE_MSG_SetMsgTime(&CF_AppData.hk.tlm_header.Msg, CFE_TIME_GetTime());
     /* return value ignored */ CFE_SB_TransmitMsg(&CF_AppData.hk.tlm_header.Msg, true);
 }
 
-/************************************************************************/
-/** \brief Checks to see if a table update is pending, and perform it.
-**
-**  \par Description
-**       Updates the table if the engine is disabled.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CheckTables
+ *
+ * Application-scope internal function
+ * See description in cf_app.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CheckTables(void)
 {
     CFE_Status_t status;
@@ -111,21 +106,14 @@ void CF_CheckTables(void)
     }
 }
 
-/************************************************************************/
-/** \brief Validation function for config table.
-**
-**  \par Description
-**       Checks that the config table being loaded has correct data.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-**  \returns
-**  \retcode #CFE_SUCCESS \retdesc \copydoc CFE_SUCCESSS \endcode
-**  \retstmt Returns anything else on error.             \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_ValidateConfigTable
+ *
+ * Application-scope internal function
+ * See description in cf_app.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int32 CF_ValidateConfigTable(void *tbl_ptr)
 {
     CF_ConfigTable_t  *tbl = (CF_ConfigTable_t *)tbl_ptr;
@@ -159,18 +147,14 @@ int32 CF_ValidateConfigTable(void *tbl_ptr)
     return ret;
 }
 
-/************************************************************************/
-/** \brief Load the table on application start
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-**  \returns
-**  \retcode #CFE_SUCCESS \retdesc \copydoc CFE_SUCCESSS \endcode
-**  \retstmt Returns anything else on error.             \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_TableInit
+ *
+ * Application-scope internal function
+ * See description in cf_app.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int32 CF_TableInit(void)
 {
     int32 status = CFE_SUCCESS;
@@ -217,22 +201,14 @@ err_out:
     return status;
 }
 
-/************************************************************************/
-/** \brief CF app init function
-**
-**  \par Description
-**       Initializes all aspects of the CF application. Messages,
-**       pipes, events, table, and the cfdp engine.
-**
-**  \par Assumptions, External Events, and Notes:
-**       This must only be called once.
-**
-**  \returns
-**  \retcode #CFE_SUCCESS \retdesc \copydoc CFE_SUCCESSS \endcode
-**  \retstmt Returns anything else on error.             \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Init
+ *
+ * Application-scope internal function
+ * See description in cf_app.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int32 CF_Init(void)
 {
     static CFE_EVS_BinFilter_t cf_event_filters[] = {
@@ -399,16 +375,14 @@ err_out:
     return status;
 }
 
-/************************************************************************/
-/** \brief CF wakeup function
-**
-**  \par Description
-**       Performs a single engine cycle for each wakeup
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_WakeUp
+ *
+ * Application-scope internal function
+ * See description in cf_app.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_WakeUp(void)
 {
     CFE_ES_PerfLogEntry(CF_PERF_ID_CYCLE_ENG);
@@ -416,17 +390,14 @@ void CF_WakeUp(void)
     CFE_ES_PerfLogExit(CF_PERF_ID_CYCLE_ENG);
 }
 
-/************************************************************************/
-/** \brief CF message processing function
-**
-**  \par Description
-**       Initializes all aspects of the CF application. Messages,
-**       pipes, events, table, and the cfdp engine.
-**
-**  \par Assumptions, External Events, and Notes:
-**       msg must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_ProcessMsg
+ *
+ * Application-scope internal function
+ * See description in cf_app.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_ProcessMsg(CFE_SB_Buffer_t *msg)
 {
     CFE_SB_MsgId_t msg_id;
@@ -456,17 +427,14 @@ void CF_ProcessMsg(CFE_SB_Buffer_t *msg)
     }
 }
 
-/************************************************************************/
-/** \brief CF app entry point
-**
-**  \par Description
-**       Main entry point of CF application.
-**       Calls the init function and manages the app run loop.
-**
-**  \par Assumptions, External Events, and Notes:
-**       This must only be called once.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_AppMain
+ *
+ * Entry point function
+ * See description in cf_app.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_AppMain(void)
 {
     int32            status;

@@ -1,28 +1,27 @@
 /************************************************************************
-** File: cf_msg.h
-**
-** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
-** Application version 3.0.0”
-** Copyright © 2019 United States Government as represented by the
-** Administrator of the National Aeronautics and Space Administration.
-** All Rights Reserved.
-** Licensed under the Apache License, Version 2.0 (the "License"); you may
-** not use this file except in compliance with the License. You may obtain
-** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software
-** distributed under the License is distributed on an "AS IS" BASIS,
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-** See the License for the specific language governing permissions and
-** limitations under the License.
-**
-**
-** Purpose:
-**  The CF Application message definitions header file
-**
-**
-**
-*************************************************************************/
+ *
+ * NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
+ * Application version 3.0.0”
+ * Copyright © 2019 United States Government as represented by the
+ * Administrator of the National Aeronautics and Space Administration.
+ * All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License. You may obtain
+ * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ************************************************************************/
+
+/**
+ * @file
+ *
+ *  The CF Application message definitions header file
+ */
 
 #ifndef CF_MSG_H
 #define CF_MSG_H
@@ -123,8 +122,8 @@ typedef struct CF_ConfigPacket
 } CF_ConfigPacket_t;
 
 /****************************************
-** CF app command packet command codes
-****************************************/
+ * CF app command packet command codes
+ ***************************************/
 
 /* NOTE: these are what was in the original app (may have slightly different names)
  * Not sure that we need to implement all these for cf 3.0 */
@@ -159,8 +158,8 @@ typedef enum
 } CF_CMDS;
 
 /****************************
-**  CF Command Formats     **
-*****************************/
+ *  CF Command Formats     **
+ ****************************/
 typedef struct CF_NoArgsCmd
 {
     CFE_MSG_CommandHeader_t cmd_header;
@@ -253,6 +252,5 @@ typedef struct CF_TransactionCmd
     uint8                   chan;     /* if 254, use ts. if 255, all channels */
     uint8                   spare[3]; /* To make structure a multiple of uint32 */
 } CF_TransactionCmd_t;
-
 
 #endif /* !CF_MSG_H */
