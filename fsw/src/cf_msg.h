@@ -84,8 +84,8 @@ typedef struct CF_HkChannel_Data
     uint16          q_size[CF_QueueIdx_NUM];
     uint8           poll_counter;
     uint8           playback_counter;
-    uint8           frozen; /* NOTE: this could be more than one flag if we ever need it */
-    uint8           spare[3];
+    uint8           frozen;   /* NOTE: this could be more than one flag if we ever need it */
+    uint8           spare[7]; /* Structure has uint64 values in the counters, so size should be multiple of 8 */
 } CF_HkChannel_Data_t;
 
 typedef struct CF_HkPacket
@@ -94,6 +94,8 @@ typedef struct CF_HkPacket
 
     /* app HK */
     CF_HkCmdCounters_t counters;
+
+    uint8 spare[4]; /* CF_HkCmdCounters_t is 4 bytes, and CF_HkChannel_Data_t uses uint64 values  */
 
     /* per-channel HK */
     CF_HkChannel_Data_t channel_hk[CF_NUM_CHANNELS];
@@ -196,6 +198,7 @@ typedef struct CF_SetParamCmd
     uint32                  value;
     uint8                   key;
     uint8                   chan_num;
+    uint8                   spare[2]; /* Required to make the size a multiple of uint32 */
 } CF_SetParamCmd_t;
 
 typedef struct CF_TxFileCmd
