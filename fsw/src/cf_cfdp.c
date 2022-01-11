@@ -1921,6 +1921,8 @@ void CF_CFDP_DisableEngine(void)
     static const CF_QueueIdx_t CLOSE_QUEUES[] = {CF_QueueIdx_RX, CF_QueueIdx_TXA, CF_QueueIdx_TXW};
     CF_Channel_t              *c;
 
+    CF_AppData.engine.enabled = 0;
+
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
         c = &CF_AppData.engine.channels[i];
