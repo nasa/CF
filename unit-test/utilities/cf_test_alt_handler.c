@@ -13,41 +13,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: UT_AltHandler_CF_CList_Traverse_TRAV_ARG_T
- *
- * A handler for CF_CList_Traverse which saves its arguments
- * including the opaque context pointer as a CF_Traverse_WriteFileArg_t object.
- *
- *-----------------------------------------------------------------*/
-void UT_AltHandler_CF_CList_Traverse_TRAV_ARG_T(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
-{
-    CF_CList_Traverse_TRAV_ARG_T_context_t *ctxt;
-    CF_Traverse_WriteFileArg_t *arg = UT_Hook_GetArgValueByName(Context, "context", CF_Traverse_WriteFileArg_t *);
-
-    if (UserObj)
-    {
-        ctxt = UserObj;
-    }
-    else
-    {
-        ctxt = UT_CF_GetContextBuffer(FuncKey, CF_CList_Traverse_TRAV_ARG_T_context_t);
-    }
-
-    if (ctxt)
-    {
-        ctxt->start = UT_Hook_GetArgValueByName(Context, "start", CF_CListNode_t *);
-        ctxt->fn    = UT_Hook_GetArgValueByName(Context, "fn", CF_CListFn_t);
-        if (arg)
-        {
-            ctxt->context_fd      = arg->fd;
-            ctxt->context_counter = arg->counter;
-            ctxt->context_result  = arg->result;
-        }
-    }
-}
-
-/*----------------------------------------------------------------
- *
  * Function: UT_AltHandler_CF_CList_Traverse_TRAVERSE_ALL_ARGS_T
  *
  * A handler for CF_CList_Traverse which saves its arguments

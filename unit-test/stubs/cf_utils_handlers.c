@@ -98,15 +98,15 @@ void UT_DefaultHandler_CF_FindUnusedTransaction(void *UserObj, UT_EntryKey_t Fun
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_WriteQueueDataToFile
+ * Function: UT_DefaultHandler_CF_WriteTxnQueueDataToFile
  *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
  *
  *-----------------------------------------------------------------*/
-void UT_DefaultHandler_CF_WriteQueueDataToFile(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
+void UT_DefaultHandler_CF_WriteTxnQueueDataToFile(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
-    CF_WriteQueueDataToFile_context_t *ctxt = UT_CF_GetContextBuffer(FuncKey, CF_WriteQueueDataToFile_context_t);
+    CF_WriteTxnQueueDataToFile_context_t *ctxt = UT_CF_GetContextBuffer(FuncKey, CF_WriteTxnQueueDataToFile_context_t);
 
     if (ctxt)
     {

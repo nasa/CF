@@ -124,7 +124,7 @@ typedef struct
     int32         fd;
     CF_Channel_t *c;
     CF_QueueIdx_t q;
-} CF_WriteQueueDataToFile_context_t;
+} CF_WriteTxnQueueDataToFile_context_t;
 
 typedef struct
 {

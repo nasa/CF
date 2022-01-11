@@ -34,8 +34,6 @@
 
 #include "cf_assert.h"
 
-#define LINEBUF_LEN ((CF_FILENAME_MAX_LEN * 2) + 128)
-
 /*----------------------------------------------------------------
  *
  * Function: CF_FindUnusedTransaction
@@ -174,63 +172,76 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_Transac
 
 /*----------------------------------------------------------------
  *
- * Function: CF_TraverseHistory
+ * Function: CF_WriteHistoryEntryToFile
  *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_TraverseHistory(CF_CListNode_t *n, CF_Traverse_WriteFileArg_t *context)
+int CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h)
 {
-    static const char *dstr[] = {"RX", "TX"};
-    int                i;
-    int32              ret;
-    int32              len;
-    char               linebuf[LINEBUF_LEN]; /* buffer for line data */
-    CF_History_t      *h = container_of(n, CF_History_t, cl_node);
+    static const char *CF_DSTR[] = {"RX", "TX"}; /* conversion of CF_Direction_t to string */
 
-    CF_Assert(h->dir < CF_Direction_NUM);
-    len = snprintf(linebuf, sizeof(linebuf) - 1, "SEQ (%d, %d)\tDIR: %s\tPEER %d\tCC: %d", h->src_eid, h->seq_num,
-                   dstr[h->dir], h->peer_eid, h->cc);
-    for (i = 0; i < 2; ++i)
+    int   i;
+    int32 ret;
+    int32 len;
+    char  linebuf[(CF_FILENAME_MAX_LEN * 2) + 128]; /* buffer for line data */
+
+    for (i = 0; i < 3; ++i)
     {
-        static const char *fstr[]   = {"SRC: %s", "DST: %s"};
-        const char        *fnames[] = {h->fnames.src_filename, h->fnames.dst_filename};
-        len                         = snprintf(linebuf, sizeof(linebuf) - 1, fstr[i], fnames[i]);
-        ret                         = CF_WrappedWrite(context->fd, linebuf, len);
+        switch (i)
+        {
+            case 0:
+                CF_Assert(h->dir < CF_Direction_NUM);
+                snprintf(linebuf, sizeof(linebuf), "SEQ (%lu, %lu)\tDIR: %s\tPEER %lu\tCC: %u\t",
+                         (unsigned long)h->src_eid, (unsigned long)h->seq_num, CF_DSTR[h->dir],
+                         (unsigned long)h->peer_eid, (unsigned int)h->cc);
+                break;
+            case 1:
+                snprintf(linebuf, sizeof(linebuf), "SRC: %s\t", h->fnames.src_filename);
+                break;
+            case 2:
+                snprintf(linebuf, sizeof(linebuf), "DST: %s\n", h->fnames.dst_filename);
+                break;
+        }
+
+        len = strlen(linebuf);
+        ret = CF_WrappedWrite(fd, linebuf, len);
         if (ret != len)
         {
-            context->result = 1; /* failed */
             CFE_EVS_SendEvent(CF_EID_ERR_CMD_WHIST_WRITE, CFE_EVS_EventType_ERROR,
-                              "CF: writing queue file failed, expected 0x%08x got 0x%08x", len, ret);
-            return CF_CLIST_EXIT;
+                              "CF: writing queue file failed, expected %ld got %ld", (long)len, (long)ret);
+            return -1;
         }
     }
 
-    return CF_CLIST_CONT;
+    return 0;
 }
 
 /*----------------------------------------------------------------
  *
- * Function: CF_TraverseTransactions
+ * Function: CF_Traverse_WriteHistoryQueueEntryToFile
  *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_TraverseTransactions(CF_CListNode_t *n, CF_Traverse_WriteFileArg_t *context)
+int CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *arg)
 {
-    CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
+    CF_Traverse_WriteHistoryFileArg_t *context = arg;
+    CF_History_t                      *h       = container_of(n, CF_History_t, cl_node);
 
-    /* use CF_TraverseHistory to print filenames and direction */
-    /* NOTE: ok to ignore return value of CF_TraverseHistory. We care
-     * about the value in context->result. The reason for this confusion
-     * is CF_TraverseHistory is also a list traversal function. In this
-     * function we are just calling it directly. */
-    /* ignore return value */ CF_TraverseHistory(&t->history->cl_node, context);
-    if (context->result)
+    /* if filter_dir is CF_Direction_NUM, this means both directions (all match) */
+    if (context->filter_dir == CF_Direction_NUM || h->dir == context->filter_dir)
     {
-        return CF_CLIST_EXIT;
+        if (CF_WriteHistoryEntryToFile(context->fd, h) < 0)
+        {
+            /* failed */
+            context->error = true;
+            return CF_CLIST_EXIT;
+        }
+
+        ++context->counter;
     }
 
     return CF_CLIST_CONT;
@@ -238,17 +249,46 @@ int CF_TraverseTransactions(CF_CListNode_t *n, CF_Traverse_WriteFileArg_t *conte
 
 /*----------------------------------------------------------------
  *
- * Function: CF_WriteQueueDataToFile
+ * Function: CF_Traverse_WriteTxnQueueEntryToFile
  *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q)
+int CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg)
 {
-    CF_Traverse_WriteFileArg_t arg = {fd, 0, 0};
-    CF_CList_Traverse(c->qs[q], (CF_CListFn_t)CF_TraverseTransactions, &arg);
-    return arg.result;
+    CF_Traverse_WriteTxnFileArg_t *context = arg;
+    CF_Transaction_t              *t       = container_of(n, CF_Transaction_t, cl_node);
+
+    if (CF_WriteHistoryEntryToFile(context->fd, t->history) < 0)
+    {
+        /* failed */
+        context->error = true;
+        return CF_CLIST_EXIT;
+    }
+
+    ++context->counter;
+    return CF_CLIST_CONT;
+}
+
+/*----------------------------------------------------------------
+ *
+ * Function: CF_WriteTxnQueueDataToFile
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
+int32 CF_WriteTxnQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_QueueIdx_t q)
+{
+    CF_Traverse_WriteTxnFileArg_t arg;
+
+    arg.fd      = fd;
+    arg.error   = false;
+    arg.counter = 0;
+
+    CF_CList_Traverse(c->qs[q], CF_Traverse_WriteTxnQueueEntryToFile, &arg);
+    return arg.error;
 }
 
 /*----------------------------------------------------------------
@@ -259,11 +299,17 @@ int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t dir)
+int32 CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_Direction_t dir)
 {
-    CF_Traverse_WriteFileArg_t arg = {fd, 0, 0};
-    CF_CList_Traverse(c->qs[CF_QueueIdx_HIST], (CF_CListFn_t)CF_TraverseHistory, &arg);
-    return arg.result;
+    CF_Traverse_WriteHistoryFileArg_t arg;
+
+    arg.fd         = fd;
+    arg.filter_dir = dir;
+    arg.error      = false;
+    arg.counter    = 0;
+
+    CF_CList_Traverse(c->qs[CF_QueueIdx_HIST], CF_Traverse_WriteHistoryQueueEntryToFile, &arg);
+    return arg.error;
 }
 
 /*----------------------------------------------------------------
