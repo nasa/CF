@@ -424,7 +424,7 @@ void CF_WrappedClose(osal_id_t fd)
     if (ret != OS_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_CLOSE_ERR, CFE_EVS_EventType_ERROR,
-                          "CF: failed to close file 0x%x, OS_close returned 0x%08x", fd, ret);
+                          "CF: failed to close file 0x%lx, OS_close returned %ld", OS_ObjectIdToInteger(fd), (long)ret);
     }
 }
 

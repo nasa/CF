@@ -177,8 +177,8 @@ int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_
         if (status != foffs)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEEK_FD, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%u:%u): error seeking to offset %ld, got %ld", (t->state == CF_TxnState_S2),
-                              (unsigned int)t->history->src_eid, (unsigned int)t->history->seq_num, (long)foffs,
+                              "CF S%d(%lu:%lu): error seeking to offset %ld, got %ld", (t->state == CF_TxnState_S2),
+                              (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num, (long)foffs,
                               (long)status);
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_seek;
             goto err_out;
@@ -189,8 +189,8 @@ int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_
     if (status != actual_bytes)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_READ, CFE_EVS_EventType_ERROR,
-                          "CF S%d(%u:%u): error reading bytes: expected %ld, got %ld", (t->state == CF_TxnState_S2),
-                          (unsigned int)t->history->src_eid, (unsigned int)t->history->seq_num, (long)actual_bytes,
+                          "CF S%d(%lu:%lu): error reading bytes: expected %ld, got %ld", (t->state == CF_TxnState_S2),
+                          (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num, (long)actual_bytes,
                           (long)status);
         ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_read;
         goto err_out;
@@ -205,8 +205,9 @@ int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_
     }
     else if (status == CF_SendRet_ERROR)
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEND_FD, CFE_EVS_EventType_ERROR, "CF S%d(%u:%u): error sending fd",
-                          (t->state == CF_TxnState_S2), t->history->src_eid, t->history->seq_num);
+        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEND_FD, CFE_EVS_EventType_ERROR, "CF S%d(%lu:%lu): error sending fd",
+                          (t->state == CF_TxnState_S2), (unsigned long)t->history->src_eid,
+                          (unsigned long)t->history->seq_num);
         goto err_out;
     }
     else
@@ -362,8 +363,9 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
         if (OS_FileOpenCheck(t->history->fnames.src_filename) == OS_SUCCESS)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_ALREADY_OPEN, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%u:%u): file %s already open", (t->state == CF_TxnState_S2), t->history->src_eid,
-                              t->history->seq_num, t->history->fnames.src_filename);
+                              "CF S%d(%lu:%lu): file %s already open", (t->state == CF_TxnState_S2),
+                              (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num,
+                              t->history->fnames.src_filename);
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_open;
             goto err_out;
         }
@@ -372,8 +374,9 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
         if (ret < 0)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_OPEN, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%u:%u): failed to open file %s, error=0x%08x", (t->state == CF_TxnState_S2),
-                              t->history->src_eid, t->history->seq_num, t->history->fnames.src_filename, ret);
+                              "CF S%d(%lu:%lu): failed to open file %s, error=%ld", (t->state == CF_TxnState_S2),
+                              (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num,
+                              t->history->fnames.src_filename, (long)ret);
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_open;
             t->fd = OS_OBJECT_ID_UNDEFINED; /* just in case */
             goto err_out;
@@ -383,8 +386,9 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
         if (status < 0)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEEK_END, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%u:%u): failed to seek end file %s, error=0x%08x", (t->state == CF_TxnState_S2),
-                              t->history->src_eid, t->history->seq_num, t->history->fnames.src_filename, status);
+                              "CF S%d(%lu:%lu): failed to seek end file %s, error=%ld", (t->state == CF_TxnState_S2),
+                              (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num,
+                              t->history->fnames.src_filename, (long)status);
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_seek;
             goto err_out;
         }
@@ -395,8 +399,9 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
         if (status != 0)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEEK_BEG, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%u:%u): failed to seek begin file %s, got 0x%08x", (t->state == CF_TxnState_S2),
-                              t->history->src_eid, t->history->seq_num, t->history->fnames.src_filename, status);
+                              "CF S%d(%lu:%lu): failed to seek begin file %s, got %ld", (t->state == CF_TxnState_S2),
+                              (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num,
+                              t->history->fnames.src_filename, (long)status);
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_seek;
             goto err_out;
         }
@@ -406,8 +411,9 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
     if (sret == CF_SendRet_ERROR)
     {
         /* failed to send md */
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEND_MD, CFE_EVS_EventType_ERROR, "CF S%d(%u:%u): failed to send md",
-                          (t->state == CF_TxnState_S2), t->history->src_eid, t->history->seq_num);
+        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEND_MD, CFE_EVS_EventType_ERROR, "CF S%d(%lu:%lu): failed to send md",
+                          (t->state == CF_TxnState_S2), (unsigned long)t->history->src_eid,
+                          (unsigned long)t->history->seq_num);
         goto err_out;
     }
     else if (sret == CF_SendRet_SUCCESS)
@@ -459,8 +465,8 @@ void CF_CFDP_S2_EarlyFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     /* received early fin, so just cancel */
     CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_EARLY_FIN, CFE_EVS_EventType_ERROR,
-                      "CF S%d(%u:%u): got early fin -- cancelling", (t->state == CF_TxnState_S2), t->history->src_eid,
-                      t->history->seq_num);
+                      "CF S%d(%lu:%lu): got early fin -- cancelling", (t->state == CF_TxnState_S2),
+                      (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
     CF_CFDP_S_Reset(t);
 }
 
@@ -533,14 +539,15 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
         if (bad_sr)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_INVALID_SR, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%u:%u): received %d invalid nak segment requests", (t->state == CF_TxnState_S2),
-                              t->history->src_eid, t->history->seq_num, bad_sr);
+                              "CF S%d(%lu:%lu): received %d invalid nak segment requests", (t->state == CF_TxnState_S2),
+                              (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num, bad_sr);
         }
     }
     else
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_PDU_NAK, CFE_EVS_EventType_ERROR, "CF S%d(%u:%u): received invalid nak pdu",
-                          (t->state == CF_TxnState_S2), t->history->src_eid, t->history->seq_num);
+        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_PDU_NAK, CFE_EVS_EventType_ERROR,
+                          "CF S%d(%lu:%lu): received invalid nak pdu", (t->state == CF_TxnState_S2),
+                          (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
         ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
     }
 }
@@ -585,8 +592,9 @@ void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     }
     else
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_PDU_EOF, CFE_EVS_EventType_ERROR, "CF S%d(%u:%u): received invalid eof pdu",
-                          (t->state == CF_TxnState_S2), t->history->src_eid, t->history->seq_num);
+        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_PDU_EOF, CFE_EVS_EventType_ERROR,
+                          "CF S%d(%lu:%lu): received invalid eof pdu", (t->state == CF_TxnState_S2),
+                          (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
         ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
     }
 }
@@ -721,7 +729,8 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
         if (CF_Timer_Expired(&t->inactivity_timer))
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_INACT_TIMER, CFE_EVS_EventType_ERROR,
-                              "CF S2(%u:%u): inactivity timer expired", t->history->src_eid, t->history->seq_num);
+                              "CF S2(%lu:%lu): inactivity timer expired", (unsigned long)t->history->src_eid,
+                              (unsigned long)t->history->seq_num);
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.inactivity_timer;
             CF_CFDP_S_Reset(t);
         }
@@ -738,8 +747,8 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
                         if (++t->state_data.s.s2.acknak_count >= CF_AppData.config_table->ack_limit)
                         {
                             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_ACK_LIMIT, CFE_EVS_EventType_ERROR,
-                                              "CF S2(%u:%u), ack limit reached, no eof-ack", t->history->src_eid,
-                                              t->history->seq_num);
+                                              "CF S2(%lu:%lu), ack limit reached, no eof-ack",
+                                              (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
                             ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.ack_limit;
 
                             /* no reason to reset this timer, as it isn't used again */

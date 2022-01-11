@@ -4,6 +4,9 @@
 #include "cf_utils.h"
 #include "cf_events.h"
 
+/* A value that may be passed to stubs accepting osal_id_t values */
+#define UT_CF_OS_OBJID OS_ObjectIdFromInteger(1)
+
 typedef struct
 {
     CF_Transaction_t *t;
@@ -880,8 +883,7 @@ void Test_CF_PrioSearch_When_t_PrioIsGreaterThanContextPrioReturn_CLIST_CONT(voi
     result = CF_PrioSearch(arg_node, arg_context);
 
     /* Assert */
-    UtAssert_True(result == CF_CLIST_CONT, "CF_PrioSearch returned %d and should be %d (CF_CLIST_CONT)", result,
-                  CF_CLIST_CONT);
+    UtAssert_INT32_EQ(result, CF_CLIST_CONT);
 
 } /* end Test_CF_PrioSearch_When_t_PrioIsGreaterThanContextPrioReturn_CLIST_CONT */
 
@@ -902,8 +904,7 @@ void Test_CF_PrioSearch_When_t_PrioIsEqToContextPrio_Set_context_t_To_t_AndRetur
     result = CF_PrioSearch(arg_node, arg_context);
 
     /* Assert */
-    UtAssert_True(result == CF_CLIST_EXIT, "CF_PrioSearch returned %d and should be %d (CF_CLIST_EXIT)", result,
-                  CF_CLIST_EXIT);
+    UtAssert_INT32_EQ(result, CF_CLIST_EXIT);
     UtAssert_ADDRESS_EQ(dummy_p.t, &dummy_t);
 
 } /* end Test_CF_PrioSearch_When_t_PrioIsEqToContextPrio_Set_context_t_To_t_AndReturn_CLIST_EXIT */
@@ -925,8 +926,7 @@ void Test_CF_PrioSearch_When_t_PrioIsLessThanContextPrio_Set_context_t_To_t_AndR
     result = CF_PrioSearch(arg_node, arg_context);
 
     /* Assert */
-    UtAssert_True(result == CF_CLIST_EXIT, "CF_PrioSearch returned %d and should be %d (CF_CLIST_EXIT)", result,
-                  CF_CLIST_EXIT);
+    UtAssert_INT32_EQ(result, CF_CLIST_EXIT);
     UtAssert_ADDRESS_EQ(dummy_p.t, &dummy_t);
 
 } /* end Test_CF_PrioSearch_When_t_PrioIsLessThanContextPrio_Set_context_t_To_t_AndReturn_CLIST_EXIT */
@@ -1155,9 +1155,7 @@ void Test_CF_TraverseAllTransactions_Impl_GetContainer_t_Call_args_fn_AndAdd_1_T
     UtAssert_True(arg_args->counter == initial_args_counter + 1,
                   "CF_TraverseAllTransactions_Impl set args->counter to %d which is 1 more than initial value %d",
                   arg_args->counter, initial_args_counter);
-    UtAssert_True(result == CF_CLIST_CONT,
-                  "CF_TraverseAllTransactions_Impl returned %d and should be %d (CF_CLIST_CONT)", result,
-                  CF_CLIST_CONT);
+    UtAssert_INT32_EQ(result, CF_CLIST_CONT);
 
 } /* end Test_CF_TraverseAllTransactions_Impl_GetContainer_t_Call_args_fn_AndAdd_1_ToCounter */
 
@@ -1176,7 +1174,6 @@ void Test_CF_TraverseAllTransactions_CallOtherFunction_CF_Q_RX_TimesAndReturn_ar
     void           *arg_context    = &dummy_context;
     uint8           expected_count = CF_QueueIdx_RX - CF_QueueIdx_PEND + 1;
     CF_CListNode_t *expected_qs_nodes[expected_count];
-    int32           result;
 
     CF_TraverseAllTransactions_fn_t arg_fn = UT_Callback_CF_TraverseAllTransactions;
 
@@ -1197,7 +1194,7 @@ void Test_CF_TraverseAllTransactions_CallOtherFunction_CF_Q_RX_TimesAndReturn_ar
     arg_c = &dummy_c;
 
     /* Act */
-    result = CF_TraverseAllTransactions(arg_c, arg_fn, arg_context);
+    UtAssert_INT32_EQ(CF_TraverseAllTransactions(arg_c, arg_fn, arg_context), expected_count);
 
     /* Assert */
     for (i = 0; i < expected_count; ++i)
@@ -1215,9 +1212,6 @@ void Test_CF_TraverseAllTransactions_CallOtherFunction_CF_Q_RX_TimesAndReturn_ar
                       "CF_CList_Traverse context_counter[%u] is %d and should be %d (+1 from previous)", i,
                       contexts_cf_clist_traverse[i].context_counter, i + 1);
     }
-    UtAssert_True(result == expected_count,
-                  "CF_TraverseAllTransactions returned %d and should be %d (CF_QueueIdx_RX - CF_QueueIdx_PEND + 1)",
-                  result, expected_count);
 } /* end Test_CF_TraverseAllTransactions_CallOtherFunction_CF_Q_RX_TimesAndReturn_args_counter */
 
 /*******************************************************************************
@@ -1230,8 +1224,7 @@ void Test_CF_TraverseAllTransactions_All_Channels_ReturnTotalTraversals(void)
 {
     /* Arrange */
     int   dummy_context;
-    void *arg_context = &dummy_context;
-    int   local_result;
+    void *arg_context       = &dummy_context;
     uint8 per_channel_count = CF_QueueIdx_RX - CF_QueueIdx_PEND + 1;
     int   expected_result   = per_channel_count * CF_NUM_CHANNELS;
 
@@ -1239,12 +1232,7 @@ void Test_CF_TraverseAllTransactions_All_Channels_ReturnTotalTraversals(void)
     UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_TRAVERSE_ALL_ARGS_T, NULL);
 
     /* Act */
-    local_result = CF_TraverseAllTransactions_All_Channels(arg_fn, arg_context);
-
-    /* Assert */
-    UtAssert_True(local_result == expected_result,
-                  "CF_TraverseAllTransactions_All_Channels returned %d and should be %d (total transversals)",
-                  local_result, expected_result);
+    UtAssert_INT32_EQ(CF_TraverseAllTransactions_All_Channels(arg_fn, arg_context), expected_result);
 
 } /* end Test_CF_TraverseAllTransactions_All_Channels_ReturnTotalTraversals */
 
@@ -1266,15 +1254,13 @@ void Test_CF_WrappedOpen_Call_OS_OpenCreate_WithGivenArgumentsAndReturnItsReturn
     int32      arg_flags                   = Any_uint32();
     int32      arg_access                  = Any_uint32();
     int32      forced_return_OS_OpenCreate = Any_int32();
-    int32      result;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_OpenCreate), forced_return_OS_OpenCreate);
 
     /* Act */
-    result = CF_WrappedOpenCreate(arg_fd, arg_fname, arg_flags, arg_access);
+    UtAssert_INT32_EQ(CF_WrappedOpenCreate(arg_fd, arg_fname, arg_flags, arg_access), forced_return_OS_OpenCreate);
 
     // /* Assert */
-    UtAssert_INT32_EQ(result, forced_return_OS_OpenCreate);
     UtAssert_STUB_COUNT(CFE_ES_PerfLogAdd, 2);
     UtAssert_STUB_COUNT(OS_OpenCreate, 1);
 } /* end Test_CF_WrappedOpen_Call_OS_OpenCreate_WithGivenArgumentsAndReturnItsReturnValue */
@@ -1290,12 +1276,10 @@ void Test_CF_WrappedOpen_Call_OS_OpenCreate_WithGivenArgumentsAndReturnItsReturn
 void Test_CF_WrappedClose_DoNotReceive_OS_SUCCESS_From_OS_close_EventSent(void)
 {
     /* Arrange */
-    int32 arg_fd = Any_uint32();
-
     UT_SetDefaultReturnValue(UT_KEY(OS_close), Any_int32_Except(OS_SUCCESS));
 
     /* Act */
-    CF_WrappedClose(arg_fd);
+    UtAssert_VOIDCALL(CF_WrappedClose(UT_CF_OS_OBJID));
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_ES_PerfLogAdd, 2);
@@ -1306,13 +1290,11 @@ void Test_CF_WrappedClose_DoNotReceive_OS_SUCCESS_From_OS_close_EventSent(void)
 void Test_CF_WrappedClose_Receive_OS_SUCCESS_From_OS_close_NoEventSent(void)
 {
     /* Arrange */
-    int32 arg_fd = Any_uint32();
-
     UT_SetHandlerFunction(UT_KEY(OS_close), local_handler_OS_close, NULL);
     UT_SetDefaultReturnValue(UT_KEY(OS_close), OS_SUCCESS);
 
     /* Act */
-    CF_WrappedClose(arg_fd);
+    UtAssert_VOIDCALL(CF_WrappedClose(UT_CF_OS_OBJID));
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_ES_PerfLogAdd, 2);
@@ -1331,21 +1313,15 @@ void Test_CF_WrappedClose_Receive_OS_SUCCESS_From_OS_close_NoEventSent(void)
 void Test_CF_WrappedRead_CallsOS_read_WithGivenArgumentsAndReturnItsReturnValue(void)
 {
     /* Arrange */
-    int32  arg_fd        = Any_int32();
     uint32 arg_read_size = Any_uint32_LessThan_or_EqualTo(10); // 10 is arbitrary to make test fast
     uint8  dummy_buf[10] = {0};                                // 10 to match max read size of 10 (arbitrary)
     void  *arg_buf       = &dummy_buf;
-    int    local_result;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_read), arg_read_size);
 
     /* Act */
-    local_result = CF_WrappedRead(arg_fd, arg_buf, arg_read_size);
+    UtAssert_INT32_EQ(CF_WrappedRead(UT_CF_OS_OBJID, arg_buf, arg_read_size), arg_read_size);
 
-    /* Assert */
-    UtAssert_True(local_result == arg_read_size,
-                  "CF_WrappedRead returned %d which is the value returned from OS_read %d", local_result,
-                  arg_read_size);
 } /* end Test_CF_WrappedRead_CallsOS_read_WithGivenArgumentsAndReturnItsReturnValue */
 
 /* end CF_WrappedRead tests */
@@ -1359,22 +1335,16 @@ void Test_CF_WrappedRead_CallsOS_read_WithGivenArgumentsAndReturnItsReturnValue(
 void Test_CF_WrappedWrite_Call_OS_write_WithGivenArgumentsAndReturnItsReturnValue(void)
 {
     /* Arrange */
-    int32  arg_fd = Any_int32();
     uint8  dummy_buf;
     void  *arg_buf         = &dummy_buf;
     uint32 test_write_size = Any_uint32();
-    int    local_result;
     int32  expected_result = Any_int32();
 
     UT_SetDefaultReturnValue(UT_KEY(OS_write), expected_result);
 
     /* Act */
-    local_result = CF_WrappedWrite(arg_fd, arg_buf, test_write_size);
+    UtAssert_INT32_EQ(CF_WrappedWrite(UT_CF_OS_OBJID, arg_buf, test_write_size), expected_result);
 
-    /* Assert */
-    UtAssert_True(local_result == expected_result,
-                  "CF_WrappedWrite returned %d which is the value returned from OS_write %d", local_result,
-                  expected_result);
 } /* end Test_CF_WrappedWrite_Call_OS_write_WithGivenArgumentsAndReturnItsReturnValue */
 
 /* end CF_WrappedWrite tests */
@@ -1388,21 +1358,15 @@ void Test_CF_WrappedWrite_Call_OS_write_WithGivenArgumentsAndReturnItsReturnValu
 void Test_CF_WrappedLseek_Call_OS_lseek_WithGivenArgumentsAndReturnItsReturnValue(void)
 {
     /* Arrange */
-    int32  arg_fd      = Any_int32();
-    uint32 test_offset = Any_uint32();
-    int    test_mode   = Any_int();
-    int    local_result;
+    uint32 test_offset     = Any_uint32();
+    int    test_mode       = Any_int();
     int32  expected_result = Any_int32();
 
     UT_SetDefaultReturnValue(UT_KEY(OS_lseek), expected_result);
 
     /* Act */
-    local_result = CF_WrappedLseek(arg_fd, test_offset, test_mode);
+    UtAssert_INT32_EQ(CF_WrappedLseek(UT_CF_OS_OBJID, test_offset, test_mode), expected_result);
 
-    /* Assert */
-    UtAssert_True(local_result == expected_result,
-                  "CF_WrappedLseek returned %d which is the value returned from OS_lseek %d", local_result,
-                  expected_result);
 } /* end Test_CF_WrappedLseek_Call_OS_lseek_WithGivenArgumentsAndReturnItsReturnValue */
 
 /* end CF_WrappedLseek tests */

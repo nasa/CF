@@ -672,7 +672,8 @@ int CF_CFDP_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_MD_SHORT, CFE_EVS_EventType_ERROR,
-                          "CF: metadata packet too short: %lu bytes received", CF_CODEC_GET_SIZE(ph->pdec));
+                          "CF: metadata packet too short: %lu bytes received",
+                          (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         goto err_out;
     }
 
@@ -748,7 +749,7 @@ int CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_FD_SHORT, CFE_EVS_EventType_ERROR,
-                          "CF: filedata pdu too short: %lu bytes received", CF_CODEC_GET_SIZE(ph->pdec));
+                          "CF: filedata pdu too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
         ret = -1;
     }
@@ -782,7 +783,7 @@ int CF_CFDP_RecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_EOF_SHORT, CFE_EVS_EventType_ERROR,
-                          "CF: eof pdu too short: %lu bytes received", CF_CODEC_GET_SIZE(ph->pdec));
+                          "CF: eof pdu too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         ret = -1;
     }
 
@@ -807,7 +808,7 @@ int CF_CFDP_RecvAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_ACK_SHORT, CFE_EVS_EventType_ERROR,
-                          "CF: ack pdu too short: %lu bytes received", CF_CODEC_GET_SIZE(ph->pdec));
+                          "CF: ack pdu too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         ret = -1;
     }
 
@@ -833,7 +834,7 @@ int CF_CFDP_RecvFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_FIN_SHORT, CFE_EVS_EventType_ERROR,
-                          "CF: fin pdu too short: %lu bytes received", CF_CODEC_GET_SIZE(ph->pdec));
+                          "CF: fin pdu too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         ret = -1;
     }
 
@@ -859,7 +860,7 @@ int CF_CFDP_RecvNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_NAK_SHORT, CFE_EVS_EventType_ERROR,
-                          "CF: nak pdu too short: %lu bytes received", CF_CODEC_GET_SIZE(ph->pdec));
+                          "CF: nak pdu too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         ret = -1;
     }
 
@@ -995,7 +996,7 @@ int32 CF_CFDP_InitEngine(void)
                                      CF_AppData.config_table->chan[i].pipe_depth_input, nbuf)) != CFE_SUCCESS)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_PIPE, CFE_EVS_EventType_ERROR,
-                              "CF: failed to create pipe %s, returned 0x%08x", nbuf, ret);
+                              "CF: failed to create pipe %s, returned 0x%08lx", nbuf, (unsigned long)ret);
             goto err_out;
         }
 
@@ -1004,8 +1005,8 @@ int32 CF_CFDP_InitEngine(void)
                                          CF_AppData.config_table->chan[i].pipe_depth_input)) != CFE_SUCCESS)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_SUB, CFE_EVS_EventType_ERROR,
-                              "CF: failed to subscribe to MID 0x%04x, returned 0x%08x",
-                              CF_AppData.config_table->chan[i].mid_input, ret);
+                              "CF: failed to subscribe to MID 0x%lx, returned 0x%08lx",
+                              (unsigned long)CF_AppData.config_table->chan[i].mid_input, (unsigned long)ret);
             goto err_out;
         }
 
@@ -1016,8 +1017,8 @@ int32 CF_CFDP_InitEngine(void)
             if (ret != OS_SUCCESS)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_INIT_SEM, CFE_EVS_EventType_ERROR,
-                                  "CF: failed to get sem id for name %s, error=0x%08x",
-                                  CF_AppData.config_table->chan[i].sem_name, ret);
+                                  "CF: failed to get sem id for name %s, error=%ld",
+                                  CF_AppData.config_table->chan[i].sem_name, (long)ret);
                 goto err_out;
             }
         }
@@ -1253,9 +1254,10 @@ static void CF_CFDP_TxFile_Initiate(CF_Transaction_t *t, CF_CFDP_Class_t cfdp_cl
                                     uint8 priority, CF_EntityId_t dest_id)
 {
     CFE_EVS_SendEvent(CF_EID_INF_CFDP_S_START_SEND, CFE_EVS_EventType_INFORMATION,
-                      "CF: start class %d tx of file %d:%.*s -> %d:%.*s", cfdp_class + 1,
-                      CF_AppData.config_table->local_eid, CF_FILENAME_MAX_LEN, t->history->fnames.src_filename, dest_id,
-                      CF_FILENAME_MAX_LEN, t->history->fnames.dst_filename);
+                      "CF: start class %d tx of file %lu:%.*s -> %lu:%.*s", cfdp_class + 1,
+                      (unsigned long)CF_AppData.config_table->local_eid, CF_FILENAME_MAX_LEN,
+                      t->history->fnames.src_filename, (unsigned long)dest_id, CF_FILENAME_MAX_LEN,
+                      t->history->fnames.dst_filename);
 
     CF_CFDP_InitTxnTxFile(t, cfdp_class, keep, chan, priority);
 
@@ -1332,7 +1334,7 @@ static int32 CF_CFDP_PlaybackDir_Initiate(CF_Playback_t *p, const char *src_file
     if (ret != OS_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_OPENDIR, CFE_EVS_EventType_ERROR,
-                          "CF: failed to open playback directory %s, error=0x%08x", src_filename, ret);
+                          "CF: failed to open playback directory %s, error=%ld", src_filename, (long)ret);
         ++CF_AppData.hk.channel_hk[chan].counters.fault.directory_read;
         goto err_out;
     }

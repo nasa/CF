@@ -84,7 +84,7 @@ void CF_CheckTables(void)
         if (status < CFE_SUCCESS)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_CHECK_REL, CFE_EVS_EventType_ERROR,
-                              "CF: error in CFE_TBL_ReleaseAddress (check), returned 0x%08x", status);
+                              "CF: error in CFE_TBL_ReleaseAddress (check), returned 0x%08lx", (unsigned long)status);
             CF_AppData.run_status = CFE_ES_RunStatus_APP_ERROR;
         }
 
@@ -92,7 +92,7 @@ void CF_CheckTables(void)
         if (status < CFE_SUCCESS)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_CHECK_MAN, CFE_EVS_EventType_ERROR,
-                              "CF: error in CFE_TBL_Manage (check), returned 0x%08x", status);
+                              "CF: error in CFE_TBL_Manage (check), returned 0x%08lx", (unsigned long)status);
             CF_AppData.run_status = CFE_ES_RunStatus_APP_ERROR;
         }
 
@@ -100,7 +100,7 @@ void CF_CheckTables(void)
         if (status < CFE_SUCCESS)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_CHECK_GA, CFE_EVS_EventType_ERROR,
-                              "CF: failed to get table address (check), returned 0x%08x", status);
+                              "CF: failed to get table address (check), returned 0x%08lx", (unsigned long)status);
             CF_AppData.run_status = CFE_ES_RunStatus_APP_ERROR;
         }
     }
@@ -164,15 +164,15 @@ int32 CF_TableInit(void)
     if (status != CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_REG, CFE_EVS_EventType_ERROR,
-                          "CF: error registering table, returned 0x%08x", status);
+                          "CF: error registering table, returned 0x%08lx", (unsigned long)status);
         goto err_out;
     }
 
     status = CFE_TBL_Load(CF_AppData.config_handle, CFE_TBL_SRC_FILE, CF_CONFIG_TABLE_FILENAME);
     if (status != CFE_SUCCESS)
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_LOAD, CFE_EVS_EventType_ERROR, "CF: error loading table, returned 0x%08x",
-                          status);
+        CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_LOAD, CFE_EVS_EventType_ERROR,
+                          "CF: error loading table, returned 0x%08lx", (unsigned long)status);
         goto err_out;
     }
 
@@ -180,7 +180,7 @@ int32 CF_TableInit(void)
     if (status != CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_MANAGE, CFE_EVS_EventType_ERROR,
-                          "CF: error in CFE_TBL_Manage, returned 0x%08x", status);
+                          "CF: error in CFE_TBL_Manage, returned 0x%08lx", (unsigned long)status);
         goto err_out;
     }
 
@@ -189,7 +189,7 @@ int32 CF_TableInit(void)
     if ((status != CFE_TBL_INFO_UPDATED) && (status != CFE_SUCCESS))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_GETADDR, CFE_EVS_EventType_ERROR,
-                          "CF: error getting table address, returned 0x%08x", status);
+                          "CF: error getting table address, returned 0x%08lx", (unsigned long)status);
         goto err_out;
     }
     else
@@ -330,13 +330,13 @@ int32 CF_Init(void)
     if ((status = CFE_EVS_Register(cf_event_filters, sizeof(cf_event_filters) / sizeof(*cf_event_filters),
                                    CFE_EVS_EventFilter_BINARY)) != CFE_SUCCESS)
     {
-        CFE_ES_WriteToSysLog("CF app: error registering with EVS, returned 0x%08x", status);
+        CFE_ES_WriteToSysLog("CF app: error registering with EVS, returned 0x%08lx", (unsigned long)status);
         goto err_out;
     }
 
     if ((status = CFE_SB_CreatePipe(&CF_AppData.cmd_pipe, CF_PIPE_DEPTH, CF_PIPE_NAME)) != CFE_SUCCESS)
     {
-        CFE_ES_WriteToSysLog("CF app: error creating pipe %s, returend 0x%08x", CF_PIPE_NAME, status);
+        CFE_ES_WriteToSysLog("CF app: error creating pipe %s, returend 0x%08lx", CF_PIPE_NAME, (unsigned long)status);
         goto err_out;
     }
 
@@ -367,7 +367,7 @@ int32 CF_Init(void)
 
     if (status != CFE_SUCCESS)
     {
-        CFE_ES_WriteToSysLog("CF: error sending init event, returned 0x%08x", status);
+        CFE_ES_WriteToSysLog("CF: error sending init event, returned 0x%08lx", (unsigned long)status);
         goto err_out;
     }
 
@@ -468,7 +468,7 @@ void CF_AppMain(void)
         else if (status != CFE_SB_TIME_OUT && status != CFE_SB_NO_MESSAGE)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_MSG_RECV, CFE_EVS_EventType_ERROR,
-                              "CF: exiting due to CFE_SB_ReceiveBuffer error 0x%08x", status);
+                              "CF: exiting due to CFE_SB_ReceiveBuffer error 0x%08lx", (unsigned long)status);
             CF_AppData.run_status = CFE_ES_RunStatus_APP_ERROR;
         }
         else

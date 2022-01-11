@@ -305,7 +305,8 @@ int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAct
         else
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CMD_TRANS_NOT_FOUND, CFE_EVS_EventType_ERROR,
-                              "CF: %s cmd: failed to find transactino for (eid %d, ts %d)", cmdstr, cmd->eid, cmd->ts);
+                              "CF: %s cmd: failed to find transactino for (eid %lu, ts %lu)", cmdstr,
+                              (unsigned long)cmd->eid, (unsigned long)cmd->ts);
         }
     }
     else if (cmd->chan == ALL_CHANNELS)
