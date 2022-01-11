@@ -911,43 +911,72 @@ int CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
 *************************************************************************/
 /* combine getset into a single function with a branch to avoid wasted memory footprint with duplicate
  * logic for finding the parameter */
-void CF_CmdGetSetParam(uint8 is_set, uint8 param_id, uint32 value, uint8 chan_num)
+void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num)
 {
-    /* These macros define entries into the paramater array. The mapping of the array is
-     * ground parameter to configuration parameter. This logic allows a simple access
-     * of the configuration parameter or a check on validity of the parameter and then
-     * access. */
-#define SPTR(x)                                                               \
-    {                                                                         \
-        &CF_AppData.config_table->x, sizeof(CF_AppData.config_table->x), NULL \
-    }
-#define SPTRFN(x, fn)                                                       \
-    {                                                                       \
-        &CF_AppData.config_table->x, sizeof(CF_AppData.config_table->x), fn \
-    }
-#define CPTRFN(x, fn)                                                                                     \
-    {                                                                                                     \
-        &CF_AppData.config_table->chan[chan_num].x, sizeof(CF_AppData.config_table->chan[chan_num].x), fn \
-    }
-    const struct
+    CF_ConfigTable_t *config;
+    int               acc;
+    bool              valid_set;
+    struct
     {
         void  *ptr;
         uint32 size;
         int (*fn)(uint32, uint8 chan_num);
-    } items[CF_NUM_CFG_PACKET_ITEMS] = {
-        SPTR(ticks_per_second),   SPTR(rx_crc_calc_bytes_per_wakeup),
-        SPTR(ack_timer_s),        SPTR(nak_timer_s),
-        SPTR(inactivity_timer_s), SPTRFN(outgoing_file_chunk_size, CF_CmdValidateChunkSize),
-        SPTR(ack_limit),          SPTR(nak_limit),
-        SPTR(local_eid),          CPTRFN(max_outgoing_messages_per_wakeup, CF_CmdValidateMaxOutgoing)};
+    } item;
 
-    int acc = 1; /* 1 means to reject */
+    acc       = 1; /* 1 means to reject */
+    valid_set = false;
+    config    = CF_AppData.config_table;
+    memset(&item, 0, sizeof(item));
 
-#if ENDIAN == _EB
-    static const int shift_map[5] = {0, 24, 16, 8, 0};
-#endif
+    switch (param_id)
+    {
+        case CF_GetSet_ValueID_ticks_per_second:
+            item.ptr  = &config->ticks_per_second;
+            item.size = sizeof(config->ticks_per_second);
+            break;
+        case CF_GetSet_ValueID_rx_crc_calc_bytes_per_wakeup:
+            item.ptr  = &config->rx_crc_calc_bytes_per_wakeup;
+            item.size = sizeof(config->rx_crc_calc_bytes_per_wakeup);
+            break;
+        case CF_GetSet_ValueID_ack_timer_s:
+            item.ptr  = &config->ack_timer_s;
+            item.size = sizeof(config->ack_timer_s);
+            break;
+        case CF_GetSet_ValueID_nak_timer_s:
+            item.ptr  = &config->nak_timer_s;
+            item.size = sizeof(config->nak_timer_s);
+            break;
+        case CF_GetSet_ValueID_inactivity_timer_s:
+            item.ptr  = &config->inactivity_timer_s;
+            item.size = sizeof(config->inactivity_timer_s);
+            break;
+        case CF_GetSet_ValueID_outgoing_file_chunk_size:
+            item.ptr  = &config->outgoing_file_chunk_size;
+            item.size = sizeof(config->outgoing_file_chunk_size);
+            item.fn   = CF_CmdValidateChunkSize;
+            break;
+        case CF_GetSet_ValueID_ack_limit:
+            item.ptr  = &config->ack_limit;
+            item.size = sizeof(config->ack_limit);
+            break;
+        case CF_GetSet_ValueID_nak_limit:
+            item.ptr  = &config->nak_limit;
+            item.size = sizeof(config->nak_limit);
+            break;
+        case CF_GetSet_ValueID_local_eid:
+            item.ptr  = &config->local_eid;
+            item.size = sizeof(config->local_eid);
+            break;
+        case CF_GetSet_ValueID_chan_max_outgoing_messages_per_wakeup:
+            item.ptr  = &config->chan[chan_num].max_outgoing_messages_per_wakeup;
+            item.size = sizeof(config->chan[chan_num].max_outgoing_messages_per_wakeup);
+            item.fn   = CF_CmdValidateMaxOutgoing;
+            break;
+        default:
+            break;
+    };
 
-    if (param_id >= CF_NUM_CFG_PACKET_ITEMS)
+    if (item.size == 0)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_GETSET_PARAM, CFE_EVS_EventType_ERROR,
                           "CF: invalid configuration parameter id %d received", param_id);
@@ -963,11 +992,9 @@ void CF_CmdGetSetParam(uint8 is_set, uint8 param_id, uint32 value, uint8 chan_nu
 
     if (is_set)
     {
-        int valid_set = 0;
-
-        if (items[param_id].fn)
+        if (item.fn)
         {
-            if (!items[param_id].fn(value, chan_num))
+            if (!item.fn(value, chan_num))
             {
                 valid_set = 1;
             }
@@ -984,26 +1011,55 @@ void CF_CmdGetSetParam(uint8 is_set, uint8 param_id, uint32 value, uint8 chan_nu
 
         if (valid_set)
         {
-            CFE_EVS_SendEvent(CF_EID_INF_CMD_GETSET1, CFE_EVS_EventType_INFORMATION,
-                              "CF: setting parameter id %d to %d", param_id, value);
-#if ENDIAN == _EB
-            CF_Assert((items[param_id].size > 0) && (items[param_id].size < 5));
-            value <<= shift_map[items[param_id].size];
-#endif
-            memcpy(items[param_id].ptr, &value, items[param_id].size);
             acc = 0;
+
+            CFE_EVS_SendEvent(CF_EID_INF_CMD_GETSET1, CFE_EVS_EventType_INFORMATION,
+                              "CF: setting parameter id %d to %lu", param_id, (unsigned long)value);
+
+            /* Store value based on its size */
+            if (item.size == sizeof(uint32))
+            {
+                *((uint32 *)item.ptr) = value;
+            }
+            else if (item.size == sizeof(uint16))
+            {
+                *((uint16 *)item.ptr) = value;
+            }
+            else if (item.size == sizeof(uint8))
+            {
+                *((uint8 *)item.ptr) = value;
+            }
+            else
+            {
+                /* unimplemented store; this is a SW configuration error! */
+                acc = 1;
+            }
         }
     }
     else
     {
-        memcpy(&value, items[param_id].ptr, items[param_id].size);
-#if ENDIAN == _EB
-        CF_Assert((items[param_id].size > 0) && (items[param_id].size < 5));
-        value >>= shift_map[items[param_id].size];
-#endif
-        CFE_EVS_SendEvent(CF_EID_INF_CMD_GETSET2, CFE_EVS_EventType_INFORMATION, "CF: parameter id %d = %d", param_id,
-                          value);
         acc = 0;
+
+        /* Read value depending on its size */
+        if (item.size == sizeof(uint32))
+        {
+            value = *((const uint32 *)item.ptr);
+        }
+        else if (item.size == sizeof(uint16))
+        {
+            value = *((const uint16 *)item.ptr);
+        }
+        else if (item.size == sizeof(uint8))
+        {
+            value = *((const uint8 *)item.ptr);
+        }
+        else
+        {
+            acc = 1;
+        }
+
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_GETSET2, CFE_EVS_EventType_INFORMATION, "CF: parameter id %d = %lu", param_id,
+                          (unsigned long)value);
     }
 
 err_out:
