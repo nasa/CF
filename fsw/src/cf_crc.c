@@ -61,8 +61,6 @@ void CF_CRC_Digest(CF_Crc_t *c, const uint8 *data, int len)
 {
     int i = 0;
 
-    /* can't use big-endian optimization with CF_SW_ALIGNMENT */
-#if (ENDIAN == _EL) || defined(CF_SW_ALIGNMENT)
     for (; i < len; ++i)
     {
         c->working <<= 8;
@@ -74,37 +72,6 @@ void CF_CRC_Digest(CF_Crc_t *c, const uint8 *data, int len)
             c->index = 0;
         }
     }
-#elif (ENDIAN == _EB) && defined(CF_HW_ALIGNMENT)
-    /* first get index to 0 byte-by-byte */
-    if (c->index)
-    {
-        for (; (c->index < 4) && (i < len); ++i, ++c->index)
-        {
-            c->working <<= 8;
-            c->working |= data[i];
-        }
-
-        c->result += c->working;
-        c->index = 0;
-    }
-
-    /* next, process data 4 bytes at a time like a boss */
-    for (/* keep previous i value */; (i + 4) <= len; i += 4)
-    {
-        c->result += (*(uint32 *)(void *)(data + i));
-    }
-
-    /* anything left over has to go back into the shift register */
-    for (/* keep previous i value */; i < len; ++i)
-    {
-        c->working <<= 8;
-        c->working |= data[i];
-
-        ++c->index;
-    }
-#else
-#error well this is odd
-#endif
 }
 
 /************************************************************************/
