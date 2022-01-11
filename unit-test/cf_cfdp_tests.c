@@ -1351,8 +1351,10 @@ void Test_CF_CFDP_DisableEngine(void)
      */
 
     /* nominal call */
+    CF_AppData.engine.enabled = 1;
     UtAssert_VOIDCALL(CF_CFDP_DisableEngine());
     UtAssert_STUB_COUNT(CFE_SB_DeletePipe, CF_NUM_CHANNELS);
+    UtAssert_BOOL_FALSE(CF_AppData.engine.enabled);
 
     /* nominal call with playbacks and polls active */
     CF_AppData.engine.channels[UT_CFDP_CHANNEL].playback[0].busy = 1;
