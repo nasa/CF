@@ -230,7 +230,8 @@ typedef struct CF_TransactionCmd
     CFE_MSG_CommandHeader_t cmd_header;
     CF_TransactionSeq_t     ts;
     CF_EntityId_t           eid;
-    uint8                   chan; /* if 254, use ts. if 255, all channels */
+    uint8                   chan;     /* if 254, use ts. if 255, all channels */
+    uint8                   spare[3]; /* To make structure a multiple of uint32 */
 } CF_TransactionCmd_t;
 
 #endif /* !CF_MSG_H */
