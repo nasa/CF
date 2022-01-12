@@ -59,18 +59,6 @@ typedef uint8 CF_EntityId_t;
 typedef uint32 CF_TransactionSeq_t;
 
 /**
- ** \cfcfg CF_HW_ALIGNMENT and CF_SW_ALIGNMENT
- **
- **  \par Description:
- **       ONE AND ONLY ONE must be #define.
- **
- **     CF_HW_ALIGNMENT is set for platforms that can handle alignment in hardware (load/store used)
- **     CF_SW_ALIGNMENT is for platforms that can't handle alignment natively (memcpy used)
- */
-#define CF_HW_ALIGNMENT
-#undef CF_SW_ALIGNMENT
-
-/**
 **  \cfcfg Application Pipe Depth
 **
 **  \par Description:

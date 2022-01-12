@@ -27,10 +27,6 @@ add_cfe_app(cf ${APP_SRC_FILES})
 # configuration table
 add_cfe_tables(cf fsw/tables/cf_def_config.c)
 
-add_definitions("-D_DEFAULT_SOURCE")
-
-add_definitions(-D_DEFAULT_SOURCE=1)
-add_definitions(-D_EL -DENDIAN=_EL -DSOFTWARE_BIG_BIT_ORDER)
 if (ENABLE_UNIT_TESTS)
   add_subdirectory(unit-test)
 endif (ENABLE_UNIT_TESTS)

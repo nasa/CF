@@ -44,22 +44,6 @@
 #error refactor code for 32 bit CF_NUM_HISTORIES
 #endif
 
-#if !defined(CF_HW_ALIGNMENT) && !defined(CF_SW_ALIGNMENT)
-#error Must define one of CF_HW_ALIGNMENT or CF_SW_ALIGNMENT
-#endif
-
-#if defined(CF_HW_ALIGNMENT) && defined(CF_SW_ALIGNMENT)
-#error Must define ONLY ONE of CF_HW_ALIGNMENT or CF_SW_ALIGNMENT
-#endif
-
-#if !defined(ENDIAN)
-#error Must define ENDIAN as _EL or _EB for little or big endian
-#endif
-
-#if (ENDIAN != _EL) && (ENDIAN != _EB)
-#error Must define ENDIAN as either _EL or _EB for little or big endian
-#endif
-
 #if (CF_PERF_ID_PDURCVD(CF_NUM_CHANNELS - 1) >= CF_PERF_ID_PDUSENT(0))
 #error Collision between CF_PERF_ID_PDURCVD and CF_PERF_ID_PDUSENT given number of channels
 #endif
