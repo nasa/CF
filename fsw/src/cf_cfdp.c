@@ -1101,30 +1101,38 @@ err_out:
  *-----------------------------------------------------------------*/
 void CF_CFDP_CycleTx(CF_Channel_t *c)
 {
+    CF_Transaction_t      *t;
+    CF_CFDP_CycleTx_args_t args;
+
     if (CF_AppData.config_table->chan[(c - CF_AppData.engine.channels)].dequeue_enabled)
     {
-        CF_CFDP_CycleTx_args_t args = {c, 0};
+        args = (CF_CFDP_CycleTx_args_t) {c, 0};
+
         /* loop through as long as there are pending transactions, and a message buffer to send their pdus on */
 
         /* NOTE: tick processesing is higher priority than sending new filedata pdus, so only send however many
          * PDUs that can be sent once we get to here */
         if (!c->cur)
         { /* don't enter if cur is set, since we need to pick up where we left off on tick processing next wakeup */
-            goto entry_jump; /* code reviewers won't like this */
-            while (!args.ran_one && c->qs[CF_QueueIdx_PEND])
+
+            while (true)
             {
-                /* didn't find anything on TXA to run, so pop one off Q_PEND and try again.
-                 * Keep going until CF_QueueIdx_PEND is empty or something is run */
-                CF_Transaction_t *t = container_of(c->qs[CF_QueueIdx_PEND], CF_Transaction_t, cl_node);
-                CF_MoveTransaction(t, CF_QueueIdx_TXA);
-                /* args is ok, still { c, 0 } */
-            entry_jump:
+                /* Attempt to run something on TXA */
                 CF_CList_Traverse(c->qs[CF_QueueIdx_TXA], CF_CFDP_CycleTxFirstActive, &args);
+
+                /* Keep going until CF_QueueIdx_PEND is empty or something is run */
+                if (args.ran_one || c->qs[CF_QueueIdx_PEND] == NULL)
+                {
+                    break;
+                }
+
+                t = container_of(c->qs[CF_QueueIdx_PEND], CF_Transaction_t, cl_node);
+                CF_MoveTransaction(t, CF_QueueIdx_TXA);
             }
         }
 
-        c->cur =
-            NULL; /* in case the loop exited due to no message buffers, clear it and start from the top next time */
+        /* in case the loop exited due to no message buffers, clear it and start from the top next time */
+        c->cur = NULL;
     }
 }
 
