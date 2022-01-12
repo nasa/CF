@@ -305,7 +305,6 @@ void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
     uint16 updated_q_size = CF_AppData.hk.channel_hk[arg_t.chan_num].q_size[arg_t.flags.com.q_index];
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_HandleAssert, 0);
     UtAssert_ADDRESS_EQ(context_clist_remove.head, expected_head);
     UtAssert_ADDRESS_EQ(context_clist_remove.node, expected_cl_node);
     UtAssert_True(updated_q_size == initial_q_size - 1, "q_size is %d and that is 1 less than initial value %d",
@@ -381,7 +380,6 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
     CF_MoveTransaction(arg_t, arg_q);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_HandleAssert, 0);
     UtAssert_STUB_COUNT(CF_CList_Remove, 1);
     UtAssert_ADDRESS_EQ(context_clist_remove.head, expected_remove_head);
     UtAssert_ADDRESS_EQ(context_clist_remove.node, expected_remove_node);
@@ -447,7 +445,6 @@ void Test_CF_CList_Remove_Ex_Call_CF_CList_Remove_AndDecrement_q_size(void)
     uint16 updated_q_size = CF_AppData.hk.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_HandleAssert, 0);
     UtAssert_STUB_COUNT(CF_CList_Remove, 1);
     UtAssert_ADDRESS_EQ(context_clist_remove.head, expected_remove_head);
     UtAssert_ADDRESS_EQ(context_clist_remove.node, expected_remove_node);

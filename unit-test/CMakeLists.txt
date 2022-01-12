@@ -41,8 +41,6 @@ add_cfe_coverage_stubs(cf_internal
 
   stubs/cf_app_global.c
   stubs/cf_app_stubs.c
-  stubs/cf_assert_handlers.c
-  stubs/cf_assert_stubs.c
   stubs/cf_cfdp_handlers.c
   stubs/cf_cfdp_dispatch_stubs.c
   stubs/cf_cfdp_r_stubs.c

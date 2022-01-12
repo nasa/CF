@@ -7,7 +7,6 @@ include_directories(${CFS_IO_LIB_MISSION_DIR}/fsw/public_inc)
 
 set(APP_SRC_FILES
   fsw/src/cf_app.c
-  fsw/src/cf_assert.c
   fsw/src/cf_cfdp.c
   fsw/src/cf_cfdp_r.c
   fsw/src/cf_cfdp_s.c
