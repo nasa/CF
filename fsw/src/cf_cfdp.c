@@ -839,6 +839,14 @@ int CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
         ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
         ret = -1;
     }
+    else if (ph->pdu_header.segment_meta_flag)
+    {
+        /* If recv PDU has the "segment_meta_flag" set, this is not currently handled in CF. */
+        CFE_EVS_SendEvent(CF_EID_ERR_PDU_FD_UNSUPPORTED, CFE_EVS_EventType_ERROR,
+                          "CF: filedata pdu with segment metadata received");
+        ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
+        ret = -1;
+    }
 
     return ret;
 }
