@@ -119,8 +119,7 @@ typedef struct CF_ConfigPacket
     uint8  nak_limit; /* number of times to retry NAK before giving up (resets on a single response */
 
     CF_EntityId_t local_eid;
-/* must #define the number of data items in this struct for command processing */
-#define CF_NUM_CFG_PACKET_ITEMS 10
+
 } CF_ConfigPacket_t;
 
 /****************************************
@@ -185,6 +184,27 @@ typedef struct
     CF_UnionArgs_Payload_t  data;
 } CF_UnionArgsCmd_t;
 
+/**
+ * @brief Parameter IDs for use with Get/Set param messages
+ *
+ * Specifically these are used for the "key" field within CF_GetParamCmd_t and
+ * CF_SetParamCmd_t message structures.
+ */
+typedef enum
+{
+    CF_GetSet_ValueID_ticks_per_second,
+    CF_GetSet_ValueID_rx_crc_calc_bytes_per_wakeup,
+    CF_GetSet_ValueID_ack_timer_s,
+    CF_GetSet_ValueID_nak_timer_s,
+    CF_GetSet_ValueID_inactivity_timer_s,
+    CF_GetSet_ValueID_outgoing_file_chunk_size,
+    CF_GetSet_ValueID_ack_limit,
+    CF_GetSet_ValueID_nak_limit,
+    CF_GetSet_ValueID_local_eid,
+    CF_GetSet_ValueID_chan_max_outgoing_messages_per_wakeup,
+    CF_GetSet_ValueID_MAX
+} CF_GetSet_ValueID_t;
+
 typedef struct CF_GetParamCmd
 {
     CFE_MSG_CommandHeader_t cmd_header;
@@ -233,5 +253,6 @@ typedef struct CF_TransactionCmd
     uint8                   chan;     /* if 254, use ts. if 255, all channels */
     uint8                   spare[3]; /* To make structure a multiple of uint32 */
 } CF_TransactionCmd_t;
+
 
 #endif /* !CF_MSG_H */

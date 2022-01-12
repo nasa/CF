@@ -181,10 +181,10 @@ void CF_CmdGetParam(CFE_SB_Buffer_t *msg)
  * Generated stub function for CF_CmdGetSetParam()
  * ----------------------------------------------------
  */
-void CF_CmdGetSetParam(uint8 is_set, uint8 param_id, uint32 value, uint8 chan_num)
+void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num)
 {
     UT_GenStub_AddParam(CF_CmdGetSetParam, uint8, is_set);
-    UT_GenStub_AddParam(CF_CmdGetSetParam, uint8, param_id);
+    UT_GenStub_AddParam(CF_CmdGetSetParam, CF_GetSet_ValueID_t, param_id);
     UT_GenStub_AddParam(CF_CmdGetSetParam, uint32, value);
     UT_GenStub_AddParam(CF_CmdGetSetParam, uint8, chan_num);
 

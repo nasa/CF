@@ -4157,12 +4157,12 @@ void Test_CF_CmdValidateMaxOutgoing_WhenGiven_val_Is_0_And_sem_name_Is_NULL_Retu
 **
 *******************************************************************************/
 
-void Test_CF_CmdGetSetParam_When_param_id_Eq_CF_NUM_CFG_PACKET_ITEMS_FailSendEventAndRejectCmd(void)
+void Test_CF_CmdGetSetParam_When_param_id_Eq_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd(void)
 {
     /* Arrange */
     CF_ConfigTable_t dummy_config_table;
     uint8            arg_is_set   = Any_uint8();
-    uint8            arg_param_id = CF_NUM_CFG_PACKET_ITEMS;
+    uint8            arg_param_id = CF_GetSet_ValueID_MAX;
     uint32           arg_value    = Any_uint32();
     uint8            arg_chan_num = Any_uint8();
 
@@ -4186,14 +4186,14 @@ void Test_CF_CmdGetSetParam_When_param_id_Eq_CF_NUM_CFG_PACKET_ITEMS_FailSendEve
                   "CF_AppData.hk.counters.err is %d and should be 1 more than %d", CF_AppData.hk.counters.err,
                   initial_hk_err_counter);
 
-} /* end Test_CF_CmdGetSetParam_When_param_id_Eq_CF_NUM_CFG_PACKET_ITEMS_FailSendEventAndRejectCmd */
+} /* end Test_CF_CmdGetSetParam_When_param_id_Eq_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd */
 
-void Test_CF_CmdGetSetParam_When_param_id_AnyGreaterThan_CF_NUM_CFG_PACKET_ITEMS_FailSendEventAndRejectCmd(void)
+void Test_CF_CmdGetSetParam_When_param_id_AnyGreaterThan_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd(void)
 {
     /* Arrange */
     CF_ConfigTable_t dummy_config_table;
     uint8            arg_is_set   = Any_uint8();
-    uint8            arg_param_id = Any_uint8_GreaterThan(CF_NUM_CFG_PACKET_ITEMS);
+    uint8            arg_param_id = Any_uint8_GreaterThan(CF_GetSet_ValueID_MAX);
     uint32           arg_value    = Any_uint32();
     uint8            arg_chan_num = Any_uint8();
 
@@ -4217,14 +4217,14 @@ void Test_CF_CmdGetSetParam_When_param_id_AnyGreaterThan_CF_NUM_CFG_PACKET_ITEMS
                   "CF_AppData.hk.counters.err is %u and should be 1 more than %u", CF_AppData.hk.counters.err,
                   initial_hk_err_counter);
 
-} /* end Test_CF_CmdGetSetParam_When_param_id_AnyGreaterThan_CF_NUM_CFG_PACKET_ITEMS_FailSendEventAndRejectCmd */
+} /* end Test_CF_CmdGetSetParam_When_param_id_AnyGreaterThan_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd */
 
 void Test_CF_CmdGetSetParam_Given_chan_num_IsEqTo_CF_NUM_CHANNELS_ErrorOutAndCountError(void)
 {
     /* Arrange */
     CF_ConfigTable_t dummy_config_table;
     uint8            arg_is_set   = Any_uint8();
-    uint8            arg_param_id = Any_uint8_LessThan(CF_NUM_CFG_PACKET_ITEMS);
+    uint8            arg_param_id = Any_uint8_LessThan(CF_GetSet_ValueID_MAX);
     uint32           arg_value    = Any_uint32();
     uint8            arg_chan_num = CF_NUM_CHANNELS;
 
@@ -4255,7 +4255,7 @@ void Test_CF_CmdGetSetParam_Given_chan_num_IsGreaterThan_CF_NUM_CHANNELS_ErrorOu
     /* Arrange */
     CF_ConfigTable_t dummy_config_table;
     uint8            arg_is_set   = Any_uint8();
-    uint8            arg_param_id = Any_uint8_LessThan(CF_NUM_CFG_PACKET_ITEMS);
+    uint8            arg_param_id = Any_uint8_LessThan(CF_GetSet_ValueID_MAX);
     uint32           arg_value    = Any_uint32();
     uint8            arg_chan_num = Any_uint8_GreaterThan(CF_NUM_CHANNELS);
 
@@ -5344,12 +5344,12 @@ void add_CF_CmdValidateMaxOutgoing_tests(void)
 
 void add_CF_CmdGetSetParam_tests(void)
 {
-    UtTest_Add(Test_CF_CmdGetSetParam_When_param_id_Eq_CF_NUM_CFG_PACKET_ITEMS_FailSendEventAndRejectCmd,
+    UtTest_Add(Test_CF_CmdGetSetParam_When_param_id_Eq_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd,
                cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_CmdGetSetParam_When_param_id_Eq_CF_NUM_CFG_PACKET_ITEMS_FailSendEventAndRejectCmd");
-    UtTest_Add(Test_CF_CmdGetSetParam_When_param_id_AnyGreaterThan_CF_NUM_CFG_PACKET_ITEMS_FailSendEventAndRejectCmd,
+               "Test_CF_CmdGetSetParam_When_param_id_Eq_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd");
+    UtTest_Add(Test_CF_CmdGetSetParam_When_param_id_AnyGreaterThan_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd,
                cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_CmdGetSetParam_When_param_id_AnyGreaterThan_CF_NUM_CFG_PACKET_ITEMS_FailSendEventAndRejectCmd");
+               "Test_CF_CmdGetSetParam_When_param_id_AnyGreaterThan_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd");
     UtTest_Add(Test_CF_CmdGetSetParam_Given_chan_num_IsEqTo_CF_NUM_CHANNELS_ErrorOutAndCountError, cf_cmd_tests_Setup,
                cf_cmd_tests_Teardown,
                "Test_CF_CmdGetSetParam_Given_chan_num_IsEqTo_CF_NUM_CHANNELS_ErrorOutAndCountError");

@@ -116,7 +116,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg);
 void CF_CmdSendCfgParams(CFE_SB_Buffer_t *msg);
 int  CF_CmdValidateChunkSize(uint32 val, uint8 chan_num /* ignored */);
 int  CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num);
-void CF_CmdGetSetParam(uint8 is_set, uint8 param_id, uint32 value, uint8 chan_num);
+void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num);
 void CF_CmdSetParam(CFE_SB_Buffer_t *msg);
 void CF_CmdGetParam(CFE_SB_Buffer_t *msg);
 void CF_CmdEnableEngine(CFE_SB_Buffer_t *msg);
