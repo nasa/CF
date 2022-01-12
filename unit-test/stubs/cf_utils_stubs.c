@@ -1,28 +1,21 @@
 /************************************************************************
-** File: cf_utils.h
-**
-** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
-** Application version 3.0.0”
-** Copyright © 2019 United States Government as represented by the
-** Administrator of the National Aeronautics and Space Administration.
-** All Rights Reserved.
-** Licensed under the Apache License, Version 2.0 (the "License"); you may
-** not use this file except in compliance with the License. You may obtain
-** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software
-** distributed under the License is distributed on an "AS IS" BASIS,
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-** See the License for the specific language governing permissions and
-** limitations under the License.
-**
-**
-** Purpose:
-**  The CF Application utils header file
-**
-**
-**
-*************************************************************************/
+ *
+ * NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
+ * Application version 3.0.0”
+ * Copyright © 2019 United States Government as represented by the
+ * Administrator of the National Aeronautics and Space Administration.
+ * All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License. You may obtain
+ * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ************************************************************************/
 
 /**
  * @file
@@ -33,14 +26,14 @@
 #include "cf_utils.h"
 #include "utgenstub.h"
 
-extern void UT_DefaultHandler_CF_FindTransactionBySequenceNumber(void *, UT_EntryKey_t, const UT_StubContext_t *);
-extern void UT_DefaultHandler_CF_FindUnusedTransaction(void *, UT_EntryKey_t, const UT_StubContext_t *);
-extern void UT_DefaultHandler_CF_ResetHistory(void *, UT_EntryKey_t, const UT_StubContext_t *);
-extern void UT_DefaultHandler_CF_TraverseAllTransactions(void *, UT_EntryKey_t, const UT_StubContext_t *);
-extern void UT_DefaultHandler_CF_TraverseAllTransactions_All_Channels(void *, UT_EntryKey_t, const UT_StubContext_t *);
-extern void UT_DefaultHandler_CF_WrappedOpenCreate(void *, UT_EntryKey_t, const UT_StubContext_t *);
-extern void UT_DefaultHandler_CF_WriteHistoryQueueDataToFile(void *, UT_EntryKey_t, const UT_StubContext_t *);
-extern void UT_DefaultHandler_CF_WriteQueueDataToFile(void *, UT_EntryKey_t, const UT_StubContext_t *);
+void UT_DefaultHandler_CF_FindTransactionBySequenceNumber(void *, UT_EntryKey_t, const UT_StubContext_t *);
+void UT_DefaultHandler_CF_FindUnusedTransaction(void *, UT_EntryKey_t, const UT_StubContext_t *);
+void UT_DefaultHandler_CF_ResetHistory(void *, UT_EntryKey_t, const UT_StubContext_t *);
+void UT_DefaultHandler_CF_TraverseAllTransactions(void *, UT_EntryKey_t, const UT_StubContext_t *);
+void UT_DefaultHandler_CF_TraverseAllTransactions_All_Channels(void *, UT_EntryKey_t, const UT_StubContext_t *);
+void UT_DefaultHandler_CF_WrappedOpenCreate(void *, UT_EntryKey_t, const UT_StubContext_t *);
+void UT_DefaultHandler_CF_WriteHistoryQueueDataToFile(void *, UT_EntryKey_t, const UT_StubContext_t *);
+void UT_DefaultHandler_CF_WriteQueueDataToFile(void *, UT_EntryKey_t, const UT_StubContext_t *);
 
 /*
  * ----------------------------------------------------

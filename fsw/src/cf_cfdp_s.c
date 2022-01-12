@@ -1,30 +1,30 @@
 /************************************************************************
-** File: cf_cfdp_s.c
-**
-** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
-** Application version 3.0.0”
-** Copyright © 2019 United States Government as represented by the
-** Administrator of the National Aeronautics and Space Administration.
-** All Rights Reserved.
-** Licensed under the Apache License, Version 2.0 (the "License"); you may
-** not use this file except in compliance with the License. You may obtain
-** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software
-** distributed under the License is distributed on an "AS IS" BASIS,
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-** See the License for the specific language governing permissions and
-** limitations under the License.
-**
-**
-** Purpose:
-**  The CF Application CFDP send logic source file
-**
-**  Handles all CFDP engine functionality specific to TX transactions.
-**
-**
-**
-*************************************************************************/
+ * File: cf_cfdp_s.c
+ *
+ * NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
+ * Application version 3.0.0”
+ * Copyright © 2019 United States Government as represented by the
+ * Administrator of the National Aeronautics and Space Administration.
+ * All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License. You may obtain
+ * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ************************************************************************/
+
+/**
+ * @file
+ *
+ *  The CF Application CFDP send logic source file
+ *
+ *  Handles all CFDP engine functionality specific to TX transactions.
+ */
 
 #include "cfe.h"
 #include "cf_verify.h"
@@ -41,36 +41,27 @@
 #include <string.h>
 #include "cf_assert.h"
 
-/************************************************************************/
-/** \brief CFDP S1 transaction reset function.
-**
-**  \par Description
-**       All S transactions use this call to indicate the transaction
-**       state can be returned to the system. While this function currently
-**       only calls CF_CFDP_ResetTransaction(), it is here as a placeholder.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S_Reset
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 static inline void CF_CFDP_S_Reset(CF_Transaction_t *t)
 {
     CF_CFDP_ResetTransaction(t, 1);
 }
 
-/************************************************************************/
-/** \brief Send an eof pdu.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-**  \returns
-**  \retcode CF_SendRet_SUCCESS on success. \endcode
-**  \retcode CF_SendRet_NO_MSG if message buffer cannot be obtained. \endcode
-**  \retcode CF_SendRet_ERROR if an error occurred while building the packet. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S_SendEof
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 CF_SendRet_t CF_CFDP_S_SendEof(CF_Transaction_t *t)
 {
     if (!t->flags.com.crc_calc)
@@ -81,13 +72,14 @@ CF_SendRet_t CF_CFDP_S_SendEof(CF_Transaction_t *t)
     return CF_CFDP_SendEof(t);
 }
 
-/************************************************************************/
-/** \brief Sends an eof for S1.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S1_SubstateSendEof
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S1_SubstateSendEof(CF_Transaction_t *t)
 {
     /* this looks weird, but the idea is we want to reset the transaction if some error occurs while sending
@@ -99,13 +91,14 @@ void CF_CFDP_S1_SubstateSendEof(CF_Transaction_t *t)
     }
 }
 
-/************************************************************************/
-/** \brief Triggers tick processing to send an EOF and wait for EOF-ACK for S2
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S2_SubstateSendEof
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *t)
 {
     t->state_data.s.sub_state    = CF_TxSubState_WAIT_FOR_EOF_ACK;
@@ -118,23 +111,14 @@ void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *t)
     CF_InsertSortPrio(t, CF_QueueIdx_TXW);
 }
 
-/************************************************************************/
-/** \brief Helper function to populate the pdu with file data and send it.
-**
-**  \par Description
-**       This function checks the file offset cache and if the desired
-**       location is where the file offset is, it can skip a seek() call.
-**       The file is read into the filedata pdu and then the pdu is sent.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-**  \returns
-**  \retstmt The number of bytes sent in the file data PDU. \endcode
-**  \endreturns
-**
-*************************************************************************/
-/* if bytes_to_read is 0, then read max possible */
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S_SendFileData
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc)
 {
     int32                           ret = -1;
@@ -244,22 +228,14 @@ err_out:
     return ret;
 }
 
-/************************************************************************/
-/** \brief Standard state function to send the next file data PDU for active transaction.
-**
-**  \par Description
-**       During the transfer of active transaction file data pdus, the file
-**       offset is saved. This function sends the next chunk of data. If
-**       the file offset equals the file size, then transition to the EOF
-**       state.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
-/* regular filedata send
- * based on t->foffs for current offset
- * checks for EOF and changes state if necessary */
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S_SubstateSendFileData
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *t)
 {
     int32 bytes_processed = CF_CFDP_S_SendFileData(t, t->foffs, (t->fsize - t->foffs), 1);
@@ -285,21 +261,14 @@ void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *t)
     }
 }
 
-/************************************************************************/
-/** \brief Respond to a nak by sending filedata pdus as response.
-**
-**  \par Description
-**       Checks to see if a metadata pdu or filedata re-transmits must
-**       occur.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-**  \returns
-**  \retstmt 0 if no NAK processed. 1 if NAK processed. <0 if error. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S_CheckAndRespondNak
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
 {
     const CF_Chunk_t *c;
@@ -347,17 +316,14 @@ err_out:
     return ret;
 }
 
-/************************************************************************/
-/** \brief Send filedata handling for S2.
-**
-**  \par Description
-**       S2 will either respond to a NAK by sending retransmits, or in
-**       absence of a NAK, it will send more of the original file data.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S2_SubstateSendFileData
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S2_SubstateSendFileData(CF_Transaction_t *t)
 {
     int ret = CF_CFDP_S_CheckAndRespondNak(t);
@@ -376,17 +342,14 @@ void CF_CFDP_S2_SubstateSendFileData(CF_Transaction_t *t)
     }
 }
 
-/************************************************************************/
-/** \brief Send metadata PDU.
-**
-**  \par Description
-**       Construct and send a metadata PDU. This function determines the
-**       size of the file to put in the metadata PDU.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S_SubstateSendMetadata
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
 {
     int          status;
@@ -466,13 +429,14 @@ err_out:
     CF_CFDP_S_Reset(t);
 }
 
-/************************************************************************/
-/** \brief Send FIN-ACK packet for S2.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S_SubstateSendFinAck
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S_SubstateSendFinAck(CF_Transaction_t *t)
 {
     /* if send, or error, reset. if no message, try again next cycle */
@@ -483,13 +447,14 @@ void CF_CFDP_S_SubstateSendFinAck(CF_Transaction_t *t)
     }
 }
 
-/************************************************************************/
-/** \brief A fin was received before file complete, so abandon the transaction.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. ph must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S2_EarlyFin
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S2_EarlyFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     /* received early fin, so just cancel */
@@ -499,31 +464,28 @@ void CF_CFDP_S2_EarlyFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     CF_CFDP_S_Reset(t);
 }
 
-/************************************************************************/
-/** \brief S2 received FIN, so set flag to send FIN-ACK.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. ph must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S2_Fin
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S2_Fin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     t->state_data.s.s2.fin_cc = ph->int_header.fin.cc;
     t->state_data.s.sub_state = CF_TxSubState_SEND_FIN_ACK;
 }
 
-/************************************************************************/
-/** \brief S2 NAK pdu received handling.
-**
-**  \par Description
-**       Stores the segment requests from the NAK packet in the chunks
-**       structure. These can be used to generate re-transmit filedata
-**       PDUs.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. ph must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S2_Nak
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S2_Nak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     const CF_Logical_SegmentRequest_t *sr;
@@ -583,30 +545,28 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     }
 }
 
-/************************************************************************/
-/** \brief S2 NAK handling but with arming the NAK timer.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. ph must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S2_Nak_Arm
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     CF_CFDP_ArmAckTimer(t);
     CF_CFDP_S2_Nak(t, ph);
 }
 
-/************************************************************************/
-/** \brief S2 received ack pdu in wait for EOF-ACK state.
-**
-**  \par Description
-**       This function will trigger a state transition to CF_TxSubState_WAIT_FOR_FIN,
-**       which waits for a FIN pdu.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. ph must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S2_WaitForEofAck
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     if (!CF_CFDP_RecvAck(t, ph))
@@ -631,13 +591,14 @@ void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     }
 }
 
-/************************************************************************/
-/** \brief S1 receive pdu processing.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S1_Recv
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S1_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     /* s1 doesn't need to receive anything */
@@ -645,13 +606,14 @@ void CF_CFDP_S1_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     CF_CFDP_S_DispatchRecv(t, ph, &substate_fns);
 }
 
-/************************************************************************/
-/** \brief S2 receive pdu processing.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S2_Recv
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S2_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     static const CF_CFDP_FileDirectiveDispatchTable_t s2_meta      = {.fdirective = {
@@ -682,13 +644,14 @@ void CF_CFDP_S2_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     CF_CFDP_S_DispatchRecv(t, ph, &substate_fns);
 }
 
-/************************************************************************/
-/** \brief S1 dispatch function.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S1_Tx
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S1_Tx(CF_Transaction_t *t)
 {
     static const CF_CFDP_S_SubstateSendDispatchTable_t substate_fns = {
@@ -701,13 +664,14 @@ void CF_CFDP_S1_Tx(CF_Transaction_t *t)
     CF_CFDP_S_DispatchTransmit(t, &substate_fns);
 }
 
-/************************************************************************/
-/** \brief S2 dispatch function.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S2_Tx
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S2_Tx(CF_Transaction_t *t)
 {
     static const CF_CFDP_S_SubstateSendDispatchTable_t substate_fns = {
@@ -720,13 +684,14 @@ void CF_CFDP_S2_Tx(CF_Transaction_t *t)
     CF_CFDP_S_DispatchTransmit(t, &substate_fns);
 }
 
-/************************************************************************/
-/** \brief Cancel an S transaction.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S_Cancel
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S_Cancel(CF_Transaction_t *t)
 {
     if (t->state_data.s.sub_state < CF_TxSubState_EOF)
@@ -736,19 +701,14 @@ void CF_CFDP_S_Cancel(CF_Transaction_t *t)
     }
 }
 
-/************************************************************************/
-/** \brief Perform tick (time-based) processing for S transactions.
-**
-**  \par Description
-**       This function is called on every transaction by the engine on
-**       every CF wakeup. This is where flags are checked to send EOF or
-**       FIN-ACK. If nothing else is sent, it checks to see if a NAK
-**       retransmit must occur.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. cont is unused, so may be NULL
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S_Tick
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
 {
     /* Steven is not real happy with this function. There should be a better way to separate out
@@ -819,18 +779,14 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
 err_out:;
 }
 
-/************************************************************************/
-/** \brief Perform NAK response for TX transactions
-**
-**  \par Description
-**       This function is called at tick processing time to send pending
-**       NAK responses. It indicates "cont" is 1 if there are more responses
-**       left to send.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL. cont must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_S_Tick_Nak
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_S_Tick_Nak(CF_Transaction_t *t, int *cont)
 {
     int ret = CF_CFDP_S_CheckAndRespondNak(t);

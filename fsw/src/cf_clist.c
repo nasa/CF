@@ -1,58 +1,59 @@
 /************************************************************************
-** File: cf_clist.c
-**
-** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
-** Application version 3.0.0”
-** Copyright © 2019 United States Government as represented by the
-** Administrator of the National Aeronautics and Space Administration.
-** All Rights Reserved.
-** Licensed under the Apache License, Version 2.0 (the "License"); you may
-** not use this file except in compliance with the License. You may obtain
-** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software
-** distributed under the License is distributed on an "AS IS" BASIS,
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-** See the License for the specific language governing permissions and
-** limitations under the License.
-**
-**
-** Purpose:
-**  The CF Application circular list definition source file
-**
-**  This is a circular doubly-linked list implementation. It is used for
-**  all data structures in CF.
-**
-**  This file is intended to be a generic class that can be used in other apps.
-**
-**
-**
-*************************************************************************/
+ *
+ * NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
+ * Application version 3.0.0”
+ * Copyright © 2019 United States Government as represented by the
+ * Administrator of the National Aeronautics and Space Administration.
+ * All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License. You may obtain
+ * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ************************************************************************/
+
+/**
+ * @file
+ *
+ *  The CF Application circular list definition source file
+ *
+ *  This is a circular doubly-linked list implementation. It is used for
+ *  all data structures in CF.
+ *
+ *  This file is intended to be a generic class that can be used in other apps.
+ */
 
 #include "cf_verify.h"
 #include "cf_clist.h"
 #include "cf_assert.h"
 
-/************************************************************************/
-/** \brief Initialize a clist node.
-**
-**  \par Assumptions, External Events, and Notes:
-**       node must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CList_InitNode
+ *
+ * Application-scope internal function
+ * See description in cf_clist.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CList_InitNode(CF_CListNode_t *node)
 {
     node->next = node;
     node->prev = node;
 }
 
-/************************************************************************/
-/** \brief Insert the given node into the front of a list.
-**
-**  \par Assumptions, External Events, and Notes:
-**       head must not be NULL. node must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CList_InsertFront
+ *
+ * Application-scope internal function
+ * See description in cf_clist.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CList_InsertFront(CF_CListNode_t **head, CF_CListNode_t *node)
 {
     CF_Assert(head);
@@ -73,13 +74,14 @@ void CF_CList_InsertFront(CF_CListNode_t **head, CF_CListNode_t *node)
     *head = node;
 }
 
-/************************************************************************/
-/** \brief Insert the given node into the back of a list.
-**
-**  \par Assumptions, External Events, and Notes:
-**       head must not be NULL. node must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CList_InsertBack
+ *
+ * Application-scope internal function
+ * See description in cf_clist.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CList_InsertBack(CF_CListNode_t **head, CF_CListNode_t *node)
 {
     CF_Assert(head);
@@ -102,17 +104,14 @@ void CF_CList_InsertBack(CF_CListNode_t **head, CF_CListNode_t *node)
     }
 }
 
-/************************************************************************/
-/** \brief Remove the first node from a list and return it.
-**
-**  \par Assumptions, External Events, and Notes:
-**       head must not be NULL.
-**
-**  \returns
-**  \retstmt The first node (now removed) in the list; NULL if list was empty. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CList_Pop
+ *
+ * Application-scope internal function
+ * See description in cf_clist.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 CF_CListNode_t *CF_CList_Pop(CF_CListNode_t **head)
 {
     CF_CListNode_t *ret;
@@ -128,13 +127,14 @@ CF_CListNode_t *CF_CList_Pop(CF_CListNode_t **head)
     return ret;
 }
 
-/************************************************************************/
-/** \brief Remove the given node from the list.
-**
-**  \par Assumptions, External Events, and Notes:
-**       head must not be NULL. node must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CList_Remove
+ *
+ * Application-scope internal function
+ * See description in cf_clist.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CList_Remove(CF_CListNode_t **head, CF_CListNode_t *node)
 {
     CF_Assert(head);
@@ -164,13 +164,14 @@ void CF_CList_Remove(CF_CListNode_t **head, CF_CListNode_t *node)
     CF_CList_InitNode(node);
 }
 
-/************************************************************************/
-/** \brief Insert the given node into the last after the given start node.
-**
-**  \par Assumptions, External Events, and Notes:
-**       head must not be NULL. node must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CList_InsertAfter
+ *
+ * Application-scope internal function
+ * See description in cf_clist.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CList_InsertAfter(CF_CListNode_t **head, CF_CListNode_t *start, CF_CListNode_t *after)
 {
     /* calling insert_after with nothing to insert after (no head) makes no sense */
@@ -186,13 +187,14 @@ void CF_CList_InsertAfter(CF_CListNode_t **head, CF_CListNode_t *start, CF_CList
     after->next->prev = after;
 }
 
-/************************************************************************/
-/** \brief Traverse the entire list, calling the given function on all nodes.
-**
-**  \par Assumptions, External Events, and Notes:
-**       start may be NULL. fn must be a valid function. context may be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CList_Traverse
+ *
+ * Application-scope internal function
+ * See description in cf_clist.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CList_Traverse(CF_CListNode_t *start, CF_CListFn_t fn, void *context)
 {
     CF_CListNode_t *n = start;
@@ -228,13 +230,14 @@ void CF_CList_Traverse(CF_CListNode_t *start, CF_CListFn_t fn, void *context)
 err_out:;
 }
 
-/************************************************************************/
-/** \brief Reverse list traversal, starting from end, calling given function on all nodes.
-**
-**  \par Assumptions, External Events, and Notes:
-**       end may be NULL. fn must be a valid function. context may be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CList_Traverse_R
+ *
+ * Application-scope internal function
+ * See description in cf_clist.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CList_Traverse_R(CF_CListNode_t *end, CF_CListFn_t fn, void *context)
 {
     if (end)

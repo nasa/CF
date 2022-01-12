@@ -1,5 +1,4 @@
 /************************************************************************
-** File: cf_cfdp_pdu.h
 **
 ** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
 ** Application version 3.0.0”
@@ -16,13 +15,7 @@
 ** See the License for the specific language governing permissions and
 ** limitations under the License.
 **
-**
-** Purpose:
-**  The CF Application CFDP PDU definitions header file
-**
-**
-**
-*************************************************************************/
+*/
 
 /**
  * @file

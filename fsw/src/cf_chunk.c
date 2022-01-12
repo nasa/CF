@@ -1,56 +1,49 @@
 /************************************************************************
-** File: cf_chunk.c
-**
-** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
-** Application version 3.0.0”
-** Copyright © 2019 United States Government as represented by the
-** Administrator of the National Aeronautics and Space Administration.
-** All Rights Reserved.
-** Licensed under the Apache License, Version 2.0 (the "License"); you may
-** not use this file except in compliance with the License. You may obtain
-** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software
-** distributed under the License is distributed on an "AS IS" BASIS,
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-** See the License for the specific language governing permissions and
-** limitations under the License.
-**
-**
-** Purpose:
-**  The CF Application chunks (sparse gap tracking) logic file
-**
-**  This class handles the complexity of sparse gap tracking so that
-**  the CFDP engine doesn't need to worry about it. Information is given
-**  to the class and when needed calculations are made internally to
-**  help the engine build NAK packets. Received NAK segmnent requests
-**  are stored in this class as well and used for re-transmit processing.
-**
-**  This is intended to be mostly a generic purpose class used by CF.
-**
-**
-**
-*************************************************************************/
-
-/* Most of this was originally written by Stephen Newell stephen@sjnewell.com
- * who wrote it responding to my asking him about the problem. He wrote it
- * in C++ and I (Steven Seeger) ported it to C and fixed a couple bugs and
- * added some stuff.
  *
- * This is a pretty generic implemenation of a solution to the problem of
- * sparse gap tracking over a linear range. */
+ * NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
+ * Application version 3.0.0”
+ * Copyright © 2019 United States Government as represented by the
+ * Administrator of the National Aeronautics and Space Administration.
+ * All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License. You may obtain
+ * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ************************************************************************/
+
+/**
+ * @file
+ *
+ *  The CF Application chunks (sparse gap tracking) logic file
+ *
+ *  This class handles the complexity of sparse gap tracking so that
+ *  the CFDP engine doesn't need to worry about it. Information is given
+ *  to the class and when needed calculations are made internally to
+ *  help the engine build NAK packets. Received NAK segmnent requests
+ *  are stored in this class as well and used for re-transmit processing.
+ *
+ *  This is intended to be mostly a generic purpose class used by CF.
+ */
+
 #include <string.h>
 #include "cf_verify.h"
 #include "cf_assert.h"
 #include "cf_chunk.h"
 
-/************************************************************************/
-/** \brief Erase a range of chunks.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Chunks_EraseRange
+ *
+ * Application-scope internal function
+ * See description in cf_chunk.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_Chunks_EraseRange(CF_ChunkList_t *chunks, CF_ChunkIdx_t start, CF_ChunkIdx_t end)
 {
     CF_Assert(end >= start);
@@ -61,13 +54,14 @@ void CF_Chunks_EraseRange(CF_ChunkList_t *chunks, CF_ChunkIdx_t start, CF_ChunkI
     }
 }
 
-/************************************************************************/
-/** \brief Erase a single chunk.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Chunks_EraseChunk
+ *
+ * Application-scope internal function
+ * See description in cf_chunk.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_Chunks_EraseChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t erase_index)
 {
     CF_Assert(chunks->count > 0);
@@ -79,13 +73,14 @@ void CF_Chunks_EraseChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t erase_index)
     --chunks->count;
 }
 
-/************************************************************************/
-/** \brief Insert a chunk before index_before.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL. chunk must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Chunks_InsertChunk
+ *
+ * Application-scope internal function
+ * See description in cf_chunk.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_Chunks_InsertChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t index_before, const CF_Chunk_t *chunk)
 {
     CF_Assert(chunks->count < chunks->max_chunks);
@@ -101,20 +96,14 @@ void CF_Chunks_InsertChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t index_before, c
     ++chunks->count;
 }
 
-/************************************************************************/
-/** \brief Finds where a chunk should be inserted in the chunks.
-**
-**  \par Description
-**       This is a C version of std::lower_bound from C++ algorithms.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL. chunk must not be NULL.
-**
-**  \returns
-**  \retstmt Returns an index to the first chunk that is greater than or equal to the requested's offset. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Chunks_FindInsertPosition
+ *
+ * Application-scope internal function
+ * See description in cf_chunk.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 CF_ChunkIdx_t CF_Chunks_FindInsertPosition(CF_ChunkList_t *chunks, const CF_Chunk_t *chunk)
 {
     CF_ChunkIdx_t first = 0;
@@ -141,17 +130,14 @@ CF_ChunkIdx_t CF_Chunks_FindInsertPosition(CF_ChunkList_t *chunks, const CF_Chun
     return first;
 }
 
-/************************************************************************/
-/** \brief Possibly combines the given chunk with the previous chunk.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL. chunk must not be NULL.
-**
-**  \returns
-**  \retstmt Returns 1 if combined with another chunk; otherwise 0. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Chunks_CombinePrevious
+ *
+ * Application-scope internal function
+ * See description in cf_chunk.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
     int ret = 0;
@@ -176,17 +162,14 @@ int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_
     return ret;
 }
 
-/************************************************************************/
-/** \brief Possibly combines the given chunk with the next chunk.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL. chunk must not be NULL.
-**
-**  \returns
-**  \retstmt Returns 1 if combined with another chunk; otherwise 0. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Chunks_CombineNext
+ *
+ * Application-scope internal function
+ * See description in cf_chunk.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
     /* check if not at the end */
@@ -238,17 +221,14 @@ int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chun
     return ret;
 }
 
-/************************************************************************/
-/** \brief Finds the smallest size out of all chunks.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL.
-**
-**  \returns
-**  \retstmt The chunk index with the smallest size. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Chunks_FindSmallestSize
+ *
+ * Application-scope internal function
+ * See description in cf_chunk.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 CF_ChunkIdx_t CF_Chunks_FindSmallestSize(const CF_ChunkList_t *chunks)
 {
     CF_ChunkIdx_t i;
@@ -265,17 +245,14 @@ CF_ChunkIdx_t CF_Chunks_FindSmallestSize(const CF_ChunkList_t *chunks)
     return smallest;
 }
 
-/************************************************************************/
-/** \brief Insert a chunk.
-**
-**  \par Description
-**       Finds the correct insertion point for a chunk. May combine with
-**       an existing chunk if contiguous.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL. chunk must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Chunks_Insert
+ *
+ * Application-scope internal function
+ * See description in cf_chunk.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_Chunks_Insert(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
     int n = CF_Chunks_CombineNext(chunks, i, chunk);
@@ -310,13 +287,14 @@ void CF_Chunks_Insert(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t 
     }
 }
 
-/************************************************************************/
-/** \brief Public function to add a chunk.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_ChunkListAdd
+ *
+ * Application-scope internal function
+ * See description in cf_chunk.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_ChunkListAdd(CF_ChunkList_t *chunks, CF_ChunkOffset_t offset, CF_ChunkSize_t size)
 {
     const CF_Chunk_t    chunk = {offset, size};
@@ -339,18 +317,14 @@ void CF_ChunkListAdd(CF_ChunkList_t *chunks, CF_ChunkOffset_t offset, CF_ChunkSi
     }
 }
 
-/************************************************************************/
-/** \brief Public function to remove some amount of size from the first chunk.
-**
-**  \par Description
-**       This may remove the chunk entirely. This function is to satisfy the
-**       use-case where data is retrieved from the structure in-order and
-**       once consumed should be removed.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_ChunkList_RemoveFromFirst
+ *
+ * Application-scope internal function
+ * See description in cf_chunk.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_ChunkList_RemoveFromFirst(CF_ChunkList_t *chunks, CF_ChunkSize_t size)
 {
     CF_Chunk_t *c = &chunks->chunks[0]; /* front is always 0 */
@@ -371,30 +345,27 @@ void CF_ChunkList_RemoveFromFirst(CF_ChunkList_t *chunks, CF_ChunkSize_t size)
     }
 }
 
-/************************************************************************/
-/** \brief Public function to remove some amount of size from the first chunk.
-**
-**  \par Description
-**       This may remove the chunk entirely. This function is to satisfy the
-**       use-case where data is retrieved from the structure in-order and
-**       once consumed should be removed.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_ChunkList_GetFirstChunk
+ *
+ * Application-scope internal function
+ * See description in cf_chunk.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 const CF_Chunk_t *CF_ChunkList_GetFirstChunk(const CF_ChunkList_t *chunks)
 {
     return chunks->count ? &chunks->chunks[0] : NULL;
 }
 
-/************************************************************************/
-/** \brief Initialize a chunks structure.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL. chunks_mem must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_ChunkListInit
+ *
+ * Application-scope internal function
+ * See description in cf_chunk.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_ChunkListInit(CF_ChunkList_t *chunks, CF_ChunkIdx_t max_chunks, CF_Chunk_t *chunks_mem)
 {
     CF_Assert(max_chunks > 0);
@@ -403,35 +374,28 @@ void CF_ChunkListInit(CF_ChunkList_t *chunks, CF_ChunkIdx_t max_chunks, CF_Chunk
     CF_ChunkListReset(chunks);
 }
 
-/************************************************************************/
-/** \brief Resets a chunks structure.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_ChunkListReset
+ *
+ * Application-scope internal function
+ * See description in cf_chunk.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_ChunkListReset(CF_ChunkList_t *chunks)
 {
     chunks->count = 0;
     memset(chunks->chunks, 0, sizeof(*chunks->chunks) * chunks->max_chunks);
 }
 
-/************************************************************************/
-/** \brief Compute gaps between chunks, and call a callback for each.
-**
-**  \par Description
-**       This function walks over all chunks and computes the gaps between.
-**       It can exit early if the calculated gap start is larger than the
-**       desired total.
-**
-**  \par Assumptions, External Events, and Notes:
-**       chunks must not be NULL. compute_gap_fn is a valid function address.
-**
-**  \returns
-**  \retstmt The number of computed gaps. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_ChunkList_ComputeGaps
+ *
+ * Application-scope internal function
+ * See description in cf_chunk.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_gaps, CF_ChunkSize_t total,
                                 CF_ChunkOffset_t start, CF_ChunkList_ComputeGapFn_t compute_gap_fn, void *opaque)
 {

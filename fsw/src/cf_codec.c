@@ -1,23 +1,28 @@
 /************************************************************************
-** File: cf_codec.c
-**
-** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
-** Application version 3.0.0”
-** Copyright © 2019 United States Government as represented by the
-** Administrator of the National Aeronautics and Space Administration.
-** All Rights Reserved.
-** Licensed under the Apache License, Version 2.0 (the "License"); you may
-** not use this file except in compliance with the License. You may obtain
-** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software
-** distributed under the License is distributed on an "AS IS" BASIS,
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-** See the License for the specific language governing permissions and
-** limitations under the License.
-**
-**
-*************************************************************************/
+ *
+ * NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
+ * Application version 3.0.0”
+ * Copyright © 2019 United States Government as represented by the
+ * Administrator of the National Aeronautics and Space Administration.
+ * All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License. You may obtain
+ * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ *
+ ************************************************************************/
+
+/**
+ * @file
+ *
+ * CFDP protocol data structure encode/decode implementation
+ */
 
 #define CF_DO_DECLARE_FIELDS
 
@@ -31,12 +36,27 @@
  * literal integers as well as variables.  So they operate on value, where
  * the load/get functions operate by reference
  */
+
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Codec_Store_uint8
+ *
+ * Internal helper routine only, not part of API.
+ *
+ *-----------------------------------------------------------------*/
 static inline void CF_Codec_Store_uint8(CF_CFDP_uint8_t *pdst, uint8 val)
 {
     pdst->octets[0] = val;
 }
 #define cfdp_set_uint8(dst, src) CF_Codec_Store_uint8(&(dst), src)
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Codec_Store_uint16
+ *
+ * Internal helper routine only, not part of API.
+ *
+ *-----------------------------------------------------------------*/
 static inline void CF_Codec_Store_uint16(CF_CFDP_uint16_t *pdst, uint16 val)
 {
     pdst->octets[1] = val & 0xFF;
@@ -45,6 +65,13 @@ static inline void CF_Codec_Store_uint16(CF_CFDP_uint16_t *pdst, uint16 val)
 }
 #define cfdp_set_uint16(dst, src) CF_Codec_Store_uint16(&(dst), src)
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Codec_Store_uint32
+ *
+ * Internal helper routine only, not part of API.
+ *
+ *-----------------------------------------------------------------*/
 static inline void CF_Codec_Store_uint32(CF_CFDP_uint32_t *pdst, uint32 val)
 {
     pdst->octets[3] = val & 0xFF;
@@ -57,6 +84,13 @@ static inline void CF_Codec_Store_uint32(CF_CFDP_uint32_t *pdst, uint32 val)
 }
 #define cfdp_set_uint32(dst, src) CF_Codec_Store_uint32(&(dst), src)
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Codec_Store_uint64
+ *
+ * Internal helper routine only, not part of API.
+ *
+ *-----------------------------------------------------------------*/
 static inline void CF_Codec_Store_uint64(CF_CFDP_uint64_t *pdst, uint64 val)
 {
     pdst->octets[7] = val & 0xFF;
@@ -77,12 +111,26 @@ static inline void CF_Codec_Store_uint64(CF_CFDP_uint64_t *pdst, uint64 val)
 }
 #define cfdp_set_uint64(dst, src) CF_Codec_Store_uint64(&(dst), src)
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Codec_Load_uint8
+ *
+ * Internal helper routine only, not part of API.
+ *
+ *-----------------------------------------------------------------*/
 static inline void CF_Codec_Load_uint8(uint8 *pdst, const CF_CFDP_uint8_t *psrc)
 {
     *pdst = psrc->octets[0];
 }
 #define cfdp_get_uint8(dst, src) CF_Codec_Load_uint8(&(dst), &(src))
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Codec_Load_uint16
+ *
+ * Internal helper routine only, not part of API.
+ *
+ *-----------------------------------------------------------------*/
 static inline void CF_Codec_Load_uint16(uint16 *pdst, const CF_CFDP_uint16_t *psrc)
 {
     uint16 val = 0;
@@ -95,6 +143,13 @@ static inline void CF_Codec_Load_uint16(uint16 *pdst, const CF_CFDP_uint16_t *ps
 }
 #define cfdp_get_uint16(dst, src) CF_Codec_Load_uint16(&(dst), &(src))
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Codec_Load_uint32
+ *
+ * Internal helper routine only, not part of API.
+ *
+ *-----------------------------------------------------------------*/
 static inline void CF_Codec_Load_uint32(uint32 *pdst, const CF_CFDP_uint32_t *psrc)
 {
     uint32 val = 0;
@@ -111,6 +166,13 @@ static inline void CF_Codec_Load_uint32(uint32 *pdst, const CF_CFDP_uint32_t *ps
 }
 #define cfdp_get_uint32(dst, src) CF_Codec_Load_uint32(&(dst), &(src))
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_Codec_Load_uint64
+ *
+ * Internal helper routine only, not part of API.
+ *
+ *-----------------------------------------------------------------*/
 static inline void CF_Codec_Load_uint64(uint64 *pdst, const CF_CFDP_uint64_t *psrc)
 {
     uint64 val = 0;
@@ -135,6 +197,14 @@ static inline void CF_Codec_Load_uint64(uint64 *pdst, const CF_CFDP_uint64_t *ps
 }
 #define cfdp_get_uint64(dst, src) CF_Codec_Load_uint64(&(dst), &(src))
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_CodecCheckSize
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 bool CF_CFDP_CodecCheckSize(CF_CodecState_t *state, size_t chunksize)
 {
     size_t next_offset = state->next_offset + chunksize;
@@ -151,6 +221,14 @@ bool CF_CFDP_CodecCheckSize(CF_CodecState_t *state, size_t chunksize)
     return CF_CFDP_CodecIsOK(state);
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DoEncodeChunk
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void *CF_CFDP_DoEncodeChunk(CF_EncoderState_t *state, size_t chunksize)
 {
     uint8 *buf = state->base + CF_CFDP_CodecGetPosition(&state->codec_state);
@@ -163,6 +241,14 @@ void *CF_CFDP_DoEncodeChunk(CF_EncoderState_t *state, size_t chunksize)
     return buf;
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DoDecodeChunk
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 const void *CF_CFDP_DoDecodeChunk(CF_DecoderState_t *state, size_t chunksize)
 {
     const uint8 *buf = state->base + CF_CFDP_CodecGetPosition(&state->codec_state);
@@ -175,6 +261,14 @@ const void *CF_CFDP_DoDecodeChunk(CF_DecoderState_t *state, size_t chunksize)
     return buf;
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_GetValueEncodedSize
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 uint8 CF_CFDP_GetValueEncodedSize(uint64 Value)
 {
     uint8  MinSize;
@@ -189,6 +283,14 @@ uint8 CF_CFDP_GetValueEncodedSize(uint64 Value)
     return MinSize;
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_EncodeIntegerInSize
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_EncodeIntegerInSize(CF_EncoderState_t *state, uint64 value, uint8 encode_size)
 {
     uint8 *dptr;
@@ -208,18 +310,14 @@ void CF_EncodeIntegerInSize(CF_EncoderState_t *state, uint64 value, uint8 encode
     }
 }
 
-/*
- * On transmit side, the common/base header must be encoded in two parts, to deal
- * with the "total_size" field.  The initial encoding of the the basic fields is
- * done as soon as it is known that a PDU of this type needs to be sent, but the
- * total size may not be yet known, as it depends on the remainder of encoding
- * and any additional data that might get added to the variable length sections.
+/*----------------------------------------------------------------
  *
- * This function encodes all base header fields _except_ total length.  There is a
- * separate function later to update the total_length to the correct value once the
- * remainder of encoding is done.  Luckily, the total_length is in the first fixed
- * position binary blob so it is easy to update later.
- */
+ * Function: CF_CFDP_EncodeHeaderWithoutSize
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_EncodeHeaderWithoutSize(CF_EncoderState_t *state, CF_Logical_PduHeader_t *plh)
 {
     CF_CFDP_PduHeader_t *peh; /* for encoding fixed sized fields */
@@ -250,6 +348,14 @@ void CF_CFDP_EncodeHeaderWithoutSize(CF_EncoderState_t *state, CF_Logical_PduHea
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_EncodeHeaderFinalSize
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_EncodeHeaderFinalSize(CF_EncoderState_t *state, CF_Logical_PduHeader_t *plh)
 {
     CF_CFDP_PduHeader_t *peh;
@@ -274,6 +380,14 @@ void CF_CFDP_EncodeHeaderFinalSize(CF_EncoderState_t *state, CF_Logical_PduHeade
     CF_CODEC_SET_DONE(state);
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_EncodeFileDirectiveHeader
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_EncodeFileDirectiveHeader(CF_EncoderState_t *state, CF_Logical_PduFileDirectiveHeader_t *pfdir)
 {
     CF_CFDP_PduFileDirectiveHeader_t *peh; /* for encoding fixed sized fields */
@@ -286,6 +400,14 @@ void CF_CFDP_EncodeFileDirectiveHeader(CF_EncoderState_t *state, CF_Logical_PduF
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_EncodeLV
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_EncodeLV(CF_EncoderState_t *state, CF_Logical_Lv_t *pllv)
 {
     CF_CFDP_lv_t *lv; /* for encoding fixed sized fields */
@@ -310,6 +432,14 @@ void CF_CFDP_EncodeLV(CF_EncoderState_t *state, CF_Logical_Lv_t *pllv)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_EncodeTLV
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_EncodeTLV(CF_EncoderState_t *state, CF_Logical_Tlv_t *pltlv)
 {
     CF_CFDP_tlv_t *tlv; /* for encoding fixed sized fields */
@@ -342,6 +472,14 @@ void CF_CFDP_EncodeTLV(CF_EncoderState_t *state, CF_Logical_Tlv_t *pltlv)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_EncodeSegmentRequest
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_EncodeSegmentRequest(CF_EncoderState_t *state, CF_Logical_SegmentRequest_t *plseg)
 {
     CF_CFDP_SegmentRequest_t *sr; /* for encoding fixed sized fields */
@@ -354,6 +492,14 @@ void CF_CFDP_EncodeSegmentRequest(CF_EncoderState_t *state, CF_Logical_SegmentRe
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_EncodeAllTlv
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_EncodeAllTlv(CF_EncoderState_t *state, CF_Logical_TlvList_t *pltlv)
 {
     uint8 i;
@@ -364,6 +510,14 @@ void CF_CFDP_EncodeAllTlv(CF_EncoderState_t *state, CF_Logical_TlvList_t *pltlv)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_EncodeAllSegments
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_EncodeAllSegments(CF_EncoderState_t *state, CF_Logical_SegmentList_t *plseg)
 {
     uint8 i;
@@ -374,6 +528,14 @@ void CF_CFDP_EncodeAllSegments(CF_EncoderState_t *state, CF_Logical_SegmentList_
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_EncodeMd
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_EncodeMd(CF_EncoderState_t *state, CF_Logical_PduMd_t *plmd)
 {
     CF_CFDP_PduMd_t *md; /* for encoding fixed sized fields */
@@ -392,6 +554,14 @@ void CF_CFDP_EncodeMd(CF_EncoderState_t *state, CF_Logical_PduMd_t *plmd)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_EncodeFileDataHeader
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_EncodeFileDataHeader(CF_EncoderState_t *state, bool with_meta, CF_Logical_PduFileDataHeader_t *plfd)
 {
     CF_CFDP_PduFileDataHeader_t *fd;
@@ -423,6 +593,14 @@ void CF_CFDP_EncodeFileDataHeader(CF_EncoderState_t *state, bool with_meta, CF_L
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_EncodeEof
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_EncodeEof(CF_EncoderState_t *state, CF_Logical_PduEof_t *pleof)
 {
     CF_CFDP_PduEof_t *eof; /* for encoding fixed sized fields */
@@ -439,6 +617,14 @@ void CF_CFDP_EncodeEof(CF_EncoderState_t *state, CF_Logical_PduEof_t *pleof)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_EncodeFin
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_EncodeFin(CF_EncoderState_t *state, CF_Logical_PduFin_t *plfin)
 {
     CF_CFDP_PduFin_t *fin; /* for encoding fixed sized fields */
@@ -455,6 +641,14 @@ void CF_CFDP_EncodeFin(CF_EncoderState_t *state, CF_Logical_PduFin_t *plfin)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_EncodeAck
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_EncodeAck(CF_EncoderState_t *state, CF_Logical_PduAck_t *plack)
 {
     CF_CFDP_PduAck_t *ack; /* for encoding fixed sized fields */
@@ -472,6 +666,14 @@ void CF_CFDP_EncodeAck(CF_EncoderState_t *state, CF_Logical_PduAck_t *plack)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_EncodeNak
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_EncodeNak(CF_EncoderState_t *state, CF_Logical_PduNak_t *plnak)
 {
     CF_CFDP_PduNak_t *nak; /* for encoding fixed sized fields */
@@ -486,6 +688,14 @@ void CF_CFDP_EncodeNak(CF_EncoderState_t *state, CF_Logical_PduNak_t *plnak)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_EncodeCrc
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_EncodeCrc(CF_EncoderState_t *state, uint32 *plcrc)
 {
     CF_CFDP_uint32_t *pecrc; /* CFDP CRC values are 32-bit only, per blue book */
@@ -497,6 +707,14 @@ void CF_CFDP_EncodeCrc(CF_EncoderState_t *state, uint32 *plcrc)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_DecodeIntegerInSize
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 uint64 CF_DecodeIntegerInSize(CF_DecoderState_t *state, uint8 decode_size)
 {
     const uint8 *sptr;
@@ -519,6 +737,14 @@ uint64 CF_DecodeIntegerInSize(CF_DecoderState_t *state, uint8 decode_size)
     return temp_val;
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DecodeHeader
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh)
 {
     const CF_CFDP_PduHeader_t *peh; /* for decoding fixed sized fields */
@@ -549,6 +775,14 @@ void CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DecodeFileDirectiveHeader
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_DecodeFileDirectiveHeader(CF_DecoderState_t *state, CF_Logical_PduFileDirectiveHeader_t *pfdir)
 {
     const CF_CFDP_PduFileDirectiveHeader_t *peh;
@@ -563,6 +797,14 @@ void CF_CFDP_DecodeFileDirectiveHeader(CF_DecoderState_t *state, CF_Logical_PduF
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DecodeLV
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_DecodeLV(CF_DecoderState_t *state, CF_Logical_Lv_t *pllv)
 {
     const CF_CFDP_lv_t *lv;
@@ -575,6 +817,14 @@ void CF_CFDP_DecodeLV(CF_DecoderState_t *state, CF_Logical_Lv_t *pllv)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DecodeTLV
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_DecodeTLV(CF_DecoderState_t *state, CF_Logical_Tlv_t *pltlv)
 {
     const CF_CFDP_tlv_t *tlv;
@@ -601,6 +851,14 @@ void CF_CFDP_DecodeTLV(CF_DecoderState_t *state, CF_Logical_Tlv_t *pltlv)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DecodeSegmentRequest
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_DecodeSegmentRequest(CF_DecoderState_t *state, CF_Logical_SegmentRequest_t *plseg)
 {
     const CF_CFDP_SegmentRequest_t *sr; /* for decoding fixed sized fields */
@@ -613,6 +871,14 @@ void CF_CFDP_DecodeSegmentRequest(CF_DecoderState_t *state, CF_Logical_SegmentRe
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DecodeMd
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_DecodeMd(CF_DecoderState_t *state, CF_Logical_PduMd_t *plmd)
 {
     const CF_CFDP_PduMd_t *md; /* for decoding fixed sized fields */
@@ -630,6 +896,14 @@ void CF_CFDP_DecodeMd(CF_DecoderState_t *state, CF_Logical_PduMd_t *plmd)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DecodeFileDataHeader
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_DecodeFileDataHeader(CF_DecoderState_t *state, bool with_meta, CF_Logical_PduFileDataHeader_t *plfd)
 {
     const CF_CFDP_PduFileDataHeader_t *fd;
@@ -686,6 +960,14 @@ void CF_CFDP_DecodeFileDataHeader(CF_DecoderState_t *state, bool with_meta, CF_L
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DecodeCrc
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_DecodeCrc(CF_DecoderState_t *state, uint32 *plcrc)
 {
     const CF_CFDP_uint32_t *pecrc; /* CFDP CRC values are 32-bit only, per blue book */
@@ -697,6 +979,14 @@ void CF_CFDP_DecodeCrc(CF_DecoderState_t *state, uint32 *plcrc)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DecodeEof
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_DecodeEof(CF_DecoderState_t *state, CF_Logical_PduEof_t *pleof)
 {
     const CF_CFDP_PduEof_t *eof; /* for decoding fixed sized fields */
@@ -712,6 +1002,14 @@ void CF_CFDP_DecodeEof(CF_DecoderState_t *state, CF_Logical_PduEof_t *pleof)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DecodeFin
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_DecodeFin(CF_DecoderState_t *state, CF_Logical_PduFin_t *plfin)
 {
     const CF_CFDP_PduFin_t *fin; /* for decoding fixed sized fields */
@@ -727,6 +1025,14 @@ void CF_CFDP_DecodeFin(CF_DecoderState_t *state, CF_Logical_PduFin_t *plfin)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DecodeAck
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_DecodeAck(CF_DecoderState_t *state, CF_Logical_PduAck_t *plack)
 {
     const CF_CFDP_PduAck_t *ack; /* for decoding fixed sized fields */
@@ -742,6 +1048,14 @@ void CF_CFDP_DecodeAck(CF_DecoderState_t *state, CF_Logical_PduAck_t *plack)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DecodeNak
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_DecodeNak(CF_DecoderState_t *state, CF_Logical_PduNak_t *plnak)
 {
     const CF_CFDP_PduNak_t *nak; /* for encoding fixed sized fields */
@@ -756,6 +1070,14 @@ void CF_CFDP_DecodeNak(CF_DecoderState_t *state, CF_Logical_PduNak_t *plnak)
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DecodeAllTlv
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_DecodeAllTlv(CF_DecoderState_t *state, CF_Logical_TlvList_t *pltlv, uint8 limit)
 {
     pltlv->num_tlv = 0;
@@ -785,6 +1107,14 @@ void CF_CFDP_DecodeAllTlv(CF_DecoderState_t *state, CF_Logical_TlvList_t *pltlv,
     }
 }
 
+/*----------------------------------------------------------------
+ *
+ * Function: CF_CFDP_DecodeAllSegments
+ *
+ * Application-scope internal function
+ * See description in cf_codec.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_CFDP_DecodeAllSegments(CF_DecoderState_t *state, CF_Logical_SegmentList_t *plseg, uint8 limit)
 {
     plseg->num_segments = 0;

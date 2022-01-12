@@ -1,30 +1,29 @@
 /************************************************************************
-** File: cf_utils.c
-**
-** NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
-** Application version 3.0.0”
-** Copyright © 2019 United States Government as represented by the
-** Administrator of the National Aeronautics and Space Administration.
-** All Rights Reserved.
-** Licensed under the Apache License, Version 2.0 (the "License"); you may
-** not use this file except in compliance with the License. You may obtain
-** a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software
-** distributed under the License is distributed on an "AS IS" BASIS,
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-** See the License for the specific language governing permissions and
-** limitations under the License.
-**
-**
-** Purpose:
-**  The CF Application general utility functions source file
-**
-**  Various odds and ends are put here.
-**
-**
-**
-*************************************************************************/
+ *
+ * NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
+ * Application version 3.0.0”
+ * Copyright © 2019 United States Government as represented by the
+ * Administrator of the National Aeronautics and Space Administration.
+ * All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License. You may obtain
+ * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ************************************************************************/
+
+/**
+ * @file
+ *
+ *  The CF Application general utility functions source file
+ *
+ *  Various odds and ends are put here.
+ */
 
 #include "cf_app.h"
 #include "cf_verify.h"
@@ -37,18 +36,14 @@
 
 #define LINEBUF_LEN ((CF_FILENAME_MAX_LEN * 2) + 128)
 
-/************************************************************************/
-/** \brief Find an unused transaction on a channel.
-**
-**  \par Assumptions, External Events, and Notes:
-**       c must not be NULL.
-**
-**  \returns
-**  \retstmt Returns a free transaction, or NULL if none are available. \endcode
-**  \endreturns
-**
-*************************************************************************/
-/* finds an unused transaction and returns with it on no Q */
+/*----------------------------------------------------------------
+ *
+ * Function: CF_FindUnusedTransaction
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c)
 {
     CF_Assert(c);
@@ -87,30 +82,28 @@ CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c)
     }
 }
 
-/************************************************************************/
-/** \brief Returns a history structure back to its unused state.
-**
-**  \par Description
-**       There's nothing to do currently other than remove the history
-**       from its current queue and put it back on CF_QueueIdx_HIST_FREE.
-**
-**  \par Assumptions, External Events, and Notes:
-**       c must not be NULL. h must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_ResetHistory
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_ResetHistory(CF_Channel_t *c, CF_History_t *h)
 {
     CF_CList_Remove_Ex(c, CF_QueueIdx_HIST, &h->cl_node);
     CF_CList_InsertBack_Ex(c, CF_QueueIdx_HIST_FREE, &h->cl_node);
 }
 
-/************************************************************************/
-/** \brief Frees and resets a transaction and returns it for later use.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_FreeTransaction
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_FreeTransaction(CF_Transaction_t *t)
 {
     uint8 c = t->chan_num;
@@ -123,18 +116,14 @@ void CF_FreeTransaction(CF_Transaction_t *t)
     CF_CList_InsertBack_Ex(&CF_AppData.engine.channels[c], CF_QueueIdx_FREE, &t->cl_node);
 }
 
-/************************************************************************/
-/** \brief List traversal function to check if the desired sequence number matches.
-**
-**  \par Assumptions, External Events, and Notes:
-**       context must not be NULL. n must not be NULL.
-**
-**  \returns
-**  \retcode 1 when it's found, which terminates list traversal \endcode
-**  \retcode 0 when it isn't found, which causes list traversal to continue \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_FindTransactionBySequenceNumber_Impl
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Traverse_TransSeqArg_t *context)
 {
     CF_Transaction_t *t   = container_of(n, CF_Transaction_t, cl_node);
@@ -149,21 +138,14 @@ int CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Traverse_Trans
     return ret;
 }
 
-/************************************************************************/
-/** \brief Finds an active transaction by sequence number.
-**
-**  \par Description
-**       This function traverses the active rx, pending, txa, and txw
-**       transaction and looks for the requested transaction.
-**
-**  \par Assumptions, External Events, and Notes:
-**       c must not be NULL.
-**
-**  \returns
-**  \retstmt The given transaction is returned if found, otherwise NULL. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_FindTransactionBySequenceNumber
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_TransactionSeq_t transaction_sequence_number,
                                                      CF_EntityId_t src_eid)
 {
@@ -190,22 +172,14 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_Transac
     return ret;
 }
 
-/************************************************************************/
-/** \brief Walks through a history queue and builds a human readable representation of it.
-**
-**  \par Description
-**       This function is used as both a list traversal function and a direct
-**       function call.
-**
-**  \par Assumptions, External Events, and Notes:
-**       n must not be NULL. context must not be NULL.
-**
-**  \returns
-**  \retcode 1 when it's found, which terminates list traversal \endcode
-**  \retcode 0 when it isn't found, which causes list traversal to continue \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_TraverseHistory
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_TraverseHistory(CF_CListNode_t *n, CF_Traverse_WriteFileArg_t *context)
 {
     static const char *dstr[] = {"RX", "TX"};
@@ -236,18 +210,14 @@ int CF_TraverseHistory(CF_CListNode_t *n, CF_Traverse_WriteFileArg_t *context)
     return CF_CLIST_CONT;
 }
 
-/************************************************************************/
-/** \brief Walk over all transactions and print information from their history.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-**  \returns
-**  \retcode 1 when it's found, which terminates list traversal \endcode
-**  \retcode 0 when it isn't found, which causes list traversal to continue \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_TraverseTransactions
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_TraverseTransactions(CF_CListNode_t *n, CF_Traverse_WriteFileArg_t *context)
 {
     CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
@@ -266,17 +236,14 @@ int CF_TraverseTransactions(CF_CListNode_t *n, CF_Traverse_WriteFileArg_t *conte
     return CF_CLIST_CONT;
 }
 
-/************************************************************************/
-/** \brief Write a transaction-based queue's transaction history to a file.
-**
-**  \par Assumptions, External Events, and Notes:
-**       c must not be NULL.
-**
-**  \returns
-**  \retstmt 0 on success; 1 on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_WriteQueueDataToFile
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q)
 {
     CF_Traverse_WriteFileArg_t arg = {fd, 0, 0};
@@ -284,17 +251,14 @@ int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q)
     return arg.result;
 }
 
-/************************************************************************/
-/** \brief Write a history-based queue's transaction history to a file.
-**
-**  \par Assumptions, External Events, and Notes:
-**       c must not be NULL.
-**
-**  \returns
-**  \retstmt 0 on success; 1 on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_WriteHistoryQueueDataToFile
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t dir)
 {
     CF_Traverse_WriteFileArg_t arg = {fd, 0, 0};
@@ -302,21 +266,14 @@ int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t d
     return arg.result;
 }
 
-/************************************************************************/
-/** \brief Searches for the first transaction with a lower priority than given.
-**
-**  \par Description
-**        that the config table being loaded has correct data.
-**
-**  \par Assumptions, External Events, and Notes:
-**       node must not be NULL. context must not be NULL.
-**
-**  \returns
-**  \retcode 1 when it's found, which terminates list traversal \endcode
-**  \retcode 0 when it isn't found, which causes list traversal to continue \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_PrioSearch
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_PrioSearch(CF_CListNode_t *node, void *context)
 {
     CF_Transaction_t          *t = container_of(node, CF_Transaction_t, cl_node);
@@ -335,19 +292,14 @@ int CF_PrioSearch(CF_CListNode_t *node, void *context)
     return CF_CLIST_CONT;
 }
 
-/************************************************************************/
-/** \brief Insert a transaction into a priority sorted transaction queue.
-**
-**  \par Description
-**       This function works by walking the queue in reverse to find a
-**       transaction with a higher priority than the given transaction.
-**       The given transaction is then inserted after that one, since it
-**       would be the next lower priority.
-**
-**  \par Assumptions, External Events, and Notes:
-**       t must not be NULL.
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_InsertSortPrio
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q)
 {
     int           insert_back = 0;
@@ -384,21 +336,14 @@ void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q)
     t->flags.com.q_index = q;
 }
 
-/************************************************************************/
-/** \brief List traversal function performs operation on every active transaction.
-**
-**  \par Description
-**       Called on every transaction via list traversal. Calls another function
-**       on that transaction.
-**
-**  \par Assumptions, External Events, and Notes:
-**       n must not be NULL. args must not be NULL.
-**
-**  \returns
-**  \retstmt Always 0 for do not exit early. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_TraverseAllTransactions_Impl
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *args)
 {
     CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
@@ -407,17 +352,14 @@ int CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *arg
     return CF_CLIST_CONT;
 }
 
-/************************************************************************/
-/** \brief Traverses all transactions on all active queues and performs an operation on them.
-**
-**  \par Assumptions, External Events, and Notes:
-**       c must not be NULL. fn must be a valid function. context must not be NULL.
-**
-**  \returns
-**  \retstmt Number of transactions traversed, or anything else on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_TraverseAllTransactions
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context)
 {
     CF_TraverseAll_Arg_t args = {fn, context, 0};
@@ -428,17 +370,14 @@ int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t 
     return args.counter;
 }
 
-/************************************************************************/
-/** \brief Traverses all transactions on all channels and performs an operation on them.
-**
-**  \par Assumptions, External Events, and Notes:
-**       fn must be a valid function. context must not be NULL.
-**
-**  \returns
-**  \retstmt Number of transactions traversed, or anything else on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_TraverseAllTransactions_All_Channels
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context)
 {
     int i;
@@ -448,17 +387,14 @@ int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, 
     return ret;
 }
 
-/************************************************************************/
-/** \brief Wrap the filesystem open call with a perf counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       fname must not be NULL.
-**
-**  \returns
-**  \retstmt Valid file descriptor, or anything else on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_WrappedOpenCreate
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int32 CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 access)
 {
     int32 ret;
@@ -469,13 +405,14 @@ int32 CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 
     return ret;
 }
 
-/************************************************************************/
-/** \brief Wrap the filesystem close call with a perf counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       None
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_WrappedClose
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 void CF_WrappedClose(osal_id_t fd)
 {
     int32 ret;
@@ -491,18 +428,14 @@ void CF_WrappedClose(osal_id_t fd)
     }
 }
 
-/************************************************************************/
-/** \brief Wrap the filesystem read call with a perf counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       buf must not be NULL.
-**
-**  \returns
-**  \retstmt >=0 number of bytes read on success \endcode
-**  \retstmt <0 on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_WrappedRead
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size)
 {
     int32 ret;
@@ -513,18 +446,14 @@ int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size)
     return ret;
 }
 
-/************************************************************************/
-/** \brief Wrap the filesystem write call with a perf counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       buf must not be NULL.
-**
-**  \returns
-**  \retstmt >=0 number of bytes read on success \endcode
-**  \retstmt <0 on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_WrappedWrite
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size)
 {
     int32 ret;
@@ -535,18 +464,14 @@ int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size)
     return ret;
 }
 
-/************************************************************************/
-/** \brief Wrap the filesystem lseek call with a perf counter.
-**
-**  \par Assumptions, External Events, and Notes:
-**       fname must not be NULL.
-**
-**  \returns
-**  \retstmt >=0 the current file position in bytes. \endcode
-**  \retstmt <0 on error. \endcode
-**  \endreturns
-**
-*************************************************************************/
+/*----------------------------------------------------------------
+ *
+ * Function: CF_WrappedLseek
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
 int32 CF_WrappedLseek(osal_id_t fd, off_t offset, int mode)
 {
     int ret;
