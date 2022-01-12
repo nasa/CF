@@ -300,7 +300,7 @@ int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAct
         if (t)
         {
             fn(t, context);
-            ret = CFE_SUCCESS;
+            ret = 1; /* because one transaction was matched - this should return a count */
         }
         else
         {
@@ -363,14 +363,22 @@ void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
     CF_ChanAction_SuspResArg_t args     = {0, action};
     int ret = CF_TsnChanAction(cmd, msgstr[action], (CF_TsnChanAction_fn_t)CF_DoSuspRes_Txn, &args);
 
-    if (!ret && args.same)
+    /*
+     * Note that this command may affect multiple transactions, depending on the value of the "chan" argument.
+     * When acting on multiple channels, the "same" output does not apply.  In reality all it means is
+     * that one of the affected channels was already set that way.
+     */
+
+    if (ret == 1 && args.same)
     {
+        /* A single transaction was mached, and it was already set the same way */
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_SUSPRES_SAME, CFE_EVS_EventType_ERROR,
                           "CF: %s cmd: setting suspend flag to current value of %d", msgstr[action], action);
         CF_CmdRej();
     }
-    else if (ret)
+    else if (ret <= 0)
     {
+        /* No transaction was matched for the given combination of chan + eid + ts  */
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_SUSPRES_CHAN, CFE_EVS_EventType_ERROR, "CF: %s cmd: no transaction found",
                           msgstr[action]);
         CF_CmdRej();
@@ -430,7 +438,9 @@ void CF_CmdCancel_Txn(CF_Transaction_t *t, void *ignored)
  *-----------------------------------------------------------------*/
 void CF_CmdCancel(CFE_SB_Buffer_t *msg)
 {
-    CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "cancel", CF_CmdCancel_Txn, NULL));
+    /* note that CF_TsnChanAction() returns the number of transactions affected, so <= 0 means failure.
+     * CF_CmdCond() accepts 0 (logical false) to mean success, nonzero (logical true) to mean failure */
+    CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "cancel", CF_CmdCancel_Txn, NULL) <= 0);
 }
 
 /*----------------------------------------------------------------
@@ -456,7 +466,9 @@ void CF_CmdAbandon_Txn(CF_Transaction_t *t, void *ignored)
  *-----------------------------------------------------------------*/
 void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
 {
-    CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "abandon", CF_CmdAbandon_Txn, NULL));
+    /* note that CF_TsnChanAction() returns the number of transactions affected, so <= 0 means failure.
+     * CF_CmdCond() accepts 0 (logical false) to mean success, nonzero (logical true) to mean failure */
+    CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "abandon", CF_CmdAbandon_Txn, NULL) <= 0);
 }
 
 /*----------------------------------------------------------------

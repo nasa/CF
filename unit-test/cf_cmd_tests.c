@@ -1383,7 +1383,6 @@ void Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_COMPOUND_KEY_TransactionNotFoun
     CF_TsnChanAction_fn_t       arg_fn = &Dummy_CF_TsnChanAction_fn_t;
     int                         dummy_context;
     void                       *arg_context = &dummy_context;
-    int                         local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
     AnyRandomStringOfLettersOfLengthCopy(dummy_cmdstr, 10);
@@ -1407,12 +1406,11 @@ void Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_COMPOUND_KEY_TransactionNotFoun
                      sizeof(contexts_CF_CFDP_FTBSN), false);
 
     /* Act */
-    local_result = CF_TsnChanAction(arg_cmd, arg_cmdstr, arg_fn, arg_context);
+    UtAssert_INT32_EQ(CF_TsnChanAction(arg_cmd, arg_cmdstr, arg_fn, arg_context), -1);
 
     UT_GetStubCount(UT_KEY(Dummy_CF_TsnChanAction_fn_t));
 
     /* Assert */
-    UtAssert_True(local_result == -1, "CF_TsnChanAction returned %d and should be -1", local_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_TRANS_NOT_FOUND);
 
@@ -1430,7 +1428,6 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_COMPOUND_KEY_TransactionFoundRun_fn_AndRe
     int                                   dummy_context;
     void                                 *arg_context = &dummy_context;
     CF_Transaction_t                      dummy_t;
-    int                                   local_result;
     Dummy_CF_TsnChanAction_fn_t_context_t context_Dummy_CF_TsnChanAction_fn_t;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -1453,13 +1450,11 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_COMPOUND_KEY_TransactionFoundRun_fn_AndRe
                      false);
 
     /* Act */
-    local_result = CF_TsnChanAction(arg_cmd, arg_cmdstr, arg_fn, arg_context);
+    UtAssert_INT32_EQ(CF_TsnChanAction(arg_cmd, arg_cmdstr, arg_fn, arg_context), 1);
 
     UT_GetStubCount(UT_KEY(Dummy_CF_TsnChanAction_fn_t));
 
     /* Assert */
-    UtAssert_True(local_result == CFE_SUCCESS, "CF_TsnChanAction returned %d and should be %d (CFE_SUCCESS)",
-                  local_result, CFE_SUCCESS);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_STUB_COUNT(Dummy_CF_TsnChanAction_fn_t, 1);
     UtAssert_True(context_Dummy_CF_TsnChanAction_fn_t.t == &dummy_t,
@@ -1479,7 +1474,6 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransac
     int                                               dummy_context;
     void                                             *arg_context     = &dummy_context;
     int                                               expected_result = Any_int();
-    int                                               local_result;
     CF_TraverseAllTransactions_All_Channels_context_t context_CF_TATAC;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -1495,12 +1489,9 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransac
                      false);
 
     /* Act */
-    local_result = CF_TsnChanAction(arg_cmd, arg_cmdstr, arg_fn, arg_context);
+    UtAssert_INT32_EQ(CF_TsnChanAction(arg_cmd, arg_cmdstr, arg_fn, arg_context), expected_result);
 
     /* Assert */
-    UtAssert_True(local_result == expected_result,
-                  "CF_TsnChanAction returned %d and should be %d (ret from CF_TraverseAllTransactions_All_Channels)",
-                  local_result, expected_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 } /* end Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels */
 
@@ -1514,7 +1505,6 @@ void Test_CF_TsnChanAction_cmd_chan_IsASingleChannel(void)
     int                                  dummy_context;
     void                                *arg_context     = &dummy_context;
     int                                  expected_result = Any_int();
-    int                                  local_result;
     CF_TraverseAllTransactions_context_t context_CF_TraverseAllTransactions;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -1526,12 +1516,9 @@ void Test_CF_TsnChanAction_cmd_chan_IsASingleChannel(void)
     UT_SetDefaultReturnValue(UT_KEY(CF_TraverseAllTransactions), expected_result);
 
     /* Act */
-    local_result = CF_TsnChanAction(arg_cmd, arg_cmdstr, arg_fn, arg_context);
+    UtAssert_INT32_EQ(CF_TsnChanAction(arg_cmd, arg_cmdstr, arg_fn, arg_context), expected_result);
 
     /* Assert */
-    UtAssert_True(local_result == expected_result,
-                  "CF_TsnChanAction returned %d and should be %d (ret from CF_TraverseAllTransactions)", local_result,
-                  expected_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     /* TODO: values for context_CF_TraverseAllTransactions need checked!! */
 } /* end Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels */
@@ -1545,7 +1532,6 @@ void Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid(void)
     CF_TsnChanAction_fn_t       arg_fn        = &Dummy_CF_TsnChanAction_fn_t;
     int                         dummy_context;
     void                       *arg_context = &dummy_context;
-    int                         local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
     arg_cmd->chan = Any_uint8_BetweenExcludeMax(CF_NUM_CHANNELS, COMPOUND_KEY);
@@ -1553,10 +1539,9 @@ void Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid(void)
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
 
     /* Act */
-    local_result = CF_TsnChanAction(arg_cmd, arg_cmdstr, arg_fn, arg_context);
+    UtAssert_INT32_EQ(CF_TsnChanAction(arg_cmd, arg_cmdstr, arg_fn, arg_context), -1);
 
     /* Assert */
-    UtAssert_True(local_result == -1, "CF_TsnChanAction returned %d and should be -1", local_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_TSN_CHAN_INVALID);
 
@@ -1631,170 +1616,66 @@ void Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action
 **
 *******************************************************************************/
 
-void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasChangedTo_1_SendEventAndRejectCmd(void)
+static void UT_AltHandler_CF_TraverseAllTransactions_SetSuspResArg(void *UserObj, UT_EntryKey_t FuncKey,
+                                                                   const UT_StubContext_t *Context)
 {
-    /* Arrange */
-    CF_Transaction_t            dummy_t_instance;
-    CF_Transaction_t           *dummy_t = &dummy_t_instance;
+    CF_ChanAction_SuspResArg_t *context = UT_Hook_GetArgValueByName(Context, "context", CF_ChanAction_SuspResArg_t *);
+    CF_ChanAction_SuspResArg_t *utargs  = UserObj;
+
+    if (context != NULL && utargs != NULL)
+    {
+        /* Update the caller-supplied context with the UT-supplied value */
+        /* only "same" flag is an output, action is an input */
+        context->same = utargs->same;
+    }
+}
+
+void Test_CF_DoSuspRes(void)
+{
+    /* Test case for:
+     * void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
+     */
+
     CF_UT_cmd_transaction_buf_t utbuf;
-    CF_TransactionCmd_t        *arg_cmd    = &utbuf.xact;
-    uint8                       arg_action = 1; // 0 is a WAG
+    CF_TransactionCmd_t        *cmd = &utbuf.xact;
+    CF_ChanAction_SuspResArg_t  utargs;
 
-    memset(&utbuf, 0, sizeof(utbuf));
+    memset(&CF_AppData.hk.counters, 0, sizeof(CF_AppData.hk.counters));
+    memset(&utargs, 0, sizeof(utargs));
+    memset(cmd, 0, sizeof(*cmd));
+
+    /* nominal */
+    /* With no setup, CF_TsnChanAction() invokes CF_TraverseAllTransactions stub, which returns 0 */
+    /* this should increment the reject counter because it did not match any transactions */
+    UtAssert_VOIDCALL(CF_DoSuspRes(cmd, 0));
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
+
+    /* set up to match 1 transaction, should be accepted, but should not generate an event */
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    UT_SetDeferredRetcode(UT_KEY(CF_TraverseAllTransactions), 1, 1);
+    UtAssert_VOIDCALL(CF_DoSuspRes(cmd, 1));
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
 
-    /* Arrange unstubbable: CF_TsnChanAction  - causes areturn -1*/
-    arg_cmd->chan = COMPOUND_KEY;
-
-    /* Arrange unstubbable: CF_FindTransactionBySequenceNumberAllChannels */
-    CF_FindTransactionBySequenceNumber_context_t context_CF_FindTransactionBySequenceNumber;
-
-    context_CF_FindTransactionBySequenceNumber.forced_return = dummy_t;
-    UT_SetDataBuffer(UT_KEY(CF_FindTransactionBySequenceNumber), &context_CF_FindTransactionBySequenceNumber,
-                     sizeof(context_CF_FindTransactionBySequenceNumber), false);
-
-    /* Arrange unstubbable: CF_DoSuspRes_Txn */
-    dummy_t->flags.com.suspended = arg_action;
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
-
-    /* Act */
-    CF_DoSuspRes(arg_cmd, arg_action);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
+    /* Output the CF_ChanAction_SuspResArg_t back to the caller, to set the "same" flag to 1 */
+    /* this gets the case where it attempts to set to the same value, and is rejected due to that */
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    UT_SetDeferredRetcode(UT_KEY(CF_TraverseAllTransactions), 1, 1);
+    utargs.same = 1;
+    UT_SetHandlerFunction(UT_KEY(CF_TraverseAllTransactions), UT_AltHandler_CF_TraverseAllTransactions_SetSuspResArg,
+                          &utargs);
+    UtAssert_VOIDCALL(CF_DoSuspRes(cmd, 0));
     UT_CF_AssertEventID(CF_EID_ERR_CMD_SUSPRES_SAME);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 2);
 
-    /* Assert CF_CmdRej */
-    UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
-                  "CF_AppData.hk.counters.err is %d and should be 1 more than %d", CF_AppData.hk.counters.err,
-                  initial_hk_err_counter);
-} /* end Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasChangedTo_1_SendEventAndRejectCmd */
-
-/* TODO: Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_neg1_And_args_same_WasChangedTo_1_SendEventAndRejectCmd
-** and Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_neg1_And_args_same_WasNotChangedFrom_0_SendEventAndRejectCmd
-** are really unable to be told apart because they have the exact same results, there is no "actual" way to know these
-** test's results are indicative of what is actually occurring except by examining the actual tests */
-void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_neg1_And_args_same_WasChangedTo_1_SendEventAndRejectCmd(void)
-{
-    /* Arrange */
-    CF_UT_cmd_transaction_buf_t utbuf;
-    CF_TransactionCmd_t        *arg_cmd    = &utbuf.xact;
-    uint8                       arg_action = 1; // 0 is a WAG
-    int                         context_to_set;
-
-    memset(&utbuf, 0, sizeof(utbuf));
-
+    /* Output the CF_ChanAction_SuspResArg_t back to the caller, to set the "same" flag to 1 */
+    /* however this time CF_TraverseAllTransactions reports it matched multiple transactions, so it should NOT reject it
+     */
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange unstubbable: CF_TsnChanAction  - causes areturn -1*/
-    arg_cmd->chan = ALL_CHANNELS;
-
-    context_to_set = 1;
-    UT_SetHandlerFunction(UT_KEY(CF_TraverseAllTransactions_All_Channels),
-                          UT_AltHandler_CF_TraverseAllTransactions_All_Channels_Set_Context, &context_to_set);
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
-
-    /* Act */
-    CF_DoSuspRes(arg_cmd, arg_action);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_SUSPRES_CHAN);
-
-    /* Assert CF_CmdRej */
-    UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
-                  "CF_AppData.hk.counters.err is %d and should be 1 more than %d", CF_AppData.hk.counters.err,
-                  initial_hk_err_counter);
-} /* end Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_neg1_And_args_same_WasChangedTo_1_SendEventAndRejectCmd */
-
-void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_neg1_And_args_same_WasNotChangedFrom_0_SendEventAndRejectCmd(
-    void)
-{
-    /* Arrange */
-    CF_UT_cmd_transaction_buf_t utbuf;
-    CF_TransactionCmd_t        *arg_cmd    = &utbuf.xact;
-    uint8                       arg_action = 1; // 0 is a WAG
-    int                         context_to_set;
-
-    memset(&utbuf, 0, sizeof(utbuf));
-
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange unstubbable: CF_TsnChanAction  - causes areturn -1*/
-    arg_cmd->chan = ALL_CHANNELS;
-
-    context_to_set = 0;
-    UT_SetHandlerFunction(UT_KEY(CF_TraverseAllTransactions_All_Channels),
-                          UT_AltHandler_CF_TraverseAllTransactions_All_Channels_Set_Context, &context_to_set);
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
-
-    /* Act */
-    CF_DoSuspRes(arg_cmd, arg_action);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_SUSPRES_CHAN);
-
-    /* Assert CF_CmdRej */
-    UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
-                  "CF_AppData.hk.counters.err is %d and should be 1 more than %d", CF_AppData.hk.counters.err,
-                  initial_hk_err_counter);
-} /* end Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_neg1_And_args_same_WasNotChangedFrom_0_SendEventAndRejectCmd
-   */
-
-void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasNotChangedFrom_0_AcceptCmd(void)
-{
-    /* Arrange */
-    CF_Transaction_t            dummy_t_instance;
-    CF_Transaction_t           *dummy_t = &dummy_t_instance;
-    CF_UT_cmd_transaction_buf_t utbuf;
-    CF_TransactionCmd_t        *arg_cmd    = &utbuf.xact;
-    uint8                       arg_action = 1; // 0 is a WAG
-
-    memset(&utbuf, 0, sizeof(utbuf));
-
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange unstubbable: CF_TsnChanAction  - causes areturn -1*/
-    arg_cmd->chan = ALL_CHANNELS;
-
-    /* Arrange unstubbable: CF_TraverseAllTransactions_All_Channels */
-    CF_TraverseAllTransactions_All_Channels_context_t context_CF_TraverseAllTransactions_All_Channels;
-
-    context_CF_TraverseAllTransactions_All_Channels.forced_return = 0;
-    UT_SetDataBuffer(UT_KEY(CF_TraverseAllTransactions_All_Channels), &context_CF_TraverseAllTransactions_All_Channels,
-                     sizeof(context_CF_TraverseAllTransactions_All_Channels), false);
-
-    /* Arrange unstubbable: CF_DoSuspRes_Txn */
-    dummy_t->flags.com.suspended = arg_action;
-
-    /* Arrange unstubbable: CF_CmdAcc */
-    uint16 initial_hk_cmd_counter = Any_uint16();
-
-    CF_AppData.hk.counters.cmd = initial_hk_cmd_counter;
-
-    /* Act */
-    CF_DoSuspRes(arg_cmd, arg_action);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-    /* Assert CF_CmdAcc */
-    UtAssert_True(CF_AppData.hk.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
-                  "CF_AppData.hk.counters.cmd is %d and should be 1 more than %d", CF_AppData.hk.counters.cmd,
-                  initial_hk_cmd_counter);
-} /* end Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasNotChangedFrom_0_AcceptCmd */
+    UT_SetDeferredRetcode(UT_KEY(CF_TraverseAllTransactions), 1, 10);
+    UtAssert_VOIDCALL(CF_DoSuspRes(cmd, 1));
+    UT_CF_AssertEventID(0);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 2);
+}
 
 /*******************************************************************************
 **
@@ -1931,7 +1812,7 @@ void Test_CF_CmdCancel_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
 
     UT_SetDataBuffer(UT_KEY(CF_TraverseAllTransactions), &context_CF_TraverseAllTransactions,
                      sizeof(context_CF_TraverseAllTransactions), false);
-    UT_SetDefaultReturnValue(UT_KEY(CF_TraverseAllTransactions), Any_int_Except(0));
+    UT_SetDefaultReturnValue(UT_KEY(CF_TraverseAllTransactions), 0);
 
     /* Arrange unstubbable: CF_CmdRej */
     uint16 initial_hk_err_counter = Any_uint16();
@@ -2006,7 +1887,7 @@ void Test_CF_CmdAbandon_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
 
     UT_SetDataBuffer(UT_KEY(CF_TraverseAllTransactions), &context_CF_TraverseAllTransactions,
                      sizeof(context_CF_TraverseAllTransactions), false);
-    UT_SetDefaultReturnValue(UT_KEY(CF_TraverseAllTransactions), Any_int_Except(0));
+    UT_SetDefaultReturnValue(UT_KEY(CF_TraverseAllTransactions), 0);
 
     /* Arrange unstubbable: CF_CmdRej */
     uint16 initial_hk_err_counter = Any_uint16();
@@ -5097,22 +4978,7 @@ void add_CF_DoSuspRes_Txn_tests(void)
 
 void add_CF_DoSuspRes_tests(void)
 {
-    UtTest_Add(
-        Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasChangedTo_1_SendEventAndRejectCmd,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-        "Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasChangedTo_1_SendEventAndRejectCmd");
-    UtTest_Add(
-        Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_neg1_And_args_same_WasChangedTo_1_SendEventAndRejectCmd,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-        "Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_neg1_And_args_same_WasChangedTo_1_SendEventAndRejectCmd");
-    UtTest_Add(
-        Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_neg1_And_args_same_WasNotChangedFrom_0_SendEventAndRejectCmd,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-        "Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_neg1_And_args_same_WasNotChangedFrom_0_"
-        "SendEventAndRejectCmd");
-    UtTest_Add(Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasNotChangedFrom_0_AcceptCmd,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasNotChangedFrom_0_AcceptCmd");
+    UtTest_Add(Test_CF_DoSuspRes, cf_cmd_tests_Setup, cf_cmd_tests_Teardown, "CF_DoSuspRes");
 } /* end add_CF_DoSuspRes_tests */
 
 void add_CF_CmdSuspend_tests(void)
