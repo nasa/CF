@@ -283,7 +283,4 @@ CFE_Status_t   Any_CFE_Status_t_Except(CFE_Status_t exception);
 CFE_MSG_Size_t Any_CFE_MSG_Size_t(void);
 CFE_MSG_Size_t Any_CFE_MSG_Size_t_LessThan(size_t ceiling);
 
-CFE_SB_MsgId_t Any_MsgId(void);
-CFE_SB_MsgId_t Any_MsgId_ExceptThese(CFE_SB_MsgId_t exceptions[], uint8 num_exceptions);
-
 #endif /* _cf_test_utils_h_ */

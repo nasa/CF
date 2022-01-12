@@ -611,7 +611,7 @@ void Test_CF_ProcessMsg_ProcessGroundCommand(void)
     /* Arrange */
     CFE_SB_Buffer_t            dummy_msg;
     CFE_SB_Buffer_t           *arg_msg      = &dummy_msg;
-    CFE_SB_MsgId_t             forced_MsgID = CF_CMD_MID;
+    CFE_SB_MsgId_t             forced_MsgID = CFE_SB_ValueToMsgId(CF_CMD_MID);
     CFE_SB_Buffer_t           *context_CF_ProcessGroundCommand_msg;
     CFE_MSG_GetMsgId_context_t context_CFE_MSG_GetMsgId;
 
@@ -637,7 +637,7 @@ void Test_CF_ProcessMsg_WakeUp(void)
     /* Arrange */
     CFE_SB_Buffer_t            dummy_msg;
     CFE_SB_Buffer_t           *arg_msg      = &dummy_msg;
-    CFE_SB_MsgId_t             forced_MsgID = CF_WAKE_UP_MID;
+    CFE_SB_MsgId_t             forced_MsgID = CFE_SB_ValueToMsgId(CF_WAKE_UP_MID);
     CFE_MSG_GetMsgId_context_t context_CFE_MSG_GetMsgId;
 
     /* CFE_MSG_GetMsgId uses return by ref */
@@ -661,7 +661,7 @@ void Test_CF_ProcessMsg_SendHk(void)
     // CFE_MSG_Message_t   dummy_Msg;
     // CFE_SB_Buffer_t     dummy_msg;
     CFE_SB_Buffer_t           *arg_msg      = NULL;
-    CFE_SB_MsgId_t             forced_MsgID = CF_SEND_HK_MID;
+    CFE_SB_MsgId_t             forced_MsgID = CFE_SB_ValueToMsgId(CF_SEND_HK_MID);
     CFE_MSG_GetMsgId_context_t context_CFE_MSG_GetMsgId;
 
     /* CFE_MSG_GetMsgId uses return by ref */
@@ -687,13 +687,23 @@ void Test_CF_ProcessMsg_SendHk(void)
 void Test_CF_ProcessMsg_UnrecognizedCommandEnterDefaultPath(void)
 {
     /* Arrange */
-    uint16                      initial_err_count   = CF_AppData.hk.counters.err;
-    CFE_SB_MsgId_t              excepted_msg_ids[3] = {CF_CMD_MID, CF_WAKE_UP_MID, CF_SEND_HK_MID};
-    CFE_SB_MsgId_t              forced_MsgID        = Any_MsgId_ExceptThese(excepted_msg_ids, 3);
-    CFE_SB_Buffer_t            *arg_msg             = NULL;
-    const char                 *expected_Spec       = "CF: invalid command packet id=0x%02x";
+    uint16                      initial_err_count = CF_AppData.hk.counters.err;
+    CFE_SB_MsgId_Atom_t         midval;
+    CFE_SB_MsgId_t              forced_MsgID;
+    CFE_SB_Buffer_t            *arg_msg = NULL;
     CFE_MSG_GetMsgId_context_t  context_CFE_MSG_GetMsgId;
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
+
+    /* do not use one of the three real MIDs.
+     * As this depends on configuration, should not hardcode values here
+     */
+    midval = 1;
+    while (midval == CF_CMD_MID || midval == CF_WAKE_UP_MID || midval == CF_SEND_HK_MID)
+    {
+        ++midval;
+    }
+
+    forced_MsgID = CFE_SB_ValueToMsgId(midval);
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &forced_MsgID, sizeof(forced_MsgID), false);
     UT_SetHookFunction(UT_KEY(CFE_MSG_GetMsgId), UT_Hook_CFE_MSG_GetMsgId, &context_CFE_MSG_GetMsgId);
@@ -713,9 +723,6 @@ void Test_CF_ProcessMsg_UnrecognizedCommandEnterDefaultPath(void)
     UtAssert_True(context_CFE_EVS_SendEvent.EventType == CFE_EVS_EventType_ERROR,
                   "CFE_EVS_SendEvent received EventType %u and should have received %u (CFE_EVS_EventType_ERROR)",
                   context_CFE_EVS_SendEvent.EventType, CFE_EVS_EventType_ERROR);
-    UtAssert_StrCmp(context_CFE_EVS_SendEvent.Spec, expected_Spec,
-                    "CFE_EVS_SendEvent received expected Spec\n'%s' - Received\n'%s' - Expected",
-                    context_CFE_EVS_SendEvent.Spec, expected_Spec);
 
 } /* end Test_CF_ProcessMsg_UnrecognizedCommandEnterDefaultPath */
 

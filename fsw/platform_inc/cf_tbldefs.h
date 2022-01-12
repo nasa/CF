@@ -47,8 +47,8 @@ typedef struct CF_ChannelConfig
     uint32 max_outgoing_messages_per_wakeup; /* max number of messages to send per wakeup (0 - unlimited) */
     uint32 rx_max_messages_per_wakeup;       /* max number of rx messages to process per wakeup */
 
-    uint16 apid_input;  /* apid for incoming messages */
-    uint16 apid_output; /* apid for outgoing messages */
+    CFE_SB_MsgId_Atom_t mid_input;  /* msgid integer value for incoming messages */
+    CFE_SB_MsgId_Atom_t mid_output; /* msgid integer value for outgoing messages */
 
     uint16 pipe_depth_input; /* depth of pipe to receive incoming pdu */
 

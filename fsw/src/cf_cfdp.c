@@ -1107,13 +1107,13 @@ int32 CF_CFDP_InitEngine(void)
             goto err_out;
         }
 
-        if ((ret =
-                 CFE_SB_SubscribeLocal(CF_AppData.config_table->chan[i].apid_input, CF_AppData.engine.channels[i].pipe,
-                                       CF_AppData.config_table->chan[i].pipe_depth_input)) != CFE_SUCCESS)
+        if ((ret = CFE_SB_SubscribeLocal(CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[i].mid_input),
+                                         CF_AppData.engine.channels[i].pipe,
+                                         CF_AppData.config_table->chan[i].pipe_depth_input)) != CFE_SUCCESS)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_SUB, CFE_EVS_EventType_ERROR,
                               "CF: failed to subscribe to MID 0x%04x, returned 0x%08x",
-                              CF_AppData.config_table->chan[i].apid_input, ret);
+                              CF_AppData.config_table->chan[i].mid_input, ret);
             goto err_out;
         }
 
