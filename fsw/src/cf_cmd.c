@@ -142,6 +142,20 @@ void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
 {
     CF_TxFileCmd_t *tx = (CF_TxFileCmd_t *)msg;
 
+    /*
+     * This needs to validate all its inputs.
+     * "keep" should only be 0 or 1 (logical true/false).
+     * For priority and dest_id params, anything is acceptable.
+     */
+    if (tx->cfdp_class > CF_CFDP_CLASS_2 || tx->chan_num >= CF_NUM_CHANNELS || tx->keep > 1)
+    {
+        CFE_EVS_SendEvent(CF_EID_ERR_CMD_BAD_PARAM, CFE_EVS_EventType_ERROR,
+                          "CF: bad parameter in CF_CmdTxFile(): chan=%u, class=%u keep=%u", (unsigned int)tx->chan_num,
+                          (unsigned int)tx->cfdp_class, (unsigned int)tx->keep);
+        CF_CmdRej();
+        return;
+    }
+
     /* make sure that the src and dst filenames are null terminated */
     tx->src_filename[sizeof(tx->src_filename) - 1] = 0;
     tx->dst_filename[sizeof(tx->dst_filename) - 1] = 0;
@@ -161,6 +175,20 @@ void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
 void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
 {
     CF_PlaybackDirCmd_t *tx = (CF_PlaybackDirCmd_t *)msg;
+
+    /*
+     * This needs to validate all its inputs.
+     * "keep" should only be 0 or 1 (logical true/false).
+     * For priority and dest_id params, anything is acceptable.
+     */
+    if (tx->cfdp_class > CF_CFDP_CLASS_2 || tx->chan_num >= CF_NUM_CHANNELS || tx->keep > 1)
+    {
+        CFE_EVS_SendEvent(CF_EID_ERR_CMD_BAD_PARAM, CFE_EVS_EventType_ERROR,
+                          "CF: bad parameter in CF_CmdPlaybackDir(): chan=%u, class=%u keep=%u",
+                          (unsigned int)tx->chan_num, (unsigned int)tx->cfdp_class, (unsigned int)tx->keep);
+        CF_CmdRej();
+        return;
+    }
 
     /* make sure that the src and dst filenames are null terminated */
     tx->src_filename[sizeof(tx->src_filename) - 1] = 0;

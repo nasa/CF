@@ -672,124 +672,45 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_all_AndResetAllMemValuesSendEvent(
 **
 *******************************************************************************/
 
-void Test_CF_CmdTxFile_WhenCallTo_CF_CFDP_TxFile_Returns_0_AcceptCommand(void)
+void Test_CF_CmdTxFile(void)
 {
-    /* Arrange */
-    int32                    dummy_CF_CFDP_TxFile_return = 0;
-    CF_UT_cmd_tx_file_buf_t  utbuf;
-    CF_TxFileCmd_t          *dummy_msg = &utbuf.tf;
-    CFE_SB_Buffer_t         *arg_msg   = &utbuf.buf;
-    CF_CFDP_TxFile_context_t context_CF_CFDP_TxFile;
+    /* Test case for:
+     * void CF_CmdTxFile(CFE_SB_Buffer_t *msg);
+     */
+    CF_UT_cmd_tx_file_buf_t utbuf;
+    CF_TxFileCmd_t         *msg = &utbuf.tf;
 
-    memset(&utbuf, 0, sizeof(utbuf));
+    memset(&CF_AppData.hk.counters, 0, sizeof(CF_AppData.hk.counters));
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_TxFile), dummy_CF_CFDP_TxFile_return);
-    UT_SetDataBuffer(UT_KEY(CF_CFDP_TxFile), &context_CF_CFDP_TxFile, sizeof(context_CF_CFDP_TxFile), false);
+    /* nominal, all zero should pass checks, just calls CF_CFDP_TxFile */
+    memset(msg, 0, sizeof(*msg));
+    UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
 
-    memcpy(dummy_msg->src_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    memcpy(dummy_msg->dst_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    dummy_msg->cfdp_class = Any_cfdp_class_t();
-    dummy_msg->keep       = Any_uint8();
-    dummy_msg->chan_num   = Any_uint8();
-    dummy_msg->priority   = Any_uint8();
-    dummy_msg->dest_id    = Any_CF_EntityId_t();
+    /* out of range arguments: bad class */
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    memset(msg, 0, sizeof(*msg));
+    msg->cfdp_class = 10;
+    UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
+    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 
-    /* Arrange unstubbable: CF_CmdAcc via CF_CmdCond */
-    uint16 initial_hk_cmd_counter = Any_uint16();
+    /* out of range arguments: bad channel */
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    memset(msg, 0, sizeof(*msg));
+    msg->chan_num = CF_NUM_CHANNELS;
+    UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
+    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 2);
 
-    CF_AppData.hk.counters.cmd = initial_hk_cmd_counter;
-    /* Act */
-    CF_CmdTxFile(arg_msg);
-
-    /* Assert */
-    UtAssert_StrCmp(context_CF_CFDP_TxFile.src_filename, dummy_msg->src_filename,
-                    "CF_CFDP_TxFile received source_filename %s and should be %s (tx->src_filename)",
-                    context_CF_CFDP_TxFile.src_filename, dummy_msg->src_filename);
-    UtAssert_StrCmp(context_CF_CFDP_TxFile.dst_filename, dummy_msg->dst_filename,
-                    "CF_CFDP_TxFile received source_filename %s and should be %s (tx->dst_filename)",
-                    context_CF_CFDP_TxFile.dst_filename, dummy_msg->dst_filename);
-    UtAssert_True(context_CF_CFDP_TxFile.cfdp_class == dummy_msg->cfdp_class,
-                  "CF_CFDP_TxFile received cfdp_class %u and should be %u (tx->cfdp_class)",
-                  context_CF_CFDP_TxFile.cfdp_class, dummy_msg->cfdp_class);
-    UtAssert_True(context_CF_CFDP_TxFile.keep == dummy_msg->keep,
-                  "CF_CFDP_TxFile received keep %u and should be %u (tx->keep)", context_CF_CFDP_TxFile.keep,
-                  dummy_msg->keep);
-    /* chan vs. chan_num -> CF_TxFileCmd_t uses chan_num, CUT uses chan */
-    UtAssert_True(context_CF_CFDP_TxFile.chan == dummy_msg->chan_num,
-                  "CF_CFDP_TxFile received chan %u and should be %u (tx->chan_num)", context_CF_CFDP_TxFile.chan,
-                  dummy_msg->chan_num);
-    UtAssert_True(context_CF_CFDP_TxFile.priority == dummy_msg->priority,
-                  "CF_CFDP_TxFile received priority %u and should be %u (tx->priority)",
-                  context_CF_CFDP_TxFile.priority, dummy_msg->priority);
-    UtAssert_True(context_CF_CFDP_TxFile.dest_id == dummy_msg->dest_id,
-                  "CF_CFDP_TxFile received dest_id %u and should be %u (tx->dest_id)", context_CF_CFDP_TxFile.dest_id,
-                  dummy_msg->dest_id);
-    /* Assert for CF-CmdAcc */
-    UtAssert_True(CF_AppData.hk.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
-                  "CF_AppData.hk.counters.cmd is %d and should be 1 more than %d", CF_AppData.hk.counters.cmd,
-                  initial_hk_cmd_counter);
-
-} /* Test_CF_CmdTxFile_WhenCallTo_CF_CFDP_TxFile_Returns_0_AcceptCommand */
-
-void Test_CF_CmdTxFile_WhenCAllTo_CF_CFDP_TxFile_Returns_Non0_RejectCommand(void)
-{
-    /* Arrange */
-    int32                    dummy_CF_CFDP_TxFile_return = Any_int32_Except(0);
-    CF_UT_cmd_tx_file_buf_t  utbuf;
-    CF_TxFileCmd_t          *dummy_msg = &utbuf.tf;
-    CFE_SB_Buffer_t         *arg_msg   = &utbuf.buf;
-    CF_CFDP_TxFile_context_t context_CF_CFDP_TxFile;
-
-    memset(&utbuf, 0, sizeof(utbuf));
-
-    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_TxFile), dummy_CF_CFDP_TxFile_return);
-    UT_SetDataBuffer(UT_KEY(CF_CFDP_TxFile), &context_CF_CFDP_TxFile, sizeof(context_CF_CFDP_TxFile), false);
-
-    memcpy(dummy_msg->src_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    memcpy(dummy_msg->dst_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    dummy_msg->cfdp_class = Any_cfdp_class_t();
-    dummy_msg->keep       = Any_uint8();
-    dummy_msg->chan_num   = Any_uint8();
-    dummy_msg->priority   = Any_uint8();
-    dummy_msg->dest_id    = Any_CF_EntityId_t();
-
-    /* Arrange unstubbable: CF_CmdAcc via CF_CmdCond */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
-
-    /* Act */
-    CF_CmdTxFile(arg_msg);
-
-    /* Assert */
-    UtAssert_StrCmp(context_CF_CFDP_TxFile.src_filename, dummy_msg->src_filename,
-                    "CF_CFDP_TxFile received source_filename %s and should be %s (tx->src_filename)",
-                    context_CF_CFDP_TxFile.src_filename, dummy_msg->src_filename);
-    UtAssert_StrCmp(context_CF_CFDP_TxFile.dst_filename, dummy_msg->dst_filename,
-                    "CF_CFDP_TxFile received source_filename %s and should be %s (tx->dst_filename)",
-                    context_CF_CFDP_TxFile.dst_filename, dummy_msg->dst_filename);
-    UtAssert_True(context_CF_CFDP_TxFile.cfdp_class == dummy_msg->cfdp_class,
-                  "CF_CFDP_TxFile received cfdp_class %u and should be %u (tx->cfdp_class)",
-                  context_CF_CFDP_TxFile.cfdp_class, dummy_msg->cfdp_class);
-    UtAssert_True(context_CF_CFDP_TxFile.keep == dummy_msg->keep,
-                  "CF_CFDP_TxFile received keep %u and should be %u (tx->keep)", context_CF_CFDP_TxFile.keep,
-                  dummy_msg->keep);
-    /* chan vs. chan_num -> CF_TxFileCmd_t uses chan_num, CUT uses chan */
-    UtAssert_True(context_CF_CFDP_TxFile.chan == dummy_msg->chan_num,
-                  "CF_CFDP_TxFile received chan %u and should be %u (tx->chan_num)", context_CF_CFDP_TxFile.chan,
-                  dummy_msg->chan_num);
-    UtAssert_True(context_CF_CFDP_TxFile.priority == dummy_msg->priority,
-                  "CF_CFDP_TxFile received priority %u and should be %u (tx->priority)",
-                  context_CF_CFDP_TxFile.priority, dummy_msg->priority);
-    UtAssert_True(context_CF_CFDP_TxFile.dest_id == dummy_msg->dest_id,
-                  "CF_CFDP_TxFile received dest_id %u and should be %u (tx->dest_id)", context_CF_CFDP_TxFile.dest_id,
-                  dummy_msg->dest_id);
-    /* Assert for CF-CmdAcc */
-    UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
-                  "CF_AppData.hk.counters.err is %d and should be 1 more than %d", CF_AppData.hk.counters.err,
-                  initial_hk_err_counter);
-
-} /* Test_CF_CmdTxFile_WhenCAllTo_CF_CFDP_TxFile_Returns_Non0_RejectCommand */
+    /* out of range arguments: bad keep */
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    memset(msg, 0, sizeof(*msg));
+    msg->keep = 15;
+    UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
+    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 3);
+}
 
 /* end CF_CmdTxFile tests */
 
@@ -799,128 +720,47 @@ void Test_CF_CmdTxFile_WhenCAllTo_CF_CFDP_TxFile_Returns_Non0_RejectCommand(void
 **
 *******************************************************************************/
 
-void Test_CF_CmdPlaybackDir_WhenCAllTo_CF_CFDP_PlaybackDir_Returns_0_AcceptCommand(void)
+void Test_CF_CmdPlaybackDir(void)
 {
-    /* Arrange */
-    int32                         dummy_CF_CFDP_PlaybackDir_return = 0;
-    CF_UT_cmd_playback_dir_buf_t  utbuf;
-    CF_PlaybackDirCmd_t          *dummy_msg = &utbuf.pd;
-    CFE_SB_Buffer_t              *arg_msg   = &utbuf.buf;
-    CF_CFDP_PlaybackDir_context_t context_CF_CFDP_PlaybackDir;
+    /* Test case for:
+     * void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg);
+     */
+    CF_UT_cmd_playback_dir_buf_t utbuf;
+    CF_PlaybackDirCmd_t         *msg = &utbuf.pd;
 
-    memset(&utbuf, 0, sizeof(utbuf));
+    memset(&CF_AppData.hk.counters, 0, sizeof(CF_AppData.hk.counters));
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_PlaybackDir), dummy_CF_CFDP_PlaybackDir_return);
-    UT_SetDataBuffer(UT_KEY(CF_CFDP_PlaybackDir), &context_CF_CFDP_PlaybackDir, sizeof(context_CF_CFDP_PlaybackDir),
-                     false);
+    /* nominal, all zero should pass checks, just calls CF_CFDP_PlaybackDir */
+    memset(msg, 0, sizeof(*msg));
+    UtAssert_VOIDCALL(CF_CmdPlaybackDir(&utbuf.buf));
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
 
-    memcpy(dummy_msg->src_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    memcpy(dummy_msg->dst_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    dummy_msg->cfdp_class = Any_cfdp_class_t();
-    dummy_msg->keep       = Any_uint8();
-    dummy_msg->chan_num   = Any_uint8();
-    dummy_msg->priority   = Any_uint8();
-    dummy_msg->dest_id    = Any_CF_EntityId_t();
+    /* out of range arguments: bad class */
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    memset(msg, 0, sizeof(*msg));
+    msg->cfdp_class = 10;
+    UtAssert_VOIDCALL(CF_CmdPlaybackDir(&utbuf.buf));
+    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 
-    /* Arrange unstubbable: CF_CmdAcc via CF_CmdCond */
-    uint16 initial_hk_cmd_counter = Any_uint16();
+    /* out of range arguments: bad channel */
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    memset(msg, 0, sizeof(*msg));
+    msg->chan_num = CF_NUM_CHANNELS;
+    UtAssert_VOIDCALL(CF_CmdPlaybackDir(&utbuf.buf));
+    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 2);
 
-    CF_AppData.hk.counters.cmd = initial_hk_cmd_counter;
-    /* Act */
-    CF_CmdPlaybackDir(arg_msg);
+    /* out of range arguments: bad keep */
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    memset(msg, 0, sizeof(*msg));
+    msg->keep = 15;
+    UtAssert_VOIDCALL(CF_CmdPlaybackDir(&utbuf.buf));
+    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 3);
+}
 
-    /* Assert */
-    UtAssert_True(UtAssert_StrCmp(context_CF_CFDP_PlaybackDir.src_filename, dummy_msg->src_filename, "Strings matched"),
-                  "CF_CmdPlaybackDir received source_filename %s and should be %s (tx->src_filename)",
-                  context_CF_CFDP_PlaybackDir.src_filename, dummy_msg->src_filename);
-    UtAssert_True(UtAssert_StrCmp(context_CF_CFDP_PlaybackDir.dst_filename, dummy_msg->dst_filename, "Strings matched"),
-                  "CF_CmdPlaybackDir received source_filename %s and should be %s (tx->dst_filename)",
-                  context_CF_CFDP_PlaybackDir.dst_filename, dummy_msg->dst_filename);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.cfdp_class == dummy_msg->cfdp_class,
-                  "CF_CmdPlaybackDir received cfdp_class %u and should be %u (tx->cfdp_class)",
-                  context_CF_CFDP_PlaybackDir.cfdp_class, dummy_msg->cfdp_class);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.keep == dummy_msg->keep,
-                  "CF_CmdPlaybackDir received keep %u and should be %u (tx->keep)", context_CF_CFDP_PlaybackDir.keep,
-                  dummy_msg->keep);
-    /* chan vs. chan_num -> CF_TxFileCmd_t uses chan_num, CUT uses chan */
-    UtAssert_True(context_CF_CFDP_PlaybackDir.chan == dummy_msg->chan_num,
-                  "CF_CmdPlaybackDir received chan %u and should be %u (tx->chan_num)",
-                  context_CF_CFDP_PlaybackDir.chan, dummy_msg->chan_num);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.priority == dummy_msg->priority,
-                  "CF_CmdPlaybackDir received priority %u and should be %u (tx->priority)",
-                  context_CF_CFDP_PlaybackDir.priority, dummy_msg->priority);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.dest_id == dummy_msg->dest_id,
-                  "CF_CmdPlaybackDir received dest_id %u and should be %u (tx->dest_id)",
-                  context_CF_CFDP_PlaybackDir.dest_id, dummy_msg->dest_id);
-    /* Assert for CF-CmdAcc */
-    UtAssert_True(CF_AppData.hk.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
-                  "CF_AppData.hk.counters.cmd is %d and should be 1 more than %d", CF_AppData.hk.counters.cmd,
-                  initial_hk_cmd_counter);
-
-} /* end Test_CF_CmdPlaybackDir_WhenCAllTo_CF_CFDP_PlaybackDir_Returns_0_AcceptCommand */
-
-void Test_CF_CmdPlaybackDir_WhenCallTo_CF_CmdPlaybackDir_Returns_non0_RejectCommand(void)
-{
-    /* Arrange */
-    int32                         dummy_CF_CFDP_PlaybackDir_return = Any_int32_Except(0);
-    CF_UT_cmd_playback_dir_buf_t  utbuf;
-    CF_PlaybackDirCmd_t          *dummy_msg = &utbuf.pd;
-    CFE_SB_Buffer_t              *arg_msg   = &utbuf.buf;
-    CF_CFDP_PlaybackDir_context_t context_CF_CFDP_PlaybackDir;
-
-    memset(&utbuf, 0, sizeof(utbuf));
-
-    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_PlaybackDir), dummy_CF_CFDP_PlaybackDir_return);
-    UT_SetDataBuffer(UT_KEY(CF_CFDP_PlaybackDir), &context_CF_CFDP_PlaybackDir, sizeof(context_CF_CFDP_PlaybackDir),
-                     false);
-
-    memcpy(dummy_msg->src_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    memcpy(dummy_msg->dst_filename, AnyFilenameOfLength(10), CF_FILENAME_MAX_LEN); // 10 is arbitrary
-    dummy_msg->cfdp_class = Any_cfdp_class_t();
-    dummy_msg->keep       = Any_uint8();
-    dummy_msg->chan_num   = Any_uint8();
-    dummy_msg->priority   = Any_uint8();
-    dummy_msg->dest_id    = Any_CF_EntityId_t();
-
-    /* Arrange unstubbable: CF_CmdAcc via CF_CmdCond */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
-
-    /* Act */
-    CF_CmdPlaybackDir(arg_msg);
-
-    /* Assert */
-    UtAssert_True(UtAssert_StrCmp(context_CF_CFDP_PlaybackDir.src_filename, dummy_msg->src_filename, "Strings matched"),
-                  "CF_CmdPlaybackDir received source_filename %s and should be %s (tx->src_filename)",
-                  context_CF_CFDP_PlaybackDir.src_filename, dummy_msg->src_filename);
-    UtAssert_True(UtAssert_StrCmp(context_CF_CFDP_PlaybackDir.dst_filename, dummy_msg->dst_filename, "Strings matched"),
-                  "CF_CmdPlaybackDir received source_filename %s and should be %s (tx->dst_filename)",
-                  context_CF_CFDP_PlaybackDir.dst_filename, dummy_msg->dst_filename);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.cfdp_class == dummy_msg->cfdp_class,
-                  "CF_CmdPlaybackDir received cfdp_class %u and should be %u (tx->cfdp_class)",
-                  context_CF_CFDP_PlaybackDir.cfdp_class, dummy_msg->cfdp_class);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.keep == dummy_msg->keep,
-                  "CF_CmdPlaybackDir received keep %u and should be %u (tx->keep)", context_CF_CFDP_PlaybackDir.keep,
-                  dummy_msg->keep);
-    /* chan vs. chan_num -> CF_TxFileCmd_t uses chan_num, CUT uses chan */
-    UtAssert_True(context_CF_CFDP_PlaybackDir.chan == dummy_msg->chan_num,
-                  "CF_CmdPlaybackDir received chan %u and should be %u (tx->chan_num)",
-                  context_CF_CFDP_PlaybackDir.chan, dummy_msg->chan_num);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.priority == dummy_msg->priority,
-                  "CF_CmdPlaybackDir received priority %u and should be %u (tx->priority)",
-                  context_CF_CFDP_PlaybackDir.priority, dummy_msg->priority);
-    UtAssert_True(context_CF_CFDP_PlaybackDir.dest_id == dummy_msg->dest_id,
-                  "CF_CmdPlaybackDir received dest_id %u and should be %u (tx->dest_id)",
-                  context_CF_CFDP_PlaybackDir.dest_id, dummy_msg->dest_id);
-    /* Assert for CF-CmdAcc */
-    UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
-                  "CF_AppData.hk.counters.err is %d and should be 1 more than %d", CF_AppData.hk.counters.err,
-                  initial_hk_err_counter);
-
-} /* Test_CF_CmdPlaybackDir_WhenCallTo_CF_CmdPlaybackDir_Returns_non0_RejectCommand */
-
-/* end CF_CmdTxFile tests */
+/* end CF_CmdPlaybackDir tests */
 
 /*******************************************************************************
 **
@@ -5008,18 +4848,12 @@ void add_CF_CmdReset_tests(void)
 
 void add_CF_CmdTxFile_tests(void)
 {
-    UtTest_Add(Test_CF_CmdTxFile_WhenCallTo_CF_CFDP_TxFile_Returns_0_AcceptCommand, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_CmdTxFile_WhenCallTo_CF_CFDP_TxFile_Returns_0_AcceptCommand");
-    UtTest_Add(Test_CF_CmdTxFile_WhenCAllTo_CF_CFDP_TxFile_Returns_Non0_RejectCommand, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_CmdTxFile_WhenCAllTo_CF_CFDP_TxFile_Returns_Non0_RejectCommand");
+    UtTest_Add(Test_CF_CmdTxFile, cf_cmd_tests_Setup, cf_cmd_tests_Teardown, "CF_CmdTxFile");
 } /* end add_CF_CmdTxFile_tests */
 
 void add_CF_CmdPlaybackDir_tests(void)
 {
-    UtTest_Add(Test_CF_CmdPlaybackDir_WhenCAllTo_CF_CFDP_PlaybackDir_Returns_0_AcceptCommand, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_CmdPlaybackDir_WhenCAllTo_CF_CFDP_PlaybackDir_Returns_0_AcceptCommand");
-    UtTest_Add(Test_CF_CmdPlaybackDir_WhenCallTo_CF_CmdPlaybackDir_Returns_non0_RejectCommand, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_CmdPlaybackDir_WhenCallTo_CF_CmdPlaybackDir_Returns_non0_RejectCommand");
+    UtTest_Add(Test_CF_CmdPlaybackDir, cf_cmd_tests_Setup, cf_cmd_tests_Teardown, "CF_CmdPlaybackDir");
 } /* end add_CF_CmdPlaybackDir_tests */
 
 void add_CF_DoChanAction_tests(void)
