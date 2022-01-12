@@ -47,9 +47,6 @@
 #include <string.h>
 #include "cf_assert.h"
 
-const int CF_max_chunks[CF_Direction_NUM][CF_NUM_CHANNELS] = {CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION,
-                                                              CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION};
-
 /**
  * @brief Initiate the process of encoding a new PDU to send
  *
@@ -1101,6 +1098,9 @@ int32 CF_CFDP_InitEngine(void)
     CF_ChunkWrapper_t *c                = CF_AppData.engine.chunks;
     int32              ret              = CFE_SUCCESS;
 
+    static const int CF_DIR_MAX_CHUNKS[CF_Direction_NUM][CF_NUM_CHANNELS] = {CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION,
+                                                                             CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION};
+
     memset(&CF_AppData.engine, 0, sizeof(CF_AppData.engine));
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
@@ -1147,9 +1147,9 @@ int32 CF_CFDP_InitEngine(void)
 
             for (k = 0; k < CF_Direction_NUM; ++k, ++c)
             {
-                CF_Assert((chunk_mem_offset + CF_max_chunks[k][i]) <= CF_NUM_CHUNKS_ALL_CHANNELS);
-                CF_ChunkListInit(&c->chunks, CF_max_chunks[k][i], &CF_AppData.engine.chunk_mem[chunk_mem_offset]);
-                chunk_mem_offset += CF_max_chunks[k][i];
+                CF_Assert((chunk_mem_offset + CF_DIR_MAX_CHUNKS[k][i]) <= CF_NUM_CHUNKS_ALL_CHANNELS);
+                CF_ChunkListInit(&c->chunks, CF_DIR_MAX_CHUNKS[k][i], &CF_AppData.engine.chunk_mem[chunk_mem_offset]);
+                chunk_mem_offset += CF_DIR_MAX_CHUNKS[k][i];
                 CF_CList_InitNode(&c->cl_node);
                 CF_CList_InsertBack(&CF_AppData.engine.channels[i].cs[k], &c->cl_node);
             }
@@ -1186,7 +1186,7 @@ err_out:
 **  \endreturns
 **
 *************************************************************************/
-int CF_CFDP_CycleTx_(CF_CListNode_t *node, void *context)
+int CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context)
 {
     CF_CFDP_CycleTx_args_t *args = (CF_CFDP_CycleTx_args_t *)context;
     CF_Transaction_t       *t    = container_of(node, CF_Transaction_t, cl_node);
@@ -1254,7 +1254,7 @@ void CF_CFDP_CycleTx(CF_Channel_t *c)
                 CF_MoveTransaction(t, CF_QueueIdx_TXA);
                 /* args is ok, still { c, 0 } */
             entry_jump:
-                CF_CList_Traverse(c->qs[CF_QueueIdx_TXA], CF_CFDP_CycleTx_, &args);
+                CF_CList_Traverse(c->qs[CF_QueueIdx_TXA], CF_CFDP_CycleTxFirstActive, &args);
             }
         }
 
@@ -1277,9 +1277,9 @@ void CF_CFDP_CycleTx(CF_Channel_t *c)
 *************************************************************************/
 int CF_CFDP_DoTick(CF_CListNode_t *node, void *context)
 {
-    int               ret  = CF_CLIST_CONT; /* CF_CLIST_CONT means don't tick one, keep looking for cur */
-    tick_args_t      *args = (tick_args_t *)context;
-    CF_Transaction_t *t    = container_of(node, CF_Transaction_t, cl_node);
+    int                  ret  = CF_CLIST_CONT; /* CF_CLIST_CONT means don't tick one, keep looking for cur */
+    CF_CFDP_Tick_args_t *args = (CF_CFDP_Tick_args_t *)context;
+    CF_Transaction_t    *t    = container_of(node, CF_Transaction_t, cl_node);
     if (!args->c->cur || (args->c->cur == t))
     {
         /* found where we left off, so clear that and move on */
@@ -1329,7 +1329,7 @@ void CF_CFDP_TickTransactions(CF_Channel_t *c)
 
     for (; c->tick_type < CF_TickType_NUM_TYPES; ++c->tick_type)
     {
-        tick_args_t args = {c, fns[c->tick_type], 0, 0};
+        CF_CFDP_Tick_args_t args = {c, fns[c->tick_type], 0, 0};
 
         do
         {
@@ -1392,8 +1392,8 @@ void CF_CFDP_InitTxnTxFile(CF_Transaction_t *t, CF_CFDP_Class_t cfdp_class, uint
 **       t must not be NULL.
 **
 *************************************************************************/
-static void CF_CFDP_TxFile_(CF_Transaction_t *t, CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority,
-                            CF_EntityId_t dest_id)
+static void CF_CFDP_TxFile_Initiate(CF_Transaction_t *t, CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan,
+                                    uint8 priority, CF_EntityId_t dest_id)
 {
     CFE_EVS_SendEvent(CF_EID_INF_CFDP_S_START_SEND, CFE_EVS_EventType_INFORMATION,
                       "CF: start class %d tx of file %d:%.*s -> %d:%.*s", cfdp_class + 1,
@@ -1456,7 +1456,7 @@ int32 CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, CF_CFDP
     t->history->fnames.src_filename[sizeof(t->history->fnames.src_filename) - 1] = 0;
     strncpy(t->history->fnames.dst_filename, dst_filename, sizeof(t->history->fnames.dst_filename) - 1);
     t->history->fnames.dst_filename[sizeof(t->history->fnames.dst_filename) - 1] = 0;
-    CF_CFDP_TxFile_(t, cfdp_class, keep, chan, priority, dest_id);
+    CF_CFDP_TxFile_Initiate(t, cfdp_class, keep, chan, priority, dest_id);
 
     ++c->num_cmd_tx;
     t->flags.tx.cmd_tx = 1;
@@ -1480,9 +1480,9 @@ err_out:
 **  \endreturns
 **
 *************************************************************************/
-static int32 CF_CFDP_PlaybackDir_(CF_Playback_t *p, const char *src_filename, const char *dst_filename,
-                                  CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority,
-                                  CF_EntityId_t dest_id)
+static int32 CF_CFDP_PlaybackDir_Initiate(CF_Playback_t *p, const char *src_filename, const char *dst_filename,
+                                          CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority,
+                                          CF_EntityId_t dest_id)
 {
     int32 ret = CFE_SUCCESS;
 
@@ -1552,7 +1552,7 @@ int32 CF_CFDP_PlaybackDir(const char *src_filename, const char *dst_filename, CF
         return -1;
     }
 
-    return CF_CFDP_PlaybackDir_(p, src_filename, dst_filename, cfdp_class, keep, chan, priority, dest_id);
+    return CF_CFDP_PlaybackDir_Initiate(p, src_filename, dst_filename, cfdp_class, keep, chan, priority, dest_id);
 }
 
 /************************************************************************/
@@ -1606,7 +1606,8 @@ void CF_CFDP_ProcessPlaybackDirectory(CF_Channel_t *c, CF_Playback_t *p)
                 pt->history->fnames.src_filename[CF_FILENAME_MAX_LEN - 1] = 0;
                 pt->history->fnames.dst_filename[CF_FILENAME_MAX_LEN - 1] = 0;
 
-                CF_CFDP_TxFile_(pt, p->cfdp_class, p->keep, (c - CF_AppData.engine.channels), p->priority, p->dest_id);
+                CF_CFDP_TxFile_Initiate(pt, p->cfdp_class, p->keep, (c - CF_AppData.engine.channels), p->priority,
+                                        p->dest_id);
 
                 pt->p = p;
                 ++p->num_ts;
@@ -1715,8 +1716,8 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c)
                 else if (CF_Timer_Expired(&p->interval_timer))
                 {
                     /* the timer has expired */
-                    int ret = CF_CFDP_PlaybackDir_(&p->pb, pd->src_dir, pd->dst_dir, pd->cfdp_class, 0, chan_index,
-                                                   pd->priority, pd->dest_eid);
+                    int ret = CF_CFDP_PlaybackDir_Initiate(&p->pb, pd->src_dir, pd->dst_dir, pd->cfdp_class, 0,
+                                                           chan_index, pd->priority, pd->dest_eid);
                     if (!ret)
                     {
                         p->timer_set = 0;
@@ -1724,7 +1725,7 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c)
                     else
                     {
                         /* error occured in playback directory, so reset the timer */
-                        /* an event is sent in CF_CFDP_PlaybackDir_ so there is no reason to
+                        /* an event is sent in CF_CFDP_PlaybackDir_Initiate so there is no reason to
                          * to have another here */
                         CF_Timer_InitRelSec(&p->interval_timer, pd->interval_sec);
                     }

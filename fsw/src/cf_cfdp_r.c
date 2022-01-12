@@ -571,9 +571,9 @@ int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
 
             nak->scope_start = 0;
             cret             = CF_ChunkList_ComputeGaps(&t->chunks->chunks,
-                                            (t->chunks->chunks.count < t->chunks->chunks.CF_max_chunks)
-                                                            ? t->chunks->chunks.CF_max_chunks
-                                                            : (t->chunks->chunks.CF_max_chunks - 1),
+                                            (t->chunks->chunks.count < t->chunks->chunks.max_chunks)
+                                                            ? t->chunks->chunks.max_chunks
+                                                            : (t->chunks->chunks.max_chunks - 1),
                                                         t->fsize, 0, CF_CFDP_R2_GapCompute, &args);
 
             if (!cret)

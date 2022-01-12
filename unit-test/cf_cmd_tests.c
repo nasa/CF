@@ -934,7 +934,7 @@ void Test_CF_DoChanAction_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1(void)
     CF_UT_cmd_unionargs_buf_t utbuf;
     CF_UnionArgsCmd_t        *arg_cmd    = &utbuf.ua;
     const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
-    chan_action_fn_t          arg_fn     = &Dummy_chan_action_fn_t;
+    CF_ChanActionFn_t         arg_fn     = &Dummy_chan_action_fn_t;
     int                       dummy_context;
     void                     *arg_context    = &dummy_context;
     uint8                     random_fn_call = Any_uint8_LessThan(CF_NUM_CHANNELS) + 1;
@@ -965,7 +965,7 @@ void Test_CF_DoChanAction_ALL_CHANNELS_WhenAll_fn_return_1_Return_1(void)
     CF_UT_cmd_unionargs_buf_t utbuf;
     CF_UnionArgsCmd_t        *arg_cmd    = &utbuf.ua;
     const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
-    chan_action_fn_t          arg_fn     = &Dummy_chan_action_fn_t;
+    CF_ChanActionFn_t         arg_fn     = &Dummy_chan_action_fn_t;
     int                       dummy_context;
     void                     *arg_context = &dummy_context;
     int                       local_result;
@@ -995,7 +995,7 @@ void Test_CF_DoChanAction_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0(void)
     CF_UT_cmd_unionargs_buf_t utbuf;
     CF_UnionArgsCmd_t        *arg_cmd    = &utbuf.ua;
     const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
-    chan_action_fn_t          arg_fn     = &Dummy_chan_action_fn_t;
+    CF_ChanActionFn_t         arg_fn     = &Dummy_chan_action_fn_t;
     int                       dummy_context;
     void                     *arg_context = &dummy_context;
     int                       local_result;
@@ -1025,7 +1025,7 @@ void Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_1_Return_1(void)
     CF_UT_cmd_unionargs_buf_t utbuf;
     CF_UnionArgsCmd_t        *arg_cmd    = &utbuf.ua;
     const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
-    chan_action_fn_t          arg_fn     = &Dummy_chan_action_fn_t;
+    CF_ChanActionFn_t         arg_fn     = &Dummy_chan_action_fn_t;
     int                       dummy_context;
     void                     *arg_context = &dummy_context;
     int                       local_result;
@@ -1055,7 +1055,7 @@ void Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_0_Return_1(void)
     CF_UT_cmd_unionargs_buf_t utbuf;
     CF_UnionArgsCmd_t        *arg_cmd    = &utbuf.ua;
     const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
-    chan_action_fn_t          arg_fn     = &Dummy_chan_action_fn_t;
+    CF_ChanActionFn_t         arg_fn     = &Dummy_chan_action_fn_t;
     int                       dummy_context;
     void                     *arg_context = &dummy_context;
     int                       local_result;
@@ -1085,7 +1085,7 @@ void Test_CF_DoChanAction_WhenChanNumberEq_CF_NUM_CHANNELS_Return_neg1_And_SendE
     CF_UT_cmd_unionargs_buf_t utbuf;
     CF_UnionArgsCmd_t        *arg_cmd    = &utbuf.ua;
     const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
-    chan_action_fn_t          arg_fn     = &Dummy_chan_action_fn_t;
+    CF_ChanActionFn_t         arg_fn     = &Dummy_chan_action_fn_t;
     int                       dummy_context;
     void                     *arg_context = &dummy_context;
     int                       local_result;
@@ -1118,7 +1118,7 @@ void Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent(void)
     CF_UT_cmd_unionargs_buf_t utbuf;
     CF_UnionArgsCmd_t        *arg_cmd    = &utbuf.ua;
     const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
-    chan_action_fn_t          arg_fn     = &Dummy_chan_action_fn_t;
+    CF_ChanActionFn_t         arg_fn     = &Dummy_chan_action_fn_t;
     int                       dummy_context;
     void                     *arg_context = &dummy_context;
     int                       local_result;
@@ -1169,10 +1169,10 @@ void Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent(void)
 void Test_CF_DoFreezeThaw_Set_frozen_ToGiven_context_barg_AndReturn_0(void)
 {
     /* Arrange */
-    uint8             arg_chan_num = Any_cf_channel();
-    bool_arg_t        dummy_context;
-    const bool_arg_t *arg_context;
-    int               local_result;
+    uint8                          arg_chan_num = Any_cf_channel();
+    CF_ChanAction_BoolArg_t        dummy_context;
+    const CF_ChanAction_BoolArg_t *arg_context;
+    int                            local_result;
 
     dummy_context.barg = Any_bool_arg_t_barg();
 
@@ -1564,11 +1564,11 @@ void Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid(void)
 
 /*******************************************************************************
 **
-**  CF_DoSuspRes_ tests
+**  CF_DoSuspRes_Txn tests
 **
 *******************************************************************************/
 
-void Test_CF_DoSuspRes__Asserts_t_Is_NULL(void)
+void Test_CF_DoSuspRes_Txn_Asserts_t_Is_NULL(void)
 {
     // /* Arrange */
 
@@ -1576,15 +1576,15 @@ void Test_CF_DoSuspRes__Asserts_t_Is_NULL(void)
 
     // /* Assert */
     UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert");
-} /* end Test_CF_DoSuspRes__Asserts_t_Is_NULL */
+} /* end Test_CF_DoSuspRes_Txn_Asserts_t_Is_NULL */
 
-void Test_CF_DoSuspRes__Set_context_same_To_1_suspended_Eq_action(void)
+void Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action(void)
 {
     /* Arrange */
-    CF_Transaction_t  dummy_t;
-    CF_Transaction_t *arg_t = &dummy_t;
-    susp_res_arg_t    dummy_context;
-    susp_res_arg_t   *arg_context = &dummy_context;
+    CF_Transaction_t            dummy_t;
+    CF_Transaction_t           *arg_t = &dummy_t;
+    CF_ChanAction_SuspResArg_t  dummy_context;
+    CF_ChanAction_SuspResArg_t *arg_context = &dummy_context;
 
     /* set same to 0 to ensure change was done - not required for test,
      * but it is helpful for verification that the function did the change */
@@ -1594,20 +1594,20 @@ void Test_CF_DoSuspRes__Set_context_same_To_1_suspended_Eq_action(void)
     arg_t->flags.com.suspended = arg_context->action;
 
     /* Act */
-    CF_DoSuspRes_(arg_t, arg_context);
+    CF_DoSuspRes_Txn(arg_t, arg_context);
 
     /* Assert */
-    UtAssert_True(arg_context->same == 1, "CF_DoSuspRes_ set context->same to %d and should be 1 (direct set)",
+    UtAssert_True(arg_context->same == 1, "CF_DoSuspRes_Txn set context->same to %d and should be 1 (direct set)",
                   arg_context->same);
-} /* end Test_CF_DoSuspRes__Set_context_same_To_1_suspended_Eq_action */
+} /* end Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action */
 
-void Test_CF_DoSuspRes__When_suspended_NotEqTo_action_Set_suspended_To_action(void)
+void Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action(void)
 {
     /* Arrange */
-    CF_Transaction_t  dummy_t;
-    CF_Transaction_t *arg_t = &dummy_t;
-    susp_res_arg_t    dummy_context;
-    susp_res_arg_t   *arg_context = &dummy_context;
+    CF_Transaction_t            dummy_t;
+    CF_Transaction_t           *arg_t = &dummy_t;
+    CF_ChanAction_SuspResArg_t  dummy_context;
+    CF_ChanAction_SuspResArg_t *arg_context = &dummy_context;
 
     /* set same to 0 to ensure change was done - not required for test,
      * but it is helpful for verification that the function did the change */
@@ -1617,13 +1617,13 @@ void Test_CF_DoSuspRes__When_suspended_NotEqTo_action_Set_suspended_To_action(vo
     arg_t->flags.com.suspended = !arg_context->action;
 
     /* Act */
-    CF_DoSuspRes_(arg_t, arg_context);
+    CF_DoSuspRes_Txn(arg_t, arg_context);
 
     /* Assert */
     UtAssert_True(arg_t->flags.com.suspended == arg_context->action,
-                  "CF_DoSuspRes_ set arg_t->flags.com.suspended to %d and should be %d (context->action)",
+                  "CF_DoSuspRes_Txn set arg_t->flags.com.suspended to %d and should be %d (context->action)",
                   arg_t->flags.com.suspended, arg_context->action);
-} /* end Test_CF_DoSuspRes__When_suspended_NotEqTo_action_Set_suspended_To_action */
+} /* end Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action */
 
 /*******************************************************************************
 **
@@ -1653,7 +1653,7 @@ void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasChange
     UT_SetDataBuffer(UT_KEY(CF_FindTransactionBySequenceNumber), &context_CF_FindTransactionBySequenceNumber,
                      sizeof(context_CF_FindTransactionBySequenceNumber), false);
 
-    /* Arrange unstubbable: CF_DoSuspRes_ */
+    /* Arrange unstubbable: CF_DoSuspRes_Txn */
     dummy_t->flags.com.suspended = arg_action;
 
     /* Arrange unstubbable: CF_CmdRej */
@@ -1777,7 +1777,7 @@ void Test_CF_DoSuspRes_CallTo_CF_TsnChanAction_Returns_0_And_args_same_WasNotCha
     UT_SetDataBuffer(UT_KEY(CF_TraverseAllTransactions_All_Channels), &context_CF_TraverseAllTransactions_All_Channels,
                      sizeof(context_CF_TraverseAllTransactions_All_Channels), false);
 
-    /* Arrange unstubbable: CF_DoSuspRes_ */
+    /* Arrange unstubbable: CF_DoSuspRes_Txn */
     dummy_t->flags.com.suspended = arg_action;
 
     /* Arrange unstubbable: CF_CmdAcc */
@@ -1884,11 +1884,11 @@ void Test_CF_CmdResume_Call_CF_DoSuspRes_WithGiven_msg_And_action_0(void)
 
 /*******************************************************************************
 **
-**  CF_CmdCancel_ tests
+**  CF_CmdCancel_Txn tests
 **
 *******************************************************************************/
 
-void Test_CF_CmdCancel__Call_CF_CFDP_CancelTransaction_WithGiven_t(void)
+void Test_CF_CmdCancel_Txn_Call_CF_CFDP_CancelTransaction_WithGiven_t(void)
 {
     /* Arrange */
     CF_Transaction_t  dummy_t;
@@ -1900,12 +1900,12 @@ void Test_CF_CmdCancel__Call_CF_CFDP_CancelTransaction_WithGiven_t(void)
                      sizeof(context_CF_CFDP_CancelTransaction), false);
 
     /* Act */
-    CF_CmdCancel_(arg_t, arg_ignored);
+    CF_CmdCancel_Txn(arg_t, arg_ignored);
 
     /* Assert */
     UtAssert_ADDRESS_EQ(context_CF_CFDP_CancelTransaction, arg_t);
 
-} /* end Test_CF_CmdCancel__Call_CF_CFDP_CancelTransaction_WithGiven_t */
+} /* end Test_CF_CmdCancel_Txn_Call_CF_CFDP_CancelTransaction_WithGiven_t */
 
 /*******************************************************************************
 **
@@ -1945,8 +1945,8 @@ void Test_CF_CmdCancel_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
     /* Assert for CF_TsnChanAction */
     UtAssert_STUB_COUNT(CF_TraverseAllTransactions, 1);
     UtAssert_ADDRESS_EQ(context_CF_TraverseAllTransactions.c, CF_AppData.engine.channels + dummy_msg->chan);
-    UtAssert_True(context_CF_TraverseAllTransactions.fn == CF_CmdCancel_,
-                  "context_CF_TraverseAllTransactions.fn ==  CF_CmdCancel_");
+    UtAssert_True(context_CF_TraverseAllTransactions.fn == CF_CmdCancel_Txn,
+                  "context_CF_TraverseAllTransactions.fn ==  CF_CmdCancel_Txn");
     UtAssert_ADDRESS_EQ(context_CF_TraverseAllTransactions.context, NULL);
     /* Assert for CF_CmdRej */
     UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
@@ -1956,11 +1956,11 @@ void Test_CF_CmdCancel_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
 
 /*******************************************************************************
 **
-**  CF_CmdAbandon_ tests
+**  CF_CmdAbandon_Txn tests
 **
 *******************************************************************************/
 
-void Test_CF_CmdAbandon__Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0(void)
+void Test_CF_CmdAbandon_Txn_Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0(void)
 {
     /* Arrange */
     CF_Transaction_t                   dummy_t;
@@ -1972,7 +1972,7 @@ void Test_CF_CmdAbandon__Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0(void)
                      sizeof(context_CF_CFDP_ResetTransaction), false);
 
     /* Act */
-    CF_CmdAbandon_(arg_t, arg_ignored);
+    CF_CmdAbandon_Txn(arg_t, arg_ignored);
 
     /* Assert */
     UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetTransaction.t, arg_t);
@@ -1980,7 +1980,7 @@ void Test_CF_CmdAbandon__Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0(void)
                   "CF_CFDP_CancelTransaction was called with int %d and should be 0 (constant in call)",
                   context_CF_CFDP_ResetTransaction.keep_history);
 
-} /* end Test_CF_CmdAbandon__Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0 */
+} /* end Test_CF_CmdAbandon_Txn_Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0 */
 
 /*******************************************************************************
 **
@@ -2020,8 +2020,8 @@ void Test_CF_CmdAbandon_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
     /* Assert for CF_TsnChanAction */
     UtAssert_STUB_COUNT(CF_TraverseAllTransactions, 1);
     UtAssert_ADDRESS_EQ(context_CF_TraverseAllTransactions.c, CF_AppData.engine.channels + dummy_msg->chan);
-    UtAssert_True(context_CF_TraverseAllTransactions.fn == CF_CmdAbandon_,
-                  "context_CF_TraverseAllTransactions.fn ==  CF_CmdAbandon_");
+    UtAssert_True(context_CF_TraverseAllTransactions.fn == CF_CmdAbandon_Txn,
+                  "context_CF_TraverseAllTransactions.fn ==  CF_CmdAbandon_Txn");
     UtAssert_ADDRESS_EQ(context_CF_TraverseAllTransactions.context, NULL);
     /* Assert for CF_CmdRej */
     UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
@@ -2038,10 +2038,10 @@ void Test_CF_CmdAbandon_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
 void Test_CF_DoEnableDisableDequeue_Set_chan_num_EnabledFlagTo_context_barg(void)
 {
     /* Arrange */
-    CF_ConfigTable_t dummy_config_table;
-    uint8            arg_chan_num = Any_cf_channel();
-    bool_arg_t       dummy_context;
-    bool_arg_t      *arg_context = &dummy_context;
+    CF_ConfigTable_t         dummy_config_table;
+    uint8                    arg_chan_num = Any_cf_channel();
+    CF_ChanAction_BoolArg_t  dummy_context;
+    CF_ChanAction_BoolArg_t *arg_context = &dummy_context;
 
     CF_AppData.config_table = &dummy_config_table;
     dummy_context.barg      = Any_bool_arg_t_barg();
@@ -2152,14 +2152,14 @@ void Test_CF_CmdDisableDequeue_Call_CmdCond_WithResultsOf_CF_DoChanAction(void)
 void Test_CF_DoEnableDisablePolldir_When_ALL_CHANNELS_SetAllPolldirsInChannelEnabledTo_context_barg(void)
 {
     /* Arrange */
-    uint8                     arg_chan_num = Any_cf_channel();
-    CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    bool_msg_arg_t            dummy_context;
-    bool_msg_arg_t           *arg_context = &dummy_context;
-    CF_ConfigTable_t          dummy_config_table;
-    uint8                     expected_enabled;
-    int                       local_result;
+    uint8                       arg_chan_num = Any_cf_channel();
+    CF_UT_cmd_unionargs_buf_t   utbuf;
+    CF_UnionArgsCmd_t          *dummy_msg = &utbuf.ua;
+    CF_ChanAction_BoolMsgArg_t  dummy_context;
+    CF_ChanAction_BoolMsgArg_t *arg_context = &dummy_context;
+    CF_ConfigTable_t            dummy_config_table;
+    uint8                       expected_enabled;
+    int                         local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2190,15 +2190,15 @@ void Test_CF_DoEnableDisablePolldir_When_ALL_CHANNELS_SetAllPolldirsInChannelEna
 void Test_CF_DoEnableDisablePolldir_WhenSetToSpecificPolldirSetPolldirFrom_context_ChannelEnabledTo_context_barg(void)
 {
     /* Arrange */
-    uint8                     arg_chan_num  = Any_cf_channel();
-    uint8                     dummy_polldir = Any_cf_polldir();
-    CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    bool_msg_arg_t            dummy_context;
-    bool_msg_arg_t           *arg_context = &dummy_context;
-    CF_ConfigTable_t          dummy_config_table;
-    uint8                     expected_enabled;
-    int                       local_result;
+    uint8                       arg_chan_num  = Any_cf_channel();
+    uint8                       dummy_polldir = Any_cf_polldir();
+    CF_UT_cmd_unionargs_buf_t   utbuf;
+    CF_UnionArgsCmd_t          *dummy_msg = &utbuf.ua;
+    CF_ChanAction_BoolMsgArg_t  dummy_context;
+    CF_ChanAction_BoolMsgArg_t *arg_context = &dummy_context;
+    CF_ConfigTable_t            dummy_config_table;
+    uint8                       expected_enabled;
+    int                         local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2224,13 +2224,13 @@ void Test_CF_DoEnableDisablePolldir_WhenSetToSpecificPolldirSetPolldirFrom_conte
 void Test_CF_DoEnableDisablePolldir_FailPolldirEq_CF_MAX_POLLING_DIR_PER_CHAN_AndSendEvent(void)
 {
     /* Arrange */
-    uint8                     arg_chan_num = Any_cf_channel();
-    CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    bool_msg_arg_t            dummy_context;
-    bool_msg_arg_t           *arg_context = &dummy_context;
-    CF_ConfigTable_t          dummy_config_table;
-    int                       local_result;
+    uint8                       arg_chan_num = Any_cf_channel();
+    CF_UT_cmd_unionargs_buf_t   utbuf;
+    CF_UnionArgsCmd_t          *dummy_msg = &utbuf.ua;
+    CF_ChanAction_BoolMsgArg_t  dummy_context;
+    CF_ChanAction_BoolMsgArg_t *arg_context = &dummy_context;
+    CF_ConfigTable_t            dummy_config_table;
+    int                         local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2255,13 +2255,13 @@ void Test_CF_DoEnableDisablePolldir_FailPolldirEq_CF_MAX_POLLING_DIR_PER_CHAN_An
 void Test_CF_DoEnableDisablePolldir_FailAnyBadPolldirSendEvent(void)
 {
     /* Arrange */
-    uint8                     arg_chan_num = Any_cf_channel();
-    CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    bool_msg_arg_t            dummy_context;
-    bool_msg_arg_t           *arg_context = &dummy_context;
-    CF_ConfigTable_t          dummy_config_table;
-    int                       local_result;
+    uint8                       arg_chan_num = Any_cf_channel();
+    CF_UT_cmd_unionargs_buf_t   utbuf;
+    CF_UnionArgsCmd_t          *dummy_msg = &utbuf.ua;
+    CF_ChanAction_BoolMsgArg_t  dummy_context;
+    CF_ChanAction_BoolMsgArg_t *arg_context = &dummy_context;
+    CF_ConfigTable_t            dummy_config_table;
+    int                         local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -5085,15 +5085,15 @@ void add_CF_TsnChanAction_tests(void)
                "Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid");
 } /* end add_CF_TsnChanAction_tests */
 
-void add_CF_DoSuspRes__tests(void)
+void add_CF_DoSuspRes_Txn_tests(void)
 {
-    UtTest_Add(Test_CF_DoSuspRes__Asserts_t_Is_NULL, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_DoSuspRes__Asserts_t_Is_NULL");
-    UtTest_Add(Test_CF_DoSuspRes__Set_context_same_To_1_suspended_Eq_action, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_DoSuspRes__Set_context_same_To_1_suspended_Eq_action");
-    UtTest_Add(Test_CF_DoSuspRes__When_suspended_NotEqTo_action_Set_suspended_To_action, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_DoSuspRes__When_suspended_NotEqTo_action_Set_suspended_To_action");
-} /* end add_CF_DoSuspRes__tests */
+    UtTest_Add(Test_CF_DoSuspRes_Txn_Asserts_t_Is_NULL, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+               "Test_CF_DoSuspRes_Txn_Asserts_t_Is_NULL");
+    UtTest_Add(Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action, cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown, "Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action");
+    UtTest_Add(Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action, cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown, "Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action");
+} /* end add_CF_DoSuspRes_Txn_tests */
 
 void add_CF_DoSuspRes_tests(void)
 {
@@ -5127,11 +5127,11 @@ void add_CF_CmdResume_tests(void)
                cf_cmd_tests_Teardown, "Test_CF_CmdResume_Call_CF_DoSuspRes_WithGiven_msg_And_action_0");
 } /* end add_CF_CmdResume_tests */
 
-void add_CF_CmdCancel__tests(void)
+void add_CF_CmdCancel_Txn_tests(void)
 {
-    UtTest_Add(Test_CF_CmdCancel__Call_CF_CFDP_CancelTransaction_WithGiven_t, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_CmdCancel__Call_CF_CFDP_CancelTransaction_WithGiven_t");
-} /* end add_CF_CF_CmdCancel__tests */
+    UtTest_Add(Test_CF_CmdCancel_Txn_Call_CF_CFDP_CancelTransaction_WithGiven_t, cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown, "Test_CF_CmdCancel_Txn_Call_CF_CFDP_CancelTransaction_WithGiven_t");
+} /* end add_CF_CF_CmdCancel_Txn_tests */
 
 void add_CF_CmdCancel_tests(void)
 {
@@ -5139,17 +5139,17 @@ void add_CF_CmdCancel_tests(void)
                "Test_CF_CmdCancel_Call_CF_CmdCond_WithNotted_CF_TsnChanAction");
 } /* end add_CF_CmdCancel_tests */
 
-void add_CF_CmdAbandon__tests(void)
+void add_CF_CmdAbandon_Txn_tests(void)
 {
-    UtTest_Add(Test_CF_CmdAbandon__Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_CmdAbandon__Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0");
-} /* end add_CF_CmdAbandon__tests */
+    UtTest_Add(Test_CF_CmdAbandon_Txn_Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0, cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown, "Test_CF_CmdAbandon_Txn_Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0");
+} /* end add_CF_CmdAbandon_Txn_tests */
 
 void add_CF_CmdAbandon_tests(void)
 {
     UtTest_Add(Test_CF_CmdAbandon_Call_CF_CmdCond_WithNotted_CF_TsnChanAction, cf_cmd_tests_Setup,
                cf_cmd_tests_Teardown, "Test_CF_CmdAbandon_Call_CF_CmdCond_WithNotted_CF_TsnChanAction");
-} /* end add_CF_CmdAbandon__tests */
+} /* end add_CF_CmdAbandon_Txn_tests */
 
 void add_CF_DoEnableDisableDequeue_tests(void)
 {
@@ -5467,7 +5467,7 @@ void UtTest_Setup(void)
 
     add_CF_TsnChanAction_tests();
 
-    add_CF_DoSuspRes__tests();
+    add_CF_DoSuspRes_Txn_tests();
 
     add_CF_DoSuspRes_tests();
 
@@ -5475,11 +5475,11 @@ void UtTest_Setup(void)
 
     add_CF_CmdResume_tests();
 
-    add_CF_CmdCancel__tests();
+    add_CF_CmdCancel_Txn_tests();
 
     add_CF_CmdCancel_tests();
 
-    add_CF_CmdAbandon__tests();
+    add_CF_CmdAbandon_Txn_tests();
 
     add_CF_CmdAbandon_tests();
 

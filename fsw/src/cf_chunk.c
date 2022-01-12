@@ -88,7 +88,7 @@ void CF_Chunks_EraseChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t erase_index)
 *************************************************************************/
 void CF_Chunks_InsertChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t index_before, const CF_Chunk_t *chunk)
 {
-    CF_Assert(chunks->count < chunks->CF_max_chunks);
+    CF_Assert(chunks->count < chunks->max_chunks);
     CF_Assert(index_before <= chunks->count);
 
     if (chunks->count && (index_before != chunks->count))
@@ -155,7 +155,7 @@ CF_ChunkIdx_t CF_Chunks_FindInsertPosition(CF_ChunkList_t *chunks, const CF_Chun
 int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
     int ret = 0;
-    CF_Assert(i <= chunks->CF_max_chunks);
+    CF_Assert(i <= chunks->max_chunks);
 
     CF_ChunkOffset_t chunk_end = chunk->offset + chunk->size;
 
@@ -292,7 +292,7 @@ void CF_Chunks_Insert(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t 
         int combined = CF_Chunks_CombinePrevious(chunks, i, chunk);
         if (!combined)
         {
-            if (chunks->count < chunks->CF_max_chunks)
+            if (chunks->count < chunks->max_chunks)
             {
                 CF_Chunks_InsertChunk(chunks, i, chunk);
             }
@@ -395,11 +395,11 @@ const CF_Chunk_t *CF_ChunkList_GetFirstChunk(const CF_ChunkList_t *chunks)
 **       chunks must not be NULL. chunks_mem must not be NULL.
 **
 *************************************************************************/
-void CF_ChunkListInit(CF_ChunkList_t *chunks, CF_ChunkIdx_t CF_max_chunks, CF_Chunk_t *chunks_mem)
+void CF_ChunkListInit(CF_ChunkList_t *chunks, CF_ChunkIdx_t max_chunks, CF_Chunk_t *chunks_mem)
 {
-    CF_Assert(CF_max_chunks > 0);
-    chunks->CF_max_chunks = CF_max_chunks;
-    chunks->chunks        = chunks_mem;
+    CF_Assert(max_chunks > 0);
+    chunks->max_chunks = max_chunks;
+    chunks->chunks     = chunks_mem;
     CF_ChunkListReset(chunks);
 }
 
@@ -413,7 +413,7 @@ void CF_ChunkListInit(CF_ChunkList_t *chunks, CF_ChunkIdx_t CF_max_chunks, CF_Ch
 void CF_ChunkListReset(CF_ChunkList_t *chunks)
 {
     chunks->count = 0;
-    memset(chunks->chunks, 0, sizeof(*chunks->chunks) * chunks->CF_max_chunks);
+    memset(chunks->chunks, 0, sizeof(*chunks->chunks) * chunks->max_chunks);
 }
 
 /************************************************************************/

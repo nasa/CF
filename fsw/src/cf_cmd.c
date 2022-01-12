@@ -204,7 +204,7 @@ void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
 **  \endreturns
 **
 *************************************************************************/
-int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, chan_action_fn_t fn, void *context)
+int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_ChanActionFn_t fn, void *context)
 {
     int ret = 0;
 
@@ -244,7 +244,7 @@ int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, chan_action_fn_t
 **  \endreturns
 **
 *************************************************************************/
-int CF_DoFreezeThaw(uint8 chan_num, const bool_arg_t *context)
+int CF_DoFreezeThaw(uint8 chan_num, const CF_ChanAction_BoolArg_t *context)
 {
     /* no need to bounds check chan_num, done in caller */
     CF_AppData.hk.channel_hk[chan_num].frozen = context->barg;
@@ -260,8 +260,8 @@ int CF_DoFreezeThaw(uint8 chan_num, const bool_arg_t *context)
 *************************************************************************/
 void CF_CmdFreeze(CFE_SB_Buffer_t *msg)
 {
-    bool_arg_t barg = {1}; /* param is frozen, so 1 means freeze */
-    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "freeze", (chan_action_fn_t)CF_DoFreezeThaw, &barg));
+    CF_ChanAction_BoolArg_t barg = {1}; /* param is frozen, so 1 means freeze */
+    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "freeze", (CF_ChanActionFn_t)CF_DoFreezeThaw, &barg));
 }
 
 /************************************************************************/
@@ -273,8 +273,8 @@ void CF_CmdFreeze(CFE_SB_Buffer_t *msg)
 *************************************************************************/
 void CF_CmdThaw(CFE_SB_Buffer_t *msg)
 {
-    bool_arg_t barg = {0}; /* param is frozen, so 0 means thawed */
-    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "thaw", (chan_action_fn_t)CF_DoFreezeThaw, &barg));
+    CF_ChanAction_BoolArg_t barg = {0}; /* param is frozen, so 0 means thawed */
+    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "thaw", (CF_ChanActionFn_t)CF_DoFreezeThaw, &barg));
 }
 
 /************************************************************************/
@@ -374,7 +374,7 @@ int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAct
 **       t must not be NULL. context must not be NULL.
 **
 *************************************************************************/
-void CF_DoSuspRes_(CF_Transaction_t *t, susp_res_arg_t *context)
+void CF_DoSuspRes_Txn(CF_Transaction_t *t, CF_ChanAction_SuspResArg_t *context)
 {
     CF_Assert(t);
     if (t->flags.com.suspended == context->action)
@@ -401,9 +401,9 @@ void CF_DoSuspRes_(CF_Transaction_t *t, susp_res_arg_t *context)
 void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
 {
     /* ok to not bounds check action, because the caller is using it in two places with constant values 0 or 1 */
-    static const char *msgstr[] = {"resume", "suspend"};
-    susp_res_arg_t     args     = {0, action};
-    int                ret      = CF_TsnChanAction(cmd, msgstr[action], (CF_TsnChanAction_fn_t)CF_DoSuspRes_, &args);
+    static const char         *msgstr[] = {"resume", "suspend"};
+    CF_ChanAction_SuspResArg_t args     = {0, action};
+    int ret = CF_TsnChanAction(cmd, msgstr[action], (CF_TsnChanAction_fn_t)CF_DoSuspRes_Txn, &args);
 
     if (!ret && args.same)
     {
@@ -454,7 +454,7 @@ void CF_CmdResume(CFE_SB_Buffer_t *msg)
 **       t must not be NULL.
 **
 *************************************************************************/
-void CF_CmdCancel_(CF_Transaction_t *t, void *ignored)
+void CF_CmdCancel_Txn(CF_Transaction_t *t, void *ignored)
 {
     CF_CFDP_CancelTransaction(t);
 }
@@ -468,7 +468,7 @@ void CF_CmdCancel_(CF_Transaction_t *t, void *ignored)
 *************************************************************************/
 void CF_CmdCancel(CFE_SB_Buffer_t *msg)
 {
-    CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "cancel", CF_CmdCancel_, NULL));
+    CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "cancel", CF_CmdCancel_Txn, NULL));
 }
 
 /************************************************************************/
@@ -478,7 +478,7 @@ void CF_CmdCancel(CFE_SB_Buffer_t *msg)
 **       msg must not be NULL.
 **
 *************************************************************************/
-void CF_CmdAbandon_(CF_Transaction_t *t, void *ignored)
+void CF_CmdAbandon_Txn(CF_Transaction_t *t, void *ignored)
 {
     CF_CFDP_ResetTransaction(t, 0);
 }
@@ -492,7 +492,7 @@ void CF_CmdAbandon_(CF_Transaction_t *t, void *ignored)
 *************************************************************************/
 void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
 {
-    CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "abandon", CF_CmdAbandon_, NULL));
+    CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "abandon", CF_CmdAbandon_Txn, NULL));
 }
 
 /************************************************************************/
@@ -506,7 +506,7 @@ void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
 **  \endreturns
 **
 *************************************************************************/
-int CF_DoEnableDisableDequeue(uint8 chan_num, const bool_arg_t *context)
+int CF_DoEnableDisableDequeue(uint8 chan_num, const CF_ChanAction_BoolArg_t *context)
 {
     /* no need to bounds check chan_num, done in caller */
     CF_AppData.config_table->chan[chan_num].dequeue_enabled = context->barg;
@@ -522,8 +522,8 @@ int CF_DoEnableDisableDequeue(uint8 chan_num, const bool_arg_t *context)
 *************************************************************************/
 void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
 {
-    bool_arg_t barg = {1};
-    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "enable_dequeue", (chan_action_fn_t)CF_DoEnableDisableDequeue,
+    CF_ChanAction_BoolArg_t barg = {1};
+    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "enable_dequeue", (CF_ChanActionFn_t)CF_DoEnableDisableDequeue,
                                &barg));
 }
 
@@ -536,9 +536,9 @@ void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
 *************************************************************************/
 void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg)
 {
-    bool_arg_t barg = {0};
-    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "disable_dequeue", (chan_action_fn_t)CF_DoEnableDisableDequeue,
-                               &barg));
+    CF_ChanAction_BoolArg_t barg = {0};
+    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "disable_dequeue",
+                               (CF_ChanActionFn_t)CF_DoEnableDisableDequeue, &barg));
 }
 
 /************************************************************************/
@@ -548,7 +548,7 @@ void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg)
 **       context must not be NULL.
 **
 *************************************************************************/
-int CF_DoEnableDisablePolldir(uint8 chan_num, const bool_msg_arg_t *context)
+int CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolMsgArg_t *context)
 {
     int ret = 0;
     /* no need to bounds check chan_num, done in caller */
@@ -583,8 +583,8 @@ int CF_DoEnableDisablePolldir(uint8 chan_num, const bool_msg_arg_t *context)
 *************************************************************************/
 void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
 {
-    bool_msg_arg_t barg = {(CF_UnionArgsCmd_t *)msg, 1};
-    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "enable_polldir", (chan_action_fn_t)CF_DoEnableDisablePolldir,
+    CF_ChanAction_BoolMsgArg_t barg = {(CF_UnionArgsCmd_t *)msg, 1};
+    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "enable_polldir", (CF_ChanActionFn_t)CF_DoEnableDisablePolldir,
                                &barg));
 }
 
@@ -597,9 +597,9 @@ void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
 *************************************************************************/
 void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
 {
-    bool_msg_arg_t barg = {(CF_UnionArgsCmd_t *)msg, 0};
-    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "disable_polldir", (chan_action_fn_t)CF_DoEnableDisablePolldir,
-                               &barg));
+    CF_ChanAction_BoolMsgArg_t barg = {(CF_UnionArgsCmd_t *)msg, 0};
+    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "disable_polldir",
+                               (CF_ChanActionFn_t)CF_DoEnableDisablePolldir, &barg));
 }
 
 /************************************************************************/
@@ -698,7 +698,7 @@ int CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
 *************************************************************************/
 void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
 {
-    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "purge_queue", (chan_action_fn_t)CF_DoPurgeQueue, msg));
+    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "purge_queue", (CF_ChanActionFn_t)CF_DoPurgeQueue, msg));
 }
 
 /************************************************************************/

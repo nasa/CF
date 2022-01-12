@@ -16,13 +16,13 @@
  * Function: UT_AltHandler_CF_CList_Traverse_TRAV_ARG_T
  *
  * A handler for CF_CList_Traverse which saves its arguments
- * including the opaque context pointer as a trav_arg_t object.
+ * including the opaque context pointer as a CF_Traverse_WriteFileArg_t object.
  *
  *-----------------------------------------------------------------*/
 void UT_AltHandler_CF_CList_Traverse_TRAV_ARG_T(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
     CF_CList_Traverse_TRAV_ARG_T_context_t *ctxt;
-    trav_arg_t                             *arg = UT_Hook_GetArgValueByName(Context, "context", trav_arg_t *);
+    CF_Traverse_WriteFileArg_t *arg = UT_Hook_GetArgValueByName(Context, "context", CF_Traverse_WriteFileArg_t *);
 
     if (UserObj)
     {
@@ -51,14 +51,14 @@ void UT_AltHandler_CF_CList_Traverse_TRAV_ARG_T(void *UserObj, UT_EntryKey_t Fun
  * Function: UT_AltHandler_CF_CList_Traverse_TRAVERSE_ALL_ARGS_T
  *
  * A handler for CF_CList_Traverse which saves its arguments
- * including the opaque context pointer as a traverse_all_args_t object.
+ * including the opaque context pointer as a CF_TraverseAll_Arg_t object.
  *
  *-----------------------------------------------------------------*/
 void UT_AltHandler_CF_CList_Traverse_TRAVERSE_ALL_ARGS_T(void *UserObj, UT_EntryKey_t FuncKey,
                                                          const UT_StubContext_t *Context)
 {
     CF_CList_Traverse_TRAVERSE_ALL_ARGS_T_context_t *ctxt;
-    traverse_all_args_t *arg = UT_Hook_GetArgValueByName(Context, "context", traverse_all_args_t *);
+    CF_TraverseAll_Arg_t *arg = UT_Hook_GetArgValueByName(Context, "context", CF_TraverseAll_Arg_t *);
 
     if (UserObj)
     {
@@ -122,13 +122,13 @@ void UT_AltHandler_CF_CList_Traverse_POINTER(void *UserObj, UT_EntryKey_t FuncKe
  * Function: UT_AltHandler_CF_CList_Traverse_R_PRIO
  *
  * A handler for CF_CList_Traverse which saves its arguments
- * including the opaque context pointer as a priority_arg_t object.
+ * including the opaque context pointer as a CF_Traverse_PriorityArg_t object.
  *
  *-----------------------------------------------------------------*/
 void UT_AltHandler_CF_CList_Traverse_R_PRIO(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
     CF_CList_Traverse_R_context_t *ctxt;
-    priority_arg_t                *arg = UT_Hook_GetArgValueByName(Context, "context", priority_arg_t *);
+    CF_Traverse_PriorityArg_t     *arg = UT_Hook_GetArgValueByName(Context, "context", CF_Traverse_PriorityArg_t *);
 
     if (UserObj)
     {

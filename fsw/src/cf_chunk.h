@@ -45,7 +45,7 @@ typedef struct CF_Chunk
 typedef struct CF_ChunkList
 {
     CF_ChunkIdx_t count;
-    CF_ChunkIdx_t CF_max_chunks;
+    CF_ChunkIdx_t max_chunks;
     CF_Chunk_t   *chunks;
 } CF_ChunkList_t;
 
@@ -61,7 +61,7 @@ static inline CF_ChunkOffset_t CF_Chunk_MAX(CF_ChunkOffset_t a, CF_ChunkOffset_t
     }
 }
 
-void CF_ChunkListInit(CF_ChunkList_t *chunks, CF_ChunkIdx_t CF_max_chunks, CF_Chunk_t *chunks_mem);
+void CF_ChunkListInit(CF_ChunkList_t *chunks, CF_ChunkIdx_t max_chunks, CF_Chunk_t *chunks_mem);
 void CF_ChunkListAdd(CF_ChunkList_t *chunks, CF_ChunkOffset_t offset, CF_ChunkSize_t size);
 void CF_ChunkListReset(CF_ChunkList_t *chunks);
 /* CF_ChunkList_RemoveFromFirst -

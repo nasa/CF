@@ -29,19 +29,19 @@
 
 #include "cf_cfdp_types.h"
 
-typedef struct CF_CFDP_CycleTx_args_t
+typedef struct CF_CFDP_CycleTx_args
 {
     CF_Channel_t *c;
     int           ran_one;
 } CF_CFDP_CycleTx_args_t;
 
-typedef struct
+typedef struct CF_CFDP_Tick_args
 {
     CF_Channel_t *c;                       /* IN param */
     void (*fn)(CF_Transaction_t *, int *); /* IN param */
     int early_exit;                        /* OUT param */
     int cont;                              /* if 1, then re-traverse the list */
-} tick_args_t;
+} CF_CFDP_Tick_args_t;
 
 void CF_CFDP_EncodeStart(CF_EncoderState_t *penc, void *msgbuf, CF_Logical_PduBuffer_t *ph, size_t encap_hdr_size,
                          size_t total_size);
@@ -100,8 +100,6 @@ void CF_CFDP_InitTxnTxFile(CF_Transaction_t *t, CF_CFDP_Class_t cfdp_class, uint
 /* returns number of bytes copied, or -1 on error */
 extern int CF_CFDP_CopyStringFromLV(char *buf, size_t buf_maxsz, const CF_Logical_Lv_t *src_lv);
 
-extern const int CF_max_chunks[CF_Direction_NUM][CF_NUM_CHANNELS];
-
 extern void CF_CFDP_ArmAckTimer(CF_Transaction_t *t);
 
 void CF_CFDP_RecvDrop(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
@@ -110,7 +108,7 @@ void CF_CFDP_RecvIdle(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 int CF_CFDP_CloseFiles(CF_CListNode_t *n, void *context);
 
 void CF_CFDP_CycleTx(CF_Channel_t *c);
-int  CF_CFDP_CycleTx_(CF_CListNode_t *node, void *context);
+int  CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context);
 void CF_CFDP_TickTransactions(CF_Channel_t *c);
 void CF_CFDP_ProcessPlaybackDirectory(CF_Channel_t *c, CF_Playback_t *p);
 void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c);

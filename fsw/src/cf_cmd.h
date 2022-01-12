@@ -26,26 +26,26 @@
 #include "cf_app.h"
 #include "cf_utils.h"
 
-typedef int (*chan_action_fn_t)(uint8 chan_num, void *context);
+typedef int (*CF_ChanActionFn_t)(uint8 chan_num, void *context);
 
-typedef struct
+typedef struct CF_ChanAction_BoolArg
 {
-    uint8 barg;
-} bool_arg_t;
+    bool barg;
+} CF_ChanAction_BoolArg_t;
 
 typedef CF_TraverseAllTransactions_fn_t CF_TsnChanAction_fn_t;
 
-typedef struct
+typedef struct CF_ChanAction_SuspResArg
 {
-    int   same; /* out param -- indicates at least one action was set to its current value */
-    uint8 action;
-} susp_res_arg_t;
+    int  same; /* out param -- indicates at least one action was set to its current value */
+    bool action;
+} CF_ChanAction_SuspResArg_t;
 
-typedef struct
+typedef struct CF_ChanAction_BoolMsgArg
 {
     const CF_UnionArgsCmd_t *msg;
-    uint8                    barg;
-} bool_msg_arg_t;
+    bool                     barg;
+} CF_ChanAction_BoolMsgArg_t;
 
 /************************************************************************/
 /** \brief Increment the command accepted counter.
@@ -88,24 +88,24 @@ void              CF_CmdNoop(CFE_SB_Buffer_t *msg);
 void              CF_CmdReset(CFE_SB_Buffer_t *msg);
 void              CF_CmdTxFile(CFE_SB_Buffer_t *msg);
 void              CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg);
-int               CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, chan_action_fn_t fn, void *context);
-int               CF_DoFreezeThaw(uint8 chan_num, const bool_arg_t *context);
+int               CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_ChanActionFn_t fn, void *context);
+int               CF_DoFreezeThaw(uint8 chan_num, const CF_ChanAction_BoolArg_t *context);
 void              CF_CmdFreeze(CFE_SB_Buffer_t *msg);
 void              CF_CmdThaw(CFE_SB_Buffer_t *msg);
 CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSeq_t ts, CF_EntityId_t eid);
 int  CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context);
-void CF_DoSuspRes_(CF_Transaction_t *t, susp_res_arg_t *context);
+void CF_DoSuspRes_Txn(CF_Transaction_t *t, CF_ChanAction_SuspResArg_t *context);
 void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action);
 void CF_CmdSuspend(CFE_SB_Buffer_t *msg);
 void CF_CmdResume(CFE_SB_Buffer_t *msg);
-void CF_CmdCancel_(CF_Transaction_t *t, void *ignored);
+void CF_CmdCancel_Txn(CF_Transaction_t *t, void *ignored);
 void CF_CmdCancel(CFE_SB_Buffer_t *msg);
-void CF_CmdAbandon_(CF_Transaction_t *t, void *ignored);
+void CF_CmdAbandon_Txn(CF_Transaction_t *t, void *ignored);
 void CF_CmdAbandon(CFE_SB_Buffer_t *msg);
-int  CF_DoEnableDisableDequeue(uint8 chan_num, const bool_arg_t *context);
+int  CF_DoEnableDisableDequeue(uint8 chan_num, const CF_ChanAction_BoolArg_t *context);
 void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg);
 void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg);
-int  CF_DoEnableDisablePolldir(uint8 chan_num, const bool_msg_arg_t *context);
+int  CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolMsgArg_t *context);
 void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg);
 void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg);
 int  CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c);

@@ -31,34 +31,34 @@
 #include "cf_app.h"
 #include "cf_assert.h"
 
-typedef struct trans_seq_arg_t
+typedef struct CF_Traverse_TransSeqArg
 {
     CF_TransactionSeq_t transaction_sequence_number;
     CF_EntityId_t       src_eid;
     CF_Transaction_t   *t; /* out param */
-} trans_seq_arg_t;
+} CF_Traverse_TransSeqArg_t;
 
-typedef struct
+typedef struct CF_Traverse_WriteFileArg
 {
     osal_id_t fd;
     int32     result;
     int32     counter;
-} trav_arg_t;
+} CF_Traverse_WriteFileArg_t;
 
 typedef void (*CF_TraverseAllTransactions_fn_t)(CF_Transaction_t *t, void *context);
 
-typedef struct
+typedef struct CF_TraverseAll_Arg
 {
     CF_TraverseAllTransactions_fn_t fn;
     void                           *context;
     int                             counter;
-} traverse_all_args_t;
+} CF_TraverseAll_Arg_t;
 
-typedef struct priority_arg_t
+typedef struct CF_Traverse_PriorityArg
 {
     CF_Transaction_t *t;        /* OUT: holds value of transaction with which to call CF_CList_InsertAfter on */
     uint8             priority; /* seeking this priority */
-} priority_arg_t;
+} CF_Traverse_PriorityArg_t;
 
 /* free a transaction from the queue it's on.
  * NOTE: this leaves the transaction in a bad state,
@@ -162,7 +162,7 @@ void CF_FreeTransaction(CF_Transaction_t *t);
 CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_TransactionSeq_t transaction_sequence_number,
                                                      CF_EntityId_t src_eid);
 
-int CF_FindTransactionBySequenceNumber_(CF_CListNode_t *n, trans_seq_arg_t *context);
+int CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Traverse_TransSeqArg_t *context);
 
 int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q);
 int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t dir);
@@ -173,9 +173,9 @@ void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q);
 int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context);
 int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context);
 
-int CF_TraverseAllTransactions_(CF_CListNode_t *n, traverse_all_args_t *args);
-int CF_TraverseHistory(CF_CListNode_t *n, trav_arg_t *context);
-int CF_TraverseTransactions(CF_CListNode_t *n, trav_arg_t *context);
+int CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *args);
+int CF_TraverseHistory(CF_CListNode_t *n, CF_Traverse_WriteFileArg_t *context);
+int CF_TraverseTransactions(CF_CListNode_t *n, CF_Traverse_WriteFileArg_t *context);
 
 int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q);
 int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t dir);

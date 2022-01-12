@@ -848,10 +848,10 @@ void Test_CF_CFDP_R_SubstateSendNak(void)
     /* this requires the chunks list to be set up, and by default compute_gaps will
        return 0 (no gaps) so the transaction goes to complete */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, &t, NULL);
-    t->flags.rx.md_recv         = true;
-    t->chunks                   = &chunks;
-    chunks.chunks.count         = 1;
-    chunks.chunks.CF_max_chunks = 2;
+    t->flags.rx.md_recv      = true;
+    t->chunks                = &chunks;
+    chunks.chunks.count      = 1;
+    chunks.chunks.max_chunks = 2;
     UtAssert_INT32_EQ(CF_CFDP_R_SubstateSendNak(t), 0);
     UtAssert_STUB_COUNT(CF_ChunkList_ComputeGaps, 1);
     UtAssert_STUB_COUNT(CF_CFDP_SendNak, 2); /* did not increment */
@@ -861,10 +861,10 @@ void Test_CF_CFDP_R_SubstateSendNak(void)
     /* this also should use the max chunks instead of count */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, &t, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_ChunkList_ComputeGaps), 1, 1);
-    t->flags.rx.md_recv         = true;
-    t->chunks                   = &chunks;
-    chunks.chunks.count         = 3;
-    chunks.chunks.CF_max_chunks = 2;
+    t->flags.rx.md_recv      = true;
+    t->chunks                = &chunks;
+    chunks.chunks.count      = 3;
+    chunks.chunks.max_chunks = 2;
     UtAssert_INT32_EQ(CF_CFDP_R_SubstateSendNak(t), 0);
     UtAssert_STUB_COUNT(CF_CFDP_SendNak, 3);
     UtAssert_BOOL_TRUE(t->flags.rx.fd_nak_sent);

@@ -54,10 +54,10 @@ void CF_ChunkListAdd(CF_ChunkList_t *chunks, CF_ChunkOffset_t offset, CF_ChunkSi
  * Generated stub function for CF_ChunkListInit()
  * ----------------------------------------------------
  */
-void CF_ChunkListInit(CF_ChunkList_t *chunks, CF_ChunkIdx_t CF_max_chunks, CF_Chunk_t *chunks_mem)
+void CF_ChunkListInit(CF_ChunkList_t *chunks, CF_ChunkIdx_t max_chunks, CF_Chunk_t *chunks_mem)
 {
     UT_GenStub_AddParam(CF_ChunkListInit, CF_ChunkList_t *, chunks);
-    UT_GenStub_AddParam(CF_ChunkListInit, CF_ChunkIdx_t, CF_max_chunks);
+    UT_GenStub_AddParam(CF_ChunkListInit, CF_ChunkIdx_t, max_chunks);
     UT_GenStub_AddParam(CF_ChunkListInit, CF_Chunk_t *, chunks_mem);
 
     UT_GenStub_Execute(CF_ChunkListInit, Basic, NULL);

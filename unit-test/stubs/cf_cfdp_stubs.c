@@ -160,19 +160,19 @@ void CF_CFDP_CycleTx(CF_Channel_t *c)
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_CycleTx_()
+ * Generated stub function for CF_CFDP_CycleTxFirstActive()
  * ----------------------------------------------------
  */
-int CF_CFDP_CycleTx_(CF_CListNode_t *node, void *context)
+int CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_CycleTx_, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_CycleTxFirstActive, int);
 
-    UT_GenStub_AddParam(CF_CFDP_CycleTx_, CF_CListNode_t *, node);
-    UT_GenStub_AddParam(CF_CFDP_CycleTx_, void *, context);
+    UT_GenStub_AddParam(CF_CFDP_CycleTxFirstActive, CF_CListNode_t *, node);
+    UT_GenStub_AddParam(CF_CFDP_CycleTxFirstActive, void *, context);
 
-    UT_GenStub_Execute(CF_CFDP_CycleTx_, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_CycleTxFirstActive, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_CycleTx_, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_CycleTxFirstActive, int);
 }
 
 /*
