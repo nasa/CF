@@ -41,7 +41,6 @@
 
 #include "common_types.h"
 #include "cf_platform_cfg.h"
-#include "cf_field.h"
 #include "cf_platform_cfg.h"
 
 #include <stddef.h>
@@ -145,22 +144,6 @@ typedef struct CF_CFDP_PduHeader
     /* variable-length data goes here - it is at least 3 additional bytes */
 
 } CF_CFDP_PduHeader_t;
-
-/*
- * Fields within the "flags" byte of the PDU header
- */
-DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_VERSION, 3, 5)
-DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_TYPE, 1, 4)
-DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_DIR, 1, 3)
-DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_MODE, 1, 2)
-DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_CRC, 1, 1)
-DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_LARGEFILE, 1, 0)
-
-/*
- * Fields within the "eid_tsn_lengths" byte of the PDU header
- */
-DECLARE_FIELD(CF_CFDP_PduHeader_LENGTHS_ENTITY, 3, 4)
-DECLARE_FIELD(CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE, 3, 0)
 
 /**
  * @brief Structure representing CFDP File Directive Header
@@ -336,11 +319,6 @@ typedef struct CF_CFDP_PduEof
 
 } CF_CFDP_PduEof_t;
 
-/*
- * Position of the condition code value within the CC field
- */
-DECLARE_FIELD(CF_CFDP_PduEof_FLAGS_CC, 4, 4)
-
 /**
  * @brief Structure representing CFDP Finished PDU
  *
@@ -352,13 +330,6 @@ typedef struct CF_CFDP_PduFin
 
 } CF_CFDP_PduFin_t;
 
-/*
- * Position of the sub-field values within the flags field
- */
-DECLARE_FIELD(CF_CFDP_PduFin_FLAGS_CC, 4, 4)
-DECLARE_FIELD(CF_CFDP_PduFin_FLAGS_DELIVERY_CODE, 1, 2)
-DECLARE_FIELD(CF_CFDP_PduFin_FLAGS_FILE_STATUS, 2, 0)
-
 /**
  * @brief Structure representing CFDP Acknowledge PDU
  *
@@ -369,15 +340,6 @@ typedef struct CF_CFDP_PduAck
     CF_CFDP_uint8_t directive_and_subtype_code;
     CF_CFDP_uint8_t cc_and_transaction_status;
 } CF_CFDP_PduAck_t;
-
-/*
- * Position of the sub-field values within the directive_and_subtype_code
- * and cc_and_transaction_status fields within the ACK PDU.
- */
-DECLARE_FIELD(CF_CFDP_PduAck_DIR_CODE, 4, 4)
-DECLARE_FIELD(CF_CFDP_PduAck_DIR_SUBTYPE_CODE, 4, 0)
-DECLARE_FIELD(CF_CFDP_PduAck_CC, 4, 4)
-DECLARE_FIELD(CF_CFDP_PduAck_TRANSACTION_STATUS, 2, 0)
 
 /**
  * @brief Structure representing CFDP Segment Request
@@ -414,13 +376,6 @@ typedef struct CF_CFDP_PduMd
 
 } CF_CFDP_PduMd_t;
 
-/*
- * Position of the sub-field values within the directive_and_subtype_code
- * and cc_and_transaction_status fields within the ACK PDU.
- */
-DECLARE_FIELD(CF_CFDP_PduMd_CLOSURE_REQUESTED, 1, 7)
-DECLARE_FIELD(CF_CFDP_PduMd_CHECKSUM_TYPE, 4, 0)
-
 typedef struct CF_CFDP_PduFileDataHeader
 {
     /*
@@ -430,14 +385,6 @@ typedef struct CF_CFDP_PduFileDataHeader
      */
     CF_CFDP_uint32_t offset;
 } CF_CFDP_PduFileDataHeader_t;
-
-/*
- * Position of the optional sub-field values within the file data PDU header
- * These are present only if the "segment metadata" flag in the common header
- * is set to 1.
- */
-DECLARE_FIELD(CF_CFDP_PduFileData_RECORD_CONTINUATION_STATE, 2, 6)
-DECLARE_FIELD(CF_CFDP_PduFileData_SEGMENT_METADATA_LENGTH, 6, 0)
 
 /*
  * To serve as a sanity check, this should accommodate the largest data block possible.
