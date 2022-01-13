@@ -979,14 +979,10 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
             {
                 *((uint16 *)item.ptr) = value;
             }
-            else if (item.size == sizeof(uint8))
-            {
-                *((uint8 *)item.ptr) = value;
-            }
             else
             {
-                /* unimplemented store; this is a SW configuration error! */
-                acc = 1;
+                /* uint8 is the only other option */
+                *((uint8 *)item.ptr) = value;
             }
         }
     }
@@ -1003,13 +999,10 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
         {
             value = *((const uint16 *)item.ptr);
         }
-        else if (item.size == sizeof(uint8))
-        {
-            value = *((const uint8 *)item.ptr);
-        }
         else
         {
-            acc = 1;
+            /* uint8 is the only other option */
+            value = *((const uint8 *)item.ptr);
         }
 
         CFE_EVS_SendEvent(CF_EID_INF_CMD_GETSET2, CFE_EVS_EventType_INFORMATION, "CF: parameter id %d = %lu", param_id,

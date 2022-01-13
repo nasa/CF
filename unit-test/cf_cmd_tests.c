@@ -4157,276 +4157,71 @@ void Test_CF_CmdValidateMaxOutgoing_WhenGiven_val_Is_0_And_sem_name_Is_NULL_Retu
 **
 *******************************************************************************/
 
-void Test_CF_CmdGetSetParam_When_param_id_Eq_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd(void)
+void Test_CF_CmdGetSetParam(void)
 {
+    /* Test cases for:
+     * void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num);
+     */
+
     /* Arrange */
-    CF_ConfigTable_t dummy_config_table;
-    uint8            arg_is_set   = Any_uint8();
-    uint8            arg_param_id = CF_GetSet_ValueID_MAX;
-    uint32           arg_value    = Any_uint32();
-    uint8            arg_chan_num = Any_uint8();
+    CF_ConfigTable_t    ut_config_table;
+    CF_GetSet_ValueID_t param_id;
+    uint16              expected_count;
 
-    CF_AppData.config_table = &dummy_config_table;
+    memset(&ut_config_table, 0, sizeof(ut_config_table));
+    memset(&CF_AppData.hk.counters, 0, sizeof(CF_AppData.hk.counters));
+    CF_AppData.config_table = &ut_config_table;
+    expected_count          = 0;
 
+    /* Nominal: "set" for each parameter */
+    for (param_id = 0; param_id < CF_GetSet_ValueID_MAX; ++param_id)
+    {
+        UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+        UtAssert_VOIDCALL(CF_CmdGetSetParam(1, param_id, 1 + param_id, UT_CFDP_CHANNEL));
+        UT_CF_AssertEventID(CF_EID_INF_CMD_GETSET1);
+        UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, ++expected_count);
+    }
+
+    /* each of the config parameters should have actually been set to a different value */
+    UtAssert_UINT32_EQ(ut_config_table.ticks_per_second, 1);
+    UtAssert_UINT32_EQ(ut_config_table.rx_crc_calc_bytes_per_wakeup, 2);
+    UtAssert_UINT32_EQ(ut_config_table.ack_timer_s, 3);
+    UtAssert_UINT32_EQ(ut_config_table.nak_timer_s, 4);
+    UtAssert_UINT32_EQ(ut_config_table.inactivity_timer_s, 5);
+    UtAssert_UINT32_EQ(ut_config_table.outgoing_file_chunk_size, 6);
+    UtAssert_UINT32_EQ(ut_config_table.ack_limit, 7);
+    UtAssert_UINT32_EQ(ut_config_table.nak_limit, 8);
+    UtAssert_UINT32_EQ(ut_config_table.local_eid, 9);
+    UtAssert_UINT32_EQ(ut_config_table.chan[UT_CFDP_CHANNEL].max_outgoing_messages_per_wakeup, 10);
+
+    /* Nominal: "get" for each parameter */
+    for (param_id = 0; param_id < CF_GetSet_ValueID_MAX; ++param_id)
+    {
+        UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+        UtAssert_VOIDCALL(CF_CmdGetSetParam(0, param_id, 1, UT_CFDP_CHANNEL));
+        UT_CF_AssertEventID(CF_EID_INF_CMD_GETSET2);
+        UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, ++expected_count);
+    }
+
+    /* Bad param ID */
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
-
-    /* Act */
-    CF_CmdGetSetParam(arg_is_set, arg_param_id, arg_value, arg_chan_num);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
+    UtAssert_VOIDCALL(CF_CmdGetSetParam(0, CF_GetSet_ValueID_MAX, 0, UT_CFDP_CHANNEL));
     UT_CF_AssertEventID(CF_EID_ERR_CMD_GETSET_PARAM);
-    /* Assert for CF_CmdRej */
-    UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
-                  "CF_AppData.hk.counters.err is %d and should be 1 more than %d", CF_AppData.hk.counters.err,
-                  initial_hk_err_counter);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 
-} /* end Test_CF_CmdGetSetParam_When_param_id_Eq_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd */
-
-void Test_CF_CmdGetSetParam_When_param_id_AnyGreaterThan_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd(void)
-{
-    /* Arrange */
-    CF_ConfigTable_t dummy_config_table;
-    uint8            arg_is_set   = Any_uint8();
-    uint8            arg_param_id = Any_uint8_GreaterThan(CF_GetSet_ValueID_MAX);
-    uint32           arg_value    = Any_uint32();
-    uint8            arg_chan_num = Any_uint8();
-
-    CF_AppData.config_table = &dummy_config_table;
-
+    /* Bad channel ID */
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
-
-    /* Act */
-    CF_CmdGetSetParam(arg_is_set, arg_param_id, arg_value, arg_chan_num);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_GETSET_PARAM);
-    /* Assert for CF_CmdRej */
-    UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
-                  "CF_AppData.hk.counters.err is %u and should be 1 more than %u", CF_AppData.hk.counters.err,
-                  initial_hk_err_counter);
-
-} /* end Test_CF_CmdGetSetParam_When_param_id_AnyGreaterThan_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd */
-
-void Test_CF_CmdGetSetParam_Given_chan_num_IsEqTo_CF_NUM_CHANNELS_ErrorOutAndCountError(void)
-{
-    /* Arrange */
-    CF_ConfigTable_t dummy_config_table;
-    uint8            arg_is_set   = Any_uint8();
-    uint8            arg_param_id = Any_uint8_LessThan(CF_GetSet_ValueID_MAX);
-    uint32           arg_value    = Any_uint32();
-    uint8            arg_chan_num = CF_NUM_CHANNELS;
-
-    CF_AppData.config_table = &dummy_config_table;
-
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
-
-    /* Act */
-    CF_CmdGetSetParam(arg_is_set, arg_param_id, arg_value, arg_chan_num);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
+    UtAssert_VOIDCALL(CF_CmdGetSetParam(0, 0, 0, CF_NUM_CHANNELS + 1));
     UT_CF_AssertEventID(CF_EID_ERR_CMD_GETSET_CHAN);
-    /* Assert for CF_CmdRej */
-    UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
-                  "CF_AppData.hk.counters.err is %u and should be 1 more than %u", CF_AppData.hk.counters.err,
-                  initial_hk_err_counter);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 2);
 
-} /* end Test_CF_CmdGetSetParam_Given_chan_num_IsEqTo_CF_NUM_CHANNELS_ErrorOutAndCountError */
-
-void Test_CF_CmdGetSetParam_Given_chan_num_IsGreaterThan_CF_NUM_CHANNELS_ErrorOutAndCountError(void)
-{
-    /* Arrange */
-    CF_ConfigTable_t dummy_config_table;
-    uint8            arg_is_set   = Any_uint8();
-    uint8            arg_param_id = Any_uint8_LessThan(CF_GetSet_ValueID_MAX);
-    uint32           arg_value    = Any_uint32();
-    uint8            arg_chan_num = Any_uint8_GreaterThan(CF_NUM_CHANNELS);
-
-    CF_AppData.config_table = &dummy_config_table;
-
+    /* Validation fail */
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
-
-    /* Act */
-    CF_CmdGetSetParam(arg_is_set, arg_param_id, arg_value, arg_chan_num);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_GETSET_CHAN);
-    /* Assert for CF_CmdRej */
-    UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
-                  "CF_AppData.hk.counters.err is %u and should be 1 more than %u", CF_AppData.hk.counters.err,
-                  initial_hk_err_counter);
-
-} /* end Test_CF_CmdGetSetParam_Given_chan_num_IsGreaterThan_CF_NUM_CHANNELS_ErrorOutAndCountError */
-
-void Test_CF_CmdGetSetParam_When_is_set_Is_0_And_param_id_Is_0_MemCopySendEventAndAcceptCommand(void)
-{
-    /* Arrange */
-    CF_ConfigTable_t dummy_config_table;
-    uint8            arg_is_set   = 0;
-    uint8            arg_param_id = 0;
-    uint32           arg_value    = Any_uint32();
-    uint8            arg_chan_num = Any_cf_chan_num();
-
-    CF_AppData.config_table = &dummy_config_table;
-
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange unstubbable: CF_CmdAcc */
-    uint16 initial_hk_cmd_counter = Any_uint16();
-
-    CF_AppData.hk.counters.cmd = initial_hk_cmd_counter;
-
-    /* Act */
-    CF_CmdGetSetParam(arg_is_set, arg_param_id, arg_value, arg_chan_num);
-
-    /* Assert */
-    /* TODO: CANNOT test memcpy because copies it to a local value (the arg value, but it was not passed by ref) and
-     * then only used in the SendEvent function which does not track that value as of the writing of this comment. */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_GETSET2);
-    /* Assert for CF_CmdAcc() */
-    UtAssert_True(CF_AppData.hk.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
-                  "CF_AppData.hk.counters.cmd is %d and should be 1 more than %d", CF_AppData.hk.counters.cmd,
-                  initial_hk_cmd_counter);
-
-} /* end Test_CF_CmdGetSetParam_When_is_set_Is_0_And_param_id_Is_0_MemCopySendEventAndAcceptCommand */
-
-void Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_0_HasANull_fn_ThenCopy_value_To_ptr_SendEventAndAcceptCommand(
-    void)
-{
-    /* Arrange */
-    CF_ConfigTable_t dummy_config_table;
-    uint8            arg_is_set   = 1;
-    uint8            arg_param_id = 0;
-    uint32           arg_value    = Any_uint32();
-    uint8            arg_chan_num = Any_cf_chan_num();
-
-    CF_AppData.config_table = &dummy_config_table;
-
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange unstubbable: CF_CmdAcc */
-    uint16 initial_hk_cmd_counter = Any_uint16();
-
-    CF_AppData.hk.counters.cmd = initial_hk_cmd_counter;
-
-    /* Act */
-    CF_CmdGetSetParam(arg_is_set, arg_param_id, arg_value, arg_chan_num);
-
-    /* Assert */
-    UtAssert_True(CF_AppData.config_table->ticks_per_second == arg_value,
-                  "ticks_per_second is %u and should be %u (value)", CF_AppData.config_table->ticks_per_second,
-                  arg_value);
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_GETSET1);
-    /* Assert for CF_CmdAcc() */
-    UtAssert_True(CF_AppData.hk.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
-                  "CF_AppData.hk.counters.cmd is %d and should be 1 more than %d", CF_AppData.hk.counters.cmd,
-                  initial_hk_cmd_counter);
-
-} /* end
-     Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_0_HasANull_fn_ThenCopy_value_To_ptr_SendEventAndAcceptCommand
-   */
-
-/* TODO: Add randomized test that will check any SPTR value, but that will take extra time for now. */
-
-void Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_5_Uses_SPTRFN_SendEventBecause_fn_Returned_1_AndRejectCommand(
-    void)
-{
-    /* Arrange */
-    CF_ConfigTable_t dummy_config_table;
-    uint8            arg_is_set   = 1;
-    uint8            arg_param_id = 5;
-    uint32           arg_value    = Any_uint32_GreaterThan(sizeof(
-        CF_CFDP_PduFileDataContent_t)); /* Arrange unstubbable: CF_CmdValidateChunkSize - specific value needed */
-    uint8            arg_chan_num = Any_cf_chan_num();
-
-    CF_AppData.config_table = &dummy_config_table;
-
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
-
-    /* Act */
-    CF_CmdGetSetParam(arg_is_set, arg_param_id, arg_value, arg_chan_num);
-
-    /* Assert */
-    /* TODO: CANNOT test memcpy because copies it to a local value (the arg value, but it was not passed by ref) and
-     * then only used in the SendEvent function which does not track that value as of the writing of this comment. */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
+    UtAssert_VOIDCALL(CF_CmdGetSetParam(1, CF_GetSet_ValueID_outgoing_file_chunk_size,
+                                        100 + sizeof(CF_CFDP_PduFileDataContent_t), UT_CFDP_CHANNEL));
     UT_CF_AssertEventID(CF_EID_ERR_CMD_GETSET_VALIDATE);
-    /* Assert for CF_CmdRej */
-    UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
-                  "CF_AppData.hk.counters.err is %u and should be 1 more than %u", CF_AppData.hk.counters.err,
-                  initial_hk_err_counter);
-
-} /* end
-     Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_5_Uses_SPTRFN_SendEventBecause_fn_Returned_1_AndRejectCommand
-   */
-
-void Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_5_Uses_SPTRFN_ThenCopy_value_To_ptr_Because_fn_Returned_0_SendEventAndAcceptCommand(
-    void)
-{
-    /* Arrange */
-    CF_ConfigTable_t dummy_config_table;
-    uint8            arg_is_set   = 1;
-    uint8            arg_param_id = 5;
-    uint32           arg_value    = Any_uint32_LessThan_or_EqualTo(sizeof(
-        CF_CFDP_PduFileDataContent_t)); /* Arrange unstubbable: CF_CmdValidateChunkSize - specific value needed */
-    uint8            arg_chan_num = Any_cf_chan_num();
-
-    CF_AppData.config_table = &dummy_config_table;
-
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange unstubbable: CF_CmdAcc */
-    uint16 initial_hk_cmd_counter = Any_uint16();
-
-    CF_AppData.hk.counters.cmd = initial_hk_cmd_counter;
-
-    /* Act */
-    CF_CmdGetSetParam(arg_is_set, arg_param_id, arg_value, arg_chan_num);
-
-    /* Assert */
-    UtAssert_True(CF_AppData.config_table->outgoing_file_chunk_size == arg_value,
-                  "outgoing_file_chunk_size is %u and should be %u (value)",
-                  CF_AppData.config_table->outgoing_file_chunk_size, arg_value);
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_GETSET1);
-    /* Assert for CF_CmdAcc() */
-    UtAssert_True(CF_AppData.hk.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
-                  "CF_AppData.hk.counters.cmd is %d and should be 1 more than %d", CF_AppData.hk.counters.cmd,
-                  initial_hk_cmd_counter);
-
-} /* end
-     Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_5_Uses_SPTRFN_ThenCopy_value_To_ptr_Because_fn_Returned_0_SendEventAndAcceptCommand
-   */
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 3);
+}
 
 /* end CF_CmdGetSetParam tests */
 
@@ -5344,36 +5139,7 @@ void add_CF_CmdValidateMaxOutgoing_tests(void)
 
 void add_CF_CmdGetSetParam_tests(void)
 {
-    UtTest_Add(Test_CF_CmdGetSetParam_When_param_id_Eq_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_CmdGetSetParam_When_param_id_Eq_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd");
-    UtTest_Add(Test_CF_CmdGetSetParam_When_param_id_AnyGreaterThan_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_CmdGetSetParam_When_param_id_AnyGreaterThan_CF_GetSet_ValueID_MAX_FailSendEventAndRejectCmd");
-    UtTest_Add(Test_CF_CmdGetSetParam_Given_chan_num_IsEqTo_CF_NUM_CHANNELS_ErrorOutAndCountError, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown,
-               "Test_CF_CmdGetSetParam_Given_chan_num_IsEqTo_CF_NUM_CHANNELS_ErrorOutAndCountError");
-    UtTest_Add(Test_CF_CmdGetSetParam_Given_chan_num_IsGreaterThan_CF_NUM_CHANNELS_ErrorOutAndCountError,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_CmdGetSetParam_Given_chan_num_IsGreaterThan_CF_NUM_CHANNELS_ErrorOutAndCountError");
-    UtTest_Add(Test_CF_CmdGetSetParam_When_is_set_Is_0_And_param_id_Is_0_MemCopySendEventAndAcceptCommand,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_CmdGetSetParam_When_is_set_Is_0_And_param_id_Is_0_MemCopySendEventAndAcceptCommand");
-    UtTest_Add(
-        Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_0_HasANull_fn_ThenCopy_value_To_ptr_SendEventAndAcceptCommand,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-        "Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_0_HasANull_fn_ThenCopy_value_To_ptr_"
-        "SendEventAndAcceptCommand");
-    UtTest_Add(
-        Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_5_Uses_SPTRFN_SendEventBecause_fn_Returned_1_AndRejectCommand,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-        "Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_5_Uses_SPTRFN_SendEventBecause_fn_Returned_1_"
-        "AndRejectCommand");
-    UtTest_Add(
-        Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_5_Uses_SPTRFN_ThenCopy_value_To_ptr_Because_fn_Returned_0_SendEventAndAcceptCommand,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-        "Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_5_Uses_SPTRFN_ThenCopy_value_To_ptr_Because_fn_"
-        "Returned_0_SendEventAndAcceptCommand");
+    UtTest_Add(Test_CF_CmdGetSetParam, cf_cmd_tests_Setup, cf_cmd_tests_Teardown, "CF_CmdGetSetParam");
 } /* end add_CF_CmdGetSetParam_tests */
 
 void add_CF_CmdSetParam_tests(void)
