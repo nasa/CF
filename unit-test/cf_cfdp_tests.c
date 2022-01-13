@@ -255,6 +255,12 @@ void Test_CF_CFDP_RecvPh(void)
     CF_CODEC_SET_DONE(ph->pdec);
     UtAssert_INT32_EQ(CF_CFDP_RecvPh(UT_CFDP_CHANNEL, ph), -1);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_SHORT_HEADER);
+
+    /* decode error, large file bit set */
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, NULL, NULL);
+    ph->pdu_header.large_flag = true;
+    UtAssert_INT32_EQ(CF_CFDP_RecvPh(UT_CFDP_CHANNEL, ph), -1);
+    UT_CF_AssertEventID(CF_EID_ERR_PDU_LARGE_FILE);
 }
 
 void Test_CF_CFDP_RecvMd(void)

@@ -632,6 +632,19 @@ int CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
 
     CF_CFDP_DecodeHeader(ph->pdec, &ph->pdu_header);
 
+    /*
+     * The "large file" flag is not supported by this implementation yet.
+     * This means file sizes and offsets will be 64 bits, so codec routines
+     * will need to be updated to understand this.  OSAL also doesn't support
+     * 64-bit file access yet.
+     */
+    if (CF_CODEC_IS_OK(ph->pdec) && ph->pdu_header.large_flag)
+    {
+        CFE_EVS_SendEvent(CF_EID_ERR_PDU_LARGE_FILE, CFE_EVS_EventType_ERROR,
+                          "CF: pdu with large file bit received (unsupported)");
+        goto err_out;
+    }
+
     if (CF_CODEC_IS_OK(ph->pdec) && ph->pdu_header.pdu_type == 0)
     {
         CF_CFDP_DecodeFileDirectiveHeader(ph->pdec, &ph->fdirective);
