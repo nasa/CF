@@ -777,6 +777,15 @@ void Test_CF_CFDP_S2_Nak(void)
     UtAssert_VOIDCALL(CF_CFDP_S2_Nak(t, ph));
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[t->chan_num].counters.recv.nak_segment_requests, 6);
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_S_INVALID_SR);
+
+    /* bad decode */
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
+    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvNak), 1, -1);
+    nak                            = &ph->int_header.nak;
+    nak->segment_list.num_segments = 1;
+    UtAssert_VOIDCALL(CF_CFDP_S2_Nak(t, ph));
+    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error, 2);
+    UT_CF_AssertEventID(CF_EID_ERR_CFDP_S_PDU_NAK);
 }
 
 void Test_CF_CFDP_S2_Nak_Arm(void)
