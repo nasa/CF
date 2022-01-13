@@ -39,7 +39,7 @@ CF_ConfigTable_t CF_config_table = {
          0x08c2,
          16,
          {{5, 25, CF_CFDP_CLASS_2, 23, "/cf/poll_dir", "./poll_dir", 0}, {0}, {0}, {0}, {0}},
-         "cf_1_sem",
+         "", /* throttle sem for channel 1, empty string means no throttle */
          1,
      },
      {5, /* max number of outgoing messages per wakeup */
@@ -48,7 +48,7 @@ CF_ConfigTable_t CF_config_table = {
       0x08c3,
       16,
       {{0}, {0}, {0}, {0}, {0}},
-      "cf_2_sem",
+      "", /* throttle sem for channel 2, empty string means no throttle */
       1}},
     3,   /* ack timer */
     3,   /* nak timer */
