@@ -179,7 +179,7 @@ typedef struct
 {
     CF_CListNode_t *start;
     CF_CListFn_t    fn;
-    int32           context_fd;
+    osal_id_t       context_fd;
     int32           context_result;
     int32           context_counter;
 } CF_CList_Traverse_TRAV_ARG_T_context_t;
