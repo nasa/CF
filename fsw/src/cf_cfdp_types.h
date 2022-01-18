@@ -171,7 +171,7 @@ typedef struct CF_ChunkWrapper
  */
 typedef struct CF_Playback
 {
-    uint32            dir_id;
+    osal_id_t         dir_id;
     CF_CFDP_Class_t   cfdp_class;
     CF_TxnFilenames_t fnames;
     uint16            num_ts; /* number of transactions -- 16 bit should be enough */
@@ -387,7 +387,7 @@ typedef struct CF_Channel
     /* For polling directories, the configuration data is in a table. */
     CF_Poll_t poll[CF_MAX_POLLING_DIR_PER_CHAN];
 
-    uint32 sem_id; /* semaphore id for output pipe */
+    osal_id_t sem_id; /* semaphore id for output pipe */
 
     const CF_Transaction_t *cur; /* current transaction during channel cycle */
 
