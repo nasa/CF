@@ -147,5 +147,6 @@
 #define CF_EID_ERR_CMD_GCMD_LEN         136
 #define CF_EID_ERR_CMD_GCMD_CC          137
 #define CF_EID_ERR_CMD_WHIST_WRITE      138
+#define CF_EID_ERR_CMD_BAD_PARAM        139
 
 #endif /* !CF_EVENTS_H */
