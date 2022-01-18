@@ -152,6 +152,7 @@ typedef enum
     CF_ENABLE_DIR_POLLING_CC  = 18,
     CF_DISABLE_DIR_POLLING_CC = 19,
     CF_DELETE_QUEUE_NODE_CC   = 20,
+    CF_PURGE_QUEUE_CC         = 21,
     CF_ENABLE_ENGINE_CC       = 22,
     CF_DISABLE_ENGINE_CC      = 23,
     CF_NUM_COMMANDS           = 24,
