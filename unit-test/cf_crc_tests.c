@@ -59,9 +59,9 @@ void test_CF_CRC_Start_ReinitializeGiven_c_ToAllZeroValues(void)
     CF_CRC_Start(arg_c);
 
     /* Assert */
-    UtAssert_True(arg_c->working == 0, "c->working was set to %d and should be 0", arg_c->working);
-    UtAssert_True(arg_c->result == 0, "c->result was set to %d and should be 0", arg_c->result);
-    UtAssert_True(arg_c->index == 0, "c->index was set to %d and should be 0", arg_c->index);
+    UtAssert_ZERO(arg_c->working);
+    UtAssert_ZERO(arg_c->result);
+    UtAssert_ZERO(arg_c->index);
 
 } /* end test_CF_CRC_Start_ReinitializeGiven_c_ToAllZeroValues*/
 
@@ -95,12 +95,9 @@ void Test_CF_CRC_Digest_When_len_Is_0_DoNotAlter_c_working_or_c_result_or_c_inde
     CF_CRC_Digest(arg_c, arg_data, arg_len);
 
     /* Assert */
-    UtAssert_True(arg_c->working == initial_c_working, "c->working is %d which is unchanged from %d", arg_c->working,
-                  initial_c_working);
-    UtAssert_True(arg_c->result == initial_c_result, "c->result is %d which is unchanged from %d", arg_c->result,
-                  initial_c_result);
-    UtAssert_True(arg_c->index == initial_c_index, "c->index is %d which is unchanged from %d", arg_c->index,
-                  initial_c_index);
+    UtAssert_UINT32_EQ(arg_c->working, initial_c_working);
+    UtAssert_UINT32_EQ(arg_c->result, initial_c_result);
+    UtAssert_UINT32_EQ(arg_c->index, initial_c_index);
 
 } /* end Test_CF_CRC_Digest_When_len_Is_0_DoNotAlter_c_working_or_c_result_or_c_index */
 
@@ -125,8 +122,7 @@ void Test_CF_CRC_Digest_When_len_Eq_1_PushDataLeftOnto_c_working(void)
     CF_CRC_Digest(arg_c, arg_data, arg_len);
 
     /* Assert */
-    UtAssert_True(arg_c->working == expected_c_working, "c->working is %u and should be %u", arg_c->working,
-                  expected_c_working);
+    UtAssert_UINT32_EQ(arg_c->working, expected_c_working);
 
 } /* end Test_CF_CRC_Digest_When_len_Eq_1_PushDataLeftOnto_c_working */
 
@@ -161,8 +157,7 @@ void Test_CF_CRC_Digest_PushDataLeftOnto_c_working_NumberOfTimesEqTo_len(void)
     CF_CRC_Digest(arg_c, arg_data, arg_len);
 
     /* Assert */
-    UtAssert_True(arg_c->working == expected_c_working, "c->working is %u and should be %u", arg_c->working,
-                  expected_c_working);
+    UtAssert_UINT32_EQ(arg_c->working, expected_c_working);
 
     /* local Teardown */
     free((uint8 *)arg_data);
@@ -186,8 +181,7 @@ void Test_CF_CRC_Digest_When_index_IsNot_3_DoNotUpdate_c_result(void)
     CF_CRC_Digest(arg_c, arg_data, arg_len);
 
     /* Assert */
-    UtAssert_True(arg_c->result == initial_c_result, "c->result was not altered and is %u and should be %u",
-                  arg_c->result, initial_c_result);
+    UtAssert_UINT32_EQ(arg_c->result, initial_c_result);
 
 } /* end Test_CF_CRC_Digest_When_index_IsNot_3_DoNotUpdate_c_result */
 
@@ -215,8 +209,7 @@ void Test_CF_CRC_Digest_When_c_index_Is_3_Update_c_result(void)
     CF_CRC_Digest(arg_c, arg_data, arg_len);
 
     /* Assert */
-    UtAssert_True(arg_c->result == expected_c_result, "c->result is %u and should be %u", arg_c->result,
-                  expected_c_result);
+    UtAssert_UINT32_EQ(arg_c->result, expected_c_result);
 
 } /* end Test_CF_CRC_Digest_When_c_index_Is_3_Update_c_result */
 
@@ -278,8 +271,7 @@ void Test_CF_CRC_Digest_Update_c_result_TheNumberOfTimes_index_Reaches4(void)
     CF_CRC_Digest(arg_c, arg_data, arg_len);
 
     /* Assert */
-    UtAssert_True(arg_c->result == expected_c_result, "c->result is %u and should be %u", arg_c->result,
-                  expected_c_result);
+    UtAssert_UINT32_EQ(arg_c->result, expected_c_result);
 
     /* local Teardown */
     free((uint8 *)arg_data);
@@ -306,7 +298,7 @@ void Test_CF_CRC_Digest_When_len_Eq1_And_c_index_LessThan_3_Update_c_index_By_1(
     CF_CRC_Digest(arg_c, arg_data, arg_len);
 
     /* Assert */
-    UtAssert_True(arg_c->index == expected_c_index, "c->index is %u and should be %u", arg_c->index, expected_c_index);
+    UtAssert_UINT32_EQ(arg_c->index, expected_c_index);
 
 } /* end Test_CF_CRC_Digest_When_len_Eq1_And_c_index_LessThan_3_Update_c_index_By_1 */
 
@@ -327,7 +319,7 @@ void Test_CF_CRC_Digest_When_len_Eq1_And_c_index_Is_3_Update_c_index_To_0(void)
     CF_CRC_Digest(arg_c, arg_data, arg_len);
 
     /* Assert */
-    UtAssert_True(arg_c->index == 0, "c->index is %u and should be 0", arg_c->index);
+    UtAssert_ZERO(arg_c->index);
 
 } /* end Test_CF_CRC_Digest_When_len_Eq1_And_c_index_Is_3_Update_c_index_To_0 */
 
@@ -357,7 +349,7 @@ void Test_CF_CRC_Digest_Update_c_index_CorrectlyDependingOn_c_index_And_len_Valu
     CF_CRC_Digest(arg_c, arg_data, arg_len);
 
     /* Assert */
-    UtAssert_True(arg_c->index == expected_c_index, "c->index is %u and should be %u", arg_c->index, expected_c_index);
+    UtAssert_UINT32_EQ(arg_c->index, expected_c_index);
 
     /* local Teardown */
     free((uint8 *)arg_data);
@@ -388,11 +380,9 @@ void Test_CF_CRC_Finalize_When_index_Is_0_DoNothing(void)
     CF_CRC_Finalize(arg_c);
 
     /* Assert */
-    UtAssert_True(arg_c->working == initial_c_working, "c->working is %d which is unchanged from %d", arg_c->working,
-                  initial_c_working);
-    UtAssert_True(arg_c->result == initial_c_result, "c->result is %d which is unchanged from %d", arg_c->result,
-                  initial_c_result);
-    UtAssert_True(arg_c->index == 0, "c->index is %d which is unchanged from 0", arg_c->index);
+    UtAssert_UINT32_EQ(arg_c->working, initial_c_working);
+    UtAssert_UINT32_EQ(arg_c->result, initial_c_result);
+    UtAssert_ZERO(arg_c->index);
 } /* end Test_CF_CRC_Finalize_When_index_Is_0_DoNothing */
 
 void Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_1(void)
@@ -413,9 +403,9 @@ void Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_1(void)
     CF_CRC_Finalize(arg_c);
 
     /* Assert */
-    UtAssert_True(arg_c->working == 0, "c->working is %u and it should be 0", arg_c->working);
-    UtAssert_True(arg_c->result == expected_result, "c->result %u and it should be %u", arg_c->result, expected_result);
-    UtAssert_True(arg_c->index == 0, "c->index is %u and it should be 0", arg_c->index);
+    UtAssert_ZERO(arg_c->working);
+    UtAssert_UINT32_EQ(arg_c->result, expected_result);
+    UtAssert_ZERO(arg_c->index);
 } /* end Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_1 */
 
 void Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_2(void)
@@ -437,9 +427,9 @@ void Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_2(void)
     CF_CRC_Finalize(arg_c);
 
     /* Assert */
-    UtAssert_True(arg_c->working == 0, "c->working is %u and it should be 0", arg_c->working);
-    UtAssert_True(arg_c->result == expected_result, "c->result %u and it should be %u", arg_c->result, expected_result);
-    UtAssert_True(arg_c->index == 0, "c->index is %u and it should be 0", arg_c->index);
+    UtAssert_ZERO(arg_c->working);
+    UtAssert_UINT32_EQ(arg_c->result, expected_result);
+    UtAssert_ZERO(arg_c->index);
 } /* end Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_2 */
 
 void Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_3(void)
@@ -461,9 +451,9 @@ void Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_3(void)
     CF_CRC_Finalize(arg_c);
 
     /* Assert */
-    UtAssert_True(arg_c->working == 0, "c->working is %u and it should be 0", arg_c->working);
-    UtAssert_True(arg_c->result == expected_result, "c->result %u and it should be %u", arg_c->result, expected_result);
-    UtAssert_True(arg_c->index == 0, "c->index is %u and it should be 0", arg_c->index);
+    UtAssert_ZERO(arg_c->working);
+    UtAssert_UINT32_EQ(arg_c->result, expected_result);
+    UtAssert_ZERO(arg_c->index);
 } /* end Test_CF_CRC_Finalize_ReceiveExpectedResultAt_index_3 */
 
 /* end CF_CRC_Finalize tests */

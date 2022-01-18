@@ -70,12 +70,12 @@ void Test_CF_HkCmd_TimestampAndSendMessageWith_CF_AppData_hk(void)
     UtAssert_STUB_COUNT(CFE_MSG_SetMsgTime, 1);
     UtAssert_ADDRESS_EQ(context_CFE_MSG_SetMsgTime.MsgPtr, &CF_AppData.hk.tlm_header.Msg);
     UtAssert_True(context_CFE_MSG_SetMsgTime.Time.Seconds == fake_time.Seconds,
-                  "CFE_MSG_SetMsgTime received Time.Seconds %u and should be %u (call to CFE_TIME_GetTime Seconds)",
-                  context_CFE_MSG_SetMsgTime.Time.Seconds, fake_time.Seconds);
+                  "CFE_MSG_SetMsgTime received Time.Seconds %lu and should be %lu (call to CFE_TIME_GetTime Seconds)",
+                  (unsigned long)context_CFE_MSG_SetMsgTime.Time.Seconds, (unsigned long)fake_time.Seconds);
     UtAssert_True(
         context_CFE_MSG_SetMsgTime.Time.Subseconds == fake_time.Subseconds,
-        "CFE_MSG_SetMsgTime received Time.Subseconds %u and should be %u (call to CFE_TIME_GetTime Subseconds)",
-        context_CFE_MSG_SetMsgTime.Time.Subseconds, fake_time.Subseconds);
+        "CFE_MSG_SetMsgTime received Time.Subseconds %lu and should be %lu (call to CFE_TIME_GetTime Subseconds)",
+        (unsigned long)context_CFE_MSG_SetMsgTime.Time.Subseconds, (unsigned long)fake_time.Subseconds);
     UtAssert_STUB_COUNT(CFE_SB_TransmitMsg, 1);
     UtAssert_ADDRESS_EQ(context_CFE_SB_TransmitMsg.MsgPtr, &CF_AppData.hk.tlm_header.Msg);
     UtAssert_True(context_CFE_SB_TransmitMsg.IncrementSequenceCount == true,
@@ -326,17 +326,14 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_Register_DidNotReturnSuccess(void)
 {
     /* Arrange */
     int32 expected_result = Any_int32_Except(CFE_SUCCESS);
-    int32 result;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_Register), expected_result);
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
 
     /* Act */
-    result = CF_TableInit();
+    UtAssert_INT32_EQ(CF_TableInit(), expected_result);
 
     /* Assert */
-    UtAssert_True(result == expected_result, "CF_TableInit should have returned 0x%08X and was 0x%08X", result,
-                  expected_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_REG);
     /* TODO: CFE_EVS_SendEvent needs to check all context values! */
@@ -346,16 +343,14 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_Load_DidNotReturnSuccess(void)
 {
     /* Arrange */
     int32 expected_result = Any_int32_Except(CFE_SUCCESS);
-    int32 result;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_Load), expected_result);
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
 
     /* Act */
-    result = CF_TableInit();
+    UtAssert_INT32_EQ(CF_TableInit(), expected_result);
 
     /* Assert */
-    UtAssert_True(result == expected_result, "CF_TableInit returned 0x%08X and was 0x%08X", result, expected_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_LOAD);
     /* TODO: CFE_EVS_SendEvent needs to check all context values! */
@@ -365,17 +360,14 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_Manage_DidNotReturnSuccess(void)
 {
     /* Arrange */
     int32 expected_result = Any_int32_Except(CFE_SUCCESS);
-    int32 result;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_Manage), expected_result);
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
 
     /* Act */
-    result = CF_TableInit();
+    UtAssert_INT32_EQ(CF_TableInit(), expected_result);
 
     /* Assert */
-    UtAssert_True(result == expected_result, "CF_TableInit should have returned 0x%08X and was 0x%08X", result,
-                  expected_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_MANAGE);
     /* TODO: CFE_EVS_SendEvent needs to check all context values! */
@@ -387,17 +379,14 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess(void)
     int32 possible_success_results[2] = {CFE_SUCCESS, CFE_TBL_INFO_UPDATED};
     int32 expected_result = Any_int32_ExceptThese(possible_success_results, sizeof(possible_success_results) /
                                                                                 sizeof(possible_success_results[0]));
-    int32 result;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_GetAddress), expected_result);
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
 
     /* Act */
-    result = CF_TableInit();
+    UtAssert_INT32_EQ(CF_TableInit(), expected_result);
 
     /* Assert */
-    UtAssert_True(result == expected_result, "CF_TableInit should have returned 0x%08X and was 0x%08X", result,
-                  expected_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_GETADDR);
     /* TODO: CFE_EVS_SendEvent needs to check all context values! */
@@ -406,32 +395,26 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess(void)
 void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_SUCCESS_SuccessAndDoNotSendEvent(void)
 {
     /* Arrange */
-    int32 result;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_GetAddress), CFE_SUCCESS);
 
     /* Act */
-    result = CF_TableInit();
+    UtAssert_INT32_EQ(CF_TableInit(), CFE_SUCCESS);
 
     /* Assert */
-    UtAssert_True(result == CFE_SUCCESS, "CF_TableInit returned 0x%08X and should be 0x%08X (CFE_SUCCESS)", result,
-                  CFE_SUCCESS);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 } /* end Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_SUCCESS_SuccessAndDoNotSendEvent */
 
 void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED_SuccessAndDoNotSendEvent(void)
 {
     /* Arrange */
-    int32 result;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_GetAddress), CFE_TBL_INFO_UPDATED);
 
     /* Act */
-    result = CF_TableInit();
+    UtAssert_INT32_EQ(CF_TableInit(), CFE_SUCCESS);
 
     /* Assert */
-    UtAssert_True(result == CFE_SUCCESS, "CF_TableInit returned 0x%08X and should be 0x%08X (CFE_SUCCESS)", result,
-                  CFE_SUCCESS);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 } /* end Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED_SuccessAndDoNotSendEvent */
 

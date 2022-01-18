@@ -66,9 +66,9 @@ void CF_CFDP_R_DispatchRecv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph,
         {
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.spurious;
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_DC_INV, CFE_EVS_EventType_ERROR,
-                              "CF R%d(%u:%u): received pdu with invalid directive code %d for sub-state %d",
-                              (t->state == CF_TxnState_R2), t->history->src_eid, t->history->seq_num,
-                              fdh->directive_code, t->state_data.r.sub_state);
+                              "CF R%d(%lu:%lu): received pdu with invalid directive code %d for sub-state %d",
+                              (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
+                              (unsigned long)t->history->seq_num, fdh->directive_code, t->state_data.r.sub_state);
         }
     }
     else
@@ -127,16 +127,16 @@ void CF_CFDP_S_DispatchRecv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph,
         {
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.spurious;
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_DC_INV, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%u:%u): received pdu with invalid directive code %d for sub-state %d",
-                              (t->state == CF_TxnState_S2), t->history->src_eid, t->history->seq_num,
-                              fdh->directive_code, t->state_data.s.sub_state);
+                              "CF S%d(%lu:%lu): received pdu with invalid directive code %d for sub-state %d",
+                              (t->state == CF_TxnState_S2), (unsigned long)t->history->src_eid,
+                              (unsigned long)t->history->seq_num, fdh->directive_code, t->state_data.s.sub_state);
         }
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_NON_FD_PDU, CFE_EVS_EventType_ERROR,
-                          "CF S%d(%u:%u): received non-file directive pdu", (t->state == CF_TxnState_S2),
-                          t->history->src_eid, t->history->seq_num);
+                          "CF S%d(%lu:%lu): received non-file directive pdu", (t->state == CF_TxnState_S2),
+                          (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
     }
 
     /* check that there's a valid function pointer. if there isn't,
