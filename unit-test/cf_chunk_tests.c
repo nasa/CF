@@ -1901,11 +1901,9 @@ void Test_CF_Chunks_Init_SetGiven_chunks_max_chunks_ToGiven_max_chunks(void)
 {
     /* Arrange */
     CF_ChunkList_t  dummy_chunks;
-    CF_ChunkList_t *arg_chunks = &dummy_chunks;
-    CF_ChunkIdx_t   arg_max_chunks =
-        Any_uint16() + 2; /* 2-65537, uint8 is used instead of CF_ChunkIdx_t to have a reasonably
-                       decent size for the test without being too large (segfault) */
-    CF_Chunk_t arg_chunks_mem[arg_max_chunks];
+    CF_ChunkList_t *arg_chunks     = &dummy_chunks;
+    CF_ChunkIdx_t   arg_max_chunks = 14;
+    CF_Chunk_t      arg_chunks_mem[14];
 
     arg_chunks->count = 0;
 
@@ -1934,11 +1932,9 @@ void Test_CF_ChunksReset_Set_count_To_0_Keeps_max_chunks_AndMemsets_chunks_ToAll
 {
     /* Arrange */
     CF_ChunkList_t  dummy_chunks;
-    CF_ChunkList_t *arg_chunks = &dummy_chunks;
-    CF_ChunkIdx_t   initial_max_chunks =
-        Any_uint16() + 2; /* 2-65537, uint8 is used instead of CF_ChunkIdx_t to have a reasonably
-                       decent size for the test without being too large (segfault) */
-    CF_Chunk_t dummy_chunks_chunks[initial_max_chunks];
+    CF_ChunkList_t *arg_chunks         = &dummy_chunks;
+    CF_ChunkIdx_t   initial_max_chunks = 17;
+    CF_Chunk_t      dummy_chunks_chunks[17];
 
     arg_chunks->count      = Any_index_t();
     arg_chunks->max_chunks = initial_max_chunks;
