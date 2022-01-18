@@ -757,7 +757,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
         /* process uplink queue data */
         if ((wq->queue == q_all) || (wq->queue == q_active))
         {
-            ret = CF_WriteQueueDataToFile(fd, c, CF_QueueIdx_RX);
+            ret = CF_WriteTxnQueueDataToFile(fd, c, CF_QueueIdx_RX);
             if (ret)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_RX, CFE_EVS_EventType_ERROR,
@@ -788,7 +788,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
             static const int qs[2] = {CF_QueueIdx_TXA, CF_QueueIdx_TXW};
             for (i = 0; i < 2; ++i)
             {
-                ret = CF_WriteQueueDataToFile(fd, c, qs[i]);
+                ret = CF_WriteTxnQueueDataToFile(fd, c, qs[i]);
                 if (ret)
                 {
                     CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_TX, CFE_EVS_EventType_ERROR,
@@ -801,7 +801,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
         if ((wq->queue == q_all) || (wq->queue == q_pend))
         {
             /* write pending queue */
-            ret = CF_WriteQueueDataToFile(fd, c, CF_QueueIdx_PEND);
+            ret = CF_WriteTxnQueueDataToFile(fd, c, CF_QueueIdx_PEND);
             if (ret)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_PEND, CFE_EVS_EventType_ERROR,

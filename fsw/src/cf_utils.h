@@ -44,17 +44,40 @@ typedef struct CF_Traverse_TransSeqArg
 } CF_Traverse_TransSeqArg_t;
 
 /**
- * @brief Argument structure for use with CList_Traverse()
+ * @brief Argument structure for use with CF_Traverse_WriteHistoryQueueEntryToFile()
  *
  * This is used for writing status files.  It contains a designated
  * file descriptor for output and counters.
+ *
+ * When traversing history, the list contains all entries, and may need additional
+ * filtering for direction (TX/RX) depending on what information the user has requested.
  */
-typedef struct CF_Traverse_WriteFileArg
+typedef struct CF_Traverse_WriteHistoryFileArg
+{
+    osal_id_t      fd;
+    CF_Direction_t filter_dir;
+
+    bool   error;   /**< Will be set to true if any write failed */
+    uint32 counter; /**< Total number of entries written */
+} CF_Traverse_WriteHistoryFileArg_t;
+
+/**
+ * @brief Argument structure for use with CF_Traverse_WriteTxnQueueEntryToFile()
+ *
+ * This is used for writing status files.  It contains a designated
+ * file descriptor for output and counters.
+ *
+ * When traversing transactions, the entire list is written to the file.
+ * No additional filtering is necessary, because the queues themselves are
+ * limited in what they contain (therefore "pre-filtered" to some degree).
+ */
+typedef struct CF_Traverse_WriteTxnFileArg
 {
     osal_id_t fd;
-    int32     result;
-    int32     counter;
-} CF_Traverse_WriteFileArg_t;
+
+    bool   error;   /**< Will be set to true if any write failed */
+    uint32 counter; /**< Total number of entries written */
+} CF_Traverse_WriteTxnFileArg_t;
 
 /**
  * @brief Callback function type for use with CF_TraverseAllTransactions()
@@ -209,6 +232,27 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_Transac
 int CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Traverse_TransSeqArg_t *context);
 
 /************************************************************************/
+/** @brief Write a single history to a file.
+ *
+ * This creates a human-readable/string representation of the information in the
+ * history object, and writes that string to the indicated file.
+ *
+ * This implements the common code between writing the history queue and transaction
+ * queue to a file, as both ultimately store the same information in a CF_History_t
+ * object, but have a different method to get to it.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *       fd should be a valid file descriptor, open for writing.
+ *
+ * @param fd Open File descriptor to write to
+ * @param h  Pointer to CF history object to write
+ *
+ * @retval 0 on success
+ * @retval -1 on error
+ */
+int CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h);
+
+/************************************************************************/
 /** @brief Write a transaction-based queue's transaction history to a file.
  *
  * @par Assumptions, External Events, and Notes:
@@ -221,10 +265,10 @@ int CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Traverse_Trans
  * @retval 0 on success
  * @retval 1 on error
  */
-int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q);
+int32 CF_WriteTxnQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_QueueIdx_t q);
 
 /************************************************************************/
-/** @brief Write a history-based queue's transaction history to a file.
+/** @brief Write a history-based queue's entries to a file.
  *
  * @par Assumptions, External Events, and Notes:
  *       c must not be NULL.
@@ -236,7 +280,7 @@ int32 CF_WriteQueueDataToFile(int32 fd, CF_Channel_t *c, CF_QueueIdx_t q);
  * @retval 0 on success
  * @retval 1 on error
  */
-int32 CF_WriteHistoryQueueDataToFile(int32 fd, CF_Channel_t *c, CF_Direction_t dir);
+int32 CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_Direction_t dir);
 
 /************************************************************************/
 /** @brief Insert a transaction into a priority sorted transaction queue.
@@ -300,36 +344,41 @@ int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, 
 int CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *args);
 
 /************************************************************************/
-/** @brief Walks through a history queue and builds a human readable representation of it.
+/** @brief Writes a human readable representation of a history queue entry to a file
  *
- * @par Description
- *       This function is used as both a list traversal function and a direct
- *       function call.
+ * This function is a wrapper around CF_WriteHistoryEntryToFile() that can be used with
+ * CF_Traverse() to write history queue entries to the file.
+ *
+ * This also implements a direction filter, so only matching entries are actually written
+ * to the file.
  *
  * @par Assumptions, External Events, and Notes:
  *       n must not be NULL. context must not be NULL.
  *
  * @param n       Node being currently traversed
- * @param context Pointer to object indicating the file descriptor and related information
+ * @param context Pointer to CF_Traverse_WriteHistoryFileArg_t indicating the file information
  *
  * @retval CF_CLIST_CONT if everything is going well
  * @retval CF_CLIST_EXIT if a write error occurred, which means traversal should stop
  */
-int CF_TraverseHistory(CF_CListNode_t *n, CF_Traverse_WriteFileArg_t *context);
+int CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *arg);
 
 /************************************************************************/
-/** @brief Walk over all transactions and print information from their history.
+/** @brief Writes a human readable representation of a transaction history entry to a file
+ *
+ * This function is a wrapper around CF_WriteHistoryEntryToFile() that can be used with
+ * CF_Traverse() to write transaction queue entries to the file.
  *
  * @par Assumptions, External Events, and Notes:
- *       None
+ *       n must not be NULL. context must not be NULL.
  *
  * @param n       Node being currently traversed
- * @param context Pointer to object indicating the file descriptor and related information
+ * @param context Pointer to CF_Traverse_WriteTxnFileArg_t indicating the file information
  *
  * @retval CF_CLIST_CONT if everything is going well
  * @retval CF_CLIST_EXIT if a write error occurred, which means traversal should stop
  */
-int CF_TraverseTransactions(CF_CListNode_t *n, CF_Traverse_WriteFileArg_t *context);
+int CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg);
 
 /************************************************************************/
 /** @brief Searches for the first transaction with a lower priority than given.

@@ -535,241 +535,118 @@ void Test_CF_CList_InsertBack_Ex_Call_CF_CList_InsertBack_AndIncrement_q_size(vo
 
 /*******************************************************************************
 **
-**  CF_TraverseHistory tests
+**  CF_Traverse_WriteHistoryQueueEntryToFile tests
 **
 *******************************************************************************/
 
-void Test_CF_TraverseHistory_AssertsBecause_h_dir_GreaterThan_CF_DIR_NUM(void)
+void Test_CF_Traverse_WriteHistoryQueueEntryToFile(void)
 {
-    // /* Arrange */
-    // CF_History_t       dummy_h;
-    // CF_CListNode_t *      arg_n = &dummy_h.cl_node;
-    // CF_Traverse_WriteFileArg_t      dummy_context;
-    // CF_Traverse_WriteFileArg_t*     arg_context = &dummy_context;
-    //
-    // dummy_h.src_eid = Any_uint8();
-    // dummy_h.seq_num = Any_uint32();
-    // dummy_h.dir = Any_direction_t();
-    // dummy_h.peer_eid = Any_uint8();
-    // dummy_h.cc = Any_condition_code_t();
+    /* Test case for:
+     * int CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *arg);
+     */
+    CF_History_t                      hist;
+    CF_Traverse_WriteHistoryFileArg_t args;
 
-    // /* Act */
-    // CF_TraverseHistory(arg_n, arg_context);
+    memset(&hist, 0, sizeof(hist));
+    memset(&args, 0, sizeof(args));
 
-    // /* Assert */
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - h->dir<CF_Direction_NUM");
+    /* nominal, if everything works, should continue */
+    hist.dir        = CF_Direction_TX;
+    args.filter_dir = CF_Direction_TX;
+    UtAssert_INT32_EQ(CF_Traverse_WriteHistoryQueueEntryToFile(&hist.cl_node, &args), CF_CLIST_CONT);
+    UtAssert_UINT32_EQ(args.counter, 1);
+    UtAssert_BOOL_FALSE(args.error);
 
-} /* end Test_CF_TraverseHistory_AssertsBecause_h_dir_GreaterThan_CF_DIR_NUM */
+    /* filter disabled (anything goes) */
+    hist.dir        = CF_Direction_RX;
+    args.filter_dir = CF_Direction_NUM;
+    UtAssert_INT32_EQ(CF_Traverse_WriteHistoryQueueEntryToFile(&hist.cl_node, &args), CF_CLIST_CONT);
+    UtAssert_UINT32_EQ(args.counter, 2);
+    UtAssert_BOOL_FALSE(args.error);
 
-void Test_CF_TraverseHistory_When_CF_WrappedWrite_FailsFirstCallReturn_CLIST_EXIT(void)
-{
-    /* Arrange */
-    CF_History_t                dummy_h;
-    CF_CListNode_t             *arg_n = &dummy_h.cl_node;
-    CF_Traverse_WriteFileArg_t  dummy_context;
-    CF_Traverse_WriteFileArg_t *arg_context      = &dummy_context;
-    char                        src_colon_str[6] = "SRC: "; /* duplicates function value */
-    uint8                       dummy_len;
-    int                         local_result;
+    /* filter no match (does not write) */
+    hist.dir        = CF_Direction_RX;
+    args.filter_dir = CF_Direction_TX;
+    UtAssert_INT32_EQ(CF_Traverse_WriteHistoryQueueEntryToFile(&hist.cl_node, &args), CF_CLIST_CONT);
+    UtAssert_UINT32_EQ(args.counter, 2); /* no increment */
+    UtAssert_BOOL_FALSE(args.error);
 
-    dummy_h.src_eid  = Any_uint8();
-    dummy_h.seq_num  = Any_uint32();
-    dummy_h.dir      = Any_direction_t();
-    dummy_h.peer_eid = Any_uint8();
-    dummy_h.cc       = Any_condition_code_t();
-
-    /* ensures dummy_context.result change to 1 was done */
-    dummy_context.result = 0;
-
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange for CF_WrappedWrite in same file as CF_TraverseHistory */
-    dummy_len = strlen(dummy_h.fnames.src_filename) + strlen(src_colon_str);
-    UT_SetDeferredRetcode(UT_KEY(OS_write), FIRST_CALL, Any_int_Except(dummy_len));
-
-    /* Act */
-    local_result = CF_TraverseHistory(arg_n, arg_context);
-
-    /* Assert */
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_WHIST_WRITE);
-    UtAssert_True(arg_context->result == 1, "CF_TraverseHistory set context.result to %d and should be 1",
-                  arg_context->result);
-    UtAssert_True(local_result == CF_CLIST_EXIT,
-                  "CF_TraverseHistory returned 0x%08X and should be 0x%08X (CF_CLIST_EXIT)", local_result,
-                  CF_CLIST_EXIT);
-
-} /* end Test_CF_TraverseHistory_When_CF_WrappedWrite_FailsFirstCallReturn_CLIST_EXIT */
-
-void Test_CF_TraverseHistory_When_CF_WrappedWrite_FailsSecondCallReturn_CLIST_EXIT(void)
-{
-    /* Arrange */
-    CF_History_t                dummy_h;
-    CF_CListNode_t             *arg_n = &dummy_h.cl_node;
-    CF_Traverse_WriteFileArg_t  dummy_context;
-    CF_Traverse_WriteFileArg_t *arg_context      = &dummy_context;
-    char                        src_colon_str[6] = "SRC: "; /* duplicates function value */
-    char                        dst_colon_str[6] = "DST: "; /* duplicates function value */
-    uint8                       dummy_len_src;
-    uint8                       dummy_len_dst;
-    int                         local_result;
-
-    dummy_h.src_eid  = Any_uint8();
-    dummy_h.seq_num  = Any_uint32();
-    dummy_h.dir      = Any_direction_t();
-    dummy_h.peer_eid = Any_uint8();
-    dummy_h.cc       = Any_condition_code_t();
-
-    /* ensures dummy_context.result change to 1 was done */
-    dummy_context.result = 0;
-
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange for CF_WrappedWrite in same file as CF_TraverseHistory */
-    dummy_len_src = strlen(dummy_h.fnames.src_filename) + strlen(src_colon_str);
-    UT_SetDeferredRetcode(UT_KEY(OS_write), FIRST_CALL, dummy_len_src);
-    dummy_len_dst = strlen(dummy_h.fnames.dst_filename) + strlen(dst_colon_str);
-    UT_SetDeferredRetcode(UT_KEY(OS_write), NEXT_CALL, Any_int_Except(dummy_len_dst));
-
-    /* Act */
-    local_result = CF_TraverseHistory(arg_n, arg_context);
-
-    /* Assert */
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_WHIST_WRITE);
-    UtAssert_True(arg_context->result == 1, "CF_TraverseHistory set context.result to %d and should be 1",
-                  arg_context->result);
-    UtAssert_True(local_result == CF_CLIST_EXIT,
-                  "CF_TraverseHistory returned 0x%08X and should be 0x%08X (CF_CLIST_EXIT)", local_result,
-                  CF_CLIST_EXIT);
-
-} /* end Test_CF_TraverseHistory_When_CF_WrappedWrite_FailsSecondCallReturn_CLIST_EXIT */
-
-void Test_CF_TraverseHistory_WhenBothWrappedWritesSuccessfulReturn_CLIST_CONT(void)
-{
-    /* Arrange */
-    CF_History_t                dummy_h;
-    CF_CListNode_t             *arg_n = &dummy_h.cl_node;
-    CF_Traverse_WriteFileArg_t  dummy_context;
-    CF_Traverse_WriteFileArg_t *arg_context      = &dummy_context;
-    char                        src_colon_str[6] = "SRC: "; /* duplicates function value */
-    char                        dst_colon_str[6] = "DST: "; /* duplicates function value */
-    uint8                       dummy_len_src;
-    uint8                       dummy_len_dst;
-    int                         local_result;
-
-    dummy_h.src_eid  = Any_uint8();
-    dummy_h.seq_num  = Any_uint32();
-    dummy_h.dir      = Any_direction_t();
-    dummy_h.peer_eid = Any_uint8();
-    dummy_h.cc       = Any_condition_code_t();
-
-    /* ensures dummy_context.result change to 1 was done */
-    dummy_context.result = 0;
-
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange for CF_WrappedWrite in same file as CF_TraverseHistory */
-    dummy_len_src = strlen(dummy_h.fnames.src_filename) + strlen(src_colon_str);
-    UT_SetDeferredRetcode(UT_KEY(OS_write), FIRST_CALL, dummy_len_src);
-    dummy_len_dst = strlen(dummy_h.fnames.dst_filename) + strlen(dst_colon_str);
-    UT_SetDeferredRetcode(UT_KEY(OS_write), NEXT_CALL, dummy_len_dst);
-
-    /* Act */
-    local_result = CF_TraverseHistory(arg_n, arg_context);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-    UtAssert_True(arg_context->result == 0, "CF_TraverseHistory context.result is %d and should be 0",
-                  arg_context->result);
-    UtAssert_True(local_result == CF_CLIST_CONT,
-                  "CF_TraverseHistory returned 0x%08X and should be 0x%08X (CF_CLIST_CONT)", local_result,
-                  CF_CLIST_CONT);
-
-} /* end Test_CF_TraverseHistory_WhenBothWrappedWritesSuccessfulReturn_CLIST_CONT */
-
-/* end CF_TraverseHistory tests */
+    /* Setup for failure */
+    UT_SetDeferredRetcode(UT_KEY(OS_write), 1, -1);
+    hist.dir        = CF_Direction_RX;
+    args.filter_dir = CF_Direction_RX;
+    UtAssert_INT32_EQ(CF_Traverse_WriteHistoryQueueEntryToFile(&hist.cl_node, &args), CF_CLIST_EXIT);
+    UtAssert_UINT32_EQ(args.counter, 2); /* no increment */
+    UtAssert_BOOL_TRUE(args.error);
+}
+/* end CF_Traverse_WriteHistoryQueueEntryToFile tests */
 
 /*******************************************************************************
 **
-**  CF_TraverseTransactions tests
+**  CF_Traverse_WriteTxnQueueEntryToFile tests
 **
 *******************************************************************************/
 
-void Test_CF_TraverseTransactions_When_context_result_Is_1_Return_CLIST_EXIT(void)
+void Test_CF_Traverse_WriteTxnQueueEntryToFile(void)
 {
-    /* Arrange */
-    CF_History_t                dummy_history;
-    CF_Transaction_t            dummy_t;
-    CF_CListNode_t             *arg_n = &dummy_t.cl_node;
-    CF_Traverse_WriteFileArg_t  dummy_context;
-    CF_Traverse_WriteFileArg_t *arg_context = &dummy_context;
-    int                         local_result;
+    /* Test case for:
+     * int CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg);
+     */
+    CF_Transaction_t              txn;
+    CF_History_t                  hist;
+    CF_Traverse_WriteTxnFileArg_t args;
 
-    /* Arrange for CF_TraverseHistory in same file as CF_TraverseTransactions */
+    memset(&txn, 0, sizeof(txn));
+    memset(&hist, 0, sizeof(hist));
+    memset(&args, 0, sizeof(args));
+    txn.history = &hist;
 
-    dummy_t.history           = &dummy_history;
-    dummy_t.history->src_eid  = Any_uint8();
-    dummy_t.history->seq_num  = Any_uint32();
-    dummy_t.history->dir      = Any_direction_t();
-    dummy_t.history->peer_eid = Any_uint8();
-    dummy_t.history->cc       = Any_condition_code_t();
+    /* nominal, if everything works, should continue */
+    UtAssert_INT32_EQ(CF_Traverse_WriteTxnQueueEntryToFile(&txn.cl_node, &args), CF_CLIST_CONT);
+    UtAssert_UINT32_EQ(args.counter, 1);
+    UtAssert_BOOL_FALSE(args.error);
 
-    /* Arrange for CF_WrappedWrite in same file as CF_TraverseHistor in same
-     * file as CF_TraverseTransactions */
-    char  src_colon_str[6] = "SRC: "; /* duplicates function value */
-    uint8 dummy_len;
+    /* Setup for failure */
+    UT_SetDeferredRetcode(UT_KEY(OS_write), 1, -1);
+    UtAssert_INT32_EQ(CF_Traverse_WriteTxnQueueEntryToFile(&txn.cl_node, &args), CF_CLIST_EXIT);
+    UtAssert_UINT32_EQ(args.counter, 1); /* no increment */
+    UtAssert_BOOL_TRUE(args.error);
+}
 
-    dummy_len = strlen(dummy_t.history->fnames.src_filename) + strlen(src_colon_str);
-    UT_SetDeferredRetcode(UT_KEY(OS_write), FIRST_CALL, Any_int_Except(dummy_len));
+/* end CF_Traverse_WriteTxnQueueEntryToFile tests */
 
-    /* Act */
-    local_result = CF_TraverseTransactions(arg_n, arg_context);
+/*******************************************************************************
+**
+**  CF_WriteHistoryEntryToFile tests
+**
+*******************************************************************************/
 
-    /* Assert */
-    UtAssert_True(local_result == CF_CLIST_EXIT, "CF_TraverseTransactions returned %d and should be %d (CF_CLIST_EXIT)",
-                  local_result, CF_CLIST_EXIT);
-} /* end Test_CF_TraverseTransactions_When_context_result_Is_1_Return_CLIST_EXIT */
-
-void Test_CF_TraverseTransactions_When_context_result_Is_0_Return_CLIST_CONT(void)
+void Test_CF_WriteHistoryEntryToFile(void)
 {
-    /* Arrange */
-    CF_History_t                dummy_history;
-    CF_Transaction_t            dummy_t;
-    CF_CListNode_t             *arg_n = &dummy_t.cl_node;
-    CF_Traverse_WriteFileArg_t  dummy_context;
-    CF_Traverse_WriteFileArg_t *arg_context = &dummy_context;
-    int                         local_result;
+    /* Test case for:
+     * int CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h)
+     */
+    osal_id_t    arg_fd = OS_ObjectIdFromInteger(1);
+    CF_History_t h;
 
-    arg_context->result = 0; /* ensures arg_context->result starts at 0 */
+    memset(&h, 0, sizeof(h));
+    strcpy(h.fnames.src_filename, "sf");
+    strcpy(h.fnames.dst_filename, "df");
 
-    /* Arrange for CF_TraverseHistor in same file as CF_TraverseTransactions */
-    dummy_t.history           = &dummy_history;
-    dummy_t.history->src_eid  = Any_uint8();
-    dummy_t.history->seq_num  = Any_uint32();
-    dummy_t.history->dir      = Any_direction_t();
-    dummy_t.history->peer_eid = Any_uint8();
-    dummy_t.history->cc       = Any_condition_code_t();
+    /* Successful write - need to set up for 3 successful calls to OS_write() */
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    UT_SetDeferredRetcode(UT_KEY(OS_write), 1, 44);
+    UT_SetDeferredRetcode(UT_KEY(OS_write), 1, strlen(h.fnames.src_filename) + 6);
+    UT_SetDeferredRetcode(UT_KEY(OS_write), 1, strlen(h.fnames.dst_filename) + 6);
+    UtAssert_INT32_EQ(CF_WriteHistoryEntryToFile(arg_fd, &h), 0);
+    UT_CF_AssertEventID(0);
 
-    /* Arrange for CF_WrappedWrite in same file as CF_TraverseHistor in same
-     * file as CF_TraverseTransactions */
-    char  src_colon_str[6] = "SRC: "; /* duplicates function value */
-    char  dst_colon_str[6] = "DST: "; /* duplicates function value */
-    uint8 dummy_len_src;
-    uint8 dummy_len_dst;
-
-    dummy_len_src = strlen(dummy_t.history->fnames.src_filename) + strlen(src_colon_str);
-    UT_SetDeferredRetcode(UT_KEY(OS_write), FIRST_CALL, dummy_len_src);
-    dummy_len_dst = strlen(dummy_t.history->fnames.dst_filename) + strlen(dst_colon_str);
-    UT_SetDeferredRetcode(UT_KEY(OS_write), NEXT_CALL, dummy_len_dst);
-
-    /* Act */
-    local_result = CF_TraverseTransactions(arg_n, arg_context);
-
-    /* Assert */
-    UtAssert_True(local_result == CF_CLIST_CONT, "CF_TraverseTransactions returned %d and should be %d (CF_CLIST_CONT)",
-                  local_result, CF_CLIST_CONT);
-} /* end Test_CF_TraverseTransactions_When_context_result_Is_0_Return_CLIST_CONT */
-
-/* end CF_TraverseTransactions tests */
+    /* Unsuccessful write */
+    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    UT_SetDeferredRetcode(UT_KEY(OS_write), 1, -1);
+    UtAssert_INT32_EQ(CF_WriteHistoryEntryToFile(arg_fd, &h), -1);
+    UT_CF_AssertEventID(CF_EID_ERR_CMD_WHIST_WRITE);
+}
 
 /*******************************************************************************
 **
@@ -777,41 +654,24 @@ void Test_CF_TraverseTransactions_When_context_result_Is_0_Return_CLIST_CONT(voi
 **
 *******************************************************************************/
 
-void Test_CF_WriteQueueDataToFile_Call_CF_CList_Traverse_AndReturn_arg_result(void)
+void Test_CF_WriteTxnQueueDataToFile(void)
 {
     /* Arrange */
-    int32           arg_fd = Any_int32();
-    CF_Channel_t    dummy_c;
-    CF_Channel_t   *arg_c = &dummy_c;
-    CF_QueueIdx_t   arg_q = Any_cf_queue_index_t();
-    CF_CListNode_t  dummy_node;
-    CF_CListNode_t *expected_start = &dummy_node;
-    CF_CListFn_t    expected_fn    = (CF_CListFn_t)CF_TraverseTransactions;
-    int32           result;
+    osal_id_t      arg_fd = OS_ObjectIdFromInteger(1);
+    CF_Channel_t   ch;
+    CF_CListNode_t node;
 
-    CF_CList_Traverse_TRAV_ARG_T_context_t context_clist_traverse;
-
-    dummy_c.qs[arg_q] = expected_start;
-
-    context_clist_traverse.context_result = Any_int32();
-    UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_TRAV_ARG_T,
-                          &context_clist_traverse);
+    memset(&node, 0, sizeof(node));
+    memset(&ch, 0, sizeof(ch));
+    ch.qs[CF_QueueIdx_TXA] = &node;
 
     /* Act */
-    result = CF_WriteQueueDataToFile(arg_fd, arg_c, arg_q);
+    /* with no configuration, this should return no error (0) */
+    UtAssert_INT32_EQ(CF_WriteTxnQueueDataToFile(arg_fd, &ch, CF_QueueIdx_TXA), 0);
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CList_Traverse, 1);
-    UtAssert_ADDRESS_EQ(context_clist_traverse.start, expected_start);
-    UtAssert_True(context_clist_traverse.fn == expected_fn, "context_clist_traverse.fn ==  expected_fn");
-    UtAssert_True(context_clist_traverse.context_fd == arg_fd,
-                  "CF_WriteQueueDataToFile received context fd %d and should be %d (fd)",
-                  context_clist_traverse.context_fd, arg_fd);
-    UtAssert_True(result == context_clist_traverse.context_result,
-                  "CF_WriteQueueDataToFile returned %d and should be %d (CF_CList_Traverse set arg.result)", result,
-                  context_clist_traverse.context_result);
-    /* NOTE: context_clist_traverse.counter is not checked because it is not altered */
-} /* end Test_CF_WriteQueueDataToFile_Call_CF_CList_Traverse_AndReturn_arg_result */
+}
 
 /* end CF_WriteQueueDataToFile tests */
 
@@ -821,43 +681,24 @@ void Test_CF_WriteQueueDataToFile_Call_CF_CList_Traverse_AndReturn_arg_result(vo
 **
 *******************************************************************************/
 
-void Test_CF_WriteHistoryQueueDataToFile_Call_CF_CList_Traverse_AndReturn_arg_result(void)
+void Test_CF_WriteHistoryQueueDataToFile(void)
 {
     /* Arrange */
-    int32           arg_fd = Any_int32();
-    CF_Channel_t    dummy_c;
-    CF_Channel_t   *arg_c   = &dummy_c;
-    CF_Direction_t  arg_dir = Any_direction_t();
-    CF_CListNode_t  dummy_node;
-    CF_CListNode_t *expected_start = &dummy_node;
-    CF_CListFn_t    expected_fn    = (CF_CListFn_t)CF_TraverseHistory;
-    int32           result;
+    osal_id_t      arg_fd = OS_ObjectIdFromInteger(1);
+    CF_Channel_t   ch;
+    CF_CListNode_t node;
 
-    CF_CList_Traverse_TRAV_ARG_T_context_t context_clist_traverse;
-
-    dummy_c.qs[CF_QueueIdx_HIST] = expected_start;
-
-    context_clist_traverse.context_result = Any_int32();
-    UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_TRAV_ARG_T,
-                          &context_clist_traverse);
+    memset(&node, 0, sizeof(node));
+    memset(&ch, 0, sizeof(ch));
+    ch.qs[CF_QueueIdx_HIST] = &node;
 
     /* Act */
-    result = CF_WriteHistoryQueueDataToFile(arg_fd, arg_c, arg_dir);
+    /* with no configuration, this should return no error (0) */
+    UtAssert_INT32_EQ(CF_WriteHistoryQueueDataToFile(arg_fd, &ch, CF_QueueIdx_HIST), 0);
 
     /* Assert */
-    /* NOTE: cannot test functions local setup of arg because it is passed as a void*
-    ** Maybe this can be overcome, but need to know what all can be sent to CF_CList_Traverse */
     UtAssert_STUB_COUNT(CF_CList_Traverse, 1);
-    UtAssert_ADDRESS_EQ(context_clist_traverse.start, expected_start);
-    UtAssert_True(context_clist_traverse.fn == expected_fn, "context_clist_traverse.fn ==  expected_fn");
-    UtAssert_True(context_clist_traverse.context_fd == arg_fd,
-                  "CF_WriteQueueDataToFile received context fd %d and should be %d (fd)",
-                  context_clist_traverse.context_fd, arg_fd);
-    UtAssert_True(result == context_clist_traverse.context_result,
-                  "CF_WriteQueueDataToFile returned %d and should be %d (CF_CList_Traverse set arg.result)", result,
-                  context_clist_traverse.context_result);
-    /* NOTE: context_clist_traverse.counter is not checked because it is not altered */
-} /* end Test_CF_WriteHistoryQueueDataToFile_Call_CF_CList_Traverse_AndReturn_arg_result */
+}
 
 /* end CF_WriteHistoryQueueDataToFile tests */
 
@@ -1429,38 +1270,28 @@ void add_cf_utils_h_tests(void)
     /* end CF_CList_InsertBack_Ex tests */
 }
 
-void add_CF_TraverseHistory_tests(void)
+void add_CF_Traverse_WriteHistoryToFile_tests(void)
 {
-    UtTest_Add(Test_CF_TraverseHistory_AssertsBecause_h_dir_GreaterThan_CF_DIR_NUM, cf_utils_tests_Setup,
-               cf_utils_tests_Teardown, "Test_CF_TraverseHistory_AssertsBecause_h_dir_GreaterThan_CF_DIR_NUM");
-    UtTest_Add(Test_CF_TraverseHistory_When_CF_WrappedWrite_FailsFirstCallReturn_CLIST_EXIT, cf_utils_tests_Setup,
-               cf_utils_tests_Teardown, "Test_CF_TraverseHistory_When_CF_WrappedWrite_FailsFirstCallReturn_CLIST_EXIT");
-    UtTest_Add(Test_CF_TraverseHistory_When_CF_WrappedWrite_FailsSecondCallReturn_CLIST_EXIT, cf_utils_tests_Setup,
-               cf_utils_tests_Teardown,
-               "Test_CF_TraverseHistory_When_CF_WrappedWrite_FailsSecondCallReturn_CLIST_EXIT");
-    UtTest_Add(Test_CF_TraverseHistory_WhenBothWrappedWritesSuccessfulReturn_CLIST_CONT, cf_utils_tests_Setup,
-               cf_utils_tests_Teardown, "Test_CF_TraverseHistory_WhenBothWrappedWritesSuccessfulReturn_CLIST_CONT");
+    UtTest_Add(Test_CF_Traverse_WriteHistoryQueueEntryToFile, cf_utils_tests_Setup, cf_utils_tests_Teardown,
+               "CF_Traverse_WriteHistoryQueueEntryToFile");
 }
 
-void add_CF_TraverseTransactions_tests(void)
+void add_CF_Traverse_WriteAllTxnToFile_tests(void)
 {
-    UtTest_Add(Test_CF_TraverseTransactions_When_context_result_Is_1_Return_CLIST_EXIT, cf_utils_tests_Setup,
-               cf_utils_tests_Teardown, "Test_CF_TraverseTransactions_When_context_result_Is_1_Return_CLIST_EXIT");
-    UtTest_Add(Test_CF_TraverseTransactions_When_context_result_Is_0_Return_CLIST_CONT, cf_utils_tests_Setup,
-               cf_utils_tests_Teardown, "Test_CF_TraverseTransactions_When_context_result_Is_0_Return_CLIST_CONT");
+    UtTest_Add(Test_CF_Traverse_WriteTxnQueueEntryToFile, cf_utils_tests_Setup, cf_utils_tests_Teardown,
+               "CF_Traverse_WriteTxnQueueEntryToFile");
 }
 
-void add_CF_WriteQueueDataToFile_tests(void)
+void add_CF_WriteTxnQueueDataToFile_tests(void)
 {
-    UtTest_Add(Test_CF_WriteQueueDataToFile_Call_CF_CList_Traverse_AndReturn_arg_result, cf_utils_tests_Setup,
-               cf_utils_tests_Teardown, "Test_CF_WriteQueueDataToFile_Call_CF_CList_Traverse_AndReturn_arg_result");
+    UtTest_Add(Test_CF_WriteTxnQueueDataToFile, cf_utils_tests_Setup, cf_utils_tests_Teardown,
+               "Test_CF_WriteTxnQueueDataToFile");
 }
 
 void add_CF_WriteHistoryQueueDataToFile_tests(void)
 {
-    UtTest_Add(Test_CF_WriteHistoryQueueDataToFile_Call_CF_CList_Traverse_AndReturn_arg_result, cf_utils_tests_Setup,
-               cf_utils_tests_Teardown,
-               "Test_CF_WriteHistoryQueueDataToFile_Call_CF_CList_Traverse_AndReturn_arg_result");
+    UtTest_Add(Test_CF_WriteHistoryQueueDataToFile, cf_utils_tests_Setup, cf_utils_tests_Teardown,
+               "Test_CF_WriteHistoryQueueDataToFile");
 }
 
 void add_CF_PrioSearch_tests(void)
@@ -1555,11 +1386,11 @@ void UtTest_Setup(void)
 
     add_cf_utils_h_tests();
 
-    add_CF_TraverseHistory_tests();
+    add_CF_Traverse_WriteHistoryToFile_tests();
 
-    add_CF_TraverseTransactions_tests();
+    add_CF_Traverse_WriteAllTxnToFile_tests();
 
-    add_CF_WriteQueueDataToFile_tests();
+    add_CF_WriteTxnQueueDataToFile_tests();
 
     add_CF_WriteHistoryQueueDataToFile_tests();
 

@@ -2554,7 +2554,7 @@ void Test_CF_CmdWriteQueue_When_CF_WrappedCreat_Fails_type_IsNot_type_up_And_que
      Test_CF_CmdWriteQueue_When_CF_WrappedCreat_Fails_type_IsNot_type_up_And_queue_Is_q_pend_SendEventAndRejectCommand
    */
 
-void Test_CF_CmdWriteQueue_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedClose_SendEventCloseAndRejectCommandWhen_CF_WriteQueueDataToFile_Fails(
+void Test_CF_CmdWriteQueue_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedClose_SendEventCloseAndRejectCommandWhen_CF_WriteTxnQueueDataToFile_Fails(
     void)
 {
     /* Arrange */
@@ -2581,13 +2581,13 @@ void Test_CF_CmdWriteQueue_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedC
     UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
                      false);
 
-    /* invalid result from CF_WriteQueueDataToFile */
-    int32                             forced_return_CF_WriteQueueDataToFile = Any_int32_Except(0);
-    CF_WriteQueueDataToFile_context_t context_CF_WriteQueueDataToFile;
+    /* invalid result from CF_WriteTxnQueueDataToFile */
+    int32                                forced_return_CF_WriteTxnQueueDataToFile = Any_int32_Except(0);
+    CF_WriteTxnQueueDataToFile_context_t context_CF_WriteTxnQueueDataToFile;
 
-    UT_SetDataBuffer(UT_KEY(CF_WriteQueueDataToFile), &context_CF_WriteQueueDataToFile,
-                     sizeof(context_CF_WriteQueueDataToFile), false);
-    UT_SetDefaultReturnValue(UT_KEY(CF_WriteQueueDataToFile), forced_return_CF_WriteQueueDataToFile);
+    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile), &context_CF_WriteTxnQueueDataToFile,
+                     sizeof(context_CF_WriteTxnQueueDataToFile), false);
+    UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
 
@@ -2600,17 +2600,17 @@ void Test_CF_CmdWriteQueue_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedC
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 1);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_WRITEQ_RX);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
     /* Assert for CF_CmdRej */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
 } /* end
-     Test_CF_CmdWriteQueue_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedClose_SendEventCloseAndRejectCommandWhen_CF_WriteQueueDataToFile_Fails
+     Test_CF_CmdWriteQueue_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedClose_SendEventCloseAndRejectCommandWhen_CF_WriteTxnQueueDataToFile_Fails
    */
 
-void Test_CF_CmdWriteQueue_When_CF_WriteQueueDataToFile_FailsAnd_wq_IsUpAnd_queue_IsActive_fd_IsPositive_Call_CF_WrappedClose_SendEventClosesAndRejectCommand(
+void Test_CF_CmdWriteQueue_When_CF_WriteTxnQueueDataToFile_FailsAnd_wq_IsUpAnd_queue_IsActive_fd_IsPositive_Call_CF_WrappedClose_SendEventClosesAndRejectCommand(
     void)
 {
     /* Arrange */
@@ -2637,13 +2637,13 @@ void Test_CF_CmdWriteQueue_When_CF_WriteQueueDataToFile_FailsAnd_wq_IsUpAnd_queu
     UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
                      false);
 
-    /* invalid result from CF_WriteQueueDataToFile */
-    int32                             forced_return_CF_WriteQueueDataToFile = Any_int32_Except(0);
-    CF_WriteQueueDataToFile_context_t context_CF_WriteQueueDataToFile;
+    /* invalid result from CF_WriteTxnQueueDataToFile */
+    int32                                forced_return_CF_WriteTxnQueueDataToFile = Any_int32_Except(0);
+    CF_WriteTxnQueueDataToFile_context_t context_CF_WriteTxnQueueDataToFile;
 
-    UT_SetDataBuffer(UT_KEY(CF_WriteQueueDataToFile), &context_CF_WriteQueueDataToFile,
-                     sizeof(context_CF_WriteQueueDataToFile), false);
-    UT_SetDefaultReturnValue(UT_KEY(CF_WriteQueueDataToFile), forced_return_CF_WriteQueueDataToFile);
+    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile), &context_CF_WriteTxnQueueDataToFile,
+                     sizeof(context_CF_WriteTxnQueueDataToFile), false);
+    UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     /* goto out_close */
     int32 context_CF_WrappedClose_fd;
@@ -2661,14 +2661,14 @@ void Test_CF_CmdWriteQueue_When_CF_WriteQueueDataToFile_FailsAnd_wq_IsUpAnd_queu
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 1);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_WRITEQ_RX);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
     /* Assert for CF_CmdRej */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
 } /* end
-     Test_CF_CmdWriteQueue_When_CF_WriteQueueDataToFile_FailsAnd_wq_IsUpAnd_queue_IsActive_fd_IsPositive_Call_CF_WrappedClose_SendEventClosesAndRejectCommand
+     Test_CF_CmdWriteQueue_When_CF_WriteTxnQueueDataToFile_FailsAnd_wq_IsUpAnd_queue_IsActive_fd_IsPositive_Call_CF_WrappedClose_SendEventClosesAndRejectCommand
    */
 
 void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsUpAnd_queue_IsHistory_fd_IsPositive_Call_CF_WrappedClose_SendEventCloseAndRejectCommand(
@@ -2722,7 +2722,7 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsUpA
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 0);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_WRITEHIST_RX);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
@@ -2759,13 +2759,13 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnFirstCallAnd_wq
     UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
                      false);
 
-    /* invalid result from CF_WriteQueueDataToFile */
-    int32                             forced_return_CF_WriteQueueDataToFile = Any_int32_Except(0);
-    CF_WriteQueueDataToFile_context_t context_CF_WriteQueueDataToFile;
+    /* invalid result from CF_WriteTxnQueueDataToFile */
+    int32                                forced_return_CF_WriteTxnQueueDataToFile = Any_int32_Except(0);
+    CF_WriteTxnQueueDataToFile_context_t context_CF_WriteTxnQueueDataToFile;
 
-    UT_SetDataBuffer(UT_KEY(CF_WriteQueueDataToFile), &context_CF_WriteQueueDataToFile,
-                     sizeof(context_CF_WriteQueueDataToFile), false);
-    UT_SetDefaultReturnValue(UT_KEY(CF_WriteQueueDataToFile), forced_return_CF_WriteQueueDataToFile);
+    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile), &context_CF_WriteTxnQueueDataToFile,
+                     sizeof(context_CF_WriteTxnQueueDataToFile), false);
+    UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     /* goto out_close */
     int32 context_CF_WrappedClose_fd;
@@ -2783,7 +2783,7 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnFirstCallAnd_wq
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 1);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_WRITEQ_TX);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
@@ -2820,15 +2820,16 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnSecondCallAnd_w
     UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
                      false);
 
-    /* invalid result from CF_WriteQueueDataToFile */
-    int32                             forced_return_CF_WriteQueueDataToFile_1st_call = 0;
-    int32                             forced_return_CF_WriteQueueDataToFile_2nd_call = Any_int32_Except(0);
-    CF_WriteQueueDataToFile_context_t context_CF_WriteQueueDataToFile[2];
+    /* invalid result from CF_WriteTxnQueueDataToFile */
+    int32                                forced_return_CF_WriteTxnQueueDataToFile_1st_call = 0;
+    int32                                forced_return_CF_WriteTxnQueueDataToFile_2nd_call = Any_int32_Except(0);
+    CF_WriteTxnQueueDataToFile_context_t context_CF_WriteTxnQueueDataToFile[2];
 
-    UT_SetDataBuffer(UT_KEY(CF_WriteQueueDataToFile), &context_CF_WriteQueueDataToFile,
-                     sizeof(context_CF_WriteQueueDataToFile), false);
-    UT_SetDefaultReturnValue(UT_KEY(CF_WriteQueueDataToFile), forced_return_CF_WriteQueueDataToFile_1st_call);
-    UT_SetDeferredRetcode(UT_KEY(CF_WriteQueueDataToFile), SECOND_CALL, forced_return_CF_WriteQueueDataToFile_2nd_call);
+    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile), &context_CF_WriteTxnQueueDataToFile,
+                     sizeof(context_CF_WriteTxnQueueDataToFile), false);
+    UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile_1st_call);
+    UT_SetDeferredRetcode(UT_KEY(CF_WriteTxnQueueDataToFile), SECOND_CALL,
+                          forced_return_CF_WriteTxnQueueDataToFile_2nd_call);
 
     /* goto out_close */
     int32 context_CF_WrappedClose_fd;
@@ -2846,7 +2847,7 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnSecondCallAnd_w
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 2);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 2);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_WRITEQ_TX);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
@@ -2883,13 +2884,13 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
     UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
                      false);
 
-    /* invalid result from CF_WriteQueueDataToFile */
-    int32                             forced_return_CF_WriteQueueDataToFile = Any_int32_Except(0);
-    CF_WriteQueueDataToFile_context_t context_CF_WriteQueueDataToFile;
+    /* invalid result from CF_WriteTxnQueueDataToFile */
+    int32                                forced_return_CF_WriteTxnQueueDataToFile = Any_int32_Except(0);
+    CF_WriteTxnQueueDataToFile_context_t context_CF_WriteTxnQueueDataToFile;
 
-    UT_SetDataBuffer(UT_KEY(CF_WriteQueueDataToFile), &context_CF_WriteQueueDataToFile,
-                     sizeof(context_CF_WriteQueueDataToFile), false);
-    UT_SetDefaultReturnValue(UT_KEY(CF_WriteQueueDataToFile), forced_return_CF_WriteQueueDataToFile);
+    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile), &context_CF_WriteTxnQueueDataToFile,
+                     sizeof(context_CF_WriteTxnQueueDataToFile), false);
+    UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     /* goto out_close */
     int32 context_CF_WrappedClose_fd;
@@ -2907,7 +2908,7 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 1);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_WRITEQ_PEND);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
@@ -2968,7 +2969,7 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 0);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_WRITEHIST_TX);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
@@ -3004,10 +3005,10 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_All(void)
     UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
                      false);
 
-    /* valid result from CF_WriteQueueDataToFile */
-    int32 forced_return_CF_WriteQueueDataToFile = 0;
+    /* valid result from CF_WriteTxnQueueDataToFile */
+    int32 forced_return_CF_WriteTxnQueueDataToFile = 0;
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_WriteQueueDataToFile), forced_return_CF_WriteQueueDataToFile);
+    UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     /* valid result from CF_WriteHistoryQueueDataToFile */
     int32 forced_return_CF_WriteHistoryQueueDataToFile = 0;
@@ -3023,7 +3024,7 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_All(void)
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 4);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 4);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 2);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
@@ -3072,7 +3073,7 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_History(void)
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 0);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 2);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
@@ -3107,10 +3108,10 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_Active(void)
     UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
                      false);
 
-    /* valid result from CF_WriteQueueDataToFile */
-    int32 forced_return_CF_WriteQueueDataToFile = 0;
+    /* valid result from CF_WriteTxnQueueDataToFile */
+    int32 forced_return_CF_WriteTxnQueueDataToFile = 0;
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_WriteQueueDataToFile), forced_return_CF_WriteQueueDataToFile);
+    UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -3121,7 +3122,7 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_Active(void)
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 3);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 3);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
@@ -3156,10 +3157,10 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_Pend(void)
     UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
                      false);
 
-    /* valid result from CF_WriteQueueDataToFile */
-    int32 forced_return_CF_WriteQueueDataToFile = 0;
+    /* valid result from CF_WriteTxnQueueDataToFile */
+    int32 forced_return_CF_WriteTxnQueueDataToFile = 0;
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_WriteQueueDataToFile), forced_return_CF_WriteQueueDataToFile);
+    UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -3170,7 +3171,7 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_Pend(void)
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 1);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
@@ -3205,10 +3206,10 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_UpAnd_q_All(void)
     UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
                      false);
 
-    /* valid result from CF_WriteQueueDataToFile */
-    int32 forced_return_CF_WriteQueueDataToFile = 0;
+    /* valid result from CF_WriteTxnQueueDataToFile */
+    int32 forced_return_CF_WriteTxnQueueDataToFile = 0;
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_WriteQueueDataToFile), forced_return_CF_WriteQueueDataToFile);
+    UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     /* valid result from CF_WriteHistoryQueueDataToFile */
     int32 forced_return_CF_WriteHistoryQueueDataToFile = 0;
@@ -3224,7 +3225,7 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_UpAnd_q_All(void)
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 1);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
@@ -3273,7 +3274,7 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_UpAnd_q_History(void)
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 0);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
@@ -3308,10 +3309,10 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_UpAnd_q_Active(void)
     UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
                      false);
 
-    /* valid result from CF_WriteQueueDataToFile */
-    int32 forced_return_CF_WriteQueueDataToFile = 0;
+    /* valid result from CF_WriteTxnQueueDataToFile */
+    int32 forced_return_CF_WriteTxnQueueDataToFile = 0;
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_WriteQueueDataToFile), forced_return_CF_WriteQueueDataToFile);
+    UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -3322,7 +3323,7 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_UpAnd_q_Active(void)
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 1);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
@@ -3359,10 +3360,10 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_All(void)
     UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
                      false);
 
-    /* valid result from CF_WriteQueueDataToFile */
-    int32 forced_return_CF_WriteQueueDataToFile = 0;
+    /* valid result from CF_WriteTxnQueueDataToFile */
+    int32 forced_return_CF_WriteTxnQueueDataToFile = 0;
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_WriteQueueDataToFile), forced_return_CF_WriteQueueDataToFile);
+    UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -3373,7 +3374,7 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_All(void)
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 3);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 3);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
@@ -3408,10 +3409,10 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_History(void)
     UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
                      false);
 
-    /* valid result from CF_WriteQueueDataToFile */
-    int32 forced_return_CF_WriteQueueDataToFile = 0;
+    /* valid result from CF_WriteTxnQueueDataToFile */
+    int32 forced_return_CF_WriteTxnQueueDataToFile = 0;
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_WriteQueueDataToFile), forced_return_CF_WriteQueueDataToFile);
+    UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -3422,7 +3423,7 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_History(void)
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 0);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
@@ -3457,10 +3458,10 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_Active(void)
     UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
                      false);
 
-    /* valid result from CF_WriteQueueDataToFile */
-    int32 forced_return_CF_WriteQueueDataToFile = 0;
+    /* valid result from CF_WriteTxnQueueDataToFile */
+    int32 forced_return_CF_WriteTxnQueueDataToFile = 0;
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_WriteQueueDataToFile), forced_return_CF_WriteQueueDataToFile);
+    UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -3471,7 +3472,7 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_Active(void)
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 2);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 2);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
@@ -3506,10 +3507,10 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_Pend(void)
     UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
                      false);
 
-    /* valid result from CF_WriteQueueDataToFile */
-    int32 forced_return_CF_WriteQueueDataToFile = 0;
+    /* valid result from CF_WriteTxnQueueDataToFile */
+    int32 forced_return_CF_WriteTxnQueueDataToFile = 0;
 
-    UT_SetDefaultReturnValue(UT_KEY(CF_WriteQueueDataToFile), forced_return_CF_WriteQueueDataToFile);
+    UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     /* Arrange unstubbable: CF_CmdAcc */
     uint16 initial_hk_cmd_counter = Any_uint16();
@@ -3520,7 +3521,7 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_Pend(void)
     CF_CmdWriteQueue(arg_msg);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteQueueDataToFile, 1);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
@@ -4788,14 +4789,15 @@ void add_CF_CmdWriteQueue_tests(void)
         "Test_CF_CmdWriteQueue_When_CF_WrappedCreat_Fails_type_IsNot_type_up_And_queue_Is_q_pend_"
         "SendEventAndRejectCommand");
     UtTest_Add(
-        Test_CF_CmdWriteQueue_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedClose_SendEventCloseAndRejectCommandWhen_CF_WriteQueueDataToFile_Fails,
+        Test_CF_CmdWriteQueue_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedClose_SendEventCloseAndRejectCommandWhen_CF_WriteTxnQueueDataToFile_Fails,
         cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
         "Test_CF_CmdWriteQueue_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedClose_"
-        "SendEventCloseAndRejectCommandWhen_CF_WriteQueueDataToFile_Fails");
+        "SendEventCloseAndRejectCommandWhen_CF_WriteTxnQueueDataToFile_Fails");
     UtTest_Add(
-        Test_CF_CmdWriteQueue_When_CF_WriteQueueDataToFile_FailsAnd_wq_IsUpAnd_queue_IsActive_fd_IsPositive_Call_CF_WrappedClose_SendEventClosesAndRejectCommand,
+        Test_CF_CmdWriteQueue_When_CF_WriteTxnQueueDataToFile_FailsAnd_wq_IsUpAnd_queue_IsActive_fd_IsPositive_Call_CF_WrappedClose_SendEventClosesAndRejectCommand,
         cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-        "Test_CF_CmdWriteQueue_When_CF_WriteQueueDataToFile_FailsAnd_wq_IsUpAnd_queue_IsActive_fd_IsPositive_Call_CF_"
+        "Test_CF_CmdWriteQueue_When_CF_WriteTxnQueueDataToFile_FailsAnd_wq_IsUpAnd_queue_IsActive_fd_IsPositive_Call_"
+        "CF_"
         "WrappedClose_SendEventClosesAndRejectCommand");
     UtTest_Add(
         Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsUpAnd_queue_IsHistory_fd_IsPositive_Call_CF_WrappedClose_SendEventCloseAndRejectCommand,
