@@ -28,6 +28,6 @@
 
 #define CF_MAJOR_VERSION 3
 #define CF_MINOR_VERSION 0
-#define CF_REVISION      0
+#define CF_REVISION      99 /* indicates a development version */
 
 #endif /* CF_VERSION_H */
