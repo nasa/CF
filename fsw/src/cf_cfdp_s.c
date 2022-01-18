@@ -504,7 +504,7 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     /* this function is only invoked for NAK PDU types */
     nak = &ph->int_header.nak;
 
-    if (nak->segment_list.num_segments > 0)
+    if (CF_CFDP_RecvNak(t, ph) == 0 && nak->segment_list.num_segments > 0)
     {
         for (counter = 0; counter < nak->segment_list.num_segments; ++counter)
         {
