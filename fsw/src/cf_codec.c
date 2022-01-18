@@ -24,11 +24,99 @@
  * CFDP protocol data structure encode/decode implementation
  */
 
-#define CF_DO_DECLARE_FIELDS
-
 #include "cf_cfdp_pdu.h"
 #include "cf_codec.h"
 #include "cf_events.h"
+
+#define xstr(s) str(s)
+#define str(s)  #s
+
+#include <stdint.h>
+
+typedef struct CF_Codec_BitField
+{
+    uint32 shift;
+    uint32 mask;
+} CF_Codec_BitField_t;
+
+/* NBITS == number of bits */
+#define DECLARE_FIELD(NAME, NBITS, SHIFT) \
+    static const CF_Codec_BitField_t NAME = {.shift = (SHIFT), .mask = ((1 << NBITS) - 1)};
+
+/*
+ * All CFDP sub-fields are fewer than 8 bits in size
+ */
+static inline uint8 CF_FieldGetVal(const uint8 *src, uint8 shift, uint8 mask)
+{
+    return (*src >> shift) & mask;
+}
+
+static inline void CF_FieldSetVal(uint8 *dest, uint8 shift, uint8 mask, uint8 val)
+{
+    *dest &= ~(mask << shift);
+    *dest |= ((val & mask) << shift);
+}
+
+/* FGV, FSV, and FAV are just simple shortenings of the field macros.
+ *
+ * FGV == field get val
+ * FSV == field set val
+ */
+
+#define FGV(SRC, NAME)       CF_FieldGetVal((SRC).octets, (NAME).shift, (NAME).mask)
+#define FSV(DEST, NAME, VAL) CF_FieldSetVal((DEST).octets, (NAME).shift, (NAME).mask, VAL)
+
+/*
+ * Fields within the "flags" byte of the PDU header
+ */
+DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_VERSION, 3, 5)
+DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_TYPE, 1, 4)
+DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_DIR, 1, 3)
+DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_MODE, 1, 2)
+DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_CRC, 1, 1)
+DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_LARGEFILE, 1, 0)
+
+/*
+ * Fields within the "eid_tsn_lengths" byte of the PDU header
+ */
+DECLARE_FIELD(CF_CFDP_PduHeader_LENGTHS_ENTITY, 3, 4)
+DECLARE_FIELD(CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE, 3, 0)
+
+/*
+ * Position of the condition code value within the CC field for EOF
+ */
+DECLARE_FIELD(CF_CFDP_PduEof_FLAGS_CC, 4, 4)
+
+/*
+ * Position of the sub-field values within the flags field for FIN
+ */
+DECLARE_FIELD(CF_CFDP_PduFin_FLAGS_CC, 4, 4)
+DECLARE_FIELD(CF_CFDP_PduFin_FLAGS_DELIVERY_CODE, 1, 2)
+DECLARE_FIELD(CF_CFDP_PduFin_FLAGS_FILE_STATUS, 2, 0)
+
+/*
+ * Position of the sub-field values within the directive_and_subtype_code
+ * and cc_and_transaction_status fields within the ACK PDU.
+ */
+DECLARE_FIELD(CF_CFDP_PduAck_DIR_CODE, 4, 4)
+DECLARE_FIELD(CF_CFDP_PduAck_DIR_SUBTYPE_CODE, 4, 0)
+DECLARE_FIELD(CF_CFDP_PduAck_CC, 4, 4)
+DECLARE_FIELD(CF_CFDP_PduAck_TRANSACTION_STATUS, 2, 0)
+
+/*
+ * Position of the sub-field values within the directive_and_subtype_code
+ * and cc_and_transaction_status fields within the ACK PDU.
+ */
+DECLARE_FIELD(CF_CFDP_PduMd_CLOSURE_REQUESTED, 1, 7)
+DECLARE_FIELD(CF_CFDP_PduMd_CHECKSUM_TYPE, 4, 0)
+
+/*
+ * Position of the optional sub-field values within the file data PDU header
+ * These are present only if the "segment metadata" flag in the common header
+ * is set to 1.
+ */
+DECLARE_FIELD(CF_CFDP_PduFileData_RECORD_CONTINUATION_STATE, 2, 6)
+DECLARE_FIELD(CF_CFDP_PduFileData_SEGMENT_METADATA_LENGTH, 6, 0)
 
 /* NOTE: get/set will handle endianess */
 /*
@@ -753,10 +841,12 @@ void CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh)
     peh = CF_DECODE_FIXED_CHUNK(state, CF_CFDP_PduHeader_t);
     if (peh != NULL)
     {
-        plh->version   = FGV(peh->flags, CF_CFDP_PduHeader_FLAGS_VERSION);
-        plh->direction = FGV(peh->flags, CF_CFDP_PduHeader_FLAGS_DIR);
-        plh->pdu_type  = FGV(peh->flags, CF_CFDP_PduHeader_FLAGS_TYPE);
-        plh->txm_mode  = FGV(peh->flags, CF_CFDP_PduHeader_FLAGS_MODE);
+        plh->version    = FGV(peh->flags, CF_CFDP_PduHeader_FLAGS_VERSION);
+        plh->direction  = FGV(peh->flags, CF_CFDP_PduHeader_FLAGS_DIR);
+        plh->pdu_type   = FGV(peh->flags, CF_CFDP_PduHeader_FLAGS_TYPE);
+        plh->txm_mode   = FGV(peh->flags, CF_CFDP_PduHeader_FLAGS_MODE);
+        plh->crc_flag   = FGV(peh->flags, CF_CFDP_PduHeader_FLAGS_CRC);
+        plh->large_flag = FGV(peh->flags, CF_CFDP_PduHeader_FLAGS_LARGEFILE);
 
         /* The eid+tsn lengths are encoded as -1 */
         plh->eid_length     = FGV(peh->eid_tsn_lengths, CF_CFDP_PduHeader_LENGTHS_ENTITY) + 1;
