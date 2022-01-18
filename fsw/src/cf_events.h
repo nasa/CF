@@ -64,6 +64,7 @@
 #define CF_EID_ERR_PDU_GET_EID_SIZE    52
 #define CF_EID_ERR_PDU_GET_TSN_SIZE    53
 #define CF_EID_ERR_PDU_FD_UNSUPPORTED  54
+#define CF_EID_ERR_PDU_LARGE_FILE      55
 
 /* CF_CFDP event ids (engine) */
 #define CF_EID_ERR_CFDP_RX_DROPPED      60
