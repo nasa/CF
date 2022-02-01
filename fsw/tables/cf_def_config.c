@@ -38,7 +38,7 @@ CF_ConfigTable_t CF_config_table = {
          0x18c8,
          0x08c2,
          16,
-         {{5, 25, CF_CFDP_CLASS_2, 23, "/cf/poll_dir", "./poll_dir", 0}, {0}, {0}, {0}, {0}},
+         {{5, 25, CF_CFDP_CLASS_2, 23, "/cf/poll_dir", "./poll_dir", 1}, {0}, {0}, {0}, {0}},
          "", /* throttle sem for channel 1, empty string means no throttle */
          1,
      },
@@ -58,4 +58,4 @@ CF_ConfigTable_t CF_config_table = {
     480, /* outgoing_file_chunk_size */
     "/cf/tmp",
 };
-CFE_TBL_FILEDEF(CF_config_table, CF_APP.config_table, CF config table, cf_def_config.tbl)
+CFE_TBL_FILEDEF(CF_config_table, CF.config_table, CF config table, cf_def_config.tbl)
