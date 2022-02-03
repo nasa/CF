@@ -1,5 +1,5 @@
-#ifndef _cf_test_utils_h_
-#define _cf_test_utils_h_
+#ifndef CF_TEST_UTILS_H
+#define CF_TEST_UTILS_H
 
 /* library includes */
 #include <time.h>
@@ -283,4 +283,4 @@ CFE_Status_t   Any_CFE_Status_t_Except(CFE_Status_t exception);
 CFE_MSG_Size_t Any_CFE_MSG_Size_t(void);
 CFE_MSG_Size_t Any_CFE_MSG_Size_t_LessThan(size_t ceiling);
 
-#endif /* _cf_test_utils_h_ */
+#endif
