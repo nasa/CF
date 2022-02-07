@@ -41,17 +41,15 @@ jobs:
       - name: Checkout bundle
         uses: actions/checkout@v2
         with:
-          path: apps/CF
+          path: apps/cf
           
       - name: Check versions
         run: git submodule
         
-      - name: Add CF app
+      - name: Add cf app
         run: |
-          sed -i '7i CFE_APP, CF, CF_AppMain, CF_APP, 80, 16384, 0x0, 0; \n' cfe/cmake/sample_defs/cpu1_cfe_es_startup.scr
-          sed -i -e 's|SET(cpu1_APPLIST ci_lab to_lab sch_lab)| SET(cpu1_APPLIST ci_lab to_lab sch_lab CF) |g' cfe/cmake/sample_defs/targets.cmake 
-          sed -i -e 's|add_cfe_tables(cf fsw/tables/cf_def_config.c)| add_cfe_tables(CF fsw/tables/cf_def_config.c) |g' apps/CF/CMakeLists.txt
-          sed -i -e 's|add_cfe_app(cf ${APP_SRC_FILES})| add_cfe_app(CF ${APP_SRC_FILES}) |g' apps/CF/CMakeLists.txt
+          sed -i '7i CFE_APP, cf, CF_AppMain, CF, 80, 16384, 0x0, 0; \n' cfe/cmake/sample_defs/cpu1_cfe_es_startup.scr
+          sed -i -e 's|SET(cpu1_APPLIST ci_lab to_lab sch_lab)| SET(cpu1_APPLIST ci_lab to_lab sch_lab cf) |g' cfe/cmake/sample_defs/targets.cmake 
           
       - name: Set up for build
         run: |
