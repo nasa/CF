@@ -1379,6 +1379,9 @@ void Test_CF_CList_Traverse_R_WhenListIsMoreThanOneNodeErrorOutFirst_fn_CallFail
     CF_CListNode_t            *dummy_end_prev = &dummy_end_prev_node;
     Dummy_clist_fn_t_context_t context_Dummy_clist_fn_t;
 
+    memset(&dummy_end, 0, sizeof(dummy_end));
+    memset(&dummy_end_prev_node, 0, sizeof(dummy_end_prev_node));
+
     arg_end->prev = dummy_end_prev;
 
     UT_SetDefaultReturnValue(UT_KEY(Dummy_clist_fn_t), 1); /* 0 is pass, 1 is fail */

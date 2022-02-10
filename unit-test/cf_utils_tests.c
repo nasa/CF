@@ -294,6 +294,9 @@ void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
     uint16           initial_q_size = Any_uint16_Except(0); /* 0 will CF_Assert */
 
     CF_CList_Remove_context_t context_clist_remove;
+
+    memset(&arg_t, 0, sizeof(arg_t));
+
     UT_SetDataBuffer(UT_KEY(CF_CList_Remove), &context_clist_remove, sizeof(context_clist_remove), false);
 
     arg_t.chan_num   = dummy_chan_num;
@@ -360,6 +363,8 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
     CF_CListNode_t  **expected_insert_back_head;
     CF_CListNode_t   *expected_insert_back_node;
     CF_QueueIdx_t     arg_q = Any_cf_queue_index_t();
+
+    memset(&dummy_t, 0, sizeof(dummy_t));
 
     arg_t->chan_num = dummy_chan_num;
 
