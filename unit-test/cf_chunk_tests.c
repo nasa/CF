@@ -1684,8 +1684,9 @@ void Test_CF_Chunks_Add_WhenNotAtEndCall_CF_Chunks_Insert(void)
         initial_chunks[i + num_chunks_before].offset = Any_uint32_GreaterThan(dummy_chunk.offset);
     }
 
-    arg_chunks->count  = num_chunks_before + num_chunks_after;
-    arg_chunks->chunks = initial_chunks;
+    arg_chunks->max_chunks = sizeof(initial_chunks)/sizeof(initial_chunks[0]);
+    arg_chunks->count      = num_chunks_before + num_chunks_after;
+    arg_chunks->chunks     = initial_chunks;
 
     /* Act */
     CF_ChunkListAdd(arg_chunks, arg_offset, arg_size);
@@ -1712,6 +1713,7 @@ void Test_CF_Chunks_Add_WhenAtEndCall_CF_Chunks_Insert(void)
     initial_chunks->size   = 0;
     arg_chunks->count      = 1;
     arg_chunks->chunks     = initial_chunks;
+    arg_chunks->max_chunks = sizeof(initial_chunks)/sizeof(initial_chunks[0]);
 
     /* Act */
     CF_ChunkListAdd(arg_chunks, arg_offset, arg_size);

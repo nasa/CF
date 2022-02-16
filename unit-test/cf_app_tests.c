@@ -834,7 +834,7 @@ void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SB_TIME_OUT_
 void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndValid_msg_Call_CF_ProcessMsg(void)
 {
     /* Arrange */
-    int32            forced_return_CFE_SB_ReceiveBuffer = CFE_SUCCESS;
+    CFE_SB_MsgId_t   forced_MsgID = CFE_SB_INVALID_MSG_ID;
     CFE_SB_Buffer_t  fake_msg;
     CFE_SB_Buffer_t *dummy_msg               = &fake_msg;
     uint16           initial_hk_counters_err = Any_uint16();
@@ -842,13 +842,11 @@ void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndV
     UT_SetDeferredRetcode(UT_KEY(CFE_ES_RunLoop), 1, true);
     UT_SetDefaultReturnValue(UT_KEY(CFE_ES_RunLoop), false);
 
-    /* TODO: setting the data buffer only removes a TSF, otherwise in this test it does nothing */
+    /* Actual data not used, just address is needed */
     UT_SetDataBuffer(UT_KEY(CFE_SB_ReceiveBuffer), &dummy_msg, sizeof(dummy_msg), false);
-    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), forced_return_CFE_SB_ReceiveBuffer);
 
-    /* Arrange unstubbable: CF_ProcessMsg */
-    UT_SetDefaultReturnValue(UT_KEY(CFE_MSG_GetMsgId),
-                             UINT32_MAX); /* UINT32_MAX selected because it should error out */
+    /* Arrange unstubbable: CF_ProcessMsg, invalid ID */
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &forced_MsgID, sizeof(forced_MsgID), false);
     CF_AppData.hk.counters.err = initial_hk_counters_err;
 
     /* Act */
