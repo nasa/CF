@@ -1459,12 +1459,13 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     CF_Chunk_t     *arg_chunk   = &dummy_chunk;
 
     /* Arrange for CF_Chunks_CombineNext to return 0 and CF_Chunks_CombinePrevious to return 0 */
-    CF_ChunkIdx_t  dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
+    CF_ChunkIdx_t  dummy_chunks_count;
     CF_Chunk_t     dummy_chunks_chunks[10] = {{0}}; /* 10 repeated for dummy_chunks for build ability */
     CF_ChunkList_t dummy_chunks;
 
     arg_chunks             = &dummy_chunks;
-    arg_chunks->max_chunks = UINT32_MAX;
+    arg_chunks->max_chunks = sizeof(dummy_chunks_chunks)/sizeof(dummy_chunks_chunks[0]);
+    dummy_chunks_count     = arg_chunks->max_chunks - 1;  /* Arbitrary, but selecting last slot */
 
     arg_chunks->count = dummy_chunks_count;
     arg_i             = arg_chunks->count;
