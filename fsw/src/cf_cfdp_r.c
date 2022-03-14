@@ -1,11 +1,11 @@
 /************************************************************************
- * File: cf_cfdp_r.c
- *
  * NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
  * Application version 3.0.0”
- * Copyright © 2019 United States Government as represented by the
+ *
+ * Copyright (c) 2019 United States Government as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All Rights Reserved.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
  * a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -15,17 +15,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- *
- * Purpose:
+ ************************************************************************/
+
+/**
+ * @file
  *  The CF Application CFDP receive logic source file
  *
  *  Handles all CFDP engine functionality specific to RX transactions.
- *
- *
- *
- ************************************************************************/
-
+ */
 #include "cfe.h"
 #include "cf_verify.h"
 #include "cf_app.h"
