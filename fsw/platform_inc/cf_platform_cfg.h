@@ -32,7 +32,12 @@
  *************************************************************************/
 
 /**
- * @cfcfg Entity id size
+ * \defgroup cfscfplatformcfg CFS CFDP Platform Configuration
+ * \{
+ */
+
+/**
+ * @brief Entity id size
  *
  * @par Description:
  *      The maximum size of the entity id as expected for all CFDP packets.
@@ -55,7 +60,7 @@
 typedef uint32 CF_EntityId_t;
 
 /**
- * @cfcfg transaction sequence number size
+ * @brief transaction sequence number size
  *
  * @par Description:
  *      The max size of the transaction sequence number as expected for all CFDP packets.
@@ -74,7 +79,7 @@ typedef uint32 CF_EntityId_t;
 typedef uint32 CF_TransactionSeq_t;
 
 /**
- *  @cfcfg Application Pipe Depth
+ *  @brief Application Pipe Depth
  *
  *  @par Description:
  *       Dictates the pipe depth of the cf command pipe.
@@ -87,7 +92,7 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_PIPE_DEPTH 32
 
 /**
- *  @cfcfg Number of channels
+ *  @brief Number of channels
  *
  *  @par Description:
  *       The number of chanenls in the engine. Changing this
@@ -99,7 +104,7 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_NUM_CHANNELS 2
 
 /**
- *  @cfcfg Max NAK segments supported in a NAK pdu
+ *  @brief Max NAK segments supported in a NAK pdu
  *
  *  @par Description:
  *       When a NAK pdu is sent or received, this is the max number of
@@ -121,7 +126,7 @@ typedef uint32 CF_TransactionSeq_t;
  * CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION is an array for each channel indciate the number of chunks to keep track of
  *   NAK requests from the receiver per transaction*/
 /**
- *  @cfcfg RX chunks per transaction (per channel)
+ *  @brief RX chunks per transaction (per channel)
  *
  *  @par Description:
  *       Number of chunks per transaction per channel (RX).
@@ -135,7 +140,7 @@ typedef uint32 CF_TransactionSeq_t;
     }
 
 /**
- *  @cfcfg TX chunks per transaction (per channel)
+ *  @brief TX chunks per transaction (per channel)
  *
  *  @par Description:
  *       Number of chunks per transaction per channel (TX).
@@ -149,7 +154,7 @@ typedef uint32 CF_TransactionSeq_t;
     }
 
 /**
- *  @cfcfg Total number of chunks (tx, rx, all channels)
+ *  @brief Total number of chunks (tx, rx, all channels)
  *
  *  @par Description:
  *       Must be equal to the sum of all values input in CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION
@@ -164,7 +169,7 @@ typedef uint32 CF_TransactionSeq_t;
 
 /* definitions that affect file queuing */
 /**
- *  @cfcfg Number of max commanded playback files per chan.
+ *  @brief Number of max commanded playback files per chan.
  *
  *  @par Description:
  *       This is the max number of outstanding ground commanded file transmits per channel.
@@ -175,7 +180,7 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_MAX_COMMANDED_PLAYBACK_FILES_PER_CHAN 10
 
 /**
- *  @cfcfg Max number of simultaneous file receives.
+ *  @brief Max number of simultaneous file receives.
  *
  *  @par Description:
  *       Each channel can support this number of file receive transactions at a time.
@@ -188,7 +193,7 @@ typedef uint32 CF_TransactionSeq_t;
 /* definitions that affect execution */
 
 /**
- *  @cfcfg Max number of commanded playback directories per channel.
+ *  @brief Max number of commanded playback directories per channel.
  *
  *  @par Description:
  *       Each channel can support this number of groudn commanded directory playbacks.
@@ -199,7 +204,7 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN 2
 
 /**
- *  @cfcfg Max number of polling directories per channel.
+ *  @brief Max number of polling directories per channel.
  *
  *  @par Description:
  *       This affects the configuration table. There must be an entry (can
@@ -211,7 +216,7 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_MAX_POLLING_DIR_PER_CHAN 5
 
 /**
- *  @cfcfg Number of transactions per playback directoriy.
+ *  @brief Number of transactions per playback directoriy.
  *
  *  @par Description:
  *       Each playback/polling directory operation will be able to have this
@@ -223,7 +228,7 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_NUM_TRANSACTIONS_PER_PLAYBACK 5
 
 /**
- *  @cfcfg Number of histories per channel
+ *  @brief Number of histories per channel
  *
  *  @par Description:
  *       Each channel can support this number of file receive transactions at a time.
@@ -234,7 +239,7 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_NUM_HISTORIES_PER_CHANNEL 256
 
 /**
- *  @cfcfg Max PDU size.
+ *  @brief Max PDU size.
  *
  *  @par Description:
  *       The max PDU size across all channels in the system. Keep in mind that
@@ -250,7 +255,7 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_MAX_PDU_SIZE 512
 
 /**
- *  @cfcfg Name of the CF Configuration Table
+ *  @brief Name of the CF Configuration Table
  *
  *  @par Description:
  *       This parameter defines the name of the CF Configuration Table.
@@ -262,7 +267,7 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_CONFIG_TABLE_NAME "config_table"
 
 /**
- *  @cfcfg CF Configuration Table Filename
+ *  @brief CF Configuration Table Filename
  *
  *  @par Description:
  *       The value of this constant defines the filename of the CF Config Table
@@ -274,7 +279,7 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_CONFIG_TABLE_FILENAME "/cf/cf_def_config.tbl"
 
 /**
- *  @cfcfg Maximum file name length.
+ *  @brief Maximum file name length.
  *
  *  @par Limits:
  *
@@ -282,7 +287,7 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_FILENAME_MAX_NAME OS_MAX_FILE_NAME
 
 /**
- *  @cfcfg Maximum file path (not including file name)
+ *  @brief Maximum file path (not including file name)
  *
  *  @par Limits:
  *
@@ -290,7 +295,7 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_FILENAME_MAX_PATH (OS_MAX_PATH_LEN - OS_MAX_FILE_NAME)
 
 /**
- *  @cfcfg Max filename and path length.
+ *  @brief Max filename and path length.
  *
  *  @par Limits:
  *
@@ -298,7 +303,7 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_FILENAME_MAX_LEN (CF_FILENAME_MAX_NAME + CF_FILENAME_MAX_PATH)
 
 /**
- *  @cfcfg R2 crc calc chunk size
+ *  @brief R2 crc calc chunk size
  *
  *  @par Description
  *       R2 performs crc calculation upon file completion in chunks. This is the size
@@ -316,11 +321,13 @@ typedef uint32 CF_TransactionSeq_t;
 #endif
 
 /**
- *  @cfcfg Number of milliseconds to wait for a SB message
+ *  @brief Number of milliseconds to wait for a SB message
  *
  *  @par Limits:
  *
  */
 #define CF_RCVMSG_TIMEOUT 100
+
+/**\}*/
 
 #endif /* !CF_PLATFORM_CFG_H */

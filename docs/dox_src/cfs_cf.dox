@@ -1,38 +1,67 @@
+/**
+  \page cfscffrontpageCFS CFDP (CF) Documentation
+  <UL>
+     <LI> \subpage cfscfintro
+     <LI> \subpage cfscfovr
+     <LI> \subpage cfscfopr
+     <LI> \subpage cfscfcmdspg
+     <LI> \subpage cfscftlmpg
+     <LI> \subpage cfscfeventspg
+     <LI> \subpage cfscfdg
+     <LI> \subpage cfscfcfgpg
+     <LI> \subpage cfscftbl
+     <LI> \subpage cfscfcons
+     <LI> \subpage cfscffaqs
+  </UL>
+**/
 
 /**
+ * \page cfscfeventspg CFS CFDP Events
+ *
+ * \ref cfscfevents
+ */
 
-    \mainpage CFS CFDP (CF) User's Guide
+/**
+ * \page cfscfcfgpg CFS CFDP Configuration
+ *
+ * \ref cfscfmissioncfg
+ *
+ * \ref cfscfplatformcfg
+ */
 
-    <UL>
-       <LI> \subpage cfscfintro
-       <LI> \subpage cfscfovr
-       <LI> \subpage cfscfopr
-       <LI> \subpage cfscfreq
-       <LI> \subpage cfscfdg
-       <LI> \subpage cfscfcmds
-       <LI> \subpage cfscftlm
-       <LI> \subpage cfscftbl
-       <LI> \subpage cfscfcons
-       <LI> \subpage cfscffaqs
-       <LI> \subpage cfscfcfg
-       <LI> \subpage cf_events.h "CFS CFDP Event Message Reference" <BR>
-    </UL>
+/**
+ * \page cfscfcmdspg CFS CFDP Commands
+ *
+ * \ref cfscfcmdmid
+ *
+ * \ref cfscfcmdstructs
+ *
+ * \ref cfscfcmdcodes
+ */
 
-**/
+/**
+ * \page cfscftlmpg CFS CFDP Telemetry
+ *
+ * \ref cfscftlmmid
+ *
+ * \ref cfscftlm
+ */
 
 /**
   \page cfscfintro CFS CFDP Introduction
 
-  <H2> Scope </H2>
+  <H1> Scope </H1>
 
   This document provides a complete specification for the commands and telemetry associated
   with the CFS CFDP (CF) application software.  The document is intended primarily 
   for users of the software (operations personal, test engineers, and maintenance personnel).  
-  The last section of the document, the deployment guide section, is intended for mission 
+  The deployment guide section, is intended for mission 
   developers when deploying and configuring the CF application software for a mission 
   flight software build environment. 
 
-  <H2> Acronyms </H2>
+  \ref cfscfversion
+
+  <H1> Acronyms </H1>
 
   <TABLE BORDER="1" CELLPADDING="2" WIDTH="60%">
   <TR><TD WIDTH="20%"> <B>Acronym</B> </TD> <TD WIDTH="40%"> <B>Description</B>                       </TD>
@@ -72,53 +101,70 @@
   <TR><TD WIDTH="20%"> TLM     </TD> <TD WIDTH="40%"> Telemetry                                       </TD>
   <TR><TD WIDTH="20%"> UTC     </TD> <TD WIDTH="40%"> Universal time code                             </TD>
   </TABLE>
-
-  Next: \ref cfscfovr <BR>
 **/
 
 /**
-
   \page cfscfovr CFS CFDP Overview
 
   CF is a cFS application for providing CFDP (CCSDS File Delivery Protocol) services. 
   Its primary function is to provide file receive and transmit functionality to this 
   protocol. It works by mapping CFDP PDUs on and off cFS's software bus.
-
   
   <H2> CF Design Overview </H2>
  
-  TODO
-    
-  Next: \ref cfscfopr <BR>
-  Prev: \ref cfscfintro
+  The CFS CFDP application is a CFDP implementation written specifically for CFS.
+  The goal was bounded, small,
+  time and space efficent implementation of the CFDP features necessary for flight.
+  CF implements Class 1 and 2 send and receive, as well as logic to cancel, suspend,
+  resume, abandon, freeze, etc.  Messages utilize "zero-copy" software bus buffers.
+
+  Configuration is mainly through the configuration table.
+
+  <H2> Key differences from CF v2.X </H2>
+
+  - There's no more text-based ground commands where strings are sent for commands.
+  - There's no more memory pool. Everything is set up with limits both in platform
+    config for static memory limits and the configuration table for dynamic timing and functionality limits.
+  - Much smaller code footprint. CF 3.0 is light-weight flight-only app. It does not provide any ground engine support.
 **/
 
 
 /**
-
   \page cfscfopr CFS CFDP Operation
 
-  TODO 
+  <H2>Initialization</H2>
 
-  Next: \ref cfscfreq <BR>
-  Prev: \ref cfscfovr
+  CF initialization is the same for Power On Resets and Processor Resets.
+  Standard application initialization activites are performed such as status and
+  tracking initialization, message initialization and subscription, table
+  initialization and registering with event services.
+
+  <H2>Run Time</H2>
+
+  <H3>Handling of Outgoing Messages</H3>
+
+  The priority of CF's use of available outgoing messages on each wakeup is:
+
+  -# Send any pending message required for RX transaction
+  -# Re-send any message required for TX transaction if timer expired (for example,
+     send EOF, or re-send EOF if ack timer expired)
+  -# Send a filedata PDU in response to a NAK request. Per wakeup, one will be sent
+     per each transaction in the TX wait state.
+  -# Once all TX wait transactions have processed their needs to send, the currently
+     active TX transfer will send new filedata PDUs. It will keep sending them until
+     there are no more messages on that wakeup (or the throttling semaphore stops it.)
+
+  <H3>Received messages</H3>
+
+   Operationally, the flow of input packets from ground into CF
+   should be throttled at some rate appropriate for ingest. CF
+   has a per-channel configuration item for max number of RX messages
+   processed per wakeup, and both CF and the ingest app
+   need to be able to handle this.
 **/
 
 
 /**
-
-  \page cfscfreq CFS CFDP Requirements
-
-  Refer to the CFDP requirements specification document for information on
-  requirements.
-
-  Next: \ref cfscfdg <BR>
-  Prev: \ref cfscfopr
-**/
-
-
-/**
-
   \page cfscfdg CFS CFDP Deployment Guide
 
   Follow the general guidelines below for platform deployment of the CFDP app.
@@ -136,7 +182,7 @@
 
   CF version 3.0 has a concept of "channels" which have their own
   configuration. The channel configuration is done in the cf_def_cfg and allows
-  apids for incoming and outgoing PDUs to be unique per channel. Each channel can be
+  message IDs for incoming and outgoing PDUs to be unique per channel. Each channel can be
   configured with polling directories as well.
 
   In CF 3.0 each channel has an upper-bound on its state, and this is part of the
@@ -158,7 +204,7 @@
 
   <H3> Software Bus </H3>
 
-  Each channel has an input APID that is subscribed on, and an APID to publish its messages on.
+  Each channel has an input message ID that is subscribed on, and a message ID to publish its messages on.
 
   <H3> Scheduler </H3>
 
@@ -168,125 +214,31 @@
 
   <H3> Endianness </H3>
 
-  In order to compile, CF must have the endianness of the system specified during
-  compile time.  This can be done by adding one of the following settings to
-  the toolchain file in the the cFS *_defs directory:
-
-  * Little endian: -D_EL DENDIAN=_EL
-  * Big Endian: -D_EB DENDIAN=_EB
-
-  NOTE: cFS intends to standardize a way for compile-time endian awareness. This will be 
-  replaced by that someday.
+  CF is endian agnostic and no longer requires specific compile time configuration/defines
+  to handle different endian systems.
 
   <H3> Integration with TO </H3>
 
-  TO's pipe needs to be able to receive packets of CF_PDU_MAX_SIZE
-
-  Next: \ref cfscfcmds <BR>
-  Prev: \ref cfscfreq
+  TO's pipe needs to be able to receive packets of #CF_MAX_PDU_SIZE
 **/
 
-
 /**
-
-  \page cfscfcmds CFS CFDP Commands
-
-  Next: \ref cfscftlm <BR>
-  Prev: \ref cfscfdg
-  
-  <TABLE BORDER="1" CELLPADDING="2" WIDTH="60%" ALIGN="CENTER">
-  <TR><TD WIDTH="20%" ALIGN="CENTER"> <B>\ref cfscftlm</B> </TD> 
-      <TD WIDTH="20%" ALIGN="CENTER"> <B>\ref cfscftbl</B></TD>
-      <TD WIDTH="20%" ALIGN="CENTER"> <B>\ref cfscfcfg</B></TD>
-  </TABLE>
-  
-  The following is a list of Commands that are processed by the CFS CFDP Application. 
-
-  Next: \ref cfscftlm <BR>
-  Prev: \ref cfscfdg
-
-**/
-
-
-/**
-
-  \page cfscftlm CFS CFDP Telemetry
-
-  Next: \ref cfscftbl <BR>
-  Prev: \ref cfscfcmds
-  
-  <TABLE BORDER="1" CELLPADDING="2" WIDTH="60%" ALIGN="CENTER">
-  <TR><TD WIDTH="20%" ALIGN="CENTER"> <B>\ref cfscfcmds</B> </TD> 
-      <TD WIDTH="20%" ALIGN="CENTER"> <B>\ref cfscftbl</B></TD>
-      <TD WIDTH="20%" ALIGN="CENTER"> <B>\ref cfscfcfg</B></TD>
-  </TABLE>
-  
-  The following are telemetry packets generated by the CFS CFDP 
-  Application.
-
-  Next: \ref cfscftbl <BR>
-  Prev: \ref cfscfcmds
-
-**/
-
-
-/**
-
   \page cfscftbl CFS CFDP Table Definitions
   
-  <TABLE BORDER="1" CELLPADDING="2" WIDTH="60%" ALIGN="CENTER">
-  <TR><TD WIDTH="20%" ALIGN="CENTER"> <B>\ref cfscfcmds</B></TD>
-      <TD WIDTH="20%" ALIGN="CENTER"> <B>\ref cfscftlm</B> </TD> 
-      <TD WIDTH="20%" ALIGN="CENTER"> <B>\ref cfscfcfg</B></TD>
-  </TABLE>
- 
-  CF relies on a configuration table.
-
-  Next: \ref cfscfcfg <BR>
-  Prev: \ref cfscftlm
+  CF utilzes a CFS table for run-time configuration defined by #CF_ConfigTable_t.  The channel
+  configuration is in #CF_ConfigTable_t.chan which contains a polling element defined by
+  #CF_PollDir_t.
 **/
 
 /**
-  \page cfscfcfg CFS CFDP Configuration Parameters
-
-  Next: \ref cfscfcons <BR>
-  Prev: \ref cfscftbl
-  
-  <TABLE BORDER="1" CELLPADDING="2" WIDTH="60%" ALIGN="CENTER">
-  <TR><TD WIDTH="20%" ALIGN="CENTER"> <B>\ref cfscfcmds</B></TD>
-      <TD WIDTH="20%" ALIGN="CENTER"> <B>\ref cfscftlm</B> </TD> 
-      <TD WIDTH="20%" ALIGN="CENTER"> <B>\ref cfscftbl</B></TD>
-  </TABLE>
-  
-  The following are configuration parameters used to configure the CFS CFDP
-  Application either for each platform or for a mission as a whole.
-
-
-  Next: \ref cfscfcons <BR>
-  Prev: \ref cfscftbl
-
-
-**/
-
-
-/**
-
   \page cfscfcons CFS CFDP Constraints
 
-  TODO
-
-  Next: \ref cfscffaqs <BR>
-  Prev: \ref cfscfcfg
+  CF is currently limited by the Software Bus performance.  Future work may
+  include implementing a point-to-point interface for high speed transfers.
 **/
-
 
 /**
+  \page cfscffaqs CFS CFDP Frequently Asked Questions
 
-\page cfscffaqs CFS CFDP Frequently Asked Questions
-
-    
-  Prev: \ref cfscfcons
+  No CF specific FAQ's have been identified/documented.
 **/
-
-
-

@@ -1,0 +1,19 @@
+#---------------------------------------------------------------------------
+# Stand-alone users guide doxyfile
+#---------------------------------------------------------------------------
+
+# Allow overrides
+@INCLUDE_PATH          = @MISSION_SOURCE_DIR@
+
+# Common setup
+@INCLUDE               = @MISSION_BINARY_DIR@/docs/cf-common.doxyfile
+
+# OSAL and cfe to resolve references and provide default settings
+@INCLUDE               = @MISSION_BINARY_DIR@/docs/cfe-common.doxyfile
+@INCLUDE               = @MISSION_BINARY_DIR@/docs/osal-common.doxyfile
+
+# Use sample definitions for generic users guide
+INPUT                 += @MISSION_SOURCE_DIR@/cfe/cmake/sample_defs
+
+PROJECT_NAME           = "CF User's Guide"
+WARN_LOGFILE           = cf_usersguide_warnings.log

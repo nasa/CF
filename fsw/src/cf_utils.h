@@ -40,7 +40,7 @@ typedef struct CF_Traverse_TransSeqArg
 {
     CF_TransactionSeq_t transaction_sequence_number;
     CF_EntityId_t       src_eid;
-    CF_Transaction_t   *t; /**< output transaction pointer */
+    CF_Transaction_t   *t; /**< \brief output transaction pointer */
 } CF_Traverse_TransSeqArg_t;
 
 /**
@@ -57,8 +57,8 @@ typedef struct CF_Traverse_WriteHistoryFileArg
     osal_id_t      fd;
     CF_Direction_t filter_dir;
 
-    bool   error;   /**< Will be set to true if any write failed */
-    uint32 counter; /**< Total number of entries written */
+    bool   error;   /**< \brief Will be set to true if any write failed */
+    uint32 counter; /**< \brief Total number of entries written */
 } CF_Traverse_WriteHistoryFileArg_t;
 
 /**
@@ -75,8 +75,8 @@ typedef struct CF_Traverse_WriteTxnFileArg
 {
     osal_id_t fd;
 
-    bool   error;   /**< Will be set to true if any write failed */
-    uint32 counter; /**< Total number of entries written */
+    bool   error;   /**< \brief Will be set to true if any write failed */
+    uint32 counter; /**< \brief Total number of entries written */
 } CF_Traverse_WriteTxnFileArg_t;
 
 /**
@@ -94,9 +94,9 @@ typedef void (*CF_TraverseAllTransactions_fn_t)(CF_Transaction_t *t, void *conte
  */
 typedef struct CF_TraverseAll_Arg
 {
-    CF_TraverseAllTransactions_fn_t fn;      /**< internal callback to use for each CList_Traverse */
-    void                           *context; /**< opaque object to pass to internal callback */
-    int                             counter; /**< Running tally of all nodes traversed from all lists */
+    CF_TraverseAllTransactions_fn_t fn;      /**< \brief internal callback to use for each CList_Traverse */
+    void                           *context; /**< \brief opaque object to pass to internal callback */
+    int                             counter; /**< \brief Running tally of all nodes traversed from all lists */
 } CF_TraverseAll_Arg_t;
 
 /**
@@ -106,8 +106,8 @@ typedef struct CF_TraverseAll_Arg
  */
 typedef struct CF_Traverse_PriorityArg
 {
-    CF_Transaction_t *t;        /**< OUT: holds value of transaction with which to call CF_CList_InsertAfter on */
-    uint8             priority; /**< seeking this priority */
+    CF_Transaction_t *t;        /**< \brief OUT: holds value of transaction with which to call CF_CList_InsertAfter on */
+    uint8             priority; /**< \brief seeking this priority */
 } CF_Traverse_PriorityArg_t;
 
 /* free a transaction from the queue it's on.
@@ -353,10 +353,10 @@ int CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *arg
  * to the file.
  *
  * @par Assumptions, External Events, and Notes:
- *       n must not be NULL. context must not be NULL.
+ *       n must not be NULL. arg must not be NULL.
  *
- * @param n       Node being currently traversed
- * @param context Pointer to CF_Traverse_WriteHistoryFileArg_t indicating the file information
+ * @param n   Node being currently traversed
+ * @param arg Pointer to CF_Traverse_WriteHistoryFileArg_t indicating the file information
  *
  * @retval CF_CLIST_CONT if everything is going well
  * @retval CF_CLIST_EXIT if a write error occurred, which means traversal should stop
@@ -370,10 +370,10 @@ int CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *arg);
  * CF_Traverse() to write transaction queue entries to the file.
  *
  * @par Assumptions, External Events, and Notes:
- *       n must not be NULL. context must not be NULL.
+ *       n must not be NULL. arg must not be NULL.
  *
- * @param n       Node being currently traversed
- * @param context Pointer to CF_Traverse_WriteTxnFileArg_t indicating the file information
+ * @param n   Node being currently traversed
+ * @param arg Pointer to CF_Traverse_WriteTxnFileArg_t indicating the file information
  *
  * @retval CF_CLIST_CONT if everything is going well
  * @retval CF_CLIST_EXIT if a write error occurred, which means traversal should stop
@@ -386,7 +386,7 @@ int CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg);
  * @par Assumptions, External Events, and Notes:
  *       node must not be NULL. context must not be NULL.
  *
- * @param n       Node being currently traversed
+ * @param node    Node being currently traversed
  * @param context Pointer to CF_Traverse_PriorityArg_t object indicating the priority to search for
  *
  * @retval CF_CLIST_EXIT when it's found, which terminates list traversal

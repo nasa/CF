@@ -19,26 +19,31 @@
 
 /**
  * @file
- *
  *  The CF Application Message IDs header file
  */
 
 #ifndef CF_MSGIDS_H
 #define CF_MSGIDS_H
 
-/**************************
- * CF Command Message IDs
- **************************/
+/**
+ * \defgroup cfscfcmdmid CFS CFDP Command Message IDs
+ * \{
+ */
 
-#define CF_CMD_MID     0x18B3
-#define CF_SEND_HK_MID 0x18B4
-#define CF_WAKE_UP_MID 0x18B5
+#define CF_CMD_MID     0x18B3 /**< \brief Message ID for commands */
+#define CF_SEND_HK_MID 0x18B4 /**< \brief Message ID to request housekeeping telemetry */
+#define CF_WAKE_UP_MID 0x18B5 /**< \brief Message ID for waking up the processing cycle */
 
-/***************************
- * CF Telemetry Message IDs
- ***************************/
+/**\}*/
 
-#define CF_HK_TLM_MID     0x08B0
-#define CF_CONFIG_TLM_MID 0x08B2
+/**
+ * \defgroup cfscftlmmid CFS CFDP Telemetry Message IDs
+ * \{
+ */
+
+#define CF_HK_TLM_MID     0x08B0 /**< \brief Message ID for housekeeping telemetry */
+#define CF_CONFIG_TLM_MID 0x08B2 /**< \brief Message ID for configuration telemetry */
+
+/**\}*/
 
 #endif /* !CF_MSGIDS_H */

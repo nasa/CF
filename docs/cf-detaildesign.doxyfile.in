@@ -1,0 +1,6 @@
+#---------------------------------------------------------------------------
+# Doxygen Configuration options for mission detailed documentation
+#---------------------------------------------------------------------------
+
+# Common files
+@INCLUDE = @MISSION_BINARY_DIR@/docs/cf-common.doxyfile

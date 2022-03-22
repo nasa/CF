@@ -100,23 +100,23 @@ typedef uint32 CF_FileSize_t;
  */
 typedef struct CF_Logical_PduHeader
 {
-    uint8 version;    /**< Version of the protocol */
-    uint8 pdu_type;   /**< File Directive (0) or File Data (1) */
-    uint8 direction;  /**< Toward Receiver (0) or Toward Sender (1) */
-    uint8 txm_mode;   /**< Acknowledged (0) or Unacknowledged (1) */
-    uint8 crc_flag;   /**< CRC not present (0) or CRC present (1) */
-    uint8 large_flag; /**< Small/32-bit size (0) or Large/64-bit size (1) */
+    uint8 version;    /**< \brief Version of the protocol */
+    uint8 pdu_type;   /**< \brief File Directive (0) or File Data (1) */
+    uint8 direction;  /**< \brief Toward Receiver (0) or Toward Sender (1) */
+    uint8 txm_mode;   /**< \brief Acknowledged (0) or Unacknowledged (1) */
+    uint8 crc_flag;   /**< \brief CRC not present (0) or CRC present (1) */
+    uint8 large_flag; /**< \brief Small/32-bit size (0) or Large/64-bit size (1) */
 
-    uint8 segment_meta_flag; /**< Segment Metatdata not present (0) or Present (1) */
-    uint8 eid_length;        /**< Length of encoded entity IDs, in octets (NOT size of logical value) */
-    uint8 txn_seq_length;    /**< Length of encoded sequence number, in octets (NOT size of logical value) */
+    uint8 segment_meta_flag; /**< \brief Segment Metatdata not present (0) or Present (1) */
+    uint8 eid_length;        /**< \brief Length of encoded entity IDs, in octets (NOT size of logical value) */
+    uint8 txn_seq_length;    /**< \brief Length of encoded sequence number, in octets (NOT size of logical value) */
 
-    uint16 header_encoded_length; /**< Length of the encoded PDU header, in octets (NOT sizeof struct) */
-    uint16 data_encoded_length;   /**< Length of the encoded PDU data, in octets */
+    uint16 header_encoded_length; /**< \brief Length of the encoded PDU header, in octets (NOT sizeof struct) */
+    uint16 data_encoded_length;   /**< \brief Length of the encoded PDU data, in octets */
 
-    CF_EntityId_t       source_eid;      /**< Source entity ID (normalized) */
-    CF_EntityId_t       destination_eid; /**< Destination entity ID (normalized) */
-    CF_TransactionSeq_t sequence_num;    /**< Sequence number (normalized) */
+    CF_EntityId_t       source_eid;      /**< \brief Source entity ID (normalized) */
+    CF_EntityId_t       destination_eid; /**< \brief Destination entity ID (normalized) */
+    CF_TransactionSeq_t sequence_num;    /**< \brief Sequence number (normalized) */
 
 } CF_Logical_PduHeader_t;
 
@@ -144,8 +144,8 @@ typedef struct CF_Logical_PduFileDirectiveHeader
  */
 typedef struct CF_Logical_Lv
 {
-    uint8       length;   /**< Length of data field */
-    const void *data_ptr; /**< Source of actual data in original location */
+    uint8       length;   /**< \brief Length of data field */
+    const void *data_ptr; /**< \brief Source of actual data in original location */
 } CF_Logical_Lv_t;
 
 /**
@@ -162,8 +162,8 @@ typedef struct CF_Logical_Lv
  */
 typedef union CF_Logical_TlvData
 {
-    CF_EntityId_t eid;      /**< Valid when type=ENTITY_ID (6) */
-    const void   *data_ptr; /**< Source of actual data in original location (other string/binary types) */
+    CF_EntityId_t eid;      /**< \brief Valid when type=ENTITY_ID (6) */
+    const void   *data_ptr; /**< \brief Source of actual data in original location (other string/binary types) */
 
 } CF_Logical_TlvData_t;
 
@@ -178,8 +178,8 @@ typedef union CF_Logical_TlvData
  */
 typedef struct CF_Logical_Tlv
 {
-    CF_CFDP_TlvType_t    type;   /**< Nature of data field */
-    uint8                length; /**< Length of data field (encoded length, not local storage size) */
+    CF_CFDP_TlvType_t    type;   /**< \brief Nature of data field */
+    uint8                length; /**< \brief Length of data field (encoded length, not local storage size) */
     CF_Logical_TlvData_t data;
 } CF_Logical_Tlv_t;
 
@@ -194,10 +194,10 @@ typedef struct CF_Logical_SegmentRequest
 
 typedef struct CF_Logical_SegmentList
 {
-    uint8 num_segments; /**< number of valid entries in the segment list */
+    uint8 num_segments; /**< \brief number of valid entries in the segment list */
 
     /**
-     * Set of all segment requests in this PDU.
+     * \brief Set of all segment requests in this PDU.
      *
      * Number of valid entries is indicated by num_segments,
      * and may be 0 if the PDU does not contain any such fields.
@@ -208,7 +208,7 @@ typedef struct CF_Logical_SegmentList
 
 typedef struct CF_Logical_TlvList
 {
-    uint8 num_tlv; /**< number of valid entries in the TLV list */
+    uint8 num_tlv; /**< \brief number of valid entries in the TLV list */
 
     CF_Logical_Tlv_t tlv[CF_PDU_MAX_TLV];
 
@@ -226,7 +226,7 @@ typedef struct CF_Logical_PduEof
     CF_FileSize_t           size;
 
     /**
-     * Set of all TLV blobs in this PDU.
+     * \brief Set of all TLV blobs in this PDU.
      */
     CF_Logical_TlvList_t tlv_list;
 
@@ -241,10 +241,10 @@ typedef struct CF_Logical_PduFin
 {
     CF_CFDP_ConditionCode_t cc;
     CF_CFDP_FinFileStatus_t file_status;
-    uint8                   delivery_code; /**< complete file indicated by '0'.  Nonzero means incomplete. */
+    uint8                   delivery_code; /**< \brief complete file indicated by '0'.  Nonzero means incomplete. */
 
     /**
-     * Set of all TLV blobs in this PDU.
+     * \brief Set of all TLV blobs in this PDU.
      */
     CF_Logical_TlvList_t tlv_list;
 } CF_Logical_PduFin_t;
@@ -256,8 +256,8 @@ typedef struct CF_Logical_PduFin
  */
 typedef struct CF_Logical_PduAck
 {
-    uint8                   ack_directive_code; /**< directive code of the PDU being ack'ed */
-    uint8                   ack_subtype_code;   /**< depends on ack_directive_code  */
+    uint8                   ack_directive_code; /**< \brief directive code of the PDU being ack'ed */
+    uint8                   ack_subtype_code;   /**< \brief depends on ack_directive_code  */
     CF_CFDP_ConditionCode_t cc;
     CF_CFDP_AckTxnStatus_t  txn_status;
 
@@ -270,8 +270,8 @@ typedef struct CF_Logical_PduAck
  */
 typedef struct CF_Logical_PduMd
 {
-    uint8 close_req;     /**< transation closure not requested (0) or requested (1) */
-    uint8 checksum_type; /**< 0 indicates legacy modular checksum */
+    uint8 close_req;     /**< \brief transation closure not requested (0) or requested (1) */
+    uint8 checksum_type; /**< \brief 0 indicates legacy modular checksum */
 
     CF_FileSize_t size;
 
@@ -289,7 +289,7 @@ typedef struct CF_Logical_PduNak
     CF_FileSize_t scope_end;
 
     /**
-     * Set of all segments in this PDU.
+     * \brief Set of all segments in this PDU.
      */
     CF_Logical_SegmentList_t segment_list;
 
@@ -299,16 +299,16 @@ typedef struct CF_Logical_PduFileDataHeader
 {
     uint8 continuation_state;
 
-    /*
-     * the segment_meta_length value will be stored in the
+    /**
+     * \brief the segment_meta_length value will be stored in the
      * segment_list.num_segments field below
      */
     CF_Logical_SegmentList_t segment_list;
 
-    CF_FileSize_t offset; /**< Offset of data in file */
+    CF_FileSize_t offset; /**< \brief Offset of data in file */
 
-    const void *data_ptr; /**< pointer to read-only data blob within encoded PDU */
-    size_t      data_len; /**< Length of data blob within encoded PDU (derived field) */
+    const void *data_ptr; /**< \brief pointer to read-only data blob within encoded PDU */
+    size_t      data_len; /**< \brief Length of data blob within encoded PDU (derived field) */
 
 } CF_Logical_PduFileDataHeader_t;
 
@@ -320,12 +320,12 @@ typedef struct CF_Logical_PduFileDataHeader
  */
 typedef union CF_Logical_IntHeader
 {
-    CF_Logical_PduEof_t            eof; /**< valid when pdu_type=0 + directive_code=EOF (4) */
-    CF_Logical_PduFin_t            fin; /**< valid when pdu_type=0 + directive_code=FIN (5) */
-    CF_Logical_PduAck_t            ack; /**< valid when pdu_type=0 + directive_code=ACK (6) */
-    CF_Logical_PduMd_t             md;  /**< valid when pdu_type=0 + directive_code=METADATA (7) */
-    CF_Logical_PduNak_t            nak; /**< valid when pdu_type=0 + directive_code=NAK (8) */
-    CF_Logical_PduFileDataHeader_t fd;  /**< valid when pdu_type=1 (directive_code is not applicable) */
+    CF_Logical_PduEof_t            eof; /**< \brief valid when pdu_type=0 + directive_code=EOF (4) */
+    CF_Logical_PduFin_t            fin; /**< \brief valid when pdu_type=0 + directive_code=FIN (5) */
+    CF_Logical_PduAck_t            ack; /**< \brief valid when pdu_type=0 + directive_code=ACK (6) */
+    CF_Logical_PduMd_t             md;  /**< \brief valid when pdu_type=0 + directive_code=METADATA (7) */
+    CF_Logical_PduNak_t            nak; /**< \brief valid when pdu_type=0 + directive_code=NAK (8) */
+    CF_Logical_PduFileDataHeader_t fd;  /**< \brief valid when pdu_type=1 (directive_code is not applicable) */
 
 } CF_Logical_IntHeader_t;
 
@@ -344,12 +344,12 @@ typedef struct CF_Logical_PduBuffer
     struct CF_DecoderState *pdec;
 
     /**
-     * Data in PDU header is applicable to all packets
+     * \brief Data in PDU header is applicable to all packets
      */
     CF_Logical_PduHeader_t pdu_header;
 
     /**
-     * The directive code applies to file directive PDUs, where
+     * \brief The directive code applies to file directive PDUs, where
      * the pdu_type in the common header is 0. Otherwise this value
      * should be set to 0 for data PDUs (which is a reserved value and
      * does not alias any valid directive code).
@@ -357,7 +357,7 @@ typedef struct CF_Logical_PduBuffer
     CF_Logical_PduFileDirectiveHeader_t fdirective;
 
     /**
-     * The internal header is specific to the type of PDU being
+     * \brief The internal header is specific to the type of PDU being
      * processed. This is a union of all those possible types.
      * See the union definition for which member applies to
      * a given processing cycle.
@@ -365,7 +365,7 @@ typedef struct CF_Logical_PduBuffer
     CF_Logical_IntHeader_t int_header;
 
     /**
-     * Some PDU types might have a CRC at the end.  If so, this
+     * \brief Some PDU types might have a CRC at the end.  If so, this
      * field reflects the value of that CRC.  Its presence/validity
      * depends on the pdu_type and crc_flag in the pdu_header.
      *

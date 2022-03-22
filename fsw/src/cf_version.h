@@ -26,8 +26,16 @@
 #ifndef CF_VERSION_H
 #define CF_VERSION_H
 
-#define CF_MAJOR_VERSION 3
-#define CF_MINOR_VERSION 0
-#define CF_REVISION      99 /* indicates a development version */
+/**
+ * \defgroup cfscfversion CFS CFDP Version
+ * \ref cfsversions
+ * \{
+ */
+
+#define CF_MAJOR_VERSION 3  /**< \brief Major version number */
+#define CF_MINOR_VERSION 0  /**< \brief Minor version number */
+#define CF_REVISION      99 /**< \brief Revision number */
+
+/**\}*/
 
 #endif /* CF_VERSION_H */

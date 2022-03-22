@@ -47,7 +47,7 @@ typedef uint32 CF_Timer_Seconds_t;
  */
 typedef struct CF_Timer
 {
-    CF_Timer_Ticks_t tick; /* expires when reaches 0 */
+    CF_Timer_Ticks_t tick; /**< \brief expires when reaches 0 */
 } CF_Timer_t;
 
 /************************************************************************/
