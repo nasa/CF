@@ -17,21 +17,13 @@
  * limitations under the License.
  ************************************************************************/
 
-/************************************************************************
-** File: cf_app_stubs.c
-**
-** %LICENSE_START
-** %LICENSE_STOP
-**
-** Purpose:
-**  The CF Application main application stubs file for unit tests
-**
-**  This file contains the stubs for the functions that initialize the
-**  application and link all logic and functionality to the CFS.
-**
-** Revision 1.0 2020/08/04 agibso1
-**  Initial revision
-*************************************************************************/
+/**
+ * @file
+ *  @brief The CF Application main application stubs file for unit tests
+ *
+ *  This file contains the stubs for the functions that initialize the
+ *  application and link all logic and functionality to the CFS.
+ */
 
 #include "cfe.h"
 #include "cf_verify.h"

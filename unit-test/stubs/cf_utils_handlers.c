@@ -17,20 +17,12 @@
  * limitations under the License.
  ************************************************************************/
 
-/************************************************************************
-** File: cf_utils_stubs.c
-**
-** %LICENSE_START
-** %LICENSE_STOP
-**
-** Purpose:
-**  The CF Application general utility functions stubs file
-**
-**  Various odds and ends are put here.
-**
-** Revision 1.0 2020/05/01 sseeger
-**  Initial revision
-*************************************************************************/
+/**
+ * @file
+ *  @brief The CF Application general utility functions stubs file
+ *
+ *  Various odds and ends are put here.
+ */
 
 #include "cf_app.h"
 #include "cf_verify.h"

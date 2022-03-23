@@ -17,25 +17,17 @@
  * limitations under the License.
  ************************************************************************/
 
-/************************************************************************
-** File: cf_chunk_handlers.c
-**
-** %LICENSE_START
-** %LICENSE_STOP
-**
-** Purpose:
-**  Stubs file for the CF Application main cfdp engine and pdu parsing file
-**
-**  This file contains two sets of functions. The first is what is needed
-**  to deal with CFDP PDUs. Specifically validating them for correctness
-**  and ensuring the byte-order is correct for the target. The second
-**  is incoming and outgoing CFDP PDUs pass through here. All receive
-**  CFDP PDU logic is performed here and the data is passed to the
-**  R (rx) and S (tx) logic.
-**
-** Revision 1.0 2020/08/04 asgibso1
-**  Initial revision
-*************************************************************************/
+/**
+ * @file
+ *  @brief Stubs file for the CF Application main cfdp engine and pdu parsing file
+ *
+ *  This file contains two sets of functions. The first is what is needed
+ *  to deal with CFDP PDUs. Specifically validating them for correctness
+ *  and ensuring the byte-order is correct for the target. The second
+ *  is incoming and outgoing CFDP PDUs pass through here. All receive
+ *  CFDP PDU logic is performed here and the data is passed to the
+ *  R (rx) and S (tx) logic.
+ */
 
 #include "cf_chunk.h"
 
