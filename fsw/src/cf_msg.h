@@ -31,6 +31,11 @@
 #include "cf_cfdp.h"
 #include "cf_tbldefs.h"
 
+/**
+ * \defgroup cfscftlm CFS CFDP Telemetry
+ * \{
+ */
+
 typedef struct CF_HkCmdCounters
 {
     uint16 cmd;
@@ -121,14 +126,17 @@ typedef struct CF_ConfigPacket
 
 } CF_ConfigPacket_t;
 
-/****************************************
- * CF app command packet command codes
- ***************************************/
+/**\}*/
 
-/* NOTE: these are what was in the original app (may have slightly different names)
- * Not sure that we need to implement all these for cf 3.0 */
-
-/* ANOTHER NOTE: not all of these are used, but they are here legacy from the old app */
+/**
+ * \defgroup cfscfcmdcodes CFS CFDP Command Codes
+ *
+ * NOTE: these are what was in the original app (may have slightly different names)
+ * Not sure that we need to implement all these for cf 3.0
+ *
+ * ANOTHER NOTE: not all of these are used, but they are here legacy from the old app
+ * \{
+ */
 typedef enum
 {
     CF_NOOP_CC               = 0,
@@ -158,9 +166,13 @@ typedef enum
     CF_NUM_COMMANDS           = 24,
 } CF_CMDS;
 
-/****************************
- *  CF Command Formats     **
- ****************************/
+/**\}*/
+
+/**
+ * \defgroup cfscfcmdstructs CFS CFDP Command Structures
+ * \{
+ */
+
 typedef struct CF_NoArgsCmd
 {
     CFE_MSG_CommandHeader_t cmd_header;
@@ -253,5 +265,7 @@ typedef struct CF_TransactionCmd
     uint8                   chan;     /* if 254, use ts. if 255, all channels */
     uint8                   spare[3]; /* To make structure a multiple of uint32 */
 } CF_TransactionCmd_t;
+
+/**\}*/
 
 #endif /* !CF_MSG_H */

@@ -102,7 +102,7 @@ void CF_CheckTables(void);
  *       None
  *
  *
- * @retval #CFE_SUCCESS \copydoc CFE_SUCCESSS
+ * @retval #CFE_SUCCESS \copydoc CFE_SUCCESS
  * @retval Returns anything else on error.
  *
  */
@@ -115,7 +115,7 @@ int32 CF_ValidateConfigTable(void *tbl_ptr);
  *       None
  *
  *
- * @retval #CFE_SUCCESS \copydoc CFE_SUCCESSS
+ * @retval #CFE_SUCCESS \copydoc CFE_SUCCESS
  * @retval Returns anything else on error.
  *
  */
@@ -132,7 +132,7 @@ int32 CF_TableInit(void);
  *       This must only be called once.
  *
  *
- * @retval #CFE_SUCCESS \copydoc CFE_SUCCESSS
+ * @retval #CFE_SUCCESS \copydoc CFE_SUCCESS
  * @retval Returns anything else on error.
  *
  */

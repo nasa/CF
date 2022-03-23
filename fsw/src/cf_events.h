@@ -26,6 +26,11 @@
 #ifndef CF_EVENTS_H
 #define CF_EVENTS_H
 
+/**
+ * \defgroup cfscfevents CFS CFDP Event IDs
+ * \{
+ */
+
 #define CF_EID_ERR_ASSERT 1
 
 /* CF_INIT event IDs */
@@ -148,5 +153,7 @@
 #define CF_EID_ERR_CMD_GCMD_CC          137
 #define CF_EID_ERR_CMD_WHIST_WRITE      138
 #define CF_EID_ERR_CMD_BAD_PARAM        139
+
+/**\}*/
 
 #endif /* !CF_EVENTS_H */

@@ -38,8 +38,8 @@
  */
 typedef struct
 {
-    CF_Transaction_t    *t;   /**< Current transaction being processed */
-    CF_Logical_PduNak_t *nak; /**< Current NAK PDU contents */
+    CF_Transaction_t    *t;   /**< \brief Current transaction being processed */
+    CF_Logical_PduNak_t *nak; /**< \brief Current NAK PDU contents */
 } CF_GapComputeArgs_t;
 
 /************************************************************************/
@@ -152,7 +152,8 @@ void CF_CFDP_R2_Reset(CF_Transaction_t *t);
  * @retval 0 on CRC match, otherwise error.
  *
  *
- * @param t  Pointer to the transaction object
+ * @param t            Pointer to the transaction object
+ * @param expected_crc Expected CRC
  */
 int CF_CFDP_R_CheckCrc(CF_Transaction_t *t, uint32 expected_crc);
 

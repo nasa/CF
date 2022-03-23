@@ -37,8 +37,8 @@ typedef uint32 CF_ChunkSize_t;
  */
 typedef struct CF_Chunk
 {
-    CF_ChunkOffset_t offset; /**< The start offset of the chunk within the file */
-    CF_ChunkSize_t   size;   /**< The size of the chunk */
+    CF_ChunkOffset_t offset; /**< \brief The start offset of the chunk within the file */
+    CF_ChunkSize_t   size;   /**< \brief The size of the chunk */
 } CF_Chunk_t;
 
 /**
@@ -48,9 +48,9 @@ typedef struct CF_Chunk
  */
 typedef struct CF_ChunkList
 {
-    CF_ChunkIdx_t count;      /**< number of chunks currently in the array */
-    CF_ChunkIdx_t max_chunks; /**< maximum number of chunks allowed in the list (allocation size) */
-    CF_Chunk_t   *chunks;     /**< chunk list array */
+    CF_ChunkIdx_t count;      /**< \brief number of chunks currently in the array */
+    CF_ChunkIdx_t max_chunks; /**< \brief maximum number of chunks allowed in the list (allocation size) */
+    CF_Chunk_t   *chunks;     /**< \brief chunk list array */
 } CF_ChunkList_t;
 
 /**

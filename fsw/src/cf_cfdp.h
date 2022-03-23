@@ -33,8 +33,8 @@
  */
 typedef struct CF_CFDP_CycleTx_args
 {
-    CF_Channel_t *c;       /**< channel structure */
-    int           ran_one; /**< should be set to 1 if a transaction was cycled */
+    CF_Channel_t *c;       /**< \brief channel structure */
+    int           ran_one; /**< \brief should be set to 1 if a transaction was cycled */
 } CF_CFDP_CycleTx_args_t;
 
 /**
@@ -42,10 +42,10 @@ typedef struct CF_CFDP_CycleTx_args
  */
 typedef struct CF_CFDP_Tick_args
 {
-    CF_Channel_t *c;                       /* IN param */
-    void (*fn)(CF_Transaction_t *, int *); /* IN param */
-    int early_exit;                        /* OUT param */
-    int cont;                              /* if 1, then re-traverse the list */
+    CF_Channel_t *c;                       /**< \brief channel structure */
+    void (*fn)(CF_Transaction_t *, int *); /**< \brief function pointer */
+    int early_exit;                        /**< \brief early exit result */
+    int cont;                              /**< \brief if 1, then re-traverse the list */
 } CF_CFDP_Tick_args_t;
 
 /********************************************************************************/
@@ -59,7 +59,7 @@ typedef struct CF_CFDP_Tick_args
  * @param msgbuf         Pointer to encapsulation message, in this case a CFE software bus message
  * @param ph             Pointer to logical PDU buffer content, will be cleared to all zero by this call
  * @param encap_hdr_size Offset of first CFDP PDU octet within buffer
- * @param msgbuf_size    Allocated size of msgbuf encapsulation structure (encoding cannot exceed this)
+ * @param total_size     Allocated size of msgbuf encapsulation structure (encoding cannot exceed this)
  */
 void CF_CFDP_EncodeStart(CF_EncoderState_t *penc, void *msgbuf, CF_Logical_PduBuffer_t *ph, size_t encap_hdr_size,
                          size_t total_size);
@@ -75,7 +75,7 @@ void CF_CFDP_EncodeStart(CF_EncoderState_t *penc, void *msgbuf, CF_Logical_PduBu
  * @param msgbuf         Pointer to encapsulation message, in this case a CFE software bus message
  * @param ph             Pointer to logical PDU buffer content, will be cleared to all zero by this call
  * @param encap_hdr_size Offset of first CFDP PDU octet within buffer
- * @param msgbuf_size    Total size of msgbuf encapsulation structure (decoding cannot exceed this)
+ * @param total_size     Total size of msgbuf encapsulation structure (decoding cannot exceed this)
  */
 void CF_CFDP_DecodeStart(CF_DecoderState_t *pdec, const void *msgbuf, CF_Logical_PduBuffer_t *ph, size_t encap_hdr_size,
                          size_t total_size);
@@ -102,7 +102,7 @@ void CF_CFDP_ResetTransaction(CF_Transaction_t *t, int keep_history);
  * @par Assumptions, External Events, and Notes:
  *       Only called once.
  *
- * @retval #CFE_SUCCESS \copydoc CFE_SUCCESSS
+ * @retval #CFE_SUCCESS \copydoc CFE_SUCCESS
  * @returns anything else on error.
  *
  */
@@ -144,7 +144,7 @@ void CF_CFDP_DisableEngine(void);
  * @param priority      CF priority level
  * @param dest_id       Entity ID of remote receiver
  *
- * @retval #CFE_SUCCESS \copydoc CFE_SUCCESSS
+ * @retval #CFE_SUCCESS \copydoc CFE_SUCCESS
  * @returns Anything else on error.
  */
 int32 CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, CF_CFDP_Class_t cfdp_class, uint8 keep,
@@ -168,7 +168,7 @@ int32 CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, CF_CFDP
  * @param priority      CF priority level
  * @param dest_id       Entity ID of remote receiver
  *
- * @retval #CFE_SUCCESS \copydoc CFE_SUCCESSS
+ * @retval #CFE_SUCCESS \copydoc CFE_SUCCESS
  * @returns Anything else on error.
  */
 int32 CF_CFDP_PlaybackDir(const char *src_filename, const char *dst_filename, CF_CFDP_Class_t cfdp_class, uint8 keep,

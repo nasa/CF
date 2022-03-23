@@ -68,13 +68,13 @@
  */
 typedef enum
 {
-    CF_TxnState_IDLE    = 0, /**< State assigned to a newly allocated transaction object */
-    CF_TxnState_R1      = 1, /**< Recieve file as class 1 */
-    CF_TxnState_S1      = 2, /**< Send file as class 1 */
-    CF_TxnState_R2      = 3, /**< Receive file as class 2 */
-    CF_TxnState_S2      = 4, /**< Send file as class 2 */
-    CF_TxnState_DROP    = 5, /**< State where all PDUs are dropped */
-    CF_TxnState_INVALID = 6  /**< Marker value for the highest possible state number */
+    CF_TxnState_IDLE    = 0, /**< \brief State assigned to a newly allocated transaction object */
+    CF_TxnState_R1      = 1, /**< \brief Recieve file as class 1 */
+    CF_TxnState_S1      = 2, /**< \brief Send file as class 1 */
+    CF_TxnState_R2      = 3, /**< \brief Receive file as class 2 */
+    CF_TxnState_S2      = 4, /**< \brief Send file as class 2 */
+    CF_TxnState_DROP    = 5, /**< \brief State where all PDUs are dropped */
+    CF_TxnState_INVALID = 6  /**< \brief Marker value for the highest possible state number */
 } CF_TxnState_t;
 
 /**
@@ -144,13 +144,13 @@ typedef enum
  */
 typedef struct CF_History
 {
-    CF_TxnFilenames_t       fnames;   /**< file names associated with this history entry */
-    CF_CListNode_t          cl_node;  /**< for connection to a CList */
-    CF_Direction_t          dir;      /**< direction of this history entry */
-    CF_CFDP_ConditionCode_t cc;       /**< final condition code of operation */
-    CF_EntityId_t           src_eid;  /**< the source eid of the transaction */
-    CF_EntityId_t           peer_eid; /**< peer_eid is always the "other guy", which is the same src_eid for RX */
-    CF_TransactionSeq_t     seq_num;  /**< transaction identifier, stays constant for entire transfer */
+    CF_TxnFilenames_t       fnames;   /**< \brief file names associated with this history entry */
+    CF_CListNode_t          cl_node;  /**< \brief for connection to a CList */
+    CF_Direction_t          dir;      /**< \brief direction of this history entry */
+    CF_CFDP_ConditionCode_t cc;       /**< \brief final condition code of operation */
+    CF_EntityId_t           src_eid;  /**< \brief the source eid of the transaction */
+    CF_EntityId_t           peer_eid; /**< \brief peer_eid is always the "other guy", same src_eid for RX */
+    CF_TransactionSeq_t     seq_num;  /**< \brief transaction identifier, stays constant for entire transfer */
 } CF_History_t;
 
 /**
@@ -174,7 +174,7 @@ typedef struct CF_Playback
     osal_id_t         dir_id;
     CF_CFDP_Class_t   cfdp_class;
     CF_TxnFilenames_t fnames;
-    uint16            num_ts; /* number of transactions -- 16 bit should be enough */
+    uint16            num_ts; /**< \brief number of transactions */
     uint8             priority;
     CF_EntityId_t     dest_id;
 
@@ -201,7 +201,7 @@ typedef struct CF_Poll
  */
 typedef struct CF_TxS2_Data
 {
-    uint8 fin_cc; /* remember the cc in the received fin pdu to echo in eof-fin */
+    uint8 fin_cc; /**< \brief remember the cc in the received fin pdu to echo in eof-fin */
     uint8 acknak_count;
 } CF_TxS2_Data_t;
 
@@ -226,7 +226,7 @@ typedef struct CF_RxS2_Data
     uint32                    rx_crc_calc_bytes;
     CF_CFDP_FinDeliveryCode_t dc;
     CF_CFDP_FinFileStatus_t   fs;
-    uint8                     eof_cc; /* remember the cc in the received eof pdu to echo in eof-ack */
+    uint8                     eof_cc; /**< \brief remember the cc in the received eof pdu to echo in eof-ack */
     uint8                     acknak_count;
 } CF_RxS2_Data_t;
 
@@ -246,7 +246,7 @@ typedef struct CF_RxState_Data
  */
 typedef struct CF_Flags_Common
 {
-    uint8 q_index; /* which Q is this in? */
+    uint8 q_index; /**< \brief Q index this is in */
     bool  ack_timer_armed;
     bool  suspended;
     bool  canceled;
@@ -260,14 +260,14 @@ typedef struct CF_Flags_Rx
 {
     CF_Flags_Common_t com;
 
-    bool md_recv; /* md received for r state */
+    bool md_recv; /**< \brief md received for r state */
     bool eof_recv;
     bool send_nak;
     bool send_fin;
     bool send_ack;
-    bool inactivity_fired; /* used for r2 */
-    bool complete;         /* r2 */
-    bool fd_nak_sent;      /* latches that at least one nak has been sent for file data */
+    bool inactivity_fired; /**< \brief used for r2 */
+    bool complete;         /**< \brief r2 */
+    bool fd_nak_sent;      /**< \brief latches that at least one nak has been sent for file data */
 } CF_Flags_Rx_t;
 
 /**
@@ -278,7 +278,7 @@ typedef struct CF_Flags_Tx
     CF_Flags_Common_t com;
 
     bool md_need_send;
-    bool cmd_tx; /* indicates transaction is commanded (ground) tx */
+    bool cmd_tx; /**< \brief indicates transaction is commanded (ground) tx */
 } CF_Flags_Tx_t;
 
 /**
@@ -286,9 +286,9 @@ typedef struct CF_Flags_Tx
  */
 typedef union CF_StateFlags
 {
-    CF_Flags_Common_t com; /**< applies to all transactions */
-    CF_Flags_Rx_t     rx;  /**< applies to only receive file transactions */
-    CF_Flags_Tx_t     tx;  /**< applies to only send file transactions */
+    CF_Flags_Common_t com; /**< \brief applies to all transactions */
+    CF_Flags_Rx_t     rx;  /**< \brief applies to only receive file transactions */
+    CF_Flags_Tx_t     tx;  /**< \brief applies to only send file transactions */
 } CF_StateFlags_t;
 
 /**
@@ -296,8 +296,8 @@ typedef union CF_StateFlags
  */
 typedef union CF_StateData
 {
-    CF_TxState_Data_t s; /**< applies to only send file transactions */
-    CF_RxState_Data_t r; /**< applies to only receive file transactions */
+    CF_TxState_Data_t s; /**< \brief applies to only send file transactions */
+    CF_RxState_Data_t r; /**< \brief applies to only receive file transactions */
 } CF_StateData_t;
 
 /**
@@ -307,33 +307,37 @@ typedef union CF_StateData
  */
 typedef struct CF_Transaction
 {
-    CF_TxnState_t state; /* each engine is commanded to do something, which is the overall state */
+    CF_TxnState_t state; /**< \brief each engine is commanded to do something, which is the overall state */
 
-    CF_History_t      *history;          /* weird, but this also holds active filenames and possibly other info */
-    CF_ChunkWrapper_t *chunks;           /* for gap tracking, only used on class 2 */
-    CF_Timer_t         inactivity_timer; /* set to the overall inactivity timer of a remote */
-    CF_Timer_t         ack_timer;        /* called ack_timer, but is also nak_timer */
+    CF_History_t      *history;          /**< \brief weird, holds active filenames and possibly other info */
+    CF_ChunkWrapper_t *chunks;           /**< \brief for gap tracking, only used on class 2 */
+    CF_Timer_t         inactivity_timer; /**< \brief set to the overall inactivity timer of a remote */
+    CF_Timer_t         ack_timer;        /**< \brief called ack_timer, but is also nak_timer */
 
-    uint32    fsize; /* lseek() should be 64-bit on 64-bit system, but osal limits to 32-bit */
-    uint32    foffs; /* offset into file for next read */
+    uint32    fsize; /**< \brief lseek() should be 64-bit on 64-bit system, but osal limits to 32-bit */
+    uint32    foffs; /**< \brief offset into file for next read */
     osal_id_t fd;
 
     CF_Crc_t crc;
 
     uint8 keep;
-    uint8 chan_num; /* if ever more than one engine, this may need to change to pointer */
+    uint8 chan_num; /**< \brief if ever more than one engine, this may need to change to pointer */
     uint8 priority;
 
     CF_CListNode_t cl_node;
 
-    CF_Playback_t *p; /* NULL if transaction does not belong to a playback */
+    CF_Playback_t *p; /**< \brief NULL if transaction does not belong to a playback */
 
     CF_StateData_t state_data;
 
-    /* NOTE: the flags here look a little strange, because there are different flags for TX and RX.
+    /**
+     * @brief State flags
+     *
+     * \note The flags here look a little strange, because there are different flags for TX and RX.
      * Both types share the same type of flag, though. Since RX flags plus the global flags is
      * over one byte, storing them this way allows 2 bytes to cover all possible flags.
-     * Please ignore the duplicate declarations of the "all" flags. :) */
+     * Please ignore the duplicate declarations of the "all" flags.
+     */
     CF_StateFlags_t flags;
 
 } CF_Transaction_t;
@@ -343,7 +347,7 @@ typedef struct CF_Transaction
  */
 typedef enum
 {
-    CF_QueueIdx_PEND      = 0, /* first one on this list is active */
+    CF_QueueIdx_PEND      = 0, /**< \brief first one on this list is active */
     CF_QueueIdx_TXA       = 1,
     CF_QueueIdx_TXW       = 2,
     CF_QueueIdx_RX        = 3,
@@ -387,9 +391,9 @@ typedef struct CF_Channel
     /* For polling directories, the configuration data is in a table. */
     CF_Poll_t poll[CF_MAX_POLLING_DIR_PER_CHAN];
 
-    osal_id_t sem_id; /* semaphore id for output pipe */
+    osal_id_t sem_id; /**< \brief semaphore id for output pipe */
 
-    const CF_Transaction_t *cur; /* current transaction during channel cycle */
+    const CF_Transaction_t *cur; /**< \brief current transaction during channel cycle */
 
     uint8 tick_type;
 } CF_Channel_t;
@@ -409,8 +413,8 @@ typedef struct CF_Channel
  */
 typedef struct CF_PduRecvMsg
 {
-    CFE_MSG_CommandHeader_t hdr; /**< software bus headers, not really used by CF */
-    CF_CFDP_PduHeader_t     ph;  /**< Beginning of CFDP headers */
+    CFE_MSG_CommandHeader_t hdr; /**< \brief software bus headers, not really used by CF */
+    CF_CFDP_PduHeader_t     ph;  /**< \brief Beginning of CFDP headers */
 } CF_PduRecvMsg_t;
 
 /**
@@ -424,8 +428,8 @@ typedef struct CF_PduRecvMsg
  */
 typedef struct CF_PduSendMsg
 {
-    CFE_MSG_TelemetryHeader_t hdr; /**< software bus headers, not really used by CF */
-    CF_CFDP_PduHeader_t       ph;  /**< Beginning of CFDP headers */
+    CFE_MSG_TelemetryHeader_t hdr; /**< \brief software bus headers, not really used by CF */
+    CF_CFDP_PduHeader_t       ph;  /**< \brief Beginning of CFDP headers */
 } CF_PduSendMsg_t;
 
 /**
@@ -435,11 +439,11 @@ typedef struct CF_PduSendMsg
  */
 typedef struct CF_Output
 {
-    CFE_SB_Buffer_t  *msg;    /**< Binary message to be sent to underlying transport */
-    CF_EncoderState_t encode; /**< Encoding state (while building message) */
+    CFE_SB_Buffer_t  *msg;    /**< \brief Binary message to be sent to underlying transport */
+    CF_EncoderState_t encode; /**< \brief Encoding state (while building message) */
 
     /**
-     * Temporary R/W buffer for holding output PDUs while working with them
+     * \brief Temporary R/W buffer for holding output PDUs while working with them
      */
     CF_Logical_PduBuffer_t tx_pdudata;
 } CF_Output_t;
@@ -451,11 +455,11 @@ typedef struct CF_Output
  */
 typedef struct CF_Input
 {
-    CFE_SB_Buffer_t  *msg;    /**< Binary message received from underlying transport */
-    CF_DecoderState_t decode; /**< Decoding state (while interpreting message) */
+    CFE_SB_Buffer_t  *msg;    /**< \brief Binary message received from underlying transport */
+    CF_DecoderState_t decode; /**< \brief Decoding state (while interpreting message) */
 
     /**
-     * Temporary R/W buffer for holding input PDUs while working with them
+     * \brief Temporary R/W buffer for holding input PDUs while working with them
      */
     CF_Logical_PduBuffer_t rx_pdudata;
 } CF_Input_t;
@@ -467,7 +471,7 @@ typedef struct CF_Input
  */
 typedef struct CF_Engine
 {
-    CF_TransactionSeq_t seq_num; /* keep track of the next sequence number to use for sends */
+    CF_TransactionSeq_t seq_num; /* \brief keep track of the next sequence number to use for sends */
 
     CF_Output_t out;
     CF_Input_t  in;
@@ -489,10 +493,10 @@ typedef struct CF_Engine
  */
 typedef enum
 {
-    CF_SendRet_SUCCESS = 0, /**< Successfully sent */
-    CF_SendRet_NO_MSG  = 1, /**< No send buffer available, throttling limit reached */
-    CF_SendRet_ERROR   = 2, /**< the send itself failed */
-    CF_SendRet_FAILURE = 3, /**< generic failure message not relating to message send */
+    CF_SendRet_SUCCESS = 0, /**< \brief Successfully sent */
+    CF_SendRet_NO_MSG  = 1, /**< \brief No send buffer available, throttling limit reached */
+    CF_SendRet_ERROR   = 2, /**< \brief the send itself failed */
+    CF_SendRet_FAILURE = 3, /**< \brief generic failure message not relating to message send */
 } CF_SendRet_t;
 
 #endif

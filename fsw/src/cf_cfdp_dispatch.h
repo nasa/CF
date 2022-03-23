@@ -61,7 +61,7 @@ typedef void (*CF_CFDP_StateRecvFunc_t)(CF_Transaction_t *t, CF_Logical_PduBuffe
  */
 typedef struct
 {
-    CF_CFDP_StateSendFunc_t tx[CF_TxnState_INVALID];
+    CF_CFDP_StateSendFunc_t tx[CF_TxnState_INVALID]; /**< \brief Transmit handler function */
 } CF_CFDP_TxnSendDispatchTable_t;
 
 /**
@@ -73,7 +73,7 @@ typedef struct
  */
 typedef struct
 {
-    /* a separate recv handler for each possible file directive PDU in this state */
+    /** \brief a separate recv handler for each possible file directive PDU in this state */
     CF_CFDP_StateRecvFunc_t rx[CF_TxnState_INVALID];
 } CF_CFDP_TxnRecvDispatchTable_t;
 
@@ -86,7 +86,7 @@ typedef struct
  */
 typedef struct
 {
-    /* a separate recv handler for each possible file directive PDU in this state */
+    /** \brief a separate recv handler for each possible file directive PDU in this state */
     CF_CFDP_StateRecvFunc_t fdirective[CF_CFDP_FileDirective_INVALID_MAX];
 } CF_CFDP_FileDirectiveDispatchTable_t;
 

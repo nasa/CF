@@ -37,9 +37,9 @@
  */
 typedef struct CF_CodecState
 {
-    bool   is_valid;    /**< whether decode is valid or not.  Set false on end of decode or error condition. */
-    size_t next_offset; /**< Offset of next byte to encode/decode, current position in PDU */
-    size_t max_size;    /**< Maximum number of bytes in the PDU */
+    bool   is_valid;    /**< \brief whether decode is valid or not.  Set false on end of decode or error condition. */
+    size_t next_offset; /**< \brief Offset of next byte to encode/decode, current position in PDU */
+    size_t max_size;    /**< \brief Maximum number of bytes in the PDU */
 } CF_CodecState_t;
 
 /**
@@ -49,8 +49,8 @@ typedef struct CF_CodecState
  */
 typedef struct CF_EncoderState
 {
-    CF_CodecState_t codec_state; /**< Common state */
-    uint8          *base;        /**< Pointer to start of encoded PDU data */
+    CF_CodecState_t codec_state; /**< \brief Common state */
+    uint8          *base;        /**< \brief Pointer to start of encoded PDU data */
 } CF_EncoderState_t;
 
 /**
@@ -60,8 +60,8 @@ typedef struct CF_EncoderState
  */
 typedef struct CF_DecoderState
 {
-    CF_CodecState_t codec_state; /**< Common state */
-    const uint8    *base;        /**< Pointer to start of encoded PDU data */
+    CF_CodecState_t codec_state; /**< \brief Common state */
+    const uint8    *base;        /**< \brief Pointer to start of encoded PDU data */
 } CF_DecoderState_t;
 
 /*********************************************************************************
@@ -816,7 +816,7 @@ void CF_CFDP_DecodeNak(CF_DecoderState_t *state, CF_Logical_PduNak_t *plnak);
  * decoder is not changed.
  *
  * @param state  Decoder state object
- * @param plcrc  Pointer to logical CRC value
+ * @param pcrc   Pointer to logical CRC value
  */
 void CF_CFDP_DecodeCrc(CF_DecoderState_t *state, uint32 *pcrc);
 

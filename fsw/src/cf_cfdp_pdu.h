@@ -137,9 +137,9 @@ typedef struct
  */
 typedef struct CF_CFDP_PduHeader
 {
-    CF_CFDP_uint8_t  flags;           /**< Flags indicating the PDU type, direction, mode, etc */
-    CF_CFDP_uint16_t length;          /**< Length of the entire PDU, in octets */
-    CF_CFDP_uint8_t  eid_tsn_lengths; /**< Lengths of the EID+TSN data (bitfields) */
+    CF_CFDP_uint8_t  flags;           /**< \brief Flags indicating the PDU type, direction, mode, etc */
+    CF_CFDP_uint16_t length;          /**< \brief Length of the entire PDU, in octets */
+    CF_CFDP_uint8_t  eid_tsn_lengths; /**< \brief Lengths of the EID+TSN data (bitfields) */
 
     /* variable-length data goes here - it is at least 3 additional bytes */
 
@@ -165,7 +165,7 @@ typedef struct CF_CFDP_PduFileDirectiveHeader
  */
 typedef struct CF_CFDP_lv
 {
-    CF_CFDP_uint8_t length; /**< Length of data field */
+    CF_CFDP_uint8_t length; /**< \brief Length of data field */
 } CF_CFDP_lv_t;
 
 /**
@@ -178,8 +178,8 @@ typedef struct CF_CFDP_lv
  */
 typedef struct CF_CFDP_tlv
 {
-    CF_CFDP_uint8_t type;   /**< Nature of data field */
-    CF_CFDP_uint8_t length; /**< Length of data field */
+    CF_CFDP_uint8_t type;   /**< \brief Nature of data field */
+    CF_CFDP_uint8_t length; /**< \brief Length of data field */
 } CF_CFDP_tlv_t;
 
 /**
@@ -205,7 +205,7 @@ typedef enum
  */
 typedef enum
 {
-    CF_CFDP_FileDirective_INVALID_MIN = 0, /* used to limit range */
+    CF_CFDP_FileDirective_INVALID_MIN = 0, /**< \brief Minimum used to limit range */
     CF_CFDP_FileDirective_EOF         = 4,
     CF_CFDP_FileDirective_FIN         = 5,
     CF_CFDP_FileDirective_ACK         = 6,
@@ -213,7 +213,7 @@ typedef enum
     CF_CFDP_FileDirective_NAK         = 8,
     CF_CFDP_FileDirective_PROMPT      = 9,
     CF_CFDP_FileDirective_KEEP_ALIVE  = 12,
-    CF_CFDP_FileDirective_INVALID_MAX = 13, /* used to limit range */
+    CF_CFDP_FileDirective_INVALID_MAX = 13, /**< \brief Maximum used to limit range */
 } CF_CFDP_FileDirective_t;
 
 /**
@@ -227,8 +227,8 @@ typedef enum
  */
 typedef enum
 {
-    CF_CFDP_CLASS_1 = 0, /**< CFDP class 1 - Unreliable transfer */
-    CF_CFDP_CLASS_2 = 1, /**< CFDP class 2 - Reliable transfer */
+    CF_CFDP_CLASS_1 = 0, /**< \brief CFDP class 1 - Unreliable transfer */
+    CF_CFDP_CLASS_2 = 1, /**< \brief CFDP class 2 - Reliable transfer */
 } CF_CFDP_Class_t;
 
 /**
@@ -376,9 +376,12 @@ typedef struct CF_CFDP_PduMd
 
 } CF_CFDP_PduMd_t;
 
+/**
+ * @brief PDU file data header
+ */
 typedef struct CF_CFDP_PduFileDataHeader
 {
-    /*
+    /**
      * NOTE: while this is the only fixed/required field in the data PDU, it may
      * have segment metadata prior to this, depending on how the fields in the
      * base header are set
@@ -386,7 +389,9 @@ typedef struct CF_CFDP_PduFileDataHeader
     CF_CFDP_uint32_t offset;
 } CF_CFDP_PduFileDataHeader_t;
 
-/*
+/**
+ * @brief PDU file data content
+ *
  * To serve as a sanity check, this should accommodate the largest data block possible.
  * In that light, it should be sized based on the minimum encoded header size, rather than
  * the maximum, as that case leaves the most space for data.
