@@ -17,23 +17,15 @@
  * limitations under the License.
  ************************************************************************/
 
-/************************************************************************
-** File: cf_clist_stubs.c
-**
-** %LICENSE_START
-** %LICENSE_STOP
-**
-** Purpose:
-**  The CF Application circular list definition stubs file
-**
-**  This is a circular doubly-linked list implementation. It is used for
-**  all data structures in CF.
-**
-**  This file is intended to be a generic class that can be used in other apps.
-**
-** Revision 1.0 2020/08/04 asgibso1
-**  Initial revision
-*************************************************************************/
+/**
+ * @file
+ *  @brief The CF Application circular list definition stubs file
+ *
+ *  This is a circular doubly-linked list implementation. It is used for
+ *  all data structures in CF.
+ *
+ *  This file is intended to be a generic class that can be used in other apps.
+ */
 
 #include "cf_verify.h"
 #include "cf_clist.h"
