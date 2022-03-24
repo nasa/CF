@@ -104,7 +104,7 @@ void CF_CFDP_S_DispatchRecv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph,
     CF_Assert(t->state_data.s.sub_state < CF_TxSubState_NUM_STATES);
     const CF_CFDP_FileDirectiveDispatchTable_t *substate_tbl;
     CF_CFDP_StateRecvFunc_t                     selected_handler;
-    CF_Logical_PduFileDirectiveHeader_t        *fdh;
+    CF_Logical_PduFileDirectiveHeader_t *       fdh;
 
     /* send state, so we only care about file directive PDU */
     selected_handler = NULL;

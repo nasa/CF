@@ -172,7 +172,7 @@ void Test_CF_CFDP_S1_Recv(void)
     /* Test case for:
      * void CF_CFDP_S1_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* class 1 recv is really a noop, it basically drops all packets.
@@ -186,7 +186,7 @@ void Test_CF_CFDP_S2_Recv(void)
     /* Test case for:
      * void CF_CFDP_S2_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* class 2 recv just invokes a dispatcher to functions that should be
@@ -729,7 +729,7 @@ void Test_CF_CFDP_S2_EarlyFin(void)
     /* Test case for:
      * void CF_CFDP_S2_EarlyFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal */
@@ -742,7 +742,7 @@ void Test_CF_CFDP_S2_Fin(void)
     /* Test case for:
      * void CF_CFDP_S2_Fin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal */
@@ -755,9 +755,9 @@ void Test_CF_CFDP_S2_Nak(void)
     /* Test case for:
      * void CF_CFDP_S2_Nak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
-    CF_Logical_PduNak_t    *nak;
+    CF_Logical_PduNak_t *   nak;
 
     /* no segments */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
@@ -811,7 +811,7 @@ void Test_CF_CFDP_S2_Nak_Arm(void)
     /* Test case for:
      * void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal */
@@ -824,7 +824,7 @@ void Test_CF_CFDP_S2_WaitForEofAck(void)
     /* Test case for:
      * void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal */

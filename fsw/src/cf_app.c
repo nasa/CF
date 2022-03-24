@@ -117,7 +117,7 @@ void CF_CheckTables(void)
  *-----------------------------------------------------------------*/
 int32 CF_ValidateConfigTable(void *tbl_ptr)
 {
-    CF_ConfigTable_t  *tbl = (CF_ConfigTable_t *)tbl_ptr;
+    CF_ConfigTable_t * tbl = (CF_ConfigTable_t *)tbl_ptr;
     int32              ret; /* initialized below */
     static const int32 no_ticks_per_second = -1;
     static const int32 crc_alignment       = -2;

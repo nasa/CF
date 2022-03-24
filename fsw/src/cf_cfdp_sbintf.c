@@ -62,7 +62,7 @@
 CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent)
 {
     /* if channel is frozen, do not take message */
-    CF_Channel_t           *c = CF_AppData.engine.channels + t->chan_num;
+    CF_Channel_t *          c = CF_AppData.engine.channels + t->chan_num;
     CF_Logical_PduBuffer_t *ret;
 
     /* this function should not be called more than once before the message
@@ -162,11 +162,11 @@ void CF_CFDP_Send(uint8 chan_num, const CF_Logical_PduBuffer_t *ph)
  *-----------------------------------------------------------------*/
 void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
 {
-    CF_Transaction_t       *t; /* initialized below */
+    CF_Transaction_t *      t; /* initialized below */
     uint32                  count = 0;
     int32                   status;
     const int               chan_num = (c - CF_AppData.engine.channels);
-    CFE_SB_Buffer_t        *bufptr;
+    CFE_SB_Buffer_t *       bufptr;
     CFE_MSG_Size_t          msg_size;
     CF_Logical_PduBuffer_t *ph;
 

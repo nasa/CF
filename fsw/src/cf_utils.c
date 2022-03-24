@@ -50,7 +50,7 @@ CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c)
     {
         int q_index; /* initialized below in if */
 
-        CF_CListNode_t   *n = c->qs[CF_QueueIdx_FREE];
+        CF_CListNode_t *  n = c->qs[CF_QueueIdx_FREE];
         CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
 
         CF_CList_Remove_Ex(c, CF_QueueIdx_FREE, &t->cl_node);
@@ -152,10 +152,10 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_Transac
      *
      * Let's put CF_QueueIdx_RX up front, because most RX packets will be file data PDUs */
     CF_Traverse_TransSeqArg_t ctx    = {transaction_sequence_number, src_eid, NULL};
-    CF_CListNode_t           *ptrs[] = {c->qs[CF_QueueIdx_RX], c->qs[CF_QueueIdx_PEND], c->qs[CF_QueueIdx_TXA],
+    CF_CListNode_t *          ptrs[] = {c->qs[CF_QueueIdx_RX], c->qs[CF_QueueIdx_PEND], c->qs[CF_QueueIdx_TXA],
                               c->qs[CF_QueueIdx_TXW]};
     int                       i;
-    CF_Transaction_t         *ret = NULL;
+    CF_Transaction_t *        ret = NULL;
 
     for (i = 0; i < (sizeof(ptrs) / sizeof(ptrs[0])); ++i)
     {
@@ -229,7 +229,7 @@ int CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h)
 int CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *arg)
 {
     CF_Traverse_WriteHistoryFileArg_t *context = arg;
-    CF_History_t                      *h       = container_of(n, CF_History_t, cl_node);
+    CF_History_t *                     h       = container_of(n, CF_History_t, cl_node);
 
     /* if filter_dir is CF_Direction_NUM, this means both directions (all match) */
     if (context->filter_dir == CF_Direction_NUM || h->dir == context->filter_dir)
@@ -258,7 +258,7 @@ int CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *arg)
 int CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg)
 {
     CF_Traverse_WriteTxnFileArg_t *context = arg;
-    CF_Transaction_t              *t       = container_of(n, CF_Transaction_t, cl_node);
+    CF_Transaction_t *             t       = container_of(n, CF_Transaction_t, cl_node);
 
     if (CF_WriteHistoryEntryToFile(context->fd, t->history) < 0)
     {
@@ -322,7 +322,7 @@ int32 CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_Direction
  *-----------------------------------------------------------------*/
 int CF_PrioSearch(CF_CListNode_t *node, void *context)
 {
-    CF_Transaction_t          *t = container_of(node, CF_Transaction_t, cl_node);
+    CF_Transaction_t *         t = container_of(node, CF_Transaction_t, cl_node);
     CF_Traverse_PriorityArg_t *p = (CF_Traverse_PriorityArg_t *)context;
 
     if (t->priority <= p->priority)

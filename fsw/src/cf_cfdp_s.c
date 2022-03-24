@@ -121,11 +121,11 @@ void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *t)
 int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc)
 {
     int32                           ret = -1;
-    CF_Logical_PduBuffer_t         *ph  = CF_CFDP_ConstructPduHeader(t, 0, CF_AppData.config_table->local_eid,
-                                                                     t->history->peer_eid, 0, t->history->seq_num, 1);
+    CF_Logical_PduBuffer_t *        ph  = CF_CFDP_ConstructPduHeader(t, 0, CF_AppData.config_table->local_eid,
+                                                            t->history->peer_eid, 0, t->history->seq_num, 1);
     CF_Logical_PduFileDataHeader_t *fd;
     size_t                          actual_bytes;
-    void                           *data_ptr;
+    void *                          data_ptr;
 
     if (!ph)
     {
@@ -494,7 +494,7 @@ void CF_CFDP_S2_Fin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 void CF_CFDP_S2_Nak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     const CF_Logical_SegmentRequest_t *sr;
-    const CF_Logical_PduNak_t         *nak;
+    const CF_Logical_PduNak_t *        nak;
     uint8                              counter;
     uint8                              bad_sr;
 

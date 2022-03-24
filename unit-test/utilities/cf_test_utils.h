@@ -106,16 +106,16 @@ typedef struct
 
 typedef struct
 {
-    CF_Channel_t       *c;
+    CF_Channel_t *      c;
     CF_TransactionSeq_t transaction_sequence_number;
     CF_EntityId_t       src_eid;
-    CF_Transaction_t   *forced_return;
+    CF_Transaction_t *  forced_return;
 } CF_FindTransactionBySequenceNumber_context_t;
 
 typedef struct
 {
     CF_TraverseAllTransactions_fn_t fn;
-    void                           *context;
+    void *                          context;
     int                             forced_return;
 } CF_TraverseAllTransactions_All_Channels_context_t;
 
@@ -135,7 +135,7 @@ typedef struct
 {
     CF_CListNode_t *start;
     CF_CListFn_t    fn;
-    void           *context;
+    void *          context;
 } CF_CList_Traverse_POINTER_context_t;
 
 typedef struct
@@ -148,21 +148,21 @@ typedef struct
 typedef struct
 {
     int32          fd;
-    CF_Channel_t  *c;
+    CF_Channel_t * c;
     CF_Direction_t dir;
 } CF_WriteHistoryQueueDataToFile_context_t;
 
 typedef struct
 {
-    CF_Channel_t                   *c;
+    CF_Channel_t *                  c;
     CF_TraverseAllTransactions_fn_t fn;
-    void                           *context;
+    void *                          context;
     /* TODO: add forced return? Stub is kinda using it but not from context */
 } CF_TraverseAllTransactions_context_t;
 
 typedef struct
 {
-    osal_id_t  *fd;
+    osal_id_t * fd;
     const char *fname;
     int32       flags;
     int32       access;
@@ -172,26 +172,26 @@ typedef struct
 typedef struct
 {
     CF_CListNode_t **head;
-    CF_CListNode_t  *node;
+    CF_CListNode_t * node;
 } CF_CList_Remove_context_t;
 
 typedef struct
 {
     CF_CListNode_t **head;
-    CF_CListNode_t  *forced_return;
+    CF_CListNode_t * forced_return;
 } CF_CList_Pop_context_t;
 
 typedef struct
 {
     CF_CListNode_t **head;
-    CF_CListNode_t  *node;
+    CF_CListNode_t * node;
 } CF_CList_InsertBack_context_t;
 
 typedef struct
 {
     CF_CListNode_t **head;
-    CF_CListNode_t  *start;
-    CF_CListNode_t  *after;
+    CF_CListNode_t * start;
+    CF_CListNode_t * after;
 } CF_CList_InsertAfter_context_t;
 
 typedef struct
@@ -205,16 +205,16 @@ typedef struct
 
 typedef struct
 {
-    CF_CListNode_t                 *start;
+    CF_CListNode_t *                start;
     CF_CListFn_t                    fn;
     CF_TraverseAllTransactions_fn_t context_fn;
-    void                           *context_context;
+    void *                          context_context;
     int                             context_counter;
 } CF_CList_Traverse_TRAVERSE_ALL_ARGS_T_context_t;
 
 typedef struct
 {
-    CF_CListNode_t   *end;
+    CF_CListNode_t *  end;
     CF_CListFn_t      fn;
     CF_Transaction_t *context_t;
 } CF_CList_Traverse_R_context_t;
@@ -289,9 +289,9 @@ int          Any_int_Negative(void);
 int          Any_int_Positive(void);
 int          Any_int_PositiveExcept(int exception);
 int          Any_int_ZeroOrPositiveLessThan(int ceiling);
-char        *AnyFilenameOfLength(size_t length);
-char        *AnyRandomStringOfTextOfLength(size_t stringLength);
-char        *AnyRandomStringOfLettersOfLength(size_t length);
+char *       AnyFilenameOfLength(size_t length);
+char *       AnyRandomStringOfTextOfLength(size_t stringLength);
+char *       AnyRandomStringOfLettersOfLength(size_t length);
 void         AnyRandomStringOfLettersOfLengthCopy(char *random_string, size_t length);
 
 uint8 Any_cf_chan_num(void);

@@ -112,7 +112,7 @@ void UT_AltHandler_CF_CList_Traverse_POINTER(void *UserObj, UT_EntryKey_t FuncKe
 void UT_AltHandler_CF_CList_Traverse_R_PRIO(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
     CF_CList_Traverse_R_context_t *ctxt;
-    CF_Traverse_PriorityArg_t     *arg = UT_Hook_GetArgValueByName(Context, "context", CF_Traverse_PriorityArg_t *);
+    CF_Traverse_PriorityArg_t *    arg = UT_Hook_GetArgValueByName(Context, "context", CF_Traverse_PriorityArg_t *);
 
     if (UserObj)
     {

@@ -498,7 +498,7 @@ void CF_CFDP_EncodeFileDirectiveHeader(CF_EncoderState_t *state, CF_Logical_PduF
 void CF_CFDP_EncodeLV(CF_EncoderState_t *state, CF_Logical_Lv_t *pllv)
 {
     CF_CFDP_lv_t *lv; /* for encoding fixed sized fields */
-    void         *data_ptr;
+    void *        data_ptr;
 
     lv = CF_ENCODE_FIXED_CHUNK(state, CF_CFDP_lv_t);
     if (lv != NULL)
@@ -530,7 +530,7 @@ void CF_CFDP_EncodeLV(CF_EncoderState_t *state, CF_Logical_Lv_t *pllv)
 void CF_CFDP_EncodeTLV(CF_EncoderState_t *state, CF_Logical_Tlv_t *pltlv)
 {
     CF_CFDP_tlv_t *tlv; /* for encoding fixed sized fields */
-    void          *data_ptr;
+    void *         data_ptr;
 
     tlv = CF_ENCODE_FIXED_CHUNK(state, CF_CFDP_tlv_t);
     if (tlv != NULL)
@@ -652,7 +652,7 @@ void CF_CFDP_EncodeMd(CF_EncoderState_t *state, CF_Logical_PduMd_t *plmd)
 void CF_CFDP_EncodeFileDataHeader(CF_EncoderState_t *state, bool with_meta, CF_Logical_PduFileDataHeader_t *plfd)
 {
     CF_CFDP_PduFileDataHeader_t *fd;
-    CF_CFDP_uint8_t             *optional_fields;
+    CF_CFDP_uint8_t *            optional_fields;
 
     /* in this packet, the optional fields actually come first */
     if (with_meta)
@@ -996,7 +996,7 @@ void CF_CFDP_DecodeMd(CF_DecoderState_t *state, CF_Logical_PduMd_t *plmd)
 void CF_CFDP_DecodeFileDataHeader(CF_DecoderState_t *state, bool with_meta, CF_Logical_PduFileDataHeader_t *plfd)
 {
     const CF_CFDP_PduFileDataHeader_t *fd;
-    const CF_CFDP_uint8_t             *optional_fields;
+    const CF_CFDP_uint8_t *            optional_fields;
     uint8                              field_count;
 
     plfd->continuation_state        = 0;

@@ -309,7 +309,7 @@ typedef struct CF_Transaction
 {
     CF_TxnState_t state; /**< \brief each engine is commanded to do something, which is the overall state */
 
-    CF_History_t      *history;          /**< \brief weird, holds active filenames and possibly other info */
+    CF_History_t *     history;          /**< \brief weird, holds active filenames and possibly other info */
     CF_ChunkWrapper_t *chunks;           /**< \brief for gap tracking, only used on class 2 */
     CF_Timer_t         inactivity_timer; /**< \brief set to the overall inactivity timer of a remote */
     CF_Timer_t         ack_timer;        /**< \brief called ack_timer, but is also nak_timer */
@@ -439,7 +439,7 @@ typedef struct CF_PduSendMsg
  */
 typedef struct CF_Output
 {
-    CFE_SB_Buffer_t  *msg;    /**< \brief Binary message to be sent to underlying transport */
+    CFE_SB_Buffer_t * msg;    /**< \brief Binary message to be sent to underlying transport */
     CF_EncoderState_t encode; /**< \brief Encoding state (while building message) */
 
     /**
@@ -455,7 +455,7 @@ typedef struct CF_Output
  */
 typedef struct CF_Input
 {
-    CFE_SB_Buffer_t  *msg;    /**< \brief Binary message received from underlying transport */
+    CFE_SB_Buffer_t * msg;    /**< \brief Binary message received from underlying transport */
     CF_DecoderState_t decode; /**< \brief Decoding state (while interpreting message) */
 
     /**

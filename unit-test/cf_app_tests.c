@@ -612,9 +612,9 @@ void Test_CF_ProcessMsg_ProcessGroundCommand(void)
 {
     /* Arrange */
     CFE_SB_Buffer_t            dummy_msg;
-    CFE_SB_Buffer_t           *arg_msg      = &dummy_msg;
+    CFE_SB_Buffer_t *          arg_msg      = &dummy_msg;
     CFE_SB_MsgId_t             forced_MsgID = CFE_SB_ValueToMsgId(CF_CMD_MID);
-    CFE_SB_Buffer_t           *context_CF_ProcessGroundCommand_msg;
+    CFE_SB_Buffer_t *          context_CF_ProcessGroundCommand_msg;
     CFE_MSG_GetMsgId_context_t context_CFE_MSG_GetMsgId;
 
     /* CFE_MSG_GetMsgId uses return by ref */
@@ -638,7 +638,7 @@ void Test_CF_ProcessMsg_WakeUp(void)
 {
     /* Arrange */
     CFE_SB_Buffer_t            dummy_msg;
-    CFE_SB_Buffer_t           *arg_msg      = &dummy_msg;
+    CFE_SB_Buffer_t *          arg_msg      = &dummy_msg;
     CFE_SB_MsgId_t             forced_MsgID = CFE_SB_ValueToMsgId(CF_WAKE_UP_MID);
     CFE_MSG_GetMsgId_context_t context_CFE_MSG_GetMsgId;
 
@@ -662,7 +662,7 @@ void Test_CF_ProcessMsg_SendHk(void)
     /* TODO: figure out if message is required here - not used at time of writing this */
     // CFE_MSG_Message_t   dummy_Msg;
     // CFE_SB_Buffer_t     dummy_msg;
-    CFE_SB_Buffer_t           *arg_msg      = NULL;
+    CFE_SB_Buffer_t *          arg_msg      = NULL;
     CFE_SB_MsgId_t             forced_MsgID = CFE_SB_ValueToMsgId(CF_SEND_HK_MID);
     CFE_MSG_GetMsgId_context_t context_CFE_MSG_GetMsgId;
 
@@ -692,7 +692,7 @@ void Test_CF_ProcessMsg_UnrecognizedCommandEnterDefaultPath(void)
     uint16                      initial_err_count = CF_AppData.hk.counters.err;
     CFE_SB_MsgId_Atom_t         midval;
     CFE_SB_MsgId_t              forced_MsgID;
-    CFE_SB_Buffer_t            *arg_msg = NULL;
+    CFE_SB_Buffer_t *           arg_msg = NULL;
     CFE_MSG_GetMsgId_context_t  context_CFE_MSG_GetMsgId;
     CFE_EVS_SendEvent_context_t context_CFE_EVS_SendEvent;
 

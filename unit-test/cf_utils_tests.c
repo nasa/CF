@@ -29,7 +29,7 @@
 typedef struct
 {
     CF_Transaction_t *t;
-    void             *context;
+    void *            context;
 } UT_Callback_CF_TraverseAllTransactions_context_t;
 
 /*******************************************************************************
@@ -144,7 +144,7 @@ void Test_CF_FindUnusedTransaction(void)
     /* Test case for:
      * CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c)
      */
-    CF_Channel_t    *c;
+    CF_Channel_t *   c;
     CF_Transaction_t txn;
     CF_History_t     hist;
 
@@ -243,7 +243,7 @@ void Test_CF_FindTransactionBySequenceNumber(void)
      */
 
     CF_Transaction_t *t;
-    CF_Channel_t     *c;
+    CF_Channel_t *    c;
 
     memset(&CF_AppData, 0, sizeof(CF_AppData));
     c = &CF_AppData.engine.channels[UT_CFDP_CHANNEL];
@@ -309,7 +309,7 @@ void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
     CF_Transaction_t arg_t;
     uint8            dummy_chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
     CF_CListNode_t **expected_head;
-    CF_CListNode_t  *expected_cl_node;
+    CF_CListNode_t * expected_cl_node;
     uint16           initial_q_size = Any_uint16_Except(0); /* 0 will CF_Assert */
 
     CF_CList_Remove_context_t context_clist_remove;
@@ -377,10 +377,10 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t          = &dummy_t;
     uint8             dummy_chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
-    CF_CListNode_t  **expected_remove_head;
-    CF_CListNode_t   *expected_remove_node;
-    CF_CListNode_t  **expected_insert_back_head;
-    CF_CListNode_t   *expected_insert_back_node;
+    CF_CListNode_t ** expected_remove_head;
+    CF_CListNode_t *  expected_remove_node;
+    CF_CListNode_t ** expected_insert_back_head;
+    CF_CListNode_t *  expected_insert_back_node;
     CF_QueueIdx_t     arg_q = Any_cf_queue_index_t();
 
     memset(&dummy_t, 0, sizeof(dummy_t));
@@ -450,12 +450,12 @@ void Test_CF_CList_Remove_Ex_AssertsBecause_q_size_Eq0(void)
 void Test_CF_CList_Remove_Ex_Call_CF_CList_Remove_AndDecrement_q_size(void)
 {
     /* Arrange */
-    CF_Channel_t    *arg_c     = &CF_AppData.engine.channels[Any_uint32_LessThan(CF_NUM_CHANNELS)];
+    CF_Channel_t *   arg_c     = &CF_AppData.engine.channels[Any_uint32_LessThan(CF_NUM_CHANNELS)];
     CF_QueueIdx_t    arg_index = Any_cf_queue_index_t();
     CF_CListNode_t   dummy_node;
-    CF_CListNode_t  *arg_node = &dummy_node;
+    CF_CListNode_t * arg_node = &dummy_node;
     CF_CListNode_t **expected_remove_head;
-    CF_CListNode_t  *expected_remove_node;
+    CF_CListNode_t * expected_remove_node;
     uint16           initial_q_size = Any_uint16_Except(0);
 
     CF_CList_Remove_context_t context_clist_remove;
@@ -486,12 +486,12 @@ void Test_CF_CList_Remove_Ex_Call_CF_CList_Remove_AndDecrement_q_size(void)
 void Test_CF_CList_InsertAfter_Ex_Call_CF_CList_InsertAfter_AndIncrement_q_size(void)
 {
     /* Arrange */
-    CF_Channel_t    *arg_c     = &CF_AppData.engine.channels[Any_uint32_LessThan(CF_NUM_CHANNELS)];
+    CF_Channel_t *   arg_c     = &CF_AppData.engine.channels[Any_uint32_LessThan(CF_NUM_CHANNELS)];
     CF_QueueIdx_t    arg_index = Any_cf_queue_index_t();
     CF_CListNode_t   dummy_start;
-    CF_CListNode_t  *arg_start = &dummy_start;
+    CF_CListNode_t * arg_start = &dummy_start;
     CF_CListNode_t   dummy_after;
-    CF_CListNode_t  *arg_after                  = &dummy_after;
+    CF_CListNode_t * arg_after                  = &dummy_after;
     uint16           initial_q_size             = Any_uint16();
     CF_CListNode_t **expected_insert_after_head = &arg_c->qs[arg_index];
 
@@ -523,13 +523,13 @@ void Test_CF_CList_InsertAfter_Ex_Call_CF_CList_InsertAfter_AndIncrement_q_size(
 void Test_CF_CList_InsertBack_Ex_Call_CF_CList_InsertBack_AndIncrement_q_size(void)
 {
     /* Arrange */
-    CF_Channel_t    *arg_c     = &CF_AppData.engine.channels[Any_uint32_LessThan(CF_NUM_CHANNELS)];
+    CF_Channel_t *   arg_c     = &CF_AppData.engine.channels[Any_uint32_LessThan(CF_NUM_CHANNELS)];
     CF_QueueIdx_t    arg_index = Any_cf_queue_index_t();
     CF_CListNode_t   dummy_node;
-    CF_CListNode_t  *arg_node       = &dummy_node;
+    CF_CListNode_t * arg_node       = &dummy_node;
     uint16           initial_q_size = Any_uint16();
     CF_CListNode_t **expected_insert_back_head;
-    CF_CListNode_t  *expected_insert_back_node;
+    CF_CListNode_t * expected_insert_back_node;
 
     CF_CList_InsertBack_context_t context_clist_insert_back;
     UT_SetDataBuffer(UT_KEY(CF_CList_InsertBack), &context_clist_insert_back, sizeof(context_clist_insert_back), false);
@@ -736,9 +736,9 @@ void Test_CF_PrioSearch_When_t_PrioIsGreaterThanContextPrioReturn_CLIST_CONT(voi
 {
     /* Arrange */
     CF_Transaction_t          dummy_t;
-    CF_CListNode_t           *arg_node = &dummy_t.cl_node;
+    CF_CListNode_t *          arg_node = &dummy_t.cl_node;
     CF_Traverse_PriorityArg_t dummy_p;
-    void                     *arg_context = (void *)&dummy_p;
+    void *                    arg_context = (void *)&dummy_p;
     int32                     result;
 
     dummy_t.priority = Any_uint8_Except(0);
@@ -756,9 +756,9 @@ void Test_CF_PrioSearch_When_t_PrioIsEqToContextPrio_Set_context_t_To_t_AndRetur
 {
     /* Arrange */
     CF_Transaction_t          dummy_t;
-    CF_CListNode_t           *arg_node = &dummy_t.cl_node;
+    CF_CListNode_t *          arg_node = &dummy_t.cl_node;
     CF_Traverse_PriorityArg_t dummy_p;
-    void                     *arg_context = (void *)&dummy_p;
+    void *                    arg_context = (void *)&dummy_p;
     int32                     result;
 
     /* NOTE: these are inverted from previous test! */
@@ -778,9 +778,9 @@ void Test_CF_PrioSearch_When_t_PrioIsLessThanContextPrio_Set_context_t_To_t_AndR
 {
     /* Arrange */
     CF_Transaction_t          dummy_t;
-    CF_CListNode_t           *arg_node = &dummy_t.cl_node;
+    CF_CListNode_t *          arg_node = &dummy_t.cl_node;
     CF_Traverse_PriorityArg_t dummy_p;
-    void                     *arg_context = (void *)&dummy_p;
+    void *                    arg_context = (void *)&dummy_p;
     int32                     result;
 
     /* NOTE: these are inverted from previous test! */
@@ -830,9 +830,9 @@ void Test_CF_InsertSortPrio_Call_CF_CList_InsertBack_Ex_ListIsEmpty_AndSet_q_ind
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t = &dummy_t;
     CF_QueueIdx_t     arg_q = Any_cf_queue_index_t();
-    CF_Channel_t     *dummy_c;
-    CF_CListNode_t  **expected_insert_back_head;
-    CF_CListNode_t   *expected_insert_back_node;
+    CF_Channel_t *    dummy_c;
+    CF_CListNode_t ** expected_insert_back_head;
+    CF_CListNode_t *  expected_insert_back_node;
 
     /* dummy_t settings to bypass CF_Assert */
     dummy_t.chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
@@ -868,13 +868,13 @@ void Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q(voi
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t = &dummy_t;
     CF_QueueIdx_t     arg_q = Any_cf_queue_index_t();
-    CF_CListNode_t   *dummy_qs;
-    CF_Channel_t     *dummy_c;
-    CF_CListNode_t   *expected_end;
+    CF_CListNode_t *  dummy_qs;
+    CF_Channel_t *    dummy_c;
+    CF_CListNode_t *  expected_end;
     CF_CListFn_t      expected_fn;
-    CF_CListNode_t  **expected_insert_after_head;
-    CF_CListNode_t  **expected_insert_after_start;
-    CF_CListNode_t  **expected_insert_after_after;
+    CF_CListNode_t ** expected_insert_after_head;
+    CF_CListNode_t ** expected_insert_after_start;
+    CF_CListNode_t ** expected_insert_after_after;
 
     CF_CList_Traverse_R_context_t context_cf_clist_traverse_r;
     UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse_R), UT_AltHandler_CF_CList_Traverse_R_PRIO,
@@ -926,12 +926,12 @@ void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t = &dummy_t;
     CF_QueueIdx_t     arg_q = Any_cf_queue_index_t();
-    CF_CListNode_t   *dummy_qs;
-    CF_Channel_t     *dummy_c;
-    CF_CListNode_t   *expected_end;
+    CF_CListNode_t *  dummy_qs;
+    CF_Channel_t *    dummy_c;
+    CF_CListNode_t *  expected_end;
     CF_CListFn_t      expected_fn;
-    CF_CListNode_t  **expected_insert_back_head;
-    CF_CListNode_t   *expected_insert_back_node;
+    CF_CListNode_t ** expected_insert_back_head;
+    CF_CListNode_t *  expected_insert_back_node;
 
     CF_CList_Traverse_R_context_t context_cf_clist_traverse_r;
     UT_SetDataBuffer(UT_KEY(CF_CList_Traverse_R), &context_cf_clist_traverse_r, sizeof(context_cf_clist_traverse_r),
@@ -987,14 +987,14 @@ void Test_CF_TraverseAllTransactions_Impl_GetContainer_t_Call_args_fn_AndAdd_1_T
 {
     /* Arrange */
     CF_Transaction_t      dummy_t;
-    CF_CListNode_t       *arg_n = &dummy_t.cl_node;
+    CF_CListNode_t *      arg_n = &dummy_t.cl_node;
     CF_TraverseAll_Arg_t  dummy_args;
     CF_TraverseAll_Arg_t *arg_args;
     int                   dummy_context_val;
-    void                 *dummy_context        = &dummy_context_val;
+    void *                dummy_context        = &dummy_context_val;
     int                   initial_args_counter = Any_int();
-    CF_Transaction_t     *expected_t;
-    void                 *expected_context;
+    CF_Transaction_t *    expected_t;
+    void *                expected_context;
     int32                 result;
 
     dummy_args.fn      = UT_Callback_CF_TraverseAllTransactions;
@@ -1034,9 +1034,9 @@ void Test_CF_TraverseAllTransactions_CallOtherFunction_CF_Q_RX_TimesAndReturn_ar
 {
     /* Arrange */
     CF_Channel_t    dummy_c;
-    CF_Channel_t   *arg_c;
+    CF_Channel_t *  arg_c;
     int             dummy_context;
-    void           *arg_context    = &dummy_context;
+    void *          arg_context    = &dummy_context;
     uint8           expected_count = CF_QueueIdx_RX - CF_QueueIdx_PEND + 1;
     CF_CListNode_t *expected_qs_nodes[expected_count];
 
@@ -1115,7 +1115,7 @@ void Test_CF_WrappedOpen_Call_OS_OpenCreate_WithGivenArgumentsAndReturnItsReturn
     osal_id_t  dummy_fd;
     osal_id_t *arg_fd = &dummy_fd;
     char       dummy_fname;
-    char      *arg_fname                   = &dummy_fname;
+    char *     arg_fname                   = &dummy_fname;
     int32      arg_flags                   = Any_uint32();
     int32      arg_access                  = Any_uint32();
     int32      forced_return_OS_OpenCreate = Any_int32();
@@ -1180,7 +1180,7 @@ void Test_CF_WrappedRead_CallsOS_read_WithGivenArgumentsAndReturnItsReturnValue(
     /* Arrange */
     uint32 arg_read_size = Any_uint32_LessThan_or_EqualTo(10); // 10 is arbitrary to make test fast
     uint8  dummy_buf[10] = {0};                                // 10 to match max read size of 10 (arbitrary)
-    void  *arg_buf       = &dummy_buf;
+    void * arg_buf       = &dummy_buf;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_read), arg_read_size);
 
@@ -1201,7 +1201,7 @@ void Test_CF_WrappedWrite_Call_OS_write_WithGivenArgumentsAndReturnItsReturnValu
 {
     /* Arrange */
     uint8  dummy_buf;
-    void  *arg_buf         = &dummy_buf;
+    void * arg_buf         = &dummy_buf;
     uint32 test_write_size = Any_uint32();
     int32  expected_result = Any_int32();
 

@@ -163,7 +163,7 @@ typedef struct CF_Logical_Lv
 typedef union CF_Logical_TlvData
 {
     CF_EntityId_t eid;      /**< \brief Valid when type=ENTITY_ID (6) */
-    const void   *data_ptr; /**< \brief Source of actual data in original location (other string/binary types) */
+    const void *  data_ptr; /**< \brief Source of actual data in original location (other string/binary types) */
 
 } CF_Logical_TlvData_t;
 

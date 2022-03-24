@@ -131,8 +131,8 @@ void Test_CF_CFDP_R_DispatchRecv(void)
      * void CF_CFDP_R_DispatchRecv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph, const
      * CF_CFDP_R_SubstateDispatchTable_t *dispatch, CF_CFDP_StateRecvFunc_t fd_fn);
      */
-    CF_Transaction_t                    *t;
-    CF_Logical_PduBuffer_t              *ph;
+    CF_Transaction_t *                   t;
+    CF_Logical_PduBuffer_t *             ph;
     CF_CFDP_R_SubstateDispatchTable_t    dispatch;
     CF_CFDP_FileDirectiveDispatchTable_t fddt;
 
@@ -189,8 +189,8 @@ void Test_CF_CFDP_S_DispatchRecv(void)
      * void CF_CFDP_S_DispatchRecv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph,
                                    const CF_CFDP_S_SubstateRecvDispatchTable_t *dispatch)
      */
-    CF_Transaction_t                     *t;
-    CF_Logical_PduBuffer_t               *ph;
+    CF_Transaction_t *                    t;
+    CF_Logical_PduBuffer_t *              ph;
     CF_CFDP_S_SubstateRecvDispatchTable_t dispatch;
     CF_CFDP_FileDirectiveDispatchTable_t  fddt;
 
@@ -230,7 +230,7 @@ void Test_CF_CFDP_S_DispatchTransmit(void)
     /* Test case for:
      * void CF_CFDP_S_DispatchTransmit(CF_Transaction_t *t, const CF_CFDP_S_SubstateSendDispatchTable_t *dispatch);
      */
-    CF_Transaction_t                     *t;
+    CF_Transaction_t *                    t;
     CF_CFDP_S_SubstateSendDispatchTable_t dispatch;
 
     /* The CF_CFDP_S2_Tx is just used as a convenient stub to target */
@@ -253,7 +253,7 @@ void Test_CF_CFDP_TxStateDispatch(void)
     /* Test case for:
      * void CF_CFDP_TxStateDispatch(CF_Transaction_t *t, const CF_CFDP_TxnSendDispatchTable_t *dispatch);
      */
-    CF_Transaction_t              *t;
+    CF_Transaction_t *             t;
     CF_CFDP_TxnSendDispatchTable_t dispatch;
 
     memset(&dispatch, 0, sizeof(dispatch));
@@ -277,8 +277,8 @@ void Test_CF_CFDP_RxStateDispatch(void)
      * void CF_CFDP_RxStateDispatch(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph, const
      * CF_CFDP_TxnRecvDispatchTable_t *dispatch);
      */
-    CF_Transaction_t              *t;
-    CF_Logical_PduBuffer_t        *ph;
+    CF_Transaction_t *             t;
+    CF_Logical_PduBuffer_t *       ph;
     CF_CFDP_TxnRecvDispatchTable_t dispatch;
 
     memset(&dispatch, 0, sizeof(dispatch));

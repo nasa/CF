@@ -74,7 +74,7 @@ void UT_DefaultHandler_CF_CFDP_ConstructPduHeader(void *UserObj, UT_EntryKey_t F
 void UT_DefaultHandler_CF_CFDP_TxFile(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
     CF_CFDP_TxFile_context_t *ctxt = UT_CF_GetContextBuffer(FuncKey, CF_CFDP_TxFile_context_t);
-    const char               *ptr;
+    const char *              ptr;
 
     if (ctxt)
     {
@@ -101,7 +101,7 @@ void UT_DefaultHandler_CF_CFDP_TxFile(void *UserObj, UT_EntryKey_t FuncKey, cons
 void UT_DefaultHandler_CF_CFDP_PlaybackDir(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
     CF_CFDP_PlaybackDir_context_t *ctxt = UT_CF_GetContextBuffer(FuncKey, CF_CFDP_PlaybackDir_context_t);
-    const char                    *ptr;
+    const char *                   ptr;
 
     if (ctxt)
     {
