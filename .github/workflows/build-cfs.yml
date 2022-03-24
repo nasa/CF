@@ -8,12 +8,15 @@ on:
 env:
   SIMULATION: native
   OMIT_DEPRECATED: true
-  ENABLE_UNIT_TESTS: false
+  ENABLE_UNIT_TESTS: true
+  CTEST_OUTPUT_ON_FAILURE: true
+  REPO_NAME: ${{ github.event.repository.name }}
 
 jobs:
   #Checks for duplicate actions. Skips push actions if there is a matching or duplicate pull-request action. 
   check-for-duplicates:
     runs-on: ubuntu-latest
+    
     # Map a step output to a job output
     outputs:
         should_skip: ${{ steps.skip_check.outputs.should_skip }}
@@ -25,13 +28,31 @@ jobs:
           skip_after_successful_duplicate: 'true'
           do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
     
-  build-run:
+  build-run-test:
+    name: Build, Run, Test
     needs: check-for-duplicates
     if: ${{ needs.check-for-duplicates.outputs.should_skip != 'true' }}
-    runs-on: ubuntu-18.04
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04]
+        buildtype: [debug, release]
+
+    # Set the type of machine to run on
+    env:
+      BUILDTYPE: ${{ matrix.buildtype }}
+    
     steps:
+      - name: Cache Source and Build
+        id: cache-src-bld
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/work/${{ env.REPO_NAME }}/${{ env.REPO_NAME }}/*
+          key: build-${{ github.run_number }}-${{ matrix.buildtype }}-${{ matrix.os }}
+      
       - name: Checkout bundle
         uses: actions/checkout@v2
         with:
@@ -84,3 +105,12 @@ jobs:
           fi
         working-directory: ./build/exe/cpu1/
 
+      - name: Install Dependencies
+        run: sudo apt-get install lcov -y        
+      
+      - name: Run Tests
+        run: make test
+
+      - name: Check Coverage
+        run: make lcov
+  
