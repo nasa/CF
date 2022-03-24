@@ -25,8 +25,8 @@ typedef struct
 {
     uint32                count;
     const CF_ChunkList_t *cs;
-    const CF_Chunk_t     *c;
-    void                 *opaque;
+    const CF_Chunk_t *    c;
+    void *                opaque;
 } Dummy_compute_gap_fn_t_context_t;
 
 Dummy_compute_gap_fn_t_context_t context_Dummy_compute_gap_fn_t;
@@ -139,7 +139,7 @@ void Test_CF_Chunks_When_start_Is_OneMoreThan_end_MovesOneChunk_EraseRange(void)
     /* Arrange */
     CF_Chunk_t       dummy_chunk_array[2];
     CF_ChunkList_t   dummy_chunks;
-    CF_ChunkList_t  *arg_chunks         = &dummy_chunks;
+    CF_ChunkList_t * arg_chunks         = &dummy_chunks;
     CF_ChunkIdx_t    arg_start          = 0;
     CF_ChunkIdx_t    arg_end            = 1;
     CF_ChunkOffset_t dummy_start_offset = Any_uint32();
@@ -168,7 +168,7 @@ void Test_CF_Chunks_When_start_IsLessThan_chunks_count_DoesNotChangeStart_EraseR
     /* Arrange */
     CF_Chunk_t       dummy_chunk_array[2];
     CF_ChunkList_t   dummy_chunks;
-    CF_ChunkList_t  *arg_chunks         = &dummy_chunks;
+    CF_ChunkList_t * arg_chunks         = &dummy_chunks;
     CF_ChunkIdx_t    arg_start          = 2;
     CF_ChunkIdx_t    arg_end            = 3;
     CF_ChunkOffset_t dummy_start_offset = Any_uint32();
@@ -264,7 +264,7 @@ void Test_CF_Chunks_EraseChunk_EraseOneChunkThatIsNotTheLastFrom_chunks_AndDecre
         Any_uint8_LessThan(10) + 2; /* 2-11, reasonably small count for testing and not its normal uint32 */
     CF_Chunk_t       dummy_chunk[11] = {{0}};
     CF_ChunkList_t   dummy_chunks;
-    CF_ChunkList_t  *arg_chunks = &dummy_chunks;
+    CF_ChunkList_t * arg_chunks = &dummy_chunks;
     CF_ChunkIdx_t    arg_erase_index;
     uint8            i                   = 0;
     CF_ChunkOffset_t offsets[11]         = {0};
@@ -327,7 +327,7 @@ void Test_CF_Chunks_EraseChunk_ErasesLastChunkFrom_chunks_AndDecrements_count(vo
         Any_uint8_LessThan(10) + 2; /* 2-11, reasonably small count for testing and not its normal uint32 */
     CF_Chunk_t       dummy_chunk[11] = {{0}};
     CF_ChunkList_t   dummy_chunks;
-    CF_ChunkList_t  *arg_chunks      = &dummy_chunks;
+    CF_ChunkList_t * arg_chunks      = &dummy_chunks;
     CF_ChunkIdx_t    arg_erase_index = initial_count - 1;
     uint8            i               = 0;
     CF_ChunkOffset_t offsets[11]     = {0};
@@ -424,7 +424,7 @@ void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoEmpty_chunks(void)
     /* Arrange */
     CF_Chunk_t        initial_chunks[1];
     CF_ChunkList_t    dummy_chunks;
-    CF_ChunkList_t   *arg_chunks       = &dummy_chunks;
+    CF_ChunkList_t *  arg_chunks       = &dummy_chunks;
     CF_ChunkIdx_t     arg_index_before = 0;
     CF_Chunk_t        dummy_chunk      = {0};
     const CF_Chunk_t *arg_chunk;
@@ -456,7 +456,7 @@ void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoStartOfSingle_chunks(void)
     CF_Chunk_t        initial_start_chunk;
     CF_Chunk_t        initial_chunks[2] = {{0}};
     CF_ChunkList_t    dummy_chunks;
-    CF_ChunkList_t   *arg_chunks       = &dummy_chunks;
+    CF_ChunkList_t *  arg_chunks       = &dummy_chunks;
     CF_ChunkIdx_t     arg_index_before = 0;
     CF_Chunk_t        dummy_chunk      = {0};
     const CF_Chunk_t *arg_chunk;
@@ -496,7 +496,7 @@ void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoEndOfSingle_chunks(void)
     CF_Chunk_t        initial_start_chunk;
     CF_Chunk_t        initial_chunks[2] = {{0}};
     CF_ChunkList_t    dummy_chunks;
-    CF_ChunkList_t   *arg_chunks       = &dummy_chunks;
+    CF_ChunkList_t *  arg_chunks       = &dummy_chunks;
     CF_ChunkIdx_t     arg_index_before = 1;
     CF_Chunk_t        dummy_chunk      = {0};
     const CF_Chunk_t *arg_chunk;
@@ -537,7 +537,7 @@ void Test_CF_Chunks_InsertChunk_PutGiven_chunk_IntoSome_chunks(void)
         Any_uint8_LessThan(10) + 1; /* 1-10, reasonably small count for testing and not its normal uint32 */
     CF_Chunk_t        initial_chunks[11] = {{0}};
     CF_ChunkList_t    dummy_chunks;
-    CF_ChunkList_t   *arg_chunks       = &dummy_chunks;
+    CF_ChunkList_t *  arg_chunks       = &dummy_chunks;
     CF_ChunkIdx_t     arg_index_before = 0;
     CF_Chunk_t        dummy_chunk      = {0};
     const CF_Chunk_t *arg_chunk;
@@ -603,7 +603,7 @@ void Test_CF_Chunks_FindInsertPosition_Given_chunks_IsEmptyReturn_0(void)
     CF_ChunkList_t  dummy_chunks;
     CF_ChunkList_t *arg_chunks  = &dummy_chunks;
     CF_Chunk_t      dummy_chunk = {0};
-    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk   = &dummy_chunk;
     CF_ChunkIdx_t   local_result;
 
     arg_chunks->count = 0;
@@ -622,7 +622,7 @@ void Test_CF_Chunks_FindInsertPosition_Given_chunks_HasOneItemAndGiven_chunk_off
     CF_ChunkList_t  dummy_chunks;
     CF_ChunkList_t *arg_chunks  = &dummy_chunks;
     CF_Chunk_t      dummy_chunk = {0};
-    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk   = &dummy_chunk;
     CF_ChunkIdx_t   local_result;
 
     initial_chunks[0].offset = Any_uint32_Except(0);
@@ -646,7 +646,7 @@ void Test_CF_Chunks_FindInsertPosition_Given_chunks_HasOneItemAndGiven_chunk_off
     CF_ChunkList_t  dummy_chunks;
     CF_ChunkList_t *arg_chunks  = &dummy_chunks;
     CF_Chunk_t      dummy_chunk = {0};
-    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk   = &dummy_chunk;
     CF_ChunkIdx_t   local_result;
 
     initial_chunks[0].offset = Any_uint32_Except(0);
@@ -670,7 +670,7 @@ void Test_CF_Chunks_FindInsertPosition_Given_chunks_HasOneItemAndGiven_chunk_off
     CF_ChunkList_t  dummy_chunks;
     CF_ChunkList_t *arg_chunks  = &dummy_chunks;
     CF_Chunk_t      dummy_chunk = {0};
-    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk   = &dummy_chunk;
     CF_ChunkIdx_t   local_result;
 
     initial_chunks[0].offset = Any_uint32_Except(UINT32_MAX);
@@ -695,7 +695,7 @@ void Test_CF_Chunks_FindInsertPosition_Given_chunks_HasTwoItemsAndGiven_chunk_of
     CF_ChunkList_t  dummy_chunks;
     CF_ChunkList_t *arg_chunks  = &dummy_chunks;
     CF_Chunk_t      dummy_chunk = {0};
-    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk   = &dummy_chunk;
     CF_ChunkIdx_t   local_result;
 
     initial_chunks[0].offset = Any_uint32_BetweenExcludeMax(0, UINT32_MAX - 1);
@@ -722,7 +722,7 @@ void Test_CF_Chunks_FindInsertPosition_Given_chunks_HasAnyItemsAndReturnCorrectE
     CF_ChunkList_t  dummy_chunks;
     CF_ChunkList_t *arg_chunks  = &dummy_chunks;
     CF_Chunk_t      dummy_chunk = {0};
-    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk   = &dummy_chunk;
     CF_ChunkIdx_t   local_result;
     uint8           num_chunks_before = Any_uint8_LessThan(10);
     uint8           num_chunks_after  = Any_uint8_LessThan(10);
@@ -806,7 +806,7 @@ void Test_CF_Chunks_CombinePrevious_Given_i_Is_0_Return_0(void)
     CF_ChunkList_t *arg_chunks = &dummy_chunks;
     CF_ChunkIdx_t   arg_i;
     CF_Chunk_t      dummy_chunk  = {0};
-    CF_Chunk_t     *arg_chunk    = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk    = &dummy_chunk;
     int             local_result = Any_int_Except(0);
 
     arg_chunks->max_chunks = Any_uint32_Except(0);
@@ -827,7 +827,7 @@ void Test_CF_Chunks_CombinePrevious_Given_chunks_count_Is_0_Return_0(void)
     CF_ChunkList_t *arg_chunks = &dummy_chunks;
     CF_ChunkIdx_t   arg_i;
     CF_Chunk_t      dummy_chunk  = {0};
-    CF_Chunk_t     *arg_chunk    = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk    = &dummy_chunk;
     int             local_result = Any_int_Except(0);
 
     arg_chunks->max_chunks = Any_uint32_Except(0);
@@ -848,7 +848,7 @@ void Test_CF_Chunks_CombinePrevious_Given_i_Is_0_And_chunks_count_Is_0_Return_0(
     CF_ChunkList_t *arg_chunks = &dummy_chunks;
     CF_ChunkIdx_t   arg_i;
     CF_Chunk_t      dummy_chunk  = {0};
-    CF_Chunk_t     *arg_chunk    = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk    = &dummy_chunk;
     int             local_result = Any_int_Except(0);
 
     arg_chunks->max_chunks = Any_uint32_Except(0);
@@ -874,7 +874,7 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
         Any_uint32_LessThan(dummy_chunks_count) +
         1; /* arg_i gets +1 because the index is 0 based, but the CUT expects an i of min 1 which is the 0 element */
     CF_Chunk_t       dummy_chunk  = {0};
-    CF_Chunk_t      *arg_chunk    = &dummy_chunk;
+    CF_Chunk_t *     arg_chunk    = &dummy_chunk;
     CF_ChunkOffset_t dummy_offset = Any_uint32_LessThan(UINT32_MAX / 2);
     CF_ChunkSize_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
     int              local_result = Any_int_Except(0);
@@ -908,7 +908,7 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
         Any_uint32_LessThan(dummy_chunks_count) +
         1; /* arg_i gets +1 because the index is 0 based, but the CUT expects an i of min 1 which is the 0 element */
     CF_Chunk_t       dummy_chunk  = {0};
-    CF_Chunk_t      *arg_chunk    = &dummy_chunk;
+    CF_Chunk_t *     arg_chunk    = &dummy_chunk;
     CF_ChunkOffset_t dummy_offset = Any_uint32_LessThan(UINT32_MAX / 2);
     CF_ChunkSize_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
     int              local_result = Any_int_Except(0);
@@ -943,7 +943,7 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
         Any_uint32_LessThan(dummy_chunks_count) +
         1; /* arg_i gets +1 because the index is 0 based, but the CUT expects an i of min 1 which is the 0 element */
     CF_Chunk_t       dummy_chunk  = {0};
-    CF_Chunk_t      *arg_chunk    = &dummy_chunk;
+    CF_Chunk_t *     arg_chunk    = &dummy_chunk;
     CF_ChunkOffset_t dummy_offset = Any_uint32_LessThan(UINT32_MAX / 2);
     CF_ChunkSize_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
     int              local_result = Any_int_Except(0);
@@ -978,7 +978,7 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
         Any_uint32_LessThan(dummy_chunks_count) +
         1; /* arg_i gets +1 because the index is 0 based, but the CUT expects an i of min 1 which is the 0 element */
     CF_Chunk_t       dummy_chunk  = {0};
-    CF_Chunk_t      *arg_chunk    = &dummy_chunk;
+    CF_Chunk_t *     arg_chunk    = &dummy_chunk;
     CF_ChunkOffset_t dummy_offset = Any_uint32_LessThan(UINT32_MAX / 2);
     CF_ChunkSize_t   dummy_size   = Any_uint32_LessThan(UINT32_MAX / 2);
     int              local_result = Any_int_Except(0);
@@ -1013,7 +1013,7 @@ void Test_CF_Chunks_CombinePrevious_GivenIndexMinusOne_chunks_chunks_ValueFor_pr
         Any_uint32_LessThan(dummy_chunks_count) +
         1; /* arg_i gets +1 because the index is 0 based, but the CUT expects an i of min 1 which is the 0 element */
     CF_Chunk_t       dummy_chunk  = {0};
-    CF_Chunk_t      *arg_chunk    = &dummy_chunk;
+    CF_Chunk_t *     arg_chunk    = &dummy_chunk;
     CF_ChunkOffset_t dummy_offset = Any_uint32_LessThan(UINT32_MAX / 2);
     CF_ChunkSize_t   initial_size = Any_uint32_LessThan(UINT32_MAX / 2);
     int              local_result = Any_int_Except(0);
@@ -1053,7 +1053,7 @@ void Test_CF_Chunks_CombineNext_Given_i_IsEqTo_Given_chunks_count_Return_0(void)
     CF_ChunkList_t *arg_chunks = &dummy_chunks;
     CF_ChunkIdx_t   arg_i;
     CF_Chunk_t      dummy_chunk;
-    CF_Chunk_t     *arg_chunk    = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk    = &dummy_chunk;
     int             local_result = Any_int_Except(0);
 
     arg_chunks->count = Any_uint32();
@@ -1100,7 +1100,7 @@ void Test_CF_Chunks_CombineNext_Given_i_IsNotEqTo_Given_chunks_count_Given_chunk
     CF_ChunkList_t *arg_chunks = &dummy_chunks;
     CF_ChunkIdx_t   arg_i;
     CF_Chunk_t      dummy_chunk  = {0};
-    CF_Chunk_t     *arg_chunk    = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk    = &dummy_chunk;
     int             local_result = Any_int_Except(0);
 
     arg_chunks->count = dummy_chunks_count;
@@ -1131,7 +1131,7 @@ void Test_CF_Chunks_CombineNext_Given_chunks_chunks_offset_IsLessThan_chunk_end_
     CF_ChunkList_t *arg_chunks = &dummy_chunks;
     CF_ChunkIdx_t   arg_i;
     CF_Chunk_t      dummy_chunk  = {0};
-    CF_Chunk_t     *arg_chunk    = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk    = &dummy_chunk;
     int             local_result = Any_int_Except(0);
 
     arg_chunks->count = dummy_chunks_count;
@@ -1164,7 +1164,7 @@ void Test_CF_Chunks_CombineNext_Given_i_IsEqToGiven_chunks_count_BreaksBReplaceE
     CF_ChunkList_t *arg_chunks = &dummy_chunks;
     CF_ChunkIdx_t   arg_i;
     CF_Chunk_t      dummy_chunk = {0};
-    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk   = &dummy_chunk;
     uint32          expected_num_chunks_combined;
     uint8           j            = 0;
     int             local_result = Any_int_Except(0);
@@ -1207,7 +1207,7 @@ void Test_CF_Chunks_CombineNext_Given_i_IsEqToGiven_chunks_count_ReplaceEverythi
     CF_ChunkList_t *arg_chunks = &dummy_chunks;
     CF_ChunkIdx_t   arg_i;
     CF_Chunk_t      dummy_chunk  = {0};
-    CF_Chunk_t     *arg_chunk    = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk    = &dummy_chunk;
     int             local_result = Any_int_Except(0);
 
     arg_chunks->count = dummy_chunks_count;
@@ -1364,7 +1364,7 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_non0_CallTo_CF_C
     CF_ChunkIdx_t   initial_i;
     CF_ChunkIdx_t   arg_i;
     CF_Chunk_t      dummy_chunk = {0};
-    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk   = &dummy_chunk;
 
     /* Arrange for CF_Chunks_CombineNext to return 1 */
     /* Arrange for CF_Chunks_CombinePrevious to return 0 */
@@ -1401,7 +1401,7 @@ void Test_CF_Chunks_Insert_CombinesNextSuccessButCombinePreviousSuccessCalls_CF_
     CF_ChunkList_t *arg_chunks;
     CF_ChunkIdx_t   arg_i;
     CF_Chunk_t      dummy_chunk = {0};
-    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk   = &dummy_chunk;
 
     /* Arrange for CF_Chunks_CombineNext to return 1 */
     /* Arrange for CF_Chunks_CombinePrevious to return 1 */
@@ -1437,7 +1437,7 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     CF_ChunkList_t *arg_chunks;
     CF_ChunkIdx_t   arg_i;
     CF_Chunk_t      dummy_chunk = {0};
-    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk   = &dummy_chunk;
 
     /* Arrange for CF_Chunks_CombineNext to return 0 and CF_Chunks_CombinePrevious to return 1 */
     uint8          dummy_chunks_count      = 10;    /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
@@ -1475,7 +1475,7 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     CF_ChunkList_t *arg_chunks;
     CF_ChunkIdx_t   arg_i;
     CF_Chunk_t      dummy_chunk = {0};
-    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk   = &dummy_chunk;
 
     /* Arrange for CF_Chunks_CombineNext to return 0 and CF_Chunks_CombinePrevious to return 0 */
     CF_ChunkIdx_t  dummy_chunks_count;
@@ -1483,8 +1483,8 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     CF_ChunkList_t dummy_chunks;
 
     arg_chunks             = &dummy_chunks;
-    arg_chunks->max_chunks = sizeof(dummy_chunks_chunks)/sizeof(dummy_chunks_chunks[0]);
-    dummy_chunks_count     = arg_chunks->max_chunks - 1;  /* Arbitrary, but selecting last slot */
+    arg_chunks->max_chunks = sizeof(dummy_chunks_chunks) / sizeof(dummy_chunks_chunks[0]);
+    dummy_chunks_count     = arg_chunks->max_chunks - 1; /* Arbitrary, but selecting last slot */
 
     arg_chunks->count = dummy_chunks_count;
     arg_i             = arg_chunks->count;
@@ -1514,7 +1514,7 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     CF_ChunkList_t *arg_chunks;
     CF_ChunkIdx_t   arg_i;
     CF_Chunk_t      dummy_chunk = {0};
-    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk   = &dummy_chunk;
 
     /* Arrange for CF_Chunks_CombineNext to return 0 and CF_Chunks_CombinePrevious to return 0 */
     CF_ChunkIdx_t  dummy_chunks_count      = 3;     /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
@@ -1556,7 +1556,7 @@ void Test_CF_Chunks_Insert_CallTo_CF_Chunks_CombineNext_Returns_0_CallTo_CF_Chun
     CF_ChunkList_t *arg_chunks;
     CF_ChunkIdx_t   arg_i;
     CF_Chunk_t      dummy_chunk = {0};
-    CF_Chunk_t     *arg_chunk   = &dummy_chunk;
+    CF_Chunk_t *    arg_chunk   = &dummy_chunk;
 
     /* Arrange for CF_Chunks_CombineNext to return 0 and CF_Chunks_CombinePrevious to return 0 */
     CF_ChunkIdx_t  dummy_chunks_count      = 3;     /* 10 for dummy_chunks_count is arbitrary, chosen for speed */
@@ -1704,7 +1704,7 @@ void Test_CF_Chunks_Add_WhenNotAtEndCall_CF_Chunks_Insert(void)
         initial_chunks[i + num_chunks_before].offset = Any_uint32_GreaterThan(dummy_chunk.offset);
     }
 
-    arg_chunks->max_chunks = sizeof(initial_chunks)/sizeof(initial_chunks[0]);
+    arg_chunks->max_chunks = sizeof(initial_chunks) / sizeof(initial_chunks[0]);
     arg_chunks->count      = num_chunks_before + num_chunks_after;
     arg_chunks->chunks     = initial_chunks;
 
@@ -1725,7 +1725,7 @@ void Test_CF_Chunks_Add_WhenAtEndCall_CF_Chunks_Insert(void)
     CF_ChunkSize_t   arg_size          = 5;
     CF_Chunk_t       initial_chunks[2] = {{0}};
     CF_ChunkList_t   dummy_chunks;
-    CF_ChunkList_t  *arg_chunks = &dummy_chunks;
+    CF_ChunkList_t * arg_chunks = &dummy_chunks;
 
     /* Arrange for CF_Chunks_FindInsertPosition */
 
@@ -1733,7 +1733,7 @@ void Test_CF_Chunks_Add_WhenAtEndCall_CF_Chunks_Insert(void)
     initial_chunks->size   = 0;
     arg_chunks->count      = 1;
     arg_chunks->chunks     = initial_chunks;
-    arg_chunks->max_chunks = sizeof(initial_chunks)/sizeof(initial_chunks[0]);
+    arg_chunks->max_chunks = sizeof(initial_chunks) / sizeof(initial_chunks[0]);
 
     /* Act */
     CF_ChunkListAdd(arg_chunks, arg_offset, arg_size);
@@ -1758,7 +1758,7 @@ void Test_CF_Chunks_RemoveFromFirst_When_chunks_HasOnlyOneChunkAndIts_size_IsEqT
 {
     /* Arrange */
     CF_ChunkList_t   dummy_chunks;
-    CF_ChunkList_t  *arg_chunks                   = &dummy_chunks;
+    CF_ChunkList_t * arg_chunks                   = &dummy_chunks;
     CF_ChunkOffset_t initial_chunks_chunks_offset = Any_uint32();
     CF_ChunkSize_t   arg_size                     = Any_uint32_Except(0);
     CF_Chunk_t       dummy_chunks_chunks;
@@ -1784,7 +1784,7 @@ void Test_CF_Chunks_RemoveFromFirst_When_chunks_HasOnlyOneChunkAndIts_size_IsSma
 {
     /* Arrange */
     CF_ChunkList_t   dummy_chunks;
-    CF_ChunkList_t  *arg_chunks                   = &dummy_chunks;
+    CF_ChunkList_t * arg_chunks                   = &dummy_chunks;
     CF_ChunkOffset_t initial_chunks_chunks_offset = Any_uint32();
     CF_ChunkSize_t   arg_size                     = Any_uint32_Except(UINT32_MAX - 1) + 2; /* from 2 to UINT_32_MAX */
     CF_ChunkSize_t   dummy_chunk_size             = Any_uint32_LessThan(arg_size);
@@ -1812,7 +1812,7 @@ void Test_CF_Chunks_RemoveFromFirst_When_chunks_size_IsGreaterThanGiven_size_Add
 {
     /* Arrange */
     CF_ChunkList_t   dummy_chunks;
-    CF_ChunkList_t  *arg_chunks                   = &dummy_chunks;
+    CF_ChunkList_t * arg_chunks                   = &dummy_chunks;
     CF_ChunkOffset_t initial_chunks_chunks_offset = Any_uint32();
     CF_ChunkSize_t   arg_size                     = Any_uint32_Except(0); /* from 2 to UINT_32_MAX */
     CF_ChunkSize_t   dummy_chunk_size             = Any_uint32_GreaterThan(arg_size);
@@ -1846,7 +1846,7 @@ void Test_CF_Chunks_GetFirstChunk_WhenGiven_chunks_count_Is_0_Return_NULL(void)
 {
     /* Arrange */
     CF_ChunkList_t    dummy_chunks;
-    CF_ChunkList_t   *arg_chunks = &dummy_chunks;
+    CF_ChunkList_t *  arg_chunks = &dummy_chunks;
     const CF_Chunk_t *local_result;
 
     arg_chunks->count = 0;
@@ -1862,7 +1862,7 @@ void Test_CF_Chunks_GetFirstChunk_WhenGiven_chunks_count_Is_1_ReturnOnlyChunk(vo
 {
     /* Arrange */
     CF_ChunkList_t    dummy_chunks = {0};
-    CF_ChunkList_t   *arg_chunks   = &dummy_chunks;
+    CF_ChunkList_t *  arg_chunks   = &dummy_chunks;
     CF_Chunk_t        only_chunk;
     const CF_Chunk_t *local_result;
 
@@ -1881,7 +1881,7 @@ void Test_CF_Chunks_GetFirstChunk_WhenGiven_chunks_count_Is_Any_index_t_ReturnFi
 {
     /* Arrange */
     CF_ChunkList_t    dummy_chunks = {0};
-    CF_ChunkList_t   *arg_chunks   = &dummy_chunks;
+    CF_ChunkList_t *  arg_chunks   = &dummy_chunks;
     CF_Chunk_t        first_chunk;
     const CF_Chunk_t *local_result;
 
@@ -2044,12 +2044,12 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_0_And_compute_gap_fn_Is_NU
 {
     /* Arrange */
     CF_ChunkList_t              dummy_chunks;
-    CF_ChunkList_t             *arg_chunks         = &dummy_chunks;
+    CF_ChunkList_t *            arg_chunks         = &dummy_chunks;
     CF_ChunkIdx_t               arg_max_gaps       = Any_uint32();
     CF_ChunkSize_t              arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
     CF_ChunkOffset_t            arg_start          = arg_total - 1;
     CF_ChunkList_ComputeGapFn_t arg_compute_gap_fn = NULL;
-    void                       *arg_opaque         = NULL;
+    void *                      arg_opaque         = NULL;
     int32                       result;
 
     arg_chunks->count = 0;
@@ -2068,12 +2068,12 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_0_And_compute_gap_fn_Is_NU
 {
     /* Arrange */
     CF_ChunkList_t              dummy_chunks;
-    CF_ChunkList_t             *arg_chunks         = &dummy_chunks;
+    CF_ChunkList_t *            arg_chunks         = &dummy_chunks;
     CF_ChunkIdx_t               arg_max_gaps       = Any_uint32();
     CF_ChunkSize_t              arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
     CF_ChunkOffset_t            arg_start          = Any_uint32_LessThan(arg_total);
     CF_ChunkList_ComputeGapFn_t arg_compute_gap_fn = NULL;
-    void                       *arg_opaque         = NULL;
+    void *                      arg_opaque         = NULL;
     int32                       result;
 
     arg_chunks->count = 0;
@@ -2091,12 +2091,12 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_0_And_compute_gap_fn_IsNot
 {
     /* Arrange */
     CF_ChunkList_t              dummy_chunks;
-    CF_ChunkList_t             *arg_chunks         = &dummy_chunks;
+    CF_ChunkList_t *            arg_chunks         = &dummy_chunks;
     CF_ChunkIdx_t               arg_max_gaps       = Any_uint32();
     CF_ChunkSize_t              arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
     CF_ChunkOffset_t            arg_start          = Any_uint32_LessThan(arg_total);
     CF_ChunkList_ComputeGapFn_t arg_compute_gap_fn = Dummy_compute_gap_fn_t;
-    void                       *arg_opaque         = NULL;
+    void *                      arg_opaque         = NULL;
     int32                       result;
 
     arg_chunks->count = 0;
@@ -2124,12 +2124,12 @@ void Test_CF_Chunks_ComputeGaps_Given_max_gaps_Is_0_Return_0(void)
     /* Arrange */
     CF_Chunk_t                  dummy_chunks_chunks[1] = {{0}};
     CF_ChunkList_t              dummy_chunks;
-    CF_ChunkList_t             *arg_chunks         = &dummy_chunks;
+    CF_ChunkList_t *            arg_chunks         = &dummy_chunks;
     CF_ChunkIdx_t               arg_max_gaps       = 0;
     CF_ChunkSize_t              arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
     CF_ChunkOffset_t            arg_start          = Any_uint32_LessThan(arg_total);
     CF_ChunkList_ComputeGapFn_t arg_compute_gap_fn = Dummy_compute_gap_fn_t;
-    void                       *arg_opaque         = NULL;
+    void *                      arg_opaque         = NULL;
     int32                       result;
 
     arg_chunks->count = 1;
@@ -2151,12 +2151,12 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_gap_start_IsEqTo_tot
     /* Arrange */
     CF_Chunk_t                  dummy_chunks_chunks[1] = {{0}};
     CF_ChunkList_t              dummy_chunks;
-    CF_ChunkList_t             *arg_chunks         = &dummy_chunks;
+    CF_ChunkList_t *            arg_chunks         = &dummy_chunks;
     CF_ChunkIdx_t               arg_max_gaps       = Any_uint32();
     CF_ChunkSize_t              arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
     CF_ChunkOffset_t            arg_start          = Any_uint32_LessThan(arg_total);
     CF_ChunkList_ComputeGapFn_t arg_compute_gap_fn = Dummy_compute_gap_fn_t;
-    void                       *arg_opaque         = NULL;
+    void *                      arg_opaque         = NULL;
     int32                       result;
 
     arg_chunks->count = 1;
@@ -2178,12 +2178,12 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_gap_start_IsGreaterT
     /* Arrange */
     CF_Chunk_t                  dummy_chunks_chunks[1] = {{0}};
     CF_ChunkList_t              dummy_chunks;
-    CF_ChunkList_t             *arg_chunks         = &dummy_chunks;
+    CF_ChunkList_t *            arg_chunks         = &dummy_chunks;
     CF_ChunkIdx_t               arg_max_gaps       = Any_uint32();
     CF_ChunkSize_t              arg_total          = Any_uint32_Except(UINT32_MAX) + 1; /* from 1 to UINT32_MAX */
     CF_ChunkOffset_t            arg_start          = Any_uint32_LessThan(arg_total);
     CF_ChunkList_ComputeGapFn_t arg_compute_gap_fn = Dummy_compute_gap_fn_t;
-    void                       *arg_opaque         = NULL;
+    void *                      arg_opaque         = NULL;
     CF_ChunkOffset_t            dummy_gap_start    = Any_uint32_GreaterThan(arg_total);
     int32                       result;
 
@@ -2206,12 +2206,12 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_gap_start_IsLessThan
     /* Arrange */
     CF_Chunk_t       dummy_chunks_chunks[1] = {{0}};
     CF_ChunkList_t   dummy_chunks;
-    CF_ChunkList_t  *arg_chunks   = &dummy_chunks;
+    CF_ChunkList_t * arg_chunks   = &dummy_chunks;
     CF_ChunkIdx_t    arg_max_gaps = UINT32_MAX; /* UINT32_MAX used to show this will not come into play for this test */
     CF_ChunkSize_t   arg_total;
     CF_ChunkOffset_t arg_start                     = 0;
     CF_ChunkList_ComputeGapFn_t arg_compute_gap_fn = Dummy_compute_gap_fn_t;
-    void                       *arg_opaque         = NULL;
+    void *                      arg_opaque         = NULL;
     int32                       result;
 
     arg_chunks->count = 1;
@@ -2240,12 +2240,12 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_c_offset_Plus_c_size
     /* Arrange */
     CF_Chunk_t       dummy_chunks_chunks[1] = {{0}};
     CF_ChunkList_t   dummy_chunks;
-    CF_ChunkList_t  *arg_chunks   = &dummy_chunks;
+    CF_ChunkList_t * arg_chunks   = &dummy_chunks;
     CF_ChunkIdx_t    arg_max_gaps = UINT32_MAX; /* UINT32_MAX used to show this will not come into play for this test */
     CF_ChunkSize_t   arg_total;
     CF_ChunkOffset_t arg_start;
     CF_ChunkList_ComputeGapFn_t arg_compute_gap_fn = Dummy_compute_gap_fn_t;
-    void                       *arg_opaque         = NULL;
+    void *                      arg_opaque         = NULL;
     int32                       result;
 
     arg_chunks->count = 1;
@@ -2276,12 +2276,12 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_c_offset_Plus_c_size
     /* Arrange */
     CF_Chunk_t       dummy_chunks_chunks[2] = {{0}};
     CF_ChunkList_t   dummy_chunks;
-    CF_ChunkList_t  *arg_chunks   = &dummy_chunks;
+    CF_ChunkList_t * arg_chunks   = &dummy_chunks;
     CF_ChunkIdx_t    arg_max_gaps = UINT32_MAX; /* UINT32_MAX used to show this will not come into play for this test */
     CF_ChunkSize_t   arg_total;
     CF_ChunkOffset_t arg_start;
     CF_ChunkList_ComputeGapFn_t arg_compute_gap_fn = NULL;
-    void                       *arg_opaque         = NULL;
+    void *                      arg_opaque         = NULL;
     int32                       result;
 
     arg_chunks->count = 2;
@@ -2313,12 +2313,12 @@ void Test_CF_Chunks_ComputeGaps_Given_chunks_count_Is_1_And_c_offset_Plus_c_size
     /* Arrange */
     CF_Chunk_t       dummy_chunks_chunks[3] = {{0}};
     CF_ChunkList_t   dummy_chunks;
-    CF_ChunkList_t  *arg_chunks   = &dummy_chunks;
+    CF_ChunkList_t * arg_chunks   = &dummy_chunks;
     CF_ChunkIdx_t    arg_max_gaps = UINT32_MAX; /* UINT32_MAX used to show this will not come into play for this test */
     CF_ChunkSize_t   arg_total;
     CF_ChunkOffset_t arg_start;
     CF_ChunkList_ComputeGapFn_t arg_compute_gap_fn = NULL;
-    void                       *arg_opaque         = NULL;
+    void *                      arg_opaque         = NULL;
     int32                       result;
 
     arg_chunks->count = 3;

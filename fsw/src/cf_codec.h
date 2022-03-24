@@ -50,7 +50,7 @@ typedef struct CF_CodecState
 typedef struct CF_EncoderState
 {
     CF_CodecState_t codec_state; /**< \brief Common state */
-    uint8          *base;        /**< \brief Pointer to start of encoded PDU data */
+    uint8 *         base;        /**< \brief Pointer to start of encoded PDU data */
 } CF_EncoderState_t;
 
 /**
@@ -61,7 +61,7 @@ typedef struct CF_EncoderState
 typedef struct CF_DecoderState
 {
     CF_CodecState_t codec_state; /**< \brief Common state */
-    const uint8    *base;        /**< \brief Pointer to start of encoded PDU data */
+    const uint8 *   base;        /**< \brief Pointer to start of encoded PDU data */
 } CF_DecoderState_t;
 
 /*********************************************************************************

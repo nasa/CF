@@ -455,10 +455,10 @@ err_out:
  *-----------------------------------------------------------------*/
 void CF_CFDP_R2_GapCompute(const CF_ChunkList_t *chunks, const CF_Chunk_t *c, void *opaque)
 {
-    CF_GapComputeArgs_t         *args = (CF_GapComputeArgs_t *)opaque;
+    CF_GapComputeArgs_t *        args = (CF_GapComputeArgs_t *)opaque;
     CF_Logical_SegmentRequest_t *pseg;
-    CF_Logical_SegmentList_t    *pseglist;
-    CF_Logical_PduNak_t         *nak;
+    CF_Logical_SegmentList_t *   pseglist;
+    CF_Logical_PduNak_t *        nak;
 
     /* This function is only invoked for NAK types */
     nak      = args->nak;
@@ -510,9 +510,9 @@ int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
             nak->scope_start = 0;
             cret             = CF_ChunkList_ComputeGaps(&t->chunks->chunks,
                                             (t->chunks->chunks.count < t->chunks->chunks.max_chunks)
-                                                            ? t->chunks->chunks.max_chunks
-                                                            : (t->chunks->chunks.max_chunks - 1),
-                                                        t->fsize, 0, CF_CFDP_R2_GapCompute, &args);
+                                                ? t->chunks->chunks.max_chunks
+                                                : (t->chunks->chunks.max_chunks - 1),
+                                            t->fsize, 0, CF_CFDP_R2_GapCompute, &args);
 
             if (!cret)
             {

@@ -145,7 +145,7 @@ CF_TransactionSeq_t Any_CF_TransactionSeq_t(void)
 typedef struct
 {
     CF_Transaction_t *t;
-    void             *context;
+    void *            context;
 } Dummy_CF_TsnChanAction_fn_t_context_t;
 
 int Dummy_chan_action_fn_t(uint8 chan_num, void *context)
@@ -300,8 +300,8 @@ void Test_CF_CmdReset_tests_WhenCommandByteIsEqTo_5_SendEventAndRejectCommand(vo
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -328,8 +328,8 @@ void Test_CF_CmdReset_tests_WhenCommandByteIsGreaterThan_5_SendEventAndRejectCom
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -356,8 +356,8 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_command_AndResetHkCmdAndErrCountSe
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -382,8 +382,8 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_fault_ResetAllHkFaultCountSendEven
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
     int                       i         = 0;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -447,8 +447,8 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_up_AndResetAllHkRecvCountSendEvent
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
     int                       i         = 0;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -500,8 +500,8 @@ void Test_CF_CmdReset_tests_SWhenCommandByteIs_down_AndResetAllHkSentCountendEve
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
     uint8                     i         = 0;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -547,8 +547,8 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_all_AndResetAllMemValuesSendEvent(
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
     int                       i         = 0;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -636,7 +636,7 @@ void Test_CF_CmdTxFile(void)
      * void CF_CmdTxFile(CFE_SB_Buffer_t *msg);
      */
     CF_UT_cmd_tx_file_buf_t utbuf;
-    CF_TxFileCmd_t         *msg = &utbuf.tf;
+    CF_TxFileCmd_t *        msg = &utbuf.tf;
 
     memset(&CF_AppData.hk.counters, 0, sizeof(CF_AppData.hk.counters));
 
@@ -684,7 +684,7 @@ void Test_CF_CmdPlaybackDir(void)
      * void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg);
      */
     CF_UT_cmd_playback_dir_buf_t utbuf;
-    CF_PlaybackDirCmd_t         *msg = &utbuf.pd;
+    CF_PlaybackDirCmd_t *        msg = &utbuf.pd;
 
     memset(&CF_AppData.hk.counters, 0, sizeof(CF_AppData.hk.counters));
 
@@ -730,11 +730,11 @@ void Test_CF_DoChanAction_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1(void)
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *arg_cmd    = &utbuf.ua;
-    const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    CF_UnionArgsCmd_t *       arg_cmd    = &utbuf.ua;
+    const char *              arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
     CF_ChanActionFn_t         arg_fn     = &Dummy_chan_action_fn_t;
     int                       dummy_context;
-    void                     *arg_context    = &dummy_context;
+    void *                    arg_context    = &dummy_context;
     uint8                     random_fn_call = Any_uint8_LessThan(CF_NUM_CHANNELS) + 1;
     int                       local_result;
 
@@ -761,11 +761,11 @@ void Test_CF_DoChanAction_ALL_CHANNELS_WhenAll_fn_return_1_Return_1(void)
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *arg_cmd    = &utbuf.ua;
-    const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    CF_UnionArgsCmd_t *       arg_cmd    = &utbuf.ua;
+    const char *              arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
     CF_ChanActionFn_t         arg_fn     = &Dummy_chan_action_fn_t;
     int                       dummy_context;
-    void                     *arg_context = &dummy_context;
+    void *                    arg_context = &dummy_context;
     int                       local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -791,11 +791,11 @@ void Test_CF_DoChanAction_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0(void)
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *arg_cmd    = &utbuf.ua;
-    const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    CF_UnionArgsCmd_t *       arg_cmd    = &utbuf.ua;
+    const char *              arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
     CF_ChanActionFn_t         arg_fn     = &Dummy_chan_action_fn_t;
     int                       dummy_context;
-    void                     *arg_context = &dummy_context;
+    void *                    arg_context = &dummy_context;
     int                       local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -821,11 +821,11 @@ void Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_1_Return_1(void)
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *arg_cmd    = &utbuf.ua;
-    const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    CF_UnionArgsCmd_t *       arg_cmd    = &utbuf.ua;
+    const char *              arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
     CF_ChanActionFn_t         arg_fn     = &Dummy_chan_action_fn_t;
     int                       dummy_context;
-    void                     *arg_context = &dummy_context;
+    void *                    arg_context = &dummy_context;
     int                       local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -851,11 +851,11 @@ void Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_0_Return_1(void)
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *arg_cmd    = &utbuf.ua;
-    const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    CF_UnionArgsCmd_t *       arg_cmd    = &utbuf.ua;
+    const char *              arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
     CF_ChanActionFn_t         arg_fn     = &Dummy_chan_action_fn_t;
     int                       dummy_context;
-    void                     *arg_context = &dummy_context;
+    void *                    arg_context = &dummy_context;
     int                       local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -881,11 +881,11 @@ void Test_CF_DoChanAction_WhenChanNumberEq_CF_NUM_CHANNELS_Return_neg1_And_SendE
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *arg_cmd    = &utbuf.ua;
-    const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    CF_UnionArgsCmd_t *       arg_cmd    = &utbuf.ua;
+    const char *              arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
     CF_ChanActionFn_t         arg_fn     = &Dummy_chan_action_fn_t;
     int                       dummy_context;
-    void                     *arg_context = &dummy_context;
+    void *                    arg_context = &dummy_context;
     int                       local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -914,11 +914,11 @@ void Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent(void)
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *arg_cmd    = &utbuf.ua;
-    const char               *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    CF_UnionArgsCmd_t *       arg_cmd    = &utbuf.ua;
+    const char *              arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
     CF_ChanActionFn_t         arg_fn     = &Dummy_chan_action_fn_t;
     int                       dummy_context;
-    void                     *arg_context = &dummy_context;
+    void *                    arg_context = &dummy_context;
     int                       local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -1003,8 +1003,8 @@ void Test_CF_CmdFreeze_Set_frozen_To_1_AndAcceptCommand(void)
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
 
     /* Arrange unstubbable: CF_DoFreezeThaw via CF_DoChanAction */
     uint8 dummy_chan_num = Any_cf_channel();
@@ -1043,8 +1043,8 @@ void Test_CF_CmdFThaw_Set_frozen_To_0_AndAcceptCommand(void)
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
 
     /* Arrange unstubbable: CF_DoFreezeThaw via CF_DoChanAction */
     uint8 dummy_chan_num = Any_cf_channel();
@@ -1085,8 +1085,8 @@ void Test_CF_FindTransactionBySequenceNumberAllChannels_WhenNoTransactionFoundRe
     /* Arrange */
     CF_TransactionSeq_t arg_ts  = Any_CF_TransactionSeq_t();
     CF_EntityId_t       arg_eid = Any_CF_EntityId_t();
-    CF_Transaction_t   *local_result;
-    CF_Transaction_t   *expected_result = NULL;
+    CF_Transaction_t *  local_result;
+    CF_Transaction_t *  expected_result = NULL;
 
     CF_FindTransactionBySequenceNumber_context_t context_CF_CFDP_FTBSN;
 
@@ -1116,8 +1116,8 @@ void Test_CF_FindTransactionBySequenceNumberAllChannels_Return_TransactionFound(
     CF_EntityId_t       arg_eid                  = Any_CF_EntityId_t();
     uint8               number_transaction_match = Any_uint8_LessThan(CF_NUM_CHANNELS);
     CF_Transaction_t    dummy_return_value;
-    CF_Transaction_t   *local_result;
-    CF_Transaction_t   *expected_result = &dummy_return_value;
+    CF_Transaction_t *  local_result;
+    CF_Transaction_t *  expected_result = &dummy_return_value;
 
     CF_FindTransactionBySequenceNumber_context_t contexts_CF_CFDP_FTBSN[CF_NUM_CHANNELS];
 
@@ -1163,12 +1163,12 @@ void Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_COMPOUND_KEY_TransactionNotFoun
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t utbuf;
-    CF_TransactionCmd_t        *arg_cmd = &utbuf.xact;
+    CF_TransactionCmd_t *       arg_cmd = &utbuf.xact;
     char                        dummy_cmdstr[10]; /* 10 is arbitrary */
     const char                  arg_cmdstr[10];   /* 10 is arbitrary */
     CF_TsnChanAction_fn_t       arg_fn = &Dummy_CF_TsnChanAction_fn_t;
     int                         dummy_context;
-    void                       *arg_context = &dummy_context;
+    void *                      arg_context = &dummy_context;
 
     memset(&utbuf, 0, sizeof(utbuf));
     AnyRandomStringOfLettersOfLengthCopy(dummy_cmdstr, 10);
@@ -1207,12 +1207,12 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_COMPOUND_KEY_TransactionFoundRun_fn_AndRe
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t           utbuf;
-    CF_TransactionCmd_t                  *arg_cmd = &utbuf.xact;
+    CF_TransactionCmd_t *                 arg_cmd = &utbuf.xact;
     char                                  dummy_cmdstr[10]; /* 10 is arbitrary */
     const char                            arg_cmdstr[10];   /* 10 is arbitrary */
     CF_TsnChanAction_fn_t                 arg_fn = &Dummy_CF_TsnChanAction_fn_t;
     int                                   dummy_context;
-    void                                 *arg_context = &dummy_context;
+    void *                                arg_context = &dummy_context;
     CF_Transaction_t                      dummy_t;
     Dummy_CF_TsnChanAction_fn_t_context_t context_Dummy_CF_TsnChanAction_fn_t;
 
@@ -1251,12 +1251,12 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransac
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t                       utbuf;
-    CF_TransactionCmd_t                              *arg_cmd = &utbuf.xact;
+    CF_TransactionCmd_t *                             arg_cmd = &utbuf.xact;
     char                                              dummy_cmdstr[10]; /* 10 is arbitrary */
     const char                                        arg_cmdstr[10];   /* 10 is arbitrary */
     CF_TsnChanAction_fn_t                             arg_fn = &Dummy_CF_TsnChanAction_fn_t;
     int                                               dummy_context;
-    void                                             *arg_context     = &dummy_context;
+    void *                                            arg_context     = &dummy_context;
     int                                               expected_result = Any_int();
     CF_TraverseAllTransactions_All_Channels_context_t context_CF_TATAC;
 
@@ -1283,11 +1283,11 @@ void Test_CF_TsnChanAction_cmd_chan_IsASingleChannel(void)
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t          utbuf;
-    CF_TransactionCmd_t                 *arg_cmd       = &utbuf.xact;
+    CF_TransactionCmd_t *                arg_cmd       = &utbuf.xact;
     const char                           arg_cmdstr[1] = "";
     CF_TsnChanAction_fn_t                arg_fn        = &Dummy_CF_TsnChanAction_fn_t;
     int                                  dummy_context;
-    void                                *arg_context     = &dummy_context;
+    void *                               arg_context     = &dummy_context;
     int                                  expected_result = Any_int();
     CF_TraverseAllTransactions_context_t context_CF_TraverseAllTransactions;
 
@@ -1311,11 +1311,11 @@ void Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid(void)
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t utbuf;
-    CF_TransactionCmd_t        *arg_cmd       = &utbuf.xact;
+    CF_TransactionCmd_t *       arg_cmd       = &utbuf.xact;
     const char                  arg_cmdstr[1] = "";
     CF_TsnChanAction_fn_t       arg_fn        = &Dummy_CF_TsnChanAction_fn_t;
     int                         dummy_context;
-    void                       *arg_context = &dummy_context;
+    void *                      arg_context = &dummy_context;
 
     memset(&utbuf, 0, sizeof(utbuf));
     arg_cmd->chan = Any_uint8_BetweenExcludeMax(CF_NUM_CHANNELS, COMPOUND_KEY);
@@ -1351,7 +1351,7 @@ void Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action(void)
 {
     /* Arrange */
     CF_Transaction_t            dummy_t;
-    CF_Transaction_t           *arg_t = &dummy_t;
+    CF_Transaction_t *          arg_t = &dummy_t;
     CF_ChanAction_SuspResArg_t  dummy_context;
     CF_ChanAction_SuspResArg_t *arg_context = &dummy_context;
 
@@ -1374,7 +1374,7 @@ void Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action
 {
     /* Arrange */
     CF_Transaction_t            dummy_t;
-    CF_Transaction_t           *arg_t = &dummy_t;
+    CF_Transaction_t *          arg_t = &dummy_t;
     CF_ChanAction_SuspResArg_t  dummy_context;
     CF_ChanAction_SuspResArg_t *arg_context = &dummy_context;
 
@@ -1421,7 +1421,7 @@ void Test_CF_DoSuspRes(void)
      */
 
     CF_UT_cmd_transaction_buf_t utbuf;
-    CF_TransactionCmd_t        *cmd = &utbuf.xact;
+    CF_TransactionCmd_t *       cmd = &utbuf.xact;
     CF_ChanAction_SuspResArg_t  utargs;
 
     memset(&CF_AppData.hk.counters, 0, sizeof(CF_AppData.hk.counters));
@@ -1472,8 +1472,8 @@ void Test_CF_CmdSuspend_Call_CF_DoSuspRes_WithGiven_msg_And_action_1(void)
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t utbuf;
-    CF_TransactionCmd_t        *dummy_cmd = &utbuf.xact;
-    CFE_SB_Buffer_t            *arg_cmd   = &utbuf.buf;
+    CF_TransactionCmd_t *       dummy_cmd = &utbuf.xact;
+    CFE_SB_Buffer_t *           arg_cmd   = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -1515,8 +1515,8 @@ void Test_CF_CmdResume_Call_CF_DoSuspRes_WithGiven_msg_And_action_0(void)
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t utbuf;
-    CF_TransactionCmd_t        *dummy_cmd = &utbuf.xact;
-    CFE_SB_Buffer_t            *arg_cmd   = &utbuf.buf;
+    CF_TransactionCmd_t *       dummy_cmd = &utbuf.xact;
+    CFE_SB_Buffer_t *           arg_cmd   = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -1558,7 +1558,7 @@ void Test_CF_CmdCancel_Txn_Call_CF_CFDP_CancelTransaction_WithGiven_t(void)
     /* Arrange */
     CF_Transaction_t  dummy_t;
     CF_Transaction_t *arg_t       = &dummy_t;
-    void             *arg_ignored = NULL;
+    void *            arg_ignored = NULL;
     CF_Transaction_t *context_CF_CFDP_CancelTransaction;
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_CancelTransaction), &context_CF_CFDP_CancelTransaction,
@@ -1582,8 +1582,8 @@ void Test_CF_CmdCancel_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t utbuf;
-    CF_TransactionCmd_t        *dummy_msg = &utbuf.xact;
-    CFE_SB_Buffer_t            *arg_msg   = &utbuf.buf;
+    CF_TransactionCmd_t *       dummy_msg = &utbuf.xact;
+    CFE_SB_Buffer_t *           arg_msg   = &utbuf.buf;
 
     // TODO: CF_TsnChanAction result is default with no setup; it should be controlled, but in the essence of time this
     // default value is used to show functionality of the code
@@ -1627,8 +1627,8 @@ void Test_CF_CmdAbandon_Txn_Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0(void
 {
     /* Arrange */
     CF_Transaction_t                   dummy_t;
-    CF_Transaction_t                  *arg_t       = &dummy_t;
-    void                              *arg_ignored = NULL;
+    CF_Transaction_t *                 arg_t       = &dummy_t;
+    void *                             arg_ignored = NULL;
     CF_CFDP_ResetTransaction_context_t context_CF_CFDP_ResetTransaction;
 
     UT_SetDataBuffer(UT_KEY(CF_CFDP_ResetTransaction), &context_CF_CFDP_ResetTransaction,
@@ -1655,8 +1655,8 @@ void Test_CF_CmdAbandon_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t utbuf;
-    CF_TransactionCmd_t        *dummy_msg = &utbuf.xact;
-    CFE_SB_Buffer_t            *arg_msg   = &utbuf.buf;
+    CF_TransactionCmd_t *       dummy_msg = &utbuf.xact;
+    CFE_SB_Buffer_t *           arg_msg   = &utbuf.buf;
 
     // TODO: CF_TsnChanAction result is default with no setup; it should be controlled, but in the essence of time this
     // default value is used to show functionality of the code
@@ -1727,8 +1727,8 @@ void Test_CF_CmdEnableDequeue_Call_CmdCond_WithResultsOf_CF_DoChanAction(void)
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
 
     /* Arrange unstubbable: CF_DoEnableDisableDequeue via CF_DoChanAction */
     CF_ConfigTable_t dummy_config_table;
@@ -1771,8 +1771,8 @@ void Test_CF_CmdDisableDequeue_Call_CmdCond_WithResultsOf_CF_DoChanAction(void)
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
 
     /* Arrange unstubbable: CF_DoEnableDisableDequeue via CF_DoChanAction */
     CF_ConfigTable_t dummy_config_table;
@@ -1815,7 +1815,7 @@ void Test_CF_DoEnableDisablePolldir_When_ALL_CHANNELS_SetAllPolldirsInChannelEna
     /* Arrange */
     uint8                       arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t   utbuf;
-    CF_UnionArgsCmd_t          *dummy_msg = &utbuf.ua;
+    CF_UnionArgsCmd_t *         dummy_msg = &utbuf.ua;
     CF_ChanAction_BoolMsgArg_t  dummy_context;
     CF_ChanAction_BoolMsgArg_t *arg_context = &dummy_context;
     CF_ConfigTable_t            dummy_config_table;
@@ -1854,7 +1854,7 @@ void Test_CF_DoEnableDisablePolldir_WhenSetToSpecificPolldirSetPolldirFrom_conte
     uint8                       arg_chan_num  = Any_cf_channel();
     uint8                       dummy_polldir = Any_cf_polldir();
     CF_UT_cmd_unionargs_buf_t   utbuf;
-    CF_UnionArgsCmd_t          *dummy_msg = &utbuf.ua;
+    CF_UnionArgsCmd_t *         dummy_msg = &utbuf.ua;
     CF_ChanAction_BoolMsgArg_t  dummy_context;
     CF_ChanAction_BoolMsgArg_t *arg_context = &dummy_context;
     CF_ConfigTable_t            dummy_config_table;
@@ -1887,7 +1887,7 @@ void Test_CF_DoEnableDisablePolldir_FailPolldirEq_CF_MAX_POLLING_DIR_PER_CHAN_An
     /* Arrange */
     uint8                       arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t   utbuf;
-    CF_UnionArgsCmd_t          *dummy_msg = &utbuf.ua;
+    CF_UnionArgsCmd_t *         dummy_msg = &utbuf.ua;
     CF_ChanAction_BoolMsgArg_t  dummy_context;
     CF_ChanAction_BoolMsgArg_t *arg_context = &dummy_context;
     CF_ConfigTable_t            dummy_config_table;
@@ -1918,7 +1918,7 @@ void Test_CF_DoEnableDisablePolldir_FailAnyBadPolldirSendEvent(void)
     /* Arrange */
     uint8                       arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t   utbuf;
-    CF_UnionArgsCmd_t          *dummy_msg = &utbuf.ua;
+    CF_UnionArgsCmd_t *         dummy_msg = &utbuf.ua;
     CF_ChanAction_BoolMsgArg_t  dummy_context;
     CF_ChanAction_BoolMsgArg_t *arg_context = &dummy_context;
     CF_ConfigTable_t            dummy_config_table;
@@ -1957,8 +1957,8 @@ void Test_CF_CmdEnablePolldir_SuccessWhenActionSuccess(void)
     uint8                     dummy_channel = Any_cf_channel();
     uint8                     dummy_polldir = Any_cf_polldir();
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -1995,8 +1995,8 @@ void Test_CF_CmdEnablePolldir_FailWhenActionFail(void)
     uint8                     dummy_channel = Any_cf_channel();
     uint8                     error_polldir = Any_uint8_BetweenInclusive(CF_MAX_POLLING_DIR_PER_CHAN, ALL_CHANNELS - 1);
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2037,8 +2037,8 @@ void Test_CF_CmdDisablePolldir_SuccessWhenActionSuccess(void)
     uint8                     dummy_channel = Any_cf_channel();
     uint8                     dummy_polldir = Any_cf_polldir();
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2075,8 +2075,8 @@ void Test_CF_CmdDisablePolldir_FailWhenActionFail(void)
     uint8                     dummy_channel = Any_cf_channel();
     uint8                     error_polldir = Any_uint8_BetweenInclusive(CF_MAX_POLLING_DIR_PER_CHAN, ALL_CHANNELS - 1);
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2112,9 +2112,9 @@ void Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT(void)
 {
     /* Arrange */
     CF_History_t                   dummy_h;
-    CF_CListNode_t                *arg_n = &dummy_h.cl_node;
+    CF_CListNode_t *               arg_n = &dummy_h.cl_node;
     CF_Channel_t                   dummy_c;
-    CF_Channel_t                  *arg_c = &dummy_c;
+    CF_Channel_t *                 arg_c = &dummy_c;
     int                            local_result;
     CF_CFDP_ResetHistory_context_t context_CF_CFDP_ResetHistory;
 
@@ -2142,9 +2142,9 @@ void Test_CF_PurgeTransaction_Call_CF_CFDP_ResetTransaction_AndReturn_CLIST_CONT
 {
     /* Arrange */
     CF_Transaction_t                   dummy_t;
-    CF_CListNode_t                    *arg_n = &dummy_t.cl_node;
+    CF_CListNode_t *                   arg_n = &dummy_t.cl_node;
     int                                dummy_ignored;
-    void                              *arg_ignored = &dummy_ignored;
+    void *                             arg_ignored = &dummy_ignored;
     int                                local_result;
     CF_CFDP_ResetTransaction_context_t context_CF_CFDP_ResetTransaction;
 
@@ -2175,10 +2175,10 @@ void Test_CF_DoPurgeQueue_PendOnly(void)
     /* Arrange */
     uint8                               arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t           utbuf;
-    CF_UnionArgsCmd_t                  *arg_cmd = &utbuf.ua;
-    CF_Channel_t                       *dummy_c;
+    CF_UnionArgsCmd_t *                 arg_cmd = &utbuf.ua;
+    CF_Channel_t *                      dummy_c;
     CF_CListNode_t                      dummy_start;
-    CF_CListNode_t                     *expected_start = &dummy_start;
+    CF_CListNode_t *                    expected_start = &dummy_start;
     int                                 local_result;
     CF_CList_Traverse_POINTER_context_t context_CF_CList_Traverse;
 
@@ -2210,10 +2210,10 @@ void Test_CF_DoPurgeQueue_HistoryOnly(void)
     /* Arrange */
     uint8                               arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t           utbuf;
-    CF_UnionArgsCmd_t                  *arg_cmd = &utbuf.ua;
-    CF_Channel_t                       *dummy_c;
+    CF_UnionArgsCmd_t *                 arg_cmd = &utbuf.ua;
+    CF_Channel_t *                      dummy_c;
     CF_CListNode_t                      dummy_start;
-    CF_CListNode_t                     *expected_start = &dummy_start;
+    CF_CListNode_t *                    expected_start = &dummy_start;
     int                                 local_result;
     CF_CList_Traverse_POINTER_context_t context_CF_CList_Traverse;
 
@@ -2247,12 +2247,12 @@ void Test_CF_DoPurgeQueue_Both(void)
     /* Arrange */
     uint8                               arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t           utbuf;
-    CF_UnionArgsCmd_t                  *arg_cmd = &utbuf.ua;
-    CF_Channel_t                       *dummy_c;
+    CF_UnionArgsCmd_t *                 arg_cmd = &utbuf.ua;
+    CF_Channel_t *                      dummy_c;
     CF_CListNode_t                      dummy_pend_start;
-    CF_CListNode_t                     *expected_pend_start = &dummy_pend_start;
+    CF_CListNode_t *                    expected_pend_start = &dummy_pend_start;
     CF_CListNode_t                      dummy_history_start;
-    CF_CListNode_t                     *expected_history_start = &dummy_history_start;
+    CF_CListNode_t *                    expected_history_start = &dummy_history_start;
     int                                 local_result;
     CF_CList_Traverse_POINTER_context_t context_CF_CList_Traverse[2];
 
@@ -2292,7 +2292,7 @@ void Test_CF_DoPurgeQueue_GivenBad_data_byte_1_SendEventAndReturn_neg1(void)
     /* Arrange */
     uint8                     arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *arg_cmd = &utbuf.ua;
+    CF_UnionArgsCmd_t *       arg_cmd = &utbuf.ua;
     int                       local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -2318,7 +2318,7 @@ void Test_CF_DoPurgeQueue_AnyGivenBad_data_byte_1_SendEventAndReturn_neg1(void)
     /* Arrange */
     uint8                     arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *arg_cmd = &utbuf.ua;
+    CF_UnionArgsCmd_t *       arg_cmd = &utbuf.ua;
     int                       local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -2351,8 +2351,8 @@ void Test_CF_CmdPurgeQueue_FailWhenActionFail(void)
     uint8                     dummy_channel = Any_cf_channel();
     uint8                     error_purge   = 3; /* Shortest return from CF_DoPurgeQueue */
     CF_UT_cmd_unionargs_buf_t utbuf;
-    CF_UnionArgsCmd_t        *dummy_msg = &utbuf.ua;
-    CFE_SB_Buffer_t          *arg_msg   = &utbuf.buf;
+    CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
+    CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2388,8 +2388,8 @@ void Test_CF_CmdWriteQueue_When_chan_Eq_CF_NUM_CAHNNELS_SendEventAndRejectComman
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2417,8 +2417,8 @@ void Test_CF_CmdWriteQueue_When_chan_GreaterThan_CF_NUM_CAHNNELS_SendEventAndRej
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2447,8 +2447,8 @@ void Test_CF_CmdWriteQueue_WhenUpAndPendingQueueSendEventAndRejectCommand(void)
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2482,8 +2482,8 @@ void Test_CF_CmdWriteQueue_When_CF_WrappedCreat_Fails_type_Is_type_up_And_queue_
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2530,8 +2530,8 @@ void Test_CF_CmdWriteQueue_When_CF_WrappedCreat_Fails_type_IsNot_type_up_And_que
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2578,8 +2578,8 @@ void Test_CF_CmdWriteQueue_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedC
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2634,8 +2634,8 @@ void Test_CF_CmdWriteQueue_When_CF_WriteTxnQueueDataToFile_FailsAnd_wq_IsUpAnd_q
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2695,8 +2695,8 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsUpA
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2756,8 +2756,8 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnFirstCallAnd_wq
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2817,8 +2817,8 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnSecondCallAnd_w
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2881,8 +2881,8 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2942,8 +2942,8 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -3002,8 +3002,8 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_All(void)
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -3056,8 +3056,8 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_History(void)
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -3105,8 +3105,8 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_Active(void)
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -3154,8 +3154,8 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_AllAnd_q_Pend(void)
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -3203,8 +3203,8 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_UpAnd_q_All(void)
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -3257,8 +3257,8 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_UpAnd_q_History(void)
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -3306,8 +3306,8 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_UpAnd_q_Active(void)
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -3357,8 +3357,8 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_All(void)
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -3406,8 +3406,8 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_History(void)
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -3455,8 +3455,8 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_Active(void)
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -3504,8 +3504,8 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_Pend(void)
 {
     /* Arrange */
     CF_UT_cmd_write_q_buf_t utbuf;
-    CF_WriteQueueCmd_t     *dummy_wq = &utbuf.wq;
-    CFE_SB_Buffer_t        *arg_msg  = &utbuf.buf;
+    CF_WriteQueueCmd_t *    dummy_wq = &utbuf.wq;
+    CFE_SB_Buffer_t *       arg_msg  = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -3561,7 +3561,7 @@ void Test_CF_CmdSendCfgParams_Set_cfg_TimeStampAndSendMsg_AcceptCommand(void)
 {
     /* Arrange */
     CFE_SB_Buffer_t              utbuf;
-    CFE_SB_Buffer_t             *arg_msg = &utbuf;
+    CFE_SB_Buffer_t *            arg_msg = &utbuf;
     CF_ConfigTable_t             dummy_config_table;
     CFE_TIME_SysTime_t           fake_time;
     CFE_SB_TransmitMsg_context_t context_CFE_SB_TransmitMsg;
@@ -3836,8 +3836,8 @@ void Test_CF_CmdSetParam_Call_CF_CmdGetSetParam_With_cmd_key_And_cmd_value(void)
 {
     /* Arrange */
     CF_UT_cmd_set_param_args_buf_t utbuf;
-    CF_SetParamCmd_t              *dummy_msg = &utbuf.sp;
-    CFE_SB_Buffer_t               *arg_msg   = &utbuf.buf;
+    CF_SetParamCmd_t *             dummy_msg = &utbuf.sp;
+    CFE_SB_Buffer_t *              arg_msg   = &utbuf.buf;
 
     /* Arrange unstubbable: CF_CmdGetSetParam */
     CF_ConfigTable_t dummy_config_table;
@@ -3884,8 +3884,8 @@ void Test_CF_CmdGetParam_Call_CF_CmdGetSetParam_With_cmd_data_byte_0_AndConstant
 {
     /* Arrange */
     CF_UT_cmd_get_param_args_buf_t utbuf;
-    CF_GetParamCmd_t              *dummy_msg = &utbuf.gp;
-    CFE_SB_Buffer_t               *arg_msg   = &utbuf.buf;
+    CF_GetParamCmd_t *             dummy_msg = &utbuf.gp;
+    CFE_SB_Buffer_t *              arg_msg   = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -4080,9 +4080,9 @@ void Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent
 {
     /* Arrange */
     CFE_SB_Buffer_t              utbuf;
-    CFE_SB_Buffer_t             *arg_msg                          = &utbuf;
+    CFE_SB_Buffer_t *            arg_msg                          = &utbuf;
     CFE_MSG_FcnCode_t            forced_return_CFE_MSG_GetFcnCode = CF_NUM_COMMANDS;
-    const char                  *expected_Spec                    = "CF: invalid ground command packet cmd_code=0x%02x";
+    const char *                 expected_Spec                    = "CF: invalid ground command packet cmd_code=0x%02x";
     CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
     CFE_EVS_SendEvent_context_t  context_CFE_EVS_SendEvent;
 
@@ -4125,10 +4125,10 @@ void Test_CF_ProcessGroundCommand_When_cmd_GreaterThan_CF_NUM_COMMANDS_FailAndSe
 {
     /* Arrange */
     CFE_SB_Buffer_t              utbuf;
-    CFE_SB_Buffer_t             *arg_msg                          = &utbuf;
+    CFE_SB_Buffer_t *            arg_msg                          = &utbuf;
     CFE_MSG_FcnCode_t            forced_return_CFE_MSG_GetFcnCode = Any_uint8_GreaterThan(CF_NUM_COMMANDS);
     CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
-    const char                  *expected_Spec = "CF: invalid ground command packet cmd_code=0x%02x";
+    const char *                 expected_Spec = "CF: invalid ground command packet cmd_code=0x%02x";
     CFE_EVS_SendEvent_context_t  context_CFE_EVS_SendEvent;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -4171,11 +4171,15 @@ void Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForT
 {
     /* Arrange */
     CFE_SB_Buffer_t   utbuf;
-    CFE_SB_Buffer_t  *arg_msg                          = &utbuf;
+    CFE_SB_Buffer_t * arg_msg                          = &utbuf;
     CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = 0x00; /* 0x00 forces fns[0] which is CF_CmdNoop */
-    CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize    = Any_uint16_Except(
-              sizeof(CF_NoArgsCmd_t)); /* sizeof(CF_NoArgsCmd_t) is expected size of CF_CmdNoop, using uint16 as a
-                                           reasonable size constraint here as size_t is at least 16 bit */
+
+    /*
+     * sizeof(CF_NoArgsCmd_t) is expected size of CF_CmdNoop, using uint16 as a
+     * reasonable size constraint here as size_t is at least 16 bit
+     */
+    CFE_MSG_Size_t forced_return_CFE_MSG_GetSize = Any_uint16_Except(sizeof(CF_NoArgsCmd_t));
+
     const char *expected_Spec = "CF: invalid ground command length for command 0x%02x, expected %d got %zd";
     CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
     CFE_MSG_GetSize_context_t    context_CFE_MSG_GetSize;
@@ -4224,11 +4228,11 @@ void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_m
 {
     /* Arrange */
     CFE_SB_Buffer_t   utbuf;
-    CFE_SB_Buffer_t  *arg_msg                          = &utbuf;
+    CFE_SB_Buffer_t * arg_msg                          = &utbuf;
     CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = 0x00; /* 0x00 forces fns[0] which is CF_CmdNoop */
     CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize =
         sizeof(CF_NoArgsCmd_t); /* sizeof(CF_NoArgsCmd_t) is expected size of CF_CmdNoop */
-    const char                  *expected_Spec = "CF: No-Op received, Version %d.%d.%d";
+    const char *                 expected_Spec = "CF: No-Op received, Version %d.%d.%d";
     CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
     CFE_MSG_GetSize_context_t    context_CFE_MSG_GetSize;
     CFE_EVS_SendEvent_context_t  context_CFE_EVS_SendEvent;
@@ -4279,7 +4283,7 @@ void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_1
 {
     /* Arrange */
     CFE_SB_Buffer_t              utbuf;
-    CFE_SB_Buffer_t             *arg_msg                          = &utbuf;
+    CFE_SB_Buffer_t *            arg_msg                          = &utbuf;
     CFE_MSG_FcnCode_t            forced_return_CFE_MSG_GetFcnCode = 0x0C; /* 0x0C forces a null slot */
     CFE_MSG_Size_t               forced_return_CFE_MSG_GetSize    = 0;
     CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;

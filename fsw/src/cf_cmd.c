@@ -388,7 +388,7 @@ void CF_DoSuspRes_Txn(CF_Transaction_t *t, CF_ChanAction_SuspResArg_t *context)
 void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
 {
     /* ok to not bounds check action, because the caller is using it in two places with constant values 0 or 1 */
-    static const char         *msgstr[] = {"resume", "suspend"};
+    static const char *        msgstr[] = {"resume", "suspend"};
     CF_ChanAction_SuspResArg_t args     = {0, action};
     int ret = CF_TsnChanAction(cmd, msgstr[action], (CF_TsnChanAction_fn_t)CF_DoSuspRes_Txn, &args);
 
@@ -722,7 +722,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
     static const int    q_history = 2;
     static const int    q_all     = 3;
     CF_WriteQueueCmd_t *wq        = (CF_WriteQueueCmd_t *)msg;
-    CF_Channel_t       *c         = &CF_AppData.engine.channels[wq->chan];
+    CF_Channel_t *      c         = &CF_AppData.engine.channels[wq->chan];
     osal_id_t           fd;
     int32               ret;
 
@@ -913,7 +913,7 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
     bool              valid_set;
     struct
     {
-        void  *ptr;
+        void * ptr;
         uint32 size;
         int (*fn)(uint32, uint8 chan_num);
     } item;

@@ -500,7 +500,7 @@ CF_SendRet_t CF_CFDP_SendAck(CF_Transaction_t *t, CF_CFDP_AckTxnStatus_t ts, CF_
                              CF_CFDP_ConditionCode_t cc, CF_EntityId_t peer_eid, CF_TransactionSeq_t tsn)
 {
     CF_Logical_PduBuffer_t *ph;
-    CF_Logical_PduAck_t    *ack;
+    CF_Logical_PduAck_t *   ack;
     CF_SendRet_t            ret = CF_SendRet_SUCCESS;
     CF_EntityId_t           src_eid;
     CF_EntityId_t           dst_eid;
@@ -992,7 +992,7 @@ int32 CF_CFDP_InitEngine(void)
     /* initialize all transaction nodes */
     int                i, j;
     int                chunk_mem_offset = 0;
-    CF_Transaction_t  *t                = CF_AppData.engine.transactions;
+    CF_Transaction_t * t                = CF_AppData.engine.transactions;
     CF_ChunkWrapper_t *c                = CF_AppData.engine.chunks;
     int32              ret              = CFE_SUCCESS;
 
@@ -1078,7 +1078,7 @@ err_out:
 int CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context)
 {
     CF_CFDP_CycleTx_args_t *args = (CF_CFDP_CycleTx_args_t *)context;
-    CF_Transaction_t       *t    = container_of(node, CF_Transaction_t, cl_node);
+    CF_Transaction_t *      t    = container_of(node, CF_Transaction_t, cl_node);
     int                     ret  = 1; /* default option is exit traversal */
 
     if (t->flags.com.suspended)
@@ -1115,7 +1115,7 @@ err_out:
  *-----------------------------------------------------------------*/
 void CF_CFDP_CycleTx(CF_Channel_t *c)
 {
-    CF_Transaction_t      *t;
+    CF_Transaction_t *     t;
     CF_CFDP_CycleTx_args_t args;
 
     if (CF_AppData.config_table->chan[(c - CF_AppData.engine.channels)].dequeue_enabled)
@@ -1162,7 +1162,7 @@ int CF_CFDP_DoTick(CF_CListNode_t *node, void *context)
 {
     int                  ret  = CF_CLIST_CONT; /* CF_CLIST_CONT means don't tick one, keep looking for cur */
     CF_CFDP_Tick_args_t *args = (CF_CFDP_Tick_args_t *)context;
-    CF_Transaction_t    *t    = container_of(node, CF_Transaction_t, cl_node);
+    CF_Transaction_t *   t    = container_of(node, CF_Transaction_t, cl_node);
     if (!args->c->cur || (args->c->cur == t))
     {
         /* found where we left off, so clear that and move on */
@@ -1297,7 +1297,7 @@ int32 CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, CF_CFDP
                      uint8 chan, uint8 priority, CF_EntityId_t dest_id)
 {
     CF_Transaction_t *t;
-    CF_Channel_t     *c = &CF_AppData.engine.channels[chan];
+    CF_Channel_t *    c = &CF_AppData.engine.channels[chan];
     CF_Assert(chan < CF_NUM_CHANNELS);
 
     int32 ret = CFE_SUCCESS;
@@ -1529,10 +1529,10 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c)
 
     for (i = 0; i < CF_MAX_POLLING_DIR_PER_CHAN; ++i)
     {
-        CF_Poll_t          *p           = &c->poll[i];
+        CF_Poll_t *         p           = &c->poll[i];
         int                 chan_index  = (c - CF_AppData.engine.channels);
         CF_ChannelConfig_t *cc          = &CF_AppData.config_table->chan[chan_index];
-        CF_PollDir_t       *pd          = &cc->polldir[i];
+        CF_PollDir_t *      pd          = &cc->polldir[i];
         int                 count_check = 0;
 
         if (pd->enabled && pd->interval_sec)
@@ -1759,7 +1759,7 @@ void CF_CFDP_DisableEngine(void)
 {
     int                        i, j;
     static const CF_QueueIdx_t CLOSE_QUEUES[] = {CF_QueueIdx_RX, CF_QueueIdx_TXA, CF_QueueIdx_TXW};
-    CF_Channel_t              *c;
+    CF_Channel_t *             c;
 
     CF_AppData.engine.enabled = 0;
 

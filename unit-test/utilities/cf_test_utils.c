@@ -36,10 +36,10 @@ static uint16 UT_CF_CapturedEventIDs[4];
 
 void *UT_CF_GetContextBufferImpl(UT_EntryKey_t FuncKey, size_t ReqSize)
 {
-    void  *TempPtr;
+    void * TempPtr;
     size_t ActualSize;
     size_t Position;
-    void  *Val;
+    void * Val;
 
     UT_GetDataBuffer(FuncKey, &TempPtr, &ActualSize, &Position);
 

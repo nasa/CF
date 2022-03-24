@@ -35,7 +35,7 @@ typedef struct
 typedef struct
 {
     const CFE_MSG_Message_t *MsgPtr;
-    CFE_SB_MsgId_t          *returned_MsgId;
+    CFE_SB_MsgId_t *         returned_MsgId;
 } CFE_MSG_GetMsgId_context_t;
 
 typedef struct
@@ -48,7 +48,7 @@ typedef struct
 typedef struct
 {
     const CFE_MSG_Message_t *MsgPtr;
-    CFE_MSG_Size_t          *Size;
+    CFE_MSG_Size_t *         Size;
 } CFE_MSG_GetSize_context_t;
 
 typedef struct
@@ -66,7 +66,7 @@ typedef struct
 typedef struct
 {
     const CFE_MSG_Message_t *MsgPtr;
-    CFE_MSG_FcnCode_t       *FcnCode;
+    CFE_MSG_FcnCode_t *      FcnCode;
 } CFE_MSG_GetFcnCode_context_t;
 
 typedef struct

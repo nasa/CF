@@ -287,10 +287,10 @@ void Test_CF_CFDP_RecvMd(void)
     /* Test case for:
      * int CF_CFDP_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
      */
-    CF_Transaction_t       *t;
-    CF_History_t           *h;
+    CF_Transaction_t *      t;
+    CF_History_t *          h;
     CF_Logical_PduBuffer_t *ph;
-    CF_Logical_PduMd_t     *md;
+    CF_Logical_PduMd_t *    md;
     const char              src[]  = "mds";
     const char              dest[] = "mdd";
 
@@ -335,7 +335,7 @@ void Test_CF_CFDP_RecvFd(void)
     /* Test case for:
      * int CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal call, no crc */
@@ -375,7 +375,7 @@ void Test_CF_CFDP_RecvEof(void)
      * int CF_CFDP_RecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
      */
 
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal call */
@@ -394,7 +394,7 @@ void Test_CF_CFDP_RecvAck(void)
     /* Test case for:
      * int CF_CFDP_RecvAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal call */
@@ -414,7 +414,7 @@ void Test_CF_CFDP_RecvFin(void)
      * int CF_CFDP_RecvFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
      */
 
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal call */
@@ -434,7 +434,7 @@ void Test_CF_CFDP_RecvNak(void)
      * int CF_CFDP_RecvNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
      */
 
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal call */
@@ -453,7 +453,7 @@ void Test_CF_CFDP_RecvDrop(void)
     /* Test case for:
      * void CF_CFDP_RecvDrop(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal call */
@@ -465,8 +465,8 @@ void Test_CF_CFDP_RecvIdle(void)
     /* Test case for:
      * void CF_CFDP_RecvIdle(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
-    CF_History_t           *h;
+    CF_Transaction_t *      t;
+    CF_History_t *          h;
     CF_Logical_PduBuffer_t *ph;
     CF_ChunkWrapper_t       ut_unused_chunks;
 
@@ -543,7 +543,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_ConstructPduHeader(const CF_Transaction_t *t, CF
                                                    CF_EntityId_t src_eid, CF_EntityId_t dst_eid, bool towards_sender,
                                                    CF_TransactionSeq_t tsn, bool silent);
 */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
     CF_Logical_PduHeader_t *hdr;
 
@@ -590,10 +590,10 @@ void Test_CF_CFDP_SendMd(void)
         CF_SendRet_t     CF_CFDP_SendMd(CF_Transaction_t *t);
      */
 
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
-    CF_History_t           *h;
-    CF_Logical_PduMd_t     *md;
+    CF_History_t *          h;
+    CF_Logical_PduMd_t *    md;
 
     /* setup without a tx message */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
@@ -631,7 +631,7 @@ void Test_CF_CFDP_SendFd(void)
         CF_SendRet_t     CF_CFDP_SendFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
     */
 
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, &t, NULL);
@@ -644,10 +644,10 @@ void Test_CF_CFDP_SendEof(void)
         CF_SendRet_t     CF_CFDP_SendEof(CF_Transaction_t *t);
      */
 
-    CF_Transaction_t       *t;
-    CF_History_t           *h;
+    CF_Transaction_t *      t;
+    CF_History_t *          h;
     CF_Logical_PduBuffer_t *ph;
-    CF_Logical_PduEof_t    *eof;
+    CF_Logical_PduEof_t *   eof;
 
     /* setup without a tx message */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
@@ -675,9 +675,9 @@ void Test_CF_CFDP_SendAck(void)
                                     CF_CFDP_ConditionCode_t cc, CF_EntityId_t peer_eid, CF_TransactionSeq_t tsn);
      */
 
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
-    CF_Logical_PduAck_t    *ack;
+    CF_Logical_PduAck_t *   ack;
 
     /* setup without a tx message */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
@@ -729,9 +729,9 @@ void Test_CF_CFDP_SendFin(void)
                                     CF_CFDP_ConditionCode_t cc);
      */
 
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
-    CF_Logical_PduFin_t    *fin;
+    CF_Logical_PduFin_t *   fin;
 
     /* setup without a tx message */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
@@ -768,7 +768,7 @@ void Test_CF_CFDP_SendNak(void)
     /* Test case for:
         CF_SendRet_t CF_CFDP_SendNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, &ph, NULL, NULL, &t, NULL);
@@ -789,8 +789,8 @@ void Test_CF_CFDP_AppendTlv(void)
         This helper is used by EOF and FIN to set TLV values
     */
     CF_Logical_PduBuffer_t *ph;
-    CF_ConfigTable_t       *config;
-    CF_Logical_TlvList_t   *tlv_list;
+    CF_ConfigTable_t *      config;
+    CF_Logical_TlvList_t *  tlv_list;
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, NULL, &config);
     config->local_eid = 123;
@@ -816,7 +816,7 @@ void Test_CF_CFDP_FindUnusedTransaction(void)
     /* Test case for:
         CF_Transaction_t *CF_CFDP_FindUnusedTransaction(CF_Channel_t *c)
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, &ph, NULL, NULL, &t, NULL);
@@ -876,9 +876,9 @@ void Test_CF_CFDP_TxFile(void)
      */
     const char        src[]  = "tsrc";
     const char        dest[] = "tdest";
-    CF_History_t     *h;
+    CF_History_t *    h;
     CF_Transaction_t *t;
-    CF_Channel_t     *c;
+    CF_Channel_t *    c;
     CF_ChunkWrapper_t chunk_wrap;
 
     memset(&chunk_wrap, 0, sizeof(chunk_wrap));
@@ -924,7 +924,7 @@ void Test_CF_CFDP_PlaybackDir(void)
     const char     src[]  = "psrc";
     const char     dest[] = "pdest";
     CF_Playback_t *pb;
-    CF_Channel_t  *c;
+    CF_Channel_t * c;
     uint8          i;
 
     /* nominal call */
@@ -972,7 +972,7 @@ void Test_CF_CFDP_CycleTx(void)
     /* Test case for:
      * void CF_CFDP_CycleTx(CF_Channel_t *c)
      */
-    CF_Channel_t     *c;
+    CF_Channel_t *    c;
     CF_Transaction_t *t;
     CF_ConfigTable_t *config;
     CF_Transaction_t  t2;
@@ -1016,7 +1016,7 @@ void Test_CF_CFDP_CycleTxFirstActive(void)
        int CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context);
      */
     CF_CFDP_CycleTx_args_t args;
-    CF_Transaction_t      *t;
+    CF_Transaction_t *     t;
 
     memset(&args, 0, sizeof(args));
 
@@ -1058,7 +1058,7 @@ void Test_CF_CFDP_DoTick(void)
     /* Test case for:
      * int CF_CFDP_DoTick(CF_CListNode_t *node, void *context);
      */
-    CF_Transaction_t   *t;
+    CF_Transaction_t *  t;
     CF_Transaction_t    t2;
     CF_CFDP_Tick_args_t args;
 
@@ -1094,10 +1094,10 @@ void Test_CF_CFDP_ProcessPollingDirectories(void)
     /* Test case for:
      * void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c)
      */
-    CF_Channel_t     *c;
+    CF_Channel_t *    c;
     CF_ConfigTable_t *config;
-    CF_PollDir_t     *pdcfg;
-    CF_Poll_t        *poll;
+    CF_PollDir_t *    pdcfg;
+    CF_Poll_t *       poll;
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &c, NULL, NULL, &config);
     pdcfg = &config->chan[UT_CFDP_CHANNEL].polldir[0];
@@ -1169,8 +1169,8 @@ void Test_CF_CFDP_ProcessPlaybackDirectory(void)
      * void CF_CFDP_ProcessPlaybackDirectory(CF_Channel_t *c, CF_Playback_t *p)
      */
     CF_Transaction_t *t;
-    CF_History_t     *h;
-    CF_Channel_t     *c;
+    CF_History_t *    h;
+    CF_Channel_t *    c;
     CF_ConfigTable_t *config;
     CF_Playback_t     pb;
     os_dirent_t       dirent[3];
@@ -1318,8 +1318,8 @@ void Test_CF_CFDP_ResetTransaction(void)
      */
 
     CF_Transaction_t *t;
-    CF_History_t     *h;
-    CF_Channel_t     *c;
+    CF_History_t *    h;
+    CF_Channel_t *    c;
     CF_Playback_t     pb;
 
     memset(&pb, 0, sizeof(pb));

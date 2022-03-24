@@ -150,7 +150,7 @@ void Test_CF_CFDP_R1_Recv(void)
      * void CF_CFDP_R1_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
 
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
@@ -163,7 +163,7 @@ void Test_CF_CFDP_R2_Recv(void)
     /* Test case for:
      * void CF_CFDP_R2_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
@@ -541,8 +541,8 @@ void Test_CF_CFDP_R_ProcessFd(void)
     /* Test case for:
      * int CF_CFDP_R_ProcessFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t               *t;
-    CF_Logical_PduBuffer_t         *ph;
+    CF_Transaction_t *              t;
+    CF_Logical_PduBuffer_t *        ph;
     CF_Logical_PduFileDataHeader_t *fd;
 
     /* nominal */
@@ -603,9 +603,9 @@ void Test_CF_CFDP_R_SubstateRecvEof(void)
     /* Test case for:
      * int CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
-    CF_Logical_PduEof_t    *eof;
+    CF_Logical_PduEof_t *   eof;
 
     /* nominal */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
@@ -644,9 +644,9 @@ void Test_CF_CFDP_R1_SubstateRecvEof(void)
     /* Test case for:
      * void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
-    CF_Logical_PduEof_t    *eof;
+    CF_Logical_PduEof_t *   eof;
 
     /* nominal */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
@@ -679,9 +679,9 @@ void Test_CF_CFDP_R2_SubstateRecvEof(void)
     /* Test case for:
      * void CF_CFDP_R2_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
-    CF_Logical_PduEof_t    *eof;
+    CF_Logical_PduEof_t *   eof;
 
     /* nominal */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
@@ -734,7 +734,7 @@ void Test_CF_CFDP_R1_SubstateRecvFileData(void)
     /* Test case for:
      * void CF_CFDP_R1_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal */
@@ -760,7 +760,7 @@ void Test_CF_CFDP_R2_SubstateRecvFileData(void)
     /* Test case for:
      * void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal */
@@ -839,7 +839,7 @@ void Test_CF_CFDP_R_SubstateSendNak(void)
     /* Test case for:
      * int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
     CF_ChunkWrapper_t       chunks;
 
@@ -1017,7 +1017,7 @@ void Test_CF_CFDP_R2_Recv_fin_ack(void)
     /* Test case for:
      * void CF_CFDP_R2_Recv_fin_ack(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal */
@@ -1038,7 +1038,7 @@ void Test_CF_CFDP_R2_RecvMd(void)
     /* Test case for:
      * void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t       *t;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal */

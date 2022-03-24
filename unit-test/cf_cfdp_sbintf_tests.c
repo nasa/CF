@@ -48,7 +48,7 @@ static void UT_CFDP_SetupBasicRxState(CF_Logical_PduBuffer_t *pdu_buffer)
 {
     static CF_DecoderState_t ut_decoder;
     static uint8             bytes[CF_CFDP_MAX_HEADER_SIZE];
-    CFE_SB_Buffer_t         *bufptr;
+    CFE_SB_Buffer_t *        bufptr;
     CFE_MSG_Size_t           sz;
 
     memset(pdu_buffer, 0, sizeof(*pdu_buffer));
@@ -212,9 +212,9 @@ void Test_CF_CFDP_ReceiveMessage(void)
     /* Test case for:
      * void CF_CFDP_ReceiveMessage(CF_Channel_t *c);
      */
-    CF_Channel_t           *c;
-    CF_ConfigTable_t       *config;
-    CF_Transaction_t       *t;
+    CF_Channel_t *          c;
+    CF_ConfigTable_t *      config;
+    CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     /* no-config - the max per wakeup will be 0, and this is a noop */
@@ -327,7 +327,7 @@ void Test_CF_CFDP_MsgOutGet(void)
      */
     CF_Transaction_t *t;
     CF_ConfigTable_t *config;
-    CF_Channel_t     *c;
+    CF_Channel_t *    c;
 
     /* nominal */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);

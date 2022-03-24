@@ -147,7 +147,7 @@ int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_
 
     if ((i && chunks->count))
     {
-        CF_Chunk_t      *prev     = &chunks->chunks[i - 1];
+        CF_Chunk_t *     prev     = &chunks->chunks[i - 1];
         CF_ChunkOffset_t prev_end = prev->offset + prev->size;
         if (chunk->offset <= prev_end)
         {
@@ -276,7 +276,7 @@ void CF_Chunks_Insert(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t 
             else
             {
                 CF_ChunkIdx_t smallest_i = CF_Chunks_FindSmallestSize(chunks);
-                CF_Chunk_t   *smallest_c = &chunks->chunks[smallest_i];
+                CF_Chunk_t *  smallest_c = &chunks->chunks[smallest_i];
                 if (smallest_c->size < chunk->size)
                 {
                     CF_Chunks_EraseChunk(chunks, smallest_i);
