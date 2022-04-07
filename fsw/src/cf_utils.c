@@ -409,9 +409,9 @@ int CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *arg
 int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context)
 {
     CF_TraverseAll_Arg_t args = {fn, context, 0};
-    CF_QueueIdx_t        index;
-    for (index = CF_QueueIdx_PEND; index <= CF_QueueIdx_RX; ++index)
-        CF_CList_Traverse(c->qs[index], (CF_CListFn_t)CF_TraverseAllTransactions_Impl, &args);
+    CF_QueueIdx_t        queueidx;
+    for (queueidx = CF_QueueIdx_PEND; queueidx <= CF_QueueIdx_RX; ++queueidx)
+        CF_CList_Traverse(c->qs[queueidx], (CF_CListFn_t)CF_TraverseAllTransactions_Impl, &args);
 
     return args.counter;
 }

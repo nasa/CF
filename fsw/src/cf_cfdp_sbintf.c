@@ -223,12 +223,12 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
                 {
                     if (!CF_CFDP_RecvFin(t, ph))
                     {
-                        CF_Transaction_t t;
+                        CF_Transaction_t t_finack;
 
-                        memset(&t, 0, sizeof(t));
-                        CF_CFDP_InitTxnTxFile(&t, CF_CFDP_CLASS_2, 1, chan_num,
+                        memset(&t_finack, 0, sizeof(t_finack));
+                        CF_CFDP_InitTxnTxFile(&t_finack, CF_CFDP_CLASS_2, 1, chan_num,
                                               0); /* populate transaction with needed fields for CF_CFDP_SendAck() */
-                        if (CF_CFDP_SendAck(&t, CF_CFDP_AckTxnStatus_UNRECOGNIZED, CF_CFDP_FileDirective_FIN,
+                        if (CF_CFDP_SendAck(&t_finack, CF_CFDP_AckTxnStatus_UNRECOGNIZED, CF_CFDP_FileDirective_FIN,
                                             ph->int_header.fin.cc, ph->pdu_header.destination_eid,
                                             ph->pdu_header.sequence_num) != CF_SendRet_NO_MSG)
                         {

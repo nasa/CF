@@ -406,7 +406,7 @@ void CF_WakeUp(void)
  *-----------------------------------------------------------------*/
 void CF_ProcessMsg(CFE_SB_Buffer_t *msg)
 {
-    CFE_SB_MsgId_t msg_id;
+    CFE_SB_MsgId_t msg_id = CFE_SB_INVALID_MSG_ID;
 
     CFE_MSG_GetMsgId(&msg->Msg, &msg_id);
 

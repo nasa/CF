@@ -1200,8 +1200,8 @@ void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
         sizeof(CF_NoArgsCmd_t),     /* CF_DISABLE_ENGINE_CC */
     };
 
-    CFE_MSG_FcnCode_t cmd;
-    size_t            len;
+    CFE_MSG_FcnCode_t cmd = 0;
+    size_t            len = 0;
 
     CFE_MSG_GetFcnCode(&msg->Msg, &cmd);
 
