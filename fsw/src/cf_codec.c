@@ -27,9 +27,6 @@
 #include "cf_codec.h"
 #include "cf_events.h"
 
-#define xstr(s) str(s)
-#define str(s)  #s
-
 #include <stdint.h>
 
 typedef struct CF_Codec_BitField
