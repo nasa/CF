@@ -294,21 +294,26 @@ int CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
         /* unless CF_SendRet_ERROR, return 1 to keep caller from sending file data */
         ret = 1; /* 1 means nak processed, so don't send filedata */
     }
-    else if ((c = CF_ChunkList_GetFirstChunk(&t->chunks->chunks)))
+    else
     {
-        ret = CF_CFDP_S_SendFileData(t, c->offset, c->size, 0);
-        if (ret > 0)
+        /* Get first chunk and process if available */
+        c = CF_ChunkList_GetFirstChunk(&t->chunks->chunks);
+        if (c != NULL)
         {
-            CF_ChunkList_RemoveFromFirst(&t->chunks->chunks, ret);
-            ret = 1; /* processed nak, so caller doesn't send file data */
-        }
-        else if (ret < 0)
-        {
-            ret = -1; /* error occurred */
-        }
-        else
-        {
-            /* nothing to do if ret==0, since nothing was sent */
+            ret = CF_CFDP_S_SendFileData(t, c->offset, c->size, 0);
+            if (ret > 0)
+            {
+                CF_ChunkList_RemoveFromFirst(&t->chunks->chunks, ret);
+                ret = 1; /* processed nak, so caller doesn't send file data */
+            }
+            else if (ret < 0)
+            {
+                ret = -1; /* error occurred */
+            }
+            else
+            {
+                /* nothing to do if ret==0, since nothing was sent */
+            }
         }
     }
 
@@ -743,7 +748,11 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
                 {
                     if (t->state_data.s.sub_state == CF_TxSubState_WAIT_FOR_EOF_ACK)
                     {
-                        if (++t->state_data.s.s2.acknak_count >= CF_AppData.config_table->ack_limit)
+                        /* Increment acknak counter */
+                        ++t->state_data.s.s2.acknak_count;
+
+                        /* Check limit and handle if needed */
+                        if (t->state_data.s.s2.acknak_count >= CF_AppData.config_table->ack_limit)
                         {
                             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_ACK_LIMIT, CFE_EVS_EventType_ERROR,
                                               "CF S2(%lu:%lu), ack limit reached, no eof-ack",

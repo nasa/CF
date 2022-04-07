@@ -158,7 +158,11 @@ void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
 
     if (send_nak && ok_to_send_nak)
     {
-        if (++t->state_data.r.r2.acknak_count >= CF_AppData.config_table->nak_limit)
+        /* Increment the acknak counter */
+        ++t->state_data.r.r2.acknak_count;
+
+        /* Check limit and handle if needed */
+        if (t->state_data.r.r2.acknak_count >= CF_AppData.config_table->nak_limit)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_NAK_LIMIT, CFE_EVS_EventType_ERROR,
                               "CF R%d(%lu:%lu): nak limited reach", (t->state == CF_TxnState_R2),
@@ -308,12 +312,16 @@ void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     eof = &ph->int_header.eof;
     crc = eof->crc;
 
-    if ((ret == CF_RxEofRet_SUCCESS) && !CF_CFDP_R_CheckCrc(t, crc))
+    if (ret == CF_RxEofRet_SUCCESS)
     {
-        /* successfully processed the file */
-        t->keep = 1; /* save the file */
+        /* Verify crc */
+        if (CF_CFDP_R_CheckCrc(t, crc) == 0)
+        {
+            /* successfully processed the file */
+            t->keep = 1; /* save the file */
+        }
+        /* if file failed to process, there's nothing to do. CF_CFDP_R_CheckCrc() generates an event on failure */
     }
-    /* if file failed to process, there's nothing to do. CF_CFDP_R_CheckCrc() generates an event on failure */
 
     /* after exit, always reset since we are done */
     /* reset even if the eof failed -- class 1, so it won't come again! */
@@ -388,19 +396,25 @@ void CF_CFDP_R2_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  *-----------------------------------------------------------------*/
 void CF_CFDP_R1_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
+    int ret;
+
     /* got file data pdu? */
-    if (CF_CFDP_RecvFd(t, ph) || CF_CFDP_R_ProcessFd(t, ph))
+    ret = CF_CFDP_RecvFd(t, ph);
+    if (ret == 0)
     {
-        goto err_out;
+        ret = CF_CFDP_R_ProcessFd(t, ph);
     }
 
-    /* class 1 digests crc */
-    CF_CRC_Digest(&t->crc, ph->int_header.fd.data_ptr, ph->int_header.fd.data_len);
-
-    return;
-
-err_out:
-    CF_CFDP_R1_Reset(t);
+    if (ret == 0)
+    {
+        /* class 1 digests crc */
+        CF_CRC_Digest(&t->crc, ph->int_header.fd.data_ptr, ph->int_header.fd.data_len);
+    }
+    else
+    {
+        /* Reset transaction on failure */
+        CF_CFDP_R1_Reset(t);
+    }
 }
 
 /*----------------------------------------------------------------
@@ -414,35 +428,40 @@ err_out:
 void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     const CF_Logical_PduFileDataHeader_t *fd;
+    int                                   ret;
 
     /* this function is only entered for data PDUs */
     fd = &ph->int_header.fd;
 
     /* got file data pdu? */
-    if (CF_CFDP_RecvFd(t, ph) || CF_CFDP_R_ProcessFd(t, ph))
+    ret = CF_CFDP_RecvFd(t, ph);
+    if (ret == 0)
     {
-        goto err_out;
+        ret = CF_CFDP_R_ProcessFd(t, ph);
     }
 
-    /* class 2 does crc at FIN, but track gaps */
-    CF_ChunkListAdd(&t->chunks->chunks, fd->offset, fd->data_len);
-
-    if (t->flags.rx.fd_nak_sent)
+    if (ret == 0)
     {
-        CF_CFDP_R2_Complete(t, 0); /* once nak-retransmit received, start checking for completion at each fd */
-    }
+        /* class 2 does crc at FIN, but track gaps */
+        CF_ChunkListAdd(&t->chunks->chunks, fd->offset, fd->data_len);
 
-    if (!t->flags.rx.complete)
+        if (t->flags.rx.fd_nak_sent)
+        {
+            CF_CFDP_R2_Complete(t, 0); /* once nak-retransmit received, start checking for completion at each fd */
+        }
+
+        if (!t->flags.rx.complete)
+        {
+            CF_CFDP_ArmAckTimer(t); /* re-arm ack timer, since we got data */
+        }
+
+        t->state_data.r.r2.acknak_count = 0;
+    }
+    else
     {
-        CF_CFDP_ArmAckTimer(t); /* re-arm ack timer, since we got data */
+        /* Reset transaction on failure */
+        CF_CFDP_R2_Reset(t);
     }
-
-    t->state_data.r.r2.acknak_count = 0;
-
-    return;
-
-err_out:
-    CF_CFDP_R2_Reset(t);
 }
 
 /*----------------------------------------------------------------
@@ -1032,7 +1051,11 @@ void CF_CFDP_R_Tick(CF_Transaction_t *t, int *cont /* unused */)
                 }
                 else if (t->state_data.r.sub_state == CF_RxSubState_WAIT_FOR_FIN_ACK)
                 {
-                    if (++t->state_data.r.r2.acknak_count >= CF_AppData.config_table->ack_limit)
+                    /* Increment acknak counter */
+                    ++t->state_data.r.r2.acknak_count;
+
+                    /* Check limit and handle if needed */
+                    if (t->state_data.r.r2.acknak_count >= CF_AppData.config_table->ack_limit)
                     {
                         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_ACK_LIMIT, CFE_EVS_EventType_ERROR,
                                           "CF R2(%lu:%lu): ack limit reached, no fin-ack",

@@ -68,7 +68,8 @@ void CF_CList_InsertFront(CF_CListNode_t **head, CF_CListNode_t *node)
         node->next = *head;
         node->prev = last;
 
-        last->next = (*head)->prev = node;
+        last->next    = node;
+        (*head)->prev = node;
     }
 
     *head = node;

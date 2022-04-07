@@ -63,7 +63,9 @@ void CF_CRC_Digest(CF_Crc_t *c, const uint8 *data, int len)
         c->working <<= 8;
         c->working |= data[i];
 
-        if (++c->index == 4)
+        ++c->index;
+
+        if (c->index == 4)
         {
             c->result += c->working;
             c->index = 0;
