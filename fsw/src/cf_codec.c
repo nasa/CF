@@ -361,7 +361,6 @@ uint8 CF_CFDP_GetValueEncodedSize(uint64 Value)
     uint8  MinSize;
     uint64 Limit = 0x100;
 
-    Limit = 0x100;
     for (MinSize = 1; MinSize < 8 && Value >= Limit; ++MinSize)
     {
         Limit <<= 8;
