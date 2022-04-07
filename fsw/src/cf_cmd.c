@@ -38,9 +38,9 @@
 
 #include <string.h>
 
-#define ALL_CHANNELS 255
-#define ALL_POLLDIRS ALL_CHANNELS
-#define COMPOUND_KEY 254
+#define ALL_CHANNELS (255)
+#define ALL_POLLDIRS (ALL_CHANNELS)
+#define COMPOUND_KEY (254)
 
 /*----------------------------------------------------------------
  *

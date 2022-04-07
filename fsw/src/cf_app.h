@@ -38,12 +38,12 @@
 /**
  * @brief The name of the application command pipe for CF
  */
-#define CF_PIPE_NAME "CF_CMD_PIPE"
+#define CF_PIPE_NAME ("CF_CMD_PIPE")
 
 /**
  * @brief A common prefix for all data pipes for CF
  */
-#define CF_CHANNEL_PIPE_PREFIX "CF_CHAN_"
+#define CF_CHANNEL_PIPE_PREFIX ("CF_CHAN_")
 
 /**
  * @brief The CF application global state structure

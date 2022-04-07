@@ -241,7 +241,7 @@ const void *CF_CFDP_DoDecodeChunk(CF_DecoderState_t *state, size_t chunksize);
  *
  * @param s Encoder or Decoder state
  */
-#define CF_CODEC_IS_OK(s) CF_CFDP_CodecIsOK(&((s)->codec_state))
+#define CF_CODEC_IS_OK(s) (CF_CFDP_CodecIsOK(&((s)->codec_state)))
 
 /************************************************************************/
 /**
@@ -253,7 +253,7 @@ const void *CF_CFDP_DoDecodeChunk(CF_DecoderState_t *state, size_t chunksize);
  *
  * @param s Encoder or Decoder state
  */
-#define CF_CODEC_SET_DONE(s) CF_CFDP_CodecSetDone(&((s)->codec_state))
+#define CF_CODEC_SET_DONE(s) (CF_CFDP_CodecSetDone(&((s)->codec_state)))
 
 /************************************************************************/
 /**
@@ -265,7 +265,7 @@ const void *CF_CFDP_DoDecodeChunk(CF_DecoderState_t *state, size_t chunksize);
  *
  * @param s Encoder or Decoder state
  */
-#define CF_CODEC_GET_POSITION(s) CF_CFDP_CodecGetPosition(&((s)->codec_state))
+#define CF_CODEC_GET_POSITION(s) (CF_CFDP_CodecGetPosition(&((s)->codec_state)))
 
 /************************************************************************/
 /**
@@ -277,7 +277,7 @@ const void *CF_CFDP_DoDecodeChunk(CF_DecoderState_t *state, size_t chunksize);
  *
  * @param s Encoder or Decoder state
  */
-#define CF_CODEC_GET_REMAIN(s) CF_CFDP_CodecGetRemain(&((s)->codec_state))
+#define CF_CODEC_GET_REMAIN(s) (CF_CFDP_CodecGetRemain(&((s)->codec_state)))
 
 /************************************************************************/
 /**
@@ -289,7 +289,7 @@ const void *CF_CFDP_DoDecodeChunk(CF_DecoderState_t *state, size_t chunksize);
  *
  * @param s Encoder or Decoder state
  */
-#define CF_CODEC_GET_SIZE(s) CF_CFDP_CodecGetSize(&((s)->codec_state))
+#define CF_CODEC_GET_SIZE(s) (CF_CFDP_CodecGetSize(&((s)->codec_state)))
 
 /************************************************************************/
 /**

@@ -89,7 +89,7 @@ typedef uint32 CF_TransactionSeq_t;
  *       The maximum size dictated by cFE platform configuration
  *		 parameter is CFE_SB_MAX_PIPE_DEPTH
  */
-#define CF_PIPE_DEPTH 32
+#define CF_PIPE_DEPTH (32)
 
 /**
  *  @brief Number of channels
@@ -101,7 +101,7 @@ typedef uint32 CF_TransactionSeq_t;
  *  @par Limits:
  *       Must be less <= 200. Obviously it will be smaller than that.
  */
-#define CF_NUM_CHANNELS 2
+#define CF_NUM_CHANNELS (2)
 
 /**
  *  @brief Max NAK segments supported in a NAK pdu
@@ -114,9 +114,15 @@ typedef uint32 CF_TransactionSeq_t;
  *  @par Limits:
  *
  */
-#define CF_NAK_MAX_SEGMENTS 58 /* max number of NAK segments CF supports (leave room for overhead */
+#define CF_NAK_MAX_SEGMENTS (58)
 
-/* CHUNKS -
+/**
+ *  @brief RX chunks per transaction (per channel)
+ *
+ *  @par Description:
+ *       Number of chunks per transaction per channel (RX).
+ *
+ * CHUNKS -
  * A chunk is a representatino of a range range (offset, size) of data received by a receiver.
  *
  * Class 2 CFDP deals with NAK, so received data must be tracked for receivers in order to generate
@@ -124,12 +130,7 @@ typedef uint32 CF_TransactionSeq_t;
  * (array size must be CF_NUM_CHANNELS)
  * CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION is an array for each channel indicating the number of chunks per transaction
  * CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION is an array for each channel indciate the number of chunks to keep track of
- *   NAK requests from the receiver per transaction*/
-/**
- *  @brief RX chunks per transaction (per channel)
- *
- *  @par Description:
- *       Number of chunks per transaction per channel (RX).
+ * NAK requests from the receiver per transaction
  *
  *  @par Limits:
  *
@@ -177,7 +178,7 @@ typedef uint32 CF_TransactionSeq_t;
  *  @par Limits:
  *
  */
-#define CF_MAX_COMMANDED_PLAYBACK_FILES_PER_CHAN 10
+#define CF_MAX_COMMANDED_PLAYBACK_FILES_PER_CHAN (10)
 
 /**
  *  @brief Max number of simultaneous file receives.
@@ -188,7 +189,7 @@ typedef uint32 CF_TransactionSeq_t;
  *  @par Limits:
  *
  */
-#define CF_MAX_SIMULTANEOUS_RX 5
+#define CF_MAX_SIMULTANEOUS_RX (5)
 
 /* definitions that affect execution */
 
@@ -201,7 +202,7 @@ typedef uint32 CF_TransactionSeq_t;
  *  @par Limits:
  *
  */
-#define CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN 2
+#define CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN (2)
 
 /**
  *  @brief Max number of polling directories per channel.
@@ -213,7 +214,7 @@ typedef uint32 CF_TransactionSeq_t;
  *  @par Limits:
  *
  */
-#define CF_MAX_POLLING_DIR_PER_CHAN 5
+#define CF_MAX_POLLING_DIR_PER_CHAN (5)
 
 /**
  *  @brief Number of transactions per playback directoriy.
@@ -225,7 +226,7 @@ typedef uint32 CF_TransactionSeq_t;
  *  @par Limits:
  *
  */
-#define CF_NUM_TRANSACTIONS_PER_PLAYBACK 5
+#define CF_NUM_TRANSACTIONS_PER_PLAYBACK (5)
 
 /**
  *  @brief Number of histories per channel
@@ -236,7 +237,7 @@ typedef uint32 CF_TransactionSeq_t;
  *  @par Limits:
  *       65536 is the current max.
  */
-#define CF_NUM_HISTORIES_PER_CHANNEL 256
+#define CF_NUM_HISTORIES_PER_CHANNEL (256)
 
 /**
  *  @brief Max PDU size.
@@ -252,7 +253,7 @@ typedef uint32 CF_TransactionSeq_t;
  *
  */
 /* CF_MAX_PDU_SIZE must be the max possible PDU for any channel. Channels can be configured with a smaller max. */
-#define CF_MAX_PDU_SIZE 512
+#define CF_MAX_PDU_SIZE (512)
 
 /**
  *  @brief Name of the CF Configuration Table
@@ -264,7 +265,7 @@ typedef uint32 CF_TransactionSeq_t;
  *       The length of this string, including the NULL terminator cannot exceed
  *       the #OS_MAX_PATH_LEN value.
  */
-#define CF_CONFIG_TABLE_NAME "config_table"
+#define CF_CONFIG_TABLE_NAME ("config_table")
 
 /**
  *  @brief CF Configuration Table Filename
@@ -276,7 +277,7 @@ typedef uint32 CF_TransactionSeq_t;
  *       The length of this string, including the NULL terminator cannot exceed
  *       the #OS_MAX_PATH_LEN value.
  */
-#define CF_CONFIG_TABLE_FILENAME "/cf/cf_def_config.tbl"
+#define CF_CONFIG_TABLE_FILENAME ("/cf/cf_def_config.tbl")
 
 /**
  *  @brief Maximum file name length.
@@ -284,7 +285,7 @@ typedef uint32 CF_TransactionSeq_t;
  *  @par Limits:
  *
  */
-#define CF_FILENAME_MAX_NAME OS_MAX_FILE_NAME
+#define CF_FILENAME_MAX_NAME (OS_MAX_FILE_NAME)
 
 /**
  *  @brief Maximum file path (not including file name)
@@ -314,7 +315,7 @@ typedef uint32 CF_TransactionSeq_t;
  *  @par Limits:
  *
  */
-#define CF_R2_CRC_CHUNK_SIZE 1024
+#define CF_R2_CRC_CHUNK_SIZE (1024)
 
 #if CF_FILENAME_MAX_LEN > OS_MAX_PATH_LEN
 #error CF_FILENAME_MAX_LEN must be <= OS_MAX_PATH_LEN
@@ -326,7 +327,7 @@ typedef uint32 CF_TransactionSeq_t;
  *  @par Limits:
  *
  */
-#define CF_RCVMSG_TIMEOUT 100
+#define CF_RCVMSG_TIMEOUT (100)
 
 /**\}*/
 
