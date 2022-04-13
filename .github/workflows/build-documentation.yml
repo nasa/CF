@@ -1,0 +1,15 @@
+name: Build and Deploy Documentation
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-documentation:
+    name: Build and deploy cFS documents
+    uses: nasa/cFS/.github/workflows/build-deploy-doc.yml@main
+    with:
+      target: "[\"cf-usersguide\"]"
+      app-name: cf
+      buildpdf: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
+      deploy: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
