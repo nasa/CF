@@ -1,0 +1,10 @@
+name: Build and Run
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-run:
+    name: Build and run with startup msg verification
+    uses: nasa/cFS/.github/workflows/build-run-app.yml@main
