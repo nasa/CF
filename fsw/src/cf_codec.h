@@ -816,8 +816,8 @@ void CF_CFDP_DecodeNak(CF_DecoderState_t *state, CF_Logical_PduNak_t *plnak);
  * decoder is not changed.
  *
  * @param state  Decoder state object
- * @param pcrc   Pointer to logical CRC value
+ * @param plcrc   Pointer to logical CRC value
  */
-void CF_CFDP_DecodeCrc(CF_DecoderState_t *state, uint32 *pcrc);
+void CF_CFDP_DecodeCrc(CF_DecoderState_t *state, uint32 *plcrc);
 
 #endif /* !CF_CODEC_H */

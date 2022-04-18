@@ -134,7 +134,6 @@ static inline void CF_Codec_Store_uint8(CF_CFDP_uint8_t *pdst, uint8 val)
 {
     pdst->octets[0] = val;
 }
-#define cfdp_set_uint8(dst, src) (CF_Codec_Store_uint8(&(dst), src))
 
 /*----------------------------------------------------------------
  *
@@ -149,7 +148,6 @@ static inline void CF_Codec_Store_uint16(CF_CFDP_uint16_t *pdst, uint16 val)
     val >>= 8;
     pdst->octets[0] = val & 0xFF;
 }
-#define cfdp_set_uint16(dst, src) (CF_Codec_Store_uint16(&(dst), src))
 
 /*----------------------------------------------------------------
  *
@@ -168,7 +166,6 @@ static inline void CF_Codec_Store_uint32(CF_CFDP_uint32_t *pdst, uint32 val)
     val >>= 8;
     pdst->octets[0] = val & 0xFF;
 }
-#define cfdp_set_uint32(dst, src) (CF_Codec_Store_uint32(&(dst), src))
 
 /*----------------------------------------------------------------
  *
@@ -195,7 +192,6 @@ static inline void CF_Codec_Store_uint64(CF_CFDP_uint64_t *pdst, uint64 val)
     val >>= 8;
     pdst->octets[0] = val & 0xFF;
 }
-#define cfdp_set_uint64(dst, src) (CF_Codec_Store_uint64(&(dst), src))
 
 /*----------------------------------------------------------------
  *
@@ -208,7 +204,6 @@ static inline void CF_Codec_Load_uint8(uint8 *pdst, const CF_CFDP_uint8_t *psrc)
 {
     *pdst = psrc->octets[0];
 }
-#define cfdp_get_uint8(dst, src) (CF_Codec_Load_uint8(&(dst), &(src)))
 
 /*----------------------------------------------------------------
  *
@@ -227,7 +222,6 @@ static inline void CF_Codec_Load_uint16(uint16 *pdst, const CF_CFDP_uint16_t *ps
 
     *pdst = val;
 }
-#define cfdp_get_uint16(dst, src) (CF_Codec_Load_uint16(&(dst), &(src)))
 
 /*----------------------------------------------------------------
  *
@@ -250,7 +244,6 @@ static inline void CF_Codec_Load_uint32(uint32 *pdst, const CF_CFDP_uint32_t *ps
 
     *pdst = val;
 }
-#define cfdp_get_uint32(dst, src) (CF_Codec_Load_uint32(&(dst), &(src)))
 
 /*----------------------------------------------------------------
  *
@@ -281,7 +274,6 @@ static inline void CF_Codec_Load_uint64(uint64 *pdst, const CF_CFDP_uint64_t *ps
 
     *pdst = val;
 }
-#define cfdp_get_uint64(dst, src) (CF_Codec_Load_uint64(&(dst), &(src)))
 
 /*----------------------------------------------------------------
  *
@@ -410,14 +402,14 @@ void CF_CFDP_EncodeHeaderWithoutSize(CF_EncoderState_t *state, CF_Logical_PduHea
     peh = CF_ENCODE_FIXED_CHUNK(state, CF_CFDP_PduHeader_t);
     if (peh != NULL)
     {
-        cfdp_set_uint8(peh->flags, 0);
+        CF_Codec_Store_uint8(&(peh->flags), 0);
         FSV(peh->flags, CF_CFDP_PduHeader_FLAGS_VERSION, plh->version);
         FSV(peh->flags, CF_CFDP_PduHeader_FLAGS_DIR, plh->direction);
         FSV(peh->flags, CF_CFDP_PduHeader_FLAGS_TYPE, plh->pdu_type);
         FSV(peh->flags, CF_CFDP_PduHeader_FLAGS_MODE, plh->txm_mode);
 
         /* The eid+tsn lengths are encoded as -1 */
-        cfdp_set_uint8(peh->eid_tsn_lengths, 0);
+        CF_Codec_Store_uint8(&(peh->eid_tsn_lengths), 0);
         FSV(peh->eid_tsn_lengths, CF_CFDP_PduHeader_LENGTHS_ENTITY, plh->eid_length - 1);
         FSV(peh->eid_tsn_lengths, CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE, plh->txn_seq_length - 1);
 
@@ -457,7 +449,7 @@ void CF_CFDP_EncodeHeaderFinalSize(CF_EncoderState_t *state, CF_Logical_PduHeade
         peh = (CF_CFDP_PduHeader_t *)state->base;
 
         /* Total length is a simple 16-bit quantity */
-        cfdp_set_uint16(peh->length, plh->data_encoded_length);
+        CF_Codec_Store_uint16(&(peh->length), plh->data_encoded_length);
     }
 
     /* This "closes" the packet so nothing else can be added to this EncoderState,
@@ -481,7 +473,7 @@ void CF_CFDP_EncodeFileDirectiveHeader(CF_EncoderState_t *state, CF_Logical_PduF
     peh = CF_ENCODE_FIXED_CHUNK(state, CF_CFDP_PduFileDirectiveHeader_t);
     if (peh != NULL)
     {
-        cfdp_set_uint8(peh->directive_code, value);
+        CF_Codec_Store_uint8(&(peh->directive_code), value);
     }
 }
 
@@ -501,7 +493,7 @@ void CF_CFDP_EncodeLV(CF_EncoderState_t *state, CF_Logical_Lv_t *pllv)
     lv = CF_ENCODE_FIXED_CHUNK(state, CF_CFDP_lv_t);
     if (lv != NULL)
     {
-        cfdp_set_uint8(lv->length, pllv->length);
+        CF_Codec_Store_uint8(&(lv->length), pllv->length);
         if (pllv->length > 0)
         {
             data_ptr = CF_CFDP_DoEncodeChunk(state, pllv->length);
@@ -533,8 +525,8 @@ void CF_CFDP_EncodeTLV(CF_EncoderState_t *state, CF_Logical_Tlv_t *pltlv)
     tlv = CF_ENCODE_FIXED_CHUNK(state, CF_CFDP_tlv_t);
     if (tlv != NULL)
     {
-        cfdp_set_uint8(tlv->type, pltlv->type);
-        cfdp_set_uint8(tlv->length, pltlv->length);
+        CF_Codec_Store_uint8(&(tlv->type), pltlv->type);
+        CF_Codec_Store_uint8(&(tlv->length), pltlv->length);
 
         /* the only TLV type currently implemented is entity id */
         if (pltlv->type == CF_CFDP_TLV_TYPE_ENTITY_ID)
@@ -572,8 +564,8 @@ void CF_CFDP_EncodeSegmentRequest(CF_EncoderState_t *state, CF_Logical_SegmentRe
     sr = CF_ENCODE_FIXED_CHUNK(state, CF_CFDP_SegmentRequest_t);
     if (sr != NULL)
     {
-        cfdp_set_uint32(sr->offset_start, plseg->offset_start);
-        cfdp_set_uint32(sr->offset_end, plseg->offset_end);
+        CF_Codec_Store_uint32(&(sr->offset_start), plseg->offset_start);
+        CF_Codec_Store_uint32(&(sr->offset_end), plseg->offset_end);
     }
 }
 
@@ -628,10 +620,10 @@ void CF_CFDP_EncodeMd(CF_EncoderState_t *state, CF_Logical_PduMd_t *plmd)
     md = CF_ENCODE_FIXED_CHUNK(state, CF_CFDP_PduMd_t);
     if (md != NULL)
     {
-        cfdp_set_uint8(md->segmentation_control, 0);
+        CF_Codec_Store_uint8(&(md->segmentation_control), 0);
         FSV(md->segmentation_control, CF_CFDP_PduMd_CLOSURE_REQUESTED, plmd->close_req);
         FSV(md->segmentation_control, CF_CFDP_PduMd_CHECKSUM_TYPE, plmd->checksum_type);
-        cfdp_set_uint32(md->size, plmd->size);
+        CF_Codec_Store_uint32(&(md->size), plmd->size);
 
         /* Add in LV for src/dest */
         CF_CFDP_EncodeLV(state, &plmd->source_filename);
@@ -664,7 +656,7 @@ void CF_CFDP_EncodeFileDataHeader(CF_EncoderState_t *state, bool with_meta, CF_L
 
     if (optional_fields != NULL)
     {
-        cfdp_set_uint8(*optional_fields, 0);
+        CF_Codec_Store_uint8(optional_fields, 0);
         FSV(*optional_fields, CF_CFDP_PduFileData_RECORD_CONTINUATION_STATE, plfd->continuation_state);
         FSV(*optional_fields, CF_CFDP_PduFileData_SEGMENT_METADATA_LENGTH, plfd->segment_list.num_segments);
 
@@ -674,7 +666,7 @@ void CF_CFDP_EncodeFileDataHeader(CF_EncoderState_t *state, bool with_meta, CF_L
     fd = CF_ENCODE_FIXED_CHUNK(state, CF_CFDP_PduFileDataHeader_t);
     if (fd != NULL)
     {
-        cfdp_set_uint32(fd->offset, plfd->offset);
+        CF_Codec_Store_uint32(&(fd->offset), plfd->offset);
     }
 }
 
@@ -693,10 +685,10 @@ void CF_CFDP_EncodeEof(CF_EncoderState_t *state, CF_Logical_PduEof_t *pleof)
     eof = CF_ENCODE_FIXED_CHUNK(state, CF_CFDP_PduEof_t);
     if (eof != NULL)
     {
-        cfdp_set_uint8(eof->cc, 0);
+        CF_Codec_Store_uint8(&(eof->cc), 0);
         FSV(eof->cc, CF_CFDP_PduEof_FLAGS_CC, pleof->cc);
-        cfdp_set_uint32(eof->crc, pleof->crc);
-        cfdp_set_uint32(eof->size, pleof->size);
+        CF_Codec_Store_uint32(&(eof->crc), pleof->crc);
+        CF_Codec_Store_uint32(&(eof->size), pleof->size);
 
         CF_CFDP_EncodeAllTlv(state, &pleof->tlv_list);
     }
@@ -717,7 +709,7 @@ void CF_CFDP_EncodeFin(CF_EncoderState_t *state, CF_Logical_PduFin_t *plfin)
     fin = CF_ENCODE_FIXED_CHUNK(state, CF_CFDP_PduFin_t);
     if (fin != NULL)
     {
-        cfdp_set_uint8(fin->flags, 0);
+        CF_Codec_Store_uint8(&(fin->flags), 0);
         FSV(fin->flags, CF_CFDP_PduFin_FLAGS_CC, plfin->cc);
         FSV(fin->flags, CF_CFDP_PduFin_FLAGS_DELIVERY_CODE, plfin->delivery_code);
         FSV(fin->flags, CF_CFDP_PduFin_FLAGS_FILE_STATUS, plfin->file_status);
@@ -741,11 +733,11 @@ void CF_CFDP_EncodeAck(CF_EncoderState_t *state, CF_Logical_PduAck_t *plack)
     ack = CF_ENCODE_FIXED_CHUNK(state, CF_CFDP_PduAck_t);
     if (ack != NULL)
     {
-        cfdp_set_uint8(ack->directive_and_subtype_code, 0);
+        CF_Codec_Store_uint8(&(ack->directive_and_subtype_code), 0);
         FSV(ack->directive_and_subtype_code, CF_CFDP_PduAck_DIR_CODE, plack->ack_directive_code);
         FSV(ack->directive_and_subtype_code, CF_CFDP_PduAck_DIR_SUBTYPE_CODE, plack->ack_subtype_code);
 
-        cfdp_set_uint8(ack->cc_and_transaction_status, 0);
+        CF_Codec_Store_uint8(&(ack->cc_and_transaction_status), 0);
         FSV(ack->cc_and_transaction_status, CF_CFDP_PduAck_CC, plack->cc);
         FSV(ack->cc_and_transaction_status, CF_CFDP_PduAck_TRANSACTION_STATUS, plack->txn_status);
     }
@@ -766,8 +758,8 @@ void CF_CFDP_EncodeNak(CF_EncoderState_t *state, CF_Logical_PduNak_t *plnak)
     nak = CF_ENCODE_FIXED_CHUNK(state, CF_CFDP_PduNak_t);
     if (nak != NULL)
     {
-        cfdp_set_uint32(nak->scope_start, plnak->scope_start);
-        cfdp_set_uint32(nak->scope_end, plnak->scope_end);
+        CF_Codec_Store_uint32(&(nak->scope_start), plnak->scope_start);
+        CF_Codec_Store_uint32(&(nak->scope_end), plnak->scope_end);
 
         CF_CFDP_EncodeAllSegments(state, &plnak->segment_list);
     }
@@ -788,7 +780,7 @@ void CF_CFDP_EncodeCrc(CF_EncoderState_t *state, uint32 *plcrc)
     pecrc = CF_ENCODE_FIXED_CHUNK(state, CF_CFDP_uint32_t);
     if (pecrc != NULL)
     {
-        cfdp_set_uint32(*pecrc, *plcrc);
+        CF_Codec_Store_uint32(pecrc, *plcrc);
     }
 }
 
@@ -850,7 +842,7 @@ void CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh)
         plh->txn_seq_length = FGV(peh->eid_tsn_lengths, CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE) + 1;
 
         /* Length is a simple 16-bit quantity and refers to the content after this header */
-        cfdp_get_uint16(plh->data_encoded_length, peh->length);
+        CF_Codec_Load_uint16(&(plh->data_encoded_length), &(peh->length));
 
         /* Now copy variable-length fields */
         plh->source_eid      = CF_DecodeIntegerInSize(state, plh->eid_length);
@@ -879,7 +871,7 @@ void CF_CFDP_DecodeFileDirectiveHeader(CF_DecoderState_t *state, CF_Logical_PduF
     peh = CF_DECODE_FIXED_CHUNK(state, CF_CFDP_PduFileDirectiveHeader_t);
     if (peh != NULL)
     {
-        cfdp_get_uint8(packet_val, peh->directive_code);
+        CF_Codec_Load_uint8(&packet_val, &(peh->directive_code));
         pfdir->directive_code = packet_val;
     }
 }
@@ -899,7 +891,7 @@ void CF_CFDP_DecodeLV(CF_DecoderState_t *state, CF_Logical_Lv_t *pllv)
     lv = CF_DECODE_FIXED_CHUNK(state, CF_CFDP_lv_t);
     if (lv != NULL)
     {
-        cfdp_get_uint8(pllv->length, lv->length);
+        CF_Codec_Load_uint8(&(pllv->length), &(lv->length));
         pllv->data_ptr = CF_CFDP_DoDecodeChunk(state, pllv->length);
     }
 }
@@ -920,8 +912,8 @@ void CF_CFDP_DecodeTLV(CF_DecoderState_t *state, CF_Logical_Tlv_t *pltlv)
     tlv = CF_DECODE_FIXED_CHUNK(state, CF_CFDP_tlv_t);
     if (tlv != NULL)
     {
-        cfdp_get_uint8(type_val, tlv->type);
-        cfdp_get_uint8(pltlv->length, tlv->length);
+        CF_Codec_Load_uint8(&type_val, &(tlv->type));
+        CF_Codec_Load_uint8(&(pltlv->length), &(tlv->length));
 
         /* the only TLV type currently implemented is entity id */
         pltlv->type = type_val;
@@ -953,8 +945,8 @@ void CF_CFDP_DecodeSegmentRequest(CF_DecoderState_t *state, CF_Logical_SegmentRe
     sr = CF_DECODE_FIXED_CHUNK(state, CF_CFDP_SegmentRequest_t);
     if (sr != NULL)
     {
-        cfdp_get_uint32(plseg->offset_start, sr->offset_start);
-        cfdp_get_uint32(plseg->offset_end, sr->offset_end);
+        CF_Codec_Load_uint32(&(plseg->offset_start), &(sr->offset_start));
+        CF_Codec_Load_uint32(&(plseg->offset_end), &(sr->offset_end));
     }
 }
 
@@ -975,7 +967,7 @@ void CF_CFDP_DecodeMd(CF_DecoderState_t *state, CF_Logical_PduMd_t *plmd)
     {
         plmd->close_req     = FGV(md->segmentation_control, CF_CFDP_PduMd_CLOSURE_REQUESTED);
         plmd->checksum_type = FGV(md->segmentation_control, CF_CFDP_PduMd_CHECKSUM_TYPE);
-        cfdp_get_uint32(plmd->size, md->size);
+        CF_Codec_Load_uint32(&(plmd->size), &(md->size));
 
         /* Add in LV for src/dest */
         CF_CFDP_DecodeLV(state, &plmd->source_filename);
@@ -1040,7 +1032,7 @@ void CF_CFDP_DecodeFileDataHeader(CF_DecoderState_t *state, bool with_meta, CF_L
     fd = CF_DECODE_FIXED_CHUNK(state, CF_CFDP_PduFileDataHeader_t);
     if (fd != NULL)
     {
-        cfdp_get_uint32(plfd->offset, fd->offset);
+        CF_Codec_Load_uint32(&(plfd->offset), &(fd->offset));
 
         plfd->data_len = CF_CODEC_GET_REMAIN(state);
         plfd->data_ptr = CF_CFDP_DoDecodeChunk(state, plfd->data_len);
@@ -1062,7 +1054,7 @@ void CF_CFDP_DecodeCrc(CF_DecoderState_t *state, uint32 *plcrc)
     pecrc = CF_DECODE_FIXED_CHUNK(state, CF_CFDP_uint32_t);
     if (pecrc != NULL)
     {
-        cfdp_get_uint32(*plcrc, *pecrc);
+        CF_Codec_Load_uint32(plcrc, pecrc);
     }
 }
 
@@ -1082,8 +1074,8 @@ void CF_CFDP_DecodeEof(CF_DecoderState_t *state, CF_Logical_PduEof_t *pleof)
     if (eof != NULL)
     {
         pleof->cc = FGV(eof->cc, CF_CFDP_PduEof_FLAGS_CC);
-        cfdp_get_uint32(pleof->crc, eof->crc);
-        cfdp_get_uint32(pleof->size, eof->size);
+        CF_Codec_Load_uint32(&(pleof->crc), &(eof->crc));
+        CF_Codec_Load_uint32(&(pleof->size), &(eof->size));
 
         CF_CFDP_DecodeAllTlv(state, &pleof->tlv_list, CF_PDU_MAX_TLV);
     }
@@ -1150,8 +1142,8 @@ void CF_CFDP_DecodeNak(CF_DecoderState_t *state, CF_Logical_PduNak_t *plnak)
     nak = CF_DECODE_FIXED_CHUNK(state, CF_CFDP_PduNak_t);
     if (nak != NULL)
     {
-        cfdp_get_uint32(plnak->scope_start, nak->scope_start);
-        cfdp_get_uint32(plnak->scope_end, nak->scope_end);
+        CF_Codec_Load_uint32(&(plnak->scope_start), &(nak->scope_start));
+        CF_Codec_Load_uint32(&(plnak->scope_end), &(nak->scope_end));
 
         CF_CFDP_DecodeAllSegments(state, &plnak->segment_list, CF_PDU_MAX_SEGMENTS);
     }
