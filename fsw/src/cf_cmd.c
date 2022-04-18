@@ -38,9 +38,9 @@
 
 #include <string.h>
 
-#define ALL_CHANNELS 255
-#define ALL_POLLDIRS ALL_CHANNELS
-#define COMPOUND_KEY 254
+#define ALL_CHANNELS (255)
+#define ALL_POLLDIRS (ALL_CHANNELS)
+#define COMPOUND_KEY (254)
 
 /*----------------------------------------------------------------
  *
@@ -1200,8 +1200,8 @@ void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
         sizeof(CF_NoArgsCmd_t),     /* CF_DISABLE_ENGINE_CC */
     };
 
-    CFE_MSG_FcnCode_t cmd;
-    size_t            len;
+    CFE_MSG_FcnCode_t cmd = 0;
+    size_t            len = 0;
 
     CFE_MSG_GetFcnCode(&msg->Msg, &cmd);
 

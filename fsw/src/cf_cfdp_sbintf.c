@@ -64,6 +64,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
     /* if channel is frozen, do not take message */
     CF_Channel_t *          c = CF_AppData.engine.channels + t->chan_num;
     CF_Logical_PduBuffer_t *ret;
+    int32                   os_status;
 
     /* this function should not be called more than once before the message
      * is sent, so if there's already an outgoing message allocated
@@ -87,7 +88,17 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
     if (!CF_AppData.hk.channel_hk[t->chan_num].frozen && !t->flags.com.suspended)
     {
         /* first, check if there's room in the pipe for the message we want to build */
-        if (!OS_ObjectIdDefined(c->sem_id) || OS_CountSemTimedWait(c->sem_id, 0) == OS_SUCCESS)
+        if (OS_ObjectIdDefined(c->sem_id))
+        {
+            os_status = OS_CountSemTimedWait(c->sem_id, 0);
+        }
+        else
+        {
+            os_status = OS_SUCCESS;
+        }
+
+        /* Allocate message buffer on success */
+        if (os_status == OS_SUCCESS)
         {
             CF_AppData.engine.out.msg = CFE_SB_AllocateMessageBuffer(offsetof(CF_PduSendMsg_t, ph) + CF_MAX_PDU_SIZE);
         }
@@ -212,12 +223,12 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
                 {
                     if (!CF_CFDP_RecvFin(t, ph))
                     {
-                        CF_Transaction_t t;
+                        CF_Transaction_t t_finack;
 
-                        memset(&t, 0, sizeof(t));
-                        CF_CFDP_InitTxnTxFile(&t, CF_CFDP_CLASS_2, 1, chan_num,
+                        memset(&t_finack, 0, sizeof(t_finack));
+                        CF_CFDP_InitTxnTxFile(&t_finack, CF_CFDP_CLASS_2, 1, chan_num,
                                               0); /* populate transaction with needed fields for CF_CFDP_SendAck() */
-                        if (CF_CFDP_SendAck(&t, CF_CFDP_AckTxnStatus_UNRECOGNIZED, CF_CFDP_FileDirective_FIN,
+                        if (CF_CFDP_SendAck(&t_finack, CF_CFDP_AckTxnStatus_UNRECOGNIZED, CF_CFDP_FileDirective_FIN,
                                             ph->int_header.fin.cc, ph->pdu_header.destination_eid,
                                             ph->pdu_header.sequence_num) != CF_SendRet_NO_MSG)
                         {
@@ -259,7 +270,8 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
                         t->state_data.r.r2.dc = CF_CFDP_FinDeliveryCode_INCOMPLETE;
                         t->state_data.r.r2.fs = CF_CFDP_FinFileStatus_DISCARDED;
 
-                        CF_CList_InsertBack_Ex(c, (t->flags.com.q_index = CF_QueueIdx_RX), &t->cl_node);
+                        t->flags.com.q_index = CF_QueueIdx_RX;
+                        CF_CList_InsertBack_Ex(c, t->flags.com.q_index, &t->cl_node);
                         CF_CFDP_DispatchRecv(t, ph); /* will enter idle state */
                     }
                 }

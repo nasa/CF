@@ -328,14 +328,16 @@ int32 CF_Init(void)
     CFE_MSG_Init(&CF_AppData.hk.tlm_header.Msg, CFE_SB_ValueToMsgId(CF_HK_TLM_MID), sizeof(CF_AppData.hk));
     CFE_MSG_Init(&CF_AppData.cfg.tlm_header.Msg, CFE_SB_ValueToMsgId(CF_CONFIG_TLM_MID), sizeof(CF_AppData.cfg));
 
-    if ((status = CFE_EVS_Register(cf_event_filters, sizeof(cf_event_filters) / sizeof(*cf_event_filters),
-                                   CFE_EVS_EventFilter_BINARY)) != CFE_SUCCESS)
+    status = CFE_EVS_Register(cf_event_filters, sizeof(cf_event_filters) / sizeof(*cf_event_filters),
+                              CFE_EVS_EventFilter_BINARY);
+    if (status != CFE_SUCCESS)
     {
         CFE_ES_WriteToSysLog("CF app: error registering with EVS, returned 0x%08lx", (unsigned long)status);
         goto err_out;
     }
 
-    if ((status = CFE_SB_CreatePipe(&CF_AppData.cmd_pipe, CF_PIPE_DEPTH, CF_PIPE_NAME)) != CFE_SUCCESS)
+    status = CFE_SB_CreatePipe(&CF_AppData.cmd_pipe, CF_PIPE_DEPTH, CF_PIPE_NAME);
+    if (status != CFE_SUCCESS)
     {
         CFE_ES_WriteToSysLog("CF app: error creating pipe %s, returend 0x%08lx", CF_PIPE_NAME, (unsigned long)status);
         goto err_out;
@@ -343,7 +345,8 @@ int32 CF_Init(void)
 
     for (i = 0; i < (sizeof(MID_VALUES) / sizeof(MID_VALUES[0])); ++i)
     {
-        if ((status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(MID_VALUES[i]), CF_AppData.cmd_pipe)) != CFE_SUCCESS)
+        status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(MID_VALUES[i]), CF_AppData.cmd_pipe);
+        if (status != CFE_SUCCESS)
         {
             CFE_ES_WriteToSysLog("CF app: failed to subscribe to MID 0x%04lx, returned 0x%08lx",
                                  (unsigned long)MID_VALUES[i], (unsigned long)status);
@@ -351,13 +354,15 @@ int32 CF_Init(void)
         }
     }
 
-    if ((status = CF_TableInit()) != CFE_SUCCESS)
+    status = CF_TableInit();
+    if (status != CFE_SUCCESS)
     {
         /* function sends event internally */
         goto err_out;
     }
 
-    if ((status = CF_CFDP_InitEngine()) != CFE_SUCCESS)
+    status = CF_CFDP_InitEngine();
+    if (status != CFE_SUCCESS)
     {
         /* function sends event internally */
         goto err_out;
@@ -401,7 +406,7 @@ void CF_WakeUp(void)
  *-----------------------------------------------------------------*/
 void CF_ProcessMsg(CFE_SB_Buffer_t *msg)
 {
-    CFE_SB_MsgId_t msg_id;
+    CFE_SB_MsgId_t msg_id = CFE_SB_INVALID_MSG_ID;
 
     CFE_MSG_GetMsgId(&msg->Msg, &msg_id);
 

@@ -28,8 +28,8 @@
 
 #include <stddef.h>
 
-#define CF_CLIST_CONT 0 /**< \brief Constant indicating to continue traversal */
-#define CF_CLIST_EXIT 1 /**< \brief Constant indicating to stop traversal */
+#define CF_CLIST_CONT (0) /**< \brief Constant indicating to continue traversal */
+#define CF_CLIST_EXIT (1) /**< \brief Constant indicating to stop traversal */
 
 /**
  * @brief Node link structure

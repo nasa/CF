@@ -990,7 +990,8 @@ void CF_CFDP_RecvIdle(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 int32 CF_CFDP_InitEngine(void)
 {
     /* initialize all transaction nodes */
-    int                i, j;
+    int                i;
+    int                j;
     int                chunk_mem_offset = 0;
     CF_Transaction_t * t                = CF_AppData.engine.transactions;
     CF_ChunkWrapper_t *c                = CF_AppData.engine.chunks;
@@ -1005,17 +1006,19 @@ int32 CF_CFDP_InitEngine(void)
     {
         char nbuf[64];
         snprintf(nbuf, sizeof(nbuf) - 1, "%s%d", CF_CHANNEL_PIPE_PREFIX, i);
-        if ((ret = CFE_SB_CreatePipe(&CF_AppData.engine.channels[i].pipe,
-                                     CF_AppData.config_table->chan[i].pipe_depth_input, nbuf)) != CFE_SUCCESS)
+        ret = CFE_SB_CreatePipe(&CF_AppData.engine.channels[i].pipe, CF_AppData.config_table->chan[i].pipe_depth_input,
+                                nbuf);
+        if (ret != CFE_SUCCESS)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_PIPE, CFE_EVS_EventType_ERROR,
                               "CF: failed to create pipe %s, returned 0x%08lx", nbuf, (unsigned long)ret);
             goto err_out;
         }
 
-        if ((ret = CFE_SB_SubscribeLocal(CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[i].mid_input),
-                                         CF_AppData.engine.channels[i].pipe,
-                                         CF_AppData.config_table->chan[i].pipe_depth_input)) != CFE_SUCCESS)
+        ret = CFE_SB_SubscribeLocal(CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[i].mid_input),
+                                    CF_AppData.engine.channels[i].pipe,
+                                    CF_AppData.config_table->chan[i].pipe_depth_input);
+        if (ret != CFE_SUCCESS)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_SUB, CFE_EVS_EventType_ERROR,
                               "CF: failed to subscribe to MID 0x%lx, returned 0x%08lx",
@@ -1274,10 +1277,15 @@ static void CF_CFDP_TxFile_Initiate(CF_Transaction_t *t, CF_CFDP_Class_t cfdp_cl
 
     CF_CFDP_InitTxnTxFile(t, cfdp_class, keep, chan, priority);
 
+    /* Increment sequence number for new transaction */
+    ++CF_AppData.engine.seq_num;
+
+    /* Capture info for history */
     t->history->dir      = CF_Direction_TX;
-    t->history->seq_num  = ++CF_AppData.engine.seq_num;
+    t->history->seq_num  = CF_AppData.engine.seq_num;
     t->history->src_eid  = CF_AppData.config_table->local_eid;
     t->history->peer_eid = dest_id;
+
     CF_CFDP_ArmInactTimer(t);
 
     /* NOTE: whether or not class 1 or 2, get a free chunks. it's cheap, and simplifies cleanup path */
@@ -1757,7 +1765,8 @@ int CF_CFDP_CloseFiles(CF_CListNode_t *n, void *context)
  *-----------------------------------------------------------------*/
 void CF_CFDP_DisableEngine(void)
 {
-    int                        i, j;
+    int                        i;
+    int                        j;
     static const CF_QueueIdx_t CLOSE_QUEUES[] = {CF_QueueIdx_RX, CF_QueueIdx_TXA, CF_QueueIdx_TXW};
     CF_Channel_t *             c;
 

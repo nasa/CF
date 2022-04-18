@@ -27,9 +27,6 @@
 #include "cf_codec.h"
 #include "cf_events.h"
 
-#define xstr(s) str(s)
-#define str(s)  #s
-
 #include <stdint.h>
 
 typedef struct CF_Codec_BitField
@@ -39,8 +36,10 @@ typedef struct CF_Codec_BitField
 } CF_Codec_BitField_t;
 
 /* NBITS == number of bits */
-#define DECLARE_FIELD(NAME, NBITS, SHIFT) \
-    static const CF_Codec_BitField_t NAME = {.shift = (SHIFT), .mask = ((1 << NBITS) - 1)};
+#define CF_INIT_FIELD(NBITS, SHIFT)                  \
+    {                                                \
+        .shift = (SHIFT), .mask = ((1 << NBITS) - 1) \
+    }
 
 /*
  * All CFDP sub-fields are fewer than 8 bits in size
@@ -62,60 +61,60 @@ static inline void CF_FieldSetVal(uint8 *dest, uint8 shift, uint8 mask, uint8 va
  * FSV == field set val
  */
 
-#define FGV(SRC, NAME)       CF_FieldGetVal((SRC).octets, (NAME).shift, (NAME).mask)
-#define FSV(DEST, NAME, VAL) CF_FieldSetVal((DEST).octets, (NAME).shift, (NAME).mask, VAL)
+#define FGV(SRC, NAME)       (CF_FieldGetVal((SRC).octets, (NAME).shift, (NAME).mask))
+#define FSV(DEST, NAME, VAL) (CF_FieldSetVal((DEST).octets, (NAME).shift, (NAME).mask, VAL))
 
 /*
  * Fields within the "flags" byte of the PDU header
  */
-DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_VERSION, 3, 5)
-DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_TYPE, 1, 4)
-DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_DIR, 1, 3)
-DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_MODE, 1, 2)
-DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_CRC, 1, 1)
-DECLARE_FIELD(CF_CFDP_PduHeader_FLAGS_LARGEFILE, 1, 0)
+static const CF_Codec_BitField_t CF_CFDP_PduHeader_FLAGS_VERSION   = CF_INIT_FIELD(3, 5);
+static const CF_Codec_BitField_t CF_CFDP_PduHeader_FLAGS_TYPE      = CF_INIT_FIELD(1, 4);
+static const CF_Codec_BitField_t CF_CFDP_PduHeader_FLAGS_DIR       = CF_INIT_FIELD(1, 3);
+static const CF_Codec_BitField_t CF_CFDP_PduHeader_FLAGS_MODE      = CF_INIT_FIELD(1, 2);
+static const CF_Codec_BitField_t CF_CFDP_PduHeader_FLAGS_CRC       = CF_INIT_FIELD(1, 1);
+static const CF_Codec_BitField_t CF_CFDP_PduHeader_FLAGS_LARGEFILE = CF_INIT_FIELD(1, 0);
 
 /*
  * Fields within the "eid_tsn_lengths" byte of the PDU header
  */
-DECLARE_FIELD(CF_CFDP_PduHeader_LENGTHS_ENTITY, 3, 4)
-DECLARE_FIELD(CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE, 3, 0)
+static const CF_Codec_BitField_t CF_CFDP_PduHeader_LENGTHS_ENTITY               = CF_INIT_FIELD(3, 4);
+static const CF_Codec_BitField_t CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE = CF_INIT_FIELD(3, 0);
 
 /*
  * Position of the condition code value within the CC field for EOF
  */
-DECLARE_FIELD(CF_CFDP_PduEof_FLAGS_CC, 4, 4)
+static const CF_Codec_BitField_t CF_CFDP_PduEof_FLAGS_CC = CF_INIT_FIELD(4, 4);
 
 /*
  * Position of the sub-field values within the flags field for FIN
  */
-DECLARE_FIELD(CF_CFDP_PduFin_FLAGS_CC, 4, 4)
-DECLARE_FIELD(CF_CFDP_PduFin_FLAGS_DELIVERY_CODE, 1, 2)
-DECLARE_FIELD(CF_CFDP_PduFin_FLAGS_FILE_STATUS, 2, 0)
+static const CF_Codec_BitField_t CF_CFDP_PduFin_FLAGS_CC            = CF_INIT_FIELD(4, 4);
+static const CF_Codec_BitField_t CF_CFDP_PduFin_FLAGS_DELIVERY_CODE = CF_INIT_FIELD(1, 2);
+static const CF_Codec_BitField_t CF_CFDP_PduFin_FLAGS_FILE_STATUS   = CF_INIT_FIELD(2, 0);
 
 /*
  * Position of the sub-field values within the directive_and_subtype_code
  * and cc_and_transaction_status fields within the ACK PDU.
  */
-DECLARE_FIELD(CF_CFDP_PduAck_DIR_CODE, 4, 4)
-DECLARE_FIELD(CF_CFDP_PduAck_DIR_SUBTYPE_CODE, 4, 0)
-DECLARE_FIELD(CF_CFDP_PduAck_CC, 4, 4)
-DECLARE_FIELD(CF_CFDP_PduAck_TRANSACTION_STATUS, 2, 0)
+static const CF_Codec_BitField_t CF_CFDP_PduAck_DIR_CODE           = CF_INIT_FIELD(4, 4);
+static const CF_Codec_BitField_t CF_CFDP_PduAck_DIR_SUBTYPE_CODE   = CF_INIT_FIELD(4, 0);
+static const CF_Codec_BitField_t CF_CFDP_PduAck_CC                 = CF_INIT_FIELD(4, 4);
+static const CF_Codec_BitField_t CF_CFDP_PduAck_TRANSACTION_STATUS = CF_INIT_FIELD(2, 0);
 
 /*
  * Position of the sub-field values within the directive_and_subtype_code
  * and cc_and_transaction_status fields within the ACK PDU.
  */
-DECLARE_FIELD(CF_CFDP_PduMd_CLOSURE_REQUESTED, 1, 7)
-DECLARE_FIELD(CF_CFDP_PduMd_CHECKSUM_TYPE, 4, 0)
+static const CF_Codec_BitField_t CF_CFDP_PduMd_CLOSURE_REQUESTED = CF_INIT_FIELD(1, 7);
+static const CF_Codec_BitField_t CF_CFDP_PduMd_CHECKSUM_TYPE     = CF_INIT_FIELD(4, 0);
 
 /*
  * Position of the optional sub-field values within the file data PDU header
  * These are present only if the "segment metadata" flag in the common header
  * is set to 1.
  */
-DECLARE_FIELD(CF_CFDP_PduFileData_RECORD_CONTINUATION_STATE, 2, 6)
-DECLARE_FIELD(CF_CFDP_PduFileData_SEGMENT_METADATA_LENGTH, 6, 0)
+static const CF_Codec_BitField_t CF_CFDP_PduFileData_RECORD_CONTINUATION_STATE = CF_INIT_FIELD(2, 6);
+static const CF_Codec_BitField_t CF_CFDP_PduFileData_SEGMENT_METADATA_LENGTH   = CF_INIT_FIELD(6, 0);
 
 /* NOTE: get/set will handle endianess */
 /*
@@ -135,7 +134,7 @@ static inline void CF_Codec_Store_uint8(CF_CFDP_uint8_t *pdst, uint8 val)
 {
     pdst->octets[0] = val;
 }
-#define cfdp_set_uint8(dst, src) CF_Codec_Store_uint8(&(dst), src)
+#define cfdp_set_uint8(dst, src) (CF_Codec_Store_uint8(&(dst), src))
 
 /*----------------------------------------------------------------
  *
@@ -150,7 +149,7 @@ static inline void CF_Codec_Store_uint16(CF_CFDP_uint16_t *pdst, uint16 val)
     val >>= 8;
     pdst->octets[0] = val & 0xFF;
 }
-#define cfdp_set_uint16(dst, src) CF_Codec_Store_uint16(&(dst), src)
+#define cfdp_set_uint16(dst, src) (CF_Codec_Store_uint16(&(dst), src))
 
 /*----------------------------------------------------------------
  *
@@ -169,7 +168,7 @@ static inline void CF_Codec_Store_uint32(CF_CFDP_uint32_t *pdst, uint32 val)
     val >>= 8;
     pdst->octets[0] = val & 0xFF;
 }
-#define cfdp_set_uint32(dst, src) CF_Codec_Store_uint32(&(dst), src)
+#define cfdp_set_uint32(dst, src) (CF_Codec_Store_uint32(&(dst), src))
 
 /*----------------------------------------------------------------
  *
@@ -196,7 +195,7 @@ static inline void CF_Codec_Store_uint64(CF_CFDP_uint64_t *pdst, uint64 val)
     val >>= 8;
     pdst->octets[0] = val & 0xFF;
 }
-#define cfdp_set_uint64(dst, src) CF_Codec_Store_uint64(&(dst), src)
+#define cfdp_set_uint64(dst, src) (CF_Codec_Store_uint64(&(dst), src))
 
 /*----------------------------------------------------------------
  *
@@ -209,7 +208,7 @@ static inline void CF_Codec_Load_uint8(uint8 *pdst, const CF_CFDP_uint8_t *psrc)
 {
     *pdst = psrc->octets[0];
 }
-#define cfdp_get_uint8(dst, src) CF_Codec_Load_uint8(&(dst), &(src))
+#define cfdp_get_uint8(dst, src) (CF_Codec_Load_uint8(&(dst), &(src)))
 
 /*----------------------------------------------------------------
  *
@@ -228,7 +227,7 @@ static inline void CF_Codec_Load_uint16(uint16 *pdst, const CF_CFDP_uint16_t *ps
 
     *pdst = val;
 }
-#define cfdp_get_uint16(dst, src) CF_Codec_Load_uint16(&(dst), &(src))
+#define cfdp_get_uint16(dst, src) (CF_Codec_Load_uint16(&(dst), &(src)))
 
 /*----------------------------------------------------------------
  *
@@ -251,7 +250,7 @@ static inline void CF_Codec_Load_uint32(uint32 *pdst, const CF_CFDP_uint32_t *ps
 
     *pdst = val;
 }
-#define cfdp_get_uint32(dst, src) CF_Codec_Load_uint32(&(dst), &(src))
+#define cfdp_get_uint32(dst, src) (CF_Codec_Load_uint32(&(dst), &(src)))
 
 /*----------------------------------------------------------------
  *
@@ -282,7 +281,7 @@ static inline void CF_Codec_Load_uint64(uint64 *pdst, const CF_CFDP_uint64_t *ps
 
     *pdst = val;
 }
-#define cfdp_get_uint64(dst, src) CF_Codec_Load_uint64(&(dst), &(src))
+#define cfdp_get_uint64(dst, src) (CF_Codec_Load_uint64(&(dst), &(src)))
 
 /*----------------------------------------------------------------
  *
@@ -361,7 +360,6 @@ uint8 CF_CFDP_GetValueEncodedSize(uint64 Value)
     uint8  MinSize;
     uint64 Limit = 0x100;
 
-    Limit = 0x100;
     for (MinSize = 1; MinSize < 8 && Value >= Limit; ++MinSize)
     {
         Limit <<= 8;

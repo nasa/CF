@@ -53,7 +53,7 @@
 /**
  * \brief Debug build assert
  */
-#define CF_Assert(x) assert(x)
+#define CF_Assert(x) (assert(x))
 
 #else                /* CF_DEBUG_BUILD */
 

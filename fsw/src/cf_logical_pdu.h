@@ -55,7 +55,7 @@
  * Without filestore requests, use of TLV is pretty limited.
  *
  */
-#define CF_PDU_MAX_TLV 4
+#define CF_PDU_MAX_TLV (4)
 
 /**
  * @brief Maximum number of segment requests in a single PDU
@@ -63,7 +63,7 @@
  * Sets an upper bound on the logical structures for the most possible
  * segment structures in a single PDU.
  */
-#define CF_PDU_MAX_SEGMENTS CF_NAK_MAX_SEGMENTS
+#define CF_PDU_MAX_SEGMENTS (CF_NAK_MAX_SEGMENTS)
 
 /**
  * @brief Type for logical file size/offset value

@@ -30,9 +30,9 @@
  * \{
  */
 
-#define CF_CMD_MID     0x18B3 /**< \brief Message ID for commands */
-#define CF_SEND_HK_MID 0x18B4 /**< \brief Message ID to request housekeeping telemetry */
-#define CF_WAKE_UP_MID 0x18B5 /**< \brief Message ID for waking up the processing cycle */
+#define CF_CMD_MID     (0x18B3) /**< \brief Message ID for commands */
+#define CF_SEND_HK_MID (0x18B4) /**< \brief Message ID to request housekeeping telemetry */
+#define CF_WAKE_UP_MID (0x18B5) /**< \brief Message ID for waking up the processing cycle */
 
 /**\}*/
 
@@ -41,8 +41,8 @@
  * \{
  */
 
-#define CF_HK_TLM_MID     0x08B0 /**< \brief Message ID for housekeeping telemetry */
-#define CF_CONFIG_TLM_MID 0x08B2 /**< \brief Message ID for configuration telemetry */
+#define CF_HK_TLM_MID     (0x08B0) /**< \brief Message ID for housekeeping telemetry */
+#define CF_CONFIG_TLM_MID (0x08B2) /**< \brief Message ID for configuration telemetry */
 
 /**\}*/
 
