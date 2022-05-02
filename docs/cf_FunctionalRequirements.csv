@@ -1,0 +1,171 @@
+Summary,Custom field (Requirement ID),Description,Custom field (Requirement Rationale)
+CF1000,CF1000,"When CF receives a ""No-Op"" command, CF shall increment the ""CF Valid-Command Counter"" and issue a cFE event message.",CF application is a cFS compliant component that must implement the cFS architectural patterns. The No-Op command allows operational checks on the end-to-end CF command and telemetry paths.
+CF1001,CF1001,"When a ""Reset-Counters"" command is received, CF shall set the command-specified ""housekeeping counters"" to a value of zero.",cFS architectural pattern for application operational interfaces. Allows for partial or full resetting of housekeeping counters. All reset operations should be observable.
+CF1002,CF1002,"If a command's header-specified length is not equal to the expected command length, CF shall reject the command.","For robust and secure operations, command must be validated prior to execution. Basic command verification in the event of SEU or memory corruption. "
+CF1003,CF1003,"When CF receives a valid command, CF shall increment the ""CF Valid-Command Counter"" and issue a ""Command Received"" cFE event message. ",Support an operational interface to provide operator feedback. 
+CF1004,CF1004,"When CF receives a command, if the command is not valid, CF shall reject the command.","For robust and secure operations, invalid commands must be rejected and not executed."
+CF1004.1,CF1004.1,"When CF receives a command, CF shall check that the command is valid before execution.","For robust and secure operations, commands and their parameters must be validated prior to execution"
+CF1004.2,CF1004.2,"When CF rejects a command, CF shall issue a ""Command Rejected"" error event message and increment the ""CF Command Rejected"" Counter.","Provide operator feedback; operators need to be made aware of command rejection both in real-time through cFS event messages and through HouseKeeping telemetry through counters."
+CF2000,CF2000,"When CF receives a CFDP receive-file protocol-directive PDU, CF shall process the file transfer request according to the directive-specified CFDP Mode, ""Unacknowledged"" Class-1 Service or ""Acknowledged"" Class-2 Service. ",Basic file transfer function that specifies the CFDP classes that shall be implemented.
+CF2001,CF2001,CF shall extract uplinked CFDP PDUs from cFE-SB messages.,CF application is a cFS compliant component that must implement the cFS architectural patterns
+CF2002,CF2002,CF shall extract file data from File-Data PDUs and reconstruct an identical copy of the extracted file from the meta-data-specified directory.,Basic CFDP function with fault handling defined in sub requirements
+CF2002.1,CF2002.1,"If CF detects that a ""fault"" has occurred, CF shall cancel the transaction and issue an ""Error"" cFE event message.","For robust and secure operations, errors in execution must be detected and handled with appropriate constraints on resource use and state machine  iterations"
+CF2002.1.2,CF2002.1.2,"CF shall detect the following scenarios and identify them as faults:
+1. Positive Ack Limit Reached
+2. Filestore Rejection
+3. File-CRC Mismatch Failure
+4. File-Size Error
+5. NAK Limit Reached
+6. Inactivity Limit Reached
+7. Suspend Request Received""","CF2002.1, CFDP-1S-18 Filestore procedures 4.9"
+CF3000,CF3000,"When CF receives a ""Transfer File"" command, CF shall play back the file indicated by the command-specified: filename, source path, destination path, keep/delete flag, service class, priority, channel, and peer-entity id. ","Also referred to as ""playback file"" command. Basic function of file transfer required to operate cFS flight systems. "
+CF3000.1,CF3000.1,"When CF receives a ""Transfer File"" command, if the command-specified is open, CF reject the command.",Open files are in a uncertain state and may change during transfer potential containing erroneous data or cause other undefined behaviors
+CF3000.3,CF3000.3,"When CF receives a ""Transfer File"" command, if the command-specified file is not found, CF shall reject the command.","For robust and secure operations, command must be validated prior to execution. Provides operational interface as to why the command was not executed."
+CF3000.4,CF3000.4,"When CF receives a ""Transfer File"" command, if the playback-pending queue is full, CF shall reject the command.","For robust and secure operations, command must be validated prior to execution. Provides operational interface as to why the command was not executed. Filterable is required to avoid multiple events when commands are sequenced."
+CF3000.5,CF3000.5,"When CF receives a ""Transfer File"" command, if the command-specified playback-channel number is not valid, CF shall reject the command.","For robust and secure operations, command must be validated prior to execution"
+CF3000.6,CF3000.6,"When CF receives a ""Transfer File"" command, if the command-specified CFDP class is neither Class 1 nor Class 2, CF shall reject the command.",CF App only supports Class 1 and Class 2 CFDP requests
+CF3001,CF3001,"When CF receives a ""Playback Directory"" command, CF shall play back all the files inside the command-specified directory as indicated by the command-specified service class, priority, destination path, keep/delete flag, channel, and peer-entity id.",Operational interface to support automation of file transfer. Interface excludes subdirectories to reduce complexity of implementation. Note the 
+CF3001.1,CF3001.1,"While CF is playing back multiple files, if the next file to be transferred is open, CF shall skip its transfer and issue an error event message. ",Open files are in a uncertain state and may change during transfer potential containing erroneous data.  Note this requirement is different than CF3000.1 in that this is determined at time of playback not at command receipt.
+CF3001.3,CF3001.3,"When CF receives a ""Playback Directory"" command, if the command-specified directory is not found, CF shall reject the command.","For robust and secure operations, command must be validated prior to execution. Provides operational interface as to why the command was not executed."
+CF3001.5,CF3001.5,"When CF receives a ""Playback Directory"" command, if the playback-pending queue is full, CF shall reject the command.","For robust and secure operations, constraints on resource violations must be checked and reported."
+CF3001.6,CF3001.6,"When CF receives a ""Playback Directory"" command, if the command-specified playback channel number is not valid, CF shall reject the command.",Support an operational interface to provide operator feedback when commands are malformed.
+CF3001.7,CF3001.7,"When CF receives a ""Playback Directory"" command, if the command-specified class number is not valid, CF shall reject the command.",Basic requirement to check parameters for reliable and secure operations. 
+CF3005,CF3005,CF shall encapsulate and publish CFDP-PDUs as cFE-SB messages.,CF application is a cFS compliant component that must implement the cFS architectural patterns. Each channel's MID should be unique to that channel. The intent is to allow different communication interfaces to subscribe to a selected channel and manage it independently
+CF3005.1,CF3005.1,Each CF channel shall have a unique cFE-SB Message ID.,"Playback channels may have different message routes to destination. In cFS, the Message ID provides that routing identifier. Unique cFE-SB Message IDs can avoid data corruption and memory problems. "
+CF3005.1.1,CF3005.1.1,The CF-channel cFE-SB Message IDs shall be specified in a CF configuration table.,"Run-time configuration table supports ease of deployment, operation maintenance, fault management, and data path configuration."
+CF3006,CF3006,The PDU output rate shall be controllable from outside the CF Application.,"As a data source in a real-time resourced constrained system, CF must not send more data than the receiver can reliably process or forward"
+CF3007,CF3007,"While there are multiple transactions in the playback-pending queue for a given channel, CF shall wait for the ""EOF Sent"" marker on the file currently being played back before starting playback for the next file in the queue. ","Provides predictable file-in-order delivery. This does not imply that the ""EOF Sent"" has been acknowledged by the receiving peer entity.
+
+Although CCSDS 3.1.2 says ""The CFDP entity shall be implemented such that virtually any number of transactions may be concurrently in various stages of transmission or reception at a single CFDP entity."" this number must be constrained for performance."
+CF3008,CF3008,"While there is no playback in progress, CF shall check the playback-pending channel queue for files at the configuration-table-defied frequency.",Supports automation of playback queuing
+CF3009,CF3009,The CF channel playback-pending-queue depth shall be configurable.,Supports recovery of file transfer operations to a known configuration and state
+CF3010,CF3010,The CF file-transfer history-queue depth shall be configurable.,Operational interface to support user knowledge of which files have been transferred and in what order. 
+CF4000,CF4000,The number of CF channels shall be defined by a CF configuration table.,Table-defined configurations support cFS architecture goals of scalability and reconfiguration of mission variability points
+CF4000.1,CF4000.1,CF-channel parameters shall be defined by a CF configuration table.,Table-defined configurations support cFS architecture goals of scalability and reconfiguration of mission variability points
+CF4000.1.1,CF4000.1.1,"The ""CF Channel Configuration Table"" shall define the following parameters:
+-- Channel parameters (repeated for each playback channel)
+1. Dequeue Enable 
+2. Downlink PDU MID
+3. Pending Queue Depth
+4. History Queue Depth
+5. Channel Name
+6. Handshake Semaphore Name
+-- Polling Directory Parameters (repeated for each polling directory)
+7. Enable State
+8. CFDP Class
+9. Priority
+10. Source Path
+11. Destination Path
+12. Preserve file
+13. Peer Entity Id
+-- Input channel parameters (repeated for each input channel)
+14. Input PDU MID
+15. Class 2 Uplink Response Channel ","Playback/output channels are defined as paths to a destination. Each path has a separate configuration space with parameters for priority, bandwidth throttling, peer entity ID, Handshake Semaphore Name (mechanism for PDU Output rate), etc."
+CF4000.2,CF4000.2,Each CF channel shall have a dedicated and independent pending queue. ,"Playback channels should be independent to avoid one channels from stalling another channel.
+
+The channel dictates the SB MsgId / Apid that the playback data PDUs will be generated with. Separate queues also helps when the one channel is throttled - e.g. if there are two channels and one is slow and one is faster, a playback requests to the slow channel may block the faster channel if they shared a single pending queue."
+CF4001,CF4001,"When CF receives an ""Enable Polling"" command, CF shall enable poll-directory processing.",Operational interface
+CF4001.1,CF4001.1,CF Polling Directories shall be polled for files at the configuration-table-defined frequency.,Operational interface to support optimization of resource utilization and file transfer bandwidth
+CF4001.2.1,CF4001.2.1,CF shall send all files in the polling directory at the configuration-table-specified priority level.,Operational interface for resource management
+CF4001.3,CF4001.3,"When CF receives a ""Disable Polling"" command, CF shall disable poll-directory processing.",Operational Interface
+CF5000,CF5000,"When CF receives a ""Freeze Channel"" command, CF shall disable the command-specified channel.","Operational interface that halts all transactions at their current state. (timers, suspend, etc.) Typically used for contact scheduling "
+CF5000.1,CF5000.1,"When CF receives a ""Freeze Channel"" command, CF shall pause all in-progress transactions for the command-specified channel.",Ensure command is applied immediately
+CF5000.2,CF5000.2,"While a channel is frozen, when a new transaction is received for that channel, CF shall not process that transaction.",A frozen channel cannot receive new transactions 
+CF5001,CF5001,"When CF receives a ""Thaw Channel"" command, CF shall re-enable the command-specified channel.",Operational Interface
+CF5001.1,CF5001.1,"When CF receives a ""Thaw Channel"" command, CF shall resume processing all paused transactions for the command-specified channel.","Operational interface that resumes all transactions at their current state. (timers, suspend,…) Typical used for contact scheduling"
+CF5002,CF5002,"The following parameters shall be configurable by a CF command:
+1. CFDP channel Ack-Timer Value (seconds)
+2. CFDP channel NAK-Timer Value (seconds)  
+3. CFDP channel Inactivity-Timeout Value (seconds) 
+4. CFDP channel Ack-Timer Value (seconds) 
+5. CFDP channel Maximum Ack Timeouts (integer counts)
+6. CFDP channel Maximum NAK Timeouts (integer counts)","Operational interface to support mission variability and reconfiguration
+"
+CF5002.1,CF5002.1,"The default values for the CFDP channel protocol parameters below shall be defined by a CF Configuration Table:
+1. CFDP channel Ack-Timer Value (seconds)
+2. CFDP channel NAK-Timer Value (seconds)  
+3. CFDP channel Inactivity-Timeout Value (seconds) 
+4. CFDP channel Ack-Timer Value (seconds) 
+5. CFDP channel Maximum Ack Timeouts (integer counts)
+6. CFDP channel Maximum NAK Timeouts (integer counts)",Ensure CF starts in a known and valid operational state
+CF5002.2,CF5002.2,"When CF receives a ""Set CFDP Channel Protocol Configuration"" command, CF shall set the command-specified parameter to the command-specified value and issue a cFE event message that confirms the change. ",Operational Interface
+CF5002.3,CF5002.3,"When CF receives a ""Set CFDP Channel Protocol Configuration"" command,  if the command-specified parameter is invalid, CF shall reject the command.  ",Command validity check for robust operation
+CF5002.4,CF5002.4,"When CF receives a ""Set CFDP Channel Protocol Configuration"" command,  if the command-specified parameter *value* is invalid, CF shall reject the command.",Command validity check for robust operation
+CF5003,CF5003,"When CF receives a ""Get CFDP Channel-Protocol Configuration Parameter"" command, CF shall issue an event message containing the current value of the command-specified configuration-table parameter.",Operational interface 
+CF5003.1,CF5003.1,"When CF receives a ""Get CFDP Channel-Protocol Configuration Parameter"" command, if the command-specified parameter is invalid, CF shall reject the command. ",Operational robustness
+CF5004,CF5004,"When CF receives a ""Get Full CFDP Channel-Protocol Configuration"" command, CF shall publish all CFDP Channel Protocol Configuration parameters to a cFS-SB message. ",Compatibility with cFE App behavior. Message can be downlinked as Housekeeping Data or sent to another app for consumption
+CF5005,CF5005,"When CF receives a ""Cancel Transaction"" command, CF shall cancel the transaction indicated by the command-specified Entity ID and transaction-sequence number.",Support an operational interface to control transactions. Transaction-Id provides a mechanism to scale to large systems and avoid performance issues with string searches
+CF5005.1,CF5005.1,"When CF receives a ""Cancel Transaction"" command, if the command-specified transaction is not in progress, CF shall reject the command.",Support an operational interface to provide operator feedback.
+CF5006,CF5006,"When CF receives an ""Abandon Transaction"" command, CF shall abandon the command-specified transaction.",Support an operational interface to provide operator feedback.
+CF5006.1,CF5006.1,"When CF receives an ""Abandon Transaction"" command, if the command-specified transaction is not in progress, CF shall reject the command.",Support an operational interface to provide operator feedback.
+CF5007,CF5007,"When CF receives an ""Abandon All Transactions"" command, CF shall abandon all transactions.",Operational interface that removes transaction state for all active transaction. 
+CF5007.1,CF5007.1,"When CF receives an ""Abandon All Transactions"" command, if there are no transactions in progress, CF shall reject the command.",Support an operational interface to provide operator feedback.
+CF5009,CF5009,"When CF receives a ""Write Active Transactions"" command, CF shall write all active transactions to a file. ",Operational interface supporting operator insight into transfer sequence and state
+CF5012,CF5012,The CF maximum-uplink PDU size shall be defined and configured at compile time.,Support constraints for security checks and resource utilization.
+CF5013,CF5013,The CF maximum number of simultaneous per-channel transactions shall be defined and configured at compile time. ,Channel concept extended to allow independent operations when other channels may be blocked due to maximum transactions
+CF5014,CF5014,The CF maximum per-channel downlink-PDU size shall be defined and configured at compile time.,Support constraints for security checks and resource utilization. Allows the PDU size to be optimized for the channel communications stack (MTU for transport and data link)
+CF5015,CF5015,"When CF receives a ""Cancel All Transactions"" command, CF shall cancel all in-progress transactions.","Support an operational interface to control transactions.  ""All"" provides an interface to cancel transactions without having knowledge of each individual transaction number. Especially useful when there may be hundreds or thousands of transactions in progress."
+CF5015.1,CF5015.1,"When CF receives ""Cancel *All* Transactions"" command, if there are no transactions in progress, CF shall reject the command.",Support an operational interface to provide operator feedback.
+CF5016,CF5016,"When CF receives a ""Suspend Transaction"" command, if the command-specified transaction is not in progress, CF shall reject the command. ",Support an operational interface to provide operator feedback.
+CF5016.1,CF5016.1,"When CF receives a ""Suspend Transaction"" command, if the command-specified transaction is not in progress, CF shall reject the command. ",Support an operational interface to provide operator feedback.
+CF5017,CF5017,"When CF receives a ""Suspend All Transactions"" command, CF shall suspend all in-progress transactions.",Operational interface to align file transfer with communications contact schedule.
+CF5017.1,CF5017.1,"When CF receives a ""Suspend All Transactions"" command, if no transactions are in progress, CF shall reject the command.  ",Support an operational interface to provide operator feedback.
+CF5018,CF5018,"When CF receives a ""Resume Transaction"" command, CF shall resume the command-specified suspended transaction",Operational interface to resume normal operations without knowing which files are suspended
+CF5018.1,CF5018.1,"When CF receives a ""Resume Transaction"" command, if the command-specified transaction is not suspended, CF shall reject the command. ",Operational interface
+CF5019,CF5019,"When CF receives a ""Resume *All* Transactions"", CF shall resume all suspended transactions",Operational interface to resume normal operations without knowing which files are suspended
+CF5019.1,CF5019.1,"When CF receives a ""Resume ALL Transactions"", if there are no suspended transactions, CF shall reject the command. ",Ensure robust operations and provide operator feedback.
+CF5020,CF5020,"When CF receives a ""Purge Queue"" command, CF shall purge the command-specified queue for the command-specified output channel. ",Support an operational interface to provide operator feedback.
+CF5020.1,CF5020.1,"When CF receives a ""Purge Queue"" command, if the command-specified queue is not defined, CF shall reject the command.",Ensure robust operations and provide operator feedback.
+CF5020.2,CF5020.2,"When CF receives a ""Purge Queue"" command, if the command-specified channel is not defined, CF shall reject the command. ",Ensure robust operations and provide operator feedback.
+CF5021,CF5021,"When CF receives a ""Write Queue"" command, CF shall write the command-specified queue's contents to the command-specified file.",Operational interface to allow insight into file transfer order. 
+CF5021.1,CF5021.1,"When CF receives a ""Write Queue"" command, if the command-specified queue is not defined, CF shall reject the command. ",Ensure robust operations and provide operator feedback.
+CF5022,CF5022,"When CF receives a ""De-Queue File"" command, CF shall remove the command-specified file from its current queue.",Support an operational interface to provide operator feedback.
+CF5022.1,CF5022.1,"When CF receives a ""De-Queue File"" command, if the command-specified file is not found, CF shall reject the command. ",Ensure robust operations and provide operator feedback.
+CF5023,CF5023,"The maximum number of transmissions, that is, the sum of simultaneous transmit and receive transactions, shall be defined at compile time.",Supports scaling resource use for mission variability
+CF5024,CF5024,"When CF receives a file-transfer request, if the requested file's size is larger than 2^32 bytes, CF shall reject the request and issue an error event message.",Constrain resources use and exclude implementation complexity of CCSDS  Large-file-size header extensions. CFDP-1S-01
+CF5030,CF5030,Each CF output channel shall have 256 file-transfer priority levels.,Priority levels are used to control the order of file transfer PDUs within a channel. Priority levels allow the control of PDU interleaving in a output channel and prevent a lower-priority transfer from blocking a high-priority operational transfer. 256 priority levels provide a high-level of granularity in the compact space of 1 byte.
+CF5030.1,CF5030.1,The CF file-transfer priority levels shall be configurable.,Allow for flexibility in configuration and operation.
+CF5030.2,CF5030.2,The highest file-transfer priority level shall be zero.,Standardized interface. If the number of levels increases or decreases the highest priority will always be the same
+CF5031,CF5031,CF shall send NAK re-transmissions in the order received at the same priority as the NAK-targeted file,PDU re-transmission priority should be the same as the original request. To not do so would allow a form of priority inversion where a large number of NAKs on a lower priority transfer would suppress re-transmission of higher priority transfers.
+CF5040,CF5040,"CF shall support CFDP file transfers in ""Unacknowledged""(Class-1) Service Mode.","Basic file transfer function. Unacknowledged Mode, also called unreliable mode, is used for non-critical data or operations without bi-directional data paths."
+CF5041,CF5041,"CF shall support CFDP file transfer in ""Acknowledged"" (Class-2) Service, Mode.","Basic file transfer function. Acknowledged Mode, also called reliable mode, is used for critical data and/or operations with bi-directional data paths."
+CF6000,CF6000,"The CF Housekeeping message shall include
+1. Command Counter
+2. Command Error Counter
+3. Playback-Pending Queue State
+-- Per-Channel HouseKeeping Entries (repeated for each channel) --
+4. Number of files on Playback-Pending Queue
+5. Frozen Status
+6. Number of Valid PDUs Received
+7. Number of Receive-Transaction Errors
+8. Number of Sent PDUs 
+9. Number of Ack Timer-Limit Faults
+10. Number of NAK Timer-Limit Faults
+11. Number of Inactivity Timer-Limit Faults
+12. Number of CRC Mismatch Faults
+13. Number of Filestore Rejection Faults
+14. Number of Filesize Error Faults
+15. Number of Cancel Request Faults
+",Operator interface that provides detailed status on operational state
+CF7000,CF7000,"When CF is initialized, CF shall initialize the following data as specified below:
+1. Command Counter = 0
+2. Command Error Counter = 0
+3. Playback-Pending Queue State = enabled
+-- Per-Channel HK Entries (repeated for each channel) --
+4. Number of files on Playback-Pending Queue = 0
+5. Frozen Status = ""thawed""
+6. Number of Valid PDUs Received = 0
+7. Number of Receive-Transaction Errors = 0
+8. Number of Sent PDUs = 0
+9. Number of Ack Timer-Limit Faults = 0
+10. Number of NAK Timer-Limit Faults = 0
+11. Number of Inactivity Timer-Limit Faults = 0
+12. Number of CRC Mismatch Faults = 0
+13. Number of Filestore Rejection Faults = 0
+14. Number of Filesize Error Faults = 0
+15. Number of Cancel Request Faults = 0",All variable must be set to a known valid state on initialization to support reliable functioning
+CF7001,CF7001,"When CF is initialized, CF shall load valid CF Configuration Tables.",All variables must be set to a known valid state on initialization to support reliable functioning. Table interface supports operational reconfiguration of CF functions.
+CF7001.1,CF7001.1,"If a CF Configuration Table fails validation, CF shall issue an error cFE event message and exit.",Support constraints for security checks and resource utilization. Without a valid configuration CF can not initialize to a functional state. 
+CF7001.1.1,CF7001.1.1,CF shall validate all parameters in CF configuration tables,Support constraints for security checks and resource utilization. Without a valid configuration CF can not initialize to a functional state. This is a critical failure that can not be corrected using a file upload. 
+CF8000,CF8000,"When CF receives an ""Initialize Engine"" command, CF shall enable the CFDP engine and re-load its configuration.",Supports operator interface to disable operations due to misconfiguration and other faults
+CF8001,CF8001,"When CF receives a ""Disable Engine"" command, CF shall disable the CFDP engine and reset its state.",Supports operator interface to disable operations due to misconfiguration and other faults
