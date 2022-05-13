@@ -237,7 +237,7 @@ void Test_CF_CRC_Digest_Update_c_result_TheNumberOfTimes_index_Reaches4(void)
     /* Arrange */
     CF_Crc_t     dummy_c;
     CF_Crc_t *   arg_c = &dummy_c;
-    const uint8 *arg_data;
+    uint8 *      arg_data;
     int32        arg_len;
     uint32       dummy_c_working;
     int          i = 0;
@@ -253,7 +253,9 @@ void Test_CF_CRC_Digest_Update_c_result_TheNumberOfTimes_index_Reaches4(void)
                           // change when more is learned about what len is supposed to be
 
     arg_data = malloc((size_t)arg_len);
-    AnyBufferOf_uint8_WithSize((uint8 *)arg_data, arg_len);
+    memset(arg_data, 0, arg_len);
+
+    AnyBufferOf_uint8_WithSize(arg_data, arg_len);
 
     dummy_c_working   = arg_c->working;
     expected_c_result = arg_c->result;

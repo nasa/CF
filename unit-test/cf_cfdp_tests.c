@@ -192,6 +192,7 @@ void Test_CF_CFDP_CF_CFDP_EncodeStart(void)
     CF_Logical_PduBuffer_t pdubuf;
 
     memset(&msg, 0xEE, sizeof(msg));
+    memset(&enc, 0, sizeof(enc));
 
     /* nominal */
     /* This should deduct for the size of the SB header, but
@@ -223,6 +224,7 @@ void Test_CF_CFDP_CF_CFDP_DecodeStart(void)
     CF_Logical_PduBuffer_t pdubuf;
 
     memset(&msg, 0xEE, sizeof(msg));
+    memset(&dec, 0, sizeof(dec));
 
     /* nominal */
     /* This should deduct for the size of the SB header, but

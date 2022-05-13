@@ -1764,7 +1764,7 @@ void Test_CF_Chunks_Init_SetGiven_chunks_max_chunks_ToGiven_max_chunks(void)
     CF_ChunkIdx_t   arg_max_chunks = 14;
     CF_Chunk_t      arg_chunks_mem[14];
 
-    arg_chunks->count = 0;
+    memset(&dummy_chunks, 0, sizeof(dummy_chunks));
 
     /* Act */
     CF_ChunkListInit(arg_chunks, arg_max_chunks, arg_chunks_mem);

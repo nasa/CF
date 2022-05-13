@@ -730,7 +730,7 @@ void AnyRandomStringOfLettersOfLengthCopy(char *random_string, size_t length)
 {
     size_t i;
 
-    for (i = 0; i < length; ++i)
+    for (i = 0; i < (length - 1); ++i)
     {
         int value = 65 + (rand() % 26); /* ASCII 65 to 91 */
 
