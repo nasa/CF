@@ -1424,6 +1424,8 @@ void CF_CFDP_ProcessPlaybackDirectory(CF_Channel_t *c, CF_Playback_t *p)
     os_dirent_t dirent;
     /* either there's no transaction (first one) or the last one was finished, so check for a new one */
 
+    memset(&dirent, 0, sizeof(dirent));
+
     while (p->diropen && (p->num_ts < CF_NUM_TRANSACTIONS_PER_PLAYBACK))
     {
         int32 status;
