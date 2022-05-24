@@ -9,15 +9,14 @@ CF1004.2,CF1004.2,"When CF rejects a command, CF shall issue a ""Command Rejecte
 CF2000,CF2000,"When CF receives a CFDP receive-file protocol-directive PDU, CF shall process the file transfer request according to the directive-specified CFDP Mode, ""Unacknowledged"" Class-1 Service or ""Acknowledged"" Class-2 Service. ",Basic file transfer function that specifies the CFDP classes that shall be implemented.
 CF2001,CF2001,CF shall extract uplinked CFDP PDUs from cFE-SB messages.,CF application is a cFS compliant component that must implement the cFS architectural patterns
 CF2002,CF2002,CF shall extract file data from File-Data PDUs and reconstruct an identical copy of the extracted file from the meta-data-specified directory.,Basic CFDP function with fault handling defined in sub requirements
-CF2002.1,CF2002.1,"If CF detects that a ""fault"" has occurred, CF shall cancel the transaction and issue an ""Error"" cFE event message.","For robust and secure operations, errors in execution must be detected and handled with appropriate constraints on resource use and state machine  iterations"
+CF2002.1,CF2002.1,"If CF detects that a ""fault"" has occurred, CF shall close out the transaction and issue an ""Error"" cFE event message.","For robust and secure operations, errors in execution must be detected and handled with appropriate constraints on resource use and state machine iterations.  ""Close out"" is intentionally vague since the action needs to be appropriate for the transmission class.  As long as the transaction doesn't hang and become stale the requirement is met.  Note ""cancel"" is overly specific, there's a cancel transaction command that is different than what is done here."
 CF2002.1.2,CF2002.1.2,"CF shall detect the following scenarios and identify them as faults:
 1. Positive Ack Limit Reached
 2. Filestore Rejection
 3. File-CRC Mismatch Failure
 4. File-Size Error
 5. NAK Limit Reached
-6. Inactivity Limit Reached
-7. Suspend Request Received""","CF2002.1, CFDP-1S-18 Filestore procedures 4.9"
+6. Inactivity Limit Reached",Fault scenarios explicitly listed and tested for specification compliance.
 CF3000,CF3000,"When CF receives a ""Transfer File"" command, CF shall play back the file indicated by the command-specified: filename, source path, destination path, keep/delete flag, service class, priority, channel, and peer-entity id. ","Also referred to as ""playback file"" command. Basic function of file transfer required to operate cFS flight systems. "
 CF3000.1,CF3000.1,"When CF receives a ""Transfer File"" command, if the command-specified is open, CF reject the command.",Open files are in a uncertain state and may change during transfer potential containing erroneous data or cause other undefined behaviors
 CF3000.3,CF3000.3,"When CF receives a ""Transfer File"" command, if the command-specified file is not found, CF shall reject the command.","For robust and secure operations, command must be validated prior to execution. Provides operational interface as to why the command was not executed."
@@ -42,25 +41,26 @@ CF3009,CF3009,The CF channel playback-pending-queue depth shall be configurable.
 CF3010,CF3010,The CF file-transfer history-queue depth shall be configurable.,Operational interface to support user knowledge of which files have been transferred and in what order. 
 CF4000,CF4000,The number of CF channels shall be defined by a CF configuration table.,Table-defined configurations support cFS architecture goals of scalability and reconfiguration of mission variability points
 CF4000.1,CF4000.1,CF-channel parameters shall be defined by a CF configuration table.,Table-defined configurations support cFS architecture goals of scalability and reconfiguration of mission variability points
-CF4000.1.1,CF4000.1.1,"The ""CF Channel Configuration Table"" shall define the following parameters:
--- Channel parameters (repeated for each playback channel)
-1. Dequeue Enable 
-2. Downlink PDU MID
-3. Pending Queue Depth
-4. History Queue Depth
-5. Channel Name
-6. Handshake Semaphore Name
--- Polling Directory Parameters (repeated for each polling directory)
-7. Enable State
-8. CFDP Class
-9. Priority
-10. Source Path
-11. Destination Path
-12. Preserve file
-13. Peer Entity Id
--- Input channel parameters (repeated for each input channel)
-14. Input PDU MID
-15. Class 2 Uplink Response Channel ","Playback/output channels are defined as paths to a destination. Each path has a separate configuration space with parameters for priority, bandwidth throttling, peer entity ID, Handshake Semaphore Name (mechanism for PDU Output rate), etc."
+CF4000.1.1,CF4000.1.1,"The ""CF Configuration Table"" shall include the following parameters:
+-- Engine parameter(s)
+1. Local entity ID
+-- Channel parameters (per-channel)
+2. Dequeue Enable 
+3. Transmit PDU MID
+4. Receive PDU MID
+5. Handshake Semaphore Name
+6. Acknowledge timer limit
+7. Non-acknowledge timer limit
+8. Acknowledge retry limit
+9. Non-acknowledge retry limit
+10. Inactivity timer limit
+-- Polling Directory Parameters (per-polling directory)
+11. Enable State
+12. CFDP Class
+13. Priority
+14. Source Path
+15. Destination Path
+16. Peer Entity Id","Engine, channel, and polling directory configuration parameters for operational flexibility."
 CF4000.2,CF4000.2,Each CF channel shall have a dedicated and independent pending queue. ,"Playback channels should be independent to avoid one channels from stalling another channel.
 
 The channel dictates the SB MsgId / Apid that the playback data PDUs will be generated with. Separate queues also helps when the one channel is throttled - e.g. if there are two channels and one is slow and one is faster, a playback requests to the slow channel may block the faster channel if they shared a single pending queue."
@@ -124,7 +124,7 @@ CF5022.1,CF5022.1,"When CF receives a ""De-Queue File"" command, if the command-
 CF5023,CF5023,"The maximum number of transmissions, that is, the sum of simultaneous transmit and receive transactions, shall be defined at compile time.",Supports scaling resource use for mission variability
 CF5024,CF5024,"When CF receives a file-transfer request, if the requested file's size is larger than 2^32 bytes, CF shall reject the request and issue an error event message.",Constrain resources use and exclude implementation complexity of CCSDS  Large-file-size header extensions. CFDP-1S-01
 CF5030,CF5030,Each CF output channel shall have 256 file-transfer priority levels.,Priority levels are used to control the order of file transfer PDUs within a channel. Priority levels allow the control of PDU interleaving in a output channel and prevent a lower-priority transfer from blocking a high-priority operational transfer. 256 priority levels provide a high-level of granularity in the compact space of 1 byte.
-CF5030.1,CF5030.1,The CF file-transfer priority levels shall be configurable.,Allow for flexibility in configuration and operation.
+CF5030.1,CF5030.1,The CF file transmission priority level for each polling directory shall be configurable.,Supports management of priorities for each polling directory.  Commanded transfers (single file or playback directory) use the priority level contained in the command.
 CF5030.2,CF5030.2,The highest file-transfer priority level shall be zero.,Standardized interface. If the number of levels increases or decreases the highest priority will always be the same
 CF5031,CF5031,CF shall send NAK re-transmissions in the order received at the same priority as the NAK-targeted file,PDU re-transmission priority should be the same as the original request. To not do so would allow a form of priority inversion where a large number of NAKs on a lower priority transfer would suppress re-transmission of higher priority transfers.
 CF5040,CF5040,"CF shall support CFDP file transfers in ""Unacknowledged""(Class-1) Service Mode.","Basic file transfer function. Unacknowledged Mode, also called unreliable mode, is used for non-critical data or operations without bi-directional data paths."
@@ -132,21 +132,18 @@ CF5041,CF5041,"CF shall support CFDP file transfer in ""Acknowledged"" (Class-2)
 CF6000,CF6000,"The CF Housekeeping message shall include
 1. Command Counter
 2. Command Error Counter
-3. Playback-Pending Queue State
--- Per-Channel HouseKeeping Entries (repeated for each channel) --
-4. Number of files on Playback-Pending Queue
+-- Per-Channel HouseKeeping Entries
+4. Number of transactions on the various queues
 5. Frozen Status
 6. Number of Valid PDUs Received
 7. Number of Receive-Transaction Errors
 8. Number of Sent PDUs 
-9. Number of Ack Timer-Limit Faults
-10. Number of NAK Timer-Limit Faults
+9. Number of Ack Limit Faults
+10. Number of NAK Limit Faults
 11. Number of Inactivity Timer-Limit Faults
 12. Number of CRC Mismatch Faults
-13. Number of Filestore Rejection Faults
-14. Number of Filesize Error Faults
-15. Number of Cancel Request Faults
-",Operator interface that provides detailed status on operational state
+13. Number of Filestore Rejection Faults (can be split by type)
+14. Number of Filesize Mismatch Faults",Operator interface that provides detailed status on operational state
 CF7000,CF7000,"When CF is initialized, CF shall initialize the following data as specified below:
 1. Command Counter = 0
 2. Command Error Counter = 0
@@ -166,6 +163,6 @@ CF7000,CF7000,"When CF is initialized, CF shall initialize the following data as
 15. Number of Cancel Request Faults = 0",All variable must be set to a known valid state on initialization to support reliable functioning
 CF7001,CF7001,"When CF is initialized, CF shall load valid CF Configuration Tables.",All variables must be set to a known valid state on initialization to support reliable functioning. Table interface supports operational reconfiguration of CF functions.
 CF7001.1,CF7001.1,"If a CF Configuration Table fails validation, CF shall issue an error cFE event message and exit.",Support constraints for security checks and resource utilization. Without a valid configuration CF can not initialize to a functional state. 
-CF7001.1.1,CF7001.1.1,CF shall validate all parameters in CF configuration tables,Support constraints for security checks and resource utilization. Without a valid configuration CF can not initialize to a functional state. This is a critical failure that can not be corrected using a file upload. 
+CF7001.1.1,CF7001.1.1,CF shall validate CF configuration table parameters.,Support constraints for security checks and resource utilization. Without a valid configuration CF can not initialize to a functional state.  Specific content validation is implementation defined.
 CF8000,CF8000,"When CF receives an ""Initialize Engine"" command, CF shall enable the CFDP engine and re-load its configuration.",Supports operator interface to disable operations due to misconfiguration and other faults
 CF8001,CF8001,"When CF receives a ""Disable Engine"" command, CF shall disable the CFDP engine and reset its state.",Supports operator interface to disable operations due to misconfiguration and other faults
