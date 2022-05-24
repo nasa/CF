@@ -1075,107 +1075,36 @@ void Test_CF_Chunks_CombineNext_Given_i_IsEqToGiven_chunks_count_ReplaceEverythi
 **
 *******************************************************************************/
 
-void Test_CF_Chunks_FindSmallestSize_Given_chunks_IsEmptyReturn_0(void)
+void Test_CF_Chunks_FindSmallestSize(void)
 {
-    /* Arrange */
-    CF_ChunkList_t  dummy_chunks;
-    CF_ChunkList_t *arg_chunks = &dummy_chunks;
-    CF_ChunkIdx_t   local_result;
+    CF_Chunk_t     chunk[4];
+    CF_ChunkList_t chunk_list;
 
-    arg_chunks->count = 0;
+    memset(chunk, 0, sizeof(chunk));
+    memset(&chunk_list, 0, sizeof(chunk_list));
 
-    /* Act */
-    local_result = CF_Chunks_FindSmallestSize(arg_chunks);
+    /* Set up values */
+    chunk_list.chunks = chunk;
+    chunk[0].size     = 3;
+    chunk[1].size     = 4;
+    chunk[2].size     = 2;
+    chunk[3].size     = 2;
 
-    /* Assert */
-    UtAssert_UINT32_EQ(local_result, 0);
-} /* end Test_CF_Chunks_FindSmallestSize_Given_chunks_IsEmptyReturn_0 */
+    /* chunk_list->count == 0 returns 0 */
+    UtAssert_UINT32_EQ(CF_Chunks_FindSmallestSize(&chunk_list), 0);
 
-void Test_CF_Chunks_FindSmallestSize_Given_chunks_HasOneChunkReturn_0(void)
-{
-    /* Arrange */
-    CF_Chunk_t      initial_chunks[1] = {{0}};
-    CF_ChunkList_t  dummy_chunks;
-    CF_ChunkList_t *arg_chunks = &dummy_chunks;
-    CF_ChunkIdx_t   local_result;
+    chunk_list.count = 1;
+    UtAssert_UINT32_EQ(CF_Chunks_FindSmallestSize(&chunk_list), 0);
 
-    initial_chunks[0].size = Any_uint32();
+    chunk_list.count = 2;
+    UtAssert_UINT32_EQ(CF_Chunks_FindSmallestSize(&chunk_list), 0);
 
-    arg_chunks->count  = 1;
-    arg_chunks->chunks = initial_chunks;
+    chunk_list.count = 3;
+    UtAssert_UINT32_EQ(CF_Chunks_FindSmallestSize(&chunk_list), 2);
 
-    /* Act */
-    local_result = CF_Chunks_FindSmallestSize(arg_chunks);
-
-    /* Assert */
-    UtAssert_UINT32_EQ(local_result, 0);
-} /* end Test_CF_Chunks_FindSmallestSize_Given_chunks_HasOneChunkReturn_0 */
-
-void Test_CF_Chunks_FindSmallestSize_Given_chunks_HasTwoChunksReturnsCorrectIndexOfSmallest(void)
-{
-    /* Arrange */
-    CF_Chunk_t      initial_chunks[2] = {{0}};
-    CF_ChunkList_t  dummy_chunks;
-    CF_ChunkList_t *arg_chunks = &dummy_chunks;
-    CF_ChunkIdx_t   expected_result;
-    CF_ChunkIdx_t   local_result;
-
-    initial_chunks[0].size = Any_uint32_Except(0);
-    initial_chunks[1].size = Any_uint32_Except(initial_chunks[0].size);
-
-    if (initial_chunks[0].size < initial_chunks[1].size)
-    {
-        expected_result = 0;
-    }
-    else
-    {
-        expected_result = 1;
-    }
-
-    arg_chunks->count  = 2;
-    arg_chunks->chunks = initial_chunks;
-
-    /* Act */
-    local_result = CF_Chunks_FindSmallestSize(arg_chunks);
-
-    /* Assert */
-    UtAssert_UINT32_EQ(local_result, expected_result);
-} /* end Test_CF_Chunks_FindSmallestSize_Given_chunks_HasTwoChunksReturnsCorrectIndexOfSmallest */
-
-void Test_CF_Chunks_FindSmallestSize_Given_chunks_HasManyChunksReturnsCorrectIndexOfSmallest(void)
-{
-    /* Arrange */
-    uint8           dummy_count        = 25;
-    CF_Chunk_t      initial_chunks[25] = {{0}}; /* 25 for initial_chunks is arbitrary, small for speed */
-    CF_ChunkList_t  dummy_chunks;
-    CF_ChunkList_t *arg_chunks      = &dummy_chunks;
-    CF_ChunkIdx_t   expected_result = Any_uint8_LessThan(25);
-    CF_ChunkIdx_t   local_result;
-    uint8           i = 0;
-
-    for (i = 0; i < dummy_count; ++i)
-    {
-        if (i != expected_result)
-        {
-            initial_chunks[i].size =
-                Any_uint32_GreaterThan(100); /* 100 is arbitrary, a number so we can select a smallest under it */
-        }
-        else
-        {
-            initial_chunks[i].size =
-                Any_uint32_LessThan(100); /* 100 is arbitrary, a number so we can select a smallest under it */
-        }
-    }
-
-    arg_chunks->count  = dummy_count;
-    arg_chunks->chunks = initial_chunks;
-
-    /* Act */
-    local_result = CF_Chunks_FindSmallestSize(arg_chunks);
-
-    /* Assert */
-    UtAssert_UINT32_EQ(local_result, expected_result);
-} /* end Test_CF_Chunks_FindSmallestSize_Given_chunks_HasManyChunksReturnsCorrectIndexOfSmallest */
+    chunk_list.count = 4;
+    UtAssert_UINT32_EQ(CF_Chunks_FindSmallestSize(&chunk_list), 2);
+}
 
 /* end CF_Chunks_FindSmallestSize tests */
 
@@ -2334,20 +2263,6 @@ void add_CF_Chunks_CombineNext_tests(void)
         "EraseRange_ThenReturn_1");
 } /* end add_CF_Chunks_CombineNext_tests */
 
-void add_CF_Chunks_FindSmallestSize_tests(void)
-{
-    UtTest_Add(Test_CF_Chunks_FindSmallestSize_Given_chunks_IsEmptyReturn_0, cf_chunk_tests_Setup,
-               cf_chunk_tests_Teardown, "Test_CF_Chunks_FindSmallestSize_Given_chunks_IsEmptyReturn_0");
-    UtTest_Add(Test_CF_Chunks_FindSmallestSize_Given_chunks_HasOneChunkReturn_0, cf_chunk_tests_Setup,
-               cf_chunk_tests_Teardown, "Test_CF_Chunks_FindSmallestSize_Given_chunks_HasOneChunkReturn_0");
-    UtTest_Add(Test_CF_Chunks_FindSmallestSize_Given_chunks_HasTwoChunksReturnsCorrectIndexOfSmallest,
-               cf_chunk_tests_Setup, cf_chunk_tests_Teardown,
-               "Test_CF_Chunks_FindSmallestSize_Given_chunks_HasTwoChunksReturnsCorrectIndexOfSmallest");
-    UtTest_Add(Test_CF_Chunks_FindSmallestSize_Given_chunks_HasManyChunksReturnsCorrectIndexOfSmallest,
-               cf_chunk_tests_Setup, cf_chunk_tests_Teardown,
-               "Test_CF_Chunks_FindSmallestSize_Given_chunks_HasManyChunksReturnsCorrectIndexOfSmallest");
-} /* end add_CF_Chunks_FindSmallestSize_tests */
-
 void add_CF_Chunks_Insert_tests(void)
 {
     UtTest_Add(
@@ -2519,7 +2434,8 @@ void UtTest_Setup(void)
 
     add_CF_Chunks_CombineNext_tests();
 
-    add_CF_Chunks_FindSmallestSize_tests();
+    UtTest_Add(Test_CF_Chunks_FindSmallestSize, cf_chunk_tests_Setup, cf_chunk_tests_Teardown,
+               "Test_CF_Chunks_FindSmallestSize");
 
     add_CF_Chunks_Insert_tests();
 
