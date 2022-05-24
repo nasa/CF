@@ -77,17 +77,15 @@ CF5002,CF5002,"The following parameters shall be configurable by a CF command:
 1. CFDP channel Ack-Timer Value (seconds)
 2. CFDP channel NAK-Timer Value (seconds)  
 3. CFDP channel Inactivity-Timeout Value (seconds) 
-4. CFDP channel Ack-Timer Value (seconds) 
-5. CFDP channel Maximum Ack Timeouts (integer counts)
-6. CFDP channel Maximum NAK Timeouts (integer counts)","Operational interface to support mission variability and reconfiguration
+4. CFDP channel Maximum Ack Timeouts (integer counts)
+5. CFDP channel Maximum NAK Timeouts (integer counts)","Operational interface to support mission variability and reconfiguration
 "
 CF5002.1,CF5002.1,"The default values for the CFDP channel protocol parameters below shall be defined by a CF Configuration Table:
 1. CFDP channel Ack-Timer Value (seconds)
 2. CFDP channel NAK-Timer Value (seconds)  
 3. CFDP channel Inactivity-Timeout Value (seconds) 
-4. CFDP channel Ack-Timer Value (seconds) 
-5. CFDP channel Maximum Ack Timeouts (integer counts)
-6. CFDP channel Maximum NAK Timeouts (integer counts)",Ensure CF starts in a known and valid operational state
+4. CFDP channel Maximum Ack Timeouts (integer counts)
+5. CFDP channel Maximum NAK Timeouts (integer counts)",Ensure CF starts in a known and valid operational state
 CF5002.2,CF5002.2,"When CF receives a ""Set CFDP Channel Protocol Configuration"" command, CF shall set the command-specified parameter to the command-specified value and issue a cFE event message that confirms the change. ",Operational Interface
 CF5002.3,CF5002.3,"When CF receives a ""Set CFDP Channel Protocol Configuration"" command,  if the command-specified parameter is invalid, CF shall reject the command.  ",Command validity check for robust operation
 CF5002.4,CF5002.4,"When CF receives a ""Set CFDP Channel Protocol Configuration"" command,  if the command-specified parameter *value* is invalid, CF shall reject the command.",Command validity check for robust operation
