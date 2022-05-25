@@ -136,29 +136,13 @@ CF6000,CF6000,"The CF Housekeeping message shall include
 6. Number of Valid PDUs Received
 7. Number of Receive-Transaction Errors
 8. Number of Sent PDUs 
-9. Number of Ack Limit Faults
-10. Number of NAK Limit Faults
+9. Number of Acknowledge Retry Limit Exceeded Faults
+10. Number of Non-Acknowledge Retry Limit Exceeded Faults
 11. Number of Inactivity Timer-Limit Faults
 12. Number of CRC Mismatch Faults
 13. Number of Filestore Rejection Faults (can be split by type)
 14. Number of Filesize Mismatch Faults",Operator interface that provides detailed status on operational state
-CF7000,CF7000,"When CF is initialized, CF shall initialize the following data as specified below:
-1. Command Counter = 0
-2. Command Error Counter = 0
-3. Playback-Pending Queue State = enabled
--- Per-Channel HK Entries (repeated for each channel) --
-4. Number of files on Playback-Pending Queue = 0
-5. Frozen Status = ""thawed""
-6. Number of Valid PDUs Received = 0
-7. Number of Receive-Transaction Errors = 0
-8. Number of Sent PDUs = 0
-9. Number of Ack Timer-Limit Faults = 0
-10. Number of NAK Timer-Limit Faults = 0
-11. Number of Inactivity Timer-Limit Faults = 0
-12. Number of CRC Mismatch Faults = 0
-13. Number of Filestore Rejection Faults = 0
-14. Number of Filesize Error Faults = 0
-15. Number of Cancel Request Faults = 0",All variable must be set to a known valid state on initialization to support reliable functioning
+CF7000,CF7000,"When CF is initialized, CF shall initialize the the housekeeping counters/numbers to zero and the frozen status as ""thawed"".",All variable must be set to a known valid state on initialization to support reliable functioning
 CF7001,CF7001,"When CF is initialized, CF shall load valid CF Configuration Tables.",All variables must be set to a known valid state on initialization to support reliable functioning. Table interface supports operational reconfiguration of CF functions.
 CF7001.1,CF7001.1,"If a CF Configuration Table fails validation, CF shall issue an error cFE event message and exit.",Support constraints for security checks and resource utilization. Without a valid configuration CF can not initialize to a functional state. 
 CF7001.1.1,CF7001.1.1,CF shall validate CF configuration table parameters.,Support constraints for security checks and resource utilization. Without a valid configuration CF can not initialize to a functional state.  Specific content validation is implementation defined.
