@@ -1,4 +1,4 @@
-#core Flight System (cFS) CFDP Application (CF)
+core Flight System (cFS) CFDP Application (CF)
 
 ## Introduction
 
