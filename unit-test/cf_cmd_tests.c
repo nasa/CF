@@ -1707,6 +1707,8 @@ void Test_CF_DoEnableDisableDequeue_Set_chan_num_EnabledFlagTo_context_barg(void
     CF_AppData.config_table = &dummy_config_table;
     dummy_context.barg      = Any_bool_arg_t_barg();
 
+    memset(&dummy_config_table, 0, sizeof(dummy_config_table));
+
     /* Act */
     CF_DoEnableDisableDequeue(arg_chan_num, arg_context);
 
@@ -1735,6 +1737,7 @@ void Test_CF_CmdEnableDequeue_Call_CmdCond_WithResultsOf_CF_DoChanAction(void)
     uint8            dummy_chan_num = Any_cf_channel();
 
     memset(&utbuf, 0, sizeof(utbuf));
+    memset(&dummy_config_table, 0, sizeof(dummy_config_table));
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -1779,6 +1782,7 @@ void Test_CF_CmdDisableDequeue_Call_CmdCond_WithResultsOf_CF_DoChanAction(void)
     uint8            dummy_chan_num = Any_cf_channel();
 
     memset(&utbuf, 0, sizeof(utbuf));
+    memset(&dummy_config_table, 0, sizeof(dummy_config_table));
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -1823,6 +1827,7 @@ void Test_CF_DoEnableDisablePolldir_When_ALL_CHANNELS_SetAllPolldirsInChannelEna
     int                         local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
+    memset(&dummy_config_table, 0, sizeof(dummy_config_table));
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -1862,6 +1867,7 @@ void Test_CF_DoEnableDisablePolldir_WhenSetToSpecificPolldirSetPolldirFrom_conte
     int                         local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
+    memset(&dummy_config_table, 0, sizeof(dummy_config_table));
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -1961,6 +1967,7 @@ void Test_CF_CmdEnablePolldir_SuccessWhenActionSuccess(void)
     CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
+    memset(&dummy_config_table, 0, sizeof(dummy_config_table));
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -2041,6 +2048,7 @@ void Test_CF_CmdDisablePolldir_SuccessWhenActionSuccess(void)
     CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
 
     memset(&utbuf, 0, sizeof(utbuf));
+    memset(&dummy_config_table, 0, sizeof(dummy_config_table));
 
     CF_AppData.config_table = &dummy_config_table;
 
@@ -3843,6 +3851,7 @@ void Test_CF_CmdSetParam_Call_CF_CmdGetSetParam_With_cmd_key_And_cmd_value(void)
     CF_ConfigTable_t dummy_config_table;
 
     memset(&utbuf, 0, sizeof(utbuf));
+    memset(&dummy_config_table, 0, sizeof(dummy_config_table));
 
     dummy_msg->key      = 0;
     dummy_msg->value    = Any_uint32();

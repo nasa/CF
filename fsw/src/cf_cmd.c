@@ -723,7 +723,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
     static const int    q_all     = 3;
     CF_WriteQueueCmd_t *wq        = (CF_WriteQueueCmd_t *)msg;
     CF_Channel_t *      c         = &CF_AppData.engine.channels[wq->chan];
-    osal_id_t           fd;
+    osal_id_t           fd        = OS_OBJECT_ID_UNDEFINED;
     int32               ret;
 
     /* check the commands for validity */

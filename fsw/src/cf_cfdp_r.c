@@ -654,6 +654,8 @@ int CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t)
     int    fret;
     int    ret;
 
+    memset(buf, 0, sizeof(buf));
+
     count_bytes = 0;
     ret         = -1;
 

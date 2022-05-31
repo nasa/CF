@@ -761,6 +761,8 @@ void Test_CF_PrioSearch_When_t_PrioIsEqToContextPrio_Set_context_t_To_t_AndRetur
     void *                    arg_context = (void *)&dummy_p;
     int32                     result;
 
+    memset(&dummy_p, 0, sizeof(dummy_p));
+
     /* NOTE: these are inverted from previous test! */
     dummy_t.priority = Any_uint8_Except(0);
     dummy_p.priority = dummy_t.priority;
@@ -782,6 +784,8 @@ void Test_CF_PrioSearch_When_t_PrioIsLessThanContextPrio_Set_context_t_To_t_AndR
     CF_Traverse_PriorityArg_t dummy_p;
     void *                    arg_context = (void *)&dummy_p;
     int32                     result;
+
+    memset(&dummy_p, 0, sizeof(dummy_p));
 
     /* NOTE: these are inverted from previous test! */
     dummy_p.priority = Any_uint8_Except(0);
