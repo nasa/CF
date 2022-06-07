@@ -323,11 +323,24 @@ typedef uint32 CF_TransactionSeq_t;
 
 /**
  *  @brief Number of milliseconds to wait for a SB message
- *
- *  @par Limits:
- *
  */
 #define CF_RCVMSG_TIMEOUT (100)
+
+/**
+ * \brief Mission specific version number
+ *
+ *  \par Description:
+ *       An application version number consists of four parts:
+ *       major version number, minor version number, revision
+ *       number and mission specific revision number. The mission
+ *       specific revision number is defined here such
+ *       that missions can manage as a configuration definition
+ *
+ *  \par Limits:
+ *       Must be defined as a numeric value that is greater than
+ *       or equal to zero.
+ */
+#define CF_MISSION_REV 0
 
 /**\}*/
 

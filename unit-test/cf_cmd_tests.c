@@ -4241,7 +4241,7 @@ void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_m
     CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = 0x00; /* 0x00 forces fns[0] which is CF_CmdNoop */
     CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize =
         sizeof(CF_NoArgsCmd_t); /* sizeof(CF_NoArgsCmd_t) is expected size of CF_CmdNoop */
-    const char *                 expected_Spec = "CF: No-Op received, Version %d.%d.%d";
+    const char *                 expected_Spec = "CF: No-Op received, Version %d.%d.%d.%d";
     CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
     CFE_MSG_GetSize_context_t    context_CFE_MSG_GetSize;
     CFE_EVS_SendEvent_context_t  context_CFE_EVS_SendEvent;
