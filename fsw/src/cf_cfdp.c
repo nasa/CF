@@ -128,7 +128,7 @@ void CF_CFDP_DecodeStart(CF_DecoderState_t *pdec, const void *msgbuf, CF_Logical
  *-----------------------------------------------------------------*/
 void CF_CFDP_ArmAckTimer(CF_Transaction_t *t)
 {
-    CF_Timer_InitRelSec(&t->ack_timer, CF_AppData.config_table->ack_timer_s);
+    CF_Timer_InitRelSec(&t->ack_timer, CF_AppData.config_table->chan[t->chan_num].ack_timer_s);
     t->flags.com.ack_timer_armed = 1;
 }
 
@@ -169,7 +169,7 @@ static inline int CF_CFDP_IsSender(CF_Transaction_t *ti)
  *-----------------------------------------------------------------*/
 static inline void CF_CFDP_ArmInactTimer(CF_Transaction_t *t)
 {
-    CF_Timer_InitRelSec(&t->inactivity_timer, CF_AppData.config_table->inactivity_timer_s);
+    CF_Timer_InitRelSec(&t->inactivity_timer, CF_AppData.config_table->chan[t->chan_num].inactivity_timer_s);
 }
 
 /*----------------------------------------------------------------

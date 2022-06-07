@@ -326,7 +326,6 @@ int32 CF_Init(void)
     CF_AppData.run_status = CFE_ES_RunStatus_APP_RUN;
 
     CFE_MSG_Init(&CF_AppData.hk.tlm_header.Msg, CFE_SB_ValueToMsgId(CF_HK_TLM_MID), sizeof(CF_AppData.hk));
-    CFE_MSG_Init(&CF_AppData.cfg.tlm_header.Msg, CFE_SB_ValueToMsgId(CF_CONFIG_TLM_MID), sizeof(CF_AppData.cfg));
 
     status = CFE_EVS_Register(cf_event_filters, sizeof(cf_event_filters) / sizeof(*cf_event_filters),
                               CFE_EVS_EventFilter_BINARY);

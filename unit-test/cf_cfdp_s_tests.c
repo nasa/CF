@@ -266,21 +266,21 @@ void Test_CF_CFDP_S_Tick(void)
     /* in CF_TxnState_S2, ack_timer_armed + expiry + finack substate */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 2, 1);
-    config->ack_limit            = 10;
-    t->state                     = CF_TxnState_S2;
-    t->flags.com.ack_timer_armed = true;
-    t->state_data.s.sub_state    = CF_TxSubState_WAIT_FOR_EOF_ACK;
+    config->chan[t->chan_num].ack_limit = 10;
+    t->state                            = CF_TxnState_S2;
+    t->flags.com.ack_timer_armed        = true;
+    t->state_data.s.sub_state           = CF_TxSubState_WAIT_FOR_EOF_ACK;
     UtAssert_VOIDCALL(CF_CFDP_S_Tick(t, &cont));
     UtAssert_STUB_COUNT(CF_CFDP_SendEof, 1);
 
     /* same, with acklimit reached */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 2, 1);
-    config->ack_limit               = 10;
-    t->state                        = CF_TxnState_S2;
-    t->flags.com.ack_timer_armed    = true;
-    t->state_data.s.sub_state       = CF_TxSubState_WAIT_FOR_EOF_ACK;
-    t->state_data.s.s2.acknak_count = 9;
+    config->chan[t->chan_num].ack_limit = 10;
+    t->state                            = CF_TxnState_S2;
+    t->flags.com.ack_timer_armed        = true;
+    t->state_data.s.sub_state           = CF_TxSubState_WAIT_FOR_EOF_ACK;
+    t->state_data.s.s2.acknak_count     = 9;
     UtAssert_VOIDCALL(CF_CFDP_S_Tick(t, &cont));
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_S_ACK_LIMIT);
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[t->chan_num].counters.fault.ack_limit, 1);
@@ -289,20 +289,20 @@ void Test_CF_CFDP_S_Tick(void)
     /* same, with CF_CFDP_S_SendEof no message */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 2, 1);
-    config->ack_limit            = 10;
-    t->state                     = CF_TxnState_S2;
-    t->flags.com.ack_timer_armed = true;
-    t->state_data.s.sub_state    = CF_TxSubState_WAIT_FOR_EOF_ACK;
+    config->chan[t->chan_num].ack_limit = 10;
+    t->state                            = CF_TxnState_S2;
+    t->flags.com.ack_timer_armed        = true;
+    t->state_data.s.sub_state           = CF_TxSubState_WAIT_FOR_EOF_ACK;
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendEof), 1, CF_SendRet_NO_MSG);
     UtAssert_VOIDCALL(CF_CFDP_S_Tick(t, &cont));
 
     /* same, with CF_CFDP_S_SendEof Error */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 2, 1);
-    config->ack_limit            = 10;
-    t->state                     = CF_TxnState_S2;
-    t->flags.com.ack_timer_armed = true;
-    t->state_data.s.sub_state    = CF_TxSubState_WAIT_FOR_EOF_ACK;
+    config->chan[t->chan_num].ack_limit = 10;
+    t->state                            = CF_TxnState_S2;
+    t->flags.com.ack_timer_armed        = true;
+    t->state_data.s.sub_state           = CF_TxSubState_WAIT_FOR_EOF_ACK;
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendEof), 1, CF_SendRet_ERROR);
     UtAssert_VOIDCALL(CF_CFDP_S_Tick(t, &cont));
     UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 3);

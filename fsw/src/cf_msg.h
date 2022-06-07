@@ -105,27 +105,6 @@ typedef struct CF_HkPacket
     CF_HkChannel_Data_t channel_hk[CF_NUM_CHANNELS];
 } CF_HkPacket_t;
 
-/* used with CF_SendRet_CFG_PARAMS_CC */
-typedef struct CF_ConfigPacket
-{
-    CFE_MSG_TelemetryHeader_t tlm_header;
-
-    uint32 ticks_per_second;             /* expected ticks per second to cfdp app */
-    uint32 rx_crc_calc_bytes_per_wakeup; /* max number of bytes per wakeup to calculate r2 crc for recvd file (must by
-                                            1024-byte aligned */
-
-    uint32 ack_timer_s;        /* in seconds */
-    uint32 nak_timer_s;        /* in seconds */
-    uint32 inactivity_timer_s; /* in seconds */
-
-    uint16 outgoing_file_chunk_size;
-    uint8  ack_limit; /* number of times to retry ACK (for ex, send fin and wait for fin-ack) */
-    uint8  nak_limit; /* number of times to retry NAK before giving up (resets on a single response */
-
-    CF_EntityId_t local_eid;
-
-} CF_ConfigPacket_t;
-
 /**\}*/
 
 /**
@@ -139,20 +118,19 @@ typedef struct CF_ConfigPacket
  */
 typedef enum
 {
-    CF_NOOP_CC               = 0,
-    CF_RESET_CC              = 1,
-    CF_TX_FILE_CC            = 2,
-    CF_PLAYBACK_DIR_CC       = 3,
-    CF_FREEZE_CC             = 4,
-    CF_THAW_CC               = 5,
-    CF_SUSPEND_CC            = 6,
-    CF_RESUME_CC             = 7,
-    CF_CANCEL_CC             = 8,
-    CF_ABANDON_CC            = 9,
-    CF_SET_MIB_PARAM_CC      = 10,
-    CF_GET_MIB_PARAM_CC      = 11,
-    CF_SendRet_CFG_PARAMS_CC = 14,
-    CF_WRITE_QUEUE_CC        = 15,
+    CF_NOOP_CC          = 0,
+    CF_RESET_CC         = 1,
+    CF_TX_FILE_CC       = 2,
+    CF_PLAYBACK_DIR_CC  = 3,
+    CF_FREEZE_CC        = 4,
+    CF_THAW_CC          = 5,
+    CF_SUSPEND_CC       = 6,
+    CF_RESUME_CC        = 7,
+    CF_CANCEL_CC        = 8,
+    CF_ABANDON_CC       = 9,
+    CF_SET_MIB_PARAM_CC = 10,
+    CF_GET_MIB_PARAM_CC = 11,
+    CF_WRITE_QUEUE_CC   = 15,
 
     /* NOTE: ENABLE/DISABLE commands should be a single command code, but legacy has them separate (ugh) */
     CF_ENABLE_DEQUEUE_CC      = 16,

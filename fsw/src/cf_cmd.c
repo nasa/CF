@@ -835,32 +835,6 @@ bail:
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CmdSendCfgParams
- *
- * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-void CF_CmdSendCfgParams(CFE_SB_Buffer_t *msg)
-{
-    CF_AppData.cfg.ticks_per_second             = CF_AppData.config_table->ticks_per_second;
-    CF_AppData.cfg.rx_crc_calc_bytes_per_wakeup = CF_AppData.config_table->rx_crc_calc_bytes_per_wakeup;
-    CF_AppData.cfg.ack_timer_s                  = CF_AppData.config_table->ack_timer_s;
-    CF_AppData.cfg.nak_timer_s                  = CF_AppData.config_table->nak_timer_s;
-    CF_AppData.cfg.inactivity_timer_s           = CF_AppData.config_table->inactivity_timer_s;
-    CF_AppData.cfg.outgoing_file_chunk_size     = CF_AppData.config_table->outgoing_file_chunk_size;
-    CF_AppData.cfg.ack_limit                    = CF_AppData.config_table->ack_limit;
-    CF_AppData.cfg.nak_limit                    = CF_AppData.config_table->nak_limit;
-    CF_AppData.cfg.local_eid                    = CF_AppData.config_table->local_eid;
-
-    CFE_MSG_SetMsgTime(&CF_AppData.cfg.tlm_header.Msg, CFE_TIME_GetTime());
-    /* return value ignored */ CFE_SB_TransmitMsg(&CF_AppData.cfg.tlm_header.Msg, true);
-
-    CF_CmdAcc();
-}
-
-/*----------------------------------------------------------------
- *
  * Function: CF_CmdValidateChunkSize
  *
  * Application-scope internal function
@@ -934,16 +908,16 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
             item.size = sizeof(config->rx_crc_calc_bytes_per_wakeup);
             break;
         case CF_GetSet_ValueID_ack_timer_s:
-            item.ptr  = &config->ack_timer_s;
-            item.size = sizeof(config->ack_timer_s);
+            item.ptr  = &config->chan[chan_num].ack_timer_s;
+            item.size = sizeof(config->chan[chan_num].ack_timer_s);
             break;
         case CF_GetSet_ValueID_nak_timer_s:
-            item.ptr  = &config->nak_timer_s;
-            item.size = sizeof(config->nak_timer_s);
+            item.ptr  = &config->chan[chan_num].nak_timer_s;
+            item.size = sizeof(config->chan[chan_num].nak_timer_s);
             break;
         case CF_GetSet_ValueID_inactivity_timer_s:
-            item.ptr  = &config->inactivity_timer_s;
-            item.size = sizeof(config->inactivity_timer_s);
+            item.ptr  = &config->chan[chan_num].inactivity_timer_s;
+            item.size = sizeof(config->chan[chan_num].inactivity_timer_s);
             break;
         case CF_GetSet_ValueID_outgoing_file_chunk_size:
             item.ptr  = &config->outgoing_file_chunk_size;
@@ -951,12 +925,12 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
             item.fn   = CF_CmdValidateChunkSize;
             break;
         case CF_GetSet_ValueID_ack_limit:
-            item.ptr  = &config->ack_limit;
-            item.size = sizeof(config->ack_limit);
+            item.ptr  = &config->chan[chan_num].ack_limit;
+            item.size = sizeof(config->chan[chan_num].ack_limit);
             break;
         case CF_GetSet_ValueID_nak_limit:
-            item.ptr  = &config->nak_limit;
-            item.size = sizeof(config->nak_limit);
+            item.ptr  = &config->chan[chan_num].nak_limit;
+            item.size = sizeof(config->chan[chan_num].nak_limit);
             break;
         case CF_GetSet_ValueID_local_eid:
             item.ptr  = &config->local_eid;
@@ -1161,7 +1135,7 @@ void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
         CF_CmdGetParam,    /* CF_GET_MIB_PARAM_CC */
         NULL,
         NULL,
-        CF_CmdSendCfgParams,  /* CF_SendRet_CFG_PARAMS_CC */
+        NULL,
         CF_CmdWriteQueue,     /* CF_WRITE_QUEUE_CC */
         CF_CmdEnableDequeue,  /* CF_ENABLE_DEQUEUE_CC */
         CF_CmdDisableDequeue, /* CF_DISABLE_DEQUEUE_CC */

@@ -277,12 +277,12 @@ void Test_CF_CFDP_R_Tick(void)
 
     /* in R2 state, ack_timer_armed set, timer expires, finack substate */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, &config);
-    config->ack_limit            = 10;
-    t->state                     = CF_TxnState_R2;
-    t->flags.com.ack_timer_armed = true;
-    t->flags.rx.inactivity_fired = true;
-    t->flags.rx.complete         = true;
-    t->state_data.r.sub_state    = CF_RxSubState_WAIT_FOR_FIN_ACK;
+    config->chan[t->chan_num].ack_limit = 10;
+    t->state                            = CF_TxnState_R2;
+    t->flags.com.ack_timer_armed        = true;
+    t->flags.rx.inactivity_fired        = true;
+    t->flags.rx.complete                = true;
+    t->state_data.r.sub_state           = CF_RxSubState_WAIT_FOR_FIN_ACK;
     UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, 1);
     UtAssert_VOIDCALL(CF_CFDP_R_Tick(t, &cont));
     UtAssert_STUB_COUNT(CF_CFDP_ArmAckTimer, 2);
@@ -290,13 +290,13 @@ void Test_CF_CFDP_R_Tick(void)
 
     /* same as above, but acknak limit reached */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, &config);
-    config->ack_limit               = 10;
-    t->state                        = CF_TxnState_R2;
-    t->flags.com.ack_timer_armed    = true;
-    t->flags.rx.inactivity_fired    = true;
-    t->flags.rx.complete            = true;
-    t->state_data.r.sub_state       = CF_RxSubState_WAIT_FOR_FIN_ACK;
-    t->state_data.r.r2.acknak_count = 9;
+    config->chan[t->chan_num].ack_limit = 10;
+    t->state                            = CF_TxnState_R2;
+    t->flags.com.ack_timer_armed        = true;
+    t->flags.rx.inactivity_fired        = true;
+    t->flags.rx.complete                = true;
+    t->state_data.r.sub_state           = CF_RxSubState_WAIT_FOR_FIN_ACK;
+    t->state_data.r.r2.acknak_count     = 9;
     UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, 1);
     UtAssert_VOIDCALL(CF_CFDP_R_Tick(t, &cont));
     UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 2);
@@ -304,12 +304,12 @@ void Test_CF_CFDP_R_Tick(void)
 
     /* in R2 state, ack_timer_armed set, timer expires, not in finack substate */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, &config);
-    config->ack_limit            = 10;
-    t->state                     = CF_TxnState_R2;
-    t->flags.com.ack_timer_armed = true;
-    t->flags.rx.inactivity_fired = true;
-    t->flags.rx.complete         = true;
-    t->state_data.r.sub_state    = CF_RxSubState_EOF;
+    config->chan[t->chan_num].ack_limit = 10;
+    t->state                            = CF_TxnState_R2;
+    t->flags.com.ack_timer_armed        = true;
+    t->flags.rx.inactivity_fired        = true;
+    t->flags.rx.complete                = true;
+    t->state_data.r.sub_state           = CF_RxSubState_EOF;
     UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, 1);
     UtAssert_VOIDCALL(CF_CFDP_R_Tick(t, &cont));
     UtAssert_STUB_COUNT(CF_CFDP_ArmAckTimer, 3);
@@ -501,7 +501,7 @@ void Test_CF_CFDP_R2_Complete(void)
 
     /* nominal, send nak */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &t, &config);
-    config->nak_limit = 2;
+    config->chan[t->chan_num].nak_limit = 2;
     UtAssert_VOIDCALL(CF_CFDP_R2_Complete(t, 1));
     UtAssert_BOOL_TRUE(t->flags.rx.send_nak);
     UtAssert_UINT32_EQ(t->state_data.r.sub_state, CF_RxSubState_FILEDATA);
@@ -516,8 +516,8 @@ void Test_CF_CFDP_R2_Complete(void)
 
     /* test with md_recv - with no more setup this only sets filedata state */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &t, &config);
-    config->nak_limit   = 2;
-    t->flags.rx.md_recv = true;
+    config->chan[t->chan_num].nak_limit = 2;
+    t->flags.rx.md_recv                 = true;
     UtAssert_VOIDCALL(CF_CFDP_R2_Complete(t, 0));
     UtAssert_UINT32_EQ(t->state_data.r.sub_state, CF_RxSubState_FILEDATA);
 
