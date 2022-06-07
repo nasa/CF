@@ -613,7 +613,8 @@ void CF_CFDP_R_Init(CF_Transaction_t *t)
         CF_CFDP_ArmAckTimer(t);
     }
 
-    ret = CF_WrappedOpenCreate(&t->fd, t->history->fnames.dst_filename, OS_FILE_FLAG_CREATE, OS_READ_WRITE);
+    ret = CF_WrappedOpenCreate(&t->fd, t->history->fnames.dst_filename, OS_FILE_FLAG_CREATE | OS_FILE_FLAG_TRUNCATE,
+                               OS_READ_WRITE);
     if (ret < 0)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_CREAT, CFE_EVS_EventType_ERROR,
