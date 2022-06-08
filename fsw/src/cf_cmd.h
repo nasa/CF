@@ -495,16 +495,6 @@ void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg);
 void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg);
 
 /************************************************************************/
-/** @brief Ground command to send configuration parameters.
- *
- * @par Assumptions, External Events, and Notes:
- *       msg must not be NULL.
- *
- * @param msg   Pointer to command message
- */
-void CF_CmdSendCfgParams(CFE_SB_Buffer_t *msg);
-
-/************************************************************************/
 /** @brief Checks if the value is less than or equal to the max pdu size.
  *
  * @par Assumptions, External Events, and Notes:

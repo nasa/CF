@@ -162,7 +162,7 @@ void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
         ++t->state_data.r.r2.acknak_count;
 
         /* Check limit and handle if needed */
-        if (t->state_data.r.r2.acknak_count >= CF_AppData.config_table->nak_limit)
+        if (t->state_data.r.r2.acknak_count >= CF_AppData.config_table->chan[t->chan_num].nak_limit)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_NAK_LIMIT, CFE_EVS_EventType_ERROR,
                               "CF R%d(%lu:%lu): nak limited reach", (t->state == CF_TxnState_R2),
@@ -1057,7 +1057,7 @@ void CF_CFDP_R_Tick(CF_Transaction_t *t, int *cont /* unused */)
                     ++t->state_data.r.r2.acknak_count;
 
                     /* Check limit and handle if needed */
-                    if (t->state_data.r.r2.acknak_count >= CF_AppData.config_table->ack_limit)
+                    if (t->state_data.r.r2.acknak_count >= CF_AppData.config_table->chan[t->chan_num].ack_limit)
                     {
                         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_ACK_LIMIT, CFE_EVS_EventType_ERROR,
                                           "CF R2(%lu:%lu): ack limit reached, no fin-ack",

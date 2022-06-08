@@ -3561,74 +3561,6 @@ void Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_Pend(void)
 
 /*******************************************************************************
 **
-**  CF_CmdSendCfgParams tests
-**
-*******************************************************************************/
-
-void Test_CF_CmdSendCfgParams_Set_cfg_TimeStampAndSendMsg_AcceptCommand(void)
-{
-    /* Arrange */
-    CFE_SB_Buffer_t              utbuf;
-    CFE_SB_Buffer_t *            arg_msg = &utbuf;
-    CF_ConfigTable_t             dummy_config_table;
-    CFE_TIME_SysTime_t           fake_time;
-    CFE_SB_TransmitMsg_context_t context_CFE_SB_TransmitMsg;
-    CFE_MSG_SetMsgTime_context_t context_CFE_MSG_SetMsgTime;
-
-    memset(&utbuf, 0, sizeof(utbuf));
-
-    dummy_config_table.ticks_per_second             = Any_uint32();
-    dummy_config_table.rx_crc_calc_bytes_per_wakeup = Any_uint32();
-    dummy_config_table.ack_timer_s                  = Any_uint32();
-    dummy_config_table.nak_timer_s                  = Any_uint32();
-    dummy_config_table.inactivity_timer_s           = Any_uint32();
-    dummy_config_table.outgoing_file_chunk_size     = Any_uint16();
-    dummy_config_table.ack_limit                    = Any_uint8();
-    dummy_config_table.nak_limit                    = Any_uint8();
-    dummy_config_table.local_eid                    = Any_uint8();
-
-    CF_AppData.config_table = &dummy_config_table;
-
-    Any_CFE_TIME_SysTime_Set(&fake_time);
-    UT_SetDataBuffer(UT_KEY(CFE_TIME_GetTime), &fake_time, sizeof(fake_time), false);
-
-    UT_SetHookFunction(UT_KEY(CFE_MSG_SetMsgTime), UT_Hook_CFE_MSG_SetMsgTime, &context_CFE_MSG_SetMsgTime);
-    UT_SetHookFunction(UT_KEY(CFE_SB_TransmitMsg), UT_Hook_CFE_SB_TransmitMsg, &context_CFE_SB_TransmitMsg);
-
-    /* Arrange unstubbable: CF_CmdAcc */
-    uint16 initial_hk_cmd_counter = Any_uint16();
-
-    CF_AppData.hk.counters.cmd = initial_hk_cmd_counter;
-
-    /* Act */
-    CF_CmdSendCfgParams(arg_msg);
-
-    /* Assert */
-    UtAssert_UINT32_EQ(CF_AppData.cfg.ticks_per_second, CF_AppData.config_table->ticks_per_second);
-    UtAssert_UINT32_EQ(CF_AppData.cfg.rx_crc_calc_bytes_per_wakeup,
-                       CF_AppData.config_table->rx_crc_calc_bytes_per_wakeup);
-    UtAssert_UINT32_EQ(CF_AppData.cfg.ack_timer_s, CF_AppData.config_table->ack_timer_s);
-    UtAssert_UINT32_EQ(CF_AppData.cfg.nak_timer_s, CF_AppData.config_table->nak_timer_s);
-    UtAssert_UINT32_EQ(CF_AppData.cfg.inactivity_timer_s, CF_AppData.config_table->inactivity_timer_s);
-    UtAssert_UINT32_EQ(CF_AppData.cfg.outgoing_file_chunk_size, CF_AppData.config_table->outgoing_file_chunk_size);
-    UtAssert_UINT32_EQ(CF_AppData.cfg.ack_limit, CF_AppData.config_table->ack_limit);
-    UtAssert_UINT32_EQ(CF_AppData.cfg.nak_limit, CF_AppData.config_table->nak_limit);
-    UtAssert_UINT32_EQ(CF_AppData.cfg.local_eid, CF_AppData.config_table->local_eid);
-    UtAssert_STUB_COUNT(CFE_MSG_SetMsgTime, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_SetMsgTime.MsgPtr, &CF_AppData.cfg.tlm_header.Msg);
-    UtAssert_UINT32_EQ(context_CFE_MSG_SetMsgTime.Time.Seconds, fake_time.Seconds);
-    UtAssert_UINT32_EQ(context_CFE_MSG_SetMsgTime.Time.Subseconds, fake_time.Subseconds);
-    UtAssert_STUB_COUNT(CFE_SB_TransmitMsg, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_SB_TransmitMsg.MsgPtr, &CF_AppData.cfg.tlm_header.Msg);
-    UtAssert_BOOL_TRUE(context_CFE_SB_TransmitMsg.IncrementSequenceCount);
-
-    /* Assert for CF_CmdAcc */
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
-
-} /* end Test_CF_CmdSendCfgParams_Set_cfg_TimeStampAndSendMsg_AcceptCommand */
-
-/*******************************************************************************
-**
 **  CF_CmdValidateChunkSize tests
 **
 *******************************************************************************/
@@ -3791,12 +3723,12 @@ void Test_CF_CmdGetSetParam(void)
     /* each of the config parameters should have actually been set to a different value */
     UtAssert_UINT32_EQ(ut_config_table.ticks_per_second, 1);
     UtAssert_UINT32_EQ(ut_config_table.rx_crc_calc_bytes_per_wakeup, 2);
-    UtAssert_UINT32_EQ(ut_config_table.ack_timer_s, 3);
-    UtAssert_UINT32_EQ(ut_config_table.nak_timer_s, 4);
-    UtAssert_UINT32_EQ(ut_config_table.inactivity_timer_s, 5);
+    UtAssert_UINT32_EQ(ut_config_table.chan[UT_CFDP_CHANNEL].ack_timer_s, 3);
+    UtAssert_UINT32_EQ(ut_config_table.chan[UT_CFDP_CHANNEL].nak_timer_s, 4);
+    UtAssert_UINT32_EQ(ut_config_table.chan[UT_CFDP_CHANNEL].inactivity_timer_s, 5);
     UtAssert_UINT32_EQ(ut_config_table.outgoing_file_chunk_size, 6);
-    UtAssert_UINT32_EQ(ut_config_table.ack_limit, 7);
-    UtAssert_UINT32_EQ(ut_config_table.nak_limit, 8);
+    UtAssert_UINT32_EQ(ut_config_table.chan[UT_CFDP_CHANNEL].ack_limit, 7);
+    UtAssert_UINT32_EQ(ut_config_table.chan[UT_CFDP_CHANNEL].nak_limit, 8);
     UtAssert_UINT32_EQ(ut_config_table.local_eid, 9);
     UtAssert_UINT32_EQ(ut_config_table.chan[UT_CFDP_CHANNEL].max_outgoing_messages_per_wakeup, 10);
 
@@ -4676,12 +4608,6 @@ void add_CF_CmdWriteQueue_tests(void)
                cf_cmd_tests_Teardown, "Test_CF_CmdWriteQueue_SuccessCall_CF_CmdAcc_type_DownAnd_q_Pend");
 } /* end add_CF_CmdWriteQueue_tests */
 
-void add_CF_CmdSendCfgParams_tests(void)
-{
-    UtTest_Add(Test_CF_CmdSendCfgParams_Set_cfg_TimeStampAndSendMsg_AcceptCommand, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_CmdSendCfgParams_Set_cfg_TimeStampAndSendMsg_AcceptCommand");
-} /* end add_CF_CmdSendCfgParams_tests */
-
 void add_CF_CmdValidateChunkSize_tests(void)
 {
     UtTest_Add(Test_CF_CmdValidateChunkSize_val_GreaterThan_pdu_fd_data_t_FailAndReturn_1, cf_cmd_tests_Setup,
@@ -4840,8 +4766,6 @@ void UtTest_Setup(void)
     add_CF_CmdPurgeQueue_tests();
 
     add_CF_CmdWriteQueue_tests();
-
-    add_CF_CmdSendCfgParams_tests();
 
     add_CF_CmdValidateChunkSize_tests();
 

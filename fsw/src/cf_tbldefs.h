@@ -57,6 +57,13 @@ typedef struct CF_ChannelConfig
     uint32 max_outgoing_messages_per_wakeup; /**< \brief max number of messages to send per wakeup (0 - unlimited) */
     uint32 rx_max_messages_per_wakeup;       /**< \brief max number of rx messages to process per wakeup */
 
+    uint32 ack_timer_s;        /**< \brief Acknowledge timer in seconds */
+    uint32 nak_timer_s;        /**< \brief Non-acknowledge timer in seconds */
+    uint32 inactivity_timer_s; /**< \brief Inactivity timer in seconds */
+
+    uint8 ack_limit; /**< number of times to retry ACK (for ex, send fin and wait for fin-ack) */
+    uint8 nak_limit; /**< number of times to retry NAK before giving up (resets on a single response */
+
     CFE_SB_MsgId_Atom_t mid_input;  /**< \brief msgid integer value for incoming messages */
     CFE_SB_MsgId_Atom_t mid_output; /**< \brief msgid integer value for outgoing messages */
 
@@ -81,13 +88,6 @@ typedef struct CF_ConfigTable
     CF_EntityId_t local_eid; /**< \brief the local entity ID of the CF app */
 
     CF_ChannelConfig_t chan[CF_NUM_CHANNELS]; /**< \brief Channel configuration */
-
-    uint32 ack_timer_s;        /**< \brief Acknowledge timer in seconds */
-    uint32 nak_timer_s;        /**< \brief Non-acknowledge timer in seconds */
-    uint32 inactivity_timer_s; /**< \brief Inactivity timer in seconds */
-
-    uint8 ack_limit; /**< number of times to retry ACK (for ex, send fin and wait for fin-ack) */
-    uint8 nak_limit; /**< number of times to retry NAK before giving up (resets on a single response */
 
     uint16 outgoing_file_chunk_size;      /**< maximum size of outgoing file data PDUs */
     char   tmp_dir[CF_FILENAME_MAX_PATH]; /**< directory to put temp files */

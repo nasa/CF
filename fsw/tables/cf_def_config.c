@@ -30,8 +30,13 @@ CF_ConfigTable_t CF_config_table = {
     16384, /* max number of bytes per wakeup to calculate r2 recv file crc */
     25,    /* temp local id */
     {{
-         5, /* max number of outgoing messages per wakeup */
-         5, /* max number of rx messages per wakeup */
+         5,  /* max number of outgoing messages per wakeup */
+         5,  /* max number of rx messages per wakeup */
+         3,  /* ack timer */
+         3,  /* nak timer */
+         30, /* inactivity timer */
+         4,  /* ack limit */
+         4,  /* nak limit */
          0x18c8,
          0x08c2,
          16,
@@ -39,19 +44,19 @@ CF_ConfigTable_t CF_config_table = {
          "", /* throttle sem for channel 1, empty string means no throttle */
          1,
      },
-     {5, /* max number of outgoing messages per wakeup */
-      5, /* max number of rx messages per wakeup */
+     {5,  /* max number of outgoing messages per wakeup */
+      5,  /* max number of rx messages per wakeup */
+      3,  /* ack timer */
+      3,  /* nak timer */
+      30, /* inactivity timer */
+      4,  /* ack limit */
+      4,  /* nak limit */
       0x18c9,
       0x08c3,
       16,
       {{0}, {0}, {0}, {0}, {0}},
       "", /* throttle sem for channel 2, empty string means no throttle */
       1}},
-    3,   /* ack timer */
-    3,   /* nak timer */
-    30,  /* inactivity timer */
-    4,   /* ack limit */
-    4,   /* nak limit */
     480, /* outgoing_file_chunk_size */
     "/cf/tmp",
 };

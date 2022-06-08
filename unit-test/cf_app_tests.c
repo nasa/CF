@@ -457,7 +457,7 @@ void Test_CF_Init_CallTo_CFE_EVS_Register_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_Wri
     result = CF_Init();
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_Init, 2);
+    UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
     UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
     UtAssert_STUB_COUNT(CFE_ES_WriteToSysLog, 1);
     UtAssert_INT32_EQ(result, forced_return_CFE_MSG_Init);
@@ -475,7 +475,7 @@ void Test_CF_Init_CallTo_CFE_SB_CreatePipe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_Wr
     result = CF_Init();
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_Init, 2);
+    UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
     UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
     UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
     UtAssert_STUB_COUNT(CFE_ES_WriteToSysLog, 1);
@@ -494,7 +494,7 @@ void Test_CF_Init_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_E
     result = CF_Init();
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_Init, 2);
+    UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
     UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
     UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
     UtAssert_STUB_COUNT(CFE_SB_Subscribe, 1);
@@ -517,7 +517,7 @@ void Test_CF_Init_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus(v
     result = CF_Init();
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_Init, 2);
+    UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
     UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
     UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
     UtAssert_STUB_COUNT(CFE_SB_Subscribe, 3);
@@ -538,7 +538,7 @@ void Test_CF_Init_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorSt
     result = CF_Init();
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_Init, 2);
+    UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
     UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
     UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
     UtAssert_STUB_COUNT(CFE_SB_Subscribe, 3);
@@ -559,7 +559,7 @@ void Test_CF_Init_CallTo_CFE_EVS_SendEvent_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_Wr
     result = CF_Init();
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_Init, 2);
+    UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
     UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
     UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
     UtAssert_STUB_COUNT(CFE_SB_Subscribe, 3);
@@ -578,7 +578,7 @@ void Test_CF_Init_Success(void)
     result = CF_Init();
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_Init, 2);
+    UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
     UtAssert_INT32_EQ(result, CFE_SUCCESS);
 } /* end Test_CF_Init_Success */
 
