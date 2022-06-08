@@ -367,8 +367,8 @@ int32 CF_Init(void)
         goto err_out;
     }
 
-    status = CFE_EVS_SendEvent(CF_EID_INF_INIT, CFE_EVS_EventType_INFORMATION, "CF Initialized. Version %d.%d.%d",
-                               CF_MAJOR_VERSION, CF_MINOR_VERSION, CF_REVISION);
+    status = CFE_EVS_SendEvent(CF_EID_INF_INIT, CFE_EVS_EventType_INFORMATION, "CF Initialized. Version %d.%d.%d.%d",
+                               CF_MAJOR_VERSION, CF_MINOR_VERSION, CF_REVISION, CF_MISSION_REV);
 
     if (status != CFE_SUCCESS)
     {
