@@ -743,7 +743,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
 
     /* PTFO: queues can be large. may want to split this work up across the state machine and take several wakeups to
      * complete */
-    ret = CF_WrappedOpenCreate(&fd, wq->filename, OS_FILE_FLAG_CREATE, OS_WRITE_ONLY);
+    ret = CF_WrappedOpenCreate(&fd, wq->filename, OS_FILE_FLAG_CREATE | OS_FILE_FLAG_TRUNCATE, OS_WRITE_ONLY);
     if (ret < 0)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_OPEN, CFE_EVS_EventType_ERROR, "CF: write queue failed to open file %s",
