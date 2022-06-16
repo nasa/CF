@@ -1329,16 +1329,6 @@ void Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid(void)
 **
 *******************************************************************************/
 
-void Test_CF_DoSuspRes_Txn_Asserts_t_Is_NULL(void)
-{
-    // /* Arrange */
-
-    // /* Act */
-
-    // /* Assert */
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert");
-} /* end Test_CF_DoSuspRes_Txn_Asserts_t_Is_NULL */
-
 void Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action(void)
 {
     /* Arrange */
@@ -4206,8 +4196,6 @@ void add_CF_TsnChanAction_tests(void)
 
 void add_CF_DoSuspRes_Txn_tests(void)
 {
-    UtTest_Add(Test_CF_DoSuspRes_Txn_Asserts_t_Is_NULL, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_DoSuspRes_Txn_Asserts_t_Is_NULL");
     UtTest_Add(Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action, cf_cmd_tests_Setup,
                cf_cmd_tests_Teardown, "Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action");
     UtTest_Add(Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action, cf_cmd_tests_Setup,

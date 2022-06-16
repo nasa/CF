@@ -630,94 +630,70 @@ void Test_CF_AppMain_CallTo_CF_Init_DoNotReturn_CFE_SUCCESS_Set_CF_AppData_run_s
 } /* end Test_CF_AppMain_CallTo_CF_Init_DoNotReturn_CFE_SUCCESS_Set_CF_AppData_run_status_To_CFE_ES_RunStatus_APP_ERROR
    */
 
-void Test_CF_AppMain_CallTo_CFE_ES_RunLoop_Returns_false_AppExit(void)
+void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
 {
-    /* Arrange */
-    UT_SetDefaultReturnValue(UT_KEY(CFE_ES_RunLoop), false);
+    CFE_SB_Buffer_t  sbbuf;
+    CFE_SB_Buffer_t *sbbufptr  = NULL;
+    uint16           events[2] = {0};
 
-    /* Act */
-    CF_AppMain();
+    memset(&sbbuf, 0, sizeof(sbbuf));
 
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_ES_PerfLogAdd, 2);
-    UtAssert_STUB_COUNT(CFE_ES_RunLoop, 1);
-    UtAssert_STUB_COUNT(CFE_ES_ExitApp, 1);
-    /* Assert for CF_Init call */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-} /* end Test_CF_AppMain_CallTo_CFE_ES_RunLoop_Returns_false_AppExit */
-
-void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_ReturnsNot_CFE_SUCCESS_AndNot_CFE_SB_TIME_OUT_SendEvent(void)
-{
-    /* Arrange */
-    CFE_SB_Buffer_t *sbbufptr = NULL;
-
+    /* Run loop once */
     UT_SetDeferredRetcode(UT_KEY(CFE_ES_RunLoop), 1, true);
     UT_SetDefaultReturnValue(UT_KEY(CFE_ES_RunLoop), false);
+
+    /* Capture events */
+    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), events, sizeof(events), false);
 
     /* Unit under test does not use the buffer in this case */
     UT_SetDataBuffer(UT_KEY(CFE_SB_ReceiveBuffer), &sbbufptr, sizeof(sbbufptr), false);
 
-    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), -1);
+    UT_SetDeferredRetcode(UT_KEY(CFE_SB_ReceiveBuffer), 1, -1);
 
     /* Act */
-    CF_AppMain();
+    UtAssert_VOIDCALL(CF_AppMain());
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_ES_PerfLogAdd, 4);
     UtAssert_STUB_COUNT(CFE_ES_RunLoop, 2);
     UtAssert_STUB_COUNT(CFE_ES_ExitApp, 1);
-    /* Assert for CF_Init call and CF_AppMain */
+
+    /* Event from CF_Init and CF_AppMain */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 2);
-} /* end Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_ReturnsNot_CFE_SUCCESS_AndNot_CFE_SB_TIME_OUT_SendEvent */
+    UtAssert_UINT32_EQ(events[0], CF_EID_INF_INIT);
+    UtAssert_UINT32_EQ(events[1], CF_EID_ERR_INIT_MSG_RECV);
 
-void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_And_msg_Is_NULL_SendEvent(void)
-{
-    /* Arrange */
-    CFE_SB_Buffer_t *sbbufptr = NULL;
-
-    UT_SetDeferredRetcode(UT_KEY(CFE_ES_RunLoop), 1, true);
-    UT_SetDefaultReturnValue(UT_KEY(CFE_ES_RunLoop), false);
-
-    /* Unit under test does not use the buffer in this case */
+    /* Reset, return CFE_SUCCESS from CFE_SB_ReceiveBuffer and buffer NULL */
+    UT_ResetState(UT_KEY(CFE_EVS_SendEvent));
+    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), events, sizeof(events), false);
     UT_SetDataBuffer(UT_KEY(CFE_SB_ReceiveBuffer), &sbbufptr, sizeof(sbbufptr), false);
-
-    /* Act */
-    CF_AppMain();
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_ES_PerfLogAdd, 4);
-    UtAssert_STUB_COUNT(CFE_ES_RunLoop, 2);
-    UtAssert_STUB_COUNT(CFE_ES_ExitApp, 1);
-    /* Assert for CF_Init call and CF_AppMain */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 2);
-} /* end Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_And_msg_Is_NULL_SendEvent */
-
-void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SB_TIME_OUT_And_msg_Is_NULL_DoNothingDuringLoop(
-    void)
-{
-    /* Arrange */
-    CFE_SB_Buffer_t *dummy_BufPtr = NULL;
-
     UT_SetDeferredRetcode(UT_KEY(CFE_ES_RunLoop), 1, true);
-    UT_SetDefaultReturnValue(UT_KEY(CFE_ES_RunLoop), false);
 
-    /* Unit under test does not use the buffer in this case */
-    UT_SetDataBuffer(UT_KEY(CFE_SB_ReceiveBuffer), &dummy_BufPtr, sizeof(dummy_BufPtr), false);
+    UtAssert_VOIDCALL(CF_AppMain());
 
-    UT_SetHandlerFunction(UT_KEY(CFE_SB_ReceiveBuffer), UT_UpdatedDefaultHandler_CFE_SB_ReceiveBuffer, NULL);
-    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_ReceiveBuffer), CFE_SB_TIME_OUT);
+    /* Event from CF_Init and CF_AppMain */
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 2);
+    UtAssert_UINT32_EQ(events[0], CF_EID_INF_INIT);
+    UtAssert_UINT32_EQ(events[1], CF_EID_ERR_INIT_MSG_RECV);
 
-    /* Act */
-    CF_AppMain();
+    /* Reset, return non-error codes and non-NULL buffer */
+    UT_ResetState(UT_KEY(CFE_EVS_SendEvent));
+    UT_ResetState(UT_KEY(CFE_ES_RunLoop));
+    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), events, sizeof(events), false);
+    sbbufptr = &sbbuf;
+    UT_SetDataBuffer(UT_KEY(CFE_SB_ReceiveBuffer), &sbbufptr, sizeof(sbbufptr), false);
+    UT_SetDeferredRetcode(UT_KEY(CFE_ES_RunLoop), 1, true);
+    UT_SetDeferredRetcode(UT_KEY(CFE_ES_RunLoop), 1, true);
+    UT_SetDeferredRetcode(UT_KEY(CFE_SB_ReceiveBuffer), 1, CFE_SB_TIME_OUT);
+    UT_SetDeferredRetcode(UT_KEY(CFE_SB_ReceiveBuffer), 1, CFE_SB_NO_MESSAGE);
 
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_ES_PerfLogAdd, 4);
-    UtAssert_STUB_COUNT(CFE_ES_RunLoop, 2);
-    UtAssert_STUB_COUNT(CFE_ES_ExitApp, 1);
-    /* Assert for CF_Init call, but CF_AppMain did not send event */
+    UtAssert_VOIDCALL(CF_AppMain());
+
+    /* Event from CF_Init */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-} /* end Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SB_TIME_OUT_And_msg_Is_NULL_DoNothingDuringLoop
-   */
+    UtAssert_UINT32_EQ(events[0], CF_EID_INF_INIT);
+    UtAssert_STUB_COUNT(CFE_ES_RunLoop, 3);
+}
 
 void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndValid_msg_Call_CF_ProcessMsg(void)
 {
@@ -862,20 +838,8 @@ void add_CF_AppMain_tests(void)
         cf_app_tests_Setup, CF_App_Tests_Teardown,
         "Test_CF_AppMain_CallTo_CF_Init_DoNotReturn_CFE_SUCCESS_Set_CF_AppData_run_status_To_CFE_ES_RunStatus_APP_"
         "ERROR");
-    UtTest_Add(Test_CF_AppMain_CallTo_CFE_ES_RunLoop_Returns_false_AppExit, cf_app_tests_Setup, CF_App_Tests_Teardown,
-               "Test_CF_AppMain_CallTo_CFE_ES_RunLoop_Returns_false_AppExit");
-    UtTest_Add(
-        Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_ReturnsNot_CFE_SUCCESS_AndNot_CFE_SB_TIME_OUT_SendEvent,
-        cf_app_tests_Setup, CF_App_Tests_Teardown,
-        "Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_ReturnsNot_CFE_SUCCESS_AndNot_CFE_SB_TIME_OUT_SendEvent");
-    UtTest_Add(Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_And_msg_Is_NULL_SendEvent,
-               cf_app_tests_Setup, CF_App_Tests_Teardown,
-               "Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_And_msg_Is_NULL_SendEvent");
-    UtTest_Add(
-        Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SB_TIME_OUT_And_msg_Is_NULL_DoNothingDuringLoop,
-        cf_app_tests_Setup, CF_App_Tests_Teardown,
-        "Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SB_TIME_OUT_And_msg_Is_NULL_"
-        "DoNothingDuringLoop");
+    UtTest_Add(Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases, cf_app_tests_Setup, CF_App_Tests_Teardown,
+               "Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases");
     UtTest_Add(
         Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndValid_msg_Call_CF_ProcessMsg,
         cf_app_tests_Setup, CF_App_Tests_Teardown,

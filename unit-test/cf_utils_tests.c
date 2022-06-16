@@ -258,51 +258,6 @@ void Test_CF_FindTransactionBySequenceNumber(void)
 
 /* CF_DequeueTransaction tests */
 
-void Test_cf_dequeue_transaction_AssertsBecause_t_IsNull(void)
-{
-    // /* Arrange */
-    // CF_Transaction_t   *arg_t = NULL;
-
-    // /* Act */
-    // CF_DequeueTransaction(arg_t);
-
-    // /* Assert */
-    // UtAssert_STUB_COUNT(CF_HandleAssert, 1);
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - t");
-} /* end Test_cf_dequeue_transaction_AssertsBecause_t_IsNull */
-
-void Test_cf_dequeue_transaction_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANNELS(void)
-{
-    // /* Arrange */
-    // CF_Transaction_t   arg_t;
-    // CF_CListNode_t *      *expected_qs =
-    //   &CF_AppData.engine.channels[arg_t.chan_num].qs[arg_t.flags.com.q_index];
-    // uint8           dummy_chan_num =
-    //   Any_uint8_GreaterThan_or_EqualTo(CF_NUM_CHANNELS);
-
-    // arg_t.chan_num = dummy_chan_num;
-
-    // /* Act */
-    // CF_DequeueTransaction(&arg_t);
-
-    // /* Assert */
-    // UtAssert_STUB_COUNT(CF_HandleAssert, 1);
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - t->chan_num<CF_NUM_CHANNELS");
-} /* end Test_cf_dequeue_transaction_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANNELS */
-
-void Test_cf_dequeue_transaction_AssertsBecause_q_size_Eq0(void)
-{
-    // /* Arrange */
-    // CF_Transaction_t   *arg_t = NULL;
-
-    // /* Act */
-    // CF_DequeueTransaction(arg_t);
-
-    // /* Assert */
-    // UtAssert_STUB_COUNT(CF_HandleAssert, 1);
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index]");
-} /* end Test_cf_dequeue_transaction_AssertsBecause_q_size_Eq0 */
-
 void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
 {
     /* Arrange */
@@ -340,36 +295,6 @@ void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
 /* end CF_DequeueTransaction tests */
 
 /* CF_MoveTransaction tests */
-
-void Test_cf_move_transaction_AssertsBecause_t_IsNull(void)
-{
-    // /* Arrange */
-
-    // /* Act */
-
-    // /* Assert */
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - t");
-} /* end Test_cf_move_transaction_AssertsBecause_t_IsNull */
-
-void Test_cf_move_transaction_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANNELS(void)
-{
-    // /* Arrange */
-
-    // /* Act */
-
-    // /* Assert */
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - t->chan_num<CF_NUM_CHANNELS");
-} /* end Test_cf_move_transaction_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANNELS */
-
-void Test_cf_move_transaction_AssertsBecause_channel_hk_Has_q_size_Eq0(void)
-{
-    // /* Arrange */
-
-    // /* Act */
-
-    // /* Assert */
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index]");
-} /* end Test_cf_move_transaction_AssertsBecause_channel_hk_Has_q_size_Eq0 */
 
 void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(void)
 {
@@ -420,31 +345,6 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
 /* end CF_MoveTransaction tests */
 
 /* CF_CList_Remove_Ex tests */
-
-void Test_CF_CList_Remove_Ex_AssertsBecause_q_size_Eq0(void)
-{
-    // /* Arrange */
-    // CF_Channel_t           dummy_c;
-    // CF_Channel_t*          arg_c = &dummy_c;
-    // CF_QueueIdx_t    arg_index = Any_cf_queue_index_t();
-    // CF_CListNode_t *          arg_node;
-    // CF_CListNode_t **         expected_remove_head;
-    // CF_CListNode_t *          expected_remove_node;
-
-    // CF_Clist_Remove_context_t context_clist_remove;
-    // UT_SetDataBuffer(UT_KEY(CF_CList_Remove), &context_clist_remove,
-    //   sizeof(context_clist_remove), false);
-    //
-    // expected_remove_head = &arg_c->qs[arg_index];
-
-    // CF_AppData.hk.channel_hk[arg_c-CF_AppData.engine.channels].q_size[arg_index] = 0;
-
-    // /* Act */
-    // CF_CList_Remove_Ex(arg_c, arg_index, arg_node);
-
-    // /* Assert */
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - CF_AppData.hk.channel_hk[c-CF_AppData.engine.channels].q_size[index]");
-} /* end Test_CF_CList_Remove_Ex_AssertsBecause_q_size_Eq0 */
 
 void Test_CF_CList_Remove_Ex_Call_CF_CList_Remove_AndDecrement_q_size(void)
 {
@@ -806,26 +706,6 @@ void Test_CF_PrioSearch_When_t_PrioIsLessThanContextPrio_Set_context_t_To_t_AndR
 **  CF_InsertSortPrio tests
 **
 *******************************************************************************/
-
-void Test_CF_InsertSortPrio_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANNELS(void)
-{
-    // /* Arrange */
-
-    // /* Act */
-
-    // /* Assert */
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - t->chan_num<CF_NUM_CHANNELS");
-} /* end Test_CF_InsertSortPrio_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANNELS */
-
-void Test_CF_InsertSortPrio_AssertsBecause_t_state_IsNot_CFDP_IDLE(void)
-{
-    // /* Arrange */
-
-    // /* Act */
-
-    // /* Assert */
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - t->state!=CF_TxnState_IDLE");
-} /* end Test_CF_InsertSortPrio_AssertsBecause_t_state_IsNot_CFDP_IDLE */
 
 void Test_CF_InsertSortPrio_Call_CF_CList_InsertBack_Ex_ListIsEmpty_AndSet_q_index_To_q(void)
 {
@@ -1257,31 +1137,16 @@ void add_cf_utils_h_tests(void)
                "CF_FindTransactionBySequenceNumber");
 
     /* CF_DequeueTransaction tests */
-    UtTest_Add(Test_cf_dequeue_transaction_AssertsBecause_t_IsNull, cf_utils_tests_Setup, cf_utils_tests_Teardown,
-               "Test_cf_dequeue_transaction_AssertsBecause_t_IsNull");
-    UtTest_Add(Test_cf_dequeue_transaction_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANNELS, cf_utils_tests_Setup,
-               cf_utils_tests_Teardown,
-               "Test_cf_dequeue_transaction_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANNELS");
-    UtTest_Add(Test_cf_dequeue_transaction_AssertsBecause_q_size_Eq0, cf_utils_tests_Setup, cf_utils_tests_Teardown,
-               "Test_cf_dequeue_transaction_AssertsBecause_q_size_Eq0");
     UtTest_Add(Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size, cf_utils_tests_Setup,
                cf_utils_tests_Teardown, "Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size");
     /* end CF_DequeueTransaction tests */
 
     /* CF_MoveTransaction tests */
-    UtTest_Add(Test_cf_move_transaction_AssertsBecause_t_IsNull, cf_utils_tests_Setup, cf_utils_tests_Teardown,
-               "Test_cf_move_transaction_AssertsBecause_t_IsNull");
-    UtTest_Add(Test_cf_move_transaction_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANNELS, cf_utils_tests_Setup,
-               cf_utils_tests_Teardown, "Test_cf_move_transaction_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANNELS");
-    UtTest_Add(Test_cf_move_transaction_AssertsBecause_channel_hk_Has_q_size_Eq0, cf_utils_tests_Setup,
-               cf_utils_tests_Teardown, "Test_cf_move_transaction_AssertsBecause_channel_hk_Has_q_size_Eq0");
     UtTest_Add(Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q, cf_utils_tests_Setup,
                cf_utils_tests_Teardown, "Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q");
     /* end CF_MoveTransaction tests */
 
     /* CF_CList_Remove_Ex tests */
-    UtTest_Add(Test_CF_CList_Remove_Ex_AssertsBecause_q_size_Eq0, cf_utils_tests_Setup, cf_utils_tests_Teardown,
-               "Test_CF_CList_Remove_Ex_AssertsBecause_q_size_Eq0");
     UtTest_Add(Test_CF_CList_Remove_Ex_Call_CF_CList_Remove_AndDecrement_q_size, cf_utils_tests_Setup,
                cf_utils_tests_Teardown, "Test_CF_CList_Remove_Ex_Call_CF_CList_Remove_AndDecrement_q_size");
     /* end CF_CList_Remove_Ex tests */
@@ -1335,10 +1200,6 @@ void add_CF_PrioSearch_tests(void)
 
 void add_CF_InsertSortPrio_tests(void)
 {
-    UtTest_Add(Test_CF_InsertSortPrio_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANNELS, cf_utils_tests_Setup,
-               cf_utils_tests_Teardown, "Test_CF_InsertSortPrio_AssertsBecause_t_chan_num_LessThan_CF_NUM_CHANNELS");
-    UtTest_Add(Test_CF_InsertSortPrio_AssertsBecause_t_state_IsNot_CFDP_IDLE, cf_utils_tests_Setup,
-               cf_utils_tests_Teardown, "Test_CF_InsertSortPrio_AssertsBecause_t_state_IsNot_CFDP_IDLE");
     UtTest_Add(Test_CF_InsertSortPrio_Call_CF_CList_InsertBack_Ex_ListIsEmpty_AndSet_q_index_To_q, cf_utils_tests_Setup,
                cf_utils_tests_Teardown,
                "Test_CF_InsertSortPrio_Call_CF_CList_InsertBack_Ex_ListIsEmpty_AndSet_q_index_To_q");

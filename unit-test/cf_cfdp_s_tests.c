@@ -611,6 +611,15 @@ void Test_CF_CFDP_S_CheckAndRespondNak(void)
     UT_SetHandlerFunction(UT_KEY(CF_ChunkList_GetFirstChunk), UT_AltHandler_GenericPointerReturn, &ut_chunk);
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, -1);
     UtAssert_INT32_EQ(CF_CFDP_S_CheckAndRespondNak(t), -1);
+
+    /* with chunklist but CF_CFDP_S_SendFileData returning 0 (nothing to send) */
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, &config);
+    config->outgoing_file_chunk_size = CF_MAX_PDU_SIZE;
+    t->fsize                         = ut_chunk.size;
+    t->chunks                        = &chunks;
+    UT_SetHandlerFunction(UT_KEY(CF_ChunkList_GetFirstChunk), UT_AltHandler_GenericPointerReturn, &ut_chunk);
+    UT_ResetState(UT_KEY(CF_CFDP_ConstructPduHeader)); /* Returns NULL by default */
+    UtAssert_INT32_EQ(CF_CFDP_S_CheckAndRespondNak(t), 0);
 }
 
 void Test_CF_CFDP_S2_SubstateSendFileData(void)
