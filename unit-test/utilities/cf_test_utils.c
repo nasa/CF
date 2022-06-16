@@ -109,6 +109,8 @@ void cf_tests_Setup(void)
     /* Note This cannot set up for CFE_EVS_SendEvent, although it is commonly
        used/needed, not every unit uses it */
     UT_CF_ResetEventCapture(0);
+
+    memset(&CF_AppData, 0, sizeof(CF_AppData));
 }
 
 void cf_tests_Teardown(void)
@@ -135,12 +137,6 @@ void TestUtil_InitializeRandomSeed(void)
     }
 
     UtPrintf("RANDOM_VALUES_SEED = %d\n", seed);
-}
-
-void TestUtil_InitMsg(CFE_MSG_Message_t *MsgPtr, CFE_SB_MsgId_t MsgId, CFE_MSG_Size_t Size)
-{
-    // CFE_MSG_Init(MsgPtr, MsgId, Size);
-    UtAssert_Abort("using TestUtil_InitMsg!!");
 }
 
 /******************************************************************************

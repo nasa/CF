@@ -39,29 +39,18 @@
 #include "utstubs.h"
 #include "utgenstub.h"
 
-/* ut_utils_lib includes */
-#include "ut_utils_cfe_hooks.h"
-
 /* cf_tests constants */
-#define UT_INT_32_DEFAULT  0xABBACABB /* 0xABBACABB == 2881145531 decimal */
-#define UT_UINT_16_DEFAULT 0xEFFD     /* 0xEFFD == 61437 decimal */
-#define UT_INT_16_DEFAULT  0xBADD     /* 0xBADD == 47837 decimal */
-#define UT_UINT_8_DEFAULT  0xED       /* 0xED == 237 decimal */
+#define UT_INT_16_DEFAULT 0xBADD /* 0xBADD == 47837 decimal */
+#define UT_UINT_8_DEFAULT 0xED   /* 0xED == 237 decimal */
 
 #define MAX_INT 2147484647 /* Set at 32bit for now,  pow(2, 31) - 1 */
 
 #define ALL_CHANNELS 255
 #define COMPOUND_KEY 254
 
-#define ERROR_RETRIEVING_ANY_VALUE -86
-
 #ifndef RANDOM_VALUES_SEED
 #define RANDOM_VALUES_SEED 0
 #endif /* !RANDOM_VALUES_SEED */
-
-#define FIRST_CALL  1
-#define SECOND_CALL 2
-#define NEXT_CALL   1
 
 #define UT_CFDP_CHANNEL 0
 
@@ -238,7 +227,6 @@ void cf_tests_Setup(void);
 void cf_tests_Teardown(void);
 
 void TestUtil_InitializeRandomSeed(void);
-void TestUtil_InitMsg(CFE_MSG_Message_t *MsgPtr, CFE_SB_MsgId_t MsgId, CFE_MSG_Size_t Size);
 
 unsigned int AnyCoinFlip(void);
 

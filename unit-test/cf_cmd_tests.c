@@ -2855,8 +2855,7 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnSecondCallAnd_w
     UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile), &context_CF_WriteTxnQueueDataToFile,
                      sizeof(context_CF_WriteTxnQueueDataToFile), false);
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile_1st_call);
-    UT_SetDeferredRetcode(UT_KEY(CF_WriteTxnQueueDataToFile), SECOND_CALL,
-                          forced_return_CF_WriteTxnQueueDataToFile_2nd_call);
+    UT_SetDeferredRetcode(UT_KEY(CF_WriteTxnQueueDataToFile), 2, forced_return_CF_WriteTxnQueueDataToFile_2nd_call);
 
     /* goto out_close */
     int32 context_CF_WrappedClose_fd;
@@ -4020,90 +4019,56 @@ void Test_CF_CmdDisableEngine_WhenEngineDisabledAndIncrementCmdAccCounterThenFai
 void Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent(void)
 {
     /* Arrange */
-    CFE_SB_Buffer_t              utbuf;
-    CFE_SB_Buffer_t *            arg_msg                          = &utbuf;
-    CFE_MSG_FcnCode_t            forced_return_CFE_MSG_GetFcnCode = CF_NUM_COMMANDS;
-    const char *                 expected_Spec                    = "CF: invalid ground command packet cmd_code=0x%02x";
-    CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
-    CFE_EVS_SendEvent_context_t  context_CFE_EVS_SendEvent;
+    CFE_SB_Buffer_t   utbuf;
+    CFE_SB_Buffer_t * arg_msg                          = &utbuf;
+    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = CF_NUM_COMMANDS;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
                      sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetFcnCode), UT_Hook_CFE_MSG_GetFcnCode, &context_CFE_MSG_GetFcnCode);
     /* CFE_MSG_GetSize does not matter for Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent
      */
 
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-    UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), UT_Hook_CFE_EVS_SendEvent, &context_CFE_EVS_SendEvent);
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
 
     /* Act */
     CF_ProcessGroundCommand(arg_msg);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetFcnCode.MsgPtr, &arg_msg->Msg);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_GCMD_CC);
-    UtAssert_True(context_CFE_EVS_SendEvent.EventType == CFE_EVS_EventType_ERROR,
-                  "CFE_EVS_SendEvent received EventType %u and should have received %u (CFE_EVS_EventType_ERROR)",
-                  context_CFE_EVS_SendEvent.EventType, CFE_EVS_EventType_ERROR);
-    UtAssert_StrCmp(context_CFE_EVS_SendEvent.Spec, expected_Spec,
-                    "CFE_EVS_SendEvent received expected Spec\n'%s' - Received\n'%s' - Expected",
-                    context_CFE_EVS_SendEvent.Spec, expected_Spec);
     /* Assert for CF_CmdRej */
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 
 } /* end Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent */
 
 void Test_CF_ProcessGroundCommand_When_cmd_GreaterThan_CF_NUM_COMMANDS_FailAndSendEvent(void)
 {
     /* Arrange */
-    CFE_SB_Buffer_t              utbuf;
-    CFE_SB_Buffer_t *            arg_msg                          = &utbuf;
-    CFE_MSG_FcnCode_t            forced_return_CFE_MSG_GetFcnCode = Any_uint8_GreaterThan(CF_NUM_COMMANDS);
-    CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
-    const char *                 expected_Spec = "CF: invalid ground command packet cmd_code=0x%02x";
-    CFE_EVS_SendEvent_context_t  context_CFE_EVS_SendEvent;
+    CFE_SB_Buffer_t   utbuf;
+    CFE_SB_Buffer_t * arg_msg                          = &utbuf;
+    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = CF_NUM_COMMANDS + 1;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
                      sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetFcnCode), UT_Hook_CFE_MSG_GetFcnCode, &context_CFE_MSG_GetFcnCode);
     /* CFE_MSG_GetSize does not matter for Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent
      */
 
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-    UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), UT_Hook_CFE_EVS_SendEvent, &context_CFE_EVS_SendEvent);
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
 
     /* Act */
     CF_ProcessGroundCommand(arg_msg);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetFcnCode.MsgPtr, &arg_msg->Msg);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_GCMD_CC);
-    UtAssert_True(context_CFE_EVS_SendEvent.EventType == CFE_EVS_EventType_ERROR,
-                  "CFE_EVS_SendEvent received EventType %u and should have received %u (CFE_EVS_EventType_ERROR)",
-                  context_CFE_EVS_SendEvent.EventType, CFE_EVS_EventType_ERROR);
-    UtAssert_StrCmp(context_CFE_EVS_SendEvent.Spec, expected_Spec,
-                    "CFE_EVS_SendEvent received expected Spec\n'%s' - Received\n'%s' - Expected",
-                    context_CFE_EVS_SendEvent.Spec, expected_Spec);
     /* Assert for CF_CmdRej */
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 
 } /* end Test_CF_ProcessGroundCommand_When_cmd_GreaterThan_CF_NUM_COMMANDS_FailAndSendEvent */
 
@@ -4113,54 +4078,28 @@ void Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForT
     /* Arrange */
     CFE_SB_Buffer_t   utbuf;
     CFE_SB_Buffer_t * arg_msg                          = &utbuf;
-    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = 0x00; /* 0x00 forces fns[0] which is CF_CmdNoop */
-
-    /*
-     * sizeof(CF_NoArgsCmd_t) is expected size of CF_CmdNoop, using uint16 as a
-     * reasonable size constraint here as size_t is at least 16 bit
-     */
-    CFE_MSG_Size_t forced_return_CFE_MSG_GetSize = Any_uint16_Except(sizeof(CF_NoArgsCmd_t));
-
-    const char *expected_Spec = "CF: invalid ground command length for command 0x%02x, expected %d got %zd";
-    CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
-    CFE_MSG_GetSize_context_t    context_CFE_MSG_GetSize;
-    CFE_EVS_SendEvent_context_t  context_CFE_EVS_SendEvent;
+    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = CF_NOOP_CC;
+    CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize    = sizeof(CF_NoArgsCmd_t) + 1; /* Invalid size */
 
     memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
                      sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetFcnCode), UT_Hook_CFE_MSG_GetFcnCode, &context_CFE_MSG_GetFcnCode);
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &forced_return_CFE_MSG_GetSize, sizeof(forced_return_CFE_MSG_GetSize),
                      false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetSize), UT_Hook_CFE_MSG_GetSize, &context_CFE_MSG_GetSize);
 
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-    UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), UT_Hook_CFE_EVS_SendEvent, &context_CFE_EVS_SendEvent);
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
 
     /* Act */
     CF_ProcessGroundCommand(arg_msg);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetFcnCode.MsgPtr, &arg_msg->Msg);
     UtAssert_STUB_COUNT(CFE_MSG_GetSize, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetSize.MsgPtr, &arg_msg->Msg);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_GCMD_LEN);
-    UtAssert_True(context_CFE_EVS_SendEvent.EventType == CFE_EVS_EventType_ERROR,
-                  "CFE_EVS_SendEvent received EventType %u and should have received %u (CFE_EVS_EventType_ERROR)",
-                  context_CFE_EVS_SendEvent.EventType, CFE_EVS_EventType_ERROR);
-    UtAssert_StrCmp(context_CFE_EVS_SendEvent.Spec, expected_Spec,
-                    "CFE_EVS_SendEvent received expected Spec\n'%s' - Received\n'%s' - Expected",
-                    context_CFE_EVS_SendEvent.Spec, expected_Spec);
     /* Assert for CF_CmdRej */
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 
 } /* end Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForThatCommandSendEventAndCall_CF_CmdRej
    */
@@ -4170,50 +4109,29 @@ void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_m
     /* Arrange */
     CFE_SB_Buffer_t   utbuf;
     CFE_SB_Buffer_t * arg_msg                          = &utbuf;
-    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = 0x00; /* 0x00 forces fns[0] which is CF_CmdNoop */
-    CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize =
-        sizeof(CF_NoArgsCmd_t); /* sizeof(CF_NoArgsCmd_t) is expected size of CF_CmdNoop */
-    const char *                 expected_Spec = "CF: No-Op received, Version %d.%d.%d.%d";
-    CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
-    CFE_MSG_GetSize_context_t    context_CFE_MSG_GetSize;
-    CFE_EVS_SendEvent_context_t  context_CFE_EVS_SendEvent;
+    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = CF_NOOP_CC;
+    CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize    = sizeof(CF_NoArgsCmd_t); /* Valid size */
 
     memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
                      sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetFcnCode), UT_Hook_CFE_MSG_GetFcnCode, &context_CFE_MSG_GetFcnCode);
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &forced_return_CFE_MSG_GetSize, sizeof(forced_return_CFE_MSG_GetSize),
                      false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetSize), UT_Hook_CFE_MSG_GetSize, &context_CFE_MSG_GetSize);
 
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-    UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), UT_Hook_CFE_EVS_SendEvent, &context_CFE_EVS_SendEvent);
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_cmd_counter = Any_uint16();
-
-    CF_AppData.hk.counters.cmd = initial_hk_cmd_counter;
 
     /* Act */
     CF_ProcessGroundCommand(arg_msg);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetFcnCode.MsgPtr, &arg_msg->Msg);
     UtAssert_STUB_COUNT(CFE_MSG_GetSize, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetSize.MsgPtr, &arg_msg->Msg);
     /* Assert for CF_CmdNoop */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_INF_CMD_NOOP);
-    UtAssert_True(context_CFE_EVS_SendEvent.EventType == CFE_EVS_EventType_INFORMATION,
-                  "CFE_EVS_SendEvent received EventType %u and should have received %u (CFE_EVS_EventType_INFORMATION)",
-                  context_CFE_EVS_SendEvent.EventType, CFE_EVS_EventType_INFORMATION);
-    UtAssert_StrCmp(context_CFE_EVS_SendEvent.Spec, expected_Spec,
-                    "CFE_EVS_SendEvent received expected Spec\n'%s' - Received\n'%s' - Expected",
-                    context_CFE_EVS_SendEvent.Spec, expected_Spec);
     /* Assert for CF_CmdAcc */
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
 
 } /* end Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_msg */
 
@@ -4223,47 +4141,31 @@ void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_m
 void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_12_Is_NULL(void)
 {
     /* Arrange */
-    CFE_SB_Buffer_t              utbuf;
-    CFE_SB_Buffer_t *            arg_msg                          = &utbuf;
-    CFE_MSG_FcnCode_t            forced_return_CFE_MSG_GetFcnCode = 0x0C; /* 0x0C forces a null slot */
-    CFE_MSG_Size_t               forced_return_CFE_MSG_GetSize    = 0;
-    CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
-    CFE_MSG_GetSize_context_t    context_CFE_MSG_GetSize;
+    CFE_SB_Buffer_t   utbuf;
+    CFE_SB_Buffer_t * arg_msg                          = &utbuf;
+    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = 0x0C; /* 0x0C forces a null slot */
+    CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize    = 0;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
                      sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetFcnCode), UT_Hook_CFE_MSG_GetFcnCode, &context_CFE_MSG_GetFcnCode);
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &forced_return_CFE_MSG_GetSize, sizeof(forced_return_CFE_MSG_GetSize),
                      false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetSize), UT_Hook_CFE_MSG_GetSize, &context_CFE_MSG_GetSize);
 
     /* Arrange unstubbable: CF_CmdAcc, CF_CmdRej */ /* technically these are NOT called, but makes sense when looking at
                                                        other tests for CF_ProcessGroundCommand */
-    uint16 initial_hk_cmd_counter = Any_uint16();
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.cmd = initial_hk_cmd_counter;
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
 
     /* Act */
     CF_ProcessGroundCommand(arg_msg);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetFcnCode.MsgPtr, &arg_msg->Msg);
     UtAssert_STUB_COUNT(CFE_MSG_GetSize, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetSize.MsgPtr, &arg_msg->Msg);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-    /* Assert for CF_CmdAcc */ /* TODO: just to note because of other CF_ProcessGroundCommand tests note, no problem
-                                  here with overflow because no values should have been altered */
-    UtAssert_True(CF_AppData.hk.counters.cmd == initial_hk_cmd_counter,
-                  "CF_AppData.hk.counters.cmd is %u and should not have changed from %u (value before call)",
-                  CF_AppData.hk.counters.cmd, initial_hk_cmd_counter);
-    UtAssert_True(CF_AppData.hk.counters.err == initial_hk_err_counter,
-                  "CF_AppData.hk.counters.err is %u and should not have changed from %u (value before call)",
-                  CF_AppData.hk.counters.err, initial_hk_err_counter);
+    /* Assert for CF_CmdAcc */
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 0);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 0);
 } /* end Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_12_Is_NULL */
 
 /* end CF_ProcessGroundCommand tests */
