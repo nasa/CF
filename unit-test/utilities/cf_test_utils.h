@@ -146,7 +146,6 @@ typedef struct
     CF_Channel_t *                  c;
     CF_TraverseAllTransactions_fn_t fn;
     void *                          context;
-    /* TODO: add forced return? Stub is kinda using it but not from context */
 } CF_TraverseAllTransactions_context_t;
 
 typedef struct
@@ -233,7 +232,6 @@ unsigned int AnyCoinFlip(void);
 bool         Any_bool(void);
 void         AnyBufferOf_uint8_WithSize(uint8 *buffer, size_t size);
 char         Any_char(void);
-char         Any_char_Except(char exception);
 uint8        Any_0_or_1(void);
 uint8        Any_uint8(void);
 uint8        Any_uint8_BetweenExcludeMax(uint8 floor, uint8 ceiling);
@@ -242,28 +240,23 @@ uint8        Any_uint8_ExceptSetBits(uint8 mask);
 uint8        Any_uint8_ExceptUnsetBits(uint8 mask);
 uint8        Any_uint8_FromThese(uint8 values[], uint8 num_values);
 uint8        Any_uint8_LessThan(uint8 ceiling);
-uint8        Any_uint8_LessThanCeilingExcept(uint8 ceiling, uint8 exception);
 uint8        Any_uint8_GreaterThan(uint8 floor);
 uint8        Any_uint8_GreaterThan_or_EqualTo(uint8 floor);
 uint8        Any_uint8_Except(uint8 exception);
-uint8        Any_uint8_ExceptThese(uint8 exceptions[], uint8 num_exceptions);
 uint16       Any_uint16(void);
 uint16       Any_uint16_BetweenExcludeMax(uint16 floor, uint16 ceiling);
 uint16       Any_uint16_Except(uint16 exception);
-uint16       Any_uint16_ExceptThese(uint16 exceptions[], uint8 num_exceptions);
 uint16       Any_uint16_GreaterThan(uint16 floor);
 uint16       Any_uint16_LessThan(uint16 ceiling);
 uint32       Any_uint32(void);
 uint32       Any_uint32_BetweenInclusive(uint32 min, uint32 max);
 uint32       Any_uint32_BetweenExcludeMax(uint32 min, uint32 max);
 uint32       Any_uint32_Except(uint32 exception);
-uint32       Any_uint32_ExceptThese(uint32 exceptions[], uint8 num_exceptions);
 uint32       Any_uint32_GreaterThan(uint32 floor);
 uint32       Any_uint32_LessThan(uint32 ceiling);
 uint32       Any_uint32_LessThan_or_EqualTo(uint32 max);
 int32        Any_int32(void);
 int32        Any_int32_Except(int32 exception);
-int32        Any_int32_ExceptThese(int32 exceptions[], uint8 num_exceptions);
 int32        Any_int32_LessThan(int32 ceiling);
 int32        Any_int32_Negative(void);
 int32        Any_int32_ZeroOrPositive(void);
@@ -284,10 +277,8 @@ void         AnyRandomStringOfLettersOfLengthCopy(char *random_string, size_t le
 
 uint8 Any_cf_chan_num(void);
 
-void           Any_CFE_TIME_SysTime_Set(CFE_TIME_SysTime_t *fake_time);
-CFE_Status_t   Any_CFE_Status_t_Negative(void);
-CFE_Status_t   Any_CFE_Status_t_Except(CFE_Status_t exception);
-CFE_MSG_Size_t Any_CFE_MSG_Size_t(void);
-CFE_MSG_Size_t Any_CFE_MSG_Size_t_LessThan(size_t ceiling);
+void         Any_CFE_TIME_SysTime_Set(CFE_TIME_SysTime_t *fake_time);
+CFE_Status_t Any_CFE_Status_t_Negative(void);
+CFE_Status_t Any_CFE_Status_t_Except(CFE_Status_t exception);
 
 #endif

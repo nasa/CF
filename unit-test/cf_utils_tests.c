@@ -399,9 +399,8 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
     expected_insert_back_head = &CF_AppData.engine.channels[arg_t->chan_num].qs[arg_q];
     expected_insert_back_node = &arg_t->cl_node;
 
-    /* after here must have chan_num set */
-    CF_AppData.hk.channel_hk[arg_t->chan_num].q_size[arg_t->flags.com.q_index] =
-        Any_uint8_LessThanCeilingExcept(CF_QueueIdx_NUM + 1, 0);
+    /* Queue size needes to be >= 1 */
+    CF_AppData.hk.channel_hk[arg_t->chan_num].q_size[arg_t->flags.com.q_index] = 1;
 
     /* Act */
     CF_MoveTransaction(arg_t, arg_q);

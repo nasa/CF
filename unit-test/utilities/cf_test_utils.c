@@ -165,20 +165,6 @@ char Any_char(void)
     return (char)Any_uint8();
 }
 
-char Any_char_Except(char exception)
-{
-    char random_value = exception;
-
-    /* TODO: Technically while (random_value == exception) could last forever, it won't */
-    while (random_value == exception)
-    {
-
-        random_value = (char)Any_uint8();
-    }
-
-    return random_value;
-}
-
 unsigned int Any_unsigned_int(void)
 {
     int random_val = rand();
@@ -186,7 +172,7 @@ unsigned int Any_unsigned_int(void)
     return random_val;
 }
 
-// TODO: AnyBufferOf_uint8_WithSize works, but name/design could use overhaul
+// AnyBufferOf_uint8_WithSize works, but name/design could use overhaul
 // should it return a pointer? or should it be named different because it alters
 // the buffer given?
 void AnyBufferOf_uint8_WithSize(uint8 *buffer, size_t size)
@@ -295,19 +281,6 @@ uint8 Any_uint8_LessThan(uint8 ceiling)
     return random_val;
 }
 
-uint8 Any_uint8_LessThanCeilingExcept(uint8 ceiling, uint8 exception)
-{
-    uint8 random_val = exception;
-
-    /* TODO: technically could loop forever here */
-    while (random_val == exception)
-    {
-        random_val = Any_uint8_LessThan(ceiling);
-    }
-
-    return random_val;
-}
-
 uint8 Any_uint8_GreaterThan(uint8 floor)
 {
     uint8 random_val;
@@ -338,30 +311,6 @@ uint8 Any_uint8_Except(uint8 exception)
     return random_val;
 }
 
-uint8 Any_uint8_ExceptThese(uint8 exceptions[], uint8 num_exceptions)
-{
-    uint8 i          = 0;
-    uint8 random_val = Any_uint8();
-
-    while (i != num_exceptions)
-    {
-        /* TODO: technically this could go forever so it SHOULD have some
-        ** sort of stop mechanism, but practically speaking this will
-        ** never really happen - so it is not that important for test code */
-        if (random_val == exceptions[i])
-        {
-            random_val = Any_uint8();
-            i          = 0;
-        }
-        else
-        {
-            ++i;
-        }
-    }
-
-    return random_val;
-}
-
 uint16 Any_uint16(void)
 {
     return (uint16)Any_unsigned_int();
@@ -386,31 +335,6 @@ uint16 Any_uint16_Except(uint16 exception)
     return random_val;
 }
 
-uint16 Any_uint16_ExceptThese(uint16 exceptions[], uint8 num_exceptions)
-{
-    uint8  i          = 0;
-    uint16 random_val = Any_uint16();
-
-    i = 0;
-    while (i != num_exceptions)
-    {
-        /* TODO: technically this could go forever so it SHOULD have some
-        ** sort of stop mechanism, but practically speaking this will
-        ** never really happen - so it is not that important for test code */
-        if (random_val == exceptions[i])
-        {
-            random_val = Any_uint16();
-            i          = 0;
-        }
-        else
-        {
-            ++i;
-        }
-    }
-
-    return random_val;
-}
-
 uint16 Any_uint16_GreaterThan(uint16 floor)
 {
     uint16 random_val;
@@ -420,7 +344,6 @@ uint16 Any_uint16_GreaterThan(uint16 floor)
     return random_val;
 }
 
-/* TODO: Any_uint16_LessThan cannot accept 0 */
 uint16 Any_uint16_LessThan(uint16 ceiling)
 {
     return rand() % ceiling;
@@ -475,30 +398,6 @@ int32 Any_int32_LessThan(int32 ceiling)
     {
         int32 new_ceiling = abs(INT32_MIN - ceiling);
         random_val        = ceiling - (rand() % new_ceiling);
-    }
-
-    return random_val;
-}
-
-uint32 Any_uint32_ExceptThese(uint32 exceptions[], uint8 num_exceptions)
-{
-    uint8  i          = 0;
-    uint32 random_val = Any_uint32();
-
-    while (i != num_exceptions)
-    {
-        /* TODO: technically this could go forever so it SHOULD have some
-        ** sort of stop mechanism, but practically speaking this will
-        ** never realy happen - so it is not that important for test code */
-        if (random_val == exceptions[i])
-        {
-            random_val = Any_uint32();
-            i          = 0;
-        }
-        else
-        {
-            ++i;
-        }
     }
 
     return random_val;
@@ -620,30 +519,6 @@ int32 Any_int32_Except(int32 exception)
     return (int32)Any_int_Except(exception);
 }
 
-int32 Any_int32_ExceptThese(int32 exceptions[], uint8 num_exceptions)
-{
-    uint8 i          = 0;
-    int32 random_val = Any_int32();
-
-    while (i != num_exceptions)
-    {
-        /* TODO: technically this could go forever so it SHOULD have some
-        ** sort of stop mechanism, but practically speaking this will
-        ** never realy happen - so it is not that important for test code */
-        if (random_val == exceptions[i])
-        {
-            random_val = Any_int32();
-            i          = 0;
-        }
-        else
-        {
-            ++i;
-        }
-    }
-
-    return random_val;
-}
-
 int32 Any_int32_Negative(void)
 {
     return Any_int_Negative();
@@ -760,47 +635,6 @@ CFE_Status_t Any_CFE_Status_t_Except(CFE_Status_t exception)
     while (rand_val == exception)
     {
         rand_val = Any_int32();
-    }
-
-    return rand_val;
-}
-
-CFE_MSG_Size_t Any_CFE_MSG_Size_t()
-{
-    CFE_MSG_Size_t rand_val;
-    /* TODO: development machine uses 64 bit size_t */
-    switch (sizeof(CFE_MSG_Size_t))
-    {
-        case 8:
-            rand_val = (CFE_MSG_Size_t)Any_uint64();
-            break;
-        case 4:
-            rand_val = (CFE_MSG_Size_t)Any_uint32();
-            break;
-        default:
-            /* size_t is guaranteed to be at least 16 bit? */
-            rand_val = (CFE_MSG_Size_t)Any_uint16();
-    }
-
-    return rand_val;
-}
-
-CFE_MSG_Size_t Any_CFE_MSG_Size_t_LessThan(size_t ceiling)
-{
-    CFE_MSG_Size_t rand_val = UT_INT_16_DEFAULT; /* switch(sizeof(CFE_MSG_Size_t)) statements will ensure this value is
-                                                    never used, but this removes the build warning */
-    /* TODO: development machine uses 64 bit size_t */
-    switch (sizeof(CFE_MSG_Size_t))
-    {
-        case 8:
-            UtAssert_Abort("Implementation of Any_uint64_LessThan pending");
-            break;
-        case 4:
-            rand_val = (CFE_MSG_Size_t)Any_uint32_LessThan(ceiling);
-            break;
-        default:
-            /* size_t is guaranteed to be at least 16 bit? */
-            rand_val = (CFE_MSG_Size_t)Any_uint16_LessThan(ceiling);
     }
 
     return rand_val;
