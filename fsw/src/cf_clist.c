@@ -142,7 +142,7 @@ void CF_CList_Remove(CF_CListNode_t **head, CF_CListNode_t *node)
     CF_Assert(node);
     CF_Assert(*head);
 
-    if ((node->next == node) && (node->prev == node))
+    if (node->next == node)
     {
         /* only node in the list, so this one is easy */
         CF_Assert(node == *head); /* sanity check */
