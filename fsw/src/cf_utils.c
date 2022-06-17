@@ -201,6 +201,7 @@ int CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h)
                 snprintf(linebuf, sizeof(linebuf), "SRC: %s\t", h->fnames.src_filename);
                 break;
             case 2:
+            default:
                 snprintf(linebuf, sizeof(linebuf), "DST: %s\n", h->fnames.dst_filename);
                 break;
         }
