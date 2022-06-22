@@ -145,16 +145,6 @@ void Test_CF_Timer_Expired_When_t_tick_IsAnyIntegerExcept_0_Return_0(void)
 **
 *******************************************************************************/
 
-void Test_CF_Timer_TickAssertsBecause_t_tick_Is_0(void)
-{
-    // /* Arrange */
-
-    // /* Act */
-
-    // /* Assert */
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert - t->tick");
-} /* Test_CF_Timer_TickAssertsBecause_t_tick_Is_0 */
-
 void Test_CF_Timer_Tick_When_t_tick_Is_non0_Decrement_t_tick(void)
 {
     /* Arrange */
@@ -206,8 +196,6 @@ void add_CF_Timer_Expired_tests(void)
 
 void add_CF_Timer_Tick_tests(void)
 {
-    UtTest_Add(Test_CF_Timer_TickAssertsBecause_t_tick_Is_0, cf_timer_tests_Setup, cf_timer_tests_Teardown,
-               "Test_CF_Timer_TickAssertsBecause_t_tick_Is_0");
     UtTest_Add(Test_CF_Timer_Tick_When_t_tick_Is_non0_Decrement_t_tick, cf_timer_tests_Setup, cf_timer_tests_Teardown,
                "Test_CF_Timer_Tick_When_t_tick_Is_non0_Decrement_t_tick");
 }

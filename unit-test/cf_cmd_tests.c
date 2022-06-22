@@ -1282,29 +1282,21 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransac
 void Test_CF_TsnChanAction_cmd_chan_IsASingleChannel(void)
 {
     /* Arrange */
-    CF_UT_cmd_transaction_buf_t          utbuf;
-    CF_TransactionCmd_t *                arg_cmd       = &utbuf.xact;
-    const char                           arg_cmdstr[1] = "";
-    CF_TsnChanAction_fn_t                arg_fn        = &Dummy_CF_TsnChanAction_fn_t;
-    int                                  dummy_context;
-    void *                               arg_context     = &dummy_context;
-    int                                  expected_result = Any_int();
-    CF_TraverseAllTransactions_context_t context_CF_TraverseAllTransactions;
+    CF_TransactionCmd_t cmd;
+    int                 result = 1;
 
-    memset(&utbuf, 0, sizeof(utbuf));
-    arg_cmd->chan = Any_cf_channel();
+    memset(&cmd, 0, sizeof(cmd));
 
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-    UT_SetDataBuffer(UT_KEY(CF_TraverseAllTransactions), &context_CF_TraverseAllTransactions,
-                     sizeof(context_CF_TraverseAllTransactions), false);
-    UT_SetDefaultReturnValue(UT_KEY(CF_TraverseAllTransactions), expected_result);
+    UT_SetDefaultReturnValue(UT_KEY(CF_TraverseAllTransactions), result);
 
     /* Act */
-    UtAssert_INT32_EQ(CF_TsnChanAction(arg_cmd, arg_cmdstr, arg_fn, arg_context), expected_result);
+    UtAssert_INT32_EQ(CF_TsnChanAction(&cmd, NULL, NULL, NULL), result);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-    /* TODO: values for context_CF_TraverseAllTransactions need checked!! */
+    UtAssert_STUB_COUNT(CF_TraverseAllTransactions, 1);
+
 } /* end Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels */
 
 void Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid(void)
@@ -1336,16 +1328,6 @@ void Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid(void)
 **  CF_DoSuspRes_Txn tests
 **
 *******************************************************************************/
-
-void Test_CF_DoSuspRes_Txn_Asserts_t_Is_NULL(void)
-{
-    // /* Arrange */
-
-    // /* Act */
-
-    // /* Assert */
-    UtAssert_MIR("JIRA: GSFCCFS-1733 CF_Assert");
-} /* end Test_CF_DoSuspRes_Txn_Asserts_t_Is_NULL */
 
 void Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action(void)
 {
@@ -1466,40 +1448,31 @@ void Test_CF_DoSuspRes(void)
 **  CF_CmdSuspend tests
 **
 *******************************************************************************/
-/* TODO: SendEvent needs to be able to check all values before action = 1 can be verified in
- * Test_CF_CmdSuspend_Call_CF_DoSuspRes_WithGiven_msg_And_action_1 */
+
+/* Test_CF_CmdSuspend_Call_CF_DoSuspRes_WithGiven_msg_And_action_1 */
 void Test_CF_CmdSuspend_Call_CF_DoSuspRes_WithGiven_msg_And_action_1(void)
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t utbuf;
-    CF_TransactionCmd_t *       dummy_cmd = &utbuf.xact;
-    CFE_SB_Buffer_t *           arg_cmd   = &utbuf.buf;
+    uint16                      events[2] = {0};
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    /* Arrange unstubbable: CF_DoSuspRes */
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), events, sizeof(events), false);
 
-    /* Arrange unstubbable: CF_TsnChanAction  - causes areturn -1*/
-    dummy_cmd->chan = Any_uint8_BetweenExcludeMax(CF_NUM_CHANNELS, COMPOUND_KEY);
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
+    /* Set to invalid channel */
+    utbuf.xact.chan = CF_NUM_CHANNELS;
 
     /* Act */
-    CF_CmdSuspend(arg_cmd);
+    CF_CmdSuspend(&utbuf.buf);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 2);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_TSN_CHAN_INVALID);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_SUSPRES_CHAN);
+    UtAssert_UINT32_EQ(events[0], CF_EID_ERR_CMD_TSN_CHAN_INVALID);
+    UtAssert_UINT32_EQ(events[1], CF_EID_ERR_CMD_SUSPRES_CHAN);
 
     /* Assert CF_CmdRej */
-    UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
-                  "CF_AppData.hk.counters.err is %d and should be 1 more than %d", CF_AppData.hk.counters.err,
-                  initial_hk_err_counter);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 } /* end Test_CF_CmdSuspend_Call_CF_DoSuspRes_WithGiven_msg_And_action_1 */
 
 /* end CF_CmdSuspend tests */
@@ -1509,40 +1482,32 @@ void Test_CF_CmdSuspend_Call_CF_DoSuspRes_WithGiven_msg_And_action_1(void)
 **  CF_CmdResume tests
 **
 *******************************************************************************/
-/* TODO: SendEvent needs to be able to check all values before action = 0 can be verified in
- * Test_CF_CmdResume_Call_CF_DoSuspRes_WithGiven_msg_And_action_0 */
+
+/* Test_CF_CmdResume_Call_CF_DoSuspRes_WithGiven_msg_And_action_0 */
 void Test_CF_CmdResume_Call_CF_DoSuspRes_WithGiven_msg_And_action_0(void)
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t utbuf;
-    CF_TransactionCmd_t *       dummy_cmd = &utbuf.xact;
-    CFE_SB_Buffer_t *           arg_cmd   = &utbuf.buf;
+    uint16                      events[2] = {0};
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    /* Arrange unstubbable: CF_DoSuspRes */
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    /* Capture events */
+    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), events, sizeof(events), false);
 
-    /* Arrange unstubbable: CF_TsnChanAction  - causes areturn -1*/
-    dummy_cmd->chan = Any_uint8_BetweenExcludeMax(CF_NUM_CHANNELS, COMPOUND_KEY);
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
+    /* Invalid channel */
+    utbuf.xact.chan = CF_NUM_CHANNELS;
 
     /* Act */
-    CF_CmdResume(arg_cmd);
+    CF_CmdResume(&utbuf.buf);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 2);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_TSN_CHAN_INVALID);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_SUSPRES_CHAN);
+    UtAssert_UINT32_EQ(events[0], CF_EID_ERR_CMD_TSN_CHAN_INVALID);
+    UtAssert_UINT32_EQ(events[1], CF_EID_ERR_CMD_SUSPRES_CHAN);
 
     /* Assert CF_CmdRej */
-    UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
-                  "CF_AppData.hk.counters.err is %d and should be 1 more than %d", CF_AppData.hk.counters.err,
-                  initial_hk_err_counter);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 } /* end Test_CF_CmdResume_Call_CF_DoSuspRes_WithGiven_msg_And_action_0 */
 
 /* end CF_CmdResume tests */
@@ -1582,39 +1547,18 @@ void Test_CF_CmdCancel_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t utbuf;
-    CF_TransactionCmd_t *       dummy_msg = &utbuf.xact;
-    CFE_SB_Buffer_t *           arg_msg   = &utbuf.buf;
-
-    // TODO: CF_TsnChanAction result is default with no setup; it should be controlled, but in the essence of time this
-    // default value is used to show functionality of the code
-    /* Arrange unstubbable: CF_TsnChanAction */
-    CF_TraverseAllTransactions_context_t context_CF_TraverseAllTransactions;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    dummy_msg->chan = Any_cf_chan_num();
-
-    UT_SetDataBuffer(UT_KEY(CF_TraverseAllTransactions), &context_CF_TraverseAllTransactions,
-                     sizeof(context_CF_TraverseAllTransactions), false);
+    /* Nominally returns number of transactions affected, cause failure */
     UT_SetDefaultReturnValue(UT_KEY(CF_TraverseAllTransactions), 0);
 
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
-
     /* Act */
-    CF_CmdCancel(arg_msg);
+    CF_CmdCancel(&utbuf.buf);
 
     /* Assert */
-    /* Assert for CF_TsnChanAction */
     UtAssert_STUB_COUNT(CF_TraverseAllTransactions, 1);
-    UtAssert_ADDRESS_EQ(context_CF_TraverseAllTransactions.c, CF_AppData.engine.channels + dummy_msg->chan);
-    UtAssert_True(context_CF_TraverseAllTransactions.fn == CF_CmdCancel_Txn,
-                  "context_CF_TraverseAllTransactions.fn ==  CF_CmdCancel_Txn");
-    UtAssert_ADDRESS_EQ(context_CF_TraverseAllTransactions.context, NULL);
-    /* Assert for CF_CmdRej */
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 } /* end Test_CF_CmdCancel_Call_CF_CmdCond_WithNotted_CF_TsnChanAction */
 
 /*******************************************************************************
@@ -1655,39 +1599,18 @@ void Test_CF_CmdAbandon_Call_CF_CmdCond_WithNotted_CF_TsnChanAction(void)
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t utbuf;
-    CF_TransactionCmd_t *       dummy_msg = &utbuf.xact;
-    CFE_SB_Buffer_t *           arg_msg   = &utbuf.buf;
-
-    // TODO: CF_TsnChanAction result is default with no setup; it should be controlled, but in the essence of time this
-    // default value is used to show functionality of the code
-    /* Arrange unstubbable: CF_TsnChanAction */
-    CF_TraverseAllTransactions_context_t context_CF_TraverseAllTransactions;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    dummy_msg->chan = Any_cf_chan_num();
-
-    UT_SetDataBuffer(UT_KEY(CF_TraverseAllTransactions), &context_CF_TraverseAllTransactions,
-                     sizeof(context_CF_TraverseAllTransactions), false);
+    /* Nominally returns number of transactions acted on, force failure */
     UT_SetDefaultReturnValue(UT_KEY(CF_TraverseAllTransactions), 0);
 
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
-
     /* Act */
-    CF_CmdAbandon(arg_msg);
+    CF_CmdAbandon(&utbuf.buf);
 
     /* Assert */
-    /* Assert for CF_TsnChanAction */
     UtAssert_STUB_COUNT(CF_TraverseAllTransactions, 1);
-    UtAssert_ADDRESS_EQ(context_CF_TraverseAllTransactions.c, CF_AppData.engine.channels + dummy_msg->chan);
-    UtAssert_True(context_CF_TraverseAllTransactions.fn == CF_CmdAbandon_Txn,
-                  "context_CF_TraverseAllTransactions.fn ==  CF_CmdAbandon_Txn");
-    UtAssert_ADDRESS_EQ(context_CF_TraverseAllTransactions.context, NULL);
-    /* Assert for CF_CmdRej */
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 } /* end Test_CF_CmdAbandon_Call_CF_CmdCond_WithNotted_CF_TsnChanAction */
 
 /*******************************************************************************
@@ -2855,8 +2778,7 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnSecondCallAnd_w
     UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile), &context_CF_WriteTxnQueueDataToFile,
                      sizeof(context_CF_WriteTxnQueueDataToFile), false);
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile_1st_call);
-    UT_SetDeferredRetcode(UT_KEY(CF_WriteTxnQueueDataToFile), SECOND_CALL,
-                          forced_return_CF_WriteTxnQueueDataToFile_2nd_call);
+    UT_SetDeferredRetcode(UT_KEY(CF_WriteTxnQueueDataToFile), 2, forced_return_CF_WriteTxnQueueDataToFile_2nd_call);
 
     /* goto out_close */
     int32 context_CF_WrappedClose_fd;
@@ -3769,44 +3691,34 @@ void Test_CF_CmdGetSetParam(void)
 **
 *******************************************************************************/
 
-/* TODO: Test_CF_CmdSetParam_Call_CF_CmdGetSetParam_With_cmd_key_And_cmd_value only uses 0 as key, there could be more
- * tests here, but only because CF_CmdGetSetParam is unstubbable, this test mimics
- * Test_CF_CmdGetSetParam_When_is_set_Is_1_And_param_id_Is_0_HasANull_fn_ThenCopy_value_To_ptr_SendEventAndAcceptCommand*/
 void Test_CF_CmdSetParam_Call_CF_CmdGetSetParam_With_cmd_key_And_cmd_value(void)
 {
     /* Arrange */
     CF_UT_cmd_set_param_args_buf_t utbuf;
-    CF_SetParamCmd_t *             dummy_msg = &utbuf.sp;
-    CFE_SB_Buffer_t *              arg_msg   = &utbuf.buf;
-
-    /* Arrange unstubbable: CF_CmdGetSetParam */
-    CF_ConfigTable_t dummy_config_table;
+    CF_ConfigTable_t               dummy_config_table;
+    uint16                         event = 0;
 
     memset(&utbuf, 0, sizeof(utbuf));
     memset(&dummy_config_table, 0, sizeof(dummy_config_table));
 
-    dummy_msg->key      = 0;
-    dummy_msg->value    = Any_uint32();
-    dummy_msg->chan_num = 0;
+    utbuf.sp.key      = CF_GetSet_ValueID_ticks_per_second;
+    utbuf.sp.value    = 1;
+    utbuf.sp.chan_num = 0;
 
     CF_AppData.config_table = &dummy_config_table;
 
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange unstubbable: CF_CmdAcc */
-    uint16 initial_hk_cmd_counter = Any_uint16();
-
-    CF_AppData.hk.counters.cmd = initial_hk_cmd_counter;
+    /* Set up to capture event id */
+    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &event, sizeof(event), false);
 
     /* Act */
-    CF_CmdSetParam(arg_msg);
+    CF_CmdSetParam(&utbuf.buf);
 
     /* Assert */
-    UtAssert_UINT32_EQ(CF_AppData.config_table->ticks_per_second, dummy_msg->value);
+    UtAssert_UINT32_EQ(CF_AppData.config_table->ticks_per_second, utbuf.sp.value);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_GETSET1);
+    UtAssert_UINT32_EQ(event, CF_EID_INF_CMD_GETSET1);
     /* Assert for CF_CmdAcc() */
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
 
 } /* end Test_CF_CmdSetParam_Call_CF_CmdGetSetParam_With_cmd_key_And_cmd_value */
 
@@ -3818,44 +3730,33 @@ void Test_CF_CmdSetParam_Call_CF_CmdGetSetParam_With_cmd_key_And_cmd_value(void)
 **
 *******************************************************************************/
 
-/* TODO: Test_CF_CmdGetParam_Call_CF_CmdGetSetParam_With_cmd_data_byte_0_And_0 only uses 0 as key, there could be more
- * tests here, but only because CF_CmdGetSetParam is unstubbable, this test mimics
- * Test_CF_CmdGetSetParam_When_is_set_Is_0_And_param_id_Is_0_MemCopySendEventAndAcceptCommand*/
 void Test_CF_CmdGetParam_Call_CF_CmdGetSetParam_With_cmd_data_byte_0_AndConstantValue_0(void)
 {
     /* Arrange */
     CF_UT_cmd_get_param_args_buf_t utbuf;
-    CF_GetParamCmd_t *             dummy_msg = &utbuf.gp;
-    CFE_SB_Buffer_t *              arg_msg   = &utbuf.buf;
+    CF_ConfigTable_t               config_table;
+    uint16                         event;
 
     memset(&utbuf, 0, sizeof(utbuf));
+    memset(&config_table, 0, sizeof(config_table));
 
-    dummy_msg->key      = 0;
-    dummy_msg->chan_num = Any_cf_chan_num();
+    utbuf.gp.key      = CF_GetSet_ValueID_ticks_per_second;
+    utbuf.gp.chan_num = 0;
 
-    /* Arrange unstubbable: CF_CmdGetSetParam */
-    CF_ConfigTable_t dummy_config_table;
+    CF_AppData.config_table = &config_table;
 
-    CF_AppData.config_table = &dummy_config_table;
-
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-
-    /* Arrange unstubbable: CF_CmdAcc */
-    uint16 initial_hk_cmd_counter = Any_uint16();
-
-    CF_AppData.hk.counters.cmd = initial_hk_cmd_counter;
+    /* Set up to capture event id */
+    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), &event, sizeof(event), false);
 
     /* Act */
-    CF_CmdGetParam(arg_msg);
+    CF_CmdGetParam(&utbuf.buf);
 
     /* Assert */
-    /* Assert for CF_CmdGetSetParam */
-    /* TODO: CANNOT test memcpy because copies it to a local value (the arg value, but it was not passed by ref) and
-     * then only used in the SendEvent function which does not track that value as of the writing of this comment. */
+    /* Note actual value not tested, just flow */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_GETSET2);
+    UtAssert_UINT32_EQ(event, CF_EID_INF_CMD_GETSET2);
     /* Assert for CF_CmdAcc() */
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
 
 } /* end Test_CF_CmdGetParam_Call_CF_CmdGetSetParam_With_cmd_data_byte_0_AndConstantValue_0 */
 
@@ -4020,90 +3921,56 @@ void Test_CF_CmdDisableEngine_WhenEngineDisabledAndIncrementCmdAccCounterThenFai
 void Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent(void)
 {
     /* Arrange */
-    CFE_SB_Buffer_t              utbuf;
-    CFE_SB_Buffer_t *            arg_msg                          = &utbuf;
-    CFE_MSG_FcnCode_t            forced_return_CFE_MSG_GetFcnCode = CF_NUM_COMMANDS;
-    const char *                 expected_Spec                    = "CF: invalid ground command packet cmd_code=0x%02x";
-    CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
-    CFE_EVS_SendEvent_context_t  context_CFE_EVS_SendEvent;
+    CFE_SB_Buffer_t   utbuf;
+    CFE_SB_Buffer_t * arg_msg                          = &utbuf;
+    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = CF_NUM_COMMANDS;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
                      sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetFcnCode), UT_Hook_CFE_MSG_GetFcnCode, &context_CFE_MSG_GetFcnCode);
     /* CFE_MSG_GetSize does not matter for Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent
      */
 
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-    UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), UT_Hook_CFE_EVS_SendEvent, &context_CFE_EVS_SendEvent);
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
 
     /* Act */
     CF_ProcessGroundCommand(arg_msg);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetFcnCode.MsgPtr, &arg_msg->Msg);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_GCMD_CC);
-    UtAssert_True(context_CFE_EVS_SendEvent.EventType == CFE_EVS_EventType_ERROR,
-                  "CFE_EVS_SendEvent received EventType %u and should have received %u (CFE_EVS_EventType_ERROR)",
-                  context_CFE_EVS_SendEvent.EventType, CFE_EVS_EventType_ERROR);
-    UtAssert_StrCmp(context_CFE_EVS_SendEvent.Spec, expected_Spec,
-                    "CFE_EVS_SendEvent received expected Spec\n'%s' - Received\n'%s' - Expected",
-                    context_CFE_EVS_SendEvent.Spec, expected_Spec);
     /* Assert for CF_CmdRej */
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 
 } /* end Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent */
 
 void Test_CF_ProcessGroundCommand_When_cmd_GreaterThan_CF_NUM_COMMANDS_FailAndSendEvent(void)
 {
     /* Arrange */
-    CFE_SB_Buffer_t              utbuf;
-    CFE_SB_Buffer_t *            arg_msg                          = &utbuf;
-    CFE_MSG_FcnCode_t            forced_return_CFE_MSG_GetFcnCode = Any_uint8_GreaterThan(CF_NUM_COMMANDS);
-    CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
-    const char *                 expected_Spec = "CF: invalid ground command packet cmd_code=0x%02x";
-    CFE_EVS_SendEvent_context_t  context_CFE_EVS_SendEvent;
+    CFE_SB_Buffer_t   utbuf;
+    CFE_SB_Buffer_t * arg_msg                          = &utbuf;
+    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = CF_NUM_COMMANDS + 1;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
                      sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetFcnCode), UT_Hook_CFE_MSG_GetFcnCode, &context_CFE_MSG_GetFcnCode);
     /* CFE_MSG_GetSize does not matter for Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent
      */
 
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-    UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), UT_Hook_CFE_EVS_SendEvent, &context_CFE_EVS_SendEvent);
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
 
     /* Act */
     CF_ProcessGroundCommand(arg_msg);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetFcnCode.MsgPtr, &arg_msg->Msg);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_GCMD_CC);
-    UtAssert_True(context_CFE_EVS_SendEvent.EventType == CFE_EVS_EventType_ERROR,
-                  "CFE_EVS_SendEvent received EventType %u and should have received %u (CFE_EVS_EventType_ERROR)",
-                  context_CFE_EVS_SendEvent.EventType, CFE_EVS_EventType_ERROR);
-    UtAssert_StrCmp(context_CFE_EVS_SendEvent.Spec, expected_Spec,
-                    "CFE_EVS_SendEvent received expected Spec\n'%s' - Received\n'%s' - Expected",
-                    context_CFE_EVS_SendEvent.Spec, expected_Spec);
     /* Assert for CF_CmdRej */
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 
 } /* end Test_CF_ProcessGroundCommand_When_cmd_GreaterThan_CF_NUM_COMMANDS_FailAndSendEvent */
 
@@ -4113,54 +3980,28 @@ void Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForT
     /* Arrange */
     CFE_SB_Buffer_t   utbuf;
     CFE_SB_Buffer_t * arg_msg                          = &utbuf;
-    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = 0x00; /* 0x00 forces fns[0] which is CF_CmdNoop */
-
-    /*
-     * sizeof(CF_NoArgsCmd_t) is expected size of CF_CmdNoop, using uint16 as a
-     * reasonable size constraint here as size_t is at least 16 bit
-     */
-    CFE_MSG_Size_t forced_return_CFE_MSG_GetSize = Any_uint16_Except(sizeof(CF_NoArgsCmd_t));
-
-    const char *expected_Spec = "CF: invalid ground command length for command 0x%02x, expected %d got %zd";
-    CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
-    CFE_MSG_GetSize_context_t    context_CFE_MSG_GetSize;
-    CFE_EVS_SendEvent_context_t  context_CFE_EVS_SendEvent;
+    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = CF_NOOP_CC;
+    CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize    = sizeof(CF_NoArgsCmd_t) + 1; /* Invalid size */
 
     memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
                      sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetFcnCode), UT_Hook_CFE_MSG_GetFcnCode, &context_CFE_MSG_GetFcnCode);
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &forced_return_CFE_MSG_GetSize, sizeof(forced_return_CFE_MSG_GetSize),
                      false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetSize), UT_Hook_CFE_MSG_GetSize, &context_CFE_MSG_GetSize);
 
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-    UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), UT_Hook_CFE_EVS_SendEvent, &context_CFE_EVS_SendEvent);
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
 
     /* Act */
     CF_ProcessGroundCommand(arg_msg);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetFcnCode.MsgPtr, &arg_msg->Msg);
     UtAssert_STUB_COUNT(CFE_MSG_GetSize, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetSize.MsgPtr, &arg_msg->Msg);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_GCMD_LEN);
-    UtAssert_True(context_CFE_EVS_SendEvent.EventType == CFE_EVS_EventType_ERROR,
-                  "CFE_EVS_SendEvent received EventType %u and should have received %u (CFE_EVS_EventType_ERROR)",
-                  context_CFE_EVS_SendEvent.EventType, CFE_EVS_EventType_ERROR);
-    UtAssert_StrCmp(context_CFE_EVS_SendEvent.Spec, expected_Spec,
-                    "CFE_EVS_SendEvent received expected Spec\n'%s' - Received\n'%s' - Expected",
-                    context_CFE_EVS_SendEvent.Spec, expected_Spec);
     /* Assert for CF_CmdRej */
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 
 } /* end Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForThatCommandSendEventAndCall_CF_CmdRej
    */
@@ -4170,100 +4011,57 @@ void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_m
     /* Arrange */
     CFE_SB_Buffer_t   utbuf;
     CFE_SB_Buffer_t * arg_msg                          = &utbuf;
-    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = 0x00; /* 0x00 forces fns[0] which is CF_CmdNoop */
-    CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize =
-        sizeof(CF_NoArgsCmd_t); /* sizeof(CF_NoArgsCmd_t) is expected size of CF_CmdNoop */
-    const char *                 expected_Spec = "CF: No-Op received, Version %d.%d.%d.%d";
-    CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
-    CFE_MSG_GetSize_context_t    context_CFE_MSG_GetSize;
-    CFE_EVS_SendEvent_context_t  context_CFE_EVS_SendEvent;
+    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = CF_NOOP_CC;
+    CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize    = sizeof(CF_NoArgsCmd_t); /* Valid size */
 
     memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
                      sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetFcnCode), UT_Hook_CFE_MSG_GetFcnCode, &context_CFE_MSG_GetFcnCode);
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &forced_return_CFE_MSG_GetSize, sizeof(forced_return_CFE_MSG_GetSize),
                      false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetSize), UT_Hook_CFE_MSG_GetSize, &context_CFE_MSG_GetSize);
 
     UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
-    UT_SetHookFunction(UT_KEY(CFE_EVS_SendEvent), UT_Hook_CFE_EVS_SendEvent, &context_CFE_EVS_SendEvent);
-
-    /* Arrange unstubbable: CF_CmdRej */
-    uint16 initial_hk_cmd_counter = Any_uint16();
-
-    CF_AppData.hk.counters.cmd = initial_hk_cmd_counter;
 
     /* Act */
     CF_ProcessGroundCommand(arg_msg);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetFcnCode.MsgPtr, &arg_msg->Msg);
     UtAssert_STUB_COUNT(CFE_MSG_GetSize, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetSize.MsgPtr, &arg_msg->Msg);
     /* Assert for CF_CmdNoop */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_INF_CMD_NOOP);
-    UtAssert_True(context_CFE_EVS_SendEvent.EventType == CFE_EVS_EventType_INFORMATION,
-                  "CFE_EVS_SendEvent received EventType %u and should have received %u (CFE_EVS_EventType_INFORMATION)",
-                  context_CFE_EVS_SendEvent.EventType, CFE_EVS_EventType_INFORMATION);
-    UtAssert_StrCmp(context_CFE_EVS_SendEvent.Spec, expected_Spec,
-                    "CFE_EVS_SendEvent received expected Spec\n'%s' - Received\n'%s' - Expected",
-                    context_CFE_EVS_SendEvent.Spec, expected_Spec);
     /* Assert for CF_CmdAcc */
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
 
 } /* end Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_msg */
 
-/* TODO: Not sure if it is even possible to have a NULL get to this check, but
-** Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_12_Is_NULL is forcing it
-** to happen.  The reason is, I'm not sure CFE_SB_GetTotalMsgLength can ever actually return 0. */
+/* Hit a NULL entry to exercise that conditional and no action */
 void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_12_Is_NULL(void)
 {
     /* Arrange */
-    CFE_SB_Buffer_t              utbuf;
-    CFE_SB_Buffer_t *            arg_msg                          = &utbuf;
-    CFE_MSG_FcnCode_t            forced_return_CFE_MSG_GetFcnCode = 0x0C; /* 0x0C forces a null slot */
-    CFE_MSG_Size_t               forced_return_CFE_MSG_GetSize    = 0;
-    CFE_MSG_GetFcnCode_context_t context_CFE_MSG_GetFcnCode;
-    CFE_MSG_GetSize_context_t    context_CFE_MSG_GetSize;
+    CFE_SB_Buffer_t   utbuf;
+    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = 0x0C; /* 0x0C forces a null slot */
+    CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize    = 0;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
                      sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetFcnCode), UT_Hook_CFE_MSG_GetFcnCode, &context_CFE_MSG_GetFcnCode);
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &forced_return_CFE_MSG_GetSize, sizeof(forced_return_CFE_MSG_GetSize),
                      false);
-    UT_SetHookFunction(UT_KEY(CFE_MSG_GetSize), UT_Hook_CFE_MSG_GetSize, &context_CFE_MSG_GetSize);
-
-    /* Arrange unstubbable: CF_CmdAcc, CF_CmdRej */ /* technically these are NOT called, but makes sense when looking at
-                                                       other tests for CF_ProcessGroundCommand */
-    uint16 initial_hk_cmd_counter = Any_uint16();
-    uint16 initial_hk_err_counter = Any_uint16();
-
-    CF_AppData.hk.counters.cmd = initial_hk_cmd_counter;
-    CF_AppData.hk.counters.err = initial_hk_err_counter;
 
     /* Act */
-    CF_ProcessGroundCommand(arg_msg);
+    CF_ProcessGroundCommand(&utbuf);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetFcnCode.MsgPtr, &arg_msg->Msg);
     UtAssert_STUB_COUNT(CFE_MSG_GetSize, 1);
-    UtAssert_ADDRESS_EQ(context_CFE_MSG_GetSize.MsgPtr, &arg_msg->Msg);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-    /* Assert for CF_CmdAcc */ /* TODO: just to note because of other CF_ProcessGroundCommand tests note, no problem
-                                  here with overflow because no values should have been altered */
-    UtAssert_True(CF_AppData.hk.counters.cmd == initial_hk_cmd_counter,
-                  "CF_AppData.hk.counters.cmd is %u and should not have changed from %u (value before call)",
-                  CF_AppData.hk.counters.cmd, initial_hk_cmd_counter);
-    UtAssert_True(CF_AppData.hk.counters.err == initial_hk_err_counter,
-                  "CF_AppData.hk.counters.err is %u and should not have changed from %u (value before call)",
-                  CF_AppData.hk.counters.err, initial_hk_err_counter);
+    /* Assert for CF_CmdAcc */
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 0);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 0);
 } /* end Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_12_Is_NULL */
 
 /* end CF_ProcessGroundCommand tests */
@@ -4398,8 +4196,6 @@ void add_CF_TsnChanAction_tests(void)
 
 void add_CF_DoSuspRes_Txn_tests(void)
 {
-    UtTest_Add(Test_CF_DoSuspRes_Txn_Asserts_t_Is_NULL, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_DoSuspRes_Txn_Asserts_t_Is_NULL");
     UtTest_Add(Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action, cf_cmd_tests_Setup,
                cf_cmd_tests_Teardown, "Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action");
     UtTest_Add(Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action, cf_cmd_tests_Setup,

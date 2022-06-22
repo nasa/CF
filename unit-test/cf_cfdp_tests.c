@@ -614,16 +614,16 @@ void Test_CF_CFDP_SendMd(void)
     UtAssert_STRINGBUF_EQ(md->source_filename.data_ptr, md->source_filename.length, h->fnames.src_filename,
                           sizeof(h->fnames.src_filename));
 
+    /* Class 2, also hit maximum string length */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, &h, &t, NULL);
     md = &ph->int_header.md;
-    strncpy(h->fnames.dst_filename, "dst2", sizeof(h->fnames.dst_filename));
+    memset(h->fnames.dst_filename, 0xFF, sizeof(h->fnames.dst_filename));
     strncpy(h->fnames.src_filename, "src2", sizeof(h->fnames.src_filename));
     t->state = CF_TxnState_S2;
     t->fsize = 5678;
     UtAssert_INT32_EQ(CF_CFDP_SendMd(t), CF_SendRet_SUCCESS);
     UtAssert_UINT32_EQ(md->size, t->fsize);
-    UtAssert_STRINGBUF_EQ(md->dest_filename.data_ptr, md->dest_filename.length, h->fnames.dst_filename,
-                          sizeof(h->fnames.dst_filename));
+    UtAssert_UINT32_EQ(md->dest_filename.length, sizeof(h->fnames.dst_filename));
     UtAssert_STRINGBUF_EQ(md->source_filename.data_ptr, md->source_filename.length, h->fnames.src_filename,
                           sizeof(h->fnames.src_filename));
 }
@@ -638,6 +638,14 @@ void Test_CF_CFDP_SendFd(void)
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, &t, NULL);
     UtAssert_INT32_EQ(CF_CFDP_SendFd(t, ph), CF_SendRet_SUCCESS);
+
+    /* Hit CF_CFDP_SetPduLength condition where final_pos < the header_encoded_length */
+    ph->pdu_header.header_encoded_length = CF_CODEC_GET_POSITION(ph->penc) + 1;
+    ph->pdu_header.data_encoded_length   = 0;
+
+    UtAssert_INT32_EQ(CF_CFDP_SendFd(t, ph), CF_SendRet_SUCCESS);
+
+    UtAssert_UINT32_EQ(ph->pdu_header.data_encoded_length, 0);
 }
 
 void Test_CF_CFDP_SendEof(void)

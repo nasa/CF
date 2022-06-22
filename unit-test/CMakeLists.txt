@@ -37,7 +37,6 @@
 add_cfe_coverage_stubs(cf_internal
   utilities/cf_test_utils.c
   utilities/cf_test_alt_handler.c
-  utilities/ut_utils_cfe_hooks.c
 
   stubs/cf_app_global.c
   stubs/cf_app_stubs.c
