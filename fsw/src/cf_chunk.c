@@ -414,45 +414,45 @@ uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_
             compute_gap_fn(chunks, &c, opaque);
         }
         ret = 1;
-        goto err_out;
     }
-
-    while ((ret < max_gaps) && (i < chunks->count))
+    else
     {
-        CF_ChunkOffset_t next_off  = (i == (chunks->count - 1)) ? total : chunks->chunks[i + 1].offset;
-        CF_ChunkOffset_t gap_start = (chunks->chunks[i].offset + chunks->chunks[i].size);
-        CF_ChunkSize_t   gap_size  = (next_off - gap_start);
-        CF_Chunk_t       c         = {gap_start, gap_size};
-
-        if (gap_start >= total)
+        while ((ret < max_gaps) && (i < chunks->count))
         {
-            break;
-        }
+            CF_ChunkOffset_t next_off  = (i == (chunks->count - 1)) ? total : chunks->chunks[i + 1].offset;
+            CF_ChunkOffset_t gap_start = (chunks->chunks[i].offset + chunks->chunks[i].size);
+            CF_ChunkSize_t   gap_size  = (next_off - gap_start);
+            CF_Chunk_t       c         = {gap_start, gap_size};
 
-        /* check if start has been passed */
-        if (!started && ((c.offset + c.size) >= start))
-        {
-            CF_ChunkSize_t start_diff = (start - c.offset);
-            if (start_diff < c.offset)
+            if (gap_start >= total)
             {
-                c.offset += start_diff;
-                c.size -= start_diff;
+                break;
             }
-            started = 1;
-        }
 
-        if (started)
-        {
-            if (compute_gap_fn)
+            /* check if start has been passed */
+            if (!started && ((c.offset + c.size) >= start))
             {
-                compute_gap_fn(chunks, &c, opaque);
+                CF_ChunkSize_t start_diff = (start - c.offset);
+                if (start_diff < c.offset)
+                {
+                    c.offset += start_diff;
+                    c.size -= start_diff;
+                }
+                started = 1;
             }
-            ++ret;
-        }
 
-        ++i;
+            if (started)
+            {
+                if (compute_gap_fn)
+                {
+                    compute_gap_fn(chunks, &c, opaque);
+                }
+                ++ret;
+            }
+
+            ++i;
+        }
     }
 
-err_out:
     return ret;
 }

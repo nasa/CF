@@ -62,7 +62,8 @@
 CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent)
 {
     /* if channel is frozen, do not take message */
-    CF_Channel_t *          c = CF_AppData.engine.channels + t->chan_num;
+    CF_Channel_t *          c       = CF_AppData.engine.channels + t->chan_num;
+    bool                    success = true;
     CF_Logical_PduBuffer_t *ret;
     int32                   os_status;
 
@@ -81,11 +82,11 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
          CF_AppData.config_table->chan[t->chan_num].max_outgoing_messages_per_wakeup))
     {
         /* no more messages this wakeup allowed */
-        c->cur = t; /* remember where we were for next time */
-        goto error_out;
+        c->cur  = t; /* remember where we were for next time */
+        success = false;
     }
 
-    if (!CF_AppData.hk.channel_hk[t->chan_num].frozen && !t->flags.com.suspended)
+    if (success && !CF_AppData.hk.channel_hk[t->chan_num].frozen && !t->flags.com.suspended)
     {
         /* first, check if there's room in the pipe for the message we want to build */
         if (OS_ObjectIdDefined(c->sem_id))
@@ -111,26 +112,28 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
                 CFE_EVS_SendEvent(CF_EID_ERR_CFDP_NO_MSG, CFE_EVS_EventType_ERROR,
                                   "CF: no output message buffer available");
             }
-            goto error_out;
+            success = false;
         }
 
-        CFE_MSG_Init(&CF_AppData.engine.out.msg->Msg,
-                     CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[t->chan_num].mid_output), 0);
-        ++CF_AppData.engine.outgoing_counter; /* even if max_outgoing_messages_per_wakeup is 0 (unlimited), it's ok
+        if (success)
+        {
+            CFE_MSG_Init(&CF_AppData.engine.out.msg->Msg,
+                         CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[t->chan_num].mid_output), 0);
+            ++CF_AppData.engine.outgoing_counter; /* even if max_outgoing_messages_per_wakeup is 0 (unlimited), it's ok
                                                     to inc this */
 
-        /* prepare for encoding - the "tx_pdudata" is what serves as the temporary holding area for content */
-        ret = &CF_AppData.engine.out.tx_pdudata;
+            /* prepare for encoding - the "tx_pdudata" is what serves as the temporary holding area for content */
+            ret = &CF_AppData.engine.out.tx_pdudata;
+        }
     }
 
     /* if returning a buffer, then reset the encoder state to point to the beginning of the encapsulation msg */
-    if (ret != NULL)
+    if (success && ret != NULL)
     {
         CF_CFDP_EncodeStart(&CF_AppData.engine.out.encode, CF_AppData.engine.out.msg, ret,
                             offsetof(CF_PduSendMsg_t, ph), offsetof(CF_PduSendMsg_t, ph) + CF_MAX_PDU_SIZE);
     }
 
-error_out:
     return ret;
 }
 

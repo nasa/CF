@@ -120,8 +120,10 @@ void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *t)
  *-----------------------------------------------------------------*/
 int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc)
 {
-    int32                           ret = -1;
-    CF_Logical_PduBuffer_t *        ph  = CF_CFDP_ConstructPduHeader(t, 0, CF_AppData.config_table->local_eid,
+    bool                            success = true;
+    int                             status  = 0;
+    int32                           ret     = -1;
+    CF_Logical_PduBuffer_t *        ph      = CF_CFDP_ConstructPduHeader(t, 0, CF_AppData.config_table->local_eid,
                                                             t->history->peer_eid, 0, t->history->seq_num, 1);
     CF_Logical_PduFileDataHeader_t *fd;
     size_t                          actual_bytes;
@@ -129,102 +131,105 @@ int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_
 
     if (!ph)
     {
-        ret = 0;
-        goto err_out; /* couldn't get message, so no bytes sent. will try again next time */
-    }
-    int status;
-
-    fd = &ph->int_header.fd;
-
-    /* need to encode data header up to this point to figure out where data needs to get copied to */
-    fd->offset = foffs;
-    CF_CFDP_EncodeFileDataHeader(ph->penc, ph->pdu_header.segment_meta_flag, fd);
-
-    /*
-     * the actual bytes to read is the smallest of these:
-     *  - passed-in size
-     *  - outgoing_file_chunk_size from configuration
-     *  - amount of space actually available in the PDU after encoding the headers
-     */
-    actual_bytes = CF_CODEC_GET_REMAIN(ph->penc);
-    if (actual_bytes > bytes_to_read)
-    {
-        actual_bytes = bytes_to_read;
-    }
-    if (actual_bytes > CF_AppData.config_table->outgoing_file_chunk_size)
-    {
-        actual_bytes = CF_AppData.config_table->outgoing_file_chunk_size;
-    }
-
-    /*
-     * The call to CF_CFDP_DoEncodeChunk() should never fail because actual_bytes is
-     * guaranteed to be less than or equal to the remaining space in the encode buffer.
-     */
-    data_ptr = CF_CFDP_DoEncodeChunk(ph->penc, actual_bytes);
-
-    /*
-     * save off a pointer to the data for future reference.
-     * This isn't encoded into the output PDU, but it allows a future step (such as CRC)
-     * to easily find and read the data blob in this PDU.
-     */
-    fd->data_len = actual_bytes;
-    fd->data_ptr = data_ptr;
-
-    if (t->state_data.s.cached_pos != foffs)
-    {
-        status = CF_WrappedLseek(t->fd, foffs, OS_SEEK_SET);
-        if (status != foffs)
-        {
-            CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEEK_FD, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%lu:%lu): error seeking to offset %ld, got %ld", (t->state == CF_TxnState_S2),
-                              (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num, (long)foffs,
-                              (long)status);
-            ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_seek;
-            goto err_out;
-        }
-    }
-
-    status = CF_WrappedRead(t->fd, data_ptr, actual_bytes);
-    if (status != actual_bytes)
-    {
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_READ, CFE_EVS_EventType_ERROR,
-                          "CF S%d(%lu:%lu): error reading bytes: expected %ld, got %ld", (t->state == CF_TxnState_S2),
-                          (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num, (long)actual_bytes,
-                          (long)status);
-        ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_read;
-        goto err_out;
-    }
-
-    t->state_data.s.cached_pos += status;
-    status = CF_CFDP_SendFd(t, ph);
-    if (status == CF_SendRet_NO_MSG)
-    {
-        ret = 0; /* no bytes were processed */
-        goto err_out;
-    }
-    else if (status == CF_SendRet_ERROR)
-    {
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEND_FD, CFE_EVS_EventType_ERROR, "CF S%d(%lu:%lu): error sending fd",
-                          (t->state == CF_TxnState_S2), (unsigned long)t->history->src_eid,
-                          (unsigned long)t->history->seq_num);
-        goto err_out;
+        ret     = 0; /* couldn't get message, so no bytes sent. will try again next time */
+        success = false;
     }
     else
     {
-        /* don't care about other cases */
+        fd = &ph->int_header.fd;
+
+        /* need to encode data header up to this point to figure out where data needs to get copied to */
+        fd->offset = foffs;
+        CF_CFDP_EncodeFileDataHeader(ph->penc, ph->pdu_header.segment_meta_flag, fd);
+
+        /*
+         * the actual bytes to read is the smallest of these:
+         *  - passed-in size
+         *  - outgoing_file_chunk_size from configuration
+         *  - amount of space actually available in the PDU after encoding the headers
+         */
+        actual_bytes = CF_CODEC_GET_REMAIN(ph->penc);
+        if (actual_bytes > bytes_to_read)
+        {
+            actual_bytes = bytes_to_read;
+        }
+        if (actual_bytes > CF_AppData.config_table->outgoing_file_chunk_size)
+        {
+            actual_bytes = CF_AppData.config_table->outgoing_file_chunk_size;
+        }
+
+        /*
+         * The call to CF_CFDP_DoEncodeChunk() should never fail because actual_bytes is
+         * guaranteed to be less than or equal to the remaining space in the encode buffer.
+         */
+        data_ptr = CF_CFDP_DoEncodeChunk(ph->penc, actual_bytes);
+
+        /*
+         * save off a pointer to the data for future reference.
+         * This isn't encoded into the output PDU, but it allows a future step (such as CRC)
+         * to easily find and read the data blob in this PDU.
+         */
+        fd->data_len = actual_bytes;
+        fd->data_ptr = data_ptr;
+
+        if (t->state_data.s.cached_pos != foffs)
+        {
+            status = CF_WrappedLseek(t->fd, foffs, OS_SEEK_SET);
+            if (status != foffs)
+            {
+                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEEK_FD, CFE_EVS_EventType_ERROR,
+                                  "CF S%d(%lu:%lu): error seeking to offset %ld, got %ld", (t->state == CF_TxnState_S2),
+                                  (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num, (long)foffs,
+                                  (long)status);
+                ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_seek;
+                success = false;
+            }
+        }
+
+        if (success)
+        {
+            status = CF_WrappedRead(t->fd, data_ptr, actual_bytes);
+            if (status != actual_bytes)
+            {
+                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_READ, CFE_EVS_EventType_ERROR,
+                                  "CF S%d(%lu:%lu): error reading bytes: expected %ld, got %ld",
+                                  (t->state == CF_TxnState_S2), (unsigned long)t->history->src_eid,
+                                  (unsigned long)t->history->seq_num, (long)actual_bytes, (long)status);
+                ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_read;
+                success = false;
+            }
+        }
+
+        if (success)
+        {
+            t->state_data.s.cached_pos += status;
+            status = CF_CFDP_SendFd(t, ph);
+            if (status == CF_SendRet_NO_MSG)
+            {
+                ret = 0; /* no bytes were processed */
+            }
+            else if (status == CF_SendRet_ERROR)
+            {
+                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEND_FD, CFE_EVS_EventType_ERROR,
+                                  "CF S%d(%lu:%lu): error sending fd", (t->state == CF_TxnState_S2),
+                                  (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
+                ret = -1;
+            }
+            else
+            {
+                CF_AppData.hk.channel_hk[t->chan_num].counters.sent.file_data_bytes += actual_bytes;
+
+                CF_Assert((foffs + actual_bytes) <= t->fsize); /* sanity check */
+                if (calc_crc)
+                {
+                    CF_CRC_Digest(&t->crc, fd->data_ptr, fd->data_len);
+                }
+
+                ret = actual_bytes;
+            }
+        }
     }
 
-    CF_AppData.hk.channel_hk[t->chan_num].counters.sent.file_data_bytes += actual_bytes;
-
-    CF_Assert((foffs + actual_bytes) <= t->fsize); /* sanity check */
-    if (calc_crc)
-    {
-        CF_CRC_Digest(&t->crc, fd->data_ptr, fd->data_len);
-    }
-
-    ret = actual_bytes;
-
-err_out:
     return ret;
 }
 
@@ -280,19 +285,16 @@ int CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
         if (sret == CF_SendRet_ERROR)
         {
             ret = -1; /* error occurred */
-            goto err_out;
-        }
-        else if (sret == CF_SendRet_SUCCESS)
-        {
-            t->flags.tx.md_need_send = 0;
         }
         else
         {
-            /* don't care about other cases */
+            if (sret == CF_SendRet_SUCCESS)
+            {
+                t->flags.tx.md_need_send = 0;
+            }
+            /* unless CF_SendRet_ERROR, return 1 to keep caller from sending file data */
+            ret = 1; /* 1 means nak processed, so don't send filedata */
         }
-
-        /* unless CF_SendRet_ERROR, return 1 to keep caller from sending file data */
-        ret = 1; /* 1 means nak processed, so don't send filedata */
     }
     else
     {
@@ -317,7 +319,6 @@ int CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
         }
     }
 
-err_out:
     return ret;
 }
 
@@ -357,7 +358,8 @@ void CF_CFDP_S2_SubstateSendFileData(CF_Transaction_t *t)
  *-----------------------------------------------------------------*/
 void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
 {
-    int          status;
+    bool         success = true;
+    int          status  = 0;
     CF_SendRet_t sret;
 
     if (!OS_ObjectIdDefined(t->fd))
@@ -371,72 +373,82 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
                               (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num,
                               t->history->fnames.src_filename);
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_open;
-            goto err_out;
+            success = false;
         }
 
-        ret = CF_WrappedOpenCreate(&t->fd, t->history->fnames.src_filename, OS_FILE_FLAG_NONE, OS_READ_ONLY);
-        if (ret < 0)
+        if (success)
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_OPEN, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%lu:%lu): failed to open file %s, error=%ld", (t->state == CF_TxnState_S2),
-                              (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num,
-                              t->history->fnames.src_filename, (long)ret);
-            ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_open;
-            t->fd = OS_OBJECT_ID_UNDEFINED; /* just in case */
-            goto err_out;
+            ret = CF_WrappedOpenCreate(&t->fd, t->history->fnames.src_filename, OS_FILE_FLAG_NONE, OS_READ_ONLY);
+            if (ret < 0)
+            {
+                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_OPEN, CFE_EVS_EventType_ERROR,
+                                  "CF S%d(%lu:%lu): failed to open file %s, error=%ld", (t->state == CF_TxnState_S2),
+                                  (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num,
+                                  t->history->fnames.src_filename, (long)ret);
+                ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_open;
+                t->fd   = OS_OBJECT_ID_UNDEFINED; /* just in case */
+                success = false;
+            }
         }
 
-        status = CF_WrappedLseek(t->fd, 0, OS_SEEK_END);
-        if (status < 0)
+        if (success)
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEEK_END, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%lu:%lu): failed to seek end file %s, error=%ld", (t->state == CF_TxnState_S2),
-                              (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num,
-                              t->history->fnames.src_filename, (long)status);
-            ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_seek;
-            goto err_out;
+            status = CF_WrappedLseek(t->fd, 0, OS_SEEK_END);
+            if (status < 0)
+            {
+                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEEK_END, CFE_EVS_EventType_ERROR,
+                                  "CF S%d(%lu:%lu): failed to seek end file %s, error=%ld",
+                                  (t->state == CF_TxnState_S2), (unsigned long)t->history->src_eid,
+                                  (unsigned long)t->history->seq_num, t->history->fnames.src_filename, (long)status);
+                ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_seek;
+                success = false;
+            }
         }
 
-        t->fsize = status;
-
-        status = CF_WrappedLseek(t->fd, 0, OS_SEEK_SET);
-        if (status != 0)
+        if (success)
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEEK_BEG, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%lu:%lu): failed to seek begin file %s, got %ld", (t->state == CF_TxnState_S2),
-                              (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num,
-                              t->history->fnames.src_filename, (long)status);
-            ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_seek;
-            goto err_out;
+            t->fsize = status;
+
+            status = CF_WrappedLseek(t->fd, 0, OS_SEEK_SET);
+            if (status != 0)
+            {
+                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEEK_BEG, CFE_EVS_EventType_ERROR,
+                                  "CF S%d(%lu:%lu): failed to seek begin file %s, got %ld",
+                                  (t->state == CF_TxnState_S2), (unsigned long)t->history->src_eid,
+                                  (unsigned long)t->history->seq_num, t->history->fnames.src_filename, (long)status);
+                ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_seek;
+                success = false;
+            }
         }
     }
 
-    sret = CF_CFDP_SendMd(t);
-    if (sret == CF_SendRet_ERROR)
+    if (success)
     {
-        /* failed to send md */
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEND_MD, CFE_EVS_EventType_ERROR, "CF S%d(%lu:%lu): failed to send md",
-                          (t->state == CF_TxnState_S2), (unsigned long)t->history->src_eid,
-                          (unsigned long)t->history->seq_num);
-        goto err_out;
-    }
-    else if (sret == CF_SendRet_SUCCESS)
-    {
-        /* once metadata is sent, switch to filedata mode */
-        t->state_data.s.sub_state = CF_TxSubState_FILEDATA;
-    }
-    else
-    {
+        sret = CF_CFDP_SendMd(t);
+        if (sret == CF_SendRet_ERROR)
+        {
+            /* failed to send md */
+            CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEND_MD, CFE_EVS_EventType_ERROR, "CF S%d(%lu:%lu): failed to send md",
+                              (t->state == CF_TxnState_S2), (unsigned long)t->history->src_eid,
+                              (unsigned long)t->history->seq_num);
+            success = false;
+        }
+        else if (sret == CF_SendRet_SUCCESS)
+        {
+            /* once metadata is sent, switch to filedata mode */
+            t->state_data.s.sub_state = CF_TxSubState_FILEDATA;
+        }
         /* if sret==CF_SendRet_NO_MSG, then try to send md again next cycle */
+    }
+
+    if (!success)
+    {
+        t->history->cc = CF_CFDP_ConditionCode_FILESTORE_REJECTION;
+        CF_CFDP_S_Reset(t);
     }
 
     /* don't need CF_CRC_Start() since taken care of by reset_cfdp() */
     /*CF_CRC_Start(&t->crc);*/
-    return;
-
-err_out:
-    t->history->cc = CF_CFDP_ConditionCode_FILESTORE_REJECTION;
-    CF_CFDP_S_Reset(t);
 }
 
 /*----------------------------------------------------------------
@@ -726,6 +738,8 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
     /* Steven is not real happy with this function. There should be a better way to separate out
      * the logic by state so that it isn't a bunch of if statements for different flags
      */
+    bool early_exit = false;
+
     /* at each tick, various timers used by S are checked */
     /* first, check inactivity timer */
     if (t->state == CF_TxnState_S2)
@@ -761,22 +775,25 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
 
                             /* no reason to reset this timer, as it isn't used again */
                             CF_CFDP_S_Reset(t);
-                            goto err_out; /* must exit after reset */
+                            early_exit = true; /* must exit after reset */
                         }
                         else
                         {
                             CF_SendRet_t sret = CF_CFDP_S_SendEof(t);
                             if (sret == CF_SendRet_NO_MSG)
                             {
-                                goto err_out; /* try next tick */
+                                early_exit = true;
                             }
                             else if (sret == CF_SendRet_ERROR)
                             {
                                 CF_CFDP_S_Reset(t); /* can't go on, error occurred */
-                                goto err_out;       /* must exit after reset */
+                                early_exit = true;
                             }
 
-                            CF_CFDP_ArmAckTimer(t); /* re-arm ack timer */
+                            if (!early_exit)
+                            {
+                                CF_CFDP_ArmAckTimer(t); /* re-arm ack timer */
+                            }
                         }
                     }
                 }
@@ -786,14 +803,12 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
                 }
             }
 
-            if (t->state_data.s.sub_state == CF_TxSubState_SEND_FIN_ACK)
+            if (!early_exit && t->state_data.s.sub_state == CF_TxSubState_SEND_FIN_ACK)
             {
                 CF_CFDP_S_SubstateSendFinAck(t);
             }
         }
     }
-
-err_out:;
 }
 
 /*----------------------------------------------------------------

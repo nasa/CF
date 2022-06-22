@@ -84,50 +84,52 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_RESET_INVALID, CFE_EVS_EventType_ERROR,
                           "CF: Received RESET COUNTERS command with invalid parameter %d", param);
         CF_CmdRej();
-        goto err_out;
     }
-
-    CFE_EVS_SendEvent(CF_EID_INF_CMD_RESET, CFE_EVS_EventType_INFORMATION, "CF: Received RESET COUNTERS command: %s",
-                      names[param]);
-
-    /* if the param is counters_command, or all counters */
-    if (!param || (param == counters_command))
+    else
     {
-        /* command counters */
-        memset(&CF_AppData.hk.counters, 0, sizeof(CF_AppData.hk.counters));
-        acc = 0; /* don't increment accept counter on command counter reset */
-    }
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_RESET, CFE_EVS_EventType_INFORMATION,
+                          "CF: Received RESET COUNTERS command: %s", names[param]);
 
-    /* if the param is counters_fault, or all counters */
-    if (!param || (param == counters_fault))
-    {
-        /* fault counters */
-        for (i = 0; i < CF_NUM_CHANNELS; ++i)
-            memset(&CF_AppData.hk.channel_hk[i].counters.fault, 0, sizeof(CF_AppData.hk.channel_hk[i].counters.fault));
-    }
+        /* if the param is counters_command, or all counters */
+        if (!param || (param == counters_command))
+        {
+            /* command counters */
+            memset(&CF_AppData.hk.counters, 0, sizeof(CF_AppData.hk.counters));
+            acc = 0; /* don't increment accept counter on command counter reset */
+        }
 
-    /* if the param is counters_up, or all counters */
-    if (!param || (param == counters_up))
-    {
-        /* up counters */
-        for (i = 0; i < CF_NUM_CHANNELS; ++i)
-            memset(&CF_AppData.hk.channel_hk[i].counters.recv, 0, sizeof(CF_AppData.hk.channel_hk[i].counters.recv));
-    }
+        /* if the param is counters_fault, or all counters */
+        if (!param || (param == counters_fault))
+        {
+            /* fault counters */
+            for (i = 0; i < CF_NUM_CHANNELS; ++i)
+                memset(&CF_AppData.hk.channel_hk[i].counters.fault, 0,
+                       sizeof(CF_AppData.hk.channel_hk[i].counters.fault));
+        }
 
-    /* if the param is counters_down, or all counters */
-    if (!param || (param == counters_down))
-    {
-        /* down counters */
-        for (i = 0; i < CF_NUM_CHANNELS; ++i)
-            memset(&CF_AppData.hk.channel_hk[i].counters.sent, 0, sizeof(CF_AppData.hk.channel_hk[i].counters.sent));
-    }
+        /* if the param is counters_up, or all counters */
+        if (!param || (param == counters_up))
+        {
+            /* up counters */
+            for (i = 0; i < CF_NUM_CHANNELS; ++i)
+                memset(&CF_AppData.hk.channel_hk[i].counters.recv, 0,
+                       sizeof(CF_AppData.hk.channel_hk[i].counters.recv));
+        }
 
-    if (acc)
-    {
-        CF_CmdAcc();
-    }
+        /* if the param is counters_down, or all counters */
+        if (!param || (param == counters_down))
+        {
+            /* down counters */
+            for (i = 0; i < CF_NUM_CHANNELS; ++i)
+                memset(&CF_AppData.hk.channel_hk[i].counters.sent, 0,
+                       sizeof(CF_AppData.hk.channel_hk[i].counters.sent));
+        }
 
-err_out:;
+        if (acc)
+        {
+            CF_CmdAcc();
+        }
+    }
 }
 
 /*----------------------------------------------------------------
@@ -820,35 +822,40 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
     CF_WriteQueueCmd_t *wq        = (CF_WriteQueueCmd_t *)msg;
     CF_Channel_t *      c         = &CF_AppData.engine.channels[wq->chan];
     osal_id_t           fd        = OS_OBJECT_ID_UNDEFINED;
+    bool                success   = true;
     int32               ret;
 
     /* check the commands for validity */
     if (wq->chan >= CF_NUM_CHANNELS)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_CHAN, CFE_EVS_EventType_ERROR, "CF: write queue invalid channel arg");
-        goto bail;
+        CF_CmdRej();
+        success = false;
     }
-
     /* only invalid combination is up direction, pending queue */
-    if ((wq->type == type_up) && (wq->queue == q_pend))
+    else if ((wq->type == type_up) && (wq->queue == q_pend))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_ARGS, CFE_EVS_EventType_ERROR,
                           "CF: write queue invalid command parameters");
-        goto bail;
+        CF_CmdRej();
+        success = false;
     }
-
-    /* PTFO: queues can be large. may want to split this work up across the state machine and take several wakeups to
-     * complete */
-    ret = CF_WrappedOpenCreate(&fd, wq->filename, OS_FILE_FLAG_CREATE | OS_FILE_FLAG_TRUNCATE, OS_WRITE_ONLY);
-    if (ret < 0)
+    else
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_OPEN, CFE_EVS_EventType_ERROR, "CF: write queue failed to open file %s",
-                          wq->filename);
-        goto bail;
+        /* PTFO: queues can be large. may want to split this work up across the state machine and take several wakeups
+         * to complete */
+        ret = CF_WrappedOpenCreate(&fd, wq->filename, OS_FILE_FLAG_CREATE | OS_FILE_FLAG_TRUNCATE, OS_WRITE_ONLY);
+        if (ret < 0)
+        {
+            CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_OPEN, CFE_EVS_EventType_ERROR, "CF: write queue failed to open file %s",
+                              wq->filename);
+            CF_CmdRej();
+            success = false;
+        }
     }
 
     /* if type is type_up, or all types */
-    if (!wq->type || (wq->type == type_up))
+    if (success && (!wq->type || (wq->type == type_up)))
     {
         /* process uplink queue data */
         if ((wq->queue == q_all) || (wq->queue == q_active))
@@ -858,24 +865,28 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_RX, CFE_EVS_EventType_ERROR,
                                   "CF: write queue failed to write CF_QueueIdx_RX data");
-                goto out_close;
+                CF_WrappedClose(fd);
+                CF_CmdRej();
+                success = false;
             }
         }
 
-        if ((wq->queue == q_all) || (wq->queue == q_history))
+        if (success && ((wq->queue == q_all) || (wq->queue == q_history)))
         {
             ret = CF_WriteHistoryQueueDataToFile(fd, c, CF_Direction_RX);
             if (ret)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEHIST_RX, CFE_EVS_EventType_ERROR,
                                   "CF: write queue failed to write history RX data");
-                goto out_close;
+                CF_WrappedClose(fd);
+                CF_CmdRej();
+                success = false;
             }
         }
     }
 
     /* if type is type_down, or all types */
-    if (!wq->type || (wq->type == type_down))
+    if (success && (!wq->type || (wq->type == type_down)))
     {
         /* process downlink queue data */
         if ((wq->queue == q_all) || (wq->queue == q_active))
@@ -889,12 +900,15 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
                 {
                     CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_TX, CFE_EVS_EventType_ERROR,
                                       "CF: write queue failed to write q index %d", qs[i]);
-                    goto out_close;
+                    CF_WrappedClose(fd);
+                    CF_CmdRej();
+                    success = false;
+                    break;
                 }
             }
         }
 
-        if ((wq->queue == q_all) || (wq->queue == q_pend))
+        if (success && ((wq->queue == q_all) || (wq->queue == q_pend)))
         {
             /* write pending queue */
             ret = CF_WriteTxnQueueDataToFile(fd, c, CF_QueueIdx_PEND);
@@ -902,11 +916,13 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_PEND, CFE_EVS_EventType_ERROR,
                                   "CF: write queue failed to write pending queue");
-                goto out_close;
+                CF_WrappedClose(fd);
+                CF_CmdRej();
+                success = false;
             }
         }
 
-        if ((wq->queue == q_all) || (wq->queue == q_history))
+        if (success && ((wq->queue == q_all) || (wq->queue == q_history)))
         {
             /* write history queue */
             ret = CF_WriteHistoryQueueDataToFile(fd, c, CF_Direction_TX);
@@ -914,20 +930,18 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEHIST_TX, CFE_EVS_EventType_ERROR,
                                   "CF: write queue failed to write CF_QueueIdx_TX data");
-                goto out_close;
+                CF_WrappedClose(fd);
+                CF_CmdRej();
+                success = false;
             }
         }
     }
 
-    CFE_EVS_SendEvent(CF_EID_INF_CMD_WQ, CFE_EVS_EventType_INFORMATION, "CF: write queue successful");
-    CF_CmdAcc();
-    return;
-
-out_close:
-    CF_WrappedClose(fd);
-
-bail:
-    CF_CmdRej();
+    if (success)
+    {
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_WQ, CFE_EVS_EventType_INFORMATION, "CF: write queue successful");
+        CF_CmdAcc();
+    }
 }
 
 /*----------------------------------------------------------------
@@ -989,7 +1003,7 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
         int (*fn)(uint32, uint8 chan_num);
     } item;
 
-    acc       = 1; /* 1 means to reject */
+    acc       = -1; /* -1 means to reject */
     valid_set = false;
     config    = CF_AppData.config_table;
     memset(&item, 0, sizeof(item));
@@ -1046,17 +1060,13 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_GETSET_PARAM, CFE_EVS_EventType_ERROR,
                           "CF: invalid configuration parameter id %d received", param_id);
-        goto err_out;
     }
-
-    if (chan_num >= CF_NUM_CHANNELS)
+    else if (chan_num >= CF_NUM_CHANNELS)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_GETSET_CHAN, CFE_EVS_EventType_ERROR,
                           "CF: invalid configuration channel id %d received", chan_num);
-        goto err_out;
     }
-
-    if (is_set)
+    else if (is_set)
     {
         if (item.fn)
         {
@@ -1121,7 +1131,6 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
                           (unsigned long)value);
     }
 
-err_out:
     if (acc == 0)
     {
         CF_CmdAcc();

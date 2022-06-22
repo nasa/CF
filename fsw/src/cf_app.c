@@ -166,39 +166,42 @@ int32 CF_TableInit(void)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_REG, CFE_EVS_EventType_ERROR,
                           "CF: error registering table, returned 0x%08lx", (unsigned long)status);
-        goto err_out;
-    }
-
-    status = CFE_TBL_Load(CF_AppData.config_handle, CFE_TBL_SRC_FILE, CF_CONFIG_TABLE_FILENAME);
-    if (status != CFE_SUCCESS)
-    {
-        CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_LOAD, CFE_EVS_EventType_ERROR,
-                          "CF: error loading table, returned 0x%08lx", (unsigned long)status);
-        goto err_out;
-    }
-
-    status = CFE_TBL_Manage(CF_AppData.config_handle);
-    if (status != CFE_SUCCESS)
-    {
-        CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_MANAGE, CFE_EVS_EventType_ERROR,
-                          "CF: error in CFE_TBL_Manage, returned 0x%08lx", (unsigned long)status);
-        goto err_out;
-    }
-
-    status = CFE_TBL_GetAddress((void **)&CF_AppData.config_table, CF_AppData.config_handle);
-    /* status will be CFE_TBL_INFO_UPDATED because it was just loaded, but we can use CFE_SUCCESS too */
-    if ((status != CFE_TBL_INFO_UPDATED) && (status != CFE_SUCCESS))
-    {
-        CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_GETADDR, CFE_EVS_EventType_ERROR,
-                          "CF: error getting table address, returned 0x%08lx", (unsigned long)status);
-        goto err_out;
     }
     else
     {
-        status = CFE_SUCCESS;
+        status = CFE_TBL_Load(CF_AppData.config_handle, CFE_TBL_SRC_FILE, CF_CONFIG_TABLE_FILENAME);
+        if (status != CFE_SUCCESS)
+        {
+            CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_LOAD, CFE_EVS_EventType_ERROR,
+                              "CF: error loading table, returned 0x%08lx", (unsigned long)status);
+        }
     }
 
-err_out:
+    if (status == CFE_SUCCESS)
+    {
+        status = CFE_TBL_Manage(CF_AppData.config_handle);
+        if (status != CFE_SUCCESS)
+        {
+            CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_MANAGE, CFE_EVS_EventType_ERROR,
+                              "CF: error in CFE_TBL_Manage, returned 0x%08lx", (unsigned long)status);
+        }
+    }
+
+    if (status == CFE_SUCCESS)
+    {
+        status = CFE_TBL_GetAddress((void **)&CF_AppData.config_table, CF_AppData.config_handle);
+        /* status will be CFE_TBL_INFO_UPDATED because it was just loaded, but we can use CFE_SUCCESS too */
+        if ((status != CFE_TBL_INFO_UPDATED) && (status != CFE_SUCCESS))
+        {
+            CFE_EVS_SendEvent(CF_EID_ERR_INIT_TBL_GETADDR, CFE_EVS_EventType_ERROR,
+                              "CF: error getting table address, returned 0x%08lx", (unsigned long)status);
+        }
+        else
+        {
+            status = CFE_SUCCESS;
+        }
+    }
+
     return status;
 }
 
@@ -224,51 +227,52 @@ int32 CF_Init(void)
     if (status != CFE_SUCCESS)
     {
         CFE_ES_WriteToSysLog("CF app: error registering with EVS, returned 0x%08lx", (unsigned long)status);
-        goto err_out;
     }
-
-    status = CFE_SB_CreatePipe(&CF_AppData.cmd_pipe, CF_PIPE_DEPTH, CF_PIPE_NAME);
-    if (status != CFE_SUCCESS)
+    else
     {
-        CFE_ES_WriteToSysLog("CF app: error creating pipe %s, returend 0x%08lx", CF_PIPE_NAME, (unsigned long)status);
-        goto err_out;
-    }
-
-    for (i = 0; i < (sizeof(MID_VALUES) / sizeof(MID_VALUES[0])); ++i)
-    {
-        status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(MID_VALUES[i]), CF_AppData.cmd_pipe);
+        status = CFE_SB_CreatePipe(&CF_AppData.cmd_pipe, CF_PIPE_DEPTH, CF_PIPE_NAME);
         if (status != CFE_SUCCESS)
         {
-            CFE_ES_WriteToSysLog("CF app: failed to subscribe to MID 0x%04lx, returned 0x%08lx",
-                                 (unsigned long)MID_VALUES[i], (unsigned long)status);
-            goto err_out;
+            CFE_ES_WriteToSysLog("CF app: error creating pipe %s, returend 0x%08lx", CF_PIPE_NAME,
+                                 (unsigned long)status);
         }
     }
 
-    status = CF_TableInit();
-    if (status != CFE_SUCCESS)
+    if (status == CFE_SUCCESS)
     {
-        /* function sends event internally */
-        goto err_out;
+        for (i = 0; i < (sizeof(MID_VALUES) / sizeof(MID_VALUES[0])); ++i)
+        {
+            status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(MID_VALUES[i]), CF_AppData.cmd_pipe);
+            if (status != CFE_SUCCESS)
+            {
+                CFE_ES_WriteToSysLog("CF app: failed to subscribe to MID 0x%04lx, returned 0x%08lx",
+                                     (unsigned long)MID_VALUES[i], (unsigned long)status);
+                break;
+            }
+        }
     }
 
-    status = CF_CFDP_InitEngine();
-    if (status != CFE_SUCCESS)
+    if (status == CFE_SUCCESS)
     {
-        /* function sends event internally */
-        goto err_out;
+        status = CF_TableInit(); /* function sends event internally */
     }
 
-    status = CFE_EVS_SendEvent(CF_EID_INF_INIT, CFE_EVS_EventType_INFORMATION, "CF Initialized. Version %d.%d.%d.%d",
-                               CF_MAJOR_VERSION, CF_MINOR_VERSION, CF_REVISION, CF_MISSION_REV);
-
-    if (status != CFE_SUCCESS)
+    if (status == CFE_SUCCESS)
     {
-        CFE_ES_WriteToSysLog("CF: error sending init event, returned 0x%08lx", (unsigned long)status);
-        goto err_out;
+        status = CF_CFDP_InitEngine(); /* function sends event internally */
     }
 
-err_out:
+    if (status == CFE_SUCCESS)
+    {
+        status =
+            CFE_EVS_SendEvent(CF_EID_INF_INIT, CFE_EVS_EventType_INFORMATION, "CF Initialized. Version %d.%d.%d.%d",
+                              CF_MAJOR_VERSION, CF_MINOR_VERSION, CF_REVISION, CF_MISSION_REV);
+        if (status != CFE_SUCCESS)
+        {
+            CFE_ES_WriteToSysLog("CF: error sending init event, returned 0x%08lx", (unsigned long)status);
+        }
+    }
+
     return status;
 }
 

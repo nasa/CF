@@ -214,7 +214,7 @@ void CF_CList_Traverse(CF_CListNode_t *start, CF_CListFn_t fn, void *context)
             }
             if (fn(n, context))
             {
-                goto err_out;
+                break;
             }
             /* list traversal is robust against an item deleting itself during traversal,
              * but there is a special case if that item is the starting node. Since this is
@@ -227,8 +227,6 @@ void CF_CList_Traverse(CF_CListNode_t *start, CF_CListFn_t fn, void *context)
             n = nn;
         } while (!last);
     }
-
-err_out:;
 }
 
 /*----------------------------------------------------------------
@@ -262,7 +260,7 @@ void CF_CList_Traverse_R(CF_CListNode_t *end, CF_CListFn_t fn, void *context)
 
                 if (fn(n, context))
                 {
-                    goto err_out;
+                    break;
                 }
 
                 /* list traversal is robust against an item deleting itself during traversal,
@@ -277,6 +275,4 @@ void CF_CList_Traverse_R(CF_CListNode_t *end, CF_CListFn_t fn, void *context)
             } while (!last);
         }
     }
-
-err_out:;
 }
