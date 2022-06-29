@@ -922,6 +922,171 @@
 #define CF_EID_INF_CMD_GETSET2 (113)
 
 /**
+ * \brief CF Suspend/Resume Command Received Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Receipt and successful processing of suspend/resume command
+ */
+#define CF_EID_INF_CMD_SUSPRES (114)
+
+/**
+ * \brief CF Write Queue Command Received Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Receipt and successful processing of write queue command
+ */
+#define CF_EID_INF_CMD_WQ (115)
+
+/**
+ * \brief CF Enable Engine Command Received Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Receipt and successful processing of enable engine command
+ */
+#define CF_EID_INF_CMD_ENABLE_ENGINE (116)
+
+/**
+ * \brief CF Disable Engine Command Received Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Receipt and successful processing of disable engine command
+ */
+#define CF_EID_INF_CMD_DISABLE_ENGINE (117)
+
+/**
+ * \brief CF Transfer File Command Received Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Receipt and successful processing of transfer file command
+ */
+#define CF_EID_INF_CMD_TX_FILE (118)
+
+/**
+ * \brief CF Playback Directory Command Received Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Receipt and successful processing of playback directory command
+ */
+#define CF_EID_INF_CMD_PLAYBACK_DIR (119)
+
+/**
+ * \brief CF Freeze Command Received Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Receipt and successful processing of freeze command
+ */
+#define CF_EID_INF_CMD_FREEZE (120)
+
+/**
+ * \brief CF Thaw Command Received Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Receipt and successful processing of thaw command
+ */
+#define CF_EID_INF_CMD_THAW (121)
+
+/**
+ * \brief CF Cancel Command Received Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Receipt and successful processing of cancel command
+ */
+#define CF_EID_INF_CMD_CANCEL (122)
+
+/**
+ * \brief CF Abandon Command Received Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Receipt and successful processing of abandon command
+ */
+#define CF_EID_INF_CMD_ABANDON (123)
+
+/**
+ * \brief CF Enable Dequeue Command Received Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Receipt and successful processing of enable dequeue command
+ */
+#define CF_EID_INF_CMD_ENABLE_DEQUEUE (124)
+
+/**
+ * \brief CF Disable Dequeue Command Received Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Receipt and successful processing of disable dequeue command
+ */
+#define CF_EID_INF_CMD_DISABLE_DEQUEUE (125)
+
+/**
+ * \brief CF Enable Polldir Command Received Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Receipt and successful processing of enable polldir command
+ */
+#define CF_EID_INF_CMD_ENABLE_POLLDIR (126)
+
+/**
+ * \brief CF Disable Polldir Command Received Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Receipt and successful processing of disable polldir command
+ */
+#define CF_EID_INF_CMD_DISABLE_POLLDIR (127)
+
+/**
+ * \brief CF Purge Queue Command Received Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Receipt and successful processing of purge queue command
+ */
+#define CF_EID_INF_CMD_PURGE_QUEUE (128)
+
+/**
  * \brief CF Reset Counters Command Invalid Event ID
  *
  *  \par Type: ERROR
@@ -930,7 +1095,7 @@
  *
  *  Reset counters command received with invalid parameter
  */
-#define CF_EID_ERR_CMD_RESET_INVALID (114)
+#define CF_EID_ERR_CMD_RESET_INVALID (129)
 
 /**
  * \brief CF Command Channel Invalid Event ID
@@ -941,7 +1106,7 @@
  *
  *  Command received with channel parameter out of range
  */
-#define CF_EID_ERR_CMD_CHAN_PARAM (115)
+#define CF_EID_ERR_CMD_CHAN_PARAM (130)
 
 /**
  * \brief CF Command Transaction Invalid Event ID
@@ -952,7 +1117,7 @@
  *
  *  Command received without a matching transaction
  */
-#define CF_EID_ERR_CMD_TRANS_NOT_FOUND (116)
+#define CF_EID_ERR_CMD_TRANS_NOT_FOUND (131)
 
 /**
  * \brief CF Command All Transaction Channel Invalid Event ID
@@ -963,7 +1128,7 @@
  *
  *  Command received to act on all transactions with invalid channel
  */
-#define CF_EID_ERR_CMD_TSN_CHAN_INVALID (117)
+#define CF_EID_ERR_CMD_TSN_CHAN_INVALID (132)
 
 /**
  * \brief CF Suspend/Resume Command For Single Transaction State Unchanged Event ID
@@ -974,7 +1139,7 @@
  *
  *  Suspend/resume command received affectina single transaction already set to that state
  */
-#define CF_EID_ERR_CMD_SUSPRES_SAME (118)
+#define CF_EID_ERR_CMD_SUSPRES_SAME (133)
 
 /**
  * \brief CF Suspend/Resume Command No Matching Transaction Event ID
@@ -985,7 +1150,7 @@
  *
  *  Suspend/resume command received without a matching transaction
  */
-#define CF_EID_ERR_CMD_SUSPRES_CHAN (119)
+#define CF_EID_ERR_CMD_SUSPRES_CHAN (134)
 
 /**
  * \brief CF Enable/Disable Polling Directory Command Invalid Polling Directory Index Event ID
@@ -996,7 +1161,7 @@
  *
  *  Enable/disable polling directory command received with invalid poling directory index
  */
-#define CF_EID_ERR_CMD_POLLDIR_INVALID (120)
+#define CF_EID_ERR_CMD_POLLDIR_INVALID (135)
 
 /**
  * \brief CF Purge Queue Command Invalid Argument Event ID
@@ -1007,7 +1172,7 @@
  *
  *  Purge Queue command received with invalid queue argument
  */
-#define CF_EID_ERR_CMD_PURGE_ARG (121)
+#define CF_EID_ERR_CMD_PURGE_ARG (136)
 
 /**
  * \brief CF Write Queue Command Invalid Channel Event ID
@@ -1018,7 +1183,7 @@
  *
  *  Write Queue command received with invalid channel argument
  */
-#define CF_EID_ERR_CMD_WQ_CHAN (122)
+#define CF_EID_ERR_CMD_WQ_CHAN (137)
 
 /**
  * \brief CF Write Queue Command Invalid Queue Event ID
@@ -1029,7 +1194,7 @@
  *
  *  Write Queue command recived with invalid queue selection arguments
  */
-#define CF_EID_ERR_CMD_WQ_ARGS (123)
+#define CF_EID_ERR_CMD_WQ_ARGS (138)
 
 /**
  * \brief CF Write Queue Command File Open Failed Event ID
@@ -1040,7 +1205,7 @@
  *
  *  Failure of open file call during processing of write queue command
  */
-#define CF_EID_ERR_CMD_WQ_OPEN (124)
+#define CF_EID_ERR_CMD_WQ_OPEN (139)
 
 /**
  * \brief CF Write Queue Command RX Active File Write Failed Event ID
@@ -1051,7 +1216,7 @@
  *
  *  Failure of file write call for RX active transactions during processing of write queue command
  */
-#define CF_EID_ERR_CMD_WQ_WRITEQ_RX (125)
+#define CF_EID_ERR_CMD_WQ_WRITEQ_RX (140)
 
 /**
  * \brief CF Write Queue Command RX History File Write Failed Event ID
@@ -1062,7 +1227,7 @@
  *
  *  Failure of file write call for RX history during processing of write queue command
  */
-#define CF_EID_ERR_CMD_WQ_WRITEHIST_RX (126)
+#define CF_EID_ERR_CMD_WQ_WRITEHIST_RX (141)
 
 /**
  * \brief CF Write Queue Command TX Active File Write Failed Event ID
@@ -1073,7 +1238,7 @@
  *
  *  Failure of file write call for TX active transactions during processing of write queue command
  */
-#define CF_EID_ERR_CMD_WQ_WRITEQ_TX (127)
+#define CF_EID_ERR_CMD_WQ_WRITEQ_TX (142)
 
 /**
  * \brief CF Write Queue Command TX Pending File Write Failed Event ID
@@ -1084,7 +1249,7 @@
  *
  *  Failure of file write call for TX pending transactions during processing of write queue command
  */
-#define CF_EID_ERR_CMD_WQ_WRITEQ_PEND (128)
+#define CF_EID_ERR_CMD_WQ_WRITEQ_PEND (143)
 
 /**
  * \brief CF Write Queue Command TX History File Write Failed Event ID
@@ -1095,7 +1260,7 @@
  *
  *  Failure of file write call for TX history during processing of write queue command
  */
-#define CF_EID_ERR_CMD_WQ_WRITEHIST_TX (129)
+#define CF_EID_ERR_CMD_WQ_WRITEHIST_TX (144)
 
 /**
  * \brief CF Set Parameter Command Parameter Validation Failed Event ID
@@ -1106,7 +1271,7 @@
  *
  *  Parameter validation failed during processing of set parameter command
  */
-#define CF_EID_ERR_CMD_GETSET_VALIDATE (130)
+#define CF_EID_ERR_CMD_GETSET_VALIDATE (145)
 
 /**
  * \brief CF Set/Get Parameter Command Invalid Parameter ID Event ID
@@ -1117,7 +1282,7 @@
  *
  *  Invalid parameter id value received in set or get parameter command
  */
-#define CF_EID_ERR_CMD_GETSET_PARAM (131)
+#define CF_EID_ERR_CMD_GETSET_PARAM (146)
 
 /**
  * \brief CF Set/Get Parameter Command Invalid Channel Event ID
@@ -1128,7 +1293,7 @@
  *
  *  Invalid channel value recieved in set or get parameter command
  */
-#define CF_EID_ERR_CMD_GETSET_CHAN (132)
+#define CF_EID_ERR_CMD_GETSET_CHAN (147)
 
 /**
  * \brief CF Enable Engine Command Failed Event ID
@@ -1139,7 +1304,7 @@
  *
  *  Failed to initialize engine when processing engine enable command
  */
-#define CF_EID_ERR_CMD_ENABLE_ENGINE (133)
+#define CF_EID_ERR_CMD_ENABLE_ENGINE (148)
 
 /**
  * \brief CF Enable Engine Command Engine Already Enabled Event ID
@@ -1150,7 +1315,7 @@
  *
  *  Enable engine command received while engine is already enabled
  */
-#define CF_EID_ERR_CMD_ENG_ALREADY_ENA (134)
+#define CF_EID_ERR_CMD_ENG_ALREADY_ENA (149)
 
 /**
  * \brief CF Disable Engine Command Engine Already Disabled Event ID
@@ -1161,7 +1326,7 @@
  *
  *  Disable engine command received while engine is already disabled
  */
-#define CF_EID_ERR_CMD_ENG_ALREADY_DIS (135)
+#define CF_EID_ERR_CMD_ENG_ALREADY_DIS (150)
 
 /**
  * \brief CF Command Length Verification Failed Event ID
@@ -1172,7 +1337,7 @@
  *
  *  Received command length verification failure
  */
-#define CF_EID_ERR_CMD_GCMD_LEN (136)
+#define CF_EID_ERR_CMD_GCMD_LEN (151)
 
 /**
  * \brief CF Command Code Invalid Event ID
@@ -1183,7 +1348,7 @@
  *
  *  Received command code unrecognized
  */
-#define CF_EID_ERR_CMD_GCMD_CC (137)
+#define CF_EID_ERR_CMD_GCMD_CC (152)
 
 /**
  * \brief CF Write Entry To File Failed Event ID
@@ -1194,7 +1359,7 @@
  *
  *  Write entry to file did not match expected length
  */
-#define CF_EID_ERR_CMD_WHIST_WRITE (138)
+#define CF_EID_ERR_CMD_WHIST_WRITE (153)
 
 /**
  * \brief CF Playback Dir Or TX File Command Bad Parameter Event ID
@@ -1205,7 +1370,7 @@
  *
  *  Bad parameter received in playback directory or transfer file command
  */
-#define CF_EID_ERR_CMD_BAD_PARAM (139)
+#define CF_EID_ERR_CMD_BAD_PARAM (154)
 
 /**\}*/
 

@@ -160,8 +160,16 @@ void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
     tx->src_filename[sizeof(tx->src_filename) - 1] = 0;
     tx->dst_filename[sizeof(tx->dst_filename) - 1] = 0;
 
-    CF_CmdCond(CF_CFDP_TxFile(tx->src_filename, tx->dst_filename, tx->cfdp_class, tx->keep, tx->chan_num, tx->priority,
-                              tx->dest_id));
+    if (CF_CFDP_TxFile(tx->src_filename, tx->dst_filename, tx->cfdp_class, tx->keep, tx->chan_num, tx->priority,
+                       tx->dest_id) == CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_TX_FILE, CFE_EVS_EventType_INFORMATION, "CF: file transfer successful");
+        CF_CmdAcc();
+    }
+    else
+    {
+        CF_CmdRej();
+    }
 }
 
 /*----------------------------------------------------------------
@@ -194,8 +202,17 @@ void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
     tx->src_filename[sizeof(tx->src_filename) - 1] = 0;
     tx->dst_filename[sizeof(tx->dst_filename) - 1] = 0;
 
-    CF_CmdCond(CF_CFDP_PlaybackDir(tx->src_filename, tx->dst_filename, tx->cfdp_class, tx->keep, tx->chan_num,
-                                   tx->priority, tx->dest_id));
+    if (CF_CFDP_PlaybackDir(tx->src_filename, tx->dst_filename, tx->cfdp_class, tx->keep, tx->chan_num, tx->priority,
+                            tx->dest_id) == CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_PLAYBACK_DIR, CFE_EVS_EventType_INFORMATION,
+                          "CF: directory playback successful");
+        CF_CmdAcc();
+    }
+    else
+    {
+        CF_CmdRej();
+    }
 }
 
 /*----------------------------------------------------------------
@@ -261,7 +278,16 @@ int CF_DoFreezeThaw(uint8 chan_num, const CF_ChanAction_BoolArg_t *context)
 void CF_CmdFreeze(CFE_SB_Buffer_t *msg)
 {
     CF_ChanAction_BoolArg_t barg = {1}; /* param is frozen, so 1 means freeze */
-    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "freeze", (CF_ChanActionFn_t)CF_DoFreezeThaw, &barg));
+
+    if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "freeze", (CF_ChanActionFn_t)CF_DoFreezeThaw, &barg) == CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_FREEZE, CFE_EVS_EventType_INFORMATION, "CF: freeze successful");
+        CF_CmdAcc();
+    }
+    else
+    {
+        CF_CmdRej();
+    }
 }
 
 /*----------------------------------------------------------------
@@ -275,7 +301,16 @@ void CF_CmdFreeze(CFE_SB_Buffer_t *msg)
 void CF_CmdThaw(CFE_SB_Buffer_t *msg)
 {
     CF_ChanAction_BoolArg_t barg = {0}; /* param is frozen, so 0 means thawed */
-    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "thaw", (CF_ChanActionFn_t)CF_DoFreezeThaw, &barg));
+
+    if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "thaw", (CF_ChanActionFn_t)CF_DoFreezeThaw, &barg) == CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_THAW, CFE_EVS_EventType_INFORMATION, "CF: thaw successful");
+        CF_CmdAcc();
+    }
+    else
+    {
+        CF_CmdRej();
+    }
 }
 
 /*----------------------------------------------------------------
@@ -414,6 +449,8 @@ void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
     }
     else
     {
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_SUSPRES, CFE_EVS_EventType_INFORMATION,
+                          "CF: %s cmd: setting suspend flag to %d", msgstr[action], action);
         CF_CmdAcc();
     }
 }
@@ -467,9 +504,15 @@ void CF_CmdCancel_Txn(CF_Transaction_t *t, void *ignored)
  *-----------------------------------------------------------------*/
 void CF_CmdCancel(CFE_SB_Buffer_t *msg)
 {
-    /* note that CF_TsnChanAction() returns the number of transactions affected, so <= 0 means failure.
-     * CF_CmdCond() accepts 0 (logical false) to mean success, nonzero (logical true) to mean failure */
-    CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "cancel", CF_CmdCancel_Txn, NULL) <= 0);
+    if (CF_TsnChanAction((CF_TransactionCmd_t *)msg, "cancel", CF_CmdCancel_Txn, NULL) > 0)
+    {
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_CANCEL, CFE_EVS_EventType_INFORMATION, "CF: cancel successful");
+        CF_CmdAcc();
+    }
+    else
+    {
+        CF_CmdRej();
+    }
 }
 
 /*----------------------------------------------------------------
@@ -495,9 +538,15 @@ void CF_CmdAbandon_Txn(CF_Transaction_t *t, void *ignored)
  *-----------------------------------------------------------------*/
 void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
 {
-    /* note that CF_TsnChanAction() returns the number of transactions affected, so <= 0 means failure.
-     * CF_CmdCond() accepts 0 (logical false) to mean success, nonzero (logical true) to mean failure */
-    CF_CmdCond(CF_TsnChanAction((CF_TransactionCmd_t *)msg, "abandon", CF_CmdAbandon_Txn, NULL) <= 0);
+    if (CF_TsnChanAction((CF_TransactionCmd_t *)msg, "abandon", CF_CmdCancel_Txn, NULL) > 0)
+    {
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_ABANDON, CFE_EVS_EventType_INFORMATION, "CF: abandon successful");
+        CF_CmdAcc();
+    }
+    else
+    {
+        CF_CmdRej();
+    }
 }
 
 /*----------------------------------------------------------------
@@ -526,8 +575,17 @@ int CF_DoEnableDisableDequeue(uint8 chan_num, const CF_ChanAction_BoolArg_t *con
 void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
 {
     CF_ChanAction_BoolArg_t barg = {1};
-    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "enable_dequeue", (CF_ChanActionFn_t)CF_DoEnableDisableDequeue,
-                               &barg));
+
+    if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "enable_dequeue", (CF_ChanActionFn_t)CF_DoEnableDisableDequeue,
+                        &barg) == CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_ENABLE_DEQUEUE, CFE_EVS_EventType_INFORMATION, "CF: dequeue enabled");
+        CF_CmdAcc();
+    }
+    else
+    {
+        CF_CmdRej();
+    }
 }
 
 /*----------------------------------------------------------------
@@ -541,8 +599,17 @@ void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
 void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg)
 {
     CF_ChanAction_BoolArg_t barg = {0};
-    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "disable_dequeue",
-                               (CF_ChanActionFn_t)CF_DoEnableDisableDequeue, &barg));
+
+    if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "disable_dequeue", (CF_ChanActionFn_t)CF_DoEnableDisableDequeue,
+                        &barg) == CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_DISABLE_DEQUEUE, CFE_EVS_EventType_INFORMATION, "CF: dequeue disabled");
+        CF_CmdAcc();
+    }
+    else
+    {
+        CF_CmdRej();
+    }
 }
 
 /*----------------------------------------------------------------
@@ -590,8 +657,18 @@ int CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolMsgArg_t *
 void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
 {
     CF_ChanAction_BoolMsgArg_t barg = {(CF_UnionArgsCmd_t *)msg, 1};
-    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "enable_polldir", (CF_ChanActionFn_t)CF_DoEnableDisablePolldir,
-                               &barg));
+
+    if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "enable_polldir", (CF_ChanActionFn_t)CF_DoEnableDisablePolldir,
+                        &barg) == CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_ENABLE_POLLDIR, CFE_EVS_EventType_INFORMATION,
+                          "CF: enabled polling directory");
+        CF_CmdAcc();
+    }
+    else
+    {
+        CF_CmdRej();
+    }
 }
 
 /*----------------------------------------------------------------
@@ -605,8 +682,18 @@ void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
 void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
 {
     CF_ChanAction_BoolMsgArg_t barg = {(CF_UnionArgsCmd_t *)msg, 0};
-    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "disable_polldir",
-                               (CF_ChanActionFn_t)CF_DoEnableDisablePolldir, &barg));
+
+    if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "disable_polldir", (CF_ChanActionFn_t)CF_DoEnableDisablePolldir,
+                        &barg) == CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_DISABLE_POLLDIR, CFE_EVS_EventType_INFORMATION,
+                          "CF: disabled polling directory");
+        CF_CmdAcc();
+    }
+    else
+    {
+        CF_CmdRej();
+    }
 }
 
 /*----------------------------------------------------------------
@@ -701,7 +788,16 @@ int CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
  *-----------------------------------------------------------------*/
 void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
 {
-    CF_CmdCond(CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "purge_queue", (CF_ChanActionFn_t)CF_DoPurgeQueue, msg));
+    if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "purge_queue", (CF_ChanActionFn_t)CF_DoPurgeQueue, msg) ==
+        CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_PURGE_QUEUE, CFE_EVS_EventType_INFORMATION, "CF: queue purged");
+        CF_CmdAcc();
+    }
+    else
+    {
+        CF_CmdRej();
+    }
 }
 
 /*----------------------------------------------------------------
@@ -823,6 +919,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
         }
     }
 
+    CFE_EVS_SendEvent(CF_EID_INF_CMD_WQ, CFE_EVS_EventType_INFORMATION, "CF: write queue successful");
     CF_CmdAcc();
     return;
 
@@ -1025,7 +1122,14 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
     }
 
 err_out:
-    CF_CmdCond(acc);
+    if (acc == 0)
+    {
+        CF_CmdAcc();
+    }
+    else
+    {
+        CF_CmdRej();
+    }
 }
 
 /*----------------------------------------------------------------
@@ -1070,6 +1174,7 @@ void CF_CmdEnableEngine(CFE_SB_Buffer_t *msg)
     {
         if (CF_CFDP_InitEngine() == CFE_SUCCESS)
         {
+            CFE_EVS_SendEvent(CF_EID_INF_CMD_ENABLE_ENGINE, CFE_EVS_EventType_INFORMATION, "CF: enabled CFDP engine");
             CF_CmdAcc();
         }
         else
@@ -1100,6 +1205,7 @@ void CF_CmdDisableEngine(CFE_SB_Buffer_t *msg)
     if (CF_AppData.engine.enabled)
     {
         CF_CFDP_DisableEngine();
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_DISABLE_ENGINE, CFE_EVS_EventType_INFORMATION, "CF: disabled CFDP engine");
         CF_CmdAcc();
     }
     else
