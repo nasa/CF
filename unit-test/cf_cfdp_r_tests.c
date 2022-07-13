@@ -1043,7 +1043,12 @@ void Test_CF_CFDP_R2_RecvMd(void)
 
     /* nominal */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
+    t->state_data.r.cached_pos      = 1;
+    t->state_data.r.r2.acknak_count = 1;
     UtAssert_VOIDCALL(CF_CFDP_R2_RecvMd(t, ph));
+    UtAssert_UINT32_EQ(t->state_data.r.cached_pos, 0);
+    UtAssert_UINT32_EQ(t->flags.rx.md_recv, 1);
+    UtAssert_UINT32_EQ(t->state_data.r.r2.acknak_count, 0);
 
     /* md_recv already set */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
@@ -1066,9 +1071,9 @@ void Test_CF_CFDP_R2_RecvMd(void)
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_R_EOF_MD_SIZE);
     UtAssert_UINT32_EQ(t->history->cc, CF_CFDP_ConditionCode_FILE_SIZE_ERROR);
 
-    /* OS_rename failure */
+    /* OS_mv failure */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
-    UT_SetDeferredRetcode(UT_KEY(OS_rename), 1, -1);
+    UT_SetDeferredRetcode(UT_KEY(OS_mv), 1, -1);
     UtAssert_VOIDCALL(CF_CFDP_R2_RecvMd(t, ph));
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_R_RENAME);
     UtAssert_UINT32_EQ(t->history->cc, CF_CFDP_ConditionCode_FILESTORE_REJECTION);
