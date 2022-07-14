@@ -161,6 +161,21 @@
    has a per-channel configuration item for max number of RX messages
    processed per wakeup, and both CF and the ingest app
    need to be able to handle this.
+
+  <H3>Temporary file/directory use</H3>
+
+   Currently the temporary directory is only used to store class 2 RX file data
+   in temporary files on a transaction that has not yet received a metadata PDU.  
+   When/if the metadata is received for that transaction, OS_mv is used to transition
+   the temporary file to the desired destination location.  Note that OS_mv attempts
+   a rename first (faster but does not work across file systems), and if that
+   fails then attempts a copy/delete (slower).  Due to this the most efficent
+   temporary directory configuration is for it to be on the same file system as the
+   destination.  Note that currently this only impacts class 2 RX with an out
+   of order metadata packet, but there's future work being considered to
+   use the temporary location for all receipts with an atomic transfer of the
+   file after successful reception and verification (where applicable) of all the
+   file data.
 **/
 
 

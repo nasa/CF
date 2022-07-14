@@ -815,7 +815,7 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     {
         /* NOTE: t->flags.rx.md_recv always 1 in R1, so this is R2 only */
         /* parse the md pdu. this will overwrite the transaction's history, which contains our filename. so let's
-         * save the filename in a local buffer so it can be used with OS_rename upon successful parsing of
+         * save the filename in a local buffer so it can be used with OS_mv upon successful parsing of
          * the md pdu */
         char fname[CF_FILENAME_MAX_LEN];
         int  status;
@@ -846,7 +846,10 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
             /* close and rename file */
             CF_WrappedClose(t->fd);
             CFE_ES_PerfLogEntry(CF_PERF_ID_RENAME);
-            status = OS_rename(fname, t->history->fnames.dst_filename);
+
+            /* Note OS_mv attempts a rename, then copy/delete if that fails so it works across file systems */
+            status = OS_mv(fname, t->history->fnames.dst_filename);
+
             CFE_ES_PerfLogExit(CF_PERF_ID_RENAME);
             if (status != OS_SUCCESS)
             {
@@ -876,6 +879,7 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
                 }
             }
 
+            t->state_data.r.cached_pos      = 0; /* reset psn due to open */
             t->flags.rx.md_recv             = 1;
             t->state_data.r.r2.acknak_count = 0; /* in case part of nak */
             CF_CFDP_R2_Complete(t, 1);           /* check for completion now that md is received */
