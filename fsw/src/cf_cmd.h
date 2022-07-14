@@ -100,19 +100,6 @@ static inline void CF_CmdRej(void)
 }
 
 /************************************************************************/
-/** @brief Conditionally increment the command accept or reject counters.
- *
- * @par Assumptions, External Events, and Notes:
- *       None
- *
- */
-static inline void CF_CmdCond(int cond)
-{
-    static void (*const fns[])(void) = {CF_CmdAcc, CF_CmdRej};
-    fns[!!cond]();
-}
-
-/************************************************************************/
 /** @brief The no-operation command.
  *
  * @par Description
