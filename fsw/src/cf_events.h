@@ -1372,6 +1372,127 @@
  */
 #define CF_EID_ERR_CMD_BAD_PARAM (154)
 
+/**
+ * \brief CF Cancel Command No Matching Transaction Event ID
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  Cancel command received without a matching transaction
+ */
+#define CF_EID_ERR_CMD_CANCEL_CHAN (155)
+
+/**
+ * \brief CF Abandon Command No Matching Transaction Event ID
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  Abandon command received without a matching transaction
+ */
+#define CF_EID_ERR_CMD_ABANDON_CHAN (156)
+
+/**
+ * \brief CF Transfer File Command Failed Event ID
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  Transfer file command was unsuccessful
+ */
+#define CF_EID_ERR_CMD_TX_FILE (157)
+
+/**
+ * \brief CF Playback Directory Command Failed Event ID
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  Playback directory command was unsuccessful
+ */
+#define CF_EID_ERR_CMD_PLAYBACK_DIR (158)
+
+/**
+ * \brief CF Freeze Command Failed Event ID
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  Freeze command was unsuccessful
+ */
+#define CF_EID_ERR_CMD_FREEZE (159)
+
+/**
+ * \brief CF Thaw Command Failed Event ID
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  Thaw command was unsuccessful
+ */
+#define CF_EID_ERR_CMD_THAW (160)
+
+/**
+ * \brief CF Enable Dequeue Command Failed Event ID
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  Enable Dequeue command was unsuccessful
+ */
+#define CF_EID_ERR_CMD_ENABLE_DEQUEUE (161)
+
+/**
+ * \brief CF Disable Dequeue Command Failed Event ID
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  Disable dequeue command was unsuccessful
+ */
+#define CF_EID_ERR_CMD_DISABLE_DEQUEUE (162)
+
+/**
+ * \brief CF Enable Polldir Command Failed Event ID
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  Enable polldir command was unsuccessful
+ */
+#define CF_EID_ERR_CMD_ENABLE_POLLDIR (163)
+
+/**
+ * \brief CF Disable Polldir Command Failed Event ID
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  Disable polldir command was unsuccessful
+ */
+#define CF_EID_ERR_CMD_DISABLE_POLLDIR (164)
+
+/**
+ * \brief CF Purge Queue Command Failed Event ID
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  Purge queue command was unsuccessful
+ */
+#define CF_EID_ERR_CMD_PURGE_QUEUE (165)
+
 /**\}*/
 
 #endif /* !CF_EVENTS_H */

@@ -168,6 +168,7 @@ void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
     }
     else
     {
+        CFE_EVS_SendEvent(CF_EID_ERR_CMD_TX_FILE, CFE_EVS_EventType_ERROR, "CF: file transfer failed");
         CF_CmdRej();
     }
 }
@@ -211,6 +212,7 @@ void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
     }
     else
     {
+        CFE_EVS_SendEvent(CF_EID_ERR_CMD_PLAYBACK_DIR, CFE_EVS_EventType_ERROR, "CF: directory playback cmd failed");
         CF_CmdRej();
     }
 }
@@ -286,6 +288,7 @@ void CF_CmdFreeze(CFE_SB_Buffer_t *msg)
     }
     else
     {
+        CFE_EVS_SendEvent(CF_EID_ERR_CMD_FREEZE, CFE_EVS_EventType_ERROR, "CF: freeze cmd failed");
         CF_CmdRej();
     }
 }
@@ -309,6 +312,7 @@ void CF_CmdThaw(CFE_SB_Buffer_t *msg)
     }
     else
     {
+        CFE_EVS_SendEvent(CF_EID_ERR_CMD_THAW, CFE_EVS_EventType_ERROR, "CF: thaw cmd failed");
         CF_CmdRej();
     }
 }
@@ -511,6 +515,8 @@ void CF_CmdCancel(CFE_SB_Buffer_t *msg)
     }
     else
     {
+        /* No transaction was matched for the given combination of chan + eid + ts  */
+        CFE_EVS_SendEvent(CF_EID_ERR_CMD_CANCEL_CHAN, CFE_EVS_EventType_ERROR, "CF: cancel cmd: no transaction found");
         CF_CmdRej();
     }
 }
@@ -545,6 +551,9 @@ void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
     }
     else
     {
+        /* No transaction was matched for the given combination of chan + eid + ts  */
+        CFE_EVS_SendEvent(CF_EID_ERR_CMD_ABANDON_CHAN, CFE_EVS_EventType_ERROR,
+                          "CF: abandon cmd: no transaction found");
         CF_CmdRej();
     }
 }
@@ -584,6 +593,7 @@ void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
     }
     else
     {
+        CFE_EVS_SendEvent(CF_EID_ERR_CMD_ENABLE_DEQUEUE, CFE_EVS_EventType_ERROR, "CF: enable dequeue cmd failed");
         CF_CmdRej();
     }
 }
@@ -608,6 +618,7 @@ void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg)
     }
     else
     {
+        CFE_EVS_SendEvent(CF_EID_ERR_CMD_DISABLE_DEQUEUE, CFE_EVS_EventType_ERROR, "CF: disable dequeue cmd failed");
         CF_CmdRej();
     }
 }
@@ -667,6 +678,8 @@ void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
     }
     else
     {
+        CFE_EVS_SendEvent(CF_EID_ERR_CMD_ENABLE_POLLDIR, CFE_EVS_EventType_ERROR,
+                          "CF: enable polling directory cmd failed");
         CF_CmdRej();
     }
 }
@@ -692,6 +705,8 @@ void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
     }
     else
     {
+        CFE_EVS_SendEvent(CF_EID_ERR_CMD_DISABLE_POLLDIR, CFE_EVS_EventType_ERROR,
+                          "CF: disable polling directory cmd failed");
         CF_CmdRej();
     }
 }
@@ -796,6 +811,7 @@ void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
     }
     else
     {
+        CFE_EVS_SendEvent(CF_EID_ERR_CMD_PURGE_QUEUE, CFE_EVS_EventType_ERROR, "CF: purge queue cmd failed");
         CF_CmdRej();
     }
 }
