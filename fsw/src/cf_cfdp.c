@@ -360,29 +360,31 @@ CF_SendRet_t CF_CFDP_SendMd(CF_Transaction_t *t)
     if (!ph)
     {
         sret = CF_SendRet_NO_MSG;
-        goto err_out;
+    }
+    else
+    {
+
+        md = &ph->int_header.md;
+
+        CF_Assert((t->state == CF_TxnState_S1) || (t->state == CF_TxnState_S2));
+
+        md->size = t->fsize;
+
+        /* at this point, need to append filenames into md packet */
+        /* this does not actually copy here - that is done during encode */
+        md->source_filename.length =
+            CF_strnlen(t->history->fnames.src_filename, sizeof(t->history->fnames.src_filename));
+        ;
+        md->source_filename.data_ptr = t->history->fnames.src_filename;
+        md->dest_filename.length = CF_strnlen(t->history->fnames.dst_filename, sizeof(t->history->fnames.dst_filename));
+        ;
+        md->dest_filename.data_ptr = t->history->fnames.dst_filename;
+
+        CF_CFDP_EncodeMd(ph->penc, md);
+        CF_CFDP_SetPduLength(ph);
+        CF_CFDP_Send(t->chan_num, ph);
     }
 
-    md = &ph->int_header.md;
-
-    CF_Assert((t->state == CF_TxnState_S1) || (t->state == CF_TxnState_S2));
-
-    md->size = t->fsize;
-
-    /* at this point, need to append filenames into md packet */
-    /* this does not actually copy here - that is done during encode */
-    md->source_filename.length = CF_strnlen(t->history->fnames.src_filename, sizeof(t->history->fnames.src_filename));
-    ;
-    md->source_filename.data_ptr = t->history->fnames.src_filename;
-    md->dest_filename.length     = CF_strnlen(t->history->fnames.dst_filename, sizeof(t->history->fnames.dst_filename));
-    ;
-    md->dest_filename.data_ptr = t->history->fnames.dst_filename;
-
-    CF_CFDP_EncodeMd(ph->penc, md);
-    CF_CFDP_SetPduLength(ph);
-    CF_CFDP_Send(t->chan_num, ph);
-
-err_out:
     return sret;
 }
 
@@ -466,25 +468,25 @@ CF_SendRet_t CF_CFDP_SendEof(CF_Transaction_t *t)
     if (!ph)
     {
         ret = CF_SendRet_NO_MSG;
-        goto err_out;
     }
-
-    eof = &ph->int_header.eof;
-
-    eof->cc   = t->history->cc;
-    eof->crc  = t->crc.result;
-    eof->size = t->fsize;
-
-    if (t->history->cc != CF_CFDP_ConditionCode_NO_ERROR)
+    else
     {
-        CF_CFDP_AppendTlv(&eof->tlv_list, CF_CFDP_TLV_TYPE_ENTITY_ID);
+        eof = &ph->int_header.eof;
+
+        eof->cc   = t->history->cc;
+        eof->crc  = t->crc.result;
+        eof->size = t->fsize;
+
+        if (t->history->cc != CF_CFDP_ConditionCode_NO_ERROR)
+        {
+            CF_CFDP_AppendTlv(&eof->tlv_list, CF_CFDP_TLV_TYPE_ENTITY_ID);
+        }
+
+        CF_CFDP_EncodeEof(ph->penc, eof);
+        CF_CFDP_SetPduLength(ph);
+        CF_CFDP_Send(t->chan_num, ph);
     }
 
-    CF_CFDP_EncodeEof(ph->penc, eof);
-    CF_CFDP_SetPduLength(ph);
-    CF_CFDP_Send(t->chan_num, ph);
-
-err_out:
     return ret;
 }
 
@@ -523,20 +525,21 @@ CF_SendRet_t CF_CFDP_SendAck(CF_Transaction_t *t, CF_CFDP_AckTxnStatus_t ts, CF_
     if (!ph)
     {
         ret = CF_SendRet_NO_MSG;
-        goto err_out;
+    }
+    else
+    {
+        ack = &ph->int_header.ack;
+
+        ack->ack_directive_code = dir_code;
+        ack->ack_subtype_code   = 1; /* looks like always 1 if not extended features */
+        ack->cc                 = cc;
+        ack->txn_status         = ts;
+
+        CF_CFDP_EncodeAck(ph->penc, ack);
+        CF_CFDP_SetPduLength(ph);
+        CF_CFDP_Send(t->chan_num, ph);
     }
 
-    ack = &ph->int_header.ack;
-
-    ack->ack_directive_code = dir_code;
-    ack->ack_subtype_code   = 1; /* looks like always 1 if not extended features */
-    ack->cc                 = cc;
-    ack->txn_status         = ts;
-
-    CF_CFDP_EncodeAck(ph->penc, ack);
-    CF_CFDP_SetPduLength(ph);
-    CF_CFDP_Send(t->chan_num, ph);
-err_out:
     return ret;
 }
 
@@ -560,25 +563,25 @@ CF_SendRet_t CF_CFDP_SendFin(CF_Transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, 
     if (!ph)
     {
         ret = CF_SendRet_NO_MSG;
-        goto err_out;
     }
-
-    fin = &ph->int_header.fin;
-
-    fin->cc            = cc;
-    fin->delivery_code = dc;
-    fin->file_status   = fs;
-
-    if (cc != CF_CFDP_ConditionCode_NO_ERROR)
+    else
     {
-        CF_CFDP_AppendTlv(&fin->tlv_list, CF_CFDP_TLV_TYPE_ENTITY_ID);
+        fin = &ph->int_header.fin;
+
+        fin->cc            = cc;
+        fin->delivery_code = dc;
+        fin->file_status   = fs;
+
+        if (cc != CF_CFDP_ConditionCode_NO_ERROR)
+        {
+            CF_CFDP_AppendTlv(&fin->tlv_list, CF_CFDP_TLV_TYPE_ENTITY_ID);
+        }
+
+        CF_CFDP_EncodeFin(ph->penc, fin);
+        CF_CFDP_SetPduLength(ph);
+        CF_CFDP_Send(t->chan_num, ph);
     }
 
-    CF_CFDP_EncodeFin(ph->penc, fin);
-    CF_CFDP_SetPduLength(ph);
-    CF_CFDP_Send(t->chan_num, ph);
-
-err_out:
     return ret;
 }
 
@@ -598,23 +601,24 @@ CF_SendRet_t CF_CFDP_SendNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     if (!ph)
     {
         ret = CF_SendRet_NO_MSG;
-        goto err_out;
+    }
+    else
+    {
+
+        CF_Assert(CF_CFDP_GetClass(t) == CF_CFDP_CLASS_2);
+
+        nak = &ph->int_header.nak;
+
+        /*
+         * NOTE: the caller should have already initialized all the fields.
+         * This does not need to add anything more to the NAK here
+         */
+
+        CF_CFDP_EncodeNak(ph->penc, nak);
+        CF_CFDP_SetPduLength(ph);
+        CF_CFDP_Send(t->chan_num, ph);
     }
 
-    CF_Assert(CF_CFDP_GetClass(t) == CF_CFDP_CLASS_2);
-
-    nak = &ph->int_header.nak;
-
-    /*
-     * NOTE: the caller should have already initialized all the fields.
-     * This does not need to add anything more to the NAK here
-     */
-
-    CF_CFDP_EncodeNak(ph->penc, nak);
-    CF_CFDP_SetPduLength(ph);
-    CF_CFDP_Send(t->chan_num, ph);
-
-err_out:
     return ret;
 }
 
@@ -628,6 +632,8 @@ err_out:
  *-----------------------------------------------------------------*/
 int CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
 {
+    int ret = 0;
+
     CF_Assert(chan_num < CF_NUM_CHANNELS);
 
     CF_CFDP_DecodeHeader(ph->pdec, &ph->pdu_header);
@@ -642,30 +648,31 @@ int CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_LARGE_FILE, CFE_EVS_EventType_ERROR,
                           "CF: pdu with large file bit received (unsupported)");
-        goto err_out;
+        ++CF_AppData.hk.channel_hk[chan_num].counters.recv.error;
+        ret = -1;
     }
-
-    if (CF_CODEC_IS_OK(ph->pdec) && ph->pdu_header.pdu_type == 0)
+    else
     {
-        CF_CFDP_DecodeFileDirectiveHeader(ph->pdec, &ph->fdirective);
+        if (CF_CODEC_IS_OK(ph->pdec) && ph->pdu_header.pdu_type == 0)
+        {
+            CF_CFDP_DecodeFileDirectiveHeader(ph->pdec, &ph->fdirective);
+        }
+
+        if (!CF_CODEC_IS_OK(ph->pdec))
+        {
+            CFE_EVS_SendEvent(CF_EID_ERR_PDU_SHORT_HEADER, CFE_EVS_EventType_ERROR, "CF: pdu too short (%lu received)",
+                              (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
+            ++CF_AppData.hk.channel_hk[chan_num].counters.recv.error;
+            ret = -1;
+        }
+        else
+        {
+            /* pdu is ok, so continue processing */
+            ++CF_AppData.hk.channel_hk[chan_num].counters.recv.pdu;
+        }
     }
 
-    if (!CF_CODEC_IS_OK(ph->pdec))
-    {
-        CFE_EVS_SendEvent(CF_EID_ERR_PDU_SHORT_HEADER, CFE_EVS_EventType_ERROR, "CF: pdu too short (%lu received)",
-                          (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
-        goto err_out;
-    }
-
-    /* pdu is ok, so continue processing */
-    ++CF_AppData.hk.channel_hk[chan_num].counters.recv.pdu;
-    /* going to leave two return statements in, since they are at the end of the function.
-     * one is normal exit path, and one is error exit path */
-    return 0;
-
-err_out:
-    ++CF_AppData.hk.channel_hk[chan_num].counters.recv.error;
-    return -1;
+    return ret;
 }
 
 /*----------------------------------------------------------------
@@ -680,6 +687,7 @@ int CF_CFDP_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     const CF_Logical_PduMd_t *md = &ph->int_header.md;
     int                       lv_ret;
+    int                       ret = 0;
 
     CF_CFDP_DecodeMd(ph->pdec, &ph->int_header.md);
     if (!CF_CODEC_IS_OK(ph->pdec))
@@ -687,49 +695,58 @@ int CF_CFDP_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_MD_SHORT, CFE_EVS_EventType_ERROR,
                           "CF: metadata packet too short: %lu bytes received",
                           (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
-        goto err_out;
+        ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
+        /* error return path */
+        ret = -1;
     }
-
-    /* store the expected file size in transaction */
-    t->fsize = md->size;
-
-    /*
-     * store the filenames in transaction.
-     *
-     * NOTE: The "CF_CFDP_CopyStringFromLV()" now knows that the data is supposed to be a C string,
-     * and ensures that the output content is properly terminated, so this only needs to check that
-     * it worked.
-     */
-    lv_ret = CF_CFDP_CopyStringFromLV(t->history->fnames.src_filename, sizeof(t->history->fnames.src_filename),
-                                      &md->source_filename);
-    if (lv_ret < 0)
+    else
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_PDU_INVALID_SRC_LEN, CFE_EVS_EventType_ERROR,
-                          "CF: metadata pdu rejected due to invalid length in source filename of 0x%02x",
-                          md->source_filename.length);
-        goto err_out;
-    }
-    lv_ret = CF_CFDP_CopyStringFromLV(t->history->fnames.dst_filename, sizeof(t->history->fnames.dst_filename),
-                                      &md->dest_filename);
-    if (lv_ret < 0)
-    {
-        CFE_EVS_SendEvent(CF_EID_ERR_PDU_INVALID_DST_LEN, CFE_EVS_EventType_ERROR,
-                          "CF: metadata pdu rejected due to invalid length in dest filename of 0x%02x",
-                          md->dest_filename.length);
-        goto err_out;
-    }
 
-    CFE_EVS_SendEvent(CF_EID_INF_PDU_MD_RECVD, CFE_EVS_EventType_INFORMATION,
-                      "CF: md received for source: %s, dest: %s", t->history->fnames.src_filename,
-                      t->history->fnames.dst_filename);
+        /* store the expected file size in transaction */
+        t->fsize = md->size;
+
+        /*
+         * store the filenames in transaction.
+         *
+         * NOTE: The "CF_CFDP_CopyStringFromLV()" now knows that the data is supposed to be a C string,
+         * and ensures that the output content is properly terminated, so this only needs to check that
+         * it worked.
+         */
+        lv_ret = CF_CFDP_CopyStringFromLV(t->history->fnames.src_filename, sizeof(t->history->fnames.src_filename),
+                                          &md->source_filename);
+        if (lv_ret < 0)
+        {
+            CFE_EVS_SendEvent(CF_EID_ERR_PDU_INVALID_SRC_LEN, CFE_EVS_EventType_ERROR,
+                              "CF: metadata pdu rejected due to invalid length in source filename of 0x%02x",
+                              md->source_filename.length);
+            ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
+            /* error return path */
+            ret = -1;
+        }
+        else
+        {
+            lv_ret = CF_CFDP_CopyStringFromLV(t->history->fnames.dst_filename, sizeof(t->history->fnames.dst_filename),
+                                              &md->dest_filename);
+            if (lv_ret < 0)
+            {
+                CFE_EVS_SendEvent(CF_EID_ERR_PDU_INVALID_DST_LEN, CFE_EVS_EventType_ERROR,
+                                  "CF: metadata pdu rejected due to invalid length in dest filename of 0x%02x",
+                                  md->dest_filename.length);
+                ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
+                /* error return path */
+                ret = -1;
+            }
+            else
+            {
+                CFE_EVS_SendEvent(CF_EID_INF_PDU_MD_RECVD, CFE_EVS_EventType_INFORMATION,
+                                  "CF: md received for source: %s, dest: %s", t->history->fnames.src_filename,
+                                  t->history->fnames.dst_filename);
+            }
+        }
+    }
 
     /* normal return path */
-    return 0;
-
-err_out:
-    ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
-    /* error return path */
-    return -1;
+    return ret;
 }
 
 /*----------------------------------------------------------------
@@ -1012,61 +1029,67 @@ int32 CF_CFDP_InitEngine(void)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_PIPE, CFE_EVS_EventType_ERROR,
                               "CF: failed to create pipe %s, returned 0x%08lx", nbuf, (unsigned long)ret);
-            goto err_out;
+            break;
         }
-
-        ret = CFE_SB_SubscribeLocal(CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[i].mid_input),
-                                    CF_AppData.engine.channels[i].pipe,
-                                    CF_AppData.config_table->chan[i].pipe_depth_input);
-        if (ret != CFE_SUCCESS)
+        else
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_INIT_SUB, CFE_EVS_EventType_ERROR,
-                              "CF: failed to subscribe to MID 0x%lx, returned 0x%08lx",
-                              (unsigned long)CF_AppData.config_table->chan[i].mid_input, (unsigned long)ret);
-            goto err_out;
-        }
-
-        if (CF_AppData.config_table->chan[i].sem_name[0])
-        {
-            ret = OS_CountSemGetIdByName(&CF_AppData.engine.channels[i].sem_id,
-                                         CF_AppData.config_table->chan[i].sem_name);
-            if (ret != OS_SUCCESS)
+            ret = CFE_SB_SubscribeLocal(CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[i].mid_input),
+                                        CF_AppData.engine.channels[i].pipe,
+                                        CF_AppData.config_table->chan[i].pipe_depth_input);
+            if (ret != CFE_SUCCESS)
             {
-                CFE_EVS_SendEvent(CF_EID_ERR_INIT_SEM, CFE_EVS_EventType_ERROR,
-                                  "CF: failed to get sem id for name %s, error=%ld",
-                                  CF_AppData.config_table->chan[i].sem_name, (long)ret);
-                goto err_out;
+                CFE_EVS_SendEvent(CF_EID_ERR_INIT_SUB, CFE_EVS_EventType_ERROR,
+                                  "CF: failed to subscribe to MID 0x%lx, returned 0x%08lx",
+                                  (unsigned long)CF_AppData.config_table->chan[i].mid_input, (unsigned long)ret);
+                break;
             }
-        }
-
-        for (j = 0; j < CF_NUM_TRANSACTIONS_PER_CHANNEL; ++j, ++t)
-        {
-            int k;
-
-            t->chan_num = i;
-            CF_FreeTransaction(t);
-
-            for (k = 0; k < CF_Direction_NUM; ++k, ++c)
+            else if (CF_AppData.config_table->chan[i].sem_name[0])
             {
-                CF_Assert((chunk_mem_offset + CF_DIR_MAX_CHUNKS[k][i]) <= CF_NUM_CHUNKS_ALL_CHANNELS);
-                CF_ChunkListInit(&c->chunks, CF_DIR_MAX_CHUNKS[k][i], &CF_AppData.engine.chunk_mem[chunk_mem_offset]);
-                chunk_mem_offset += CF_DIR_MAX_CHUNKS[k][i];
-                CF_CList_InitNode(&c->cl_node);
-                CF_CList_InsertBack(&CF_AppData.engine.channels[i].cs[k], &c->cl_node);
-            }
-        }
+                ret = OS_CountSemGetIdByName(&CF_AppData.engine.channels[i].sem_id,
+                                             CF_AppData.config_table->chan[i].sem_name);
+                if (ret != OS_SUCCESS)
+                {
+                    CFE_EVS_SendEvent(CF_EID_ERR_INIT_SEM, CFE_EVS_EventType_ERROR,
+                                      "CF: failed to get sem id for name %s, error=%ld",
+                                      CF_AppData.config_table->chan[i].sem_name, (long)ret);
+                    break;
+                }
+                else
+                {
+                    for (j = 0; j < CF_NUM_TRANSACTIONS_PER_CHANNEL; ++j, ++t)
+                    {
+                        int k;
 
-        for (j = 0; j < CF_NUM_HISTORIES_PER_CHANNEL; ++j)
-        {
-            CF_History_t *h = &CF_AppData.engine.histories[(i * CF_NUM_HISTORIES_PER_CHANNEL) + j];
-            CF_CList_InitNode(&h->cl_node);
-            CF_CList_InsertBack_Ex(&CF_AppData.engine.channels[i], CF_QueueIdx_HIST_FREE, &h->cl_node);
+                        t->chan_num = i;
+                        CF_FreeTransaction(t);
+
+                        for (k = 0; k < CF_Direction_NUM; ++k, ++c)
+                        {
+                            CF_Assert((chunk_mem_offset + CF_DIR_MAX_CHUNKS[k][i]) <= CF_NUM_CHUNKS_ALL_CHANNELS);
+                            CF_ChunkListInit(&c->chunks, CF_DIR_MAX_CHUNKS[k][i],
+                                             &CF_AppData.engine.chunk_mem[chunk_mem_offset]);
+                            chunk_mem_offset += CF_DIR_MAX_CHUNKS[k][i];
+                            CF_CList_InitNode(&c->cl_node);
+                            CF_CList_InsertBack(&CF_AppData.engine.channels[i].cs[k], &c->cl_node);
+                        }
+                    }
+
+                    for (j = 0; j < CF_NUM_HISTORIES_PER_CHANNEL; ++j)
+                    {
+                        CF_History_t *h = &CF_AppData.engine.histories[(i * CF_NUM_HISTORIES_PER_CHANNEL) + j];
+                        CF_CList_InitNode(&h->cl_node);
+                        CF_CList_InsertBack_Ex(&CF_AppData.engine.channels[i], CF_QueueIdx_HIST_FREE, &h->cl_node);
+                    }
+                }
+            }
         }
     }
 
-    CF_AppData.engine.enabled = 1;
+    if (ret == CFE_SUCCESS)
+    {
+        CF_AppData.engine.enabled = 1;
+    }
 
-err_out:
     return ret;
 }
 
@@ -1087,25 +1110,25 @@ int CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context)
     if (t->flags.com.suspended)
     {
         ret = 0; /* suspended, so move on to next */
-        goto err_out;
     }
-
-    CF_Assert(t->flags.com.q_index == CF_QueueIdx_TXA); /* huh? */
-
-    /* if no more messages, then c->cur will be set.
-     * If the transaction sent the last filedata pdu and eof, it will move itself
-     * off the active queue. Run until either of these occur. */
-    while (!args->c->cur && t->flags.com.q_index == CF_QueueIdx_TXA)
+    else
     {
-        CFE_ES_PerfLogEntry(CF_PERF_ID_PDUSENT(t->chan_num));
-        CF_CFDP_DispatchTx(t);
-        CFE_ES_PerfLogExit(CF_PERF_ID_PDUSENT(t->chan_num));
+        CF_Assert(t->flags.com.q_index == CF_QueueIdx_TXA); /* huh? */
+
+        /* if no more messages, then c->cur will be set.
+         * If the transaction sent the last filedata pdu and eof, it will move itself
+         * off the active queue. Run until either of these occur. */
+        while (!args->c->cur && t->flags.com.q_index == CF_QueueIdx_TXA)
+        {
+            CFE_ES_PerfLogEntry(CF_PERF_ID_PDUSENT(t->chan_num));
+            CF_CFDP_DispatchTx(t);
+            CFE_ES_PerfLogExit(CF_PERF_ID_PDUSENT(t->chan_num));
+        }
+
+        args->ran_one = 1;
     }
 
-    args->ran_one = 1;
-
-err_out:
-    return ret; /* exit traversal */
+    return ret;
 }
 
 /*----------------------------------------------------------------
@@ -1198,6 +1221,8 @@ int CF_CFDP_DoTick(CF_CListNode_t *node, void *context)
  *-----------------------------------------------------------------*/
 void CF_CFDP_TickTransactions(CF_Channel_t *c)
 {
+    bool reset = true;
+
     void (*fns[CF_TickType_NUM_TYPES])(CF_Transaction_t *, int *) = {CF_CFDP_R_Tick, CF_CFDP_S_Tick,
                                                                      CF_CFDP_S_Tick_Nak};
     int qs[CF_TickType_NUM_TYPES]                                 = {CF_QueueIdx_RX, CF_QueueIdx_TXW, CF_QueueIdx_TXW};
@@ -1218,7 +1243,7 @@ void CF_CFDP_TickTransactions(CF_Channel_t *c)
                  * If current tick type is nak response, then reset tick type. It would be
                  * bad to let NAK response starve out RX or TXW ticks on the next cycle.
                  *
-                 * If RX ticks use up all availalee messages, then we pick up where whe left
+                 * If RX ticks use up all available messages, then we pick up where we left
                  * off on the next cycle. (This causes some RX tick counts to be missed,
                  * but that's ok. Precise timing isn't required.)
                  *
@@ -1230,17 +1255,25 @@ void CF_CFDP_TickTransactions(CF_Channel_t *c)
                  *
                  * New file data on TXA
                  */
-                if (c->tick_type == CF_TickType_TXW_NAK)
-                    break; /* triggers tick type reset below */
-                else
-                    goto early_exit;
+                if (c->tick_type != CF_TickType_TXW_NAK)
+                {
+                    reset = false;
+                }
+
+                break;
             }
         } while (args.cont);
+
+        if (!reset)
+        {
+            break;
+        }
     }
 
-    c->tick_type = CF_TickType_RX; /* reset tick type */
-
-early_exit:;
+    if (reset)
+    {
+        c->tick_type = CF_TickType_RX; /* reset tick type */
+    }
 }
 
 /*----------------------------------------------------------------
@@ -1315,25 +1348,26 @@ int32 CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, CF_CFDP
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_MAX_CMD_TX, CFE_EVS_EventType_ERROR,
                           "CF: max number of commanded files reached");
         ret = -1;
-        goto err_out;
+    }
+    else
+    {
+
+        t = CF_FindUnusedTransaction(&CF_AppData.engine.channels[chan]);
+        CF_Assert(t); /* should always have a free transaction at this point */
+
+        CF_Assert(t->state == CF_TxnState_IDLE);
+
+        /* NOTE: the caller of this function ensures the provided src and dst filenames are NULL terminated */
+        strncpy(t->history->fnames.src_filename, src_filename, sizeof(t->history->fnames.src_filename) - 1);
+        t->history->fnames.src_filename[sizeof(t->history->fnames.src_filename) - 1] = 0;
+        strncpy(t->history->fnames.dst_filename, dst_filename, sizeof(t->history->fnames.dst_filename) - 1);
+        t->history->fnames.dst_filename[sizeof(t->history->fnames.dst_filename) - 1] = 0;
+        CF_CFDP_TxFile_Initiate(t, cfdp_class, keep, chan, priority, dest_id);
+
+        ++c->num_cmd_tx;
+        t->flags.tx.cmd_tx = 1;
     }
 
-    t = CF_FindUnusedTransaction(&CF_AppData.engine.channels[chan]);
-    CF_Assert(t); /* should always have a free transaction at this point */
-
-    CF_Assert(t->state == CF_TxnState_IDLE);
-
-    /* NOTE: the caller of this function ensures the provided src and dst filenames are NULL terminated */
-    strncpy(t->history->fnames.src_filename, src_filename, sizeof(t->history->fnames.src_filename) - 1);
-    t->history->fnames.src_filename[sizeof(t->history->fnames.src_filename) - 1] = 0;
-    strncpy(t->history->fnames.dst_filename, dst_filename, sizeof(t->history->fnames.dst_filename) - 1);
-    t->history->fnames.dst_filename[sizeof(t->history->fnames.dst_filename) - 1] = 0;
-    CF_CFDP_TxFile_Initiate(t, cfdp_class, keep, chan, priority, dest_id);
-
-    ++c->num_cmd_tx;
-    t->flags.tx.cmd_tx = 1;
-
-err_out:
     return ret;
 }
 
@@ -1357,25 +1391,24 @@ static int32 CF_CFDP_PlaybackDir_Initiate(CF_Playback_t *p, const char *src_file
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_OPENDIR, CFE_EVS_EventType_ERROR,
                           "CF: failed to open playback directory %s, error=%ld", src_filename, (long)ret);
         ++CF_AppData.hk.channel_hk[chan].counters.fault.directory_read;
-        goto err_out;
+    }
+    else
+    {
+        p->diropen    = 1;
+        p->busy       = 1;
+        p->keep       = keep;
+        p->priority   = priority;
+        p->dest_id    = dest_id;
+        p->cfdp_class = cfdp_class;
+
+        /* NOTE: the caller of this function ensures the provided src and dst filenames are NULL terminated */
+        strncpy(p->fnames.src_filename, src_filename, sizeof(p->fnames.src_filename) - 1);
+        p->fnames.src_filename[sizeof(p->fnames.src_filename) - 1] = 0;
+        strncpy(p->fnames.dst_filename, dst_filename, sizeof(p->fnames.dst_filename) - 1);
+        p->fnames.dst_filename[sizeof(p->fnames.dst_filename) - 1] = 0;
     }
 
-    p->diropen    = 1;
-    p->busy       = 1;
-    p->keep       = keep;
-    p->priority   = priority;
-    p->dest_id    = dest_id;
-    p->cfdp_class = cfdp_class;
-
-    /* NOTE: the caller of this function ensures the provided src and dst filenames are NULL terminated */
-    strncpy(p->fnames.src_filename, src_filename, sizeof(p->fnames.src_filename) - 1);
-    p->fnames.src_filename[sizeof(p->fnames.src_filename) - 1] = 0;
-    strncpy(p->fnames.dst_filename, dst_filename, sizeof(p->fnames.dst_filename) - 1);
-    p->fnames.dst_filename[sizeof(p->fnames.dst_filename) - 1] = 0;
-
     /* the executor will start the transfer next cycle */
-
-err_out:
     return ret;
 }
 

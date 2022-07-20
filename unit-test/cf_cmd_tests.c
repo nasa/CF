@@ -2798,7 +2798,6 @@ void Test_CF_CmdWriteQueue_When_CF_WriteTxnQueueDataToFile_FailsAnd_wq_IsUpAnd_q
                      sizeof(context_CF_WriteTxnQueueDataToFile), false);
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
-    /* goto out_close */
     int32 context_CF_WrappedClose_fd;
 
     UT_SetDataBuffer(UT_KEY(CF_WrappedClose), &context_CF_WrappedClose_fd, sizeof(context_CF_WrappedClose_fd), false);
@@ -2859,7 +2858,6 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsUpA
                      sizeof(context_CF_WriteHistoryQueueDataToFile), false);
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteHistoryQueueDataToFile), forced_return_CF_WriteHistoryQueueDataToFile);
 
-    /* goto out_close */
     int32 context_CF_WrappedClose_fd;
 
     UT_SetDataBuffer(UT_KEY(CF_WrappedClose), &context_CF_WrappedClose_fd, sizeof(context_CF_WrappedClose_fd), false);
@@ -2920,7 +2918,6 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnFirstCallAnd_wq
                      sizeof(context_CF_WriteTxnQueueDataToFile), false);
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
-    /* goto out_close */
     int32 context_CF_WrappedClose_fd;
 
     UT_SetDataBuffer(UT_KEY(CF_WrappedClose), &context_CF_WrappedClose_fd, sizeof(context_CF_WrappedClose_fd), false);
@@ -2983,7 +2980,6 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnSecondCallAnd_w
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile_1st_call);
     UT_SetDeferredRetcode(UT_KEY(CF_WriteTxnQueueDataToFile), 2, forced_return_CF_WriteTxnQueueDataToFile_2nd_call);
 
-    /* goto out_close */
     int32 context_CF_WrappedClose_fd;
 
     UT_SetDataBuffer(UT_KEY(CF_WrappedClose), &context_CF_WrappedClose_fd, sizeof(context_CF_WrappedClose_fd), false);
@@ -3044,7 +3040,6 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
                      sizeof(context_CF_WriteTxnQueueDataToFile), false);
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
-    /* goto out_close */
     int32 context_CF_WrappedClose_fd;
 
     UT_SetDataBuffer(UT_KEY(CF_WrappedClose), &context_CF_WrappedClose_fd, sizeof(context_CF_WrappedClose_fd), false);
@@ -3105,7 +3100,6 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
                      sizeof(context_CF_WriteHistoryQueueDataToFile), false);
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteHistoryQueueDataToFile), forced_return_CF_WriteHistoryQueueDataToFile);
 
-    /* goto out_close */
     int32 context_CF_WrappedClose_fd;
 
     UT_SetDataBuffer(UT_KEY(CF_WrappedClose), &context_CF_WrappedClose_fd, sizeof(context_CF_WrappedClose_fd), false);
