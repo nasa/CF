@@ -538,7 +538,7 @@ void CF_CmdAbandon_Txn(CF_Transaction_t *t, void *ignored)
  *-----------------------------------------------------------------*/
 void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
 {
-    if (CF_TsnChanAction((CF_TransactionCmd_t *)msg, "abandon", CF_CmdCancel_Txn, NULL) > 0)
+    if (CF_TsnChanAction((CF_TransactionCmd_t *)msg, "abandon", CF_CmdAbandon_Txn, NULL) > 0)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_ABANDON, CFE_EVS_EventType_INFORMATION, "CF: abandon successful");
         CF_CmdAcc();
