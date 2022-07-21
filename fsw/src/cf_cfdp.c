@@ -1031,57 +1031,53 @@ int32 CF_CFDP_InitEngine(void)
                               "CF: failed to create pipe %s, returned 0x%08lx", nbuf, (unsigned long)ret);
             break;
         }
-        else
+
+        ret = CFE_SB_SubscribeLocal(CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[i].mid_input),
+                                    CF_AppData.engine.channels[i].pipe,
+                                    CF_AppData.config_table->chan[i].pipe_depth_input);
+        if (ret != CFE_SUCCESS)
         {
-            ret = CFE_SB_SubscribeLocal(CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[i].mid_input),
-                                        CF_AppData.engine.channels[i].pipe,
-                                        CF_AppData.config_table->chan[i].pipe_depth_input);
-            if (ret != CFE_SUCCESS)
+            CFE_EVS_SendEvent(CF_EID_ERR_INIT_SUB, CFE_EVS_EventType_ERROR,
+                              "CF: failed to subscribe to MID 0x%lx, returned 0x%08lx",
+                              (unsigned long)CF_AppData.config_table->chan[i].mid_input, (unsigned long)ret);
+            break;
+        }
+
+        if (CF_AppData.config_table->chan[i].sem_name[0])
+        {
+            ret = OS_CountSemGetIdByName(&CF_AppData.engine.channels[i].sem_id,
+                                         CF_AppData.config_table->chan[i].sem_name);
+            if (ret != OS_SUCCESS)
             {
-                CFE_EVS_SendEvent(CF_EID_ERR_INIT_SUB, CFE_EVS_EventType_ERROR,
-                                  "CF: failed to subscribe to MID 0x%lx, returned 0x%08lx",
-                                  (unsigned long)CF_AppData.config_table->chan[i].mid_input, (unsigned long)ret);
+                CFE_EVS_SendEvent(CF_EID_ERR_INIT_SEM, CFE_EVS_EventType_ERROR,
+                                  "CF: failed to get sem id for name %s, error=%ld",
+                                  CF_AppData.config_table->chan[i].sem_name, (long)ret);
                 break;
             }
-            else if (CF_AppData.config_table->chan[i].sem_name[0])
+        }
+
+        for (j = 0; j < CF_NUM_TRANSACTIONS_PER_CHANNEL; ++j, ++t)
+        {
+            int k;
+
+            t->chan_num = i;
+            CF_FreeTransaction(t);
+
+            for (k = 0; k < CF_Direction_NUM; ++k, ++c)
             {
-                ret = OS_CountSemGetIdByName(&CF_AppData.engine.channels[i].sem_id,
-                                             CF_AppData.config_table->chan[i].sem_name);
-                if (ret != OS_SUCCESS)
-                {
-                    CFE_EVS_SendEvent(CF_EID_ERR_INIT_SEM, CFE_EVS_EventType_ERROR,
-                                      "CF: failed to get sem id for name %s, error=%ld",
-                                      CF_AppData.config_table->chan[i].sem_name, (long)ret);
-                    break;
-                }
-                else
-                {
-                    for (j = 0; j < CF_NUM_TRANSACTIONS_PER_CHANNEL; ++j, ++t)
-                    {
-                        int k;
-
-                        t->chan_num = i;
-                        CF_FreeTransaction(t);
-
-                        for (k = 0; k < CF_Direction_NUM; ++k, ++c)
-                        {
-                            CF_Assert((chunk_mem_offset + CF_DIR_MAX_CHUNKS[k][i]) <= CF_NUM_CHUNKS_ALL_CHANNELS);
-                            CF_ChunkListInit(&c->chunks, CF_DIR_MAX_CHUNKS[k][i],
-                                             &CF_AppData.engine.chunk_mem[chunk_mem_offset]);
-                            chunk_mem_offset += CF_DIR_MAX_CHUNKS[k][i];
-                            CF_CList_InitNode(&c->cl_node);
-                            CF_CList_InsertBack(&CF_AppData.engine.channels[i].cs[k], &c->cl_node);
-                        }
-                    }
-
-                    for (j = 0; j < CF_NUM_HISTORIES_PER_CHANNEL; ++j)
-                    {
-                        CF_History_t *h = &CF_AppData.engine.histories[(i * CF_NUM_HISTORIES_PER_CHANNEL) + j];
-                        CF_CList_InitNode(&h->cl_node);
-                        CF_CList_InsertBack_Ex(&CF_AppData.engine.channels[i], CF_QueueIdx_HIST_FREE, &h->cl_node);
-                    }
-                }
+                CF_Assert((chunk_mem_offset + CF_DIR_MAX_CHUNKS[k][i]) <= CF_NUM_CHUNKS_ALL_CHANNELS);
+                CF_ChunkListInit(&c->chunks, CF_DIR_MAX_CHUNKS[k][i], &CF_AppData.engine.chunk_mem[chunk_mem_offset]);
+                chunk_mem_offset += CF_DIR_MAX_CHUNKS[k][i];
+                CF_CList_InitNode(&c->cl_node);
+                CF_CList_InsertBack(&CF_AppData.engine.channels[i].cs[k], &c->cl_node);
             }
+        }
+
+        for (j = 0; j < CF_NUM_HISTORIES_PER_CHANNEL; ++j)
+        {
+            CF_History_t *h = &CF_AppData.engine.histories[(i * CF_NUM_HISTORIES_PER_CHANNEL) + j];
+            CF_CList_InitNode(&h->cl_node);
+            CF_CList_InsertBack_Ex(&CF_AppData.engine.channels[i], CF_QueueIdx_HIST_FREE, &h->cl_node);
         }
     }
 
