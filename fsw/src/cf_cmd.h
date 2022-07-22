@@ -77,29 +77,6 @@ typedef struct CF_ChanAction_BoolMsgArg
 } CF_ChanAction_BoolMsgArg_t;
 
 /************************************************************************/
-/** @brief Increment the command accepted counter.
- *
- * @par Assumptions, External Events, and Notes:
- *       None
- */
-static inline void CF_CmdAcc(void)
-{
-    ++CF_AppData.hk.counters.cmd;
-}
-
-/************************************************************************/
-/** @brief Increment the command rejected counter.
- *
- * @par Assumptions, External Events, and Notes:
- *       None
- *
- */
-static inline void CF_CmdRej(void)
-{
-    ++CF_AppData.hk.counters.err;
-}
-
-/************************************************************************/
 /** @brief The no-operation command.
  *
  * @par Description
