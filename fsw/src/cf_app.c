@@ -223,6 +223,8 @@ int32 CF_Init(void)
 
     CFE_MSG_Init(&CF_AppData.hk.tlm_header.Msg, CFE_SB_ValueToMsgId(CF_HK_TLM_MID), sizeof(CF_AppData.hk));
 
+    CFE_MSG_Init(&CF_AppData.eot.tlm_header.Msg, CFE_SB_ValueToMsgId(CF_EOT_TLM_MID), sizeof(CF_AppData.eot));
+
     status = CFE_EVS_Register(NULL, 0, CFE_EVS_EventFilter_BINARY);
     if (status != CFE_SUCCESS)
     {

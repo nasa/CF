@@ -125,6 +125,23 @@ typedef struct CF_HkPacket
     CF_HkChannel_Data_t channel_hk[CF_NUM_CHANNELS]; /**< \brief Per channel housekeeping data */
 } CF_HkPacket_t;
 
+typedef struct CF_EotPacket
+{
+    CFE_MSG_TelemetryHeader_t tlm_header;
+    uint32                    channel;
+    CF_Direction_t            direction;
+    CF_TxnFilenames_t         fnames;
+    CF_CFDP_Class_t           cfdp_class;
+
+    /* Channel */
+    /* TX/RX Direction */
+    /* File names : Source and Target */
+    /* Status - What status? */
+    /* Class */
+    /* Anything else?? */
+
+} CF_EotPacket_t;
+
 /**\}*/
 
 /**
