@@ -54,8 +54,6 @@ typedef struct
 {
     CF_HkPacket_t hk;
 
-    CF_EotPacket_t eot;
-
     uint32 run_status;
 
     CFE_SB_PipeId_t cmd_pipe;

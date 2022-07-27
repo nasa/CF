@@ -94,6 +94,16 @@ void CF_CFDP_DecodeStart(CF_DecoderState_t *pdec, const void *msgbuf, CF_Logical
 void CF_CFDP_ResetTransaction(CF_Transaction_t *t, int keep_history);
 
 /************************************************************************/
+/** @brief Send an end of transaction packet.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *       t must not be NULL.
+ *
+ * @param t  Pointer to the transaction object
+ */
+void CF_CFDP_SendEotPkt(CF_Transaction_t *t);
+
+/************************************************************************/
 /** @brief Initialization function for the cfdp engine
  *
  * @par Description
