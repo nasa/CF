@@ -69,7 +69,7 @@
 typedef enum
 {
     CF_TxnState_IDLE    = 0, /**< \brief State assigned to a newly allocated transaction object */
-    CF_TxnState_R1      = 1, /**< \brief Recieve file as class 1 */
+    CF_TxnState_R1      = 1, /**< \brief Receive file as class 1 */
     CF_TxnState_S1      = 2, /**< \brief Send file as class 1 */
     CF_TxnState_R2      = 3, /**< \brief Receive file as class 2 */
     CF_TxnState_S2      = 4, /**< \brief Send file as class 2 */

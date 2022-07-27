@@ -334,7 +334,7 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSe
 
     /* transaction sequence numbers are referenced with the tuple (eid, tsn)
      * Even though these tuples are unique to a channel, they should be unique
-     * across the entire system. Meaning, it isn't correect to have the same
+     * across the entire system. Meaning, it isn't correct to have the same
      * EID re-using a TSN in the same system. So, in order to locate the transaction
      * to suspend, we need to search across all channels for it. */
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
@@ -374,7 +374,7 @@ int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAct
         else
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CMD_TRANS_NOT_FOUND, CFE_EVS_EventType_ERROR,
-                              "CF: %s cmd: failed to find transactino for (eid %lu, ts %lu)", cmdstr,
+                              "CF: %s cmd: failed to find transaction for (eid %lu, ts %lu)", cmdstr,
                               (unsigned long)cmd->eid, (unsigned long)cmd->ts);
         }
     }

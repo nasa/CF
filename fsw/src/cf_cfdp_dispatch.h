@@ -91,7 +91,7 @@ typedef struct
 } CF_CFDP_FileDirectiveDispatchTable_t;
 
 /**
- * @brief A dispatch table for receive file transactions, recieve side
+ * @brief A dispatch table for receive file transactions, receive side
  *
  * This is used for "receive file" transactions upon receipt of a directive PDU.
  * Depending on the sub-state of the transaction, a different action may be taken.
@@ -125,7 +125,7 @@ typedef struct
 
 /************************************************************************/
 /**
- * @brief Dispatch function for received PDUs on receieve-file transactions
+ * @brief Dispatch function for received PDUs on receive-file transactions
  *
  * Receive file transactions primarily only react/respond to received PDUs
  *

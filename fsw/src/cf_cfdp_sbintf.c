@@ -207,7 +207,7 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
             t = CF_FindTransactionBySequenceNumber(c, ph->pdu_header.sequence_num, ph->pdu_header.source_eid);
             if (t)
             {
-                /* found one! send it to the transaction state processor */
+                /* found one! Send it to the transaction state processor */
                 CF_Assert(t->state > CF_TxnState_IDLE);
                 CF_CFDP_DispatchRecv(t, ph);
             }

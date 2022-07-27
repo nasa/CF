@@ -23,7 +23,7 @@
  * Structures defining to CFDP PDUs
  *
  * Note that structures and enumerations defined in this file with a CF_CFDP
- * prefix are defined according to the CCSDS CFDP specifiction (727.0-B-5).
+ * prefix are defined according to the CCSDS CFDP specification (727.0-B-5).
  * These values must match the specification for that structure/field, they are
  * not locally changeable.
  *
@@ -232,9 +232,9 @@ typedef enum
 } CF_CFDP_Class_t;
 
 /**
- * @brief Values for "acknowledgement transfer status"
+ * @brief Values for "acknowledgment transfer status"
  *
- * This enum is pertient to the ACK PDU type, defines the
+ * This enum is pertinent to the ACK PDU type, defines the
  * values for the directive field.
  *
  * Defined per section 5.2.4 / table 5-8 of CCSDS 727.0-B-5
@@ -251,7 +251,7 @@ typedef enum
 /**
  * @brief Values for "finished delivery code"
  *
- * This enum is pertient to the FIN PDU type, defines the
+ * This enum is pertinent to the FIN PDU type, defines the
  * values for the delivery code field.
  *
  * Defined per section 5.2.3 / table 5-7 of CCSDS 727.0-B-5
@@ -266,7 +266,7 @@ typedef enum
 /**
  * @brief Values for "finished file status"
  *
- * This enum is pertient to the FIN PDU type, defines the
+ * This enum is pertinent to the FIN PDU type, defines the
  * values for the file status field.
  *
  * Defined per section 5.2.3 / table 5-7 of CCSDS 727.0-B-5

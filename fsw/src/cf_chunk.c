@@ -25,7 +25,7 @@
  *  This class handles the complexity of sparse gap tracking so that
  *  the CFDP engine doesn't need to worry about it. Information is given
  *  to the class and when needed calculations are made internally to
- *  help the engine build NAK packets. Received NAK segmnent requests
+ *  help the engine build NAK packets. Received NAK segment requests
  *  are stored in this class as well and used for re-transmit processing.
  *
  *  This is intended to be mostly a generic purpose class used by CF.

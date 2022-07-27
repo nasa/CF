@@ -925,7 +925,6 @@ void CF_CFDP_DecodeTLV(CF_DecoderState_t *state, CF_Logical_Tlv_t *pltlv)
         {
             /* not implemented, but must not send random data */
             pltlv->data.data_ptr = CF_CFDP_DoDecodeChunk(state, pltlv->length);
-            ;
         }
     }
 }
