@@ -129,11 +129,6 @@ typedef struct CF_HkPacket
 
 /**
  * \defgroup cfscfcmdcodes CFS CFDP Command Codes
- *
- * NOTE: these are what was in the original app (may have slightly different names)
- * Not sure that we need to implement all these for cf 3.0
- *
- * ANOTHER NOTE: not all of these are used, but they are here legacy from the old app
  * \{
  */
 typedef enum
@@ -715,9 +710,6 @@ typedef enum
      *  \sa #CF_ENABLE_DIR_POLLING_CC
      */
     CF_DISABLE_DIR_POLLING_CC = 19,
-
-    /** \brief Unused */
-    CF_DELETE_QUEUE_NODE_CC = 20,
 
     /**
      * \brief Purge queue
