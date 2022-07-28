@@ -850,7 +850,7 @@ void Test_CF_CFDP_InitEngine(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, NULL, &config);
     UtAssert_INT32_EQ(CF_CFDP_InitEngine(), 0);
     UtAssert_BOOL_TRUE(CF_AppData.engine.enabled);
-    UtAssert_STUB_COUNT(CF_FreeTransaction, CF_NUM_TRANSACTIONS_PER_CHANNEL);
+    UtAssert_STUB_COUNT(CF_FreeTransaction, CF_NUM_TRANSACTIONS_PER_CHANNEL * CF_NUM_CHANNELS);
 
     /* nominal call, with sem */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, NULL, &config);
