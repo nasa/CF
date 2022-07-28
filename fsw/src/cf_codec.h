@@ -166,7 +166,7 @@ static inline void CF_CFDP_CodecReset(CF_CodecState_t *state, size_t max_size)
  *
  * @param state      Encoder/Decoder common state
  * @param chunksize  Size of next block to encode/decode
- * @retval true      If encode/deocde is possible, enough space exists
+ * @retval true      If encode/decode is possible, enough space exists
  * @retval false     If encode/decode is not possible, not enough space or prior error occurred
  */
 bool CF_CFDP_CodecCheckSize(CF_CodecState_t *state, size_t chunksize);
@@ -357,7 +357,7 @@ uint64 CF_DecodeIntegerInSize(CF_DecoderState_t *state, uint8 decode_size);
  * @brief Encodes a CFDP PDU base header block, bypassing the size field
  *
  * On transmit side, the common/base header must be encoded in two parts, to deal
- * with the "total_size" field.  The initial encoding of the the basic fields is
+ * with the "total_size" field.  The initial encoding of the basic fields is
  * done as soon as it is known that a PDU of this type needs to be sent, but the
  * total size may not be yet known, as it depends on the remainder of encoding
  * and any additional data that might get added to the variable length sections.

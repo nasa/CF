@@ -147,7 +147,7 @@ void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg);
  *       accept or reject counters.
  *
  * @par Assumptions, External Events, and Notes:
- *       cmd must not be NULL. errstr must not be NULL. fn must be a valid function. context may be NULL.
+ *       cmd must not be NULL, errstr must not be NULL, fn must be a valid function, context may be NULL.
  *
  * @param cmd       Pointer to command being processed
  * @param errstr    String to be included in the EVS event if command should fail
@@ -216,7 +216,7 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSe
  *       does handle the command accept or reject counters.
  *
  * @par Assumptions, External Events, and Notes:
- *       cmd must not be NULL. fn must be a valid function. context may be NULL.
+ *       cmd must not be NULL, fn must be a valid function, context may be NULL.
  *
  * @param cmd       Pointer to the command message
  * @param cmdstr    String to include in any generated EVS events

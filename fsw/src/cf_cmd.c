@@ -334,7 +334,7 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSe
 
     /* transaction sequence numbers are referenced with the tuple (eid, tsn)
      * Even though these tuples are unique to a channel, they should be unique
-     * across the entire system. Meaning, it isn't correect to have the same
+     * across the entire system. Meaning, it isn't correct to have the same
      * EID re-using a TSN in the same system. So, in order to locate the transaction
      * to suspend, we need to search across all channels for it. */
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
@@ -374,7 +374,7 @@ int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAct
         else
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CMD_TRANS_NOT_FOUND, CFE_EVS_EventType_ERROR,
-                              "CF: %s cmd: failed to find transactino for (eid %lu, ts %lu)", cmdstr,
+                              "CF: %s cmd: failed to find transaction for (eid %lu, ts %lu)", cmdstr,
                               (unsigned long)cmd->eid, (unsigned long)cmd->ts);
         }
     }
@@ -1272,10 +1272,10 @@ void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
         CF_CmdDisableDequeue, /* CF_DISABLE_DEQUEUE_CC */
         CF_CmdEnablePolldir,  /* CF_ENABLE_DIR_POLLING_CC */
         CF_CmdDisablePolldir, /* CF_DISABLE_DIR_POLLING_CC */
-        NULL,                 /* CF_DELETE_QUEUE_NODE_CC */
-        CF_CmdPurgeQueue,     /* CF_PURGE_QUEUE_CC */
-        CF_CmdEnableEngine,   /* CF_ENABLE_ENGINE_CC */
-        CF_CmdDisableEngine,  /* CF_DISABLE_ENGINE_CC */
+        NULL,
+        CF_CmdPurgeQueue,    /* CF_PURGE_QUEUE_CC */
+        CF_CmdEnableEngine,  /* CF_ENABLE_ENGINE_CC */
+        CF_CmdDisableEngine, /* CF_DISABLE_ENGINE_CC */
     };
 
     static const uint16 expected_lengths[CF_NUM_COMMANDS] = {
@@ -1293,16 +1293,16 @@ void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
         sizeof(CF_GetParamCmd_t),    /* CF_GET_MIB_PARAM_CC */
         0,
         0,
-        sizeof(CF_NoArgsCmd_t),     /* CF_SendRet_CFG_PARAMS_CC */
+        0,
         sizeof(CF_WriteQueueCmd_t), /* CF_WRITE_QUEUE_CC */
         sizeof(CF_UnionArgsCmd_t),  /* CF_ENABLE_DEQUEUE_CC */
         sizeof(CF_UnionArgsCmd_t),  /* CF_DISABLE_DEQUEUE_CC */
         sizeof(CF_UnionArgsCmd_t),  /* CF_ENABLE_DIR_POLLING_CC */
         sizeof(CF_UnionArgsCmd_t),  /* CF_DISABLE_DIR_POLLING_CC */
-        0,                          /* CF_DELETE_QUEUE_NODE_CC */
-        sizeof(CF_UnionArgsCmd_t),  /* CF_PURGE_QUEUE_CC */
-        sizeof(CF_NoArgsCmd_t),     /* CF_ENABLE_ENGINE_CC */
-        sizeof(CF_NoArgsCmd_t),     /* CF_DISABLE_ENGINE_CC */
+        0,
+        sizeof(CF_UnionArgsCmd_t), /* CF_PURGE_QUEUE_CC */
+        sizeof(CF_NoArgsCmd_t),    /* CF_ENABLE_ENGINE_CC */
+        sizeof(CF_NoArgsCmd_t),    /* CF_DISABLE_ENGINE_CC */
     };
 
     CFE_MSG_FcnCode_t cmd = 0;

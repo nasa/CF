@@ -31,7 +31,7 @@
  * Specifically, this intent differs in the following ways:
  * - All numeric fields are in native byte order
  * - All structures are padded/aligned according to native CPU (i.e. not packed)
- * - All bitfields are exploded, where each field/group is a separate member
+ * - All bit-fields are exploded, where each field/group is a separate member
  * - Variable-size content is normalized, allocated as the maximum possible size
  */
 
@@ -50,7 +50,7 @@
  * This just serves to set an upper bound on the logical structures, to keep
  * things simple.  The real limit varies depending on the specific PDU type
  * being processed.  This caps the amount of storage memory for the worst
- * case, the actual number present is always part of the runtime state.
+ * case, the actual number present is always part of the run-time state.
  *
  * Without filestore requests, use of TLV is pretty limited.
  *
@@ -76,7 +76,7 @@
 typedef uint32 CF_FileSize_t;
 
 /*
- * Note that by exploding the bitfields into separate members, this will make the
+ * Note that by exploding the bit-fields into separate members, this will make the
  * storage much less efficient (in many cases using 8 bits to store only 1 logical bit)
  * but this greatly improves and simplifies the access during processing, avoiding
  * repeated shifts and mask.  Furthermore, it only needs to be stored this way
@@ -140,7 +140,7 @@ typedef struct CF_Logical_PduFileDirectiveHeader
  *
  * These are only used for string data (mostly filenames) so
  * the data can refer directly to the encoded bits, it does
- * not necesarily need to be duplicated here.
+ * not necessarily need to be duplicated here.
  */
 typedef struct CF_Logical_Lv
 {
@@ -270,7 +270,7 @@ typedef struct CF_Logical_PduAck
  */
 typedef struct CF_Logical_PduMd
 {
-    uint8 close_req;     /**< \brief transation closure not requested (0) or requested (1) */
+    uint8 close_req;     /**< \brief transaction closure not requested (0) or requested (1) */
     uint8 checksum_type; /**< \brief 0 indicates legacy modular checksum */
 
     CF_FileSize_t size;

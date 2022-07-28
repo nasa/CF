@@ -141,7 +141,7 @@
  *
  *  \par Cause:
  *
- *  Failure from SB Recieve Buffer call in application run loop
+ *  Failure from SB Receive Buffer call in application run loop
  */
 #define CF_EID_ERR_INIT_MSG_RECV (29)
 
@@ -405,7 +405,7 @@
  *
  *  \par Cause:
  *
- *  Command request to transimit a file received when channel is already
+ *  Command request to transmit a file received when channel is already
  *  handling the maximum number of concurrent command transmit transactions
  */
 #define CF_EID_ERR_CFDP_MAX_CMD_TX (64)
@@ -601,7 +601,7 @@
  *
  *  \par Cause:
  *
- *  Out-of-order RX Class 2 Metadata PDU reveived with file size that doesn't
+ *  Out-of-order RX Class 2 Metadata PDU received with file size that doesn't
  *  match already received EOF PDU file size
  */
 #define CF_EID_ERR_CFDP_R_EOF_MD_SIZE (82)
@@ -895,7 +895,7 @@
  *
  *  \par Cause:
  *
- *  Receipt and sucessful processing of reset counters command
+ *  Receipt and successful processing of reset counters command
  */
 #define CF_EID_INF_CMD_RESET (111)
 
@@ -1137,7 +1137,7 @@
  *
  *  \par Cause:
  *
- *  Suspend/resume command received affectina single transaction already set to that state
+ *  Suspend/resume command received affecting single transaction already set to that state
  */
 #define CF_EID_ERR_CMD_SUSPRES_SAME (133)
 
@@ -1192,7 +1192,7 @@
  *
  *  \par Cause:
  *
- *  Write Queue command recived with invalid queue selection arguments
+ *  Write Queue command received with invalid queue selection arguments
  */
 #define CF_EID_ERR_CMD_WQ_ARGS (138)
 
@@ -1291,7 +1291,7 @@
  *
  *  \par Cause:
  *
- *  Invalid channel value recieved in set or get parameter command
+ *  Invalid channel value received in set or get parameter command
  */
 #define CF_EID_ERR_CMD_GETSET_CHAN (147)
 

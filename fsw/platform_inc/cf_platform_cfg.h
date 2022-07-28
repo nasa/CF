@@ -85,7 +85,7 @@ typedef uint32 CF_TransactionSeq_t;
  *       Dictates the pipe depth of the cf command pipe.
  *
  *  @par Limits:
- *		 The minimum size of this paramater is 1
+ *		 The minimum size of this parameter is 1
  *       The maximum size dictated by cFE platform configuration
  *		 parameter is CFE_SB_MAX_PIPE_DEPTH
  */
@@ -95,7 +95,7 @@ typedef uint32 CF_TransactionSeq_t;
  *  @brief Number of channels
  *
  *  @par Description:
- *       The number of chanenls in the engine. Changing this
+ *       The number of channels in the engine. Changing this
  *       value changes the configuration table for the application.
  *
  *  @par Limits:
@@ -123,13 +123,13 @@ typedef uint32 CF_TransactionSeq_t;
  *       Number of chunks per transaction per channel (RX).
  *
  * CHUNKS -
- * A chunk is a representatino of a range range (offset, size) of data received by a receiver.
+ * A chunk is a representation of a range range (offset, size) of data received by a receiver.
  *
  * Class 2 CFDP deals with NAK, so received data must be tracked for receivers in order to generate
  * the NAK. The sender must also keep track of NAK requests and send new file data PDUs as a result.
  * (array size must be CF_NUM_CHANNELS)
  * CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION is an array for each channel indicating the number of chunks per transaction
- * CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION is an array for each channel indciate the number of chunks to keep track of
+ * CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION is an array for each channel indicate the number of chunks to keep track of
  * NAK requests from the receiver per transaction
  *
  *  @par Limits:
@@ -197,7 +197,7 @@ typedef uint32 CF_TransactionSeq_t;
  *  @brief Max number of commanded playback directories per channel.
  *
  *  @par Description:
- *       Each channel can support this number of groudn commanded directory playbacks.
+ *       Each channel can support this number of ground commanded directory playbacks.
  *
  *  @par Limits:
  *
@@ -217,7 +217,7 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_MAX_POLLING_DIR_PER_CHAN (5)
 
 /**
- *  @brief Number of transactions per playback directoriy.
+ *  @brief Number of transactions per playback directory.
  *
  *  @par Description:
  *       Each playback/polling directory operation will be able to have this

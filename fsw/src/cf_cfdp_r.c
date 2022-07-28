@@ -126,12 +126,12 @@ void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
 {
     int send_nak = 0;
     int send_fin = 0;
-    /* checking if r2 is complete. check nak list, and send NAK if appropriate */
+    /* checking if r2 is complete. Check nak list, and send NAK if appropriate */
     /* if all data is present, then there will be no gaps in the chunk */
 
     if (t->history->cc == CF_CFDP_ConditionCode_NO_ERROR)
     {
-        /* first, check if md is received. if not, send specialized nak */
+        /* first, check if md is received. If not, send specialized nak */
         if (!t->flags.rx.md_recv)
         {
             send_nak = 1;
@@ -716,7 +716,7 @@ int CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t)
         /* all bytes calculated, so now check */
         if (!CF_CFDP_R_CheckCrc(t, t->state_data.r.r2.eof_crc))
         {
-            /* crc matched! we are happy */
+            /* crc matched! We are happy */
             t->keep = 1; /* save the file */
 
             /* set fin pdu status */

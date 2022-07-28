@@ -136,9 +136,9 @@ void CF_CFDP_S_DispatchRecv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph,
                           (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
     }
 
-    /* check that there's a valid function pointer. if there isn't,
+    /* check that there's a valid function pointer. If there isn't,
      * then silently ignore. We may want to discuss if it's worth
-     * shutting down the whole transation if a PDU is received
+     * shutting down the whole transaction if a PDU is received
      * that doesn't make sense to be received (For example,
      * class 1 CFDP receiving a NAK PDU) but for now, we silently
      * ignore the received packet and keep chugging along. */

@@ -274,7 +274,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_ConstructPduHeader(const CF_Transaction_t *t, CF
 
         hdr->version   = 1;
         hdr->pdu_type  = (directive_code == 0); /* set to '1' for file data pdu, '0' for a directive pdu */
-        hdr->direction = (towards_sender != 0); /* set to '1' for toward sender, '0' for toward recevier */
+        hdr->direction = (towards_sender != 0); /* set to '1' for toward sender, '0' for toward receiver */
         hdr->txm_mode  = (CF_CFDP_GetClass(t) == CF_CFDP_CLASS_1); /* set to '1' for class 1 data, '0' for class 2 */
 
         /* choose the larger of the two EIDs to determine size */
@@ -374,10 +374,8 @@ CF_SendRet_t CF_CFDP_SendMd(CF_Transaction_t *t)
         /* this does not actually copy here - that is done during encode */
         md->source_filename.length =
             CF_strnlen(t->history->fnames.src_filename, sizeof(t->history->fnames.src_filename));
-        ;
         md->source_filename.data_ptr = t->history->fnames.src_filename;
         md->dest_filename.length = CF_strnlen(t->history->fnames.dst_filename, sizeof(t->history->fnames.dst_filename));
-        ;
         md->dest_filename.data_ptr = t->history->fnames.dst_filename;
 
         CF_CFDP_EncodeMd(ph->penc, md);
@@ -805,7 +803,6 @@ int CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  *-----------------------------------------------------------------*/
 int CF_CFDP_RecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    /* CF_CFDP_RecvPh() must have been called before this, so use ldst to access pdu header */
     int ret = 0;
 
     CF_CFDP_DecodeEof(ph->pdec, &ph->int_header.eof);
@@ -830,7 +827,6 @@ int CF_CFDP_RecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  *-----------------------------------------------------------------*/
 int CF_CFDP_RecvAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    /* CF_CFDP_RecvPh() must have been called before this, so use ldst to access pdu header */
     int ret = 0;
 
     CF_CFDP_DecodeAck(ph->pdec, &ph->int_header.ack);
@@ -856,7 +852,6 @@ int CF_CFDP_RecvAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  *-----------------------------------------------------------------*/
 int CF_CFDP_RecvFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    /* CF_CFDP_RecvPh() must have been called before this, so use ldst to access pdu header */
     int ret = 0;
 
     CF_CFDP_DecodeFin(ph->pdec, &ph->int_header.fin);
@@ -869,7 +864,7 @@ int CF_CFDP_RecvFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     }
 
     /* NOTE: right now we don't care about the fault location */
-    /* nothing to do for this one. all fields are bytes */
+    /* nothing to do for this one. All fields are bytes */
     return ret;
 }
 
@@ -968,7 +963,7 @@ void CF_CFDP_RecvIdle(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
                 status = CF_CFDP_RecvMd(t, ph);
                 if (!status)
                 {
-                    /* NOTE: whether or not class 1 or 2, get a free chunks. it's cheap, and simplifies cleanup path */
+                    /* NOTE: whether or not class 1 or 2, get a free chunks. It's cheap, and simplifies cleanup path */
                     t->state            = ph->pdu_header.txm_mode ? CF_TxnState_R1 : CF_TxnState_R2;
                     t->flags.rx.md_recv = 1;
                     CF_CFDP_R_Init(t); /* initialize R */
@@ -1146,7 +1141,7 @@ void CF_CFDP_CycleTx(CF_Channel_t *c)
 
         /* loop through as long as there are pending transactions, and a message buffer to send their pdus on */
 
-        /* NOTE: tick processesing is higher priority than sending new filedata pdus, so only send however many
+        /* NOTE: tick processing is higher priority than sending new filedata pdus, so only send however many
          * PDUs that can be sent once we get to here */
         if (!c->cur)
         { /* don't enter if cur is set, since we need to pick up where we left off on tick processing next wakeup */
@@ -1235,7 +1230,7 @@ void CF_CFDP_TickTransactions(CF_Channel_t *c)
             CF_CList_Traverse(c->qs[qs[c->tick_type]], CF_CFDP_DoTick, &args);
             if (args.early_exit)
             {
-                /* early exit means we ran out of availalbe outgoing messages this wakeup.
+                /* early exit means we ran out of available outgoing messages this wakeup.
                  * If current tick type is nak response, then reset tick type. It would be
                  * bad to let NAK response starve out RX or TXW ticks on the next cycle.
                  *
@@ -1317,7 +1312,7 @@ static void CF_CFDP_TxFile_Initiate(CF_Transaction_t *t, CF_CFDP_Class_t cfdp_cl
 
     CF_CFDP_ArmInactTimer(t);
 
-    /* NOTE: whether or not class 1 or 2, get a free chunks. it's cheap, and simplifies cleanup path */
+    /* NOTE: whether or not class 1 or 2, get a free chunks. It's cheap, and simplifies cleanup path */
     t->chunks = CF_CFDP_FindUnusedChunks(&CF_AppData.engine.channels[chan], CF_Direction_TX);
     CF_InsertSortPrio(t, CF_QueueIdx_PEND);
 }
@@ -1596,7 +1591,7 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c)
                     }
                     else
                     {
-                        /* error occured in playback directory, so reset the timer */
+                        /* error occurred in playback directory, so reset the timer */
                         /* an event is sent in CF_CFDP_PlaybackDir_Initiate so there is no reason to
                          * to have another here */
                         CF_Timer_InitRelSec(&p->interval_timer, pd->interval_sec);
@@ -1701,7 +1696,7 @@ void CF_CFDP_ResetTransaction(CF_Transaction_t *t, int keep_history)
 
         if (t->p)
         {
-            /* a playback's transaction is now done. decrement the playback counter */
+            /* a playback's transaction is now done, decrement the playback counter */
             CF_Assert(t->p->num_ts);
             --t->p->num_ts;
         }
@@ -1813,7 +1808,7 @@ void CF_CFDP_DisableEngine(void)
             CF_CList_Traverse(c->qs[CLOSE_QUEUES[j]], CF_CFDP_CloseFiles, NULL);
         }
 
-        /* any playback directories need to have their dirents closed */
+        /* any playback directories need to have their directory ids closed */
         for (j = 0; j < CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN; ++j)
         {
             if (c->playback[j].busy)

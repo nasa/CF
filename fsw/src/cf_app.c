@@ -233,7 +233,7 @@ int32 CF_Init(void)
         status = CFE_SB_CreatePipe(&CF_AppData.cmd_pipe, CF_PIPE_DEPTH, CF_PIPE_NAME);
         if (status != CFE_SUCCESS)
         {
-            CFE_ES_WriteToSysLog("CF app: error creating pipe %s, returend 0x%08lx", CF_PIPE_NAME,
+            CFE_ES_WriteToSysLog("CF app: error creating pipe %s, returned 0x%08lx", CF_PIPE_NAME,
                                  (unsigned long)status);
         }
     }

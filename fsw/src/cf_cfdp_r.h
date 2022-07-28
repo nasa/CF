@@ -173,7 +173,7 @@ int CF_CFDP_R_CheckCrc(CF_Transaction_t *t, uint32 expected_crc);
  *       t must not be NULL.
  *
  * @param t  Pointer to the transaction object
- * @param ok_to_send_nak If set to 0, supresses sending of a NAK packet
+ * @param ok_to_send_nak If set to 0, suppress sending of a NAK packet
  */
 void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak);
 
@@ -288,7 +288,7 @@ void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
  *       This is a function callback from CF_ChunkList_ComputeGaps().
  *
  * @par Assumptions, External Events, and Notes:
- *       chunks must not be NULL. c must not be NULL. opaque must not be NULL.
+ *       chunks must not be NULL, c must not be NULL, opaque must not be NULL.
  *
  * @retval 0 on success. Returns anything else on error.
  *

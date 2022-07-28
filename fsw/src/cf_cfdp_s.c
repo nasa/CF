@@ -131,7 +131,7 @@ int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_
 
     if (!ph)
     {
-        ret     = 0; /* couldn't get message, so no bytes sent. will try again next time */
+        ret     = 0; /* couldn't get message, so no bytes sent. Will try again next time */
         success = false;
     }
     else

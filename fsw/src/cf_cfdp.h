@@ -66,7 +66,7 @@ void CF_CFDP_EncodeStart(CF_EncoderState_t *penc, void *msgbuf, CF_Logical_PduBu
 
 /********************************************************************************/
 /**
- * @brief Initiate the process of decoding a receieved PDU
+ * @brief Initiate the process of decoding a received PDU
  *
  * This resets the decoder and PDU buffer to initial values, and prepares for decoding a new PDU
  * that was received from a remote entity.
@@ -186,7 +186,7 @@ int32 CF_CFDP_PlaybackDir(const char *src_filename, const char *dst_filename, CF
  * @param dst_eid        Value to set in destination entity ID field
  * @param towards_sender Whether this is transmitting toward the sender entity
  * @param tsn            Transaction sequence number to put into PDU
- * @param silent         If true, supresses error event if no message buffer available
+ * @param silent         If true, suppress error event if no message buffer available
  *
  * @returns Pointer to PDU buffer which may be filled with additional data
  * @retval  NULL if no message buffer available
@@ -222,7 +222,7 @@ CF_SendRet_t CF_CFDP_SendMd(CF_Transaction_t *t);
  * @note Unlike other "send" routines, the file data PDU must be acquired and
  * filled by the caller prior to invoking this routine.  This routine only
  * sends the PDU that was previously allocated and assembled.  As such, the
- * typical failure possibilies do not apply to this call.
+ * typical failure possibilities do not apply to this call.
  *
  * @returns CF_SendRet_t status code
  * @retval CF_SendRet_SUCCESS on success.
@@ -301,7 +301,7 @@ CF_SendRet_t CF_CFDP_SendFin(CF_Transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, 
  * @note Unlike other "send" routines, the NAK PDU must be acquired and
  * filled by the caller prior to invoking this routine.  This routine only
  * encodes and sends the previously-assembled PDU buffer.  As such, the
- * typical failure possibilies do not apply to this call.
+ * typical failure possibilities do not apply to this call.
  *
  * @returns CF_SendRet_t status code
  * @retval CF_SendRet_SUCCESS on success.
@@ -403,7 +403,7 @@ int CF_CFDP_RecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 /** @brief Unpack an ack PDU from a received message.
  *
  * This should only be invoked for buffers that have been identified
- * as an acknowledgement PDU.
+ * as an acknowledgment PDU.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -441,7 +441,7 @@ int CF_CFDP_RecvFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 /** @brief Unpack a nak PDU from a received message.
  *
  * This should only be invoked for buffers that have been identified
- * as an negative/non-acknowledgement PDU.
+ * as an negative/non-acknowledgment PDU.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -615,7 +615,7 @@ void CF_CFDP_CycleTx(CF_Channel_t *c);
  *       data pdus until there are no outgoing message buffers.
  *
  * @par Assumptions, External Events, and Notes:
- *       node must not be NULL. context must not be NULL.
+ *       node must not be NULL. Context must not be NULL.
  *
  * @param node    Pointer to list node
  * @param context Pointer to CF_CFDP_CycleTx_args_t object (passed through)
@@ -649,7 +649,7 @@ void CF_CFDP_TickTransactions(CF_Channel_t *c);
  *       if a valid file is found initiates playback on it.
  *
  * @par Assumptions, External Events, and Notes:
- *       c must not be NULL. p must not be NULL.
+ *       c must not be NULL, p must not be NULL.
  *
  * @param c  The channel associated with the playback
  * @param p  The playback state
@@ -676,7 +676,7 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c);
  * This helper is used in conjunction with CF_CList_Traverse().
  *
  * @par Assumptions, External Events, and Notes:
- *       node must not be NULL. context must not be NULL.
+ *       node must not be NULL, context must not be NULL.
  *
  * @param node    Pointer to list node
  * @param context Pointer to CF_CFDP_Tick_args_t object (passed through)

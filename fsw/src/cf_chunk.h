@@ -215,7 +215,7 @@ void CF_Chunks_EraseChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t erase_index);
  * Items in the list after the index_before will be shifted/moved to open a gap.
  *
  * @par Assumptions, External Events, and Notes:
- *       chunks must not be NULL. chunk must not be NULL.
+ *       chunks must not be NULL, chunk must not be NULL.
  *
  * @param chunks       Pointer to CF_ChunkList_t object
  * @param index_before position to insert at - this becomes the ID of the inserted chunk
@@ -230,7 +230,7 @@ void CF_Chunks_InsertChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t index_before, c
  *       This is a C version of std::lower_bound from C++ algorithms.
  *
  * @par Assumptions, External Events, and Notes:
- *       chunks must not be NULL. chunk must not be NULL.
+ *       chunks must not be NULL, chunk must not be NULL.
  *
  * @param chunks       Pointer to CF_ChunkList_t object
  * @param chunk        Chunk data to insert
@@ -244,7 +244,7 @@ CF_ChunkIdx_t CF_Chunks_FindInsertPosition(CF_ChunkList_t *chunks, const CF_Chun
 /** @brief Possibly combines the given chunk with the previous chunk.
  *
  * @par Assumptions, External Events, and Notes:
- *       chunks must not be NULL. chunk must not be NULL.
+ *       chunks must not be NULL, chunk must not be NULL.
  *
  * @param chunks       Pointer to CF_ChunkList_t object
  * @param i            Index of chunk to combine
@@ -261,7 +261,7 @@ int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_
 /** @brief Possibly combines the given chunk with the next chunk.
  *
  * @par Assumptions, External Events, and Notes:
- *       chunks must not be NULL. chunk must not be NULL.
+ *       chunks must not be NULL, chunk must not be NULL.
  *
  * @param chunks       Pointer to CF_ChunkList_t object
  * @param i            Index of chunk to combine
@@ -296,7 +296,7 @@ CF_ChunkIdx_t CF_Chunks_FindSmallestSize(const CF_ChunkList_t *chunks);
  *       an existing chunk if contiguous.
  *
  * @par Assumptions, External Events, and Notes:
- *       chunks must not be NULL. chunk must not be NULL.
+ *       chunks must not be NULL, chunk must not be NULL.
  *
  * @param chunks       Pointer to CF_ChunkList_t object
  * @param i            Position to insert chunk at
