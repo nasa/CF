@@ -26,14 +26,14 @@
 
 static union
 {
-    CF_PduRecvMsg_t cf_msg;
+    CF_PduCmdMsg_t cf_msg;
     CFE_SB_Buffer_t sb_buf;
     uint8           bytes[CF_MAX_PDU_SIZE];
 } UT_r_msg;
 
 static union
 {
-    CF_PduRecvMsg_t cf_msg;
+    CF_PduTlmMsg_t cf_msg;
     CFE_SB_Buffer_t sb_buf;
     uint8           bytes[CF_MAX_PDU_SIZE];
 } UT_s_msg;
@@ -50,6 +50,7 @@ static void UT_CFDP_SetupBasicRxState(CF_Logical_PduBuffer_t *pdu_buffer)
     static uint8             bytes[CF_CFDP_MAX_HEADER_SIZE];
     CFE_SB_Buffer_t *        bufptr;
     CFE_MSG_Size_t           sz;
+    CFE_MSG_Type_t           msg_type = CFE_MSG_Type_Cmd;
 
     memset(pdu_buffer, 0, sizeof(*pdu_buffer));
     memset(bytes, 0, sizeof(bytes));
@@ -68,6 +69,9 @@ static void UT_CFDP_SetupBasicRxState(CF_Logical_PduBuffer_t *pdu_buffer)
     /* setup for a potential call to CFE_MSG_GetSize() */
     sz = sizeof(UT_r_msg);
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &sz, sizeof(sz), true);
+
+    /* setup for a potential call to CFE_MSG_GetType() */
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetType), &msg_type, sizeof(msg_type), false);
 }
 
 static void UT_CFDP_SetupBasicTxState(CF_Logical_PduBuffer_t *pdu_buffer)
@@ -216,6 +220,7 @@ void Test_CF_CFDP_ReceiveMessage(void)
     CF_ConfigTable_t *      config;
     CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
+    CFE_MSG_Type_t          msg_type = CFE_MSG_Type_Tlm;
 
     /* no-config - the max per wakeup will be 0, and this is a noop */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &c, NULL, NULL, NULL);
@@ -243,6 +248,13 @@ void Test_CF_CFDP_ReceiveMessage(void)
     /* failure in CF_CFDP_RecvPh - nothing really happens here */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, &c, NULL, &t, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvPh), 1, -1);
+    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
+
+    /* Test the path where the function recieves a telemetry packet on it's pipe */
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, &c, NULL, &t, &config);
+    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvPh), 1, -1);
+    /* Override message type to take the command branch of the if then/else clause */
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetType), &msg_type, sizeof(msg_type), false);
     UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
 
     /*

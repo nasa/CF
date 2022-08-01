@@ -31,6 +31,38 @@
 
 #include "cf_cfdp_types.h"
 
+/**
+ * @brief PDU command encapsulation structure
+ *
+ * This encapsulates a CFDP pdu into a format that is sent or received over the
+ * software bus, adding "command" encapsulation (even though these are not really
+ * commands).
+ *
+ * @note this is only the definition of the header.  In reality all messages are
+ * larger than this, up to CF_MAX_PDU_SIZE.
+ */
+typedef struct CF_PduCmdMsg
+{
+    CFE_MSG_CommandHeader_t hdr; /**< \brief software bus headers, not really used by CF */
+    CF_CFDP_PduHeader_t     ph;  /**< \brief Beginning of CFDP headers */
+} CF_PduCmdMsg_t;
+
+/**
+ * @brief PDU send encapsulation structure
+ *
+ * This encapsulates a CFDP pdu into a format that is sent or received over the
+ * software bus, adding "telemetry" encapsulation (even though these are not really
+ * telemetry items).
+ *
+ * @note this is only the definition of the header.  In reality all messages are
+ * larger than this, up to CF_MAX_PDU_SIZE.
+ */
+typedef struct CF_PduTlmMsg
+{
+    CFE_MSG_TelemetryHeader_t hdr; /**< \brief software bus headers, not really used by CF */
+    CF_CFDP_PduHeader_t       ph;  /**< \brief Beginning of CFDP headers */
+} CF_PduTlmMsg_t;
+
 /************************************************************************/
 /** @brief Obtain a message buffer to construct a PDU inside.
  *

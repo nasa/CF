@@ -47,6 +47,7 @@
 
 #include "cf_cfdp_r.h"
 #include "cf_cfdp_s.h"
+#include "cf_cfdp_sbintf.h"
 
 #include <string.h>
 #include "cf_assert.h"
@@ -101,7 +102,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
         /* Allocate message buffer on success */
         if (os_status == OS_SUCCESS)
         {
-            CF_AppData.engine.out.msg = CFE_SB_AllocateMessageBuffer(offsetof(CF_PduSendMsg_t, ph) + CF_MAX_PDU_SIZE);
+            CF_AppData.engine.out.msg = CFE_SB_AllocateMessageBuffer(offsetof(CF_PduTlmMsg_t, ph) + CF_MAX_PDU_SIZE);
         }
 
         if (!CF_AppData.engine.out.msg)
@@ -131,7 +132,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
     if (success && ret != NULL)
     {
         CF_CFDP_EncodeStart(&CF_AppData.engine.out.encode, CF_AppData.engine.out.msg, ret,
-                            offsetof(CF_PduSendMsg_t, ph), offsetof(CF_PduSendMsg_t, ph) + CF_MAX_PDU_SIZE);
+                            offsetof(CF_PduTlmMsg_t, ph), offsetof(CF_PduTlmMsg_t, ph) + CF_MAX_PDU_SIZE);
     }
 
     return ret;
@@ -153,7 +154,7 @@ void CF_CFDP_Send(uint8 chan_num, const CF_Logical_PduBuffer_t *ph)
 
     /* now handle the SB encapsulation - this should reflect the
      * length of the entire message, including encapsulation */
-    sb_msgsize = offsetof(CF_PduSendMsg_t, ph);
+    sb_msgsize = offsetof(CF_PduTlmMsg_t, ph);
     sb_msgsize += ph->pdu_header.header_encoded_length;
     sb_msgsize += ph->pdu_header.data_encoded_length;
 
@@ -182,6 +183,8 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
     const int               chan_num = (c - CF_AppData.engine.channels);
     CFE_SB_Buffer_t *       bufptr;
     CFE_MSG_Size_t          msg_size;
+    CFE_MSG_Type_t          msg_type = CFE_MSG_Type_Invalid;
+
     CF_Logical_PduBuffer_t *ph;
 
     for (; count < CF_AppData.config_table->chan[chan_num].rx_max_messages_per_wakeup; ++count)
@@ -200,7 +203,15 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
         ph                       = &CF_AppData.engine.in.rx_pdudata;
         CFE_ES_PerfLogEntry(CF_PERF_ID_PDURCVD(chan_num));
         CFE_MSG_GetSize(&bufptr->Msg, &msg_size);
-        CF_CFDP_DecodeStart(&CF_AppData.engine.in.decode, bufptr, ph, offsetof(CF_PduRecvMsg_t, ph), msg_size);
+        CFE_MSG_GetType(&bufptr->Msg, &msg_type);
+        if (msg_type == CFE_MSG_Type_Tlm)
+        {
+            CF_CFDP_DecodeStart(&CF_AppData.engine.in.decode, bufptr, ph, offsetof(CF_PduTlmMsg_t, ph), msg_size);
+        }
+        else
+        {
+            CF_CFDP_DecodeStart(&CF_AppData.engine.in.decode, bufptr, ph, offsetof(CF_PduCmdMsg_t, ph), msg_size);
+        }
         if (!CF_CFDP_RecvPh(chan_num, ph))
         {
             /* got a valid pdu -- look it up by sequence number */

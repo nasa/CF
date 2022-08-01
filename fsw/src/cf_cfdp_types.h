@@ -403,36 +403,6 @@ typedef struct CF_Channel
  * of size CF_MAX_PDU_SIZE */
 
 /**
- * @brief PDU receive encapsulation structure
- *
- * This encapsulates a CFDP pdu into a format that is received over the software bus,
- * adding "command" encapsulation (even though these are not really commands).
- *
- * @note this is only the definition of the header.  In reality all messages are
- * larger than this, up to CF_MAX_PDU_SIZE.
- */
-typedef struct CF_PduRecvMsg
-{
-    CFE_MSG_CommandHeader_t hdr; /**< \brief software bus headers, not really used by CF */
-    CF_CFDP_PduHeader_t     ph;  /**< \brief Beginning of CFDP headers */
-} CF_PduRecvMsg_t;
-
-/**
- * @brief PDU send encapsulation structure
- *
- * This encapsulates a CFDP pdu into a format that is sent over the software bus,
- * adding "telemetry" encapsulation (even though these are not really telemetry items).
- *
- * @note this is only the definition of the header.  In reality all messages are
- * larger than this, up to CF_MAX_PDU_SIZE.
- */
-typedef struct CF_PduSendMsg
-{
-    CFE_MSG_TelemetryHeader_t hdr; /**< \brief software bus headers, not really used by CF */
-    CF_CFDP_PduHeader_t       ph;  /**< \brief Beginning of CFDP headers */
-} CF_PduSendMsg_t;
-
-/**
  * @brief CF engine output state
  *
  * Keeps the state of the current output PDU in the CF engine
