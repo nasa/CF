@@ -26,14 +26,14 @@
 
 static union
 {
-    CF_PduCmdMsg_t cf_msg;
+    CF_PduCmdMsg_t  cf_msg;
     CFE_SB_Buffer_t sb_buf;
     uint8           bytes[CF_MAX_PDU_SIZE];
 } UT_r_msg;
 
 static union
 {
-    CF_PduTlmMsg_t cf_msg;
+    CF_PduTlmMsg_t  cf_msg;
     CFE_SB_Buffer_t sb_buf;
     uint8           bytes[CF_MAX_PDU_SIZE];
 } UT_s_msg;

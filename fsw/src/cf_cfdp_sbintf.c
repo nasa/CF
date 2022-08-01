@@ -131,8 +131,8 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
     /* if returning a buffer, then reset the encoder state to point to the beginning of the encapsulation msg */
     if (success && ret != NULL)
     {
-        CF_CFDP_EncodeStart(&CF_AppData.engine.out.encode, CF_AppData.engine.out.msg, ret,
-                            offsetof(CF_PduTlmMsg_t, ph), offsetof(CF_PduTlmMsg_t, ph) + CF_MAX_PDU_SIZE);
+        CF_CFDP_EncodeStart(&CF_AppData.engine.out.encode, CF_AppData.engine.out.msg, ret, offsetof(CF_PduTlmMsg_t, ph),
+                            offsetof(CF_PduTlmMsg_t, ph) + CF_MAX_PDU_SIZE);
     }
 
     return ret;
@@ -177,13 +177,13 @@ void CF_CFDP_Send(uint8 chan_num, const CF_Logical_PduBuffer_t *ph)
  *-----------------------------------------------------------------*/
 void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
 {
-    CF_Transaction_t *      t; /* initialized below */
-    uint32                  count = 0;
-    int32                   status;
-    const int               chan_num = (c - CF_AppData.engine.channels);
-    CFE_SB_Buffer_t *       bufptr;
-    CFE_MSG_Size_t          msg_size;
-    CFE_MSG_Type_t          msg_type = CFE_MSG_Type_Invalid;
+    CF_Transaction_t *t; /* initialized below */
+    uint32            count = 0;
+    int32             status;
+    const int         chan_num = (c - CF_AppData.engine.channels);
+    CFE_SB_Buffer_t * bufptr;
+    CFE_MSG_Size_t    msg_size;
+    CFE_MSG_Type_t    msg_type = CFE_MSG_Type_Invalid;
 
     CF_Logical_PduBuffer_t *ph;
 
