@@ -254,6 +254,7 @@ void Test_CF_CFDP_ReceiveMessage(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, &c, NULL, &t, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvPh), 1, -1);
     /* Override message type to take the command branch of the if then/else clause */
+    UT_ResetState(UT_KEY(CFE_MSG_GetType)); /* clears the previous cmd type */
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetType), &msg_type, sizeof(msg_type), false);
     UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
 
