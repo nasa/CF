@@ -226,6 +226,9 @@ void          UT_CF_CheckEventID_Impl(uint16 ExpectedID, const char *EventIDStr)
 void cf_tests_Setup(void);
 void cf_tests_Teardown(void);
 
+/* Helper macro to avoid coping test name */
+#define TEST_CF_ADD(test) UtTest_Add(test, cf_tests_Setup, cf_tests_Teardown, #test);
+
 void TestUtil_InitializeRandomSeed(void);
 
 unsigned int AnyCoinFlip(void);
