@@ -32,7 +32,7 @@
 #define HEADS true
 #define TAILS false
 
-static uint16 UT_CF_CapturedEventIDs[4];
+uint16 UT_CF_CapturedEventIDs[4];
 
 void *UT_CF_GetContextBufferImpl(UT_EntryKey_t FuncKey, size_t ReqSize)
 {
@@ -71,15 +71,12 @@ void *UT_CF_GetContextBufferImpl(UT_EntryKey_t FuncKey, size_t ReqSize)
     return TempPtr;
 }
 
-void UT_CF_ResetEventCapture(UT_EntryKey_t FuncKey)
+void UT_CF_ResetEventCapture(void)
 {
     /* set up the buffer to store the generated event ID */
     memset(UT_CF_CapturedEventIDs, 0, sizeof(UT_CF_CapturedEventIDs));
-    if (FuncKey)
-    {
-        UT_ResetState(FuncKey);
-        UT_SetDataBuffer(FuncKey, UT_CF_CapturedEventIDs, sizeof(UT_CF_CapturedEventIDs), false);
-    }
+    UT_ResetState(UT_KEY(CFE_EVS_SendEvent));
+    UT_SetDataBuffer(UT_KEY(CFE_EVS_SendEvent), UT_CF_CapturedEventIDs, sizeof(UT_CF_CapturedEventIDs), false);
 }
 
 void UT_CF_CheckEventID_Impl(uint16 ExpectedID, const char *EventIDStr)
@@ -105,10 +102,8 @@ void cf_tests_Setup(void)
 {
     UT_ResetState(0);
 
-    /* make sure to clear any stored event ID between tests */
-    /* Note This cannot set up for CFE_EVS_SendEvent, although it is commonly
-       used/needed, not every unit uses it */
-    UT_CF_ResetEventCapture(0);
+    /* Reset CFE_EVS_SendEvent capture */
+    UT_CF_ResetEventCapture();
 
     memset(&CF_AppData, 0, sizeof(CF_AppData));
 }

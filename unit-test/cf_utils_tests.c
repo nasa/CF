@@ -557,15 +557,14 @@ void Test_CF_WriteHistoryEntryToFile(void)
     strcpy(h.fnames.dst_filename, "df");
 
     /* Successful write - need to set up for 3 successful calls to OS_write() */
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
     UT_SetDeferredRetcode(UT_KEY(OS_write), 1, 44);
     UT_SetDeferredRetcode(UT_KEY(OS_write), 1, strlen(h.fnames.src_filename) + 6);
     UT_SetDeferredRetcode(UT_KEY(OS_write), 1, strlen(h.fnames.dst_filename) + 6);
     UtAssert_INT32_EQ(CF_WriteHistoryEntryToFile(arg_fd, &h), 0);
-    UT_CF_AssertEventID(0);
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* Unsuccessful write */
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    UT_CF_ResetEventCapture();
     UT_SetDeferredRetcode(UT_KEY(OS_write), 1, -1);
     UtAssert_INT32_EQ(CF_WriteHistoryEntryToFile(arg_fd, &h), -1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_WHIST_WRITE);

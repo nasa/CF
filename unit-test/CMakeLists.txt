@@ -61,7 +61,7 @@ add_cfe_coverage_stubs(cf_internal
   stubs/cf_utils_stubs.c
 )
 
-target_link_libraries(coverage-cf_internal-stubs core_api ut_assert)
+target_link_libraries(coverage-cf_internal-stubs ut_core_api_stubs ut_assert)
 target_include_directories(coverage-cf_internal-stubs PUBLIC utilities)
 
 # Generate a dedicated "testrunner" executable for each test file

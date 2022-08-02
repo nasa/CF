@@ -173,7 +173,7 @@ static void UT_CFDP_SetupBasicTestState(UT_CF_Setup_t setup, CF_Logical_PduBuffe
     }
 
     /* reset the event ID capture between each sub-case */
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    UT_CF_ResetEventCapture();
 }
 
 /* end cf_cfdp_tests local utility functions */
@@ -333,20 +333,20 @@ void Test_CF_CFDP_MsgOutGet(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
     UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(t, false));
     UtAssert_STUB_COUNT(CFE_SB_ReleaseMessageBuffer, 0);
-    UT_CF_AssertEventID(0);
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* This should discard the old message, and get a new one */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
     UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(t, false));
     UtAssert_STUB_COUNT(CFE_SB_ReleaseMessageBuffer, 1);
-    UT_CF_AssertEventID(0);
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* test the various throttling mechanisms */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, &config);
     config->chan[UT_CFDP_CHANNEL].max_outgoing_messages_per_wakeup = 3;
     UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(t, false));
     UtAssert_NULL(CF_CFDP_MsgOutGet(t, false));
-    UT_CF_AssertEventID(0);
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &c, NULL, &t, NULL);
     c->sem_id = OS_ObjectIdFromInteger(123);
@@ -359,13 +359,13 @@ void Test_CF_CFDP_MsgOutGet(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
     t->flags.com.suspended = 1;
     UtAssert_NULL(CF_CFDP_MsgOutGet(t, false));
-    UT_CF_AssertEventID(0);
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* channel is frozen */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
     CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].frozen = 1;
     UtAssert_NULL(CF_CFDP_MsgOutGet(t, false));
-    UT_CF_AssertEventID(0);
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].frozen = 0;
 
     /* no msg available from SB */
@@ -376,7 +376,7 @@ void Test_CF_CFDP_MsgOutGet(void)
     /* same, but the silent flag should supress the event */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
     UtAssert_NULL(CF_CFDP_MsgOutGet(t, true));
-    UT_CF_AssertEventID(0);
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 }
 
 /*******************************************************************************

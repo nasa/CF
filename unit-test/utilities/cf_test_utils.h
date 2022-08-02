@@ -216,8 +216,9 @@ void *UT_CF_GetContextBufferImpl(UT_EntryKey_t FuncKey, size_t ReqSize);
  * Provides a simplified way to capture and check for calls to CFE_EVS_SendEvent.
  *
  */
-void UT_CF_ResetEventCapture(UT_EntryKey_t FuncKey);
-void UT_CF_CheckEventID_Impl(uint16 ExpectedID, const char *EventIDStr);
+extern uint16 UT_CF_CapturedEventIDs[];
+void          UT_CF_ResetEventCapture(void);
+void          UT_CF_CheckEventID_Impl(uint16 ExpectedID, const char *EventIDStr);
 #define UT_CF_AssertEventID(eid) UT_CF_CheckEventID_Impl(eid, #eid)
 
 /* bottom */

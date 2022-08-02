@@ -113,7 +113,7 @@ static void UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_t setup, CF_Logical_PduBuf
     }
 
     /* reset the event ID capture between each sub-case */
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    UT_CF_ResetEventCapture();
 }
 
 /*******************************************************************************
@@ -368,7 +368,7 @@ void Test_CF_CFDP_R_Init(void)
     t->flags.rx.md_recv = true;
     UtAssert_VOIDCALL(CF_CFDP_R_Init(t));
     UtAssert_STUB_COUNT(CF_CFDP_ArmAckTimer, 2);
-    UT_CF_AssertEventID(0);
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* failure of file open, class 1 */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &t, NULL);
@@ -478,7 +478,7 @@ void Test_CF_CFDP_R_CheckCrc(void)
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &t, NULL);
     t->crc.result = 0xc0ffee;
     UtAssert_INT32_EQ(CF_CFDP_R_CheckCrc(t, 0xc0ffee), 0);
-    UT_CF_AssertEventID(0);
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 }
 
 void Test_CF_CFDP_R2_Complete(void)
