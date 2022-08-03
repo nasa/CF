@@ -136,7 +136,7 @@ static void UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_t setup, CF_Logical_PduBuf
     }
 
     /* reset the event ID capture between each sub-case */
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    UT_CF_ResetEventCapture();
 }
 
 /*******************************************************************************
@@ -664,7 +664,7 @@ void Test_CF_CFDP_S_SubstateSendMetadata(void)
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
     OS_OpenCreate(&t->fd, "ut", 0, 0); /* sets fd */
     UtAssert_VOIDCALL(CF_CFDP_S_SubstateSendMetadata(t));
-    UT_CF_AssertEventID(0);
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_UINT32_EQ(t->state_data.s.sub_state, CF_TxSubState_FILEDATA);
 
     /* this retval is sticky and applies for the rest of the test cases */
@@ -705,7 +705,7 @@ void Test_CF_CFDP_S_SubstateSendMetadata(void)
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendMd), 1, CF_SendRet_NO_MSG);
     UtAssert_VOIDCALL(CF_CFDP_S_SubstateSendMetadata(t));
-    UT_CF_AssertEventID(0);
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_UINT32_EQ(t->history->cc, 0);
 
     /* everything works */

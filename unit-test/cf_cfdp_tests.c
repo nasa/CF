@@ -141,7 +141,7 @@ static void UT_CFDP_SetupBasicTestState(UT_CF_Setup_t setup, CF_Logical_PduBuffe
     }
 
     /* reset the event ID capture between each sub-case */
-    UT_CF_ResetEventCapture(UT_KEY(CFE_EVS_SendEvent));
+    UT_CF_ResetEventCapture();
 }
 
 /* end cf_cfdp_tests local utility functions */
