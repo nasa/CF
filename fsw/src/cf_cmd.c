@@ -165,12 +165,13 @@ void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
     if (CF_CFDP_TxFile(tx->src_filename, tx->dst_filename, tx->cfdp_class, tx->keep, tx->chan_num, tx->priority,
                        tx->dest_id) == CFE_SUCCESS)
     {
-        CFE_EVS_SendEvent(CF_EID_INF_CMD_TX_FILE, CFE_EVS_EventType_INFORMATION, "CF: file transfer successful");
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_TX_FILE, CFE_EVS_EventType_INFORMATION,
+                          "CF: file transfer successfully initiated");
         ++CF_AppData.hk.counters.cmd;
     }
     else
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_CMD_TX_FILE, CFE_EVS_EventType_ERROR, "CF: file transfer failed");
+        CFE_EVS_SendEvent(CF_EID_ERR_CMD_TX_FILE, CFE_EVS_EventType_ERROR, "CF: file transfer initiation failed");
         ++CF_AppData.hk.counters.err;
     }
 }
@@ -209,12 +210,13 @@ void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
                             tx->dest_id) == CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_PLAYBACK_DIR, CFE_EVS_EventType_INFORMATION,
-                          "CF: directory playback successful");
+                          "CF: directory playback initiation successful");
         ++CF_AppData.hk.counters.cmd;
     }
     else
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_CMD_PLAYBACK_DIR, CFE_EVS_EventType_ERROR, "CF: directory playback cmd failed");
+        CFE_EVS_SendEvent(CF_EID_ERR_CMD_PLAYBACK_DIR, CFE_EVS_EventType_ERROR,
+                          "CF: directory playback initiation failed");
         ++CF_AppData.hk.counters.err;
     }
 }
@@ -512,7 +514,8 @@ void CF_CmdCancel(CFE_SB_Buffer_t *msg)
 {
     if (CF_TsnChanAction((CF_TransactionCmd_t *)msg, "cancel", CF_CmdCancel_Txn, NULL) > 0)
     {
-        CFE_EVS_SendEvent(CF_EID_INF_CMD_CANCEL, CFE_EVS_EventType_INFORMATION, "CF: cancel successful");
+        CFE_EVS_SendEvent(CF_EID_INF_CMD_CANCEL, CFE_EVS_EventType_INFORMATION,
+                          "CF: cancel transaction successfully initiated");
         ++CF_AppData.hk.counters.cmd;
     }
     else
