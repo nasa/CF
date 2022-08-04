@@ -529,8 +529,17 @@ void Test_CF_CmdTxFile(void)
 
     /* nominal, all zero should pass checks, just calls CF_CFDP_TxFile */
     memset(msg, 0, sizeof(*msg));
+    msg->cfdp_class = CF_CFDP_CLASS_1;
     UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
+    UT_CF_AssertEventID(CF_EID_INF_CMD_TX_FILE);
+
+    UT_CF_ResetEventCapture();
+    memset(msg, 0, sizeof(*msg));
+    msg->cfdp_class = CF_CFDP_CLASS_2;
+    UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 2);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_INF_CMD_TX_FILE);
 
@@ -542,13 +551,20 @@ void Test_CF_CmdTxFile(void)
     UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 
+    UT_CF_ResetEventCapture();
+    memset(msg, 0, sizeof(*msg));
+    msg->cfdp_class = -10;
+    UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
+    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 2);
+
     /* out of range arguments: bad channel */
     UT_CF_ResetEventCapture();
     memset(msg, 0, sizeof(*msg));
     msg->chan_num = CF_NUM_CHANNELS;
     UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
     UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 2);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 3);
 
     /* out of range arguments: bad keep */
     UT_CF_ResetEventCapture();
@@ -556,7 +572,7 @@ void Test_CF_CmdTxFile(void)
     msg->keep = 15;
     UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
     UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 3);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 4);
 
     /* CF_CFDP_TxFile fails*/
     UT_CF_ResetEventCapture();
@@ -564,7 +580,7 @@ void Test_CF_CmdTxFile(void)
     memset(msg, 0, sizeof(*msg));
     UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
     UT_CF_AssertEventID(CF_EID_ERR_CMD_TX_FILE);
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 4);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 5);
 }
 
 /* end CF_CmdTxFile tests */
@@ -587,8 +603,14 @@ void Test_CF_CmdPlaybackDir(void)
 
     /* nominal, all zero should pass checks, just calls CF_CFDP_PlaybackDir */
     memset(msg, 0, sizeof(*msg));
+    msg->cfdp_class = CF_CFDP_CLASS_1;
     UtAssert_VOIDCALL(CF_CmdPlaybackDir(&utbuf.buf));
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
+
+    memset(msg, 0, sizeof(*msg));
+    msg->cfdp_class = CF_CFDP_CLASS_2;
+    UtAssert_VOIDCALL(CF_CmdPlaybackDir(&utbuf.buf));
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 2);
 
     /* out of range arguments: bad class */
     memset(msg, 0, sizeof(*msg));
@@ -597,13 +619,20 @@ void Test_CF_CmdPlaybackDir(void)
     UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 
+    UT_CF_ResetEventCapture();
+    memset(msg, 0, sizeof(*msg));
+    msg->cfdp_class = -10;
+    UtAssert_VOIDCALL(CF_CmdPlaybackDir(&utbuf.buf));
+    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 2);
+
     /* out of range arguments: bad channel */
     UT_CF_ResetEventCapture();
     memset(msg, 0, sizeof(*msg));
     msg->chan_num = CF_NUM_CHANNELS;
     UtAssert_VOIDCALL(CF_CmdPlaybackDir(&utbuf.buf));
     UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 2);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 3);
 
     /* out of range arguments: bad keep */
     UT_CF_ResetEventCapture();
@@ -611,7 +640,7 @@ void Test_CF_CmdPlaybackDir(void)
     msg->keep = 15;
     UtAssert_VOIDCALL(CF_CmdPlaybackDir(&utbuf.buf));
     UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 3);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 4);
 
     /* CF_CFDP_PlaybackDir fails*/
     UT_CF_ResetEventCapture();
@@ -619,7 +648,7 @@ void Test_CF_CmdPlaybackDir(void)
     memset(msg, 0, sizeof(*msg));
     UtAssert_VOIDCALL(CF_CmdPlaybackDir(&utbuf.buf));
     UT_CF_AssertEventID(CF_EID_ERR_CMD_PLAYBACK_DIR);
-    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 4);
+    UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 5);
 }
 
 /* end CF_CmdPlaybackDir tests */
