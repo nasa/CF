@@ -1386,6 +1386,41 @@ void Test_CF_CFDP_ResetTransaction(void)
     UtAssert_STUB_COUNT(CF_FreeTransaction, 8);
 }
 
+void Test_CF_CFDP_SendEotPkt(void)
+{
+    CF_EotPktBuf_t  PktBuf;
+    CF_EotPktBuf_t *PktBufPtr;
+
+    CF_Transaction_t *t;
+    CF_Playback_t     pb;
+
+    memset(&pb, 0, sizeof(pb));
+
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
+
+    /* Test case where CF_EotPktBuf_t is NULL */
+    UtAssert_VOIDCALL(CF_CFDP_SendEotPkt(t));
+
+    /* Verify results */
+    UtAssert_STUB_COUNT(CFE_MSG_Init, 0);
+    UtAssert_STUB_COUNT(CFE_SB_TimeStampMsg, 0);
+    UtAssert_STUB_COUNT(CFE_SB_TransmitBuffer, 0);
+
+    /* setup for a call to CFE_SB_AllocateMessageBuffer() */
+    PktBufPtr = &PktBuf;
+    memset(PktBufPtr, 0, sizeof(*PktBufPtr));
+    UT_SetDataBuffer(UT_KEY(CFE_SB_AllocateMessageBuffer), &PktBufPtr, sizeof(PktBufPtr), true);
+
+    /* Execute the function being tested */
+    /* nominal call */
+    UtAssert_VOIDCALL(CF_CFDP_SendEotPkt(t));
+
+    /* Verify results */
+    UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
+    UtAssert_STUB_COUNT(CFE_SB_TimeStampMsg, 1);
+    UtAssert_STUB_COUNT(CFE_SB_TransmitBuffer, 1);
+}
+
 void Test_CF_CFDP_DisableEngine(void)
 {
     /* Test case for:
@@ -1461,6 +1496,7 @@ void UtTest_Setup(void)
     UtTest_Add(Test_CF_CFDP_DoTick, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_DoTick");
     UtTest_Add(Test_CF_CFDP_TickTransactions, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_TickTransactions");
     UtTest_Add(Test_CF_CFDP_ResetTransaction, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_ResetTransaction");
+    UtTest_Add(Test_CF_CFDP_SendEotPkt, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "Test_CF_CFDP_SendEotPkt");
     UtTest_Add(Test_CF_CFDP_CancelTransaction, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown,
                "CF_CFDP_CancelTransaction");
     UtTest_Add(Test_CF_CFDP_DisableEngine, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_DisableEngine");

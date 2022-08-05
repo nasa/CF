@@ -125,6 +125,36 @@ typedef struct CF_HkPacket
     CF_HkChannel_Data_t channel_hk[CF_NUM_CHANNELS]; /**< \brief Per channel housekeeping data */
 } CF_HkPacket_t;
 
+/**
+ * \brief End of transaction packet
+ */
+typedef struct CF_EotPacket
+{
+    CFE_MSG_TelemetryHeader_t tlm_header; /**< \brief Telemetry header */
+    CF_TransactionSeq_t       seq_num;    /**< \brief transaction identifier, stays constant for entire transfer */
+    uint32                    channel;    /**< \brief Channel number */
+    CF_Direction_t            direction;  /**< \brief direction of this transaction */
+    CF_TxnState_t             state;      /**< \brief Transaction state */
+    CF_CFDP_ConditionCode_t   cc;         /**< \brief final condition code of operation */
+    CF_EntityId_t             src_eid;    /**< \brief the source eid of the transaction */
+    CF_EntityId_t             peer_eid;   /**< \brief peer_eid is always the "other guy", same src_eid for RX */
+    uint32                    fsize;      /**< \brief File size */
+    uint32                    crc_result; /**< \brief CRC result */
+    CF_TxnFilenames_t         fnames;     /**< \brief file names associated with this transaction */
+} CF_EotPacket_t;
+
+/**
+ * \brief Single application file info packet buffer
+ *
+ * This typedef supports CFE_SB_AllocateMessageBuffer use with a CF_EotPkt_t
+ * that compiles with the alignment constraints of a CFE_SB_Buffer_t
+ */
+typedef union
+{
+    CFE_SB_Buffer_t SBBuf; /**< \brief Message buffer for alignment */
+    CF_EotPacket_t  eot;   /**< \brief Single end of transaction info packet */
+} CF_EotPktBuf_t;
+
 /**\}*/
 
 /**

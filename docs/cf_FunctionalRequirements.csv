@@ -139,6 +139,18 @@ CF6000,CF6000,"The CF Housekeeping message shall include
 12. Number of CRC Mismatch Faults
 13. Number of Filestore Rejection Faults (can be split by type)
 14. Number of Filesize Mismatch Faults",Operator interface that provides detailed status on operational state
+CF6001,CF6001,"The CF End of Transaction message shall include
+1. Transaction identifier
+2. Channel number
+3. Direction of transaction
+4. Filenames associated with transaction
+5. Transaction state
+6. Condition code
+7. Source EID of transaction
+8. Peer EID of transaction
+9. File size
+10. CRC state",Operator interface that provides detailed information on transaction
+CF6001.1,CF6001.1,"When a transaction terminates, CF shall generate an End of Transaction information packet",Operational awareness of transaction closure and potential automation of follow-on actions
 CF7000,CF7000,"When CF is initialized, CF shall initialize the the housekeeping counters/numbers to zero and the frozen status as ""thawed"".",All variable must be set to a known valid state on initialization to support reliable functioning
 CF7001,CF7001,"When CF is initialized, CF shall load valid CF Configuration Tables.",All variables must be set to a known valid state on initialization to support reliable functioning. Table interface supports operational reconfiguration of CF functions.
 CF7001.1,CF7001.1,"If a CF Configuration Table fails validation, CF shall issue an error cFE event message and exit.",Support constraints for security checks and resource utilization. Without a valid configuration CF can not initialize to a functional state. 
