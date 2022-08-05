@@ -1745,16 +1745,16 @@ void CF_CFDP_SendEotPkt(CF_Transaction_t *t)
     {
         CFE_MSG_Init(&PktBuf->eot.tlm_header.Msg, CFE_SB_ValueToMsgId(CF_EOT_TLM_MID), sizeof(*PktBuf));
 
-        PktBuf->eot.channel   = t->chan_num;
-        PktBuf->eot.direction = t->history->dir;
-        PktBuf->eot.fnames    = t->history->fnames;
-        PktBuf->eot.state     = t->state;
-        PktBuf->eot.cc        = t->history->cc;
-        PktBuf->eot.src_eid   = t->history->src_eid;
-        PktBuf->eot.peer_eid  = t->history->peer_eid;
-        PktBuf->eot.seq_num   = t->history->seq_num;
-        PktBuf->eot.fsize     = t->fsize;
-        PktBuf->eot.crc       = t->crc;
+        PktBuf->eot.channel    = t->chan_num;
+        PktBuf->eot.direction  = t->history->dir;
+        PktBuf->eot.fnames     = t->history->fnames;
+        PktBuf->eot.state      = t->state;
+        PktBuf->eot.cc         = t->history->cc;
+        PktBuf->eot.src_eid    = t->history->src_eid;
+        PktBuf->eot.peer_eid   = t->history->peer_eid;
+        PktBuf->eot.seq_num    = t->history->seq_num;
+        PktBuf->eot.fsize      = t->fsize;
+        PktBuf->eot.crc_result = t->crc.result;
 
         /*
         ** Timestamp and send eod of transaction telemetry

@@ -140,14 +140,14 @@ CF6000,CF6000,"The CF Housekeeping message shall include
 13. Number of Filestore Rejection Faults (can be split by type)
 14. Number of Filesize Mismatch Faults",Operator interface that provides detailed status on operational state
 CF6001,CF6001,"The CF End of Transaction message shall include
-1. Channel number
-2. Direction of transaction
-3. Filenames associated with transaction
-4. Transaction state
-5. Condition code
-6. Source EID of transaction
-7. Peer EID of transaction
-8. Transaction identifier
+1. Transaction identifier
+2. Channel number
+3. Direction of transaction
+4. Filenames associated with transaction
+5. Transaction state
+6. Condition code
+7. Source EID of transaction
+8. Peer EID of transaction
 9. File size
 10. CRC state",Operator interface that provides detailed information on transaction
 CF6001.1,CF6001.1,"When a transaction terminates, CF shall generate an End of Transaction information packet",Operational awareness of transaction closure and potential automation of follow-on actions
