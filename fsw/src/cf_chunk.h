@@ -128,7 +128,7 @@ void CF_ChunkListReset(CF_ChunkList_t *chunks);
  *       once consumed should be removed.
  *
  * @par Assumptions, External Events, and Notes:
- *       chunks must not be NULL.
+ *       chunks must not be NULL and list must not be empty
  *
  * @note
  * Good computer science would have a generic remove function, but that's much more complex
@@ -182,8 +182,14 @@ uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_
 /************************************************************************/
 /** @brief Erase a range of chunks.
  *
- * @note This changes the chunk IDs of all chunks that follow
- * Items in the list after the end item will be shifted/moved to close the gap.
+ * Items in the list starting at the end index will be shifted/moved to close the gap.
+ * If end <= start nothing will be done (OK to pass matching start/end as a no-op)
+ * If end == list size, list from start on will be erased (nothing moved)
+ *
+ * Example:
+ *   list = {a, b, c, d, e}
+ *   EraseRange index start 1, end 3
+ *   list = {a, d, e}
  *
  * @par Assumptions, External Events, and Notes:
  *       chunks must not be NULL.

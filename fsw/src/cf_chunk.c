@@ -46,10 +46,12 @@
  *-----------------------------------------------------------------*/
 void CF_Chunks_EraseRange(CF_ChunkList_t *chunks, CF_ChunkIdx_t start, CF_ChunkIdx_t end)
 {
-    CF_Assert(end >= start);
-    if (start < chunks->count)
+    /* Sanity check */
+    CF_Assert(end <= chunks->count);
+
+    if (start < end)
     {
-        memmove(&chunks->chunks[start], &chunks->chunks[end], sizeof(*chunks->chunks) * (end - start));
+        memmove(&chunks->chunks[start], &chunks->chunks[end], sizeof(*chunks->chunks) * (chunks->count - end));
         chunks->count -= (end - start);
     }
 }
@@ -140,23 +142,30 @@ CF_ChunkIdx_t CF_Chunks_FindInsertPosition(CF_ChunkList_t *chunks, const CF_Chun
  *-----------------------------------------------------------------*/
 int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
-    int ret = 0;
+    CF_Chunk_t *     prev;
+    CF_ChunkOffset_t prev_end;
+    CF_ChunkOffset_t chunk_end;
+    int              ret = 0;
+
     CF_Assert(i <= chunks->max_chunks);
 
-    CF_ChunkOffset_t chunk_end = chunk->offset + chunk->size;
-
-    if ((i && chunks->count))
+    /* Only need to check if there is a previous */
+    if (i > 0)
     {
-        CF_Chunk_t *     prev     = &chunks->chunks[i - 1];
-        CF_ChunkOffset_t prev_end = prev->offset + prev->size;
+        chunk_end = chunk->offset + chunk->size;
+        prev      = &chunks->chunks[i - 1];
+        prev_end  = prev->offset + prev->size;
+
+        /* Check if start of new chunk is less than end of previous (overlaps) */
         if (chunk->offset <= prev_end)
         {
+            /* When combining, use the bigger of the two endings */
             if (prev_end < chunk_end)
             {
-                /* extend the previous chunk, then see if we can combine */
+                /* Combine with previous chunk */
                 prev->size = chunk_end - prev->offset;
-                ret        = 1;
             }
+            ret = 1;
         }
     }
     return ret;
@@ -172,52 +181,40 @@ int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_
  *-----------------------------------------------------------------*/
 int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
-    /* check if not at the end */
-    int ret = 0;
-    if (i != chunks->count)
+    CF_ChunkIdx_t    combined_i = i;
+    int              ret        = 0;
+    CF_ChunkOffset_t chunk_end  = chunk->offset + chunk->size;
+
+    /* Assert no rollover, only possible as a bug */
+    CF_Assert(chunk_end > chunk->offset);
+
+    /* Determine how many can be combined */
+    for (; combined_i < chunks->count; ++combined_i)
     {
-        CF_ChunkOffset_t chunk_end = chunk->offset + chunk->size;
-        CF_Assert(chunk_end >= chunk->offset);
-
-        /* check if anything can be combined */
-        if (chunks->chunks[i].offset <= chunk_end)
+        /* Advance combine index until there is a gap between end and the next offset */
+        if (chunk_end < chunks->chunks[combined_i].offset)
         {
-            /* figure out how many chunks can be combined */
-            CF_ChunkIdx_t    combined_i = i;
-            CF_ChunkOffset_t new_end; /* initialized below */
-
-            for (; combined_i < chunks->count; ++combined_i)
-            {
-                CF_ChunkOffset_t existing_end = chunks->chunks[combined_i].offset + chunks->chunks[combined_i].size;
-                if (chunk_end < existing_end)
-                {
-                    break;
-                }
-            }
-
-            if (combined_i != chunks->count)
-            {
-                /* not at the end */
-                new_end = CF_Chunk_MAX(chunks->chunks[combined_i].offset + chunks->chunks[combined_i].size, chunk_end);
-            }
-            else
-            {
-                /* new chunk replaces everything until the end */
-                new_end = CF_Chunk_MAX(
-                    chunks->chunks[chunks->count - 1].offset + chunks->chunks[chunks->count - 1].size, chunk_end);
-            }
-
-            chunks->chunks[i].size   = new_end - chunk->offset;
-            chunks->chunks[i].offset = chunk->offset;
-
-            if (i != combined_i)
-            {
-                /* erase the next chunk */
-                CF_Chunks_EraseRange(chunks, i + 1, combined_i);
-            }
-            ret = 1;
+            break;
         }
     }
+
+    /* If index advanced the range of chunks can be combined */
+    if (i != combined_i)
+    {
+
+        /* End is the max of last combined chunk end or new chunk end */
+        chunk_end =
+            CF_Chunk_MAX(chunks->chunks[combined_i - 1].offset + chunks->chunks[combined_i - 1].size, chunk_end);
+
+        /* Use current slot as combined entry */
+        chunks->chunks[i].size   = chunk_end - chunk->offset;
+        chunks->chunks[i].offset = chunk->offset;
+
+        /* Erase the rest of the combined chunks (if any) */
+        CF_Chunks_EraseRange(chunks, i + 1, combined_i);
+        ret = 1;
+    }
+
     return ret;
 }
 
@@ -305,16 +302,7 @@ void CF_ChunkListAdd(CF_ChunkList_t *chunks, CF_ChunkOffset_t offset, CF_ChunkSi
      * to use 64-bit numbers */
     CF_Assert((offset + size) >= offset);
 
-    if (i != chunks->count)
-    {
-        /* not at the end */
-        CF_Assert(chunk.offset <= chunks->chunks[i].offset);
-        CF_Chunks_Insert(chunks, i, &chunk);
-    }
-    else
-    {
-        CF_Chunks_Insert(chunks, i, &chunk);
-    }
+    CF_Chunks_Insert(chunks, i, &chunk);
 }
 
 /*----------------------------------------------------------------
@@ -399,16 +387,20 @@ void CF_ChunkListReset(CF_ChunkList_t *chunks)
 uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_gaps, CF_ChunkSize_t total,
                                 CF_ChunkOffset_t start, CF_ChunkList_ComputeGapFn_t compute_gap_fn, void *opaque)
 {
-    uint32        ret     = 0;
-    CF_ChunkIdx_t i       = 0;
-    int           started = 0;
+    uint32           ret = 0;
+    CF_ChunkIdx_t    i   = 0;
+    CF_ChunkOffset_t next_off;
+    CF_ChunkOffset_t gap_start;
+    CF_Chunk_t       c;
+
     CF_Assert(total); /* does it make sense to have a 0 byte file? */
     CF_Assert(start < total);
 
     /* simple case: there is no chunk data, which means there is a single gap of the entire size */
     if (!chunks->count)
     {
-        CF_Chunk_t c = {0, total};
+        c.offset = 0;
+        c.size   = total;
         if (compute_gap_fn)
         {
             compute_gap_fn(chunks, &c, opaque);
@@ -417,39 +409,39 @@ uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_
     }
     else
     {
+        /* Handle initial gap if needed */
+        if (start < chunks->chunks[0].offset)
+        {
+            c.offset = start;
+            c.size   = chunks->chunks[0].offset - start;
+            if (compute_gap_fn)
+            {
+                compute_gap_fn(chunks, &c, opaque);
+            }
+            ret = 1;
+        }
+
         while ((ret < max_gaps) && (i < chunks->count))
         {
-            CF_ChunkOffset_t next_off  = (i == (chunks->count - 1)) ? total : chunks->chunks[i + 1].offset;
-            CF_ChunkOffset_t gap_start = (chunks->chunks[i].offset + chunks->chunks[i].size);
-            CF_ChunkSize_t   gap_size  = (next_off - gap_start);
-            CF_Chunk_t       c         = {gap_start, gap_size};
+            next_off  = (i == (chunks->count - 1)) ? total : chunks->chunks[i + 1].offset;
+            gap_start = (chunks->chunks[i].offset + chunks->chunks[i].size);
+
+            c.offset = (gap_start > start) ? gap_start : start;
+            c.size   = (next_off - c.offset);
 
             if (gap_start >= total)
             {
                 break;
             }
-
-            /* check if start has been passed */
-            if (!started && ((c.offset + c.size) >= start))
+            else if (start < next_off)
             {
-                CF_ChunkSize_t start_diff = (start - c.offset);
-                if (start_diff < c.offset)
-                {
-                    c.offset += start_diff;
-                    c.size -= start_diff;
-                }
-                started = 1;
-            }
-
-            if (started)
-            {
+                /* Only report if gap finishes after start */
                 if (compute_gap_fn)
                 {
                     compute_gap_fn(chunks, &c, opaque);
                 }
                 ++ret;
             }
-
             ++i;
         }
     }
