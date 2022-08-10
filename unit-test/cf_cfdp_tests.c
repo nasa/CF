@@ -288,7 +288,6 @@ void Test_CF_CFDP_RecvPh(void)
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_DecodeHeader), 1, -1);
     UtAssert_INT32_EQ(CF_CFDP_RecvPh(UT_CFDP_CHANNEL, ph), -1);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_TRUNCATION);
-
 }
 
 void Test_CF_CFDP_RecvMd(void)
