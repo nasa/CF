@@ -348,6 +348,17 @@
  */
 #define CF_EID_ERR_PDU_LARGE_FILE (55)
 
+/**
+ * \brief CF PDU Header Field Truncation
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  PDU Header received with fields that would be truncated with the cf configuration
+ */
+#define CF_EID_ERR_PDU_TRUNCATION (56)
+
 /**************************************************************************
  * CF_CFDP event IDs - Engine
  */

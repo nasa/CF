@@ -633,16 +633,25 @@ int CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
     int ret = 0;
 
     CF_Assert(chan_num < CF_NUM_CHANNELS);
-
-    CF_CFDP_DecodeHeader(ph->pdec, &ph->pdu_header);
-
+    /*
+     * If the source eid, destination eid, or sequence number fields
+     * are larger than the sizes configured in the cf platform config
+     * file, then reject the PDU.
+     */
+    if (CF_CFDP_DecodeHeader(ph->pdec, &ph->pdu_header) != CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CF_EID_ERR_PDU_TRUNCATION, CFE_EVS_EventType_ERROR,
+                          "CF: pdu rejected due to eid/seq number field truncation");
+        ++CF_AppData.hk.channel_hk[chan_num].counters.recv.error;
+        ret = -1;
+    }
     /*
      * The "large file" flag is not supported by this implementation yet.
      * This means file sizes and offsets will be 64 bits, so codec routines
      * will need to be updated to understand this.  OSAL also doesn't support
      * 64-bit file access yet.
      */
-    if (CF_CODEC_IS_OK(ph->pdec) && ph->pdu_header.large_flag)
+    else if (CF_CODEC_IS_OK(ph->pdec) && ph->pdu_header.large_flag)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_LARGE_FILE, CFE_EVS_EventType_ERROR,
                           "CF: pdu with large file bit received (unsupported)");
