@@ -716,7 +716,7 @@ void Test_CF_CFDP_DecodeHeader(void)
     CF_Logical_PduHeader_t out;
     int32                  ret_val;
     const uint8            bytes[]     = {0x3c, 0x01, 0x02, 0x00, 0x44, 0x55, 0x66};
-    const uint8            bad_input[] = {0x3c, 0x01, 0x02, 0x33, 0x44, 0x55, 0x66};
+    const uint8            bad_input[] = {0x3c, 0x01, 0x02, 0x77, 0x44, 0x55, 0x66};
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
