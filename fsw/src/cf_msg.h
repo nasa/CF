@@ -133,9 +133,9 @@ typedef struct CF_EotPacket
     CFE_MSG_TelemetryHeader_t tlm_header; /**< \brief Telemetry header */
     CF_TransactionSeq_t       seq_num;    /**< \brief transaction identifier, stays constant for entire transfer */
     uint32                    channel;    /**< \brief Channel number */
-    CF_Direction_t            direction;  /**< \brief direction of this transaction */
-    CF_TxnState_t             state;      /**< \brief Transaction state */
-    CF_CFDP_ConditionCode_t   cc;         /**< \brief final condition code of operation */
+    uint32                    direction;  /**< \brief direction of this transaction */
+    uint32                    state;      /**< \brief Transaction state */
+    uint32                    cc;         /**< \brief final condition code of operation */
     CF_EntityId_t             src_eid;    /**< \brief the source eid of the transaction */
     CF_EntityId_t             peer_eid;   /**< \brief peer_eid is always the "other guy", same src_eid for RX */
     uint32                    fsize;      /**< \brief File size */
