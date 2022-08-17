@@ -282,6 +282,12 @@ void Test_CF_CFDP_RecvPh(void)
     ph->pdu_header.large_flag = true;
     UtAssert_INT32_EQ(CF_CFDP_RecvPh(UT_CFDP_CHANNEL, ph), -1);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_LARGE_FILE);
+
+    /* decode error, insufficient storage for EID or seq num */
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, NULL, NULL);
+    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_DecodeHeader), 1, -1);
+    UtAssert_INT32_EQ(CF_CFDP_RecvPh(UT_CFDP_CHANNEL, ph), -1);
+    UT_CF_AssertEventID(CF_EID_ERR_PDU_TRUNCATION);
 }
 
 void Test_CF_CFDP_RecvMd(void)

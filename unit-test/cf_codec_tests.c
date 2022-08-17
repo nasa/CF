@@ -714,21 +714,24 @@ void Test_CF_CFDP_DecodeHeader(void)
      */
     CF_DecoderState_t      state;
     CF_Logical_PduHeader_t out;
-    const uint8            bytes[]     = {0x3c, 0x01, 0x02, 0x00, 0x44, 0x55, 0x66};
-    const uint8            bad_input[] = {0x20, 0x01, 0x02, 0x33, 0x01, 0x02, 0x03};
+    int32                  ret_val;
+    const uint8            bytes[]   = {0x3c, 0x01, 0x02, 0x00, 0x44, 0x55, 0x66};
+    const uint8            bad_eid[] = {0x3c, 0x01, 0x02, 0x73, 0x44, 0x55, 0x66};
+    const uint8            bad_tsn[] = {0x3c, 0x01, 0x02, 0x37, 0x44, 0x55, 0x66};
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
 
     /* call w/zero state should be noop */
     UT_CF_SetupDecodeState(&state, bytes, 0);
-    CF_CFDP_DecodeHeader(&state, &out);
+    ret_val = CF_CFDP_DecodeHeader(&state, &out);
     UtAssert_BOOL_FALSE(CF_CODEC_IS_OK(&state));
     UtAssert_MemCmpValue(&out, 0xEE, sizeof(out), "Bytes unchanged");
+    UtAssert_True(ret_val == CFE_SUCCESS, "CF_CFDP_DecodeHeader returned %d and should be 0", ret_val);
 
     /* setup nominal */
     UT_CF_SetupDecodeState(&state, bytes, sizeof(bytes));
-    CF_CFDP_DecodeHeader(&state, &out);
+    ret_val = CF_CFDP_DecodeHeader(&state, &out);
     UtAssert_BOOL_TRUE(CF_CODEC_IS_OK(&state));
     UtAssert_UINT32_EQ(CF_CODEC_GET_POSITION(&state), sizeof(bytes));
     UtAssert_UINT32_EQ(out.version, 1);
@@ -742,16 +745,21 @@ void Test_CF_CFDP_DecodeHeader(void)
     UtAssert_UINT32_EQ(out.sequence_num, 0x55);
     UtAssert_UINT32_EQ(out.destination_eid, 0x66);
     UtAssert_UINT32_EQ(out.header_encoded_length, sizeof(bytes));
+    UtAssert_True(ret_val == CFE_SUCCESS, "CF_CFDP_DecodeHeader returned %d and should be 0", ret_val);
 
     /*
-     * The bad input has large embedded EID/TSN lengths that would
-     * cause it to read beyond the end of the buffer.  This is to
-     * verify that the decode detects the problem and does not
-     * read beyond the end.
+     * Check for EID that would be truncated
      */
-    UT_CF_SetupDecodeState(&state, bad_input, sizeof(bad_input));
-    CF_CFDP_DecodeHeader(&state, &out);
-    UtAssert_BOOL_FALSE(CF_CODEC_IS_OK(&state));
+    UT_CF_SetupDecodeState(&state, bad_eid, sizeof(bad_eid));
+    ret_val = CF_CFDP_DecodeHeader(&state, &out);
+    UtAssert_True(ret_val == -1, "CF_CFDP_DecodeHeader returned %d and should be -1", ret_val);
+
+    /*
+     * Check for TSN that would be truncated
+     */
+    UT_CF_SetupDecodeState(&state, bad_tsn, sizeof(bad_tsn));
+    ret_val = CF_CFDP_DecodeHeader(&state, &out);
+    UtAssert_True(ret_val == -1, "CF_CFDP_DecodeHeader returned %d and should be -1", ret_val);
 }
 void Test_CF_CFDP_DecodeFileDirectiveHeader(void)
 {

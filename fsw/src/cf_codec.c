@@ -822,9 +822,10 @@ uint64 CF_DecodeIntegerInSize(CF_DecoderState_t *state, uint8 decode_size)
  * See description in cf_codec.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh)
+int32 CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh)
 {
     const CF_CFDP_PduHeader_t *peh; /* for decoding fixed sized fields */
+    int32                      ret = CFE_SUCCESS;
 
     /* decode the standard PDU header */
     peh = CF_DECODE_FIXED_CHUNK(state, CF_CFDP_PduHeader_t);
@@ -843,15 +844,22 @@ void CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh)
 
         /* Length is a simple 16-bit quantity and refers to the content after this header */
         CF_Codec_Load_uint16(&(plh->data_encoded_length), &(peh->length));
+        if ((plh->eid_length > sizeof(plh->source_eid)) || (plh->txn_seq_length > sizeof(plh->sequence_num)))
+        {
+            ret = -1;
+        }
+        else
+        {
+            /* Now copy variable-length fields */
+            plh->source_eid      = CF_DecodeIntegerInSize(state, plh->eid_length);
+            plh->sequence_num    = CF_DecodeIntegerInSize(state, plh->txn_seq_length);
+            plh->destination_eid = CF_DecodeIntegerInSize(state, plh->eid_length);
 
-        /* Now copy variable-length fields */
-        plh->source_eid      = CF_DecodeIntegerInSize(state, plh->eid_length);
-        plh->sequence_num    = CF_DecodeIntegerInSize(state, plh->txn_seq_length);
-        plh->destination_eid = CF_DecodeIntegerInSize(state, plh->eid_length);
-
-        /* The header length is where decoding ended at this point */
-        plh->header_encoded_length = CF_CODEC_GET_POSITION(state);
+            /* The header length is where decoding ended at this point */
+            plh->header_encoded_length = CF_CODEC_GET_POSITION(state);
+        }
     }
+    return ret;
 }
 
 /*----------------------------------------------------------------
