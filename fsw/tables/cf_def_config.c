@@ -28,36 +28,57 @@
 CF_ConfigTable_t CF_config_table = {
     10,    /* ticks_per_second */
     16384, /* max number of bytes per wakeup to calculate r2 recv file crc */
-    25,    /* temp local id */
-    {{
-         5,  /* max number of outgoing messages per wakeup */
-         5,  /* max number of rx messages per wakeup */
-         3,  /* ack timer */
-         3,  /* nak timer */
-         30, /* inactivity timer */
-         4,  /* ack limit */
-         4,  /* nak limit */
-         0x18c8,
-         0x08c2,
-         16,
-         {{5, 25, CF_CFDP_CLASS_2, 23, "/cf/poll_dir", "./poll_dir", 1}, {0}, {0}, {0}, {0}},
-         "", /* throttle sem for channel 1, empty string means no throttle */
-         1,
+    25,    /* local entity id */
+    {      /* channel configuration for CF_NUM_CHANNELS */
+     {
+         /* channel 0 */
+         5,      /* max number of outgoing messages per wakeup */
+         5,      /* max number of rx messages per wakeup */
+         3,      /* ack timer */
+         3,      /* nak timer */
+         30,     /* inactivity timer */
+         4,      /* ack limit */
+         4,      /* nak limit */
+         0x18c8, /* input message id */
+         0x08c2, /* output message id */
+         16,     /* input pipe depth */
+         {       /* polling directory configuration for CF_MAX_POLLING_DIR_PER_CHAN */
+          {
+              /* polling directory 0 */
+              5,               /* interval seconds */
+              25,              /* priority */
+              CF_CFDP_CLASS_2, /* class to send */
+              23,              /* destination entity id */
+              "/cf/poll_dir",  /* source directory */
+              "./poll_dir",    /* destination directory */
+              0                /* polling directory enable flag (1 = enabled) */
+          },
+          {
+              0 /* zero fill unused polling directory slots */
+          }},
+         "", /* throttle sem, empty string means no throttle */
+         1,  /* dequeue enable flag (1 = enabled) */
      },
-     {5,  /* max number of outgoing messages per wakeup */
-      5,  /* max number of rx messages per wakeup */
-      3,  /* ack timer */
-      3,  /* nak timer */
-      30, /* inactivity timer */
-      4,  /* ack limit */
-      4,  /* nak limit */
-      0x18c9,
-      0x08c3,
-      16,
-      {{0}, {0}, {0}, {0}, {0}},
-      "", /* throttle sem for channel 2, empty string means no throttle */
-      1}},
-    480, /* outgoing_file_chunk_size */
-    "/cf/tmp",
+     {
+         /* channel 1 */
+         5,      /* max number of outgoing messages per wakeup */
+         5,      /* max number of rx messages per wakeup */
+         3,      /* ack timer */
+         3,      /* nak timer */
+         30,     /* inactivity timer */
+         4,      /* ack limit */
+         4,      /* nak limit */
+         0x18c9, /* input message id */
+         0x08c3, /* output message id */
+         16,     /* input pipe depth */
+         {       /* polling directory configuration for CF_MAX_POOLING_DIR_PER_CHAN */
+          {
+              0 /* zero fill unused polling directory slots */
+          }},
+         "", /* throttle sem, empty string means no throttle */
+         1   /* dequeue enable flag (1 = enabled) */
+     }},
+    480,       /* outgoing_file_chunk_size */
+    "/cf/tmp", /* temporary file directory */
 };
 CFE_TBL_FILEDEF(CF_config_table, CF.config_table, CF config table, cf_def_config.tbl)
