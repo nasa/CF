@@ -41,9 +41,8 @@
  * \{
  */
 
-#define CF_HK_TLM_MID     (0x08B0) /**< \brief Message ID for housekeeping telemetry */
-#define CF_CONFIG_TLM_MID (0x08B2) /**< \brief Message ID for configuration telemetry */
-#define CF_EOT_TLM_MID    (0x08B3) /**< \brief Message ID for end of transaction telemetry */
+#define CF_HK_TLM_MID  (0x08B0) /**< \brief Message ID for housekeeping telemetry */
+#define CF_EOT_TLM_MID (0x08B3) /**< \brief Message ID for end of transaction telemetry */
 
 /**\}*/
 
