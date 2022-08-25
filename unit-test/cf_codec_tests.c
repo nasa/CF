@@ -714,7 +714,6 @@ void Test_CF_CFDP_DecodeHeader(void)
      */
     CF_DecoderState_t      state;
     CF_Logical_PduHeader_t out;
-    int32                  ret_val;
     const uint8            bytes[]   = {0x3c, 0x01, 0x02, 0x00, 0x44, 0x55, 0x66};
     const uint8            bad_eid[] = {0x3c, 0x01, 0x02, 0x73, 0x44, 0x55, 0x66};
     const uint8            bad_tsn[] = {0x3c, 0x01, 0x02, 0x37, 0x44, 0x55, 0x66};
@@ -724,14 +723,13 @@ void Test_CF_CFDP_DecodeHeader(void)
 
     /* call w/zero state should be noop */
     UT_CF_SetupDecodeState(&state, bytes, 0);
-    ret_val = CF_CFDP_DecodeHeader(&state, &out);
+    UtAssert_INT32_EQ(CF_CFDP_DecodeHeader(&state, &out), 0);
     UtAssert_BOOL_FALSE(CF_CODEC_IS_OK(&state));
     UtAssert_MemCmpValue(&out, 0xEE, sizeof(out), "Bytes unchanged");
-    UtAssert_True(ret_val == CFE_SUCCESS, "CF_CFDP_DecodeHeader returned %d and should be 0", ret_val);
 
     /* setup nominal */
     UT_CF_SetupDecodeState(&state, bytes, sizeof(bytes));
-    ret_val = CF_CFDP_DecodeHeader(&state, &out);
+    UtAssert_INT32_EQ(CF_CFDP_DecodeHeader(&state, &out), 0);
     UtAssert_BOOL_TRUE(CF_CODEC_IS_OK(&state));
     UtAssert_UINT32_EQ(CF_CODEC_GET_POSITION(&state), sizeof(bytes));
     UtAssert_UINT32_EQ(out.version, 1);
@@ -745,21 +743,18 @@ void Test_CF_CFDP_DecodeHeader(void)
     UtAssert_UINT32_EQ(out.sequence_num, 0x55);
     UtAssert_UINT32_EQ(out.destination_eid, 0x66);
     UtAssert_UINT32_EQ(out.header_encoded_length, sizeof(bytes));
-    UtAssert_True(ret_val == CFE_SUCCESS, "CF_CFDP_DecodeHeader returned %d and should be 0", ret_val);
 
     /*
      * Check for EID that would be truncated
      */
     UT_CF_SetupDecodeState(&state, bad_eid, sizeof(bad_eid));
-    ret_val = CF_CFDP_DecodeHeader(&state, &out);
-    UtAssert_True(ret_val == -1, "CF_CFDP_DecodeHeader returned %d and should be -1", ret_val);
+    UtAssert_INT32_EQ(CF_CFDP_DecodeHeader(&state, &out), -1);
 
     /*
      * Check for TSN that would be truncated
      */
     UT_CF_SetupDecodeState(&state, bad_tsn, sizeof(bad_tsn));
-    ret_val = CF_CFDP_DecodeHeader(&state, &out);
-    UtAssert_True(ret_val == -1, "CF_CFDP_DecodeHeader returned %d and should be -1", ret_val);
+    UtAssert_INT32_EQ(CF_CFDP_DecodeHeader(&state, &out), -1);
 }
 void Test_CF_CFDP_DecodeFileDirectiveHeader(void)
 {
