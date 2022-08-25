@@ -25,7 +25,7 @@ void Test_CF_CRC_Start(void)
     /* Arrange */
     CF_Crc_t c;
 
-    memset(&c, 0, sizeof(c));
+    memset(&c, 0xFF, sizeof(c));
 
     /* Act */
     UtAssert_VOIDCALL(CF_CRC_Start(&c));
