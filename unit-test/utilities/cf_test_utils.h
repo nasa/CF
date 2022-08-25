@@ -39,10 +39,6 @@
 #include "utstubs.h"
 #include "utgenstub.h"
 
-/* cf_tests constants */
-#define UT_INT_16_DEFAULT 0xBADD /* 0xBADD == 47837 decimal */
-#define UT_UINT_8_DEFAULT 0xED   /* 0xED == 237 decimal */
-
 #define MAX_INT 2147484647 /* Set at 32bit for now,  pow(2, 31) - 1 */
 
 #define ALL_CHANNELS 255
