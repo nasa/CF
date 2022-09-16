@@ -221,9 +221,6 @@ int CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL. ph must not be NULL.
  *
- *
- * @retval 0 on success. Returns anything else on error.
- *
  * @param t  Pointer to the transaction object
  * @param ph Pointer to the PDU information
  *
@@ -239,9 +236,6 @@ void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL. ph must not be NULL.
- *
- *
- * @retval 0 on success. Returns anything else on error.
  *
  * @param t  Pointer to the transaction object
  * @param ph Pointer to the PDU information
@@ -289,8 +283,6 @@ void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
  *
  * @par Assumptions, External Events, and Notes:
  *       chunks must not be NULL, c must not be NULL, opaque must not be NULL.
- *
- * @retval 0 on success. Returns anything else on error.
  *
  * @param chunks Not used, required for compatibility with CF_ChunkList_ComputeGaps
  * @param c      Pointer to a single chunk information
