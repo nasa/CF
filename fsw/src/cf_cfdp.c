@@ -139,10 +139,10 @@ void CF_CFDP_ArmAckTimer(CF_Transaction_t *t)
  * Internal helper routine only, not part of API.
  *
  *-----------------------------------------------------------------*/
-static inline CF_CFDP_Class_t CF_CFDP_GetClass(const CF_Transaction_t *ti)
+static inline CF_CFDP_Class_t CF_CFDP_GetClass(const CF_Transaction_t *t)
 {
-    CF_Assert(ti->flags.com.q_index != CF_QueueIdx_FREE);
-    return !!((ti->state == CF_TxnState_S2) || (ti->state == CF_TxnState_R2));
+    CF_Assert(t->flags.com.q_index != CF_QueueIdx_FREE);
+    return !!((t->state == CF_TxnState_S2) || (t->state == CF_TxnState_R2));
 }
 
 /*----------------------------------------------------------------
@@ -152,12 +152,12 @@ static inline CF_CFDP_Class_t CF_CFDP_GetClass(const CF_Transaction_t *ti)
  * Internal helper routine only, not part of API.
  *
  *-----------------------------------------------------------------*/
-static inline int CF_CFDP_IsSender(CF_Transaction_t *ti)
+static inline int CF_CFDP_IsSender(CF_Transaction_t *t)
 {
-    CF_Assert(ti->flags.com.q_index != CF_QueueIdx_FREE);
+    CF_Assert(t->flags.com.q_index != CF_QueueIdx_FREE);
     /* the state could actually be CF_TxnState_IDLE, which is still not a sender. This would
      * be an unused transaction in the RX (CF_CFDP_ReceiveMessage) path. */
-    return !!((ti->state == CF_TxnState_S1) || (ti->state == CF_TxnState_S2));
+    return !!((t->state == CF_TxnState_S1) || (t->state == CF_TxnState_S2));
 }
 
 /*----------------------------------------------------------------
