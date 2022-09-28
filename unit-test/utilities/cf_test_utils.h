@@ -41,9 +41,6 @@
 
 #define MAX_INT 2147484647 /* Set at 32bit for now,  pow(2, 31) - 1 */
 
-#define ALL_CHANNELS 255
-#define COMPOUND_KEY 254
-
 #ifndef RANDOM_VALUES_SEED
 #define RANDOM_VALUES_SEED 0
 #endif /* !RANDOM_VALUES_SEED */

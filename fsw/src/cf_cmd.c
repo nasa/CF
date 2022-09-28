@@ -38,10 +38,6 @@
 
 #include <string.h>
 
-#define ALL_CHANNELS (255)
-#define ALL_POLLDIRS (ALL_CHANNELS)
-#define COMPOUND_KEY (254)
-
 /*----------------------------------------------------------------
  *
  * Function: CF_CmdNoop
@@ -67,11 +63,6 @@ void CF_CmdNoop(CFE_SB_Buffer_t *msg)
  *-----------------------------------------------------------------*/
 void CF_CmdReset(CFE_SB_Buffer_t *msg)
 {
-    static const int counters_command = 1;
-    static const int counters_fault   = 2;
-    static const int counters_up      = 3;
-    static const int counters_down    = 4;
-
     CF_UnionArgsCmd_t *cmd      = (CF_UnionArgsCmd_t *)msg;
     static const char *names[5] = {"all", "cmd", "fault", "up", "down"};
     /* 0=all, 1=cmd, 2=fault 3=up 4=down */
@@ -90,16 +81,16 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
         CFE_EVS_SendEvent(CF_EID_INF_CMD_RESET, CFE_EVS_EventType_INFORMATION,
                           "CF: Received RESET COUNTERS command: %s", names[param]);
 
-        /* if the param is counters_command, or all counters */
-        if (!param || (param == counters_command))
+        /* if the param is CF_Reset_command, or all counters */
+        if ((param == CF_Reset_all) || (param == CF_Reset_command))
         {
             /* command counters */
             memset(&CF_AppData.hk.counters, 0, sizeof(CF_AppData.hk.counters));
             acc = 0; /* don't increment accept counter on command counter reset */
         }
 
-        /* if the param is counters_fault, or all counters */
-        if (!param || (param == counters_fault))
+        /* if the param is CF_Reset_fault, or all counters */
+        if ((param == CF_Reset_all) || (param == CF_Reset_fault))
         {
             /* fault counters */
             for (i = 0; i < CF_NUM_CHANNELS; ++i)
@@ -107,8 +98,8 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
                        sizeof(CF_AppData.hk.channel_hk[i].counters.fault));
         }
 
-        /* if the param is counters_up, or all counters */
-        if (!param || (param == counters_up))
+        /* if the param is CF_Reset_up, or all counters */
+        if ((param == CF_Reset_all) || (param == CF_Reset_up))
         {
             /* up counters */
             for (i = 0; i < CF_NUM_CHANNELS; ++i)
@@ -116,8 +107,8 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
                        sizeof(CF_AppData.hk.channel_hk[i].counters.recv));
         }
 
-        /* if the param is counters_down, or all counters */
-        if (!param || (param == counters_down))
+        /* if the param is CF_Reset_down, or all counters */
+        if ((param == CF_Reset_all) || (param == CF_Reset_down))
         {
             /* down counters */
             for (i = 0; i < CF_NUM_CHANNELS; ++i)
@@ -238,7 +229,7 @@ int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_ChanActionFn_
     /* this function is generic for any ground command that takes a single channel
      * argument which must be less than CF_NUM_CHANNELS or 255 which is a special
      * value that means apply command to all channels */
-    if (cmd->data.byte[0] == ALL_CHANNELS)
+    if (cmd->data.byte[0] == CF_ALL_CHANNELS)
     {
         /* apply to all channels */
         int i;
@@ -365,7 +356,7 @@ int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAct
 {
     int ret = -1;
 
-    if (cmd->chan == COMPOUND_KEY)
+    if (cmd->chan == CF_COMPOUND_KEY)
     {
         /* special value 254 means to use the compound key (cmd->eid, cmd->ts) to find the transaction
          * to act upon */
@@ -382,7 +373,7 @@ int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAct
                               (unsigned long)cmd->eid, (unsigned long)cmd->ts);
         }
     }
-    else if (cmd->chan == ALL_CHANNELS)
+    else if (cmd->chan == CF_ALL_CHANNELS)
     {
         /* perform action on all channels, all transactions */
         ret = CF_TraverseAllTransactions_All_Channels(fn, context);
@@ -642,7 +633,7 @@ int CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolMsgArg_t *
 {
     int ret = 0;
     /* no need to bounds check chan_num, done in caller */
-    if (context->msg->data.byte[1] == ALL_POLLDIRS)
+    if (context->msg->data.byte[1] == CF_ALL_POLLDIRS)
     {
         /* all polldirs in channel */
         int i;
@@ -833,17 +824,10 @@ void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
  *-----------------------------------------------------------------*/
 void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
 {
-    /* a type value of 0 means to process both type_up and type_down */
-    static const int    type_up   = 1;
-    static const int    type_down = 2;
-    static const int    q_pend    = 0;
-    static const int    q_active  = 1;
-    static const int    q_history = 2;
-    static const int    q_all     = 3;
-    CF_WriteQueueCmd_t *wq        = (CF_WriteQueueCmd_t *)msg;
-    CF_Channel_t *      c         = &CF_AppData.engine.channels[wq->chan];
-    osal_id_t           fd        = OS_OBJECT_ID_UNDEFINED;
-    bool                success   = true;
+    CF_WriteQueueCmd_t *wq      = (CF_WriteQueueCmd_t *)msg;
+    CF_Channel_t *      c       = &CF_AppData.engine.channels[wq->chan];
+    osal_id_t           fd      = OS_OBJECT_ID_UNDEFINED;
+    bool                success = true;
     int32               ret;
 
     /* check the commands for validity */
@@ -854,7 +838,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
         success = false;
     }
     /* only invalid combination is up direction, pending queue */
-    else if ((wq->type == type_up) && (wq->queue == q_pend))
+    else if ((wq->type == CF_Type_up) && (wq->queue == CF_Queue_pend))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_ARGS, CFE_EVS_EventType_ERROR,
                           "CF: write queue invalid command parameters");
@@ -876,10 +860,10 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
     }
 
     /* if type is type_up, or all types */
-    if (success && (!wq->type || (wq->type == type_up)))
+    if (success && ((wq->type == CF_Type_all) || (wq->type == CF_Type_up)))
     {
         /* process uplink queue data */
-        if ((wq->queue == q_all) || (wq->queue == q_active))
+        if ((wq->queue == CF_Queue_all) || (wq->queue == CF_Queue_active))
         {
             ret = CF_WriteTxnQueueDataToFile(fd, c, CF_QueueIdx_RX);
             if (ret)
@@ -892,7 +876,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
             }
         }
 
-        if (success && ((wq->queue == q_all) || (wq->queue == q_history)))
+        if (success && ((wq->queue == CF_Queue_all) || (wq->queue == CF_Queue_history)))
         {
             ret = CF_WriteHistoryQueueDataToFile(fd, c, CF_Direction_RX);
             if (ret)
@@ -907,10 +891,10 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
     }
 
     /* if type is type_down, or all types */
-    if (success && (!wq->type || (wq->type == type_down)))
+    if (success && ((wq->type == CF_Type_all) || (wq->type == CF_Type_down)))
     {
         /* process downlink queue data */
-        if ((wq->queue == q_all) || (wq->queue == q_active))
+        if ((wq->queue == CF_Queue_all) || (wq->queue == CF_Queue_active))
         {
             int              i;
             static const int qs[2] = {CF_QueueIdx_TXA, CF_QueueIdx_TXW};
@@ -929,7 +913,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
             }
         }
 
-        if (success && ((wq->queue == q_all) || (wq->queue == q_pend)))
+        if (success && ((wq->queue == CF_Queue_all) || (wq->queue == CF_Queue_pend)))
         {
             /* write pending queue */
             ret = CF_WriteTxnQueueDataToFile(fd, c, CF_QueueIdx_PEND);
@@ -943,7 +927,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
             }
         }
 
-        if (success && ((wq->queue == q_all) || (wq->queue == q_history)))
+        if (success && ((wq->queue == CF_Queue_all) || (wq->queue == CF_Queue_history)))
         {
             /* write history queue */
             ret = CF_WriteHistoryQueueDataToFile(fd, c, CF_Direction_TX);
