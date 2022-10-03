@@ -261,7 +261,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_command_AndResetHkCmdAndErrCountSe
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    dummy_msg->data.byte[0] = 1; /* 1 is 'cmd' */
+    dummy_msg->data.byte[0] = CF_Reset_command;
 
     CF_AppData.hk.counters.cmd = Any_uint16_Except(0);
     CF_AppData.hk.counters.err = Any_uint16_Except(0);
@@ -286,7 +286,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_fault_ResetAllHkFaultCountSendEven
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    dummy_msg->data.byte[0] = 2; /* 2 is 'fault' */
+    dummy_msg->data.byte[0] = CF_Reset_fault;
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
@@ -348,7 +348,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_up_AndResetAllHkRecvCountSendEvent
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    dummy_msg->data.byte[0] = 3; /* 3 is 'up' */
+    dummy_msg->data.byte[0] = CF_Reset_up;
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
@@ -398,7 +398,7 @@ void Test_CF_CmdReset_tests_SWhenCommandByteIs_down_AndResetAllHkSentCountendEve
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    dummy_msg->data.byte[0] = 4; /* 4 is 'down' */
+    dummy_msg->data.byte[0] = CF_Reset_down;
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
@@ -442,7 +442,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_all_AndResetAllMemValuesSendEvent(
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    dummy_msg->data.byte[0] = 0; /* 0 is 'all' */
+    dummy_msg->data.byte[0] = CF_Reset_all;
 
     CF_AppData.hk.counters.cmd = Any_uint16_Except(0);
     CF_AppData.hk.counters.err = Any_uint16_Except(0);
@@ -659,7 +659,7 @@ void Test_CF_CmdPlaybackDir(void)
 **
 *******************************************************************************/
 
-void Test_CF_DoChanAction_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1(void)
+void Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1(void)
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
@@ -673,7 +673,7 @@ void Test_CF_DoChanAction_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1(void)
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    arg_cmd->data.byte[0] = ALL_CHANNELS;
+    arg_cmd->data.byte[0] = CF_ALL_CHANNELS;
 
     UT_SetDeferredRetcode(UT_KEY(Dummy_chan_action_fn_t), random_fn_call, 1);
 
@@ -688,9 +688,9 @@ void Test_CF_DoChanAction_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1(void)
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_True(local_result == 1, "CF_DoChanAction returned %d and should be 1 (an fn returned 1)", local_result);
 
-} /* end Test_CF_DoChanAction_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1 */
+} /* end Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1 */
 
-void Test_CF_DoChanAction_ALL_CHANNELS_WhenAll_fn_return_1_Return_1(void)
+void Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAll_fn_return_1_Return_1(void)
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
@@ -703,7 +703,7 @@ void Test_CF_DoChanAction_ALL_CHANNELS_WhenAll_fn_return_1_Return_1(void)
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    arg_cmd->data.byte[0] = ALL_CHANNELS;
+    arg_cmd->data.byte[0] = CF_ALL_CHANNELS;
 
     UT_SetDefaultReturnValue(UT_KEY(Dummy_chan_action_fn_t), 1);
 
@@ -718,9 +718,9 @@ void Test_CF_DoChanAction_ALL_CHANNELS_WhenAll_fn_return_1_Return_1(void)
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_True(local_result == 1, "CF_DoChanAction returned %d and should be 1 (an fn returned 1)", local_result);
 
-} /* end Test_CF_DoChanAction_ALL_CHANNELS_WhenAll_fn_return_1_Return_1 */
+} /* end Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAll_fn_return_1_Return_1 */
 
-void Test_CF_DoChanAction_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0(void)
+void Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0(void)
 {
     /* Arrange */
     CF_UT_cmd_unionargs_buf_t utbuf;
@@ -733,7 +733,7 @@ void Test_CF_DoChanAction_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0(void)
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    arg_cmd->data.byte[0] = ALL_CHANNELS;
+    arg_cmd->data.byte[0] = CF_ALL_CHANNELS;
 
     UT_SetDefaultReturnValue(UT_KEY(Dummy_chan_action_fn_t), 0);
 
@@ -748,7 +748,7 @@ void Test_CF_DoChanAction_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0(void)
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_True(local_result == 0, "CF_DoChanAction returned %d and should be 0 (all fn returned 0)", local_result);
 
-} /* end Test_CF_DoChanAction_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0 */
+} /* end Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0 */
 
 void Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_1_Return_1(void)
 {
@@ -854,15 +854,15 @@ void Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent(void)
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    /* force ALL_CHANNELS to not be a selection possibility */
-    arg_cmd->data.byte[0] = ALL_CHANNELS;
+    /* force CF_ALL_CHANNELS to not be a selection possibility */
+    arg_cmd->data.byte[0] = CF_ALL_CHANNELS;
     int catastrophe_count = 0;
-    while (arg_cmd->data.byte[0] == ALL_CHANNELS)
+    while (arg_cmd->data.byte[0] == CF_ALL_CHANNELS)
     {
         if (catastrophe_count == 10) // 10 is arbitrary
         {
             UtAssert_Message(UTASSERT_CASETYPE_ABORT, __FILE__, __LINE__,
-                             "CANNOT make arg_cmd->data.byte[0] != ALL_CHANNELS in 10 tries");
+                             "CANNOT make arg_cmd->data.byte[0] != CF_ALL_CHANNELS in 10 tries");
         }
 
         arg_cmd->data.byte[0] = Any_uint8_GreaterThan_or_EqualTo(CF_NUM_CHANNELS);
@@ -1135,7 +1135,7 @@ void Test_CF_FindTransactionBySequenceNumberAllChannels_Return_TransactionFound(
 **
 *******************************************************************************/
 
-void Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_COMPOUND_KEY_TransactionNotFoundAndReturn_neg1_Fail(void)
+void Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionNotFoundAndReturn_neg1_Fail(void)
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t utbuf;
@@ -1150,7 +1150,7 @@ void Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_COMPOUND_KEY_TransactionNotFoun
     AnyRandomStringOfLettersOfLengthCopy(dummy_cmdstr, 10);
     memcpy((char *)arg_cmdstr, &dummy_cmdstr, 10);
 
-    arg_cmd->chan = COMPOUND_KEY;
+    arg_cmd->chan = CF_COMPOUND_KEY;
 
     /* Arrange unstubbable: CF_FindTransactionBySequenceNumberAllChannels */
     CF_FindTransactionBySequenceNumber_context_t contexts_CF_CFDP_FTBSN[CF_NUM_CHANNELS];
@@ -1175,9 +1175,9 @@ void Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_COMPOUND_KEY_TransactionNotFoun
     UT_CF_AssertEventID(CF_EID_ERR_CMD_TRANS_NOT_FOUND);
 
     UtAssert_STUB_COUNT(Dummy_CF_TsnChanAction_fn_t, 0);
-} /* end Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_COMPOUND_KEY_TransactionNotFoundAndReturn_neg1_Fail */
+} /* end Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionNotFoundAndReturn_neg1_Fail */
 
-void Test_CF_TsnChanAction_cmd_chan_Eq_COMPOUND_KEY_TransactionFoundRun_fn_AndReturn_CFE_SUCCESS(void)
+void Test_CF_TsnChanAction_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionFoundRun_fn_AndReturn_CFE_SUCCESS(void)
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t           utbuf;
@@ -1194,7 +1194,7 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_COMPOUND_KEY_TransactionFoundRun_fn_AndRe
     AnyRandomStringOfLettersOfLengthCopy(dummy_cmdstr, 10);
     memcpy((char *)arg_cmdstr, &dummy_cmdstr, 10);
 
-    arg_cmd->chan = COMPOUND_KEY;
+    arg_cmd->chan = CF_COMPOUND_KEY;
 
     UT_SetDataBuffer(UT_KEY(Dummy_CF_TsnChanAction_fn_t), &context_Dummy_CF_TsnChanAction_fn_t,
                      sizeof(context_Dummy_CF_TsnChanAction_fn_t), false);
@@ -1218,9 +1218,9 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_COMPOUND_KEY_TransactionFoundRun_fn_AndRe
     UtAssert_STUB_COUNT(Dummy_CF_TsnChanAction_fn_t, 1);
     UtAssert_ADDRESS_EQ(context_Dummy_CF_TsnChanAction_fn_t.t, &dummy_t);
     UtAssert_ADDRESS_EQ(context_Dummy_CF_TsnChanAction_fn_t.context, arg_context);
-} /* end Test_CF_TsnChanAction_cmd_chan_Eq_COMPOUND_KEY_TransactionFoundRun_fn_AndReturn_CFE_SUCCESS */
+} /* end Test_CF_TsnChanAction_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionFoundRun_fn_AndReturn_CFE_SUCCESS */
 
-void Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels(void)
+void Test_CF_TsnChanAction_cmd_chan_Eq_CF_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels(void)
 {
     /* Arrange */
     CF_UT_cmd_transaction_buf_t                       utbuf;
@@ -1239,7 +1239,7 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransac
 
     context_CF_TATAC.forced_return = expected_result;
 
-    arg_cmd->chan = ALL_CHANNELS;
+    arg_cmd->chan = CF_ALL_CHANNELS;
 
     UT_SetDataBuffer(UT_KEY(CF_TraverseAllTransactions_All_Channels), &context_CF_TATAC, sizeof(context_CF_TATAC),
                      false);
@@ -1249,7 +1249,7 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransac
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-} /* end Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels */
+} /* end Test_CF_TsnChanAction_cmd_chan_Eq_CF_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels */
 
 void Test_CF_TsnChanAction_cmd_chan_IsASingleChannel(void)
 {
@@ -1268,7 +1268,7 @@ void Test_CF_TsnChanAction_cmd_chan_IsASingleChannel(void)
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_STUB_COUNT(CF_TraverseAllTransactions, 1);
 
-} /* end Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels */
+} /* end Test_CF_TsnChanAction_cmd_chan_Eq_CF_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels */
 
 void Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid(void)
 {
@@ -1281,7 +1281,7 @@ void Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid(void)
     void *                      arg_context = &dummy_context;
 
     memset(&utbuf, 0, sizeof(utbuf));
-    arg_cmd->chan = Any_uint8_BetweenExcludeMax(CF_NUM_CHANNELS, COMPOUND_KEY);
+    arg_cmd->chan = Any_uint8_BetweenExcludeMax(CF_NUM_CHANNELS, CF_COMPOUND_KEY);
 
     /* Act */
     UtAssert_INT32_EQ(CF_TsnChanAction(arg_cmd, arg_cmdstr, arg_fn, arg_context), -1);
@@ -1804,7 +1804,7 @@ void Test_CF_CmdDisableDequeue_Failure(void)
 **
 *******************************************************************************/
 
-void Test_CF_DoEnableDisablePolldir_When_ALL_CHANNELS_SetAllPolldirsInChannelEnabledTo_context_barg(void)
+void Test_CF_DoEnableDisablePolldir_When_CF_ALL_CHANNELS_SetAllPolldirsInChannelEnabledTo_context_barg(void)
 {
     /* Arrange */
     uint8                       arg_chan_num = Any_cf_channel();
@@ -1821,7 +1821,7 @@ void Test_CF_DoEnableDisablePolldir_When_ALL_CHANNELS_SetAllPolldirsInChannelEna
 
     CF_AppData.config_table = &dummy_config_table;
 
-    dummy_msg->data.byte[1] = ALL_CHANNELS;
+    dummy_msg->data.byte[1] = CF_ALL_CHANNELS;
 
     dummy_context.msg  = dummy_msg;
     dummy_context.barg = Any_bool_arg_t_barg();
@@ -1841,7 +1841,7 @@ void Test_CF_DoEnableDisablePolldir_When_ALL_CHANNELS_SetAllPolldirsInChannelEna
     }
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_True(local_result == 0, "CF_DoEnableDisablePolldir returned %d and should be 0", local_result);
-} /* end Test_CF_DoEnableDisablePolldir_When_ALL_CHANNELS_SetAllPolldirsInChannelEnabledTo_context_barg */
+} /* end Test_CF_DoEnableDisablePolldir_When_CF_ALL_CHANNELS_SetAllPolldirsInChannelEnabledTo_context_barg */
 
 void Test_CF_DoEnableDisablePolldir_WhenSetToSpecificPolldirSetPolldirFrom_context_ChannelEnabledTo_context_barg(void)
 {
@@ -1985,8 +1985,8 @@ void Test_CF_CmdEnablePolldir_SuccessWhenActionSuccess(void)
 void Test_CF_CmdEnablePolldir_FailWhenActionFail(void)
 {
     /* Arrange */
-    uint8                     dummy_channel = Any_cf_channel();
-    uint8                     error_polldir = Any_uint8_BetweenInclusive(CF_MAX_POLLING_DIR_PER_CHAN, ALL_CHANNELS - 1);
+    uint8 dummy_channel = Any_cf_channel();
+    uint8 error_polldir = Any_uint8_BetweenInclusive(CF_MAX_POLLING_DIR_PER_CHAN, CF_ALL_CHANNELS - 1);
     CF_UT_cmd_unionargs_buf_t utbuf;
     CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
     CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
@@ -2066,8 +2066,8 @@ void Test_CF_CmdDisablePolldir_SuccessWhenActionSuccess(void)
 void Test_CF_CmdDisablePolldir_FailWhenActionFail(void)
 {
     /* Arrange */
-    uint8                     dummy_channel = Any_cf_channel();
-    uint8                     error_polldir = Any_uint8_BetweenInclusive(CF_MAX_POLLING_DIR_PER_CHAN, ALL_CHANNELS - 1);
+    uint8 dummy_channel = Any_cf_channel();
+    uint8 error_polldir = Any_uint8_BetweenInclusive(CF_MAX_POLLING_DIR_PER_CHAN, CF_ALL_CHANNELS - 1);
     CF_UT_cmd_unionargs_buf_t utbuf;
     CF_UnionArgsCmd_t *       dummy_msg = &utbuf.ua;
     CFE_SB_Buffer_t *         arg_msg   = &utbuf.buf;
@@ -2466,8 +2466,8 @@ void Test_CF_CmdWriteQueue_WhenUpAndPendingQueueSendEventAndRejectCommand(void)
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* invalid combination up direction, pending queue */
-    dummy_wq->type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 0; /* 0 is q_pend */
+    dummy_wq->type  = CF_Type_up;
+    dummy_wq->queue = CF_Queue_pend;
 
     uint16 initial_hk_err_counter = Any_uint16();
 
@@ -2498,7 +2498,7 @@ void Test_CF_CmdWriteQueue_When_CF_WrappedCreat_Fails_type_Is_type_up_And_queue_
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination up direction, NOT pending queue */
-    dummy_wq->type  = 1;                         /* type_all = 0; type_up = 1, type_down = 2 */
+    dummy_wq->type  = CF_Type_up;
     dummy_wq->queue = Any_queue_Except_q_pend(); /* 0 is q_pend */
 
     /* invalid result from CF_WrappedCreat */
@@ -2543,8 +2543,8 @@ void Test_CF_CmdWriteQueue_When_CF_WrappedCreat_Fails_type_IsNot_type_up_And_que
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination down direction, pending queue */
-    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 0; /* 0 is q_pend */
+    dummy_wq->type  = CF_Type_down;
+    dummy_wq->queue = CF_Queue_pend;
 
     /* invalid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -2589,8 +2589,8 @@ void Test_CF_CmdWriteQueue_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedC
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 0; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 3; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_all;
+    dummy_wq->queue = CF_Queue_all;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -2642,8 +2642,8 @@ void Test_CF_CmdWriteQueue_When_CF_WriteTxnQueueDataToFile_FailsAnd_wq_IsUpAnd_q
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_up;
+    dummy_wq->queue = CF_Queue_active;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -2699,8 +2699,8 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsUpA
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 2; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_up;
+    dummy_wq->queue = CF_Queue_history;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -2756,8 +2756,8 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnFirstCallAnd_wq
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_down;
+    dummy_wq->queue = CF_Queue_active;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -2813,8 +2813,8 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnSecondCallAnd_w
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_down;
+    dummy_wq->queue = CF_Queue_active;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -2872,8 +2872,8 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 0; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_down;
+    dummy_wq->queue = CF_Queue_pend;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -2929,8 +2929,8 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 2; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_down;
+    dummy_wq->queue = CF_Queue_history;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -2985,8 +2985,8 @@ void Test_CF_CmdWriteQueue_Success_type_AllAnd_q_All(void)
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 0; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 3; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_all;
+    dummy_wq->queue = CF_Queue_all;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -3039,8 +3039,8 @@ void Test_CF_CmdWriteQueue_Success_type_AllAnd_q_History(void)
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 0; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 2; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_all;
+    dummy_wq->queue = CF_Queue_history;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -3088,8 +3088,8 @@ void Test_CF_CmdWriteQueue_Success_type_AllAnd_q_Active(void)
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 0; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_all;
+    dummy_wq->queue = CF_Queue_active;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -3137,8 +3137,8 @@ void Test_CF_CmdWriteQueue_Success_type_AllAnd_q_Pend(void)
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 0; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 0; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_all;
+    dummy_wq->queue = CF_Queue_pend;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -3186,8 +3186,8 @@ void Test_CF_CmdWriteQueue_Success_type_UpAnd_q_All(void)
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 3; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_up;
+    dummy_wq->queue = CF_Queue_all;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -3240,8 +3240,8 @@ void Test_CF_CmdWriteQueue_Success_type_UpAnd_q_History(void)
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 2; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_up;
+    dummy_wq->queue = CF_Queue_history;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -3289,8 +3289,8 @@ void Test_CF_CmdWriteQueue_Success_type_UpAnd_q_Active(void)
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 1; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_up;
+    dummy_wq->queue = CF_Queue_active;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -3340,8 +3340,8 @@ void Test_CF_CmdWriteQueue_Success_type_DownAnd_q_All(void)
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 3; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_down;
+    dummy_wq->queue = CF_Queue_all;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -3389,8 +3389,8 @@ void Test_CF_CmdWriteQueue_Success_type_DownAnd_q_History(void)
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 2; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_down;
+    dummy_wq->queue = CF_Queue_history;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -3438,8 +3438,8 @@ void Test_CF_CmdWriteQueue_Success_type_DownAnd_q_Active(void)
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 1; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_down;
+    dummy_wq->queue = CF_Queue_active;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -3487,8 +3487,8 @@ void Test_CF_CmdWriteQueue_Success_type_DownAnd_q_Pend(void)
     dummy_wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
 
     /* valid combination all direction, all queue */
-    dummy_wq->type  = 2; /* type_all = 0; type_up = 1, type_down = 2 */
-    dummy_wq->queue = 0; /* q_pend = 0; q_active = 1; q_history = 2; q_all = 3 */
+    dummy_wq->type  = CF_Type_down;
+    dummy_wq->queue = CF_Queue_pend;
 
     /* valid result from CF_WrappedCreat */
     strncpy(dummy_wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
@@ -4133,12 +4133,12 @@ void add_CF_CmdPlaybackDir_tests(void)
 
 void add_CF_DoChanAction_tests(void)
 {
-    UtTest_Add(Test_CF_DoChanAction_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_DoChanAction_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1");
-    UtTest_Add(Test_CF_DoChanAction_ALL_CHANNELS_WhenAll_fn_return_1_Return_1, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_DoChanAction_ALL_CHANNELS_WhenAll_fn_return_1_Return_1");
-    UtTest_Add(Test_CF_DoChanAction_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_DoChanAction_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0");
+    UtTest_Add(Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1, cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown, "Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1");
+    UtTest_Add(Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAll_fn_return_1_Return_1, cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown, "Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAll_fn_return_1_Return_1");
+    UtTest_Add(Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0, cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown, "Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0");
     UtTest_Add(Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_1_Return_1, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
                "Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_1_Return_1");
     UtTest_Add(Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_0_Return_1, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
@@ -4183,15 +4183,15 @@ void add_CF_FindTransactionBySequenceNumberAllChannels_tests(void)
 
 void add_CF_TsnChanAction_tests(void)
 {
-    UtTest_Add(Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_COMPOUND_KEY_TransactionNotFoundAndReturn_neg1_Fail,
+    UtTest_Add(Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionNotFoundAndReturn_neg1_Fail,
                cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_COMPOUND_KEY_TransactionNotFoundAndReturn_neg1_Fail");
-    UtTest_Add(Test_CF_TsnChanAction_cmd_chan_Eq_COMPOUND_KEY_TransactionFoundRun_fn_AndReturn_CFE_SUCCESS,
+               "Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionNotFoundAndReturn_neg1_Fail");
+    UtTest_Add(Test_CF_TsnChanAction_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionFoundRun_fn_AndReturn_CFE_SUCCESS,
                cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_TsnChanAction_cmd_chan_Eq_COMPOUND_KEY_TransactionFoundRun_fn_AndReturn_CFE_SUCCESS");
-    UtTest_Add(Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels,
+               "Test_CF_TsnChanAction_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionFoundRun_fn_AndReturn_CFE_SUCCESS");
+    UtTest_Add(Test_CF_TsnChanAction_cmd_chan_Eq_CF_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels,
                cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_TsnChanAction_cmd_chan_Eq_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels");
+               "Test_CF_TsnChanAction_cmd_chan_Eq_CF_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels");
     UtTest_Add(Test_CF_TsnChanAction_cmd_chan_IsASingleChannel, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
                "Test_CF_TsnChanAction_cmd_chan_IsASingleChannel");
     UtTest_Add(Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
@@ -4271,9 +4271,9 @@ void add_CF_CmdDisableDequeue_tests(void)
 
 void add_CF_DoEnableDisablePolldir_tests(void)
 {
-    UtTest_Add(Test_CF_DoEnableDisablePolldir_When_ALL_CHANNELS_SetAllPolldirsInChannelEnabledTo_context_barg,
+    UtTest_Add(Test_CF_DoEnableDisablePolldir_When_CF_ALL_CHANNELS_SetAllPolldirsInChannelEnabledTo_context_barg,
                cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_DoEnableDisablePolldir_When_ALL_CHANNELS_SetAllPolldirsInChannelEnabledTo_context_barg");
+               "Test_CF_DoEnableDisablePolldir_When_CF_ALL_CHANNELS_SetAllPolldirsInChannelEnabledTo_context_barg");
     UtTest_Add(
         Test_CF_DoEnableDisablePolldir_WhenSetToSpecificPolldirSetPolldirFrom_context_ChannelEnabledTo_context_barg,
         cf_cmd_tests_Setup, cf_cmd_tests_Teardown,

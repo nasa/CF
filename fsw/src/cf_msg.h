@@ -31,6 +31,10 @@
 #include "cf_cfdp.h"
 #include "cf_tbldefs.h"
 
+#define CF_ALL_CHANNELS (255)
+#define CF_ALL_POLLDIRS (CF_ALL_CHANNELS)
+#define CF_COMPOUND_KEY (254)
+
 /**
  * \defgroup cfscftlm CFS CFDP Telemetry
  * \{
@@ -888,6 +892,39 @@ typedef struct
     CFE_MSG_CommandHeader_t cmd_header; /**< \brief Command header */
     CF_UnionArgs_Payload_t  data;       /**< \brief Generic command arguments */
 } CF_UnionArgsCmd_t;
+
+/**
+ * \brief IDs for use for Reset cmd
+ */
+typedef enum
+{
+    CF_Reset_all     = 0, /**< \brief Reset all */
+    CF_Reset_command = 1, /**< \brief Reset command */
+    CF_Reset_fault   = 2, /**< \brief Reset fault */
+    CF_Reset_up      = 3, /**< \brief Reset up */
+    CF_Reset_down    = 4  /**< \brief Reset down */
+} CF_Reset_t;
+
+/**
+ * \brief Type IDs for use for Write Queue cmd
+ */
+typedef enum
+{
+    CF_Type_all  = 0, /**< \brief Type all */
+    CF_Type_up   = 1, /**< \brief Type up */
+    CF_Type_down = 2  /**< \brief Type down */
+} CF_Type_t;
+
+/**
+ * \brief Queue IDs for use for Write Queue cmd
+ */
+typedef enum
+{
+    CF_Queue_pend    = 0, /**< \brief Queue pending */
+    CF_Queue_active  = 1, /**< \brief Queue active */
+    CF_Queue_history = 2, /**< \brief Queue history */
+    CF_Queue_all     = 3  /**< \brief Queue all */
+} CF_Queue_t;
 
 /**
  * \brief Parameter IDs for use with Get/Set parameter messages
