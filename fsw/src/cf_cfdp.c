@@ -471,11 +471,11 @@ CF_SendRet_t CF_CFDP_SendEof(CF_Transaction_t *t)
     {
         eof = &ph->int_header.eof;
 
-        eof->cc   = t->history->cc;
+        eof->cc   = CF_TxnStatus_To_ConditionCode(t->history->txn_stat);
         eof->crc  = t->crc.result;
         eof->size = t->fsize;
 
-        if (t->history->cc != CF_CFDP_ConditionCode_NO_ERROR)
+        if (eof->cc != CF_CFDP_ConditionCode_NO_ERROR)
         {
             CF_CFDP_AppendTlv(&eof->tlv_list, CF_CFDP_TLV_TYPE_ENTITY_ID);
         }
@@ -787,6 +787,7 @@ int CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_FD_SHORT, CFE_EVS_EventType_ERROR,
                           "CF: filedata pdu too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
+        CF_CFDP_SetTxnStatus(t, CF_TxnStatus_PROTOCOL_ERROR);
         ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
         ret = -1;
     }
@@ -795,6 +796,7 @@ int CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
         /* If recv PDU has the "segment_meta_flag" set, this is not currently handled in CF. */
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_FD_UNSUPPORTED, CFE_EVS_EventType_ERROR,
                           "CF: filedata pdu with segment metadata received");
+        CF_CFDP_SetTxnStatus(t, CF_TxnStatus_PROTOCOL_ERROR);
         ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
         ret = -1;
     }
@@ -1735,6 +1737,22 @@ void CF_CFDP_ResetTransaction(CF_Transaction_t *t, int keep_history)
 
 /*----------------------------------------------------------------
  *
+ * Function: CF_CFDP_SetTxnStatus
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_r.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
+void CF_CFDP_SetTxnStatus(CF_Transaction_t *t, CF_TxnStatus_t txn_stat)
+{
+    if (!CF_TxnStatus_IsError(t->history->txn_stat))
+    {
+        t->history->txn_stat = txn_stat;
+    }
+}
+
+/*----------------------------------------------------------------
+ *
  * Function: CF_CFDP_SendEotPkt
  *
  * Application-scope internal function
@@ -1758,7 +1776,7 @@ void CF_CFDP_SendEotPkt(CF_Transaction_t *t)
         PktBuf->eot.direction  = t->history->dir;
         PktBuf->eot.fnames     = t->history->fnames;
         PktBuf->eot.state      = t->state;
-        PktBuf->eot.cc         = t->history->cc;
+        PktBuf->eot.txn_stat   = t->history->txn_stat;
         PktBuf->eot.src_eid    = t->history->src_eid;
         PktBuf->eot.peer_eid   = t->history->peer_eid;
         PktBuf->eot.seq_num    = t->history->seq_num;
@@ -1809,7 +1827,7 @@ void CF_CFDP_CancelTransaction(CF_Transaction_t *t)
     if (!t->flags.com.canceled)
     {
         t->flags.com.canceled = 1;
-        t->history->cc        = CF_CFDP_ConditionCode_CANCEL_REQUEST_RECEIVED;
+        CF_CFDP_SetTxnStatus(t, CF_TxnStatus_CANCEL_REQUEST_RECEIVED);
         fns[!!CF_CFDP_IsSender(t)](t);
     }
 }

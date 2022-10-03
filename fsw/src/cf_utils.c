@@ -193,9 +193,9 @@ int CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h)
         {
             case 0:
                 CF_Assert(h->dir < CF_Direction_NUM);
-                snprintf(linebuf, sizeof(linebuf), "SEQ (%lu, %lu)\tDIR: %s\tPEER %lu\tCC: %u\t",
+                snprintf(linebuf, sizeof(linebuf), "SEQ (%lu, %lu)\tDIR: %s\tPEER %lu\tSTAT: %d\t",
                          (unsigned long)h->src_eid, (unsigned long)h->seq_num, CF_DSTR[h->dir],
-                         (unsigned long)h->peer_eid, (unsigned int)h->cc);
+                         (unsigned long)h->peer_eid, (int)h->txn_stat);
                 break;
             case 1:
                 snprintf(linebuf, sizeof(linebuf), "SRC: %s\t", h->fnames.src_filename);
@@ -526,4 +526,100 @@ int32 CF_WrappedLseek(osal_id_t fd, off_t offset, int mode)
     ret = OS_lseek(fd, offset, mode);
     CFE_ES_PerfLogExit(CF_PERF_ID_FSEEK);
     return ret;
+}
+
+/*----------------------------------------------------------------
+ *
+ * Function: CF_TxnStatus_IsError
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
+bool CF_TxnStatus_IsError(CF_TxnStatus_t txn_stat)
+{
+    /* The value of CF_TxnStatus_UNDEFINED (-1) indicates a transaction is in progress and no error
+     * has occurred yet.  This will be will be set to CF_TxnStatus_NO_ERROR (0) after successful
+     * completion of the transaction (FIN/EOF).  Anything else indicates a problem has occurred. */
+    return (txn_stat > CF_TxnStatus_NO_ERROR);
+}
+
+/*----------------------------------------------------------------
+ *
+ * Function: CF_TxnStatus_To_ConditionCode
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
+CF_CFDP_ConditionCode_t CF_TxnStatus_To_ConditionCode(CF_TxnStatus_t txn_stat)
+{
+    CF_CFDP_ConditionCode_t result;
+
+    if (!CF_TxnStatus_IsError(txn_stat))
+    {
+        /* If no status has been set (CF_TxnStatus_UNDEFINED), treat that as NO_ERROR for
+         * the purpose of CFDP CC.  This can occur e.g. when sending ACK PDUs and no errors
+         * have happened yet, but the transaction is not yet complete and thus not final. */
+        result = CF_CFDP_ConditionCode_NO_ERROR;
+    }
+    else
+    {
+        switch (txn_stat)
+        {
+            /* The definition of CF_TxnStatus_t is such that the 4-bit codes (0-15) share the same
+             * numeric values as the CFDP condition codes, and can be put directly into the 4-bit
+             * CC field of a FIN/ACK/EOF PDU.  Extended codes use the upper bits (>15) to differentiate */
+            case CF_TxnStatus_NO_ERROR:
+            case CF_TxnStatus_POS_ACK_LIMIT_REACHED:
+            case CF_TxnStatus_KEEP_ALIVE_LIMIT_REACHED:
+            case CF_TxnStatus_INVALID_TRANSMISSION_MODE:
+            case CF_TxnStatus_FILESTORE_REJECTION:
+            case CF_TxnStatus_FILE_CHECKSUM_FAILURE:
+            case CF_TxnStatus_FILE_SIZE_ERROR:
+            case CF_TxnStatus_NAK_LIMIT_REACHED:
+            case CF_TxnStatus_INACTIVITY_DETECTED:
+            case CF_TxnStatus_INVALID_FILE_STRUCTURE:
+            case CF_TxnStatus_CHECK_LIMIT_REACHED:
+            case CF_TxnStatus_UNSUPPORTED_CHECKSUM_TYPE:
+            case CF_TxnStatus_SUSPEND_REQUEST_RECEIVED:
+            case CF_TxnStatus_CANCEL_REQUEST_RECEIVED:
+                result = (CF_CFDP_ConditionCode_t)txn_stat;
+                break;
+
+                /* Extended status codes below here ---
+                 * There are no CFDP CCs to directly represent these status codes. Normally this should
+                 * not happen as the engine should not be sending a CFDP CC (FIN/ACK/EOF PDU) for a
+                 * transaction that is not in a valid CFDP-defined state.  This should be translated
+                 * to the closest CFDP CC per the intent/meaning of the transaction status code. */
+
+            case CF_TxnStatus_ACK_LIMIT_NO_FIN:
+            case CF_TxnStatus_ACK_LIMIT_NO_EOF:
+                /* this is similar to the inactivity timeout (no fin-ack) */
+                result = CF_CFDP_ConditionCode_INACTIVITY_DETECTED;
+                break;
+
+            default:
+                /* Catch-all: any invalid protocol state will cancel the transaction, and thus this
+                 * is the closest CFDP CC in practice for all other unhandled errors. */
+                result = CF_CFDP_ConditionCode_CANCEL_REQUEST_RECEIVED;
+                break;
+        }
+    }
+
+    return result;
+}
+
+/*----------------------------------------------------------------
+ *
+ * Function: CF_TxnStatus_From_ConditionCode
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
+CF_TxnStatus_t CF_TxnStatus_From_ConditionCode(CF_CFDP_ConditionCode_t cc)
+{
+    /* All CFDP CC values directly correspond to a Transaction Status of the same numeric value */
+    return (CF_TxnStatus_t)cc;
 }

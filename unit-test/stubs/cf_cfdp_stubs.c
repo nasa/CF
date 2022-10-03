@@ -519,6 +519,18 @@ CF_SendRet_t CF_CFDP_SendEof(CF_Transaction_t *t)
 
 /*
  * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_SendEotPkt()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_SendEotPkt(CF_Transaction_t *t)
+{
+    UT_GenStub_AddParam(CF_CFDP_SendEotPkt, CF_Transaction_t *, t);
+
+    UT_GenStub_Execute(CF_CFDP_SendEotPkt, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
  * Generated stub function for CF_CFDP_SendFd()
  * ----------------------------------------------------
  */
@@ -585,6 +597,19 @@ CF_SendRet_t CF_CFDP_SendNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     UT_GenStub_Execute(CF_CFDP_SendNak, Basic, NULL);
 
     return UT_GenStub_GetReturnValue(CF_CFDP_SendNak, CF_SendRet_t);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_SetTxnStatus()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_SetTxnStatus(CF_Transaction_t *t, CF_TxnStatus_t txn_stat)
+{
+    UT_GenStub_AddParam(CF_CFDP_SetTxnStatus, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_SetTxnStatus, CF_TxnStatus_t, txn_stat);
+
+    UT_GenStub_Execute(CF_CFDP_SetTxnStatus, Basic, NULL);
 }
 
 /*

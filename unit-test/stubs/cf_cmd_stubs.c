@@ -251,18 +251,6 @@ void CF_CmdResume(CFE_SB_Buffer_t *msg)
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CmdSendCfgParams()
- * ----------------------------------------------------
- */
-void CF_CmdSendCfgParams(CFE_SB_Buffer_t *msg)
-{
-    UT_GenStub_AddParam(CF_CmdSendCfgParams, CFE_SB_Buffer_t *, msg);
-
-    UT_GenStub_Execute(CF_CmdSendCfgParams, Basic, NULL);
-}
-
-/*
- * ----------------------------------------------------
  * Generated stub function for CF_CmdSetParam()
  * ----------------------------------------------------
  */

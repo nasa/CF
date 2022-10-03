@@ -94,6 +94,20 @@ void CF_CFDP_DecodeStart(CF_DecoderState_t *pdec, const void *msgbuf, CF_Logical
 void CF_CFDP_ResetTransaction(CF_Transaction_t *t, int keep_history);
 
 /************************************************************************/
+/** @brief Helper function to store transaction status code only
+ *
+ * This records the status in the history block but does not set FIN flag
+ * or take any other protocol/state machine actions.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *       t must not be NULL.
+ *
+ * @param t  Pointer to the transaction object
+ * @param cc Status Code value to set within transaction
+ */
+void CF_CFDP_SetTxnStatus(CF_Transaction_t *t, CF_TxnStatus_t txn_stat);
+
+/************************************************************************/
 /** @brief Send an end of transaction packet.
  *
  * @par Assumptions, External Events, and Notes:
