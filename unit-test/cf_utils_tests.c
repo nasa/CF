@@ -1007,7 +1007,7 @@ void Test_CF_WrappedOpen_Call_OS_OpenCreate_WithGivenArgumentsAndReturnItsReturn
     /* Act */
     UtAssert_INT32_EQ(CF_WrappedOpenCreate(arg_fd, arg_fname, arg_flags, arg_access), forced_return_OS_OpenCreate);
 
-    // /* Assert */
+    /* Assert */
     UtAssert_STUB_COUNT(CFE_ES_PerfLogAdd, 2);
     UtAssert_STUB_COUNT(OS_OpenCreate, 1);
 } /* end Test_CF_WrappedOpen_Call_OS_OpenCreate_WithGivenArgumentsAndReturnItsReturnValue */
@@ -1060,8 +1060,8 @@ void Test_CF_WrappedClose_Receive_OS_SUCCESS_From_OS_close_NoEventSent(void)
 void Test_CF_WrappedRead_CallsOS_read_WithGivenArgumentsAndReturnItsReturnValue(void)
 {
     /* Arrange */
-    uint32 arg_read_size = Any_uint32_LessThan_or_EqualTo(10); // 10 is arbitrary to make test fast
-    uint8  dummy_buf[10] = {0};                                // 10 to match max read size of 10 (arbitrary)
+    uint32 arg_read_size = Any_uint32_LessThan_or_EqualTo(10); /* 10 is arbitrary to make test fast */
+    uint8  dummy_buf[10] = {0};                                /* 10 to match max read size of 10 (arbitrary) */
     void * arg_buf       = &dummy_buf;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_read), arg_read_size);

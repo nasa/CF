@@ -167,9 +167,11 @@ unsigned int Any_unsigned_int(void)
     return random_val;
 }
 
-// AnyBufferOf_uint8_WithSize works, but name/design could use overhaul
-// should it return a pointer? or should it be named different because it alters
-// the buffer given?
+/*
+ * AnyBufferOf_uint8_WithSize works, but name/design could use overhaul
+ * should it return a pointer? or should it be named different because it alters
+ * the buffer given?
+ */
 void AnyBufferOf_uint8_WithSize(uint8 *buffer, size_t size)
 {
     int i;
@@ -260,7 +262,7 @@ uint8 Any_uint8_BetweenExcludeMax(uint8 floor, uint8 ceiling)
 uint8 Any_uint8_BetweenInclusive(uint8 floor, uint8 ceiling)
 {
     uint8 random_val;
-    uint8 diff = ceiling - floor + 1; // +1 for inclusive
+    uint8 diff = ceiling - floor + 1; /* +1 for inclusive */
 
     random_val = (rand() % diff) + floor;
 

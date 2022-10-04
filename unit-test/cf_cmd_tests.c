@@ -859,7 +859,7 @@ void Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent(void)
     int catastrophe_count = 0;
     while (arg_cmd->data.byte[0] == CF_ALL_CHANNELS)
     {
-        if (catastrophe_count == 10) // 10 is arbitrary
+        if (catastrophe_count == 10) /* 10 is arbitrary */
         {
             UtAssert_Message(UTASSERT_CASETYPE_ABORT, __FILE__, __LINE__,
                              "CANNOT make arg_cmd->data.byte[0] != CF_ALL_CHANNELS in 10 tries");
@@ -3603,9 +3603,6 @@ void Test_CF_CmdValidateMaxOutgoing_WhenGiven_val_IsNot_0_Return_0_Success(void)
     uint32 arg_val      = Any_uint32_Except(0);
     uint8  arg_chan_num = Any_uint8(); /* Any_uint8() used here because it shows value does not matter in this test */
     int    local_result;
-
-    // CF_AppData.config_table = &dummy_config_table;
-    //  memcpy(CF_AppData.config_table->chan[arg_chan_num].sem_name, dummy_sem_name, 20);
 
     /* Act */
     local_result = CF_CmdValidateMaxOutgoing(arg_val, arg_chan_num);

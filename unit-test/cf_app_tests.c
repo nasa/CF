@@ -182,11 +182,11 @@ CF_ConfigTable_t dummy_table;
 /* CF_ValidateConfigTable tests specific functions */
 void cf_config_table_tests_set_dummy_table_to_nominal(void)
 {
-    // all values for dummy_table.ticks_per_second nominal except 0
+    /* all values for dummy_table.ticks_per_second nominal except 0 */
     dummy_table.ticks_per_second = Any_uint32_Except(0);
-    // all values (except 0) & 3ff == 0 are nominal (1024 byte aligned)
+    /* all values (except 0) & 3ff == 0 are nominal (1024 byte aligned) */
     dummy_table.rx_crc_calc_bytes_per_wakeup = Any_uint32_Except(0) << 10;
-    // all values less than sizeof(CF_CFDP_PduFileDataContent_t) are nominal
+    /* all values less than sizeof(CF_CFDP_PduFileDataContent_t) are nominal */
     dummy_table.outgoing_file_chunk_size = Any_uint16_LessThan(sizeof(CF_CFDP_PduFileDataContent_t));
 } /* end cf_config_table_tests_set_dummy_table_to_nominal */
 
@@ -254,7 +254,7 @@ void Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArra
     CF_ConfigTable_t *arg_table = &dummy_table;
     int32             result;
 
-    // outgoing_file_chunk_size set to greater than sizeof(CF_CFDP_PduFileDataContent_t)
+    /* outgoing_file_chunk_size set to greater than sizeof(CF_CFDP_PduFileDataContent_t) */
     arg_table->ticks_per_second             = 1;
     arg_table->rx_crc_calc_bytes_per_wakeup = 0x0400; /* 1024 aligned */
     arg_table->outgoing_file_chunk_size     = sizeof(CF_CFDP_PduFileDataContent_t) + 1;
@@ -482,7 +482,6 @@ void Test_CF_Init_CallTo_CFE_EVS_SendEvent_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_Wr
     UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
     UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
     UtAssert_STUB_COUNT(CFE_SB_Subscribe, 3);
-    // UtAssert_STUB_COUNT(CF_TableInit, 1);
     UtAssert_STUB_COUNT(CF_CFDP_InitEngine, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
 } /* end Test_CF_Init_CallTo_CFE_EVS_SendEvent_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus */
