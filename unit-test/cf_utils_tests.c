@@ -41,14 +41,12 @@ typedef struct
 void cf_utils_tests_Setup(void)
 {
     cf_tests_Setup();
-} /* end cf_utils_tests_Setup */
+}
 
 void cf_utils_tests_Teardown(void)
 {
     cf_tests_Teardown();
-} /* end cf_utils_tests_Teardown */
-
-/* end cf_utils_tests Setup and Teardown */
+}
 
 /*******************************************************************************
 **
@@ -87,8 +85,6 @@ void local_handler_OS_close(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubC
 
 /*----------------------------------------------------------------
  *
- * Function: UT_Callback_CF_TraverseAllTransactions
- *
  * A UT-specific callback that can be used with CF_TraverseAllTransactions
  *
  *-----------------------------------------------------------------*/
@@ -105,8 +101,6 @@ static void UT_Callback_CF_TraverseAllTransactions(CF_Transaction_t *t, void *co
 }
 
 /*----------------------------------------------------------------
- *
- * Function: UT_AltHandler_CF_CList_Traverse_SeqArg_SetTxn
  *
  * A simple handler that just sets the "t" output in the state object
  *
@@ -289,10 +283,7 @@ void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
     UtAssert_ADDRESS_EQ(context_clist_remove.node, expected_cl_node);
     UtAssert_True(updated_q_size == initial_q_size - 1, "q_size is %d and that is 1 less than initial value %d",
                   updated_q_size, initial_q_size);
-
-} /* end Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size */
-
-/* end CF_DequeueTransaction tests */
+}
 
 /* CF_MoveTransaction tests */
 
@@ -340,9 +331,7 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
     UtAssert_True(arg_t->flags.com.q_index == arg_q,
                   "t->flags.com.q_index set to %u and should equal passed in q value %u", arg_t->flags.com.q_index,
                   arg_q);
-} /* end Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q */
-
-/* end CF_MoveTransaction tests */
+}
 
 /* CF_CList_Remove_Ex tests */
 
@@ -376,9 +365,7 @@ void Test_CF_CList_Remove_Ex_Call_CF_CList_Remove_AndDecrement_q_size(void)
     UtAssert_ADDRESS_EQ(context_clist_remove.node, expected_remove_node);
     UtAssert_True(updated_q_size == initial_q_size - 1, "q_size is %d and that is 1 less than initial value %d",
                   updated_q_size, initial_q_size);
-} /* end Test_CF_CList_Remove_Ex_Call_CF_CList_Remove_AndDecrement_q_size */
-
-/* end CF_CList_Remove_Ex tests */
+}
 
 /* CF_CList_InsertAfter_Ex tests */
 
@@ -412,10 +399,7 @@ void Test_CF_CList_InsertAfter_Ex_Call_CF_CList_InsertAfter_AndIncrement_q_size(
     UtAssert_ADDRESS_EQ(context_CF_CList_InsertAfter.after, arg_after);
     UtAssert_True(updated_q_size == (uint16)(initial_q_size + 1),
                   "q_size is %d and that is 1 more than initial value %d", updated_q_size, initial_q_size);
-
-} /* end Test_CF_CList_InsertAfter_Ex_Call_CF_CList_InsertAfter_AndIncrement_q_size */
-
-/* end CF_CList_InsertAfter_Ex tests */
+}
 
 /* CF_CList_InsertBack_Ex tests */
 
@@ -449,12 +433,7 @@ void Test_CF_CList_InsertBack_Ex_Call_CF_CList_InsertBack_AndIncrement_q_size(vo
     UtAssert_ADDRESS_EQ(context_clist_insert_back.node, expected_insert_back_node);
     UtAssert_True(updated_q_size == (uint16)(initial_q_size + 1),
                   "q_size is %d and that is 1 more than initial value %d", updated_q_size, initial_q_size);
-
-} /* end Test_CF_CList_InsertBack_Ex_Call_CF_CList_InsertBack_AndIncrement_q_size */
-
-/* end CF_CList_InsertBack_Ex tests */
-
-/* end cf_utils.h function tests */
+}
 
 /*******************************************************************************
 **
@@ -502,7 +481,6 @@ void Test_CF_Traverse_WriteHistoryQueueEntryToFile(void)
     UtAssert_UINT32_EQ(args.counter, 2); /* no increment */
     UtAssert_BOOL_TRUE(args.error);
 }
-/* end CF_Traverse_WriteHistoryQueueEntryToFile tests */
 
 /*******************************************************************************
 **
@@ -535,8 +513,6 @@ void Test_CF_Traverse_WriteTxnQueueEntryToFile(void)
     UtAssert_UINT32_EQ(args.counter, 1); /* no increment */
     UtAssert_BOOL_TRUE(args.error);
 }
-
-/* end CF_Traverse_WriteTxnQueueEntryToFile tests */
 
 /*******************************************************************************
 **
@@ -595,8 +571,6 @@ void Test_CF_WriteTxnQueueDataToFile(void)
     UtAssert_STUB_COUNT(CF_CList_Traverse, 1);
 }
 
-/* end CF_WriteQueueDataToFile tests */
-
 /*******************************************************************************
 **
 **  CF_WriteHistoryQueueDataToFile tests
@@ -622,8 +596,6 @@ void Test_CF_WriteHistoryQueueDataToFile(void)
     UtAssert_STUB_COUNT(CF_CList_Traverse, 1);
 }
 
-/* end CF_WriteHistoryQueueDataToFile tests */
-
 /*******************************************************************************
 **
 **  CF_PrioSearch tests
@@ -647,8 +619,7 @@ void Test_CF_PrioSearch_When_t_PrioIsGreaterThanContextPrioReturn_CLIST_CONT(voi
 
     /* Assert */
     UtAssert_INT32_EQ(result, CF_CLIST_CONT);
-
-} /* end Test_CF_PrioSearch_When_t_PrioIsGreaterThanContextPrioReturn_CLIST_CONT */
+}
 
 void Test_CF_PrioSearch_When_t_PrioIsEqToContextPrio_Set_context_t_To_t_AndReturn_CLIST_EXIT(void)
 {
@@ -671,8 +642,7 @@ void Test_CF_PrioSearch_When_t_PrioIsEqToContextPrio_Set_context_t_To_t_AndRetur
     /* Assert */
     UtAssert_INT32_EQ(result, CF_CLIST_EXIT);
     UtAssert_ADDRESS_EQ(dummy_p.t, &dummy_t);
-
-} /* end Test_CF_PrioSearch_When_t_PrioIsEqToContextPrio_Set_context_t_To_t_AndReturn_CLIST_EXIT */
+}
 
 void Test_CF_PrioSearch_When_t_PrioIsLessThanContextPrio_Set_context_t_To_t_AndReturn_CLIST_EXIT(void)
 {
@@ -695,10 +665,7 @@ void Test_CF_PrioSearch_When_t_PrioIsLessThanContextPrio_Set_context_t_To_t_AndR
     /* Assert */
     UtAssert_INT32_EQ(result, CF_CLIST_EXIT);
     UtAssert_ADDRESS_EQ(dummy_p.t, &dummy_t);
-
-} /* end Test_CF_PrioSearch_When_t_PrioIsLessThanContextPrio_Set_context_t_To_t_AndReturn_CLIST_EXIT */
-
-/* end CF_PrioSearch tests */
+}
 
 /*******************************************************************************
 **
@@ -741,7 +708,7 @@ void Test_CF_InsertSortPrio_Call_CF_CList_InsertBack_Ex_ListIsEmpty_AndSet_q_ind
     UtAssert_True(arg_t->flags.com.q_index == arg_q,
                   "arg_t->flags.com.q_index set to %d and should be %d (CF_QueueIdx_t q)", arg_t->flags.com.q_index,
                   arg_q);
-} /* end Test_CF_InsertSortPrio_Call_CF_CList_InsertBack_Ex_ListIsEmpty_AndSet_q_index_To_q */
+}
 
 void Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q(void)
 {
@@ -799,8 +766,7 @@ void Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q(voi
     UtAssert_ADDRESS_EQ(context_CF_CList_InsertAfter.after, (CF_CListNode_t *)expected_insert_after_after);
     UtAssert_True(arg_t->flags.com.q_index == arg_q, "t->flags.com.q_index is %u and should be %u (q)",
                   arg_t->flags.com.q_index, arg_q);
-
-} /* end Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q */
+}
 
 void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
 {
@@ -854,10 +820,7 @@ void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
     UtAssert_ADDRESS_EQ(context_clist_insert_back.node, expected_insert_back_node);
     UtAssert_True(arg_t->flags.com.q_index == arg_q, "t->flags.com.q_index is %u and should be %u (q)",
                   arg_t->flags.com.q_index, arg_q);
-
-} /* end Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex */
-
-/* end CF_InsertSortPrio tests */
+}
 
 /*******************************************************************************
 **
@@ -903,8 +866,7 @@ void Test_CF_TraverseAllTransactions_Impl_GetContainer_t_Call_args_fn_AndAdd_1_T
                   "CF_TraverseAllTransactions_Impl set args->counter to %d which is 1 more than initial value %d",
                   arg_args->counter, initial_args_counter);
     UtAssert_INT32_EQ(result, CF_CLIST_CONT);
-
-} /* end Test_CF_TraverseAllTransactions_Impl_GetContainer_t_Call_args_fn_AndAdd_1_ToCounter */
+}
 
 /*******************************************************************************
 **
@@ -959,7 +921,7 @@ void Test_CF_TraverseAllTransactions_CallOtherFunction_CF_Q_RX_TimesAndReturn_ar
                       "CF_CList_Traverse context_counter[%u] is %d and should be %d (+1 from previous)", i,
                       contexts_cf_clist_traverse[i].context_counter, i + 1);
     }
-} /* end Test_CF_TraverseAllTransactions_CallOtherFunction_CF_Q_RX_TimesAndReturn_args_counter */
+}
 
 /*******************************************************************************
 **
@@ -980,10 +942,7 @@ void Test_CF_TraverseAllTransactions_All_Channels_ReturnTotalTraversals(void)
 
     /* Act */
     UtAssert_INT32_EQ(CF_TraverseAllTransactions_All_Channels(arg_fn, arg_context), expected_result);
-
-} /* end Test_CF_TraverseAllTransactions_All_Channels_ReturnTotalTraversals */
-
-/* end CF_TraverseAllTransactions_All_Channels tests */
+}
 
 /*******************************************************************************
 **
@@ -1010,9 +969,7 @@ void Test_CF_WrappedOpen_Call_OS_OpenCreate_WithGivenArgumentsAndReturnItsReturn
     // /* Assert */
     UtAssert_STUB_COUNT(CFE_ES_PerfLogAdd, 2);
     UtAssert_STUB_COUNT(OS_OpenCreate, 1);
-} /* end Test_CF_WrappedOpen_Call_OS_OpenCreate_WithGivenArgumentsAndReturnItsReturnValue */
-
-/* end CF_WrappedOpen tests */
+}
 
 /*******************************************************************************
 **
@@ -1032,7 +989,7 @@ void Test_CF_WrappedClose_DoNotReceive_OS_SUCCESS_From_OS_close_EventSent(void)
     UtAssert_STUB_COUNT(CFE_ES_PerfLogAdd, 2);
     UtAssert_STUB_COUNT(OS_close, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-} /* end Test_CF_WrappedClose_DoNotReceive_OS_SUCCESS_From_OS_close_EventSent */
+}
 
 void Test_CF_WrappedClose_Receive_OS_SUCCESS_From_OS_close_NoEventSent(void)
 {
@@ -1047,9 +1004,7 @@ void Test_CF_WrappedClose_Receive_OS_SUCCESS_From_OS_close_NoEventSent(void)
     UtAssert_STUB_COUNT(CFE_ES_PerfLogAdd, 2);
     UtAssert_STUB_COUNT(OS_close, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-} /* end Test_CF_WrappedClose_Receive_OS_SUCCESS_From_OS_close_NoEventSent */
-
-/* end CF_WrappedClose tests */
+}
 
 /*******************************************************************************
 **
@@ -1068,10 +1023,7 @@ void Test_CF_WrappedRead_CallsOS_read_WithGivenArgumentsAndReturnItsReturnValue(
 
     /* Act */
     UtAssert_INT32_EQ(CF_WrappedRead(UT_CF_OS_OBJID, arg_buf, arg_read_size), arg_read_size);
-
-} /* end Test_CF_WrappedRead_CallsOS_read_WithGivenArgumentsAndReturnItsReturnValue */
-
-/* end CF_WrappedRead tests */
+}
 
 /*******************************************************************************
 **
@@ -1091,10 +1043,7 @@ void Test_CF_WrappedWrite_Call_OS_write_WithGivenArgumentsAndReturnItsReturnValu
 
     /* Act */
     UtAssert_INT32_EQ(CF_WrappedWrite(UT_CF_OS_OBJID, arg_buf, test_write_size), expected_result);
-
-} /* end Test_CF_WrappedWrite_Call_OS_write_WithGivenArgumentsAndReturnItsReturnValue */
-
-/* end CF_WrappedWrite tests */
+}
 
 /*******************************************************************************
 **
@@ -1113,10 +1062,7 @@ void Test_CF_WrappedLseek_Call_OS_lseek_WithGivenArgumentsAndReturnItsReturnValu
 
     /* Act */
     UtAssert_INT32_EQ(CF_WrappedLseek(UT_CF_OS_OBJID, test_offset, test_mode), expected_result);
-
-} /* end Test_CF_WrappedLseek_Call_OS_lseek_WithGivenArgumentsAndReturnItsReturnValue */
-
-/* end CF_WrappedLseek tests */
+}
 
 /*******************************************************************************
 **
@@ -1300,7 +1246,4 @@ void UtTest_Setup(void)
     add_CF_WrappedWrite_tests();
 
     add_CF_WrappedLseek_tests();
-
-} /* end UtTest_Setup for cf_utils_tests.c */
-
-/* end cf_utils_tests.c */
+}

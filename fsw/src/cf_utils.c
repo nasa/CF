@@ -36,8 +36,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: CF_FindUnusedTransaction
- *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
  *
@@ -82,8 +80,6 @@ CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_ResetHistory
- *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
  *
@@ -95,8 +91,6 @@ void CF_ResetHistory(CF_Channel_t *c, CF_History_t *h)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_FreeTransaction
  *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
@@ -115,8 +109,6 @@ void CF_FreeTransaction(CF_Transaction_t *t)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_FindTransactionBySequenceNumber_Impl
  *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
@@ -137,8 +129,6 @@ int CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Traverse_Trans
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_FindTransactionBySequenceNumber
  *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
@@ -171,8 +161,6 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_Transac
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_WriteHistoryEntryToFile
  *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
@@ -221,8 +209,6 @@ int CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_Traverse_WriteHistoryQueueEntryToFile
- *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
  *
@@ -250,8 +236,6 @@ int CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *arg)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_Traverse_WriteTxnQueueEntryToFile
- *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
  *
@@ -274,8 +258,6 @@ int CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_WriteTxnQueueDataToFile
- *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
  *
@@ -293,8 +275,6 @@ int32 CF_WriteTxnQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_QueueIdx_t q)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_WriteHistoryQueueDataToFile
  *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
@@ -314,8 +294,6 @@ int32 CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_Direction
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_PrioSearch
  *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
@@ -340,8 +318,6 @@ int CF_PrioSearch(CF_CListNode_t *node, void *context)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_InsertSortPrio
  *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
@@ -385,8 +361,6 @@ void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_TraverseAllTransactions_Impl
- *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
  *
@@ -400,8 +374,6 @@ int CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *arg
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_TraverseAllTransactions
  *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
@@ -419,8 +391,6 @@ int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t 
 
 /*----------------------------------------------------------------
  *
- * Function: CF_TraverseAllTransactions_All_Channels
- *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
  *
@@ -435,8 +405,6 @@ int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, 
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_WrappedOpenCreate
  *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
@@ -453,8 +421,6 @@ int32 CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_WrappedClose
  *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
@@ -477,8 +443,6 @@ void CF_WrappedClose(osal_id_t fd)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_WrappedRead
- *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
  *
@@ -495,8 +459,6 @@ int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_WrappedWrite
- *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
  *
@@ -512,8 +474,6 @@ int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_WrappedLseek
  *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail

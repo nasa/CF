@@ -42,8 +42,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_ChunkList_GetFirstChunk
- *
  * Default always returns NULL, an alt handler can be registered for other pointer returns
  *
  *-----------------------------------------------------------------*/

@@ -180,8 +180,6 @@ static void UT_CFDP_SetupBasicTestState(UT_CF_Setup_t setup, CF_Logical_PduBuffe
     UT_CF_ResetEventCapture();
 }
 
-/* end cf_cfdp_tests local utility functions */
-
 /*******************************************************************************
 **
 **  cf_cfdp_tests Setup and Teardown
@@ -197,13 +195,12 @@ void cf_cfdp_tests_Setup(void)
      * previously left in here.
      */
     memset(&CF_AppData, 0, sizeof(CF_AppData));
-
-} /* end cf_cfdp_tests_Setup */
+}
 
 void cf_cfdp_tests_Teardown(void)
 {
     cf_tests_Teardown();
-} /* end cf_cfdp_tests_Teardown */
+}
 
 /*******************************************************************************
 **
@@ -404,7 +401,4 @@ void UtTest_Setup(void)
 
     UtTest_Add(Test_CF_CFDP_MsgOutGet, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_MsgOutGet");
     UtTest_Add(Test_CF_CFDP_Send, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_Send");
-
-} /* end UtTest_Setup for cf_cfdp_tests.c */
-
-/* end cf_cfdp_tests.c */
+}

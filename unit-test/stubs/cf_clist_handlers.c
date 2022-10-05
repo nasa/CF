@@ -41,8 +41,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_CList_InitNode
- *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
  *
@@ -58,8 +56,6 @@ void UT_DefaultHandler_CF_CList_InitNode(void *UserObj, UT_EntryKey_t FuncKey, c
 }
 
 /*----------------------------------------------------------------
- *
- * Function: UT_DefaultHandler_CF_CList_InsertBack
  *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
@@ -78,8 +74,6 @@ void UT_DefaultHandler_CF_CList_InsertBack(void *UserObj, UT_EntryKey_t FuncKey,
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_CList_CF_CList_Pop
- *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
  *
@@ -97,8 +91,6 @@ void UT_DefaultHandler_CF_CList_CF_CList_Pop(void *UserObj, UT_EntryKey_t FuncKe
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_CList_Remove
- *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
  *
@@ -115,8 +107,6 @@ void UT_DefaultHandler_CF_CList_Remove(void *UserObj, UT_EntryKey_t FuncKey, con
 }
 
 /*----------------------------------------------------------------
- *
- * Function: UT_DefaultHandler_CF_CList_InsertAfter
  *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
@@ -136,8 +126,6 @@ void UT_DefaultHandler_CF_CList_InsertAfter(void *UserObj, UT_EntryKey_t FuncKey
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_CList_Traverse
- *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
  *
@@ -152,8 +140,6 @@ void UT_DefaultHandler_CF_CList_Traverse(void *UserObj, UT_EntryKey_t FuncKey, c
 }
 
 /*----------------------------------------------------------------
- *
- * Function: UT_DefaultHandler_CF_CList_Traverse_R
  *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.

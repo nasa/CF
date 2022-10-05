@@ -38,8 +38,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: CF_Chunks_EraseRange
- *
  * Application-scope internal function
  * See description in cf_chunk.h for argument/return detail
  *
@@ -58,8 +56,6 @@ void CF_Chunks_EraseRange(CF_ChunkList_t *chunks, CF_ChunkIdx_t start, CF_ChunkI
 
 /*----------------------------------------------------------------
  *
- * Function: CF_Chunks_EraseChunk
- *
  * Application-scope internal function
  * See description in cf_chunk.h for argument/return detail
  *
@@ -76,8 +72,6 @@ void CF_Chunks_EraseChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t erase_index)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_Chunks_InsertChunk
  *
  * Application-scope internal function
  * See description in cf_chunk.h for argument/return detail
@@ -99,8 +93,6 @@ void CF_Chunks_InsertChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t index_before, c
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_Chunks_FindInsertPosition
  *
  * Application-scope internal function
  * See description in cf_chunk.h for argument/return detail
@@ -133,8 +125,6 @@ CF_ChunkIdx_t CF_Chunks_FindInsertPosition(CF_ChunkList_t *chunks, const CF_Chun
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_Chunks_CombinePrevious
  *
  * Application-scope internal function
  * See description in cf_chunk.h for argument/return detail
@@ -173,8 +163,6 @@ int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_
 
 /*----------------------------------------------------------------
  *
- * Function: CF_Chunks_CombineNext
- *
  * Application-scope internal function
  * See description in cf_chunk.h for argument/return detail
  *
@@ -201,7 +189,6 @@ int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chun
     /* If index advanced the range of chunks can be combined */
     if (i != combined_i)
     {
-
         /* End is the max of last combined chunk end or new chunk end */
         chunk_end =
             CF_Chunk_MAX(chunks->chunks[combined_i - 1].offset + chunks->chunks[combined_i - 1].size, chunk_end);
@@ -219,8 +206,6 @@ int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chun
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_Chunks_FindSmallestSize
  *
  * Application-scope internal function
  * See description in cf_chunk.h for argument/return detail
@@ -243,8 +228,6 @@ CF_ChunkIdx_t CF_Chunks_FindSmallestSize(const CF_ChunkList_t *chunks)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_Chunks_Insert
  *
  * Application-scope internal function
  * See description in cf_chunk.h for argument/return detail
@@ -286,8 +269,6 @@ void CF_Chunks_Insert(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t 
 
 /*----------------------------------------------------------------
  *
- * Function: CF_ChunkListAdd
- *
  * Application-scope internal function
  * See description in cf_chunk.h for argument/return detail
  *
@@ -306,8 +287,6 @@ void CF_ChunkListAdd(CF_ChunkList_t *chunks, CF_ChunkOffset_t offset, CF_ChunkSi
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_ChunkList_RemoveFromFirst
  *
  * Application-scope internal function
  * See description in cf_chunk.h for argument/return detail
@@ -335,8 +314,6 @@ void CF_ChunkList_RemoveFromFirst(CF_ChunkList_t *chunks, CF_ChunkSize_t size)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_ChunkList_GetFirstChunk
- *
  * Application-scope internal function
  * See description in cf_chunk.h for argument/return detail
  *
@@ -347,8 +324,6 @@ const CF_Chunk_t *CF_ChunkList_GetFirstChunk(const CF_ChunkList_t *chunks)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_ChunkListInit
  *
  * Application-scope internal function
  * See description in cf_chunk.h for argument/return detail
@@ -364,8 +339,6 @@ void CF_ChunkListInit(CF_ChunkList_t *chunks, CF_ChunkIdx_t max_chunks, CF_Chunk
 
 /*----------------------------------------------------------------
  *
- * Function: CF_ChunkListReset
- *
  * Application-scope internal function
  * See description in cf_chunk.h for argument/return detail
  *
@@ -377,8 +350,6 @@ void CF_ChunkListReset(CF_ChunkList_t *chunks)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_ChunkList_ComputeGaps
  *
  * Application-scope internal function
  * See description in cf_chunk.h for argument/return detail

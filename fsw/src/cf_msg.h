@@ -167,7 +167,6 @@ typedef union
  */
 typedef enum
 {
-
     /**
      * \brief No-op
      *

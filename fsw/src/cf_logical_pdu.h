@@ -117,7 +117,6 @@ typedef struct CF_Logical_PduHeader
     CF_EntityId_t       source_eid;      /**< \brief Source entity ID (normalized) */
     CF_EntityId_t       destination_eid; /**< \brief Destination entity ID (normalized) */
     CF_TransactionSeq_t sequence_num;    /**< \brief Sequence number (normalized) */
-
 } CF_Logical_PduHeader_t;
 
 /**
@@ -164,7 +163,6 @@ typedef union CF_Logical_TlvData
 {
     CF_EntityId_t eid;      /**< \brief Valid when type=ENTITY_ID (6) */
     const void *  data_ptr; /**< \brief Source of actual data in original location (other string/binary types) */
-
 } CF_Logical_TlvData_t;
 
 /**
@@ -203,7 +201,6 @@ typedef struct CF_Logical_SegmentList
      * and may be 0 if the PDU does not contain any such fields.
      */
     CF_Logical_SegmentRequest_t segments[CF_PDU_MAX_SEGMENTS];
-
 } CF_Logical_SegmentList_t;
 
 typedef struct CF_Logical_TlvList
@@ -211,7 +208,6 @@ typedef struct CF_Logical_TlvList
     uint8 num_tlv; /**< \brief number of valid entries in the TLV list */
 
     CF_Logical_Tlv_t tlv[CF_PDU_MAX_TLV];
-
 } CF_Logical_TlvList_t;
 
 /**
@@ -229,7 +225,6 @@ typedef struct CF_Logical_PduEof
      * \brief Set of all TLV blobs in this PDU.
      */
     CF_Logical_TlvList_t tlv_list;
-
 } CF_Logical_PduEof_t;
 
 /**
@@ -260,7 +255,6 @@ typedef struct CF_Logical_PduAck
     uint8                   ack_subtype_code;   /**< \brief depends on ack_directive_code  */
     CF_CFDP_ConditionCode_t cc;
     CF_CFDP_AckTxnStatus_t  txn_status;
-
 } CF_Logical_PduAck_t;
 
 /**
@@ -277,7 +271,6 @@ typedef struct CF_Logical_PduMd
 
     CF_Logical_Lv_t source_filename;
     CF_Logical_Lv_t dest_filename;
-
 } CF_Logical_PduMd_t;
 
 /**
@@ -292,7 +285,6 @@ typedef struct CF_Logical_PduNak
      * \brief Set of all segments in this PDU.
      */
     CF_Logical_SegmentList_t segment_list;
-
 } CF_Logical_PduNak_t;
 
 typedef struct CF_Logical_PduFileDataHeader
@@ -309,7 +301,6 @@ typedef struct CF_Logical_PduFileDataHeader
 
     const void *data_ptr; /**< \brief pointer to read-only data blob within encoded PDU */
     size_t      data_len; /**< \brief Length of data blob within encoded PDU (derived field) */
-
 } CF_Logical_PduFileDataHeader_t;
 
 /**
@@ -326,7 +317,6 @@ typedef union CF_Logical_IntHeader
     CF_Logical_PduMd_t             md;  /**< \brief valid when pdu_type=0 + directive_code=METADATA (7) */
     CF_Logical_PduNak_t            nak; /**< \brief valid when pdu_type=0 + directive_code=NAK (8) */
     CF_Logical_PduFileDataHeader_t fd;  /**< \brief valid when pdu_type=1 (directive_code is not applicable) */
-
 } CF_Logical_IntHeader_t;
 
 /**
@@ -373,7 +363,6 @@ typedef struct CF_Logical_PduBuffer
      * does not permit for any other size.
      */
     uint32 content_crc;
-
 } CF_Logical_PduBuffer_t;
 
 #endif /* !CF_LOGICAL_PDU_H */

@@ -33,8 +33,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_R_DispatchRecv
- *
  * Application-scope internal function
  * See description in cf_cfdp_dispatch.h for argument/return detail
  *
@@ -92,8 +90,6 @@ void CF_CFDP_R_DispatchRecv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph,
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_S_DispatchRecv
- *
  * Application-scope internal function
  * See description in cf_cfdp_dispatch.h for argument/return detail
  *
@@ -150,8 +146,6 @@ void CF_CFDP_S_DispatchRecv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph,
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_S_DispatchTransmit
- *
  * Application-scope internal function
  * See description in cf_cfdp_dispatch.h for argument/return detail
  *
@@ -168,8 +162,6 @@ void CF_CFDP_S_DispatchTransmit(CF_Transaction_t *t, const CF_CFDP_S_SubstateSen
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_TxStateDispatch
  *
  * Application-scope internal function
  * See description in cf_cfdp_dispatch.h for argument/return detail
@@ -188,8 +180,6 @@ void CF_CFDP_TxStateDispatch(CF_Transaction_t *t, const CF_CFDP_TxnSendDispatchT
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_RxStateDispatch
  *
  * Application-scope internal function
  * See description in cf_cfdp_dispatch.h for argument/return detail

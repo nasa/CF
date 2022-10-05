@@ -42,8 +42,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_ResetHistory
- *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
  *
@@ -60,8 +58,6 @@ void UT_DefaultHandler_CF_ResetHistory(void *UserObj, UT_EntryKey_t FuncKey, con
 }
 
 /*----------------------------------------------------------------
- *
- * Function: UT_DefaultHandler_CF_FindTransactionBySequenceNumber
  *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
@@ -93,8 +89,6 @@ void UT_DefaultHandler_CF_FindTransactionBySequenceNumber(void *UserObj, UT_Entr
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_FindUnusedTransaction
- *
  * Default always returns NULL, an alt handler can be registered for other pointer returns
  *
  *-----------------------------------------------------------------*/
@@ -108,8 +102,6 @@ void UT_DefaultHandler_CF_FindUnusedTransaction(void *UserObj, UT_EntryKey_t Fun
 }
 
 /*----------------------------------------------------------------
- *
- * Function: UT_DefaultHandler_CF_WriteTxnQueueDataToFile
  *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
@@ -128,8 +120,6 @@ void UT_DefaultHandler_CF_WriteTxnQueueDataToFile(void *UserObj, UT_EntryKey_t F
 }
 
 /*----------------------------------------------------------------
- *
- * Function: UT_DefaultHandler_CF_WriteHistoryQueueDataToFile
  *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
@@ -151,8 +141,6 @@ void UT_DefaultHandler_CF_WriteHistoryQueueDataToFile(void *UserObj, UT_EntryKey
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_TraverseAllTransactions
- *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
  *
@@ -170,8 +158,6 @@ void UT_DefaultHandler_CF_TraverseAllTransactions(void *UserObj, UT_EntryKey_t F
 }
 
 /*----------------------------------------------------------------
- *
- * Function: UT_DefaultHandler_CF_TraverseAllTransactions_All_Channels
  *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
@@ -193,8 +179,6 @@ void UT_DefaultHandler_CF_TraverseAllTransactions_All_Channels(void *UserObj, UT
 }
 
 /*----------------------------------------------------------------
- *
- * Function: UT_DefaultHandler_CF_WrappedOpenCreate
  *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.

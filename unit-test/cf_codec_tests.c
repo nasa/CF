@@ -200,6 +200,7 @@ void Test_CF_CFDP_EncodeFileDirectiveHeader(void)
     UtAssert_MemCmp(bytes, expected, sizeof(expected), "Encoded Bytes");
     UtAssert_MemCmpValue(bytes + sizeof(expected), 0xEE, sizeof(bytes) - sizeof(expected), "Remainder unchanged");
 }
+
 void Test_CF_CFDP_EncodeLV(void)
 {
     /* Test for:
@@ -252,6 +253,7 @@ void Test_CF_CFDP_EncodeLV(void)
     UtAssert_UINT32_EQ(CF_CODEC_GET_POSITION(&state), sizeof(expected_nodata));
     UtAssert_MemCmp(bytes, expected_nodata, sizeof(expected_nodata), "Encoded Bytes");
 }
+
 void Test_CF_CFDP_EncodeTLV(void)
 {
     /* Test for:
@@ -316,6 +318,7 @@ void Test_CF_CFDP_EncodeTLV(void)
     UtAssert_UINT32_EQ(CF_CODEC_GET_POSITION(&state), sizeof(expected_nodata));
     UtAssert_MemCmp(bytes, expected_nodata, sizeof(expected_nodata), "Encoded Bytes");
 }
+
 void Test_CF_CFDP_EncodeSegmentRequest(void)
 {
     /* Test for:
@@ -347,6 +350,7 @@ void Test_CF_CFDP_EncodeSegmentRequest(void)
     UtAssert_MemCmp(bytes, expected, sizeof(expected), "Encoded Bytes");
     UtAssert_MemCmpValue(bytes + sizeof(expected), 0xEE, sizeof(bytes) - sizeof(expected), "Remainder unchanged");
 }
+
 void Test_CF_CFDP_EncodeAllTlv(void)
 {
     /* Test for:
@@ -388,6 +392,7 @@ void Test_CF_CFDP_EncodeAllTlv(void)
     UtAssert_MemCmp(bytes, expected, sizeof(expected), "Encoded Bytes");
     UtAssert_MemCmpValue(bytes + sizeof(expected), 0xEE, sizeof(bytes) - sizeof(expected), "Remainder unchanged");
 }
+
 void Test_CF_CFDP_EncodeAllSegments(void)
 {
     /* Test for:
@@ -428,6 +433,7 @@ void Test_CF_CFDP_EncodeAllSegments(void)
     UtAssert_MemCmp(bytes, expected, sizeof(expected), "Encoded Bytes");
     UtAssert_MemCmpValue(bytes + sizeof(expected), 0xEE, sizeof(bytes) - sizeof(expected), "Remainder unchanged");
 }
+
 void Test_CF_CFDP_EncodeMd(void)
 {
     /* Test for:
@@ -462,6 +468,7 @@ void Test_CF_CFDP_EncodeMd(void)
     UtAssert_MemCmp(bytes, expected, sizeof(expected), "Encoded Bytes");
     UtAssert_MemCmpValue(bytes + sizeof(expected), 0xEE, sizeof(bytes) - sizeof(expected), "Remainder unchanged");
 }
+
 void Test_CF_CFDP_EncodeFileDataHeader(void)
 {
     /* Test for:
@@ -508,6 +515,7 @@ void Test_CF_CFDP_EncodeFileDataHeader(void)
     UtAssert_UINT32_EQ(CF_CODEC_GET_POSITION(&state), sizeof(expected_meta));
     UtAssert_MemCmp(bytes, expected_meta, sizeof(expected_meta), "Encoded Bytes");
 }
+
 void Test_CF_CFDP_EncodeEof(void)
 {
     /* Test for:
@@ -544,6 +552,7 @@ void Test_CF_CFDP_EncodeEof(void)
     UtAssert_MemCmp(bytes, expected, sizeof(expected), "Encoded Bytes");
     UtAssert_MemCmpValue(bytes + sizeof(expected), 0xEE, sizeof(bytes) - sizeof(expected), "Remainder unchanged");
 }
+
 void Test_CF_CFDP_EncodeFin(void)
 {
     /* Test for:
@@ -576,6 +585,7 @@ void Test_CF_CFDP_EncodeFin(void)
     UtAssert_MemCmp(bytes, expected, sizeof(expected), "Encoded Bytes");
     UtAssert_MemCmpValue(bytes + sizeof(expected), 0xEE, sizeof(bytes) - sizeof(expected), "Remainder unchanged");
 }
+
 void Test_CF_CFDP_EncodeAck(void)
 {
     /* Test for:
@@ -609,6 +619,7 @@ void Test_CF_CFDP_EncodeAck(void)
     UtAssert_MemCmp(bytes, expected, sizeof(expected), "Encoded Bytes");
     UtAssert_MemCmpValue(bytes + sizeof(expected), 0xEE, sizeof(bytes) - sizeof(expected), "Remainder unchanged");
 }
+
 void Test_CF_CFDP_EncodeNak(void)
 {
     /* Test for:
@@ -646,6 +657,7 @@ void Test_CF_CFDP_EncodeNak(void)
     UtAssert_MemCmp(bytes, expected, sizeof(expected), "Encoded Bytes");
     UtAssert_MemCmpValue(bytes + sizeof(expected), 0xEE, sizeof(bytes) - sizeof(expected), "Remainder unchanged");
 }
+
 void Test_CF_CFDP_EncodeCrc(void)
 {
     /* Test for:
@@ -676,6 +688,7 @@ void Test_CF_CFDP_EncodeCrc(void)
     UtAssert_MemCmp(bytes, expected, sizeof(expected), "Encoded Bytes");
     UtAssert_MemCmpValue(bytes + sizeof(expected), 0xEE, sizeof(bytes) - sizeof(expected), "Remainder unchanged");
 }
+
 void Test_CF_DecodeIntegerInSize(void)
 {
     /* Test for:
@@ -707,6 +720,7 @@ void Test_CF_DecodeIntegerInSize(void)
     UtAssert_BOOL_TRUE(CF_CODEC_IS_OK(&state));
     UtAssert_UINT32_EQ(CF_CODEC_GET_POSITION(&state), sizeof(bytes_4));
 }
+
 void Test_CF_CFDP_DecodeHeader(void)
 {
     /* Test for:
@@ -756,6 +770,7 @@ void Test_CF_CFDP_DecodeHeader(void)
     UT_CF_SetupDecodeState(&state, bad_tsn, sizeof(bad_tsn));
     UtAssert_INT32_EQ(CF_CFDP_DecodeHeader(&state, &out), -1);
 }
+
 void Test_CF_CFDP_DecodeFileDirectiveHeader(void)
 {
     /* Test for:
@@ -781,6 +796,7 @@ void Test_CF_CFDP_DecodeFileDirectiveHeader(void)
     UtAssert_UINT32_EQ(CF_CODEC_GET_POSITION(&state), sizeof(bytes));
     UtAssert_UINT32_EQ(out.directive_code, CF_CFDP_FileDirective_NAK);
 }
+
 void Test_CF_CFDP_DecodeLV(void)
 {
     /* Test for:
@@ -813,6 +829,7 @@ void Test_CF_CFDP_DecodeLV(void)
     CF_CFDP_DecodeLV(&state, &out);
     UtAssert_BOOL_FALSE(CF_CODEC_IS_OK(&state));
 }
+
 void Test_CF_CFDP_DecodeTLV(void)
 {
     /* Test for:
@@ -856,6 +873,7 @@ void Test_CF_CFDP_DecodeTLV(void)
     CF_CFDP_DecodeTLV(&state, &out);
     UtAssert_BOOL_FALSE(CF_CODEC_IS_OK(&state));
 }
+
 void Test_CF_CFDP_DecodeSegmentRequest(void)
 {
     /* Test for:
@@ -882,6 +900,7 @@ void Test_CF_CFDP_DecodeSegmentRequest(void)
     UtAssert_UINT32_EQ(out.offset_start, 0x11223344);
     UtAssert_UINT32_EQ(out.offset_end, 0x55667788);
 }
+
 void Test_CF_CFDP_DecodeAllTlv(void)
 {
     /* Test for:
@@ -936,6 +955,7 @@ void Test_CF_CFDP_DecodeAllTlv(void)
     CF_CFDP_DecodeAllTlv(&state, &out, 1 + CF_PDU_MAX_TLV);
     UtAssert_BOOL_FALSE(CF_CODEC_IS_OK(&state));
 }
+
 void Test_CF_CFDP_DecodeAllSegments(void)
 {
     /* Test for:
@@ -982,6 +1002,7 @@ void Test_CF_CFDP_DecodeAllSegments(void)
     CF_CFDP_DecodeAllSegments(&state, &out, 1 + CF_PDU_MAX_SEGMENTS);
     UtAssert_BOOL_FALSE(CF_CODEC_IS_OK(&state));
 }
+
 void Test_CF_CFDP_DecodeMd(void)
 {
     /* Test for:
@@ -1017,6 +1038,7 @@ void Test_CF_CFDP_DecodeMd(void)
     CF_CFDP_DecodeMd(&state, &out);
     UtAssert_BOOL_FALSE(CF_CODEC_IS_OK(&state));
 }
+
 void Test_CF_CFDP_DecodeFileDataHeader(void)
 {
     /* Test for:
@@ -1071,6 +1093,7 @@ void Test_CF_CFDP_DecodeFileDataHeader(void)
     CF_CFDP_DecodeFileDataHeader(&state, true, &out);
     UtAssert_BOOL_FALSE(CF_CODEC_IS_OK(&state));
 }
+
 void Test_CF_CFDP_DecodeEof(void)
 {
     /* Test for:
@@ -1108,6 +1131,7 @@ void Test_CF_CFDP_DecodeEof(void)
     CF_CFDP_DecodeEof(&state, &out);
     UtAssert_BOOL_FALSE(CF_CODEC_IS_OK(&state));
 }
+
 void Test_CF_CFDP_DecodeFin(void)
 {
     /* Test for:
@@ -1135,6 +1159,7 @@ void Test_CF_CFDP_DecodeFin(void)
     UtAssert_UINT32_EQ(out.delivery_code, 1);
     UtAssert_UINT32_EQ(out.file_status, 2);
 }
+
 void Test_CF_CFDP_DecodeAck(void)
 {
     /* Test for:
@@ -1163,6 +1188,7 @@ void Test_CF_CFDP_DecodeAck(void)
     UtAssert_UINT32_EQ(out.cc, 2);
     UtAssert_UINT32_EQ(out.txn_status, 3);
 }
+
 void Test_CF_CFDP_DecodeNak(void)
 {
     /* Test for:
@@ -1195,6 +1221,7 @@ void Test_CF_CFDP_DecodeNak(void)
     UtAssert_UINT32_EQ(out.segment_list.segments[1].offset_start, 0x7);
     UtAssert_UINT32_EQ(out.segment_list.segments[1].offset_end, 0x8);
 }
+
 void Test_CF_CFDP_DecodeCrc(void)
 {
     /* Test for:
@@ -1278,7 +1305,4 @@ void UtTest_Setup(void)
 
     Add_CF_Encode_tests();
     Add_CF_Decode_tests();
-
-} /* end UtTest_Setup for cf_codec_tests.c */
-
-/* end cf_codec_tests.c */
+}

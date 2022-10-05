@@ -74,7 +74,6 @@ void UT_CF_Chunk_SetupFull(CF_ChunkList_t *CList)
 /* Print the chunk list to the UT log (test debug helper) */
 void UT_CF_Chunk_Print(CF_ChunkList_t *CList)
 {
-
     CF_ChunkIdx_t cidx;
 
     UtPrintf("Chunk list: index{offset, size}");

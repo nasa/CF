@@ -48,8 +48,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_EncodeStart
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -83,8 +81,6 @@ void CF_CFDP_EncodeStart(CF_EncoderState_t *penc, void *msgbuf, CF_Logical_PduBu
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_DecodeStart
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -120,8 +116,6 @@ void CF_CFDP_DecodeStart(CF_DecoderState_t *pdec, const void *msgbuf, CF_Logical
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_ArmAckTimer
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -134,8 +128,6 @@ void CF_CFDP_ArmAckTimer(CF_Transaction_t *t)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_GetClass
- *
  * Internal helper routine only, not part of API.
  *
  *-----------------------------------------------------------------*/
@@ -146,8 +138,6 @@ static inline CF_CFDP_Class_t CF_CFDP_GetClass(const CF_Transaction_t *t)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_IsSender
  *
  * Internal helper routine only, not part of API.
  *
@@ -162,8 +152,6 @@ static inline int CF_CFDP_IsSender(CF_Transaction_t *t)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_ArmInactTimer
- *
  * Internal helper routine only, not part of API.
  *
  *-----------------------------------------------------------------*/
@@ -173,8 +161,6 @@ static inline void CF_CFDP_ArmInactTimer(CF_Transaction_t *t)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_DispatchRecv
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -195,8 +181,6 @@ void CF_CFDP_DispatchRecv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_DispatchTx
- *
  * Internal helper routine only, not part of API.
  *
  *-----------------------------------------------------------------*/
@@ -209,8 +193,6 @@ static void CF_CFDP_DispatchTx(CF_Transaction_t *t)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_FindUnusedChunks
  *
  * Internal helper routine only, not part of API.
  *
@@ -227,8 +209,6 @@ static CF_ChunkWrapper_t *CF_CFDP_FindUnusedChunks(CF_Channel_t *c, CF_Direction
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_SetPduLength
  *
  * Internal helper routine only, not part of API.
  *
@@ -250,8 +230,6 @@ static void CF_CFDP_SetPduLength(CF_Logical_PduBuffer_t *ph)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_ConstructPduHeader
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -323,8 +301,6 @@ CF_Logical_PduBuffer_t *CF_CFDP_ConstructPduHeader(const CF_Transaction_t *t, CF
 
 /*----------------------------------------------------------------
  *
- * Function: CF_strnlen
- *
  * Internal helper routine only, not part of API.
  *
  *-----------------------------------------------------------------*/
@@ -340,8 +316,6 @@ static inline size_t CF_strnlen(const char *s, size_t maxlen)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_SendMd
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -363,7 +337,6 @@ CF_SendRet_t CF_CFDP_SendMd(CF_Transaction_t *t)
     }
     else
     {
-
         md = &ph->int_header.md;
 
         CF_Assert((t->state == CF_TxnState_S1) || (t->state == CF_TxnState_S2));
@@ -388,8 +361,6 @@ CF_SendRet_t CF_CFDP_SendMd(CF_Transaction_t *t)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_SendFd
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -409,8 +380,6 @@ CF_SendRet_t CF_CFDP_SendFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_AppendTlv
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -448,8 +417,6 @@ void CF_CFDP_AppendTlv(CF_Logical_TlvList_t *ptlv_list, CF_CFDP_TlvType_t tlv_ty
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_SendEof
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -489,8 +456,6 @@ CF_SendRet_t CF_CFDP_SendEof(CF_Transaction_t *t)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_SendAck
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -543,8 +508,6 @@ CF_SendRet_t CF_CFDP_SendAck(CF_Transaction_t *t, CF_CFDP_AckTxnStatus_t ts, CF_
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_SendFin
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -585,8 +548,6 @@ CF_SendRet_t CF_CFDP_SendFin(CF_Transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, 
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_SendNak
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -602,7 +563,6 @@ CF_SendRet_t CF_CFDP_SendNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     }
     else
     {
-
         CF_Assert(CF_CFDP_GetClass(t) == CF_CFDP_CLASS_2);
 
         nak = &ph->int_header.nak;
@@ -621,8 +581,6 @@ CF_SendRet_t CF_CFDP_SendNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_RecvPh
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -684,8 +642,6 @@ int CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_RecvMd
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -708,7 +664,6 @@ int CF_CFDP_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     }
     else
     {
-
         /* store the expected file size in transaction */
         t->fsize = md->size;
 
@@ -758,8 +713,6 @@ int CF_CFDP_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_RecvFd
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -804,8 +757,6 @@ int CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_RecvEof
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -827,8 +778,6 @@ int CF_CFDP_RecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_RecvAck
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -852,8 +801,6 @@ int CF_CFDP_RecvAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_RecvFin
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -879,8 +826,6 @@ int CF_CFDP_RecvFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_RecvNak
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -903,8 +848,6 @@ int CF_CFDP_RecvNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_RecvDrop
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -915,8 +858,6 @@ void CF_CFDP_RecvDrop(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_RecvIdle
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -1001,8 +942,6 @@ void CF_CFDP_RecvIdle(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_InitEngine
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -1095,8 +1034,6 @@ int32 CF_CFDP_InitEngine(void)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_CycleTxFirstActive
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -1132,8 +1069,6 @@ int CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_CycleTx
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -1178,8 +1113,6 @@ void CF_CFDP_CycleTx(CF_Channel_t *c)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_DoTick
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -1212,8 +1145,6 @@ int CF_CFDP_DoTick(CF_CListNode_t *node, void *context)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_TickTransactions
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -1278,8 +1209,6 @@ void CF_CFDP_TickTransactions(CF_Channel_t *c)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_InitTxnTxFile
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -1293,8 +1222,6 @@ void CF_CFDP_InitTxnTxFile(CF_Transaction_t *t, CF_CFDP_Class_t cfdp_class, uint
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_TxFile_Initiate
  *
  * Internal helper routine only, not part of API.
  *
@@ -1328,8 +1255,6 @@ static void CF_CFDP_TxFile_Initiate(CF_Transaction_t *t, CF_CFDP_Class_t cfdp_cl
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_TxFile
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -1351,7 +1276,6 @@ int32 CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, CF_CFDP
     }
     else
     {
-
         t = CF_FindUnusedTransaction(&CF_AppData.engine.channels[chan]);
         CF_Assert(t); /* should always have a free transaction at this point */
 
@@ -1372,8 +1296,6 @@ int32 CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, CF_CFDP
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_PlaybackDir_Initiate
  *
  * Internal helper routine only, not part of API.
  *
@@ -1414,8 +1336,6 @@ static int32 CF_CFDP_PlaybackDir_Initiate(CF_Playback_t *p, const char *src_file
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_PlaybackDir
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -1445,8 +1365,6 @@ int32 CF_CFDP_PlaybackDir(const char *src_filename, const char *dst_filename, CF
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_ProcessPlaybackDirectory
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -1514,8 +1432,6 @@ void CF_CFDP_ProcessPlaybackDirectory(CF_Channel_t *c, CF_Playback_t *p)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_UpdatePollPbCounted
- *
  * Internal helper routine only, not part of API.
  *
  *-----------------------------------------------------------------*/
@@ -1540,8 +1456,6 @@ static void CF_CFDP_UpdatePollPbCounted(CF_Playback_t *pb, int up, uint8 *counte
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_ProcessPlaybackDirectories
- *
  * Internal helper routine only, not part of API.
  *
  *-----------------------------------------------------------------*/
@@ -1559,8 +1473,6 @@ static void CF_CFDP_ProcessPlaybackDirectories(CF_Channel_t *c)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_ProcessPollingDirectories
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -1624,8 +1536,6 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_CycleEngine
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -1664,8 +1574,6 @@ void CF_CFDP_CycleEngine(void)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_ResetTransaction
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
@@ -1735,8 +1643,6 @@ void CF_CFDP_ResetTransaction(CF_Transaction_t *t, int keep_history)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_SendEotPkt
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -1775,8 +1681,6 @@ void CF_CFDP_SendEotPkt(CF_Transaction_t *t)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_CopyStringFromLV
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -1797,8 +1701,6 @@ int CF_CFDP_CopyStringFromLV(char *buf, size_t buf_maxsz, const CF_Logical_Lv_t 
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_CancelTransaction
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -1816,8 +1718,6 @@ void CF_CFDP_CancelTransaction(CF_Transaction_t *t)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_CloseFiles
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -1833,8 +1733,6 @@ int CF_CFDP_CloseFiles(CF_CListNode_t *n, void *context)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_DisableEngine
  *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail

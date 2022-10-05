@@ -142,7 +142,6 @@ typedef struct CF_CFDP_PduHeader
     CF_CFDP_uint8_t  eid_tsn_lengths; /**< \brief Lengths of the EID+TSN data (bitfields) */
 
     /* variable-length data goes here - it is at least 3 additional bytes */
-
 } CF_CFDP_PduHeader_t;
 
 /**
@@ -316,7 +315,6 @@ typedef struct CF_CFDP_PduEof
     CF_CFDP_uint8_t  cc;
     CF_CFDP_uint32_t crc;
     CF_CFDP_uint32_t size;
-
 } CF_CFDP_PduEof_t;
 
 /**
@@ -327,7 +325,6 @@ typedef struct CF_CFDP_PduEof
 typedef struct CF_CFDP_PduFin
 {
     CF_CFDP_uint8_t flags;
-
 } CF_CFDP_PduFin_t;
 
 /**
@@ -361,7 +358,6 @@ typedef struct CF_CFDP_PduNak
 {
     CF_CFDP_uint32_t scope_start;
     CF_CFDP_uint32_t scope_end;
-
 } CF_CFDP_PduNak_t;
 
 /**
@@ -373,7 +369,6 @@ typedef struct CF_CFDP_PduMd
 {
     CF_CFDP_uint8_t  segmentation_control;
     CF_CFDP_uint32_t size;
-
 } CF_CFDP_PduMd_t;
 
 /**

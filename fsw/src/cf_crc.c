@@ -35,8 +35,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CRC_Start
- *
  * Application-scope internal function
  * See description in cf_crc.h for argument/return detail
  *
@@ -47,8 +45,6 @@ void CF_CRC_Start(CF_Crc_t *c)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CRC_Digest
  *
  * Application-scope internal function
  * See description in cf_crc.h for argument/return detail
@@ -74,8 +70,6 @@ void CF_CRC_Digest(CF_Crc_t *c, const uint8 *data, int len)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CRC_Finalize
  *
  * Application-scope internal function
  * See description in cf_crc.h for argument/return detail
