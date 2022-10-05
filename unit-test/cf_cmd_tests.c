@@ -140,7 +140,7 @@ CF_TransactionSeq_t Any_CF_TransactionSeq_t(void)
 
 typedef struct
 {
-    CF_Transaction_t *t;
+    CF_Transaction_t *txn;
     void *            context;
 } CF_TsnChanAction_fn_t_context_t;
 
@@ -150,14 +150,14 @@ int Chan_action_fn_t(uint8 chan_num, void *context)
     return UT_DEFAULT_IMPL(Chan_action_fn_t);
 }
 
-void Dummy_CF_TsnChanAction_fn_t(CF_Transaction_t *t, void *context)
+void Dummy_CF_TsnChanAction_fn_t(CF_Transaction_t *txn, void *context)
 {
     CF_TsnChanAction_fn_t_context_t *ctxt =
         UT_CF_GetContextBuffer(UT_KEY(Dummy_CF_TsnChanAction_fn_t), CF_TsnChanAction_fn_t_context_t);
 
     if (ctxt)
     {
-        ctxt->t       = t;
+        ctxt->txn       = txn;
         ctxt->context = context;
     }
 
@@ -1043,7 +1043,7 @@ void Test_CF_FindTransactionBySequenceNumberAllChannels_WhenNoTransactionFoundRe
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_FindTransactionBySequenceNumber, CF_NUM_CHANNELS);
-    UtAssert_ADDRESS_EQ(context_CF_CFDP_FTBSN.c, CF_AppData.engine.channels);
+    UtAssert_ADDRESS_EQ(context_CF_CFDP_FTBSN.chan, CF_AppData.engine.channels);
     UtAssert_UINT32_EQ(context_CF_CFDP_FTBSN.transaction_sequence_number, arg_ts);
     UtAssert_UINT32_EQ(context_CF_CFDP_FTBSN.src_eid, arg_eid);
     UtAssert_ADDRESS_EQ(local_result, expected_result);
@@ -1082,11 +1082,11 @@ void Test_CF_FindTransactionBySequenceNumberAllChannels_Return_TransactionFound(
     UtAssert_STUB_COUNT(CF_FindTransactionBySequenceNumber, number_transaction_match + 1);
     for (i = 0; i < number_transaction_match; ++i)
     {
-        UtAssert_ADDRESS_EQ(contexts_CF_CFDP_FTBSN[i].c, CF_AppData.engine.channels + i);
+        UtAssert_ADDRESS_EQ(contexts_CF_CFDP_FTBSN[i].chan, CF_AppData.engine.channels + i);
         UtAssert_UINT32_EQ(contexts_CF_CFDP_FTBSN[i].transaction_sequence_number, arg_ts);
         UtAssert_UINT32_EQ(contexts_CF_CFDP_FTBSN[i].src_eid, arg_eid);
     }
-    UtAssert_ADDRESS_EQ(contexts_CF_CFDP_FTBSN[i].c, CF_AppData.engine.channels + i);
+    UtAssert_ADDRESS_EQ(contexts_CF_CFDP_FTBSN[i].chan, CF_AppData.engine.channels + i);
     UtAssert_UINT32_EQ(contexts_CF_CFDP_FTBSN[i].transaction_sequence_number, arg_ts);
     UtAssert_UINT32_EQ(contexts_CF_CFDP_FTBSN[i].src_eid, arg_eid);
     UtAssert_ADDRESS_EQ(local_result, expected_result);
@@ -1150,7 +1150,7 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionFoundRun_fn_An
     CF_TsnChanAction_fn_t           arg_fn = &Dummy_CF_TsnChanAction_fn_t;
     int                             context;
     void *                          arg_context = &context;
-    CF_Transaction_t                t;
+    CF_Transaction_t                txn;
     CF_TsnChanAction_fn_t_context_t context_CF_TsnChanAction_fn_t;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -1166,7 +1166,7 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionFoundRun_fn_An
     CF_FindTransactionBySequenceNumber_context_t context_CF_CFDP_FTBSN;
 
     /* set matching transaction */
-    context_CF_CFDP_FTBSN.forced_return = &t;
+    context_CF_CFDP_FTBSN.forced_return = &txn;
 
     UT_SetDataBuffer(UT_KEY(CF_FindTransactionBySequenceNumber), &context_CF_CFDP_FTBSN, sizeof(context_CF_CFDP_FTBSN),
                      false);
@@ -1179,7 +1179,7 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionFoundRun_fn_An
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_STUB_COUNT(Dummy_CF_TsnChanAction_fn_t, 1);
-    UtAssert_ADDRESS_EQ(context_CF_TsnChanAction_fn_t.t, &t);
+    UtAssert_ADDRESS_EQ(context_CF_TsnChanAction_fn_t.txn, &txn);
     UtAssert_ADDRESS_EQ(context_CF_TsnChanAction_fn_t.context, arg_context);
 }
 
@@ -1262,8 +1262,8 @@ void Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid(void)
 void Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action(void)
 {
     /* Arrange */
-    CF_Transaction_t            t;
-    CF_Transaction_t *          arg_t = &t;
+    CF_Transaction_t            txn;
+    CF_Transaction_t *          arg_t = &txn;
     CF_ChanAction_SuspResArg_t  context;
     CF_ChanAction_SuspResArg_t *arg_context = &context;
 
@@ -1285,8 +1285,8 @@ void Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action(void)
 void Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action(void)
 {
     /* Arrange */
-    CF_Transaction_t            t;
-    CF_Transaction_t *          arg_t = &t;
+    CF_Transaction_t            txn;
+    CF_Transaction_t *          arg_t = &txn;
     CF_ChanAction_SuspResArg_t  context;
     CF_ChanAction_SuspResArg_t *arg_context = &context;
 
@@ -1443,8 +1443,8 @@ void Test_CF_CmdResume_Call_CF_DoSuspRes_WithGiven_msg_And_action_0(void)
 void Test_CF_CmdCancel_Txn_Call_CF_CFDP_CancelTransaction_WithGiven_t(void)
 {
     /* Arrange */
-    CF_Transaction_t  t;
-    CF_Transaction_t *arg_t       = &t;
+    CF_Transaction_t  txn;
+    CF_Transaction_t *arg_t       = &txn;
     void *            arg_ignored = NULL;
     CF_Transaction_t *context_CF_CFDP_CancelTransaction;
 
@@ -1512,8 +1512,8 @@ void Test_CF_CmdCancel_Failure(void)
 void Test_CF_CmdAbandon_Txn_Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0(void)
 {
     /* Arrange */
-    CF_Transaction_t                   t;
-    CF_Transaction_t *                 arg_t       = &t;
+    CF_Transaction_t                   txn;
+    CF_Transaction_t *                 arg_t       = &txn;
     void *                             arg_ignored = NULL;
     CF_CFDP_ResetTransaction_context_t context_CF_CFDP_ResetTransaction;
 
@@ -1524,7 +1524,7 @@ void Test_CF_CmdAbandon_Txn_Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0(void
     CF_CmdAbandon_Txn(arg_t, arg_ignored);
 
     /* Assert */
-    UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetTransaction.t, arg_t);
+    UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetTransaction.txn, arg_t);
     UtAssert_True(context_CF_CFDP_ResetTransaction.keep_history == 0,
                   "CF_CFDP_CancelTransaction was called with int %d and should be 0 (constant in call)",
                   context_CF_CFDP_ResetTransaction.keep_history);
@@ -2052,10 +2052,10 @@ void Test_CF_CmdDisablePolldir_FailWhenActionFail(void)
 void Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT(void)
 {
     /* Arrange */
-    CF_History_t                   h;
-    CF_CListNode_t *               arg_n = &h.cl_node;
-    CF_Channel_t                   c;
-    CF_Channel_t *                 arg_c = &c;
+    CF_History_t                   history;
+    CF_CListNode_t *               arg_n = &history.cl_node;
+    CF_Channel_t                   chan;
+    CF_Channel_t *                 arg_c = &chan;
     int                            local_result;
     CF_CFDP_ResetHistory_context_t context_CF_CFDP_ResetHistory;
 
@@ -2066,8 +2066,8 @@ void Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT(void)
     local_result = CF_PurgeHistory(arg_n, arg_c);
 
     /* Assert */
-    UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetHistory.c, arg_c);
-    UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetHistory.h, &h);
+    UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetHistory.chan, arg_c);
+    UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetHistory.history, &history);
     UtAssert_True(local_result == CF_CLIST_CONT, "CF_PurgeHistory returned %d and should be %d (CF_CLIST_CONT)",
                   local_result, CF_CLIST_CONT);
 }
@@ -2081,8 +2081,8 @@ void Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT(void)
 void Test_CF_PurgeTransaction_Call_CF_CFDP_ResetTransaction_AndReturn_CLIST_CONT(void)
 {
     /* Arrange */
-    CF_Transaction_t                   t;
-    CF_CListNode_t *                   arg_n = &t.cl_node;
+    CF_Transaction_t                   txn;
+    CF_CListNode_t *                   arg_n = &txn.cl_node;
     int                                ignored;
     void *                             arg_ignored = &ignored;
     int                                local_result;
@@ -2095,7 +2095,7 @@ void Test_CF_PurgeTransaction_Call_CF_CFDP_ResetTransaction_AndReturn_CLIST_CONT
     local_result = CF_PurgeTransaction(arg_n, arg_ignored);
 
     /* Assert */
-    UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetTransaction.t, &t);
+    UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetTransaction.txn, &txn);
     UtAssert_True(context_CF_CFDP_ResetTransaction.keep_history == 0,
                   "CF_CFDP_ResetTransaction received keep_history %u and should be 0 (constant)",
                   context_CF_CFDP_ResetTransaction.keep_history);
@@ -2115,7 +2115,7 @@ void Test_CF_DoPurgeQueue_PendOnly(void)
     uint8                               arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t           utbuf;
     CF_UnionArgsCmd_t *                 arg_cmd = &utbuf.ua;
-    CF_Channel_t *                      c;
+    CF_Channel_t *                      chan;
     CF_CListNode_t                      start;
     CF_CListNode_t *                    expected_start = &start;
     CFE_Status_t                        local_result;
@@ -2127,8 +2127,8 @@ void Test_CF_DoPurgeQueue_PendOnly(void)
     UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_POINTER,
                           &context_CF_CList_Traverse);
 
-    c                       = &CF_AppData.engine.channels[arg_chan_num];
-    c->qs[CF_QueueIdx_PEND] = expected_start;
+    chan                       = &CF_AppData.engine.channels[arg_chan_num];
+    chan->qs[CF_QueueIdx_PEND] = expected_start;
 
     /* Act */
     local_result = CF_DoPurgeQueue(arg_chan_num, arg_cmd);
@@ -2151,7 +2151,7 @@ void Test_CF_DoPurgeQueue_HistoryOnly(void)
     uint8                               arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t           utbuf;
     CF_UnionArgsCmd_t *                 arg_cmd = &utbuf.ua;
-    CF_Channel_t *                      c;
+    CF_Channel_t *                      chan;
     CF_CListNode_t                      start;
     CF_CListNode_t *                    expected_start = &start;
     CFE_Status_t                        local_result;
@@ -2165,8 +2165,8 @@ void Test_CF_DoPurgeQueue_HistoryOnly(void)
     UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_POINTER,
                           &context_CF_CList_Traverse);
 
-    c                       = &CF_AppData.engine.channels[arg_chan_num];
-    c->qs[CF_QueueIdx_HIST] = expected_start;
+    chan                       = &CF_AppData.engine.channels[arg_chan_num];
+    chan->qs[CF_QueueIdx_HIST] = expected_start;
 
     /* Act */
     local_result = CF_DoPurgeQueue(arg_chan_num, arg_cmd);
@@ -2178,7 +2178,7 @@ void Test_CF_DoPurgeQueue_HistoryOnly(void)
     UtAssert_ADDRESS_EQ(context_CF_CList_Traverse.start, expected_start);
     UtAssert_True(context_CF_CList_Traverse.fn == (CF_CListFn_t)CF_PurgeHistory,
                   "context_CF_CList_Traverse.fn ==  (CF_CListFn_t )CF_PurgeHistory");
-    UtAssert_ADDRESS_EQ(context_CF_CList_Traverse.context, c);
+    UtAssert_ADDRESS_EQ(context_CF_CList_Traverse.context, chan);
     UtAssert_True(local_result == CFE_SUCCESS, "CF_DoPurgeQueue returned %d and should be 0 (CFE_SUCCESS)",
                   local_result);
 }
@@ -2189,7 +2189,7 @@ void Test_CF_DoPurgeQueue_Both(void)
     uint8                               arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t           utbuf;
     CF_UnionArgsCmd_t *                 arg_cmd = &utbuf.ua;
-    CF_Channel_t *                      c;
+    CF_Channel_t *                      chan;
     CF_CListNode_t                      pend_start;
     CF_CListNode_t *                    expected_pend_start = &pend_start;
     CF_CListNode_t                      history_start;
@@ -2206,9 +2206,9 @@ void Test_CF_DoPurgeQueue_Both(void)
     UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_POINTER, NULL);
     UT_SetDataBuffer(UT_KEY(CF_CList_Traverse), context_CF_CList_Traverse, sizeof(context_CF_CList_Traverse), false);
 
-    c                       = &CF_AppData.engine.channels[arg_chan_num];
-    c->qs[CF_QueueIdx_PEND] = expected_pend_start;
-    c->qs[CF_QueueIdx_HIST] = expected_history_start;
+    chan                       = &CF_AppData.engine.channels[arg_chan_num];
+    chan->qs[CF_QueueIdx_PEND] = expected_pend_start;
+    chan->qs[CF_QueueIdx_HIST] = expected_history_start;
 
     /* Act */
     local_result = CF_DoPurgeQueue(arg_chan_num, arg_cmd);
@@ -2224,7 +2224,7 @@ void Test_CF_DoPurgeQueue_Both(void)
     UtAssert_ADDRESS_EQ(context_CF_CList_Traverse[1].start, expected_history_start);
     UtAssert_True(context_CF_CList_Traverse[1].fn == (CF_CListFn_t)CF_PurgeHistory,
                   "context_CF_CList_Traverse[1].fn ==  (CF_CListFn_t )CF_PurgeHistory");
-    UtAssert_ADDRESS_EQ(context_CF_CList_Traverse[1].context, c);
+    UtAssert_ADDRESS_EQ(context_CF_CList_Traverse[1].context, chan);
     UtAssert_True(local_result == CFE_SUCCESS, "CF_DoPurgeQueue returned %d and should be 0 (CFE_SUCCESS)",
                   local_result);
 }

@@ -42,11 +42,11 @@ typedef struct CF_Crc
 /** @brief Start a CRC streamable digest.
  *
  * @par Assumptions, External Events, and Notes:
- *       c must not be NULL.
+ *       crc must not be NULL.
  *
- * @param c  CRC object to operate on
+ * @param crc  CRC object to operate on
  */
-void CF_CRC_Start(CF_Crc_t *c);
+void CF_CRC_Start(CF_Crc_t *crc);
 
 /************************************************************************/
 /** @brief Digest a chunk for CRC calculation.
@@ -56,14 +56,14 @@ void CF_CRC_Start(CF_Crc_t *c);
  *       4-byte word in case the input was not evenly divisible for 4.
  *
  * @par Assumptions, External Events, and Notes:
- *       c must not be NULL.
+ *       crc must not be NULL.
  *
- * @param c    CRC object to operate on
+ * @param crc    CRC object to operate on
  * @param data Pointer to data to digest
  * @param len  Length of data to digest
  *
  */
-void CF_CRC_Digest(CF_Crc_t *c, const uint8 *data, int len);
+void CF_CRC_Digest(CF_Crc_t *crc, const uint8 *data, int len);
 
 /************************************************************************/
 /** @brief Finalize a CRC calculation.
@@ -74,11 +74,11 @@ void CF_CRC_Digest(CF_Crc_t *c, const uint8 *data, int len);
  *       result field of the structure holds the result.
  *
  * @par Assumptions, External Events, and Notes:
- *       c must not be NULL.
+ *       crc must not be NULL.
  *
- * @param c    CRC object to operate on
+ * @param crc    CRC object to operate on
  *
  */
-void CF_CRC_Finalize(CF_Crc_t *c);
+void CF_CRC_Finalize(CF_Crc_t *crc);
 
 #endif /* !CF_CRC_H */

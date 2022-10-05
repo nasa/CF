@@ -39,9 +39,9 @@
  * See description in cf_crc.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CRC_Start(CF_Crc_t *c)
+void CF_CRC_Start(CF_Crc_t *crc)
 {
-    memset(c, 0, sizeof(*c));
+    memset(crc, 0, sizeof(*crc));
 }
 
 /*----------------------------------------------------------------
@@ -50,21 +50,21 @@ void CF_CRC_Start(CF_Crc_t *c)
  * See description in cf_crc.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CRC_Digest(CF_Crc_t *c, const uint8 *data, int len)
+void CF_CRC_Digest(CF_Crc_t *crc, const uint8 *data, int len)
 {
     int i = 0;
 
     for (; i < len; ++i)
     {
-        c->working <<= 8;
-        c->working |= data[i];
+        crc->working <<= 8;
+        crc->working |= data[i];
 
-        ++c->index;
+        ++crc->index;
 
-        if (c->index == 4)
+        if (crc->index == 4)
         {
-            c->result += c->working;
-            c->index = 0;
+            crc->result += crc->working;
+            crc->index = 0;
         }
     }
 }
@@ -75,16 +75,16 @@ void CF_CRC_Digest(CF_Crc_t *c, const uint8 *data, int len)
  * See description in cf_crc.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CRC_Finalize(CF_Crc_t *c)
+void CF_CRC_Finalize(CF_Crc_t *crc)
 {
-    if (c->index)
+    if (crc->index)
     {
-        c->result += (c->working << (8 * (4 - c->index)));
+        crc->result += (crc->working << (8 * (4 - crc->index)));
 
         /* set the index to 0 in case the user calls CF_CRC_Digest() again. It
          * will add the new data to the CRC result. This lets the user get
          * the current result in the stream if they want. */
-        c->index   = 0;
-        c->working = 0;
+        crc->index   = 0;
+        crc->working = 0;
     }
 }

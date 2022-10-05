@@ -44,10 +44,10 @@
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R2_SetFinTxnStatus(CF_Transaction_t *t, CF_TxnStatus_t txn_stat)
+void CF_CFDP_R2_SetFinTxnStatus(CF_Transaction_t *txn, CF_TxnStatus_t txn_stat)
 {
-    CF_CFDP_SetTxnStatus(t, txn_stat);
-    t->flags.rx.send_fin = 1;
+    CF_CFDP_SetTxnStatus(txn, txn_stat);
+    txn->flags.rx.send_fin = 1;
 }
 
 /*----------------------------------------------------------------
@@ -56,9 +56,9 @@ void CF_CFDP_R2_SetFinTxnStatus(CF_Transaction_t *t, CF_TxnStatus_t txn_stat)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R1_Reset(CF_Transaction_t *t)
+void CF_CFDP_R1_Reset(CF_Transaction_t *txn)
 {
-    CF_CFDP_ResetTransaction(t, 1);
+    CF_CFDP_ResetTransaction(txn, 1);
 }
 
 /*----------------------------------------------------------------
@@ -67,18 +67,18 @@ void CF_CFDP_R1_Reset(CF_Transaction_t *t)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R2_Reset(CF_Transaction_t *t)
+void CF_CFDP_R2_Reset(CF_Transaction_t *txn)
 {
-    if ((t->state_data.r.sub_state == CF_RxSubState_WAIT_FOR_FIN_ACK) ||
-        (t->state_data.r.r2.eof_cc != CF_CFDP_ConditionCode_NO_ERROR) || CF_TxnStatus_IsError(t->history->txn_stat) ||
-        t->flags.com.canceled)
+    if ((txn->state_data.receive.sub_state == CF_RxSubState_WAIT_FOR_FIN_ACK) ||
+        (txn->state_data.receive.r2.eof_cc != CF_CFDP_ConditionCode_NO_ERROR) || CF_TxnStatus_IsError(txn->history->txn_stat) ||
+        txn->flags.com.canceled)
     {
-        CF_CFDP_R1_Reset(t); /* it's done */
+        CF_CFDP_R1_Reset(txn); /* it's done */
     }
     else
     {
         /* not waiting for FIN ACK, so trigger send FIN */
-        t->flags.rx.send_fin = 1;
+        txn->flags.rx.send_fin = 1;
     }
 }
 
@@ -88,18 +88,18 @@ void CF_CFDP_R2_Reset(CF_Transaction_t *t)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_CFDP_R_CheckCrc(CF_Transaction_t *t, uint32 expected_crc)
+CFE_Status_t CF_CFDP_R_CheckCrc(CF_Transaction_t *txn, uint32 expected_crc)
 {
     CFE_Status_t ret = CFE_SUCCESS;
-    CF_CRC_Finalize(&t->crc);
-    if (t->crc.result != expected_crc)
+    CF_CRC_Finalize(&txn->crc);
+    if (txn->crc.result != expected_crc)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_CRC, CFE_EVS_EventType_ERROR,
                           "CF R%d(%lu:%lu): CRC mismatch for R trans. got 0x%08lx expected 0x%08lx",
-                          (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
-                          (unsigned long)t->history->seq_num, (unsigned long)t->crc.result,
+                          (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
+                          (unsigned long)txn->history->seq_num, (unsigned long)txn->crc.result,
                           (unsigned long)expected_crc);
-        ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.crc_mismatch;
+        ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.crc_mismatch;
         ret = 1;
     }
 
@@ -112,7 +112,7 @@ CFE_Status_t CF_CFDP_R_CheckCrc(CF_Transaction_t *t, uint32 expected_crc)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
+void CF_CFDP_R2_Complete(CF_Transaction_t *txn, int ok_to_send_nak)
 {
     uint32 ret;
     int    send_nak = 0;
@@ -120,24 +120,24 @@ void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
     /* checking if r2 is complete. Check NAK list, and send NAK if appropriate */
     /* if all data is present, then there will be no gaps in the chunk */
 
-    if (!CF_TxnStatus_IsError(t->history->txn_stat))
+    if (!CF_TxnStatus_IsError(txn->history->txn_stat))
     {
         /* first, check if md is received. If not, send specialized NAK */
-        if (!t->flags.rx.md_recv)
+        if (!txn->flags.rx.md_recv)
         {
             send_nak = 1;
         }
         else
         {
             /* only look for 1 gap, since the goal here is just to know that there are gaps */
-            ret = CF_ChunkList_ComputeGaps(&t->chunks->chunks, 1, t->fsize, 0, NULL, NULL);
+            ret = CF_ChunkList_ComputeGaps(&txn->chunks->chunks, 1, txn->fsize, 0, NULL, NULL);
 
             if (ret)
             {
                 /* there is at least 1 gap, so send a NAK */
                 send_nak = 1;
             }
-            else if (t->flags.rx.eof_recv)
+            else if (txn->flags.rx.eof_recv)
             {
                 /* the EOF was received, and there are no NAKs -- process completion in send FIN state */
                 send_fin = 1;
@@ -147,37 +147,37 @@ void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
         if (send_nak && ok_to_send_nak)
         {
             /* Increment the acknak counter */
-            ++t->state_data.r.r2.acknak_count;
+            ++txn->state_data.receive.r2.acknak_count;
 
             /* Check limit and handle if needed */
-            if (t->state_data.r.r2.acknak_count >= CF_AppData.config_table->chan[t->chan_num].nak_limit)
+            if (txn->state_data.receive.r2.acknak_count >= CF_AppData.config_table->chan[txn->chan_num].nak_limit)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_NAK_LIMIT, CFE_EVS_EventType_ERROR,
-                                  "CF R%d(%lu:%lu): NAK limited reach", (t->state == CF_TxnState_R2),
-                                  (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
+                                  "CF R%d(%lu:%lu): NAK limited reach", (txn->state == CF_TxnState_R2),
+                                  (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
                 send_fin = 1;
-                ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.nak_limit;
+                ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.nak_limit;
                 /* don't use CF_CFDP_R2_SetFinTxnStatus because many places in this function set send_fin */
-                CF_CFDP_SetTxnStatus(t, CF_TxnStatus_NAK_LIMIT_REACHED);
-                t->state_data.r.r2.acknak_count = 0; /* reset for fin/ack */
+                CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_NAK_LIMIT_REACHED);
+                txn->state_data.receive.r2.acknak_count = 0; /* reset for fin/ack */
             }
             else
             {
-                t->flags.rx.send_nak = 1;
+                txn->flags.rx.send_nak = 1;
             }
         }
 
         if (send_fin)
         {
-            t->flags.rx.complete = 1; /* latch completeness, since send_fin is cleared later */
+            txn->flags.rx.complete = 1; /* latch completeness, since send_fin is cleared later */
 
             /* the transaction is now considered complete, but this will not overwrite an
              * error status code if there was one set */
-            CF_CFDP_R2_SetFinTxnStatus(t, CF_TxnStatus_NO_ERROR);
+            CF_CFDP_R2_SetFinTxnStatus(txn, CF_TxnStatus_NO_ERROR);
         }
 
         /* always go to CF_RxSubState_FILEDATA, and let tick change state */
-        t->state_data.r.sub_state = CF_RxSubState_FILEDATA;
+        txn->state_data.receive.sub_state = CF_RxSubState_FILEDATA;
     }
 }
 
@@ -187,7 +187,7 @@ void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
     const CF_Logical_PduFileDataHeader_t *fd;
     int32                                 fret;
@@ -203,38 +203,38 @@ CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph
      * adjustments here, just write it.
      */
 
-    if (t->state_data.r.cached_pos != fd->offset)
+    if (txn->state_data.receive.cached_pos != fd->offset)
     {
-        fret = CF_WrappedLseek(t->fd, fd->offset, OS_SEEK_SET);
+        fret = CF_WrappedLseek(txn->fd, fd->offset, OS_SEEK_SET);
         if (fret != fd->offset)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_SEEK_FD, CFE_EVS_EventType_ERROR,
-                              "CF R%d(%lu:%lu): failed to seek offset %ld, got %ld", (t->state == CF_TxnState_R2),
-                              (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num, (long)fd->offset,
+                              "CF R%d(%lu:%lu): failed to seek offset %ld, got %ld", (txn->state == CF_TxnState_R2),
+                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num, (long)fd->offset,
                               (long)fret);
-            CF_CFDP_SetTxnStatus(t, CF_TxnStatus_FILE_SIZE_ERROR);
-            ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_seek;
+            CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILE_SIZE_ERROR);
+            ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_seek;
             ret = CF_ERROR; /* connection will reset in caller */
         }
     }
 
     if (ret != CF_ERROR)
     {
-        fret = CF_WrappedWrite(t->fd, fd->data_ptr, fd->data_len);
+        fret = CF_WrappedWrite(txn->fd, fd->data_ptr, fd->data_len);
         if (fret != fd->data_len)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_WRITE, CFE_EVS_EventType_ERROR,
-                              "CF R%d(%lu:%lu): OS_write expected %ld, got %ld", (t->state == CF_TxnState_R2),
-                              (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num,
+                              "CF R%d(%lu:%lu): OS_write expected %ld, got %ld", (txn->state == CF_TxnState_R2),
+                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
                               (long)fd->data_len, (long)fret);
-            CF_CFDP_SetTxnStatus(t, CF_TxnStatus_FILESTORE_REJECTION);
-            ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_write;
+            CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
+            ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_write;
             ret = CF_ERROR; /* connection will reset in caller */
         }
         else
         {
-            t->state_data.r.cached_pos = fd->data_len + fd->offset;
-            CF_AppData.hk.channel_hk[t->chan_num].counters.recv.file_data_bytes += fd->data_len;
+            txn->state_data.receive.cached_pos = fd->data_len + fd->offset;
+            CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.file_data_bytes += fd->data_len;
         }
     }
 
@@ -247,33 +247,33 @@ CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+CFE_Status_t CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
     CFE_Status_t               ret = CFE_SUCCESS;
     const CF_Logical_PduEof_t *eof;
 
-    if (!CF_CFDP_RecvEof(t, ph))
+    if (!CF_CFDP_RecvEof(txn, ph))
     {
         /* this function is only entered for PDUs identified as EOF type */
         eof = &ph->int_header.eof;
 
         /* only check size if MD received, otherwise it's still OK */
-        if (t->flags.rx.md_recv && (eof->size != t->fsize))
+        if (txn->flags.rx.md_recv && (eof->size != txn->fsize))
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_SIZE_MISMATCH, CFE_EVS_EventType_ERROR,
                               "CF R%d(%lu:%lu): EOF file size mismatch: got %lu expected %lu",
-                              (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
-                              (unsigned long)t->history->seq_num, (unsigned long)eof->size, (unsigned long)t->fsize);
-            ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_size_mismatch;
+                              (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
+                              (unsigned long)txn->history->seq_num, (unsigned long)eof->size, (unsigned long)txn->fsize);
+            ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_size_mismatch;
             ret = CF_REC_PDU_FSIZE_MISMATCH_ERROR;
         }
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_PDU_EOF, CFE_EVS_EventType_ERROR, "CF R%d(%lu:%lu): invalid EOF packet",
-                          (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
-                          (unsigned long)t->history->seq_num);
-        ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
+                          (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
+                          (unsigned long)txn->history->seq_num);
+        ++CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.error;
         ret = CF_REC_PDU_BAD_EOF_ERROR;
     }
 
@@ -286,9 +286,9 @@ CFE_Status_t CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
-    int                        ret = CF_CFDP_R_SubstateRecvEof(t, ph);
+    int                        ret = CF_CFDP_R_SubstateRecvEof(txn, ph);
     uint32                     crc;
     const CF_Logical_PduEof_t *eof;
 
@@ -299,17 +299,17 @@ void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     if (ret == CFE_SUCCESS)
     {
         /* Verify CRC */
-        if (CF_CFDP_R_CheckCrc(t, crc) == CFE_SUCCESS)
+        if (CF_CFDP_R_CheckCrc(txn, crc) == CFE_SUCCESS)
         {
             /* successfully processed the file */
-            t->keep = 1; /* save the file */
+            txn->keep = 1; /* save the file */
         }
         /* if file failed to process, there's nothing to do. CF_CFDP_R_CheckCrc() generates an event on failure */
     }
 
     /* after exit, always reset since we are done */
     /* reset even if the EOF failed -- class 1, so it won't come again! */
-    CF_CFDP_R1_Reset(t);
+    CF_CFDP_R1_Reset(txn);
 }
 
 /*----------------------------------------------------------------
@@ -318,39 +318,39 @@ void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R2_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+void CF_CFDP_R2_SubstateRecvEof(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
     const CF_Logical_PduEof_t *eof;
     int                        ret;
 
-    if (!t->flags.rx.eof_recv)
+    if (!txn->flags.rx.eof_recv)
     {
-        ret = CF_CFDP_R_SubstateRecvEof(t, ph);
+        ret = CF_CFDP_R_SubstateRecvEof(txn, ph);
 
         /* did receiving EOF succeed? */
         if (ret == CFE_SUCCESS)
         {
             eof = &ph->int_header.eof;
 
-            t->flags.rx.eof_recv = 1;
+            txn->flags.rx.eof_recv = 1;
 
             /* need to remember the EOF CRC for later */
-            t->state_data.r.r2.eof_crc  = eof->crc;
-            t->state_data.r.r2.eof_size = eof->size;
+            txn->state_data.receive.r2.eof_crc  = eof->crc;
+            txn->state_data.receive.r2.eof_size = eof->size;
 
             /* always ACK the EOF, even if we're not done */
-            t->state_data.r.r2.eof_cc = eof->cc;
-            t->flags.rx.send_ack      = 1; /* defer sending ACK to tick handling */
+            txn->state_data.receive.r2.eof_cc = eof->cc;
+            txn->flags.rx.send_ack      = 1; /* defer sending ACK to tick handling */
 
             /* only check for complete if EOF with no errors */
-            if (t->state_data.r.r2.eof_cc == CF_CFDP_ConditionCode_NO_ERROR)
+            if (txn->state_data.receive.r2.eof_cc == CF_CFDP_ConditionCode_NO_ERROR)
             {
-                CF_CFDP_R2_Complete(t, 1); /* CF_CFDP_R2_Complete() will change state */
+                CF_CFDP_R2_Complete(txn, 1); /* CF_CFDP_R2_Complete() will change state */
             }
             else
             {
-                CF_CFDP_SetTxnStatus(t, CF_TxnStatus_From_ConditionCode(t->state_data.r.r2.eof_cc));
-                CF_CFDP_R2_Reset(t);
+                CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_From_ConditionCode(txn->state_data.receive.r2.eof_cc));
+                CF_CFDP_R2_Reset(txn);
             }
         }
         else
@@ -358,12 +358,12 @@ void CF_CFDP_R2_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
             /* bad EOF sent? */
             if (ret == CF_REC_PDU_FSIZE_MISMATCH_ERROR)
             {
-                CF_CFDP_R2_SetFinTxnStatus(t, CF_TxnStatus_FILE_SIZE_ERROR);
+                CF_CFDP_R2_SetFinTxnStatus(txn, CF_TxnStatus_FILE_SIZE_ERROR);
             }
             else
             {
                 /* can't do anything with this bad EOF, so return to FILEDATA */
-                t->state_data.r.sub_state = CF_RxSubState_FILEDATA;
+                txn->state_data.receive.sub_state = CF_RxSubState_FILEDATA;
             }
         }
     }
@@ -375,26 +375,26 @@ void CF_CFDP_R2_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R1_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+void CF_CFDP_R1_SubstateRecvFileData(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
     int ret;
 
     /* got file data PDU? */
-    ret = CF_CFDP_RecvFd(t, ph);
+    ret = CF_CFDP_RecvFd(txn, ph);
     if (ret == CFE_SUCCESS)
     {
-        ret = CF_CFDP_R_ProcessFd(t, ph);
+        ret = CF_CFDP_R_ProcessFd(txn, ph);
     }
 
     if (ret == CFE_SUCCESS)
     {
         /* class 1 digests CRC */
-        CF_CRC_Digest(&t->crc, ph->int_header.fd.data_ptr, ph->int_header.fd.data_len);
+        CF_CRC_Digest(&txn->crc, ph->int_header.fd.data_ptr, ph->int_header.fd.data_len);
     }
     else
     {
         /* Reset transaction on failure */
-        CF_CFDP_R1_Reset(t);
+        CF_CFDP_R1_Reset(txn);
     }
 }
 
@@ -404,7 +404,7 @@ void CF_CFDP_R1_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
     const CF_Logical_PduFileDataHeader_t *fd;
     int                                   ret;
@@ -413,33 +413,33 @@ void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
     fd = &ph->int_header.fd;
 
     /* got file data PDU? */
-    ret = CF_CFDP_RecvFd(t, ph);
+    ret = CF_CFDP_RecvFd(txn, ph);
     if (ret == CFE_SUCCESS)
     {
-        ret = CF_CFDP_R_ProcessFd(t, ph);
+        ret = CF_CFDP_R_ProcessFd(txn, ph);
     }
 
     if (ret == CFE_SUCCESS)
     {
         /* class 2 does CRC at FIN, but track gaps */
-        CF_ChunkListAdd(&t->chunks->chunks, fd->offset, fd->data_len);
+        CF_ChunkListAdd(&txn->chunks->chunks, fd->offset, fd->data_len);
 
-        if (t->flags.rx.fd_nak_sent)
+        if (txn->flags.rx.fd_nak_sent)
         {
-            CF_CFDP_R2_Complete(t, 0); /* once nak-retransmit received, start checking for completion at each fd */
+            CF_CFDP_R2_Complete(txn, 0); /* once nak-retransmit received, start checking for completion at each fd */
         }
 
-        if (!t->flags.rx.complete)
+        if (!txn->flags.rx.complete)
         {
-            CF_CFDP_ArmAckTimer(t); /* re-arm ACK timer, since we got data */
+            CF_CFDP_ArmAckTimer(txn); /* re-arm ACK timer, since we got data */
         }
 
-        t->state_data.r.r2.acknak_count = 0;
+        txn->state_data.receive.r2.acknak_count = 0;
     }
     else
     {
         /* Reset transaction on failure */
-        CF_CFDP_R2_Reset(t);
+        CF_CFDP_R2_Reset(txn);
     }
 }
 
@@ -449,7 +449,7 @@ void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R2_GapCompute(const CF_ChunkList_t *chunks, const CF_Chunk_t *c, void *opaque)
+void CF_CFDP_R2_GapCompute(const CF_ChunkList_t *chunks, const CF_Chunk_t *chunk, void *opaque)
 {
     CF_GapComputeArgs_t *        args = (CF_GapComputeArgs_t *)opaque;
     CF_Logical_SegmentRequest_t *pseg;
@@ -459,7 +459,7 @@ void CF_CFDP_R2_GapCompute(const CF_ChunkList_t *chunks, const CF_Chunk_t *c, vo
     /* This function is only invoked for NAK types */
     nak      = args->nak;
     pseglist = &nak->segment_list;
-    CF_Assert(c->size > 0);
+    CF_Assert(chunk->size > 0);
 
     /* it seems that scope in the old engine is not used the way I read it in the spec, so
      * leave this code here for now for future reference */
@@ -468,8 +468,8 @@ void CF_CFDP_R2_GapCompute(const CF_ChunkList_t *chunks, const CF_Chunk_t *c, vo
     {
         pseg = &pseglist->segments[pseglist->num_segments];
 
-        pseg->offset_start = c->offset - nak->scope_start;
-        pseg->offset_end   = pseg->offset_start + c->size;
+        pseg->offset_start = chunk->offset - nak->scope_start;
+        pseg->offset_end   = pseg->offset_start + chunk->size;
 
         ++pseglist->num_segments;
     }
@@ -481,11 +481,11 @@ void CF_CFDP_R2_GapCompute(const CF_ChunkList_t *chunks, const CF_Chunk_t *c, vo
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
+CFE_Status_t CF_CFDP_R_SubstateSendNak(CF_Transaction_t *txn)
 {
     CF_Logical_PduBuffer_t *ph =
-        CF_CFDP_ConstructPduHeader(t, CF_CFDP_FileDirective_NAK, t->history->peer_eid,
-                                   CF_AppData.config_table->local_eid, 1, t->history->seq_num, 1);
+        CF_CFDP_ConstructPduHeader(txn, CF_CFDP_FileDirective_NAK, txn->history->peer_eid,
+                                   CF_AppData.config_table->local_eid, 1, txn->history->seq_num, 1);
     CF_Logical_PduNak_t *nak;
     CFE_Status_t         sret;
     uint32               cret;
@@ -495,36 +495,36 @@ CFE_Status_t CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
     {
         nak = &ph->int_header.nak;
 
-        if (t->flags.rx.md_recv)
+        if (txn->flags.rx.md_recv)
         {
             /* we have metadata, so send valid NAK */
-            CF_GapComputeArgs_t args = {t, nak};
+            CF_GapComputeArgs_t args = {txn, nak};
 
             nak->scope_start = 0;
-            cret             = CF_ChunkList_ComputeGaps(&t->chunks->chunks,
-                                            (t->chunks->chunks.count < t->chunks->chunks.max_chunks)
-                                                ? t->chunks->chunks.max_chunks
-                                                : (t->chunks->chunks.max_chunks - 1),
-                                            t->fsize, 0, CF_CFDP_R2_GapCompute, &args);
+            cret             = CF_ChunkList_ComputeGaps(&txn->chunks->chunks,
+                                            (txn->chunks->chunks.count < txn->chunks->chunks.max_chunks)
+                                                ? txn->chunks->chunks.max_chunks
+                                                : (txn->chunks->chunks.max_chunks - 1),
+                                            txn->fsize, 0, CF_CFDP_R2_GapCompute, &args);
 
             if (!cret)
             {
                 /* no gaps left, so go ahead and check for completion */
-                t->flags.rx.complete = 1; /* we know md was received, and there's no gaps -- it's complete */
+                txn->flags.rx.complete = 1; /* we know md was received, and there's no gaps -- it's complete */
                 ret                  = CFE_SUCCESS;
             }
             else
             {
                 /* gaps are present, so let's send the NAK PDU */
                 nak->scope_end          = 0;
-                sret                    = CF_CFDP_SendNak(t, ph);
-                t->flags.rx.fd_nak_sent = 1; /* latch that at least one NAK has been sent requesting filedata */
+                sret                    = CF_CFDP_SendNak(txn, ph);
+                txn->flags.rx.fd_nak_sent = 1; /* latch that at least one NAK has been sent requesting filedata */
                 CF_Assert(sret != CF_SEND_PDU_ERROR); /* NOTE: this CF_Assert is here because CF_CFDP_SendNak()
                                                      does not return CF_SEND_PDU_ERROR, so if it's ever added to
                                                      that function we need to test handling it here */
                 if (sret == CFE_SUCCESS)
                 {
-                    CF_AppData.hk.channel_hk[t->chan_num].counters.sent.nak_segment_requests += cret;
+                    CF_AppData.hk.channel_hk[txn->chan_num].counters.sent.nak_segment_requests += cret;
                     ret = CFE_SUCCESS;
                 }
             }
@@ -534,8 +534,8 @@ CFE_Status_t CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
             /* need to send simple NAK packet to request metadata PDU again */
             /* after doing so, transition to recv md state */
             CFE_EVS_SendEvent(CF_EID_INF_CFDP_R_REQUEST_MD, CFE_EVS_EventType_INFORMATION,
-                              "CF R%d(%lu:%lu): requesting MD", (t->state == CF_TxnState_R2),
-                              (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
+                              "CF R%d(%lu:%lu): requesting MD", (txn->state == CF_TxnState_R2),
+                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
             /* scope start/end, and sr[0] start/end == 0 special value to request metadata */
             nak->scope_start                           = 0;
             nak->scope_end                             = 0;
@@ -543,7 +543,7 @@ CFE_Status_t CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
             nak->segment_list.segments[0].offset_end   = 0;
             nak->segment_list.num_segments             = 1;
 
-            sret = CF_CFDP_SendNak(t, ph);
+            sret = CF_CFDP_SendNak(txn, ph);
             CF_Assert(sret != CF_SEND_PDU_ERROR); /* this CF_Assert is here because CF_CFDP_SendNak() does not
                                                     return CF_SEND_PDU_ERROR */
             if (sret == CFE_SUCCESS)
@@ -562,51 +562,51 @@ CFE_Status_t CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R_Init(CF_Transaction_t *t)
+void CF_CFDP_R_Init(CF_Transaction_t *txn)
 {
     int32 ret;
 
-    if (t->state == CF_TxnState_R2)
+    if (txn->state == CF_TxnState_R2)
     {
-        if (!t->flags.rx.md_recv)
+        if (!txn->flags.rx.md_recv)
         {
             /* we need to make a temp file and then do a NAK for md PDU */
             /* the transaction already has a history, and that has a buffer that we can use to
              * hold the temp filename */
             /* the -1 below is to make room for the slash */
-            snprintf(t->history->fnames.dst_filename, sizeof(t->history->fnames.dst_filename) - 1, "%.*s/%lu.tmp",
-                     CF_FILENAME_MAX_PATH - 1, CF_AppData.config_table->tmp_dir, (unsigned long)t->history->seq_num);
+            snprintf(txn->history->fnames.dst_filename, sizeof(txn->history->fnames.dst_filename) - 1, "%.*s/%lu.tmp",
+                     CF_FILENAME_MAX_PATH - 1, CF_AppData.config_table->tmp_dir, (unsigned long)txn->history->seq_num);
             CFE_EVS_SendEvent(CF_EID_INF_CFDP_R_TEMP_FILE, CFE_EVS_EventType_INFORMATION,
                               "CF R%d(%lu:%lu): making temp file %s for transaction without MD",
-                              (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
-                              (unsigned long)t->history->seq_num, t->history->fnames.dst_filename);
+                              (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
+                              (unsigned long)txn->history->seq_num, txn->history->fnames.dst_filename);
         }
 
-        CF_CFDP_ArmAckTimer(t);
+        CF_CFDP_ArmAckTimer(txn);
     }
 
-    ret = CF_WrappedOpenCreate(&t->fd, t->history->fnames.dst_filename, OS_FILE_FLAG_CREATE | OS_FILE_FLAG_TRUNCATE,
+    ret = CF_WrappedOpenCreate(&txn->fd, txn->history->fnames.dst_filename, OS_FILE_FLAG_CREATE | OS_FILE_FLAG_TRUNCATE,
                                OS_READ_WRITE);
     if (ret < 0)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_CREAT, CFE_EVS_EventType_ERROR,
                           "CF R%d(%lu:%lu): failed to create file %s for writing, error=%ld",
-                          (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
-                          (unsigned long)t->history->seq_num, t->history->fnames.dst_filename, (long)ret);
-        ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_open;
-        t->fd = OS_OBJECT_ID_UNDEFINED; /* just in case */
-        if (t->state == CF_TxnState_R2)
+                          (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
+                          (unsigned long)txn->history->seq_num, txn->history->fnames.dst_filename, (long)ret);
+        ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_open;
+        txn->fd = OS_OBJECT_ID_UNDEFINED; /* just in case */
+        if (txn->state == CF_TxnState_R2)
         {
-            CF_CFDP_R2_SetFinTxnStatus(t, CF_TxnStatus_FILESTORE_REJECTION);
+            CF_CFDP_R2_SetFinTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
         }
         else
         {
-            CF_CFDP_R1_Reset(t);
+            CF_CFDP_R1_Reset(txn);
         }
     }
     else
     {
-        t->state_data.r.sub_state = CF_RxSubState_FILEDATA;
+        txn->state_data.receive.sub_state = CF_RxSubState_FILEDATA;
     }
 }
 
@@ -616,7 +616,7 @@ void CF_CFDP_R_Init(CF_Transaction_t *t)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t)
+CFE_Status_t CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *txn)
 {
     uint8        buf[CF_R2_CRC_CHUNK_SIZE];
     size_t       count_bytes;
@@ -631,78 +631,78 @@ CFE_Status_t CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t)
     count_bytes = 0;
     ret         = CF_ERROR;
 
-    if (t->state_data.r.r2.rx_crc_calc_bytes == 0)
+    if (txn->state_data.receive.r2.rx_crc_calc_bytes == 0)
     {
-        CF_CRC_Start(&t->crc);
+        CF_CRC_Start(&txn->crc);
     }
 
     while ((count_bytes < CF_AppData.config_table->rx_crc_calc_bytes_per_wakeup) &&
-           (t->state_data.r.r2.rx_crc_calc_bytes < t->fsize))
+           (txn->state_data.receive.r2.rx_crc_calc_bytes < txn->fsize))
     {
-        want_offs_size = t->state_data.r.r2.rx_crc_calc_bytes + sizeof(buf);
+        want_offs_size = txn->state_data.receive.r2.rx_crc_calc_bytes + sizeof(buf);
 
-        if (want_offs_size > t->fsize)
+        if (want_offs_size > txn->fsize)
         {
-            read_size = t->fsize - t->state_data.r.r2.rx_crc_calc_bytes;
+            read_size = txn->fsize - txn->state_data.receive.r2.rx_crc_calc_bytes;
         }
         else
         {
             read_size = sizeof(buf);
         }
 
-        if (t->state_data.r.cached_pos != t->state_data.r.r2.rx_crc_calc_bytes)
+        if (txn->state_data.receive.cached_pos != txn->state_data.receive.r2.rx_crc_calc_bytes)
         {
-            fret = CF_WrappedLseek(t->fd, t->state_data.r.r2.rx_crc_calc_bytes, OS_SEEK_SET);
-            if (fret != t->state_data.r.r2.rx_crc_calc_bytes)
+            fret = CF_WrappedLseek(txn->fd, txn->state_data.receive.r2.rx_crc_calc_bytes, OS_SEEK_SET);
+            if (fret != txn->state_data.receive.r2.rx_crc_calc_bytes)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_SEEK_CRC, CFE_EVS_EventType_ERROR,
-                                  "CF R%d(%lu:%lu): failed to seek offset %lu, got %ld", (t->state == CF_TxnState_R2),
-                                  (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num,
-                                  (unsigned long)t->state_data.r.r2.rx_crc_calc_bytes, (long)fret);
-                CF_CFDP_SetTxnStatus(t, CF_TxnStatus_FILE_SIZE_ERROR);
-                ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_seek;
+                                  "CF R%d(%lu:%lu): failed to seek offset %lu, got %ld", (txn->state == CF_TxnState_R2),
+                                  (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
+                                  (unsigned long)txn->state_data.receive.r2.rx_crc_calc_bytes, (long)fret);
+                CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILE_SIZE_ERROR);
+                ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_seek;
                 success = false;
                 break;
             }
         }
 
-        fret = CF_WrappedRead(t->fd, buf, read_size);
+        fret = CF_WrappedRead(txn->fd, buf, read_size);
         if (fret != read_size)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_READ, CFE_EVS_EventType_ERROR,
                               "CF R%d(%lu:%lu): failed to read file expected %lu, got %ld",
-                              (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
-                              (unsigned long)t->history->seq_num, (unsigned long)read_size, (long)fret);
-            CF_CFDP_SetTxnStatus(t, CF_TxnStatus_FILE_SIZE_ERROR);
-            ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_read;
+                              (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
+                              (unsigned long)txn->history->seq_num, (unsigned long)read_size, (long)fret);
+            CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILE_SIZE_ERROR);
+            ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_read;
             success = false;
             break;
         }
 
-        CF_CRC_Digest(&t->crc, buf, read_size);
-        t->state_data.r.r2.rx_crc_calc_bytes += read_size;
-        t->state_data.r.cached_pos = t->state_data.r.r2.rx_crc_calc_bytes;
+        CF_CRC_Digest(&txn->crc, buf, read_size);
+        txn->state_data.receive.r2.rx_crc_calc_bytes += read_size;
+        txn->state_data.receive.cached_pos = txn->state_data.receive.r2.rx_crc_calc_bytes;
         count_bytes += read_size;
     }
 
-    if (success && t->state_data.r.r2.rx_crc_calc_bytes == t->fsize)
+    if (success && txn->state_data.receive.r2.rx_crc_calc_bytes == txn->fsize)
     {
         /* all bytes calculated, so now check */
-        if (!CF_CFDP_R_CheckCrc(t, t->state_data.r.r2.eof_crc))
+        if (!CF_CFDP_R_CheckCrc(txn, txn->state_data.receive.r2.eof_crc))
         {
             /* CRC matched! We are happy */
-            t->keep = 1; /* save the file */
+            txn->keep = 1; /* save the file */
 
             /* set FIN PDU status */
-            t->state_data.r.r2.dc = CF_CFDP_FinDeliveryCode_COMPLETE;
-            t->state_data.r.r2.fs = CF_CFDP_FinFileStatus_RETAINED;
+            txn->state_data.receive.r2.dc = CF_CFDP_FinDeliveryCode_COMPLETE;
+            txn->state_data.receive.r2.fs = CF_CFDP_FinFileStatus_RETAINED;
         }
         else
         {
-            CF_CFDP_R2_SetFinTxnStatus(t, CF_TxnStatus_FILE_CHECKSUM_FAILURE);
+            CF_CFDP_R2_SetFinTxnStatus(txn, CF_TxnStatus_FILE_CHECKSUM_FAILURE);
         }
 
-        t->flags.com.crc_calc = 1;
+        txn->flags.com.crc_calc = 1;
 
         ret = CFE_SUCCESS;
     }
@@ -716,15 +716,15 @@ CFE_Status_t CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_CFDP_R2_SubstateSendFin(CF_Transaction_t *t)
+CFE_Status_t CF_CFDP_R2_SubstateSendFin(CF_Transaction_t *txn)
 {
     CFE_Status_t sret;
     CFE_Status_t ret = CFE_SUCCESS;
 
-    if (!CF_TxnStatus_IsError(t->history->txn_stat) && !t->flags.com.crc_calc)
+    if (!CF_TxnStatus_IsError(txn->history->txn_stat) && !txn->flags.com.crc_calc)
     {
         /* no error, and haven't checked CRC -- so start checking it */
-        if (CF_CFDP_R2_CalcCrcChunk(t))
+        if (CF_CFDP_R2_CalcCrcChunk(txn))
         {
             ret = CF_ERROR; /* signal to caller to re-enter next tick */
         }
@@ -732,10 +732,10 @@ CFE_Status_t CF_CFDP_R2_SubstateSendFin(CF_Transaction_t *t)
 
     if (ret != CF_ERROR)
     {
-        sret = CF_CFDP_SendFin(t, t->state_data.r.r2.dc, t->state_data.r.r2.fs,
-                               CF_TxnStatus_To_ConditionCode(t->history->txn_stat));
+        sret = CF_CFDP_SendFin(txn, txn->state_data.receive.r2.dc, txn->state_data.receive.r2.fs,
+                               CF_TxnStatus_To_ConditionCode(txn->history->txn_stat));
         CF_Assert(sret != CF_SEND_PDU_ERROR); /* CF_CFDP_SendFin does not return CF_SEND_PDU_ERROR */
-        t->state_data.r.sub_state =
+        txn->state_data.receive.sub_state =
             CF_RxSubState_WAIT_FOR_FIN_ACK; /* whether or not FIN send successful, ok to transition state */
         if (sret != CFE_SUCCESS)
         {
@@ -753,19 +753,19 @@ CFE_Status_t CF_CFDP_R2_SubstateSendFin(CF_Transaction_t *t)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R2_Recv_fin_ack(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+void CF_CFDP_R2_Recv_fin_ack(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
-    if (!CF_CFDP_RecvAck(t, ph))
+    if (!CF_CFDP_RecvAck(txn, ph))
     {
         /* got fin-ack, so time to close the state */
-        CF_CFDP_R2_Reset(t);
+        CF_CFDP_R2_Reset(txn);
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_PDU_FINACK, CFE_EVS_EventType_ERROR, "CF R%d(%lu:%lu): invalid fin-ack",
-                          (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
-                          (unsigned long)t->history->seq_num);
-        ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
+                          (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
+                          (unsigned long)txn->history->seq_num);
+        ++CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.error;
     }
 }
 
@@ -775,7 +775,7 @@ void CF_CFDP_R2_Recv_fin_ack(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+void CF_CFDP_R2_RecvMd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
     char  fname[CF_FILENAME_MAX_LEN];
     int   status;
@@ -783,32 +783,32 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     bool  success = true;
 
     /* it isn't an error to get another MD PDU, right? */
-    if (!t->flags.rx.md_recv)
+    if (!txn->flags.rx.md_recv)
     {
-        /* NOTE: t->flags.rx.md_recv always 1 in R1, so this is R2 only */
+        /* NOTE: txn->flags.rx.md_recv always 1 in R1, so this is R2 only */
         /* parse the md PDU. this will overwrite the transaction's history, which contains our filename. so let's
          * save the filename in a local buffer so it can be used with OS_mv upon successful parsing of
          * the md PDU */
 
         strcpy(
             fname,
-            t->history->fnames.dst_filename); /* strcpy is ok, since fname is CF_FILENAME_MAX_LEN like dst_filename */
-        status = CF_CFDP_RecvMd(t, ph);
+            txn->history->fnames.dst_filename); /* strcpy is ok, since fname is CF_FILENAME_MAX_LEN like dst_filename */
+        status = CF_CFDP_RecvMd(txn, ph);
         if (!status)
         {
             /* successfully obtained md PDU */
-            if (t->flags.rx.eof_recv)
+            if (txn->flags.rx.eof_recv)
             {
                 /* EOF was received, so check that md and EOF sizes match */
-                if (t->state_data.r.r2.eof_size != t->fsize)
+                if (txn->state_data.receive.r2.eof_size != txn->fsize)
                 {
                     CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_EOF_MD_SIZE, CFE_EVS_EventType_ERROR,
                                       "CF R%d(%lu:%lu): EOF/md size mismatch md: %lu, EOF: %lu",
-                                      (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
-                                      (unsigned long)t->history->seq_num, (unsigned long)t->fsize,
-                                      (unsigned long)t->state_data.r.r2.eof_size);
-                    ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_size_mismatch;
-                    CF_CFDP_R2_SetFinTxnStatus(t, CF_TxnStatus_FILE_SIZE_ERROR);
+                                      (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
+                                      (unsigned long)txn->history->seq_num, (unsigned long)txn->fsize,
+                                      (unsigned long)txn->state_data.receive.r2.eof_size);
+                    ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_size_mismatch;
+                    CF_CFDP_R2_SetFinTxnStatus(txn, CF_TxnStatus_FILE_SIZE_ERROR);
                     success = false;
                 }
             }
@@ -816,56 +816,56 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
             if (success)
             {
                 /* close and rename file */
-                CF_WrappedClose(t->fd);
+                CF_WrappedClose(txn->fd);
                 CFE_ES_PerfLogEntry(CF_PERF_ID_RENAME);
 
                 /* Note OS_mv attempts a rename, then copy/delete if that fails so it works across file systems */
-                status = OS_mv(fname, t->history->fnames.dst_filename);
+                status = OS_mv(fname, txn->history->fnames.dst_filename);
 
                 CFE_ES_PerfLogExit(CF_PERF_ID_RENAME);
                 if (status != OS_SUCCESS)
                 {
                     CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_RENAME, CFE_EVS_EventType_ERROR,
                                       "CF R%d(%lu:%lu): failed to rename file in R2, error=%ld",
-                                      (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
-                                      (unsigned long)t->history->seq_num, (long)status);
-                    t->fd = OS_OBJECT_ID_UNDEFINED;
-                    CF_CFDP_R2_SetFinTxnStatus(t, CF_TxnStatus_FILESTORE_REJECTION);
-                    ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_rename;
+                                      (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
+                                      (unsigned long)txn->history->seq_num, (long)status);
+                    txn->fd = OS_OBJECT_ID_UNDEFINED;
+                    CF_CFDP_R2_SetFinTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
+                    ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_rename;
                     success = false;
                 }
                 else
                 {
                     ret =
-                        CF_WrappedOpenCreate(&t->fd, t->history->fnames.dst_filename, OS_FILE_FLAG_NONE, OS_READ_WRITE);
+                        CF_WrappedOpenCreate(&txn->fd, txn->history->fnames.dst_filename, OS_FILE_FLAG_NONE, OS_READ_WRITE);
                     if (ret < 0)
                     {
                         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_OPEN, CFE_EVS_EventType_ERROR,
                                           "CF R%d(%lu:%lu): failed to open renamed file in R2, error=%ld",
-                                          (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
-                                          (unsigned long)t->history->seq_num, (long)ret);
-                        CF_CFDP_R2_SetFinTxnStatus(t, CF_TxnStatus_FILESTORE_REJECTION);
-                        ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_open;
-                        t->fd   = OS_OBJECT_ID_UNDEFINED; /* just in case */
+                                          (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
+                                          (unsigned long)txn->history->seq_num, (long)ret);
+                        CF_CFDP_R2_SetFinTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
+                        ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_open;
+                        txn->fd   = OS_OBJECT_ID_UNDEFINED; /* just in case */
                         success = false;
                     }
                 }
 
                 if (success)
                 {
-                    t->state_data.r.cached_pos      = 0; /* reset psn due to open */
-                    t->flags.rx.md_recv             = 1;
-                    t->state_data.r.r2.acknak_count = 0; /* in case part of NAK */
-                    CF_CFDP_R2_Complete(t, 1);           /* check for completion now that md is received */
+                    txn->state_data.receive.cached_pos      = 0; /* reset psn due to open */
+                    txn->flags.rx.md_recv             = 1;
+                    txn->state_data.receive.r2.acknak_count = 0; /* in case part of NAK */
+                    CF_CFDP_R2_Complete(txn, 1);           /* check for completion now that md is received */
                 }
             }
         }
         else
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_PDU_MD, CFE_EVS_EventType_ERROR, "CF R%d(%lu:%lu): invalid md received",
-                              (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
-                              (unsigned long)t->history->seq_num);
-            ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
+                              (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
+                              (unsigned long)txn->history->seq_num);
+            ++CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.error;
             /* do nothing here, since it will be NAK'd again later */
         }
     }
@@ -877,7 +877,7 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R1_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+void CF_CFDP_R1_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
     static const CF_CFDP_FileDirectiveDispatchTable_t r1_fdir_handlers = {
         .fdirective = {[CF_CFDP_FileDirective_EOF] = CF_CFDP_R1_SubstateRecvEof}};
@@ -886,7 +886,7 @@ void CF_CFDP_R1_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
                   [CF_RxSubState_EOF]              = &r1_fdir_handlers,
                   [CF_RxSubState_WAIT_FOR_FIN_ACK] = &r1_fdir_handlers}};
 
-    CF_CFDP_R_DispatchRecv(t, ph, &substate_fns, CF_CFDP_R1_SubstateRecvFileData);
+    CF_CFDP_R_DispatchRecv(txn, ph, &substate_fns, CF_CFDP_R1_SubstateRecvFileData);
 }
 
 /*----------------------------------------------------------------
@@ -895,7 +895,7 @@ void CF_CFDP_R1_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R2_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+void CF_CFDP_R2_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
     static const CF_CFDP_FileDirectiveDispatchTable_t r2_fdir_handlers_normal = {
         .fdirective = {
@@ -912,7 +912,7 @@ void CF_CFDP_R2_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
                   [CF_RxSubState_EOF]              = &r2_fdir_handlers_normal,
                   [CF_RxSubState_WAIT_FOR_FIN_ACK] = &r2_fdir_handlers_finack}};
 
-    CF_CFDP_R_DispatchRecv(t, ph, &substate_fns, CF_CFDP_R2_SubstateRecvFileData);
+    CF_CFDP_R_DispatchRecv(txn, ph, &substate_fns, CF_CFDP_R2_SubstateRecvFileData);
 }
 
 /*----------------------------------------------------------------
@@ -921,16 +921,16 @@ void CF_CFDP_R2_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R_Cancel(CF_Transaction_t *t)
+void CF_CFDP_R_Cancel(CF_Transaction_t *txn)
 {
     /* for cancel, only need to send FIN if R2 */
-    if ((t->state == CF_TxnState_R2) && (t->state_data.r.sub_state < CF_RxSubState_WAIT_FOR_FIN_ACK))
+    if ((txn->state == CF_TxnState_R2) && (txn->state_data.receive.sub_state < CF_RxSubState_WAIT_FOR_FIN_ACK))
     {
-        t->flags.rx.send_fin = 1;
+        txn->flags.rx.send_fin = 1;
     }
     else
     {
-        CF_CFDP_R1_Reset(t); /* if R1, just call it quits */
+        CF_CFDP_R1_Reset(txn); /* if R1, just call it quits */
     }
 }
 
@@ -940,12 +940,12 @@ void CF_CFDP_R_Cancel(CF_Transaction_t *t)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R_SendInactivityEvent(CF_Transaction_t *t)
+void CF_CFDP_R_SendInactivityEvent(CF_Transaction_t *txn)
 {
     CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_INACT_TIMER, CFE_EVS_EventType_ERROR,
-                      "CF R%d(%lu:%lu): inactivity timer expired", (t->state == CF_TxnState_R2),
-                      (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
-    ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.inactivity_timer;
+                      "CF R%d(%lu:%lu): inactivity timer expired", (txn->state == CF_TxnState_R2),
+                      (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
+    ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.inactivity_timer;
 }
 
 /*----------------------------------------------------------------
@@ -954,7 +954,7 @@ void CF_CFDP_R_SendInactivityEvent(CF_Transaction_t *t)
  * See description in cf_cfdp_r.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R_Tick(CF_Transaction_t *t, int *cont /* unused */)
+void CF_CFDP_R_Tick(CF_Transaction_t *txn, int *cont /* unused */)
 {
     /* Steven is not real happy with this function. There should be a better way to separate out
      * the logic by state so that it isn't a bunch of if statements for different flags
@@ -965,49 +965,49 @@ void CF_CFDP_R_Tick(CF_Transaction_t *t, int *cont /* unused */)
 
     /* at each tick, various timers used by R are checked */
     /* first, check inactivity timer */
-    if (t->state == CF_TxnState_R2)
+    if (txn->state == CF_TxnState_R2)
     {
-        if (!t->flags.rx.inactivity_fired)
+        if (!txn->flags.rx.inactivity_fired)
         {
-            if (CF_Timer_Expired(&t->inactivity_timer))
+            if (CF_Timer_Expired(&txn->inactivity_timer))
             {
-                CF_CFDP_R_SendInactivityEvent(t);
+                CF_CFDP_R_SendInactivityEvent(txn);
 
-                CF_CFDP_R2_SetFinTxnStatus(t, CF_TxnStatus_INACTIVITY_DETECTED);
-                t->flags.rx.inactivity_fired = 1;
+                CF_CFDP_R2_SetFinTxnStatus(txn, CF_TxnStatus_INACTIVITY_DETECTED);
+                txn->flags.rx.inactivity_fired = 1;
             }
             else
             {
-                CF_Timer_Tick(&t->inactivity_timer);
+                CF_Timer_Tick(&txn->inactivity_timer);
             }
         }
 
         /* rx maintenance: possibly process send_eof_ack, send_nak or send_fin */
-        if (t->flags.rx.send_ack)
+        if (txn->flags.rx.send_ack)
         {
-            sret = CF_CFDP_SendAck(t, CF_CFDP_AckTxnStatus_ACTIVE, CF_CFDP_FileDirective_EOF, t->state_data.r.r2.eof_cc,
-                                   t->history->peer_eid, t->history->seq_num);
+            sret = CF_CFDP_SendAck(txn, CF_CFDP_AckTxnStatus_ACTIVE, CF_CFDP_FileDirective_EOF, txn->state_data.receive.r2.eof_cc,
+                                   txn->history->peer_eid, txn->history->seq_num);
             CF_Assert(sret != CF_SEND_PDU_ERROR);
 
             /* if CFE_SUCCESS, then move on in the state machine. CF_CFDP_SendAck does not return
              * CF_SEND_PDU_ERROR */
             if (sret != CF_SEND_PDU_NO_BUF_AVAIL_ERROR)
             {
-                t->flags.rx.send_ack = 0;
+                txn->flags.rx.send_ack = 0;
             }
         }
-        else if (t->flags.rx.send_nak)
+        else if (txn->flags.rx.send_nak)
         {
-            if (!CF_CFDP_R_SubstateSendNak(t))
+            if (!CF_CFDP_R_SubstateSendNak(txn))
             {
-                t->flags.rx.send_nak = 0; /* will re-enter on error */
+                txn->flags.rx.send_nak = 0; /* will re-enter on error */
             }
         }
-        else if (t->flags.rx.send_fin)
+        else if (txn->flags.rx.send_fin)
         {
-            if (!CF_CFDP_R2_SubstateSendFin(t))
+            if (!CF_CFDP_R2_SubstateSendFin(txn))
             {
-                t->flags.rx.send_fin = 0; /* will re-enter on error */
+                txn->flags.rx.send_fin = 0; /* will re-enter on error */
             }
         }
         else
@@ -1015,58 +1015,58 @@ void CF_CFDP_R_Tick(CF_Transaction_t *t, int *cont /* unused */)
             /* don't care about any other cases */
         }
 
-        if (t->flags.com.ack_timer_armed)
+        if (txn->flags.com.ack_timer_armed)
         {
-            if (CF_Timer_Expired(&t->ack_timer))
+            if (CF_Timer_Expired(&txn->ack_timer))
             {
                 /* ACK timer expired, so check for completion */
-                if (!t->flags.rx.complete)
+                if (!txn->flags.rx.complete)
                 {
-                    CF_CFDP_R2_Complete(t, 1);
+                    CF_CFDP_R2_Complete(txn, 1);
                 }
-                else if (t->state_data.r.sub_state == CF_RxSubState_WAIT_FOR_FIN_ACK)
+                else if (txn->state_data.receive.sub_state == CF_RxSubState_WAIT_FOR_FIN_ACK)
                 {
                     /* Increment acknak counter */
-                    ++t->state_data.r.r2.acknak_count;
+                    ++txn->state_data.receive.r2.acknak_count;
 
                     /* Check limit and handle if needed */
-                    if (t->state_data.r.r2.acknak_count >= CF_AppData.config_table->chan[t->chan_num].ack_limit)
+                    if (txn->state_data.receive.r2.acknak_count >= CF_AppData.config_table->chan[txn->chan_num].ack_limit)
                     {
                         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_ACK_LIMIT, CFE_EVS_EventType_ERROR,
                                           "CF R2(%lu:%lu): ACK limit reached, no fin-ack",
-                                          (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
-                        CF_CFDP_SetTxnStatus(t, CF_TxnStatus_ACK_LIMIT_NO_FIN);
-                        ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.ack_limit;
-                        CF_CFDP_R2_Reset(t);
+                                          (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
+                        CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_ACK_LIMIT_NO_FIN);
+                        ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.ack_limit;
+                        CF_CFDP_R2_Reset(txn);
                         success = false;
                     }
                     else
                     {
-                        t->flags.rx.send_fin = 1;
+                        txn->flags.rx.send_fin = 1;
                     }
                 }
 
                 if (success)
                 {
-                    CF_CFDP_ArmAckTimer(t); /* whether sending FIN or waiting for more filedata, need ACK timer armed */
+                    CF_CFDP_ArmAckTimer(txn); /* whether sending FIN or waiting for more filedata, need ACK timer armed */
                 }
             }
             else
             {
-                CF_Timer_Tick(&t->ack_timer);
+                CF_Timer_Tick(&txn->ack_timer);
             }
         }
     }
     else
     {
-        if (CF_Timer_Expired(&t->inactivity_timer))
+        if (CF_Timer_Expired(&txn->inactivity_timer))
         {
-            CF_CFDP_R_SendInactivityEvent(t);
-            CF_CFDP_R1_Reset(t);
+            CF_CFDP_R_SendInactivityEvent(txn);
+            CF_CFDP_R1_Reset(txn);
         }
         else
         {
-            CF_Timer_Tick(&t->inactivity_timer);
+            CF_Timer_Tick(&txn->inactivity_timer);
         }
     }
 }

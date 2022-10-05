@@ -35,43 +35,43 @@
 /** @brief S1 receive PDU processing.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t  Pointer to the transaction object
+ * @param txn  Pointer to the transaction object
  * @param ph Pointer to the PDU information
  */
-void CF_CFDP_S1_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+void CF_CFDP_S1_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief S2 receive PDU processing.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t  Pointer to the transaction object
+ * @param txn  Pointer to the transaction object
  * @param ph Pointer to the PDU information
  */
-void CF_CFDP_S2_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+void CF_CFDP_S2_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief S1 dispatch function.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t  Pointer to the transaction object
+ * @param txn  Pointer to the transaction object
  */
-void CF_CFDP_S1_Tx(CF_Transaction_t *t);
+void CF_CFDP_S1_Tx(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief S2 dispatch function.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t  Pointer to the transaction object
+ * @param txn  Pointer to the transaction object
  */
-void CF_CFDP_S2_Tx(CF_Transaction_t *t);
+void CF_CFDP_S2_Tx(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief Perform tick (time-based) processing for S transactions.
@@ -83,12 +83,12 @@ void CF_CFDP_S2_Tx(CF_Transaction_t *t);
  *       retransmit must occur.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL. cont is unused, so may be NULL
+ *       txn must not be NULL. cont is unused, so may be NULL
  *
- * @param t  Pointer to the transaction object
+ * @param txn  Pointer to the transaction object
  * @param cont Unused, exists for compatibility with tick processor
  */
-void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont);
+void CF_CFDP_S_Tick(CF_Transaction_t *txn, int *cont);
 
 /************************************************************************/
 /** @brief Perform NAK response for TX transactions
@@ -99,22 +99,22 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont);
  *       left to send.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL. cont must not be NULL.
+ *       txn must not be NULL. cont must not be NULL.
  *
- * @param t  Pointer to the transaction object
+ * @param txn  Pointer to the transaction object
  * @param cont Set to 1 if a NAK was generated
  */
-void CF_CFDP_S_Tick_Nak(CF_Transaction_t *t, int *cont);
+void CF_CFDP_S_Tick_Nak(CF_Transaction_t *txn, int *cont);
 
 /************************************************************************/
 /** @brief Cancel an S transaction.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t  Pointer to the transaction object
+ * @param txn  Pointer to the transaction object
  */
-void CF_CFDP_S_Cancel(CF_Transaction_t *t);
+void CF_CFDP_S_Cancel(CF_Transaction_t *txn);
 
 /***********************************************************************
  *
@@ -127,35 +127,35 @@ void CF_CFDP_S_Cancel(CF_Transaction_t *t);
 /** @brief Send an EOF PDU.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
  * @retval CFE_SUCCESS on success.
  * @retval CF_SEND_PDU_NO_BUF_AVAIL_ERROR if message buffer cannot be obtained.
  * @retval CF_SEND_PDU_ERROR if an error occurred while building the packet.
  *
- * @param t  Pointer to the transaction object
+ * @param txn  Pointer to the transaction object
  */
-CFE_Status_t CF_CFDP_S_SendEof(CF_Transaction_t *t);
+CFE_Status_t CF_CFDP_S_SendEof(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief Sends an EOF for S1.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t  Pointer to the transaction object
+ * @param txn  Pointer to the transaction object
  */
-void CF_CFDP_S1_SubstateSendEof(CF_Transaction_t *t);
+void CF_CFDP_S1_SubstateSendEof(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief Triggers tick processing to send an EOF and wait for EOF-ACK for S2
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t  Pointer to the transaction object
+ * @param txn  Pointer to the transaction object
  */
-void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *t);
+void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief Helper function to populate the PDU with file data and send it.
@@ -166,18 +166,18 @@ void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *t);
  *       The file is read into the filedata PDU and then the PDU is sent.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
  * @returns The number of bytes sent in the file data PDU (CFE_SUCCESS,
  *          i.e. 0, if no bytes were processed), or CF_ERROR on error
  *
- * @param t     Pointer to the transaction object
+ * @param txn     Pointer to the transaction object
  * @param foffs Position in file to send data from
  * @param bytes_to_read Number of bytes to send (maximum)
  * @param calc_crc Enable CRC/Checksum calculation
  *
  */
-CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc);
+CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc);
 
 /************************************************************************/
 /** @brief Standard state function to send the next file data PDU for active transaction.
@@ -189,11 +189,11 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 by
  *       state.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t     Pointer to the transaction object
+ * @param txn     Pointer to the transaction object
  */
-void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *t);
+void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief Respond to a NAK by sending filedata PDUs as response.
@@ -203,15 +203,15 @@ void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *t);
  *       occur.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
  * @returns CF_ERROR if error.
  * @retval 0 if no NAK processed.
  * @retval 1 if NAK processed.
  *
- * @param t     Pointer to the transaction object
+ * @param txn     Pointer to the transaction object
  */
-CFE_Status_t CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t);
+CFE_Status_t CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief Send filedata handling for S2.
@@ -221,11 +221,11 @@ CFE_Status_t CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t);
  *       absence of a NAK, it will send more of the original file data.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t     Pointer to the transaction object
+ * @param txn     Pointer to the transaction object
  */
-void CF_CFDP_S2_SubstateSendFileData(CF_Transaction_t *t);
+void CF_CFDP_S2_SubstateSendFileData(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief Send metadata PDU.
@@ -235,43 +235,43 @@ void CF_CFDP_S2_SubstateSendFileData(CF_Transaction_t *t);
  *       size of the file to put in the metadata PDU.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t     Pointer to the transaction object
+ * @param txn     Pointer to the transaction object
  */
-void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t);
+void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief Send FIN-ACK packet for S2.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t     Pointer to the transaction object
+ * @param txn     Pointer to the transaction object
  */
-void CF_CFDP_S_SubstateSendFinAck(CF_Transaction_t *t);
+void CF_CFDP_S_SubstateSendFinAck(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief A FIN was received before file complete, so abandon the transaction.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL. ph must not be NULL.
+ *       txn must not be NULL. ph must not be NULL.
  *
- * @param t  Pointer to the transaction object
+ * @param txn  Pointer to the transaction object
  * @param ph Pointer to the PDU information
  */
-void CF_CFDP_S2_EarlyFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+void CF_CFDP_S2_EarlyFin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief S2 received FIN, so set flag to send FIN-ACK.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL. ph must not be NULL.
+ *       txn must not be NULL. ph must not be NULL.
  *
- * @param t  Pointer to the transaction object
+ * @param txn  Pointer to the transaction object
  * @param ph Pointer to the PDU information
  */
-void CF_CFDP_S2_Fin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+void CF_CFDP_S2_Fin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief S2 NAK PDU received handling.
@@ -282,23 +282,23 @@ void CF_CFDP_S2_Fin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
  *       PDUs.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL. ph must not be NULL.
+ *       txn must not be NULL. ph must not be NULL.
  *
- * @param t  Pointer to the transaction object
+ * @param txn  Pointer to the transaction object
  * @param ph Pointer to the PDU information
  */
-void CF_CFDP_S2_Nak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+void CF_CFDP_S2_Nak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief S2 NAK handling but with arming the NAK timer.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL. ph must not be NULL.
+ *       txn must not be NULL. ph must not be NULL.
  *
- * @param t  Pointer to the transaction object
+ * @param txn  Pointer to the transaction object
  * @param ph Pointer to the PDU information
  */
-void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief S2 received ACK PDU in wait for EOF-ACK state.
@@ -308,11 +308,11 @@ void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
  *       which waits for a FIN PDU.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL. ph must not be NULL.
+ *       txn must not be NULL. ph must not be NULL.
  *
- * @param t  Pointer to the transaction object
+ * @param txn  Pointer to the transaction object
  * @param ph Pointer to the PDU information
  */
-void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 
 #endif /* !CF_CFDP_S_H */

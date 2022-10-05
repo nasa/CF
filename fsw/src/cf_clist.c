@@ -188,21 +188,21 @@ void CF_CList_InsertAfter(CF_CListNode_t **head, CF_CListNode_t *start, CF_CList
  *-----------------------------------------------------------------*/
 void CF_CList_Traverse(CF_CListNode_t *start, CF_CListFn_t fn, void *context)
 {
-    CF_CListNode_t *n = start;
-    CF_CListNode_t *nn;
+    CF_CListNode_t *node = start;
+    CF_CListNode_t *node_next;
     int             last = 0;
 
-    if (n)
+    if (node)
     {
         do
         {
-            /* set nn in case callback removes this node from the list */
-            nn = n->next;
-            if (nn == start)
+            /* set node_next in case callback removes this node from the list */
+            node_next = node->next;
+            if (node_next == start)
             {
                 last = 1;
             }
-            if (fn(n, context))
+            if (fn(node, context))
             {
                 break;
             }
@@ -210,11 +210,11 @@ void CF_CList_Traverse(CF_CListNode_t *start, CF_CListFn_t fn, void *context)
              * but there is a special case if that item is the starting node. Since this is
              * a circular list, start is remembered so we know when to stop. Must set start
              * to the next node in this case. */
-            if ((start == n) && (n->next != nn))
+            if ((start == node) && (node->next != node_next))
             {
-                start = nn;
+                start = node_next;
             }
-            n = nn;
+            node = node_next;
         } while (!last);
     }
 }
@@ -229,24 +229,24 @@ void CF_CList_Traverse_R(CF_CListNode_t *end, CF_CListFn_t fn, void *context)
 {
     if (end)
     {
-        CF_CListNode_t *n = end->prev;
-        CF_CListNode_t *nn;
+        CF_CListNode_t *node = end->prev;
+        CF_CListNode_t *node_next;
         int             last = 0;
 
-        if (n)
+        if (node)
         {
-            end = n;
+            end = node;
 
             do
             {
-                /* set nn in case callback removes this node from the list */
-                nn = n->prev;
-                if (nn == end)
+                /* set node_next in case callback removes this node from the list */
+                node_next = node->prev;
+                if (node_next == end)
                 {
                     last = 1;
                 }
 
-                if (fn(n, context))
+                if (fn(node, context))
                 {
                     break;
                 }
@@ -255,11 +255,11 @@ void CF_CList_Traverse_R(CF_CListNode_t *end, CF_CListFn_t fn, void *context)
                  * but there is a special case if that item is the starting node. Since this is
                  * a circular list, "end" is remembered so we know when to stop. Must set "end"
                  * to the next node in this case. */
-                if ((end == n) && (n->prev != nn))
+                if ((end == node) && (node->prev != node_next))
                 {
-                    end = nn;
+                    end = node_next;
                 }
-                n = nn;
+                node = node_next;
             } while (!last);
         }
     }

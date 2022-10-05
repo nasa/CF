@@ -51,9 +51,9 @@ uint32 CF_Timer_Sec2Ticks(CF_Timer_Seconds_t sec)
  * See description in cf_timer.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_Timer_InitRelSec(CF_Timer_t *t, uint32 rel_sec)
+void CF_Timer_InitRelSec(CF_Timer_t *txn, uint32 rel_sec)
 {
-    t->tick = CF_Timer_Sec2Ticks(rel_sec);
+    txn->tick = CF_Timer_Sec2Ticks(rel_sec);
 }
 
 /*----------------------------------------------------------------
@@ -62,9 +62,9 @@ void CF_Timer_InitRelSec(CF_Timer_t *t, uint32 rel_sec)
  * See description in cf_timer.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-bool CF_Timer_Expired(const CF_Timer_t *t)
+bool CF_Timer_Expired(const CF_Timer_t *txn)
 {
-    return !t->tick;
+    return !txn->tick;
 }
 
 /*----------------------------------------------------------------
@@ -73,8 +73,8 @@ bool CF_Timer_Expired(const CF_Timer_t *t)
  * See description in cf_timer.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_Timer_Tick(CF_Timer_t *t)
+void CF_Timer_Tick(CF_Timer_t *txn)
 {
-    CF_Assert(t->tick);
-    --t->tick;
+    CF_Assert(txn->tick);
+    --txn->tick;
 }

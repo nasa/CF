@@ -195,7 +195,7 @@ typedef struct CF_ChunkWrapper
 /**
  * @brief CF Playback entry
  *
- * Keeps the state of CF playback requests
+ * Keeps the state of CF pb requests
  */
 typedef struct CF_Playback
 {
@@ -324,8 +324,8 @@ typedef union CF_StateFlags
  */
 typedef union CF_StateData
 {
-    CF_TxState_Data_t s; /**< \brief applies to only send file transactions */
-    CF_RxState_Data_t r; /**< \brief applies to only receive file transactions */
+    CF_TxState_Data_t send;    /**< \brief applies to only send file transactions */
+    CF_RxState_Data_t receive; /**< \brief applies to only receive file transactions */
 } CF_StateData_t;
 
 /**
@@ -354,7 +354,7 @@ typedef struct CF_Transaction
 
     CF_CListNode_t cl_node;
 
-    CF_Playback_t *p; /**< \brief NULL if transaction does not belong to a playback */
+    CF_Playback_t *pb; /**< \brief NULL if transaction does not belong to a playback */
 
     CF_StateData_t state_data;
 
@@ -385,7 +385,7 @@ typedef enum
  *
  * This keeps the state of CF channels
  *
- * Each CF channel has a separate transaction list, PDU throttle, playback,
+ * Each CF channel has a separate transaction list, PDU throttle, pb,
  * and poll state, as well as separate addresses on the underlying message
  * transport (e.g. SB).
  */

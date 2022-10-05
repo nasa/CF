@@ -211,31 +211,31 @@ void cf_cfdp_tests_Teardown(void)
 void Test_CF_CFDP_ReceiveMessage(void)
 {
     /* Test case for:
-     * void CF_CFDP_ReceiveMessage(CF_Channel_t *c);
+     * void CF_CFDP_ReceiveMessage(CF_Channel_t *chan);
      */
-    CF_Channel_t *          c;
+    CF_Channel_t *          chan;
     CF_ConfigTable_t *      config;
-    CF_Transaction_t *      t;
+    CF_Transaction_t *      txn;
     CF_Logical_PduBuffer_t *ph;
     CFE_MSG_Type_t          msg_type = CFE_MSG_Type_Tlm;
     size_t *                msg_size_buf;
 
     /* no-config - the max per wakeup will be 0, and this is a noop */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &c, NULL, NULL, NULL);
-    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, NULL, NULL);
+    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
 
     /* failure in CFE_SB_ReceiveBuffer */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &c, NULL, NULL, &config);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, NULL, &config);
     config->chan[UT_CFDP_CHANNEL].rx_max_messages_per_wakeup = 1;
     UT_SetDeferredRetcode(UT_KEY(CFE_SB_ReceiveBuffer), 1, CFE_SB_NO_MESSAGE);
-    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
+    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
 
     /* Set up with a zero size input message, this should fail decoding */
     msg_size_buf = 0;
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvPh), 1, -1);
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &msg_size_buf, sizeof(msg_size_buf), false);
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetType), &msg_type, sizeof(msg_type), false);
-    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
+    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
     UT_ResetState(UT_KEY(CF_CFDP_RecvPh));
     UT_ResetState(UT_KEY(CFE_MSG_GetSize));
     UT_ResetState(UT_KEY(CFE_MSG_GetType));
@@ -245,84 +245,84 @@ void Test_CF_CFDP_ReceiveMessage(void)
      *  - CF_FindTransactionBySequenceNumber() returns NULL
      *  - CF_CFDP_FindUnusedTransaction() needs to return non-NULL
      */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, &c, NULL, &t, &config);
-    UT_SetHandlerFunction(UT_KEY(CF_FindUnusedTransaction), UT_AltHandler_GenericPointerReturn, t);
-    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, &chan, NULL, &txn, &config);
+    UT_SetHandlerFunction(UT_KEY(CF_FindUnusedTransaction), UT_AltHandler_GenericPointerReturn, txn);
+    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
     UtAssert_STUB_COUNT(CF_CFDP_DispatchRecv, 1); /* should be dispatched */
-    UtAssert_UINT32_EQ(t->history->dir, CF_Direction_RX);
-    UtAssert_UINT32_EQ(t->state_data.r.r2.dc, CF_CFDP_FinDeliveryCode_INCOMPLETE);
-    UtAssert_UINT32_EQ(t->state_data.r.r2.fs, CF_CFDP_FinFileStatus_DISCARDED);
+    UtAssert_UINT32_EQ(txn->history->dir, CF_Direction_RX);
+    UtAssert_UINT32_EQ(txn->state_data.receive.r2.dc, CF_CFDP_FinDeliveryCode_INCOMPLETE);
+    UtAssert_UINT32_EQ(txn->state_data.receive.r2.fs, CF_CFDP_FinFileStatus_DISCARDED);
 
     /* failure in CF_CFDP_RecvPh - nothing really happens here */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, &c, NULL, &t, &config);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, &chan, NULL, &txn, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvPh), 1, -1);
-    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
+    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
 
     /* Test the path where the function recieves a telemetry packet on it's pipe */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, &c, NULL, &t, &config);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, &chan, NULL, &txn, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvPh), 1, -1);
     /* Override message type to take the command branch of the if then/else clause */
     UT_ResetState(UT_KEY(CFE_MSG_GetType)); /* clears the previous cmd type */
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetType), &msg_type, sizeof(msg_type), false);
-    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
+    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
 
     /*
      *  - CF_CFDP_RecvPh() succeeds
      *  - CF_FindTransactionBySequenceNumber() returns non-NULL
      */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, &c, NULL, &t, &config);
-    t->state = CF_TxnState_R2;
-    UT_SetHandlerFunction(UT_KEY(CF_FindTransactionBySequenceNumber), UT_AltHandler_GenericPointerReturn, t);
-    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, &chan, NULL, &txn, &config);
+    txn->state = CF_TxnState_R2;
+    UT_SetHandlerFunction(UT_KEY(CF_FindTransactionBySequenceNumber), UT_AltHandler_GenericPointerReturn, txn);
+    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
     UtAssert_STUB_COUNT(CF_CFDP_DispatchRecv, 2);              /* should be dispatched */
     UT_ResetState(UT_KEY(CF_FindTransactionBySequenceNumber)); /* clears it */
 
     /* FIN handling special case */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &c, NULL, &t, &config);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, &config);
     config->local_eid             = 123;
     ph->pdu_header.source_eid     = config->local_eid;
     ph->fdirective.directive_code = CF_CFDP_FileDirective_FIN;
-    c->cur                        = t;
-    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
-    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[t->chan_num].counters.recv.spurious, 1);
+    chan->cur                        = txn;
+    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
+    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.spurious, 1);
     UtAssert_STUB_COUNT(CF_CFDP_SendAck, 1);
-    UtAssert_NULL(c->cur); /* cleared */
+    UtAssert_NULL(chan->cur); /* cleared */
 
     /* FIN handling special case, but failure of CF_CFDP_RecvFin */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &c, NULL, &t, &config);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvFin), 1, -1);
     config->local_eid             = 123;
     ph->pdu_header.source_eid     = config->local_eid;
     ph->fdirective.directive_code = CF_CFDP_FileDirective_FIN;
-    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
-    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[t->chan_num].counters.recv.spurious, 1); /* no increment */
+    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
+    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.spurious, 1); /* no increment */
     UtAssert_STUB_COUNT(CF_CFDP_SendAck, 1);                                             /* no increment */
-    UtAssert_NULL(c->cur);                                                               /* cleared */
+    UtAssert_NULL(chan->cur);                                                               /* cleared */
 
     /* FIN handling special case, but failure of CF_CFDP_SendAck */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &c, NULL, &t, &config);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendAck), 1, CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
     config->local_eid             = 123;
     ph->pdu_header.source_eid     = config->local_eid;
     ph->fdirective.directive_code = CF_CFDP_FileDirective_FIN;
-    c->cur                        = t;
-    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
-    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[t->chan_num].counters.recv.spurious, 2); /* this does get increment */
-    UtAssert_ADDRESS_EQ(c->cur, t);                                                      /* not changed */
+    chan->cur                        = txn;
+    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
+    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.spurious, 2); /* this does get increment */
+    UtAssert_ADDRESS_EQ(chan->cur, txn);                                                      /* not changed */
 
     /* recv but not the correct destination_eid */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &c, NULL, &t, &config);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, &config);
     config->local_eid              = 123;
     ph->pdu_header.destination_eid = ~config->local_eid;
-    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
+    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_INVALID_DST_EID);
 
     /* recv correct destination_eid but CF_MAX_SIMULTANEOUS_RX hit */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &c, NULL, &t, &config);
-    CF_AppData.hk.channel_hk[t->chan_num].q_size[CF_QueueIdx_RX] = CF_MAX_SIMULTANEOUS_RX;
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, &config);
+    CF_AppData.hk.channel_hk[txn->chan_num].q_size[CF_QueueIdx_RX] = CF_MAX_SIMULTANEOUS_RX;
     config->local_eid                                            = 123;
     ph->pdu_header.destination_eid                               = config->local_eid;
-    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
+    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_RX_DROPPED);
 }
 
@@ -344,59 +344,59 @@ void Test_CF_CFDP_Send(void)
 void Test_CF_CFDP_MsgOutGet(void)
 {
     /* Test case for:
-        CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent)
+        CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool silent)
      */
-    CF_Transaction_t *t;
+    CF_Transaction_t *txn;
     CF_ConfigTable_t *config;
-    CF_Channel_t *    c;
+    CF_Channel_t *    chan;
 
     /* nominal */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
-    UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(t, false));
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
+    UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(txn, false));
     UtAssert_STUB_COUNT(CFE_SB_ReleaseMessageBuffer, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* This should discard the old message, and get a new one */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
-    UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(t, false));
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
+    UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(txn, false));
     UtAssert_STUB_COUNT(CFE_SB_ReleaseMessageBuffer, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* test the various throttling mechanisms */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, &config);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
     config->chan[UT_CFDP_CHANNEL].max_outgoing_messages_per_wakeup = 3;
-    UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(t, false));
-    UtAssert_NULL(CF_CFDP_MsgOutGet(t, false));
+    UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(txn, false));
+    UtAssert_NULL(CF_CFDP_MsgOutGet(txn, false));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &c, NULL, &t, NULL);
-    c->sem_id = OS_ObjectIdFromInteger(123);
-    UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(t, false));
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, NULL);
+    chan->sem_id = OS_ObjectIdFromInteger(123);
+    UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(txn, false));
     UT_SetDeferredRetcode(UT_KEY(OS_CountSemTimedWait), 1, OS_ERROR_TIMEOUT);
-    UtAssert_NULL(CF_CFDP_MsgOutGet(t, false));
+    UtAssert_NULL(CF_CFDP_MsgOutGet(txn, false));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* transaction is suspended */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
-    t->flags.com.suspended = 1;
-    UtAssert_NULL(CF_CFDP_MsgOutGet(t, false));
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
+    txn->flags.com.suspended = 1;
+    UtAssert_NULL(CF_CFDP_MsgOutGet(txn, false));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* channel is frozen */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
     CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].frozen = 1;
-    UtAssert_NULL(CF_CFDP_MsgOutGet(t, false));
+    UtAssert_NULL(CF_CFDP_MsgOutGet(txn, false));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].frozen = 0;
 
     /* no msg available from SB */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
-    UtAssert_NULL(CF_CFDP_MsgOutGet(t, false));
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
+    UtAssert_NULL(CF_CFDP_MsgOutGet(txn, false));
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_NO_MSG);
 
     /* same, but the silent flag should suppress the event */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
-    UtAssert_NULL(CF_CFDP_MsgOutGet(t, true));
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
+    UtAssert_NULL(CF_CFDP_MsgOutGet(txn, true));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 }
 

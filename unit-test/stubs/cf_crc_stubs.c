@@ -31,9 +31,9 @@
  * Generated stub function for CF_CRC_Digest()
  * ----------------------------------------------------
  */
-void CF_CRC_Digest(CF_Crc_t *c, const uint8 *data, int len)
+void CF_CRC_Digest(CF_Crc_t *crc, const uint8 *data, int len)
 {
-    UT_GenStub_AddParam(CF_CRC_Digest, CF_Crc_t *, c);
+    UT_GenStub_AddParam(CF_CRC_Digest, CF_Crc_t *, crc);
     UT_GenStub_AddParam(CF_CRC_Digest, const uint8 *, data);
     UT_GenStub_AddParam(CF_CRC_Digest, int, len);
 
@@ -45,9 +45,9 @@ void CF_CRC_Digest(CF_Crc_t *c, const uint8 *data, int len)
  * Generated stub function for CF_CRC_Finalize()
  * ----------------------------------------------------
  */
-void CF_CRC_Finalize(CF_Crc_t *c)
+void CF_CRC_Finalize(CF_Crc_t *crc)
 {
-    UT_GenStub_AddParam(CF_CRC_Finalize, CF_Crc_t *, c);
+    UT_GenStub_AddParam(CF_CRC_Finalize, CF_Crc_t *, crc);
 
     UT_GenStub_Execute(CF_CRC_Finalize, Basic, NULL);
 }
@@ -57,9 +57,9 @@ void CF_CRC_Finalize(CF_Crc_t *c)
  * Generated stub function for CF_CRC_Start()
  * ----------------------------------------------------
  */
-void CF_CRC_Start(CF_Crc_t *c)
+void CF_CRC_Start(CF_Crc_t *crc)
 {
-    UT_GenStub_AddParam(CF_CRC_Start, CF_Crc_t *, c);
+    UT_GenStub_AddParam(CF_CRC_Start, CF_Crc_t *, crc);
 
     UT_GenStub_Execute(CF_CRC_Start, Basic, NULL);
 }
