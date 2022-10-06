@@ -95,10 +95,10 @@ void CF_CFDP_DecodeAllTlv(CF_DecoderState_t *state, CF_Logical_TlvList_t *pltlv,
  * Generated stub function for CF_CFDP_DecodeCrc()
  * ----------------------------------------------------
  */
-void CF_CFDP_DecodeCrc(CF_DecoderState_t *state, uint32 *pcrc)
+void CF_CFDP_DecodeCrc(CF_DecoderState_t *state, uint32 *plcrc)
 {
     UT_GenStub_AddParam(CF_CFDP_DecodeCrc, CF_DecoderState_t *, state);
-    UT_GenStub_AddParam(CF_CFDP_DecodeCrc, uint32 *, pcrc);
+    UT_GenStub_AddParam(CF_CFDP_DecodeCrc, uint32 *, plcrc);
 
     UT_GenStub_Execute(CF_CFDP_DecodeCrc, Basic, NULL);
 }
@@ -164,6 +164,7 @@ void CF_CFDP_DecodeFin(CF_DecoderState_t *state, CF_Logical_PduFin_t *plfin)
 int32 CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh)
 {
     UT_GenStub_SetupReturnBuffer(CF_CFDP_DecodeHeader, int32);
+
     UT_GenStub_AddParam(CF_CFDP_DecodeHeader, CF_DecoderState_t *, state);
     UT_GenStub_AddParam(CF_CFDP_DecodeHeader, CF_Logical_PduHeader_t *, plh);
 

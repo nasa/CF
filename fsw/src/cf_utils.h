@@ -473,4 +473,48 @@ int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size);
  */
 int32 CF_WrappedLseek(osal_id_t fd, off_t offset, int mode);
 
+/************************************************************************/
+/** @brief Converts the internal transaction status to a CFDP condition code
+ *
+ * Transaction status is a superset of condition codes, and includes
+ * other error conditions for which CFDP will not send FIN/ACK/EOF
+ * and thus there is no corresponding condition code.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *        Not all transaction status codes directly correlate to a CFDP CC
+ *
+ * @param txn_stat   Transaction status
+ *
+ * @returns CFDP protocol condition code
+ */
+CF_CFDP_ConditionCode_t CF_TxnStatus_To_ConditionCode(CF_TxnStatus_t txn_stat);
+
+/************************************************************************/
+/** @brief Converts a CFDP condition code to an internal transaction status
+ *
+ * @par Assumptions, External Events, and Notes:
+ *       None
+ *
+ * @param txn_stat   Transaction status
+ *
+ * @returns CFDP protocol condition code
+ */
+CF_TxnStatus_t CF_TxnStatus_From_ConditionCode(CF_CFDP_ConditionCode_t cc);
+
+/************************************************************************/
+/** @brief Check if the internal transaction status represents an error
+ *
+ * @par Assumptions, External Events, and Notes:
+ *       Transaction status is a superset of condition codes, and includes
+ *       other error conditions for which CFDP will not send FIN/ACK/EOF
+ *       and thus there is no corresponding condition code.
+ *
+ * @param txn_stat   Transaction status
+ *
+ * @returns Boolean value indicating if the transaction is in an errorred state
+ * @retval true if the an error has occurred during the transaction
+ * @retval false if no error has occurred during the transaction yet
+ */
+bool CF_TxnStatus_IsError(CF_TxnStatus_t txn_stat);
+
 #endif /* !CF_UTILS_H */

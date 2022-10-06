@@ -68,7 +68,7 @@ void CF_CFDP_R_DispatchRecv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph,
     }
     else
     {
-        if (t->history->cc == CF_CFDP_ConditionCode_NO_ERROR)
+        if (!CF_TxnStatus_IsError(t->history->txn_stat))
         {
             selected_handler = fd_fn;
         }

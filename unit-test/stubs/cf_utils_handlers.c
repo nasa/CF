@@ -198,3 +198,19 @@ void UT_DefaultHandler_CF_WrappedOpenCreate(void *UserObj, UT_EntryKey_t FuncKey
         UT_Stub_SetReturnValue(FuncKey, ctxt->forced_return);
     }
 }
+
+/*----------------------------------------------------------------
+ *
+ * Function: UT_DefaultHandler_CF_TxnStatus_IsError
+ *
+ * Translate the return value to a "bool"
+ *
+ *-----------------------------------------------------------------*/
+void UT_DefaultHandler_CF_TxnStatus_IsError(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
+{
+    bool result;
+
+    result = (bool)Context->Int32StatusCode;
+
+    UT_Stub_SetReturnValue(FuncKey, result);
+}

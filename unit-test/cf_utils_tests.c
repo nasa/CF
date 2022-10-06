@@ -1064,6 +1064,77 @@ void Test_CF_WrappedLseek_Call_OS_lseek_WithGivenArgumentsAndReturnItsReturnValu
     UtAssert_INT32_EQ(CF_WrappedLseek(UT_CF_OS_OBJID, test_offset, test_mode), expected_result);
 }
 
+void Test_CF_TxnStatus_IsError(void)
+{
+    /* Test function for:
+     * bool CF_TxnStatus_IsError(CF_TxnStatus_t txn_stat)
+     */
+    UtAssert_BOOL_FALSE(CF_TxnStatus_IsError(CF_TxnStatus_UNDEFINED));
+    UtAssert_BOOL_FALSE(CF_TxnStatus_IsError(CF_TxnStatus_NO_ERROR));
+    UtAssert_BOOL_TRUE(CF_TxnStatus_IsError(CF_TxnStatus_INACTIVITY_DETECTED));
+    UtAssert_BOOL_TRUE(CF_TxnStatus_IsError(CF_TxnStatus_MAX));
+}
+
+void Test_CF_TxnStatus_To_ConditionCode(void)
+{
+    /* Test function for:
+     * CF_CFDP_ConditionCode_t CF_TxnStatus_To_ConditionCode(CF_TxnStatus_t txn_stat)
+     */
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_UNDEFINED), CF_CFDP_ConditionCode_NO_ERROR);
+
+    /* for the 4-bit condition codes these should be numerically equivalent to status codes */
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_NO_ERROR), CF_CFDP_ConditionCode_NO_ERROR);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_POS_ACK_LIMIT_REACHED),
+                      CF_CFDP_ConditionCode_POS_ACK_LIMIT_REACHED);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_KEEP_ALIVE_LIMIT_REACHED),
+                      CF_CFDP_ConditionCode_KEEP_ALIVE_LIMIT_REACHED);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_INVALID_TRANSMISSION_MODE),
+                      CF_CFDP_ConditionCode_INVALID_TRANSMISSION_MODE);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_FILESTORE_REJECTION),
+                      CF_CFDP_ConditionCode_FILESTORE_REJECTION);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_FILE_CHECKSUM_FAILURE),
+                      CF_CFDP_ConditionCode_FILE_CHECKSUM_FAILURE);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_FILE_SIZE_ERROR),
+                      CF_CFDP_ConditionCode_FILE_SIZE_ERROR);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_NAK_LIMIT_REACHED),
+                      CF_CFDP_ConditionCode_NAK_LIMIT_REACHED);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_INACTIVITY_DETECTED),
+                      CF_CFDP_ConditionCode_INACTIVITY_DETECTED);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_INVALID_FILE_STRUCTURE),
+                      CF_CFDP_ConditionCode_INVALID_FILE_STRUCTURE);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_CHECK_LIMIT_REACHED),
+                      CF_CFDP_ConditionCode_CHECK_LIMIT_REACHED);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_UNSUPPORTED_CHECKSUM_TYPE),
+                      CF_CFDP_ConditionCode_UNSUPPORTED_CHECKSUM_TYPE);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_SUSPEND_REQUEST_RECEIVED),
+                      CF_CFDP_ConditionCode_SUSPEND_REQUEST_RECEIVED);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_CANCEL_REQUEST_RECEIVED),
+                      CF_CFDP_ConditionCode_CANCEL_REQUEST_RECEIVED);
+
+    /* Other extended translations */
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_ACK_LIMIT_NO_FIN),
+                      CF_CFDP_ConditionCode_INACTIVITY_DETECTED);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_ACK_LIMIT_NO_EOF),
+                      CF_CFDP_ConditionCode_INACTIVITY_DETECTED);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_PROTOCOL_ERROR),
+                      CF_CFDP_ConditionCode_CANCEL_REQUEST_RECEIVED);
+    UtAssert_INT32_EQ(CF_TxnStatus_To_ConditionCode(CF_TxnStatus_MAX), CF_CFDP_ConditionCode_CANCEL_REQUEST_RECEIVED);
+}
+
+void Test_CF_TxnStatus_From_ConditionCode(void)
+{
+    /* Test function for:
+     * CF_TxnStatus_t CF_TxnStatus_From_ConditionCode(CF_CFDP_ConditionCode_t cc)
+     */
+    int32 i;
+
+    /* for the 4-bit condition codes these should be numerically equivalent to status codes */
+    for (i = 0; i <= 15; ++i)
+    {
+        UtAssert_INT32_EQ(CF_TxnStatus_From_ConditionCode(i), i);
+    }
+}
+
 /*******************************************************************************
 **
 **  cf_utils_tests UtTest_Add groups
@@ -1105,6 +1176,12 @@ void add_cf_utils_h_tests(void)
     UtTest_Add(Test_CF_CList_InsertBack_Ex_Call_CF_CList_InsertBack_AndIncrement_q_size, cf_utils_tests_Setup,
                cf_utils_tests_Teardown, "Test_CF_CList_InsertBack_Ex_Call_CF_CList_InsertBack_AndIncrement_q_size");
     /* end CF_CList_InsertBack_Ex tests */
+
+    UtTest_Add(Test_CF_TxnStatus_IsError, cf_utils_tests_Setup, cf_utils_tests_Teardown, "CF_TxnStatus_IsError");
+    UtTest_Add(Test_CF_TxnStatus_To_ConditionCode, cf_utils_tests_Setup, cf_utils_tests_Teardown,
+               "CF_TxnStatus_To_ConditionCode");
+    UtTest_Add(Test_CF_TxnStatus_From_ConditionCode, cf_utils_tests_Setup, cf_utils_tests_Teardown,
+               "CF_TxnStatus_From_ConditionCode");
 }
 
 void add_CF_Traverse_WriteHistoryToFile_tests(void)

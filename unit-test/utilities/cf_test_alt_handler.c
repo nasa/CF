@@ -159,3 +159,19 @@ void UT_AltHandler_GenericPointerReturn(void *UserObj, UT_EntryKey_t FuncKey, co
 {
     UT_Stub_SetReturnValue(FuncKey, UserObj);
 }
+
+/*----------------------------------------------------------------
+ *
+ * Function: UT_AltHandler_CaptureTransactionStatus
+ *
+ * A handler for CF_CFDP_SetTxnStatus() and similar that captures the CF_TxnStatus_t
+ * value to the supplied storage location.
+ *
+ *-----------------------------------------------------------------*/
+void UT_AltHandler_CaptureTransactionStatus(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
+{
+    CF_TxnStatus_t *p_txn_stat = UserObj;
+    CF_TxnStatus_t  in_stat    = UT_Hook_GetArgValueByName(Context, "txn_stat", CF_TxnStatus_t);
+
+    *p_txn_stat = in_stat;
+}

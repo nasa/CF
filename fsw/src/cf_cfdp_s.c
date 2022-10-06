@@ -245,7 +245,7 @@ void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *t)
     else if (bytes_processed < 0)
     {
         /* IO error -- change state and send EOF */
-        t->history->cc            = CF_CFDP_ConditionCode_FILESTORE_REJECTION;
+        CF_CFDP_SetTxnStatus(t, CF_TxnStatus_FILESTORE_REJECTION);
         t->state_data.s.sub_state = CF_TxSubState_EOF;
     }
     else
@@ -324,6 +324,7 @@ void CF_CFDP_S2_SubstateSendFileData(CF_Transaction_t *t)
     }
     else if (ret < 0)
     {
+        CF_CFDP_SetTxnStatus(t, CF_TxnStatus_NAK_RESPONSE_ERROR);
         CF_CFDP_S_Reset(t);
     }
     else
@@ -425,7 +426,7 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
 
     if (!success)
     {
-        t->history->cc = CF_CFDP_ConditionCode_FILESTORE_REJECTION;
+        CF_CFDP_SetTxnStatus(t, CF_TxnStatus_FILESTORE_REJECTION);
         CF_CFDP_S_Reset(t);
     }
 
@@ -445,6 +446,7 @@ void CF_CFDP_S_SubstateSendFinAck(CF_Transaction_t *t)
     if (CF_CFDP_SendAck(t, CF_CFDP_AckTxnStatus_ACTIVE, CF_CFDP_FileDirective_FIN, t->state_data.s.s2.fin_cc,
                         t->history->peer_eid, t->history->seq_num) != CF_SendRet_NO_MSG)
     {
+        CF_CFDP_SetTxnStatus(t, CF_TxnStatus_NO_ERROR);
         CF_CFDP_S_Reset(t);
     }
 }
@@ -461,6 +463,7 @@ void CF_CFDP_S2_EarlyFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_EARLY_FIN, CFE_EVS_EventType_ERROR,
                       "CF S%d(%lu:%lu): got early fin -- cancelling", (t->state == CF_TxnState_S2),
                       (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
+    CF_CFDP_SetTxnStatus(t, CF_TxnStatus_EARLY_FIN);
     CF_CFDP_S_Reset(t);
 }
 
@@ -566,7 +569,7 @@ void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     {
         /* don't send fin if error. Don't check the eof CC, just go with
          * the stored one we sent before */
-        if (t->history->cc != CF_CFDP_ConditionCode_NO_ERROR)
+        if (CF_TxnStatus_IsError(t->history->txn_stat))
         {
             CF_CFDP_S_Reset(t);
         }
@@ -707,6 +710,8 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_INACT_TIMER, CFE_EVS_EventType_ERROR,
                               "CF S2(%lu:%lu): inactivity timer expired", (unsigned long)t->history->src_eid,
                               (unsigned long)t->history->seq_num);
+            CF_CFDP_SetTxnStatus(t, CF_TxnStatus_INACTIVITY_DETECTED);
+
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.inactivity_timer;
             CF_CFDP_S_Reset(t);
         }
@@ -729,6 +734,7 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
                             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_ACK_LIMIT, CFE_EVS_EventType_ERROR,
                                               "CF S2(%lu:%lu), ack limit reached, no eof-ack",
                                               (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
+                            CF_CFDP_SetTxnStatus(t, CF_TxnStatus_ACK_LIMIT_NO_EOF);
                             ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.ack_limit;
 
                             /* no reason to reset this timer, as it isn't used again */
@@ -744,6 +750,7 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
                             }
                             else if (sret == CF_SendRet_ERROR)
                             {
+                                CF_CFDP_SetTxnStatus(t, CF_TxnStatus_SEND_EOF_FAILURE);
                                 CF_CFDP_S_Reset(t); /* can't go on, error occurred */
                                 early_exit = true;
                             }
