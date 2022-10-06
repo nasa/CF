@@ -361,6 +361,7 @@ void Test_CF_CFDP_RecvFd(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     CF_CODEC_SET_DONE(ph->pdec);
     UtAssert_INT32_EQ(CF_CFDP_RecvFd(t, ph), -1);
+    UtAssert_INT32_EQ(t->history->txn_stat, CF_TxnStatus_PROTOCOL_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_FD_SHORT);
 
     /* deode errors: crc part */
@@ -374,6 +375,7 @@ void Test_CF_CFDP_RecvFd(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     ph->pdu_header.segment_meta_flag = 1;
     UtAssert_INT32_EQ(CF_CFDP_RecvFd(t, ph), -1);
+    UtAssert_INT32_EQ(t->history->txn_stat, CF_TxnStatus_PROTOCOL_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_FD_UNSUPPORTED);
 }
 
@@ -675,10 +677,10 @@ void Test_CF_CFDP_SendEof(void)
     UtAssert_INT32_EQ(CF_CFDP_SendEof(t), CF_SendRet_SUCCESS);
     UtAssert_ZERO(eof->tlv_list.num_tlv);
 
-    /* test with an alternate condition code, which should append a TLV */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, &h, &t, NULL);
-    eof   = &ph->int_header.eof;
-    h->cc = CF_CFDP_ConditionCode_FILESTORE_REJECTION;
+    /* test with a transaction error status, which should append a TLV */
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, &h, &t, NULL);
+    eof = &ph->int_header.eof;
+    UT_SetDefaultReturnValue(UT_KEY(CF_TxnStatus_To_ConditionCode), CF_CFDP_ConditionCode_FILESTORE_REJECTION);
     UtAssert_INT32_EQ(CF_CFDP_SendEof(t), CF_SendRet_SUCCESS);
     UtAssert_UINT32_EQ(eof->tlv_list.num_tlv, 1);
     UtAssert_STUB_COUNT(CF_CFDP_Send, 2);
@@ -1392,6 +1394,29 @@ void Test_CF_CFDP_ResetTransaction(void)
     UtAssert_STUB_COUNT(CF_FreeTransaction, 8);
 }
 
+void Test_CF_CFDP_SetTxnStatus(void)
+{
+    /* Test case for:
+     * void CF_CFDP_SetTxnStatus(CF_Transaction_t *t, CF_TxnStatus_t txn_stat)
+     */
+
+    CF_Transaction_t *t;
+
+    /* nominal call */
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
+    UtAssert_VOIDCALL(CF_CFDP_SetTxnStatus(t, CF_TxnStatus_NO_ERROR));
+    UtAssert_INT32_EQ(t->history->txn_stat, CF_TxnStatus_NO_ERROR);
+
+    /* set an error */
+    UtAssert_VOIDCALL(CF_CFDP_SetTxnStatus(t, CF_TxnStatus_FILESTORE_REJECTION));
+    UtAssert_INT32_EQ(t->history->txn_stat, CF_TxnStatus_FILESTORE_REJECTION);
+
+    /* confirm errors are "sticky"  */
+    UT_SetDefaultReturnValue(UT_KEY(CF_TxnStatus_IsError), true);
+    UtAssert_VOIDCALL(CF_CFDP_SetTxnStatus(t, CF_TxnStatus_NO_ERROR));
+    UtAssert_INT32_EQ(t->history->txn_stat, CF_TxnStatus_FILESTORE_REJECTION);
+}
+
 void Test_CF_CFDP_SendEotPkt(void)
 {
     CF_EotPktBuf_t  PktBuf;
@@ -1502,6 +1527,7 @@ void UtTest_Setup(void)
     UtTest_Add(Test_CF_CFDP_DoTick, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_DoTick");
     UtTest_Add(Test_CF_CFDP_TickTransactions, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_TickTransactions");
     UtTest_Add(Test_CF_CFDP_ResetTransaction, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_ResetTransaction");
+    UtTest_Add(Test_CF_CFDP_SetTxnStatus, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_SetTxnStatus");
     UtTest_Add(Test_CF_CFDP_SendEotPkt, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "Test_CF_CFDP_SendEotPkt");
     UtTest_Add(Test_CF_CFDP_CancelTransaction, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown,
                "CF_CFDP_CancelTransaction");

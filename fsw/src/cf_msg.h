@@ -139,7 +139,7 @@ typedef struct CF_EotPacket
     uint32                    channel;    /**< \brief Channel number */
     uint32                    direction;  /**< \brief direction of this transaction */
     uint32                    state;      /**< \brief Transaction state */
-    uint32                    cc;         /**< \brief final condition code of operation */
+    uint32                    txn_stat;   /**< \brief final status code of transaction (extended CFDP CC) */
     CF_EntityId_t             src_eid;    /**< \brief the source eid of the transaction */
     CF_EntityId_t             peer_eid;   /**< \brief peer_eid is always the "other guy", same src_eid for RX */
     uint32                    fsize;      /**< \brief File size */

@@ -173,15 +173,15 @@ void CF_CFDP_R2_Reset(CF_Transaction_t *t)
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_R2_SetCc()
+ * Generated stub function for CF_CFDP_R2_SetFinTxnStatus()
  * ----------------------------------------------------
  */
-void CF_CFDP_R2_SetCc(CF_Transaction_t *t, CF_CFDP_ConditionCode_t cc)
+void CF_CFDP_R2_SetFinTxnStatus(CF_Transaction_t *t, CF_TxnStatus_t txn_stat)
 {
-    UT_GenStub_AddParam(CF_CFDP_R2_SetCc, CF_Transaction_t *, t);
-    UT_GenStub_AddParam(CF_CFDP_R2_SetCc, CF_CFDP_ConditionCode_t, cc);
+    UT_GenStub_AddParam(CF_CFDP_R2_SetFinTxnStatus, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_R2_SetFinTxnStatus, CF_TxnStatus_t, txn_stat);
 
-    UT_GenStub_Execute(CF_CFDP_R2_SetCc, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_R2_SetFinTxnStatus, Basic, NULL);
 }
 
 /*

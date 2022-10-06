@@ -104,15 +104,15 @@ void CF_CFDP_R_Cancel(CF_Transaction_t *t);
 void CF_CFDP_R_Init(CF_Transaction_t *t);
 
 /************************************************************************/
-/** @brief Helper function to store condition code set send_fin flag.
+/** @brief Helper function to store transaction status code and set send_fin flag.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
  *
  * @param t  Pointer to the transaction object
- * @param cc Condition Code value to set within transaction
+ * @param cc Status Code value to set within transaction
  */
-void CF_CFDP_R2_SetCc(CF_Transaction_t *t, CF_CFDP_ConditionCode_t cc);
+void CF_CFDP_R2_SetFinTxnStatus(CF_Transaction_t *t, CF_TxnStatus_t txn_stat);
 
 /************************************************************************/
 /** @brief CFDP R1 transaction reset function.

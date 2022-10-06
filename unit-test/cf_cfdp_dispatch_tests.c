@@ -163,7 +163,7 @@ void Test_CF_CFDP_R_DispatchRecv(void)
     /* file data with error */
     UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     ph->pdu_header.pdu_type = 1;
-    t->history->cc          = CF_CFDP_ConditionCode_FILESTORE_REJECTION;
+    UT_SetDeferredRetcode(UT_KEY(CF_TxnStatus_IsError), 1, true);
     UtAssert_VOIDCALL(CF_CFDP_R_DispatchRecv(t, ph, &dispatch, NULL));
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[t->chan_num].counters.recv.dropped, 1);
 

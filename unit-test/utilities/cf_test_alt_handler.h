@@ -39,4 +39,6 @@ void UT_AltHandler_CF_TraverseAllTransactions_All_Channels_Set_Context(void *Use
 
 void UT_AltHandler_GenericPointerReturn(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context);
 
+void UT_AltHandler_CaptureTransactionStatus(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context);
+
 #endif /* CF_TEST_ALT_HANDLER_H */

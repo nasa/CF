@@ -31,6 +31,7 @@ void UT_DefaultHandler_CF_FindUnusedTransaction(void *, UT_EntryKey_t, const UT_
 void UT_DefaultHandler_CF_ResetHistory(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_TraverseAllTransactions(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_TraverseAllTransactions_All_Channels(void *, UT_EntryKey_t, const UT_StubContext_t *);
+void UT_DefaultHandler_CF_TxnStatus_IsError(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_WrappedOpenCreate(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_WriteHistoryQueueDataToFile(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_WriteTxnQueueDataToFile(void *, UT_EntryKey_t, const UT_StubContext_t *);
@@ -227,6 +228,54 @@ int CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg)
     UT_GenStub_Execute(CF_Traverse_WriteTxnQueueEntryToFile, Basic, NULL);
 
     return UT_GenStub_GetReturnValue(CF_Traverse_WriteTxnQueueEntryToFile, int);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_TxnStatus_From_ConditionCode()
+ * ----------------------------------------------------
+ */
+CF_TxnStatus_t CF_TxnStatus_From_ConditionCode(CF_CFDP_ConditionCode_t cc)
+{
+    UT_GenStub_SetupReturnBuffer(CF_TxnStatus_From_ConditionCode, CF_TxnStatus_t);
+
+    UT_GenStub_AddParam(CF_TxnStatus_From_ConditionCode, CF_CFDP_ConditionCode_t, cc);
+
+    UT_GenStub_Execute(CF_TxnStatus_From_ConditionCode, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_TxnStatus_From_ConditionCode, CF_TxnStatus_t);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_TxnStatus_IsError()
+ * ----------------------------------------------------
+ */
+bool CF_TxnStatus_IsError(CF_TxnStatus_t txn_stat)
+{
+    UT_GenStub_SetupReturnBuffer(CF_TxnStatus_IsError, bool);
+
+    UT_GenStub_AddParam(CF_TxnStatus_IsError, CF_TxnStatus_t, txn_stat);
+
+    UT_GenStub_Execute(CF_TxnStatus_IsError, Basic, UT_DefaultHandler_CF_TxnStatus_IsError);
+
+    return UT_GenStub_GetReturnValue(CF_TxnStatus_IsError, bool);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_TxnStatus_To_ConditionCode()
+ * ----------------------------------------------------
+ */
+CF_CFDP_ConditionCode_t CF_TxnStatus_To_ConditionCode(CF_TxnStatus_t txn_stat)
+{
+    UT_GenStub_SetupReturnBuffer(CF_TxnStatus_To_ConditionCode, CF_CFDP_ConditionCode_t);
+
+    UT_GenStub_AddParam(CF_TxnStatus_To_ConditionCode, CF_TxnStatus_t, txn_stat);
+
+    UT_GenStub_Execute(CF_TxnStatus_To_ConditionCode, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_TxnStatus_To_ConditionCode, CF_CFDP_ConditionCode_t);
 }
 
 /*

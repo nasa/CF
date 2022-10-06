@@ -138,19 +138,69 @@ typedef enum
 } CF_Direction_t;
 
 /**
+ * @brief Values for Transaction Status code
+ *
+ * This enum defines the possible values representing the
+ * result of a transaction.  This is a superset of the condition codes
+ * defined in CCSDS book 727 (condition codes) but with additional
+ * values for local conditions that the blue book does not have,
+ * such as protocol/state machine or decoding errors.
+ *
+ * The values here are designed to not overlap with the condition
+ * codes defined in the blue book, but can be translated to one
+ * of those codes for the purposes of FIN/ACK/EOF PDUs.
+ */
+typedef enum
+{
+    /**
+     * The undefined status is a placeholder for new transactions before a value is set.
+     */
+    CF_TxnStatus_UNDEFINED = -1,
+
+    /* Status codes 0-15 share the same values/meanings as the CFDP condition code (CC) */
+    CF_TxnStatus_NO_ERROR                  = CF_CFDP_ConditionCode_NO_ERROR,
+    CF_TxnStatus_POS_ACK_LIMIT_REACHED     = CF_CFDP_ConditionCode_POS_ACK_LIMIT_REACHED,
+    CF_TxnStatus_KEEP_ALIVE_LIMIT_REACHED  = CF_CFDP_ConditionCode_KEEP_ALIVE_LIMIT_REACHED,
+    CF_TxnStatus_INVALID_TRANSMISSION_MODE = CF_CFDP_ConditionCode_INVALID_TRANSMISSION_MODE,
+    CF_TxnStatus_FILESTORE_REJECTION       = CF_CFDP_ConditionCode_FILESTORE_REJECTION,
+    CF_TxnStatus_FILE_CHECKSUM_FAILURE     = CF_CFDP_ConditionCode_FILE_CHECKSUM_FAILURE,
+    CF_TxnStatus_FILE_SIZE_ERROR           = CF_CFDP_ConditionCode_FILE_SIZE_ERROR,
+    CF_TxnStatus_NAK_LIMIT_REACHED         = CF_CFDP_ConditionCode_NAK_LIMIT_REACHED,
+    CF_TxnStatus_INACTIVITY_DETECTED       = CF_CFDP_ConditionCode_INACTIVITY_DETECTED,
+    CF_TxnStatus_INVALID_FILE_STRUCTURE    = CF_CFDP_ConditionCode_INVALID_FILE_STRUCTURE,
+    CF_TxnStatus_CHECK_LIMIT_REACHED       = CF_CFDP_ConditionCode_CHECK_LIMIT_REACHED,
+    CF_TxnStatus_UNSUPPORTED_CHECKSUM_TYPE = CF_CFDP_ConditionCode_UNSUPPORTED_CHECKSUM_TYPE,
+    CF_TxnStatus_SUSPEND_REQUEST_RECEIVED  = CF_CFDP_ConditionCode_SUSPEND_REQUEST_RECEIVED,
+    CF_TxnStatus_CANCEL_REQUEST_RECEIVED   = CF_CFDP_ConditionCode_CANCEL_REQUEST_RECEIVED,
+
+    /* Additional status codes for items not representable in a CFDP CC, these can be set in
+     * transactions that did not make it to the point of sending FIN/EOF. */
+    CF_TxnStatus_PROTOCOL_ERROR     = 16,
+    CF_TxnStatus_ACK_LIMIT_NO_FIN   = 17,
+    CF_TxnStatus_ACK_LIMIT_NO_EOF   = 18,
+    CF_TxnStatus_NAK_RESPONSE_ERROR = 19,
+    CF_TxnStatus_SEND_EOF_FAILURE   = 20,
+    CF_TxnStatus_EARLY_FIN          = 21,
+
+    /* keep last */
+    CF_TxnStatus_MAX = 22
+
+} CF_TxnStatus_t;
+
+/**
  * @brief CF History entry
  *
  * Records CF app operations for future reference
  */
 typedef struct CF_History
 {
-    CF_TxnFilenames_t       fnames;   /**< \brief file names associated with this history entry */
-    CF_CListNode_t          cl_node;  /**< \brief for connection to a CList */
-    CF_Direction_t          dir;      /**< \brief direction of this history entry */
-    CF_CFDP_ConditionCode_t cc;       /**< \brief final condition code of operation */
-    CF_EntityId_t           src_eid;  /**< \brief the source eid of the transaction */
-    CF_EntityId_t           peer_eid; /**< \brief peer_eid is always the "other guy", same src_eid for RX */
-    CF_TransactionSeq_t     seq_num;  /**< \brief transaction identifier, stays constant for entire transfer */
+    CF_TxnFilenames_t   fnames;   /**< \brief file names associated with this history entry */
+    CF_CListNode_t      cl_node;  /**< \brief for connection to a CList */
+    CF_Direction_t      dir;      /**< \brief direction of this history entry */
+    CF_TxnStatus_t      txn_stat; /**< \brief final status of operation */
+    CF_EntityId_t       src_eid;  /**< \brief the source eid of the transaction */
+    CF_EntityId_t       peer_eid; /**< \brief peer_eid is always the "other guy", same src_eid for RX */
+    CF_TransactionSeq_t seq_num;  /**< \brief transaction identifier, stays constant for entire transfer */
 } CF_History_t;
 
 /**
