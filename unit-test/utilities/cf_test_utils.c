@@ -222,7 +222,6 @@ uint8 Any_uint8_ExceptUnsetBits(uint8 bits)
 
     while ((random_value | bits) == bits)
     {
-
         if (num_tries == max_tries)
         {
             UtPrintf("Any_uint8_ExceptUnsetBits unable to get valid number in %u checks\n", num_tries);

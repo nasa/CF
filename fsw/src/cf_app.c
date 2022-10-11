@@ -40,8 +40,6 @@ CF_AppData_t CF_AppData;
 
 /*----------------------------------------------------------------
  *
- * Function: CF_HkCmd
- *
  * Application-scope internal function
  * See description in cf_app.h for argument/return detail
  *
@@ -53,8 +51,6 @@ void CF_HkCmd(void)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CheckTables
  *
  * Application-scope internal function
  * See description in cf_app.h for argument/return detail
@@ -109,8 +105,6 @@ void CF_CheckTables(void)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_ValidateConfigTable
- *
  * Application-scope internal function
  * See description in cf_app.h for argument/return detail
  *
@@ -149,8 +143,6 @@ int32 CF_ValidateConfigTable(void *tbl_ptr)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_TableInit
  *
  * Application-scope internal function
  * See description in cf_app.h for argument/return detail
@@ -206,8 +198,6 @@ int32 CF_TableInit(void)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_Init
  *
  * Application-scope internal function
  * See description in cf_app.h for argument/return detail
@@ -278,8 +268,6 @@ int32 CF_Init(void)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_WakeUp
- *
  * Application-scope internal function
  * See description in cf_app.h for argument/return detail
  *
@@ -292,8 +280,6 @@ void CF_WakeUp(void)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_ProcessMsg
  *
  * Application-scope internal function
  * See description in cf_app.h for argument/return detail
@@ -329,8 +315,6 @@ void CF_ProcessMsg(CFE_SB_Buffer_t *msg)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_AppMain
  *
  * Entry point function
  * See description in cf_app.h for argument/return detail

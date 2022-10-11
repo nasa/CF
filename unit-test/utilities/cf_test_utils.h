@@ -52,7 +52,6 @@ typedef enum
     UT_CF_Setup_NONE,
     UT_CF_Setup_TX,
     UT_CF_Setup_RX
-
 } UT_CF_Setup_t;
 
 /*******************************************************************************

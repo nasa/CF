@@ -32,14 +32,12 @@
 void cf_app_tests_Setup(void)
 {
     cf_tests_Setup();
-} /* end cf_app_tests_Setup */
+}
 
 void CF_App_Tests_Teardown(void)
 {
     cf_tests_Teardown();
-} /* end CF_App_Tests_Teardown */
-
-/* end cf_app_tests Setup and Teardown */
+}
 
 /*******************************************************************************
 **
@@ -61,8 +59,6 @@ void UT_UpdatedDefaultHandler_CFE_SB_ReceiveBuffer(void *UserObj, UT_EntryKey_t 
     UT_Stub_CopyToLocal(UT_KEY(CFE_SB_ReceiveBuffer), BufPtr, sizeof(*BufPtr));
 }
 
-/* end cf_app_tests helpers */
-
 /*******************************************************************************
 **
 **  CF_HkCmd tests - full coverage
@@ -71,7 +67,6 @@ void UT_UpdatedDefaultHandler_CFE_SB_ReceiveBuffer(void *UserObj, UT_EntryKey_t 
 
 void Test_CF_HkCmd(void)
 {
-
     /* Act */
     CF_HkCmd();
 
@@ -80,8 +75,6 @@ void Test_CF_HkCmd(void)
     UtAssert_STUB_COUNT(CFE_SB_TransmitMsg, 1);
     UtAssert_STUB_COUNT(CFE_TIME_GetTime, 1);
 }
-
-/* end CF_HkCmd tests */
 
 /*******************************************************************************
 **
@@ -99,7 +92,7 @@ void Test_CF_CheckTables_DoNotReleaseAddressBecauseEngineIsEnabled(void)
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_TBL_ReleaseAddress, 0);
-} /* end Test_CF_CheckTables_DoNotReleaseAddressBecauseEngineIsEnabled */
+}
 
 void Test_CF_CheckTables_CallTo_CFE_TBL_ReleaseAddress_ReturnsNot_CFE_SUCCESS_SendEvent(void)
 {
@@ -111,7 +104,7 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_ReleaseAddress_ReturnsNot_CFE_SUCCESS_Se
     /* Assert */
     UtAssert_STUB_COUNT(CFE_TBL_ReleaseAddress, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-} /* end Test_CF_CheckTables_CallTo_CFE_TBL_ReleaseAddress_ReturnsNot_CFE_SUCCESS_SendEvent */
+}
 
 void Test_CF_CheckTables_CallTo_CFE_TBL_Manage_ReturnsNot_CFE_SUCCESS_SendEvent(void)
 {
@@ -124,7 +117,7 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_Manage_ReturnsNot_CFE_SUCCESS_SendEvent(
     UtAssert_STUB_COUNT(CFE_TBL_ReleaseAddress, 1);
     UtAssert_STUB_COUNT(CFE_TBL_Manage, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-} /* end Test_CF_CheckTables_CallTo_CFE_TBL_Manage_ReturnsNot_CFE_SUCCESS_SendEvent */
+}
 
 void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_ReturnsNot_CFE_SUCCESS_Or_CFE_TBL_INFO_UPDATED_SendEvent(void)
 {
@@ -138,7 +131,7 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_ReturnsNot_CFE_SUCCESS_Or_CFE
     UtAssert_STUB_COUNT(CFE_TBL_Manage, 1);
     UtAssert_STUB_COUNT(CFE_TBL_GetAddress, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-} /* end Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_ReturnsNot_CFE_SUCCESS_Or_CFE_TBL_INFO_UPDATED_SendEvent */
+}
 
 void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS(void)
 {
@@ -150,7 +143,7 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS(void)
     UtAssert_STUB_COUNT(CFE_TBL_Manage, 1);
     UtAssert_STUB_COUNT(CFE_TBL_GetAddress, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-} /* end Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS */
+}
 
 void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED(void)
 {
@@ -164,9 +157,7 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED(
     UtAssert_STUB_COUNT(CFE_TBL_Manage, 1);
     UtAssert_STUB_COUNT(CFE_TBL_GetAddress, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-} /* end Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED */
-
-/* end CF_CheckTables tests */
+}
 
 /*******************************************************************************
 **
@@ -188,13 +179,13 @@ void cf_config_table_tests_set_dummy_table_to_nominal(void)
     dummy_table.rx_crc_calc_bytes_per_wakeup = Any_uint32_Except(0) << 10;
     // all values less than sizeof(CF_CFDP_PduFileDataContent_t) are nominal
     dummy_table.outgoing_file_chunk_size = Any_uint16_LessThan(sizeof(CF_CFDP_PduFileDataContent_t));
-} /* end cf_config_table_tests_set_dummy_table_to_nominal */
+}
 
 void Setup_cf_config_table_tests(void)
 {
     cf_app_tests_Setup();
     cf_config_table_tests_set_dummy_table_to_nominal();
-} /* end Setup_cf_config_table_tests */
+}
 
 /* end CF_ValidateConfigTable tests specific items */
 
@@ -211,7 +202,7 @@ void Test_CF_ValidateConfigTable_FailBecauseTableTicksPerSecondIs0(void)
 
     /* Assert */
     UtAssert_INT32_EQ(result, -1);
-} /* end Test_CF_ValidateConfigTable_FailBecauseTableTicksPerSecondIs0 */
+}
 
 void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0(void)
 {
@@ -227,7 +218,7 @@ void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0(void)
 
     /* Assert */
     UtAssert_INT32_EQ(result, -2);
-} /* end Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0 */
+}
 
 void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIsNot1024ByteAligned(void)
 {
@@ -246,7 +237,7 @@ void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIsNot1024ByteAlign
 
     /* Assert */
     UtAssert_INT32_EQ(result, -2);
-} /* end Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIsNot1024ByteAligned */
+}
 
 void Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArray(void)
 {
@@ -264,7 +255,7 @@ void Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArra
 
     /* Assert */
     UtAssert_INT32_EQ(result, -3);
-} /* end Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArray */
+}
 
 void Test_CF_ValidateConfigTable_Success(void)
 {
@@ -281,9 +272,7 @@ void Test_CF_ValidateConfigTable_Success(void)
 
     /* Assert */
     UtAssert_INT32_EQ(result, CFE_SUCCESS);
-} /* end Test_CF_ValidateConfigTable_Success */
-
-/* end CF_ValidateConfigTable tests */
+}
 
 /*******************************************************************************
 **
@@ -303,7 +292,7 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_Register_DidNotReturnSuccess(void)
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_REG);
-} /* end Test_CF_TableInit_FailBecause_CFE_TBL_Register_DidNotReturnSuccess */
+}
 
 void Test_CF_TableInit_FailBecause_CFE_TBL_Load_DidNotReturnSuccess(void)
 {
@@ -317,7 +306,7 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_Load_DidNotReturnSuccess(void)
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_LOAD);
-} /* end Test_CF_TableInit_FailBecause_CFE_TBL_Load_DidNotReturnSuccess */
+}
 
 void Test_CF_TableInit_FailBecause_CFE_TBL_Manage_DidNotReturnSuccess(void)
 {
@@ -332,7 +321,7 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_Manage_DidNotReturnSuccess(void)
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_MANAGE);
-} /* end Test_CF_TableInit_FailBecause_CFE_TBL_Manage_DidNotReturnSuccess */
+}
 
 void Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess(void)
 {
@@ -347,7 +336,7 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess(void)
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_GETADDR);
-} /* end Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess */
+}
 
 void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_SUCCESS_SuccessAndDoNotSendEvent(void)
 {
@@ -356,7 +345,7 @@ void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_SUCCESS_SuccessAndDoN
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-} /* end Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_SUCCESS_SuccessAndDoNotSendEvent */
+}
 
 void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED_SuccessAndDoNotSendEvent(void)
 {
@@ -368,9 +357,7 @@ void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED_Succ
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-} /* end Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED_SuccessAndDoNotSendEvent */
-
-/* end CF_TableInit tests */
+}
 
 /*******************************************************************************
 **
@@ -391,7 +378,7 @@ void Test_CF_Init_CallTo_CFE_EVS_Register_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_Wri
     UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
     UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
     UtAssert_STUB_COUNT(CFE_ES_WriteToSysLog, 1);
-} /* end Test_CF_Init_CallTo_CFE_EVS_Register_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus */
+}
 
 void Test_CF_Init_CallTo_CFE_SB_CreatePipe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus(void)
 {
@@ -408,7 +395,7 @@ void Test_CF_Init_CallTo_CFE_SB_CreatePipe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_Wr
     UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
     UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
     UtAssert_STUB_COUNT(CFE_ES_WriteToSysLog, 1);
-} /* end Test_CF_Init_CallTo_CFE_SB_CreatePipe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus */
+}
 
 void Test_CF_Init_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus(void)
 {
@@ -426,7 +413,7 @@ void Test_CF_Init_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_E
     UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
     UtAssert_STUB_COUNT(CFE_SB_Subscribe, 1);
     UtAssert_STUB_COUNT(CFE_ES_WriteToSysLog, 1);
-} /* end Test_CF_Init_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus */
+}
 
 /* NOTE: multi call test for CFE_SB_Subscribe would be helpful but not necessary for coverage */
 
@@ -447,7 +434,7 @@ void Test_CF_Init_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus(v
     UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
     UtAssert_STUB_COUNT(CFE_SB_Subscribe, 3);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-} /* end Test_CF_Init_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus */
+}
 
 void Test_CF_Init_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus(void)
 {
@@ -465,7 +452,7 @@ void Test_CF_Init_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorSt
     UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
     UtAssert_STUB_COUNT(CFE_SB_Subscribe, 3);
     UtAssert_STUB_COUNT(CF_CFDP_InitEngine, 1);
-} /* end Test_CF_Init_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus */
+}
 
 void Test_CF_Init_CallTo_CFE_EVS_SendEvent_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus(void)
 {
@@ -485,7 +472,7 @@ void Test_CF_Init_CallTo_CFE_EVS_SendEvent_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_Wr
     // UtAssert_STUB_COUNT(CF_TableInit, 1);
     UtAssert_STUB_COUNT(CF_CFDP_InitEngine, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-} /* end Test_CF_Init_CallTo_CFE_EVS_SendEvent_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus */
+}
 
 void Test_CF_Init_Success(void)
 {
@@ -494,9 +481,7 @@ void Test_CF_Init_Success(void)
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
-} /* end Test_CF_Init_Success */
-
-/* end CF_Init tests */
+}
 
 /*******************************************************************************
 **
@@ -514,7 +499,7 @@ void Test_CF_WakeUp(void)
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_CycleEngine, 1);
-} /* end Test_CF_WakeUp */
+}
 
 /*******************************************************************************
 **
@@ -539,7 +524,7 @@ void Test_CF_ProcessMsg_ProcessGroundCommand(void)
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetMsgId, 1);
     UtAssert_STUB_COUNT(CF_ProcessGroundCommand, 1);
-} /* end Test_CF_ProcessMsg_ProcessGroundCommand */
+}
 
 void Test_CF_ProcessMsg_WakeUp(void)
 {
@@ -558,8 +543,7 @@ void Test_CF_ProcessMsg_WakeUp(void)
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetMsgId, 1);
     UtAssert_STUB_COUNT(CF_CFDP_CycleEngine, 1);
-
-} /* end Test_CF_ProcessMsg_WakeUp */
+}
 
 void Test_CF_ProcessMsg_SendHk(void)
 {
@@ -578,7 +562,7 @@ void Test_CF_ProcessMsg_SendHk(void)
     UtAssert_STUB_COUNT(CFE_MSG_GetMsgId, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_STUB_COUNT(CFE_MSG_SetMsgTime, 1); /* Confirms CF_HkCmd path was taken */
-} /* end Test_CF_ProcessMsg_SendHk */
+}
 
 void Test_CF_ProcessMsg_UnrecognizedCommandEnterDefaultPath(void)
 {
@@ -595,10 +579,7 @@ void Test_CF_ProcessMsg_UnrecognizedCommandEnterDefaultPath(void)
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_INIT_CMD_LENGTH);
-
-} /* end Test_CF_ProcessMsg_UnrecognizedCommandEnterDefaultPath */
-
-/* end CF_ProcessMsg tests */
+}
 
 /*******************************************************************************
 **
@@ -622,8 +603,7 @@ void Test_CF_AppMain_CallTo_CF_Init_DoNotReturn_CFE_SUCCESS_Set_CF_AppData_run_s
     UtAssert_STUB_COUNT(CFE_ES_RunLoop, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_UINT32_EQ(CF_AppData.run_status, CFE_ES_RunStatus_APP_ERROR);
-} /* end Test_CF_AppMain_CallTo_CF_Init_DoNotReturn_CFE_SUCCESS_Set_CF_AppData_run_status_To_CFE_ES_RunStatus_APP_ERROR
-   */
+}
 
 void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
 {
@@ -711,9 +691,7 @@ void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndV
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 2);
     /* Assert for CF_ProcessMsg */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
-} /* end Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndValid_msg_Call_CF_ProcessMsg */
-
-/* end CF_AppMain tests */
+}
 
 /*******************************************************************************
 **
@@ -743,7 +721,7 @@ void add_CF_CheckTables_tests(void)
                CF_App_Tests_Teardown, "Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS");
     UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED, Setup_cf_config_table_tests,
                CF_App_Tests_Teardown, "Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED");
-} /* end add_CF_CheckTables_tests */
+}
 
 void add_CF_ValidateConfigTable_tests(void)
 {
@@ -759,7 +737,7 @@ void add_CF_ValidateConfigTable_tests(void)
                "Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArray");
     UtTest_Add(Test_CF_ValidateConfigTable_Success, Setup_cf_config_table_tests, CF_App_Tests_Teardown,
                "Test_CF_ValidateConfigTable_Success");
-} /* end add_CF_ValidateConfigTable_tests */
+}
 
 void add_CF_TableInit_tests(void)
 {
@@ -777,7 +755,7 @@ void add_CF_TableInit_tests(void)
     UtTest_Add(Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED_SuccessAndDoNotSendEvent,
                cf_app_tests_Setup, CF_App_Tests_Teardown,
                "Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED_SuccessAndDoNotSendEvent");
-} /* end add_CF_TableInit_tests */
+}
 
 void add_CF_Init_tests(void)
 {
@@ -803,12 +781,12 @@ void add_CF_Init_tests(void)
         cf_app_tests_Setup, CF_App_Tests_Teardown,
         "Test_CF_Init_CallTo_CFE_EVS_SendEvent_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus");
     UtTest_Add(Test_CF_Init_Success, cf_app_tests_Setup, CF_App_Tests_Teardown, "Test_CF_Init_Success");
-} /* end add_CF_Init_tests */
+}
 
 void add_CF_WakeUp_tests(void)
 {
     UtTest_Add(Test_CF_WakeUp, cf_app_tests_Setup, CF_App_Tests_Teardown, "Test_CF_WakeUp");
-} /* end add_CF_WakeUp_tests */
+}
 
 void add_CF_ProcessMsg_tests(void)
 {
@@ -818,7 +796,7 @@ void add_CF_ProcessMsg_tests(void)
     UtTest_Add(Test_CF_ProcessMsg_SendHk, cf_app_tests_Setup, CF_App_Tests_Teardown, "Test_CF_ProcessMsg_SendHk");
     UtTest_Add(Test_CF_ProcessMsg_UnrecognizedCommandEnterDefaultPath, cf_app_tests_Setup, CF_App_Tests_Teardown,
                "Test_CF_ProcessMsg_UnrecognizedCommandEnterDefaultPath");
-} /* end add_CF_ProcessMsg_tests */
+}
 
 void add_CF_AppMain_tests(void)
 {
@@ -833,9 +811,7 @@ void add_CF_AppMain_tests(void)
         Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndValid_msg_Call_CF_ProcessMsg,
         cf_app_tests_Setup, CF_App_Tests_Teardown,
         "Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndValid_msg_Call_CF_ProcessMsg");
-} /* end add_CF_AppMain_tests */
-
-/* end cf_app_tests UtTest_Add groups */
+}
 
 /*******************************************************************************
 **
@@ -863,4 +839,3 @@ void UtTest_Setup(void)
 
     add_CF_AppMain_tests();
 }
-/* end cf_app_tests.c */

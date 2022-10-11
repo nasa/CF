@@ -36,8 +36,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: CF_Timer_Sec2Ticks
- *
  * Application-scope internal function
  * See description in cf_timer.h for argument/return detail
  *
@@ -48,8 +46,6 @@ uint32 CF_Timer_Sec2Ticks(CF_Timer_Seconds_t sec)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_Timer_InitRelSec
  *
  * Application-scope internal function
  * See description in cf_timer.h for argument/return detail
@@ -62,8 +58,6 @@ void CF_Timer_InitRelSec(CF_Timer_t *t, uint32 rel_sec)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_Timer_Expired
- *
  * Application-scope internal function
  * See description in cf_timer.h for argument/return detail
  *
@@ -74,8 +68,6 @@ int CF_Timer_Expired(const CF_Timer_t *t)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_Timer_Tick
  *
  * Application-scope internal function
  * See description in cf_timer.h for argument/return detail

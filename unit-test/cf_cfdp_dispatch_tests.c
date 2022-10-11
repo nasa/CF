@@ -109,15 +109,12 @@ void cf_cfdp_dispatch_tests_Setup(void)
 
     /* make sure global data is wiped between tests */
     memset(&CF_AppData, 0, sizeof(CF_AppData));
-
-} /* end cf_cfdp_dispatch_tests_Setup */
+}
 
 void cf_cfdp_dispatch_tests_Teardown(void)
 {
     cf_tests_Teardown();
-} /* end cf_cfdp_dispatch_tests_Teardown */
-
-/* end cf_cfdp_dispatch_tests Setup and Teardown */
+}
 
 /*******************************************************************************
 **
@@ -316,7 +313,4 @@ void UtTest_Setup(void)
                "CF_CFDP_TxStateDispatch");
     UtTest_Add(Test_CF_CFDP_RxStateDispatch, cf_cfdp_dispatch_tests_Setup, cf_cfdp_dispatch_tests_Teardown,
                "CF_CFDP_RxStateDispatch");
-
-} /* end UtTest_Setup for cf_cfdp_dispatch_tests.c */
-
-/* end cf_cfdp_dispatch_tests.c */
+}

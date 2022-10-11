@@ -131,15 +131,12 @@ void cf_cfdp_r_tests_Setup(void)
 
     /* make sure global data is wiped between tests */
     memset(&CF_AppData, 0, sizeof(CF_AppData));
-
-} /* end cf_cfdp_r_tests_Setup */
+}
 
 void cf_cfdp_r_tests_Teardown(void)
 {
     cf_tests_Teardown();
-} /* end cf_cfdp_r_tests_Teardown */
-
-/* end cf_cfdp_r_tests Setup and Teardown */
+}
 
 /*******************************************************************************
 **
@@ -1153,7 +1150,4 @@ void UtTest_Setup(void)
     UtTest_Add(Test_CF_CFDP_R2_RecvMd, cf_cfdp_r_tests_Setup, cf_cfdp_r_tests_Teardown, "CF_CFDP_R2_RecvMd");
     UtTest_Add(Test_CF_CFDP_R_SendInactivityEvent, cf_cfdp_r_tests_Setup, cf_cfdp_r_tests_Teardown,
                "CF_CFDP_R_SendInactivityEvent");
-
-} /* end UtTest_Setup for cf_cfdp_r_tests.c */
-
-/* end cf_cfdp_r_tests.c */
+}

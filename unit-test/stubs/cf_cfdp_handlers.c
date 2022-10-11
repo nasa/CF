@@ -49,8 +49,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_CFDP_ConstructPduHeader
- *
  * Default always returns NULL, an alt handler can be registered for other pointer returns
  *
  *-----------------------------------------------------------------*/
@@ -64,8 +62,6 @@ void UT_DefaultHandler_CF_CFDP_ConstructPduHeader(void *UserObj, UT_EntryKey_t F
 }
 
 /*----------------------------------------------------------------
- *
- * Function: UT_DefaultHandler_CF_CFDP_TxFile
  *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
@@ -92,8 +88,6 @@ void UT_DefaultHandler_CF_CFDP_TxFile(void *UserObj, UT_EntryKey_t FuncKey, cons
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_CFDP_TxFile
- *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
  *
@@ -119,8 +113,6 @@ void UT_DefaultHandler_CF_CFDP_PlaybackDir(void *UserObj, UT_EntryKey_t FuncKey,
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_CFDP_ResetTransaction
- *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
  *
@@ -137,8 +129,6 @@ void UT_DefaultHandler_CF_CFDP_ResetTransaction(void *UserObj, UT_EntryKey_t Fun
 }
 
 /*----------------------------------------------------------------
- *
- * Function: UT_DefaultHandler_CF_CFDP_CancelTransaction
  *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.

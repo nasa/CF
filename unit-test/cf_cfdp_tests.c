@@ -144,8 +144,6 @@ static void UT_CFDP_SetupBasicTestState(UT_CF_Setup_t setup, CF_Logical_PduBuffe
     UT_CF_ResetEventCapture();
 }
 
-/* end cf_cfdp_tests local utility functions */
-
 /*******************************************************************************
 **
 **  cf_cfdp_tests Setup and Teardown
@@ -161,15 +159,12 @@ void cf_cfdp_tests_Setup(void)
      * previously left in here.
      */
     memset(&CF_AppData, 0, sizeof(CF_AppData));
-
-} /* end cf_cfdp_tests_Setup */
+}
 
 void cf_cfdp_tests_Teardown(void)
 {
     cf_tests_Teardown();
-} /* end cf_cfdp_tests_Teardown */
-
-/* end cf_cfdp_tests Setup and Teardown */
+}
 
 /*******************************************************************************
 **
@@ -470,6 +465,7 @@ void Test_CF_CFDP_RecvDrop(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     UtAssert_VOIDCALL(CF_CFDP_RecvDrop(t, ph));
 }
+
 void Test_CF_CFDP_RecvIdle(void)
 {
     /* Test case for:
@@ -635,6 +631,7 @@ void Test_CF_CFDP_SendMd(void)
     UtAssert_STRINGBUF_EQ(md->source_filename.data_ptr, md->source_filename.length, h->fnames.src_filename,
                           sizeof(h->fnames.src_filename));
 }
+
 void Test_CF_CFDP_SendFd(void)
 {
     /* Test case for:
@@ -1564,7 +1561,4 @@ void UtTest_Setup(void)
     UtTest_Add(Test_CF_CFDP_SendFin, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_SendFin");
     UtTest_Add(Test_CF_CFDP_SendNak, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_SendNak");
     UtTest_Add(Test_CF_CFDP_AppendTlv, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_AppendTlv");
-
-} /* end UtTest_Setup for cf_cfdp_tests.c */
-
-/* end cf_cfdp_tests.c */
+}

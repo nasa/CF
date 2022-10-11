@@ -389,7 +389,6 @@ typedef struct CF_Transaction
      * Please ignore the duplicate declarations of the "all" flags.
      */
     CF_StateFlags_t flags;
-
 } CF_Transaction_t;
 
 /**

@@ -135,7 +135,6 @@ int CF_CFDP_CopyStringFromLV(char *buf, size_t buf_maxsz, const CF_Logical_Lv_t 
  */
 void CF_CFDP_CycleEngine(void)
 {
-
     UT_GenStub_Execute(CF_CFDP_CycleEngine, Basic, NULL);
 }
 
@@ -192,7 +191,6 @@ void CF_CFDP_DecodeStart(CF_DecoderState_t *pdec, const void *msgbuf, CF_Logical
  */
 void CF_CFDP_DisableEngine(void)
 {
-
     UT_GenStub_Execute(CF_CFDP_DisableEngine, Basic, NULL);
 }
 

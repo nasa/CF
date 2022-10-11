@@ -32,8 +32,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: UT_AltHandler_CF_CList_Traverse_TRAVERSE_ALL_ARGS_T
- *
  * A handler for CF_CList_Traverse which saves its arguments
  * including the opaque context pointer as a CF_TraverseAll_Arg_t object.
  *
@@ -74,8 +72,6 @@ void UT_AltHandler_CF_CList_Traverse_TRAVERSE_ALL_ARGS_T(void *UserObj, UT_Entry
 
 /*----------------------------------------------------------------
  *
- * Function: UT_AltHandler_CF_CList_Traverse_POINTER
- *
  * A handler for CF_CList_Traverse which saves its arguments
  * to a CF_CList_Traverse_POINTER_context_t object.
  *
@@ -102,8 +98,6 @@ void UT_AltHandler_CF_CList_Traverse_POINTER(void *UserObj, UT_EntryKey_t FuncKe
 }
 
 /*----------------------------------------------------------------
- *
- * Function: UT_AltHandler_CF_CList_Traverse_R_PRIO
  *
  * A handler for CF_CList_Traverse which saves its arguments
  * including the opaque context pointer as a CF_Traverse_PriorityArg_t object.
@@ -138,8 +132,6 @@ void UT_AltHandler_CF_CList_Traverse_R_PRIO(void *UserObj, UT_EntryKey_t FuncKey
 
 /*----------------------------------------------------------------
  *
- * Function: UT_AltHandler_CF_TraverseAllTransactions_All_Channels_Set_Context
- *
  * A handler for CF_TraverseAllTransactions which _sets_ the opaque context
  * pointer as a int* object.  The value is taken from the UserObj opaque pointer.
  *
@@ -158,8 +150,6 @@ void UT_AltHandler_CF_TraverseAllTransactions_All_Channels_Set_Context(void *Use
 }
 
 /*----------------------------------------------------------------
- *
- * Function: UT_AltHandler_GenericPointerReturn
  *
  * A simple handler that can be used for any stub that returns a pointer.
  * it just forces the return value to be the object passed in as UserObj.

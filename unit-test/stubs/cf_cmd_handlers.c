@@ -36,8 +36,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_ProcessGroundCommand
- *
  * For compatibility with other tests, this has a mechanism to save its
  * arguments to a test-provided context capture buffer.
  *

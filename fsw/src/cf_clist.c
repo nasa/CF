@@ -34,8 +34,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CList_InitNode
- *
  * Application-scope internal function
  * See description in cf_clist.h for argument/return detail
  *
@@ -47,8 +45,6 @@ void CF_CList_InitNode(CF_CListNode_t *node)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CList_InsertFront
  *
  * Application-scope internal function
  * See description in cf_clist.h for argument/return detail
@@ -76,8 +72,6 @@ void CF_CList_InsertFront(CF_CListNode_t **head, CF_CListNode_t *node)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CList_InsertBack
  *
  * Application-scope internal function
  * See description in cf_clist.h for argument/return detail
@@ -107,8 +101,6 @@ void CF_CList_InsertBack(CF_CListNode_t **head, CF_CListNode_t *node)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CList_Pop
- *
  * Application-scope internal function
  * See description in cf_clist.h for argument/return detail
  *
@@ -129,8 +121,6 @@ CF_CListNode_t *CF_CList_Pop(CF_CListNode_t **head)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CList_Remove
  *
  * Application-scope internal function
  * See description in cf_clist.h for argument/return detail
@@ -167,8 +157,6 @@ void CF_CList_Remove(CF_CListNode_t **head, CF_CListNode_t *node)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CList_InsertAfter
- *
  * Application-scope internal function
  * See description in cf_clist.h for argument/return detail
  *
@@ -189,8 +177,6 @@ void CF_CList_InsertAfter(CF_CListNode_t **head, CF_CListNode_t *start, CF_CList
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CList_Traverse
  *
  * Application-scope internal function
  * See description in cf_clist.h for argument/return detail
@@ -230,8 +216,6 @@ void CF_CList_Traverse(CF_CListNode_t *start, CF_CListFn_t fn, void *context)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CList_Traverse_R
  *
  * Application-scope internal function
  * See description in cf_clist.h for argument/return detail

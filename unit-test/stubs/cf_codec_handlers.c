@@ -31,8 +31,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_CFDP_CodecCheckSize
- *
  * Translates return value into the correct size for returning
  *
  *-----------------------------------------------------------------*/
@@ -55,8 +53,6 @@ void UT_DefaultHandler_CF_CFDP_CodecCheckSize(void *UserObj, UT_EntryKey_t FuncK
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_CFDP_DoEncodeChunk
- *
  * Default always returns NULL, an alt handler can be registered for other pointer returns
  *
  *-----------------------------------------------------------------*/
@@ -72,8 +68,6 @@ void UT_DefaultHandler_CF_CFDP_DoEncodeChunk(void *UserObj, UT_EntryKey_t FuncKe
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_CFDP_DoDecodeChunk
- *
  * Default always returns NULL, an alt handler can be registered for other pointer returns
  *
  *-----------------------------------------------------------------*/
@@ -88,8 +82,6 @@ void UT_DefaultHandler_CF_CFDP_DoDecodeChunk(void *UserObj, UT_EntryKey_t FuncKe
 }
 
 /*----------------------------------------------------------------
- *
- * Function: UT_DefaultHandler_CF_CFDP_GetValueEncodedSize
  *
  * Translates return value into the correct size for returning
  *
@@ -115,8 +107,6 @@ void UT_DefaultHandler_CF_CFDP_GetValueEncodedSize(void *UserObj, UT_EntryKey_t 
 }
 
 /*----------------------------------------------------------------
- *
- * Function: UT_DefaultHandler_CF_DecodeIntegerInSize
  *
  * Translates return value into the correct size for returning
  *

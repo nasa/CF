@@ -42,8 +42,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_S_Reset
- *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
  *
@@ -54,8 +52,6 @@ static inline void CF_CFDP_S_Reset(CF_Transaction_t *t)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_S_SendEof
  *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
@@ -72,8 +68,6 @@ CF_SendRet_t CF_CFDP_S_SendEof(CF_Transaction_t *t)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_S1_SubstateSendEof
  *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
@@ -92,8 +86,6 @@ void CF_CFDP_S1_SubstateSendEof(CF_Transaction_t *t)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_S2_SubstateSendEof
- *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
  *
@@ -111,8 +103,6 @@ void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *t)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_S_SendFileData
  *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
@@ -235,8 +225,6 @@ int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_S_SubstateSendFileData
- *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
  *
@@ -267,8 +255,6 @@ void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *t)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_S_CheckAndRespondNak
  *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
@@ -324,8 +310,6 @@ int CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_S2_SubstateSendFileData
- *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
  *
@@ -350,8 +334,6 @@ void CF_CFDP_S2_SubstateSendFileData(CF_Transaction_t *t)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_S_SubstateSendMetadata
  *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
@@ -454,8 +436,6 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_S_SubstateSendFinAck
- *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
  *
@@ -473,8 +453,6 @@ void CF_CFDP_S_SubstateSendFinAck(CF_Transaction_t *t)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_S2_EarlyFin
- *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
  *
@@ -491,8 +469,6 @@ void CF_CFDP_S2_EarlyFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_S2_Fin
- *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
  *
@@ -504,8 +480,6 @@ void CF_CFDP_S2_Fin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_S2_Nak
  *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
@@ -573,8 +547,6 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_S2_Nak_Arm
- *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
  *
@@ -586,8 +558,6 @@ void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_S2_WaitForEofAck
  *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
@@ -620,8 +590,6 @@ void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_S1_Recv
- *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
  *
@@ -634,8 +602,6 @@ void CF_CFDP_S1_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_S2_Recv
  *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
@@ -673,8 +639,6 @@ void CF_CFDP_S2_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_S1_Tx
- *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
  *
@@ -692,8 +656,6 @@ void CF_CFDP_S1_Tx(CF_Transaction_t *t)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_S2_Tx
  *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
@@ -713,8 +675,6 @@ void CF_CFDP_S2_Tx(CF_Transaction_t *t)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_S_Cancel
- *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
  *
@@ -729,8 +689,6 @@ void CF_CFDP_S_Cancel(CF_Transaction_t *t)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_S_Tick
  *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail
@@ -819,8 +777,6 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_S_Tick_Nak
  *
  * Application-scope internal function
  * See description in cf_cfdp_s.h for argument/return detail

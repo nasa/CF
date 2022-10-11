@@ -125,8 +125,6 @@ static const CF_Codec_BitField_t CF_CFDP_PduFileData_SEGMENT_METADATA_LENGTH   =
 
 /*----------------------------------------------------------------
  *
- * Function: CF_Codec_Store_uint8
- *
  * Internal helper routine only, not part of API.
  *
  *-----------------------------------------------------------------*/
@@ -136,8 +134,6 @@ static inline void CF_Codec_Store_uint8(CF_CFDP_uint8_t *pdst, uint8 val)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_Codec_Store_uint16
  *
  * Internal helper routine only, not part of API.
  *
@@ -150,8 +146,6 @@ static inline void CF_Codec_Store_uint16(CF_CFDP_uint16_t *pdst, uint16 val)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_Codec_Store_uint32
  *
  * Internal helper routine only, not part of API.
  *
@@ -168,8 +162,6 @@ static inline void CF_Codec_Store_uint32(CF_CFDP_uint32_t *pdst, uint32 val)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_Codec_Store_uint64
  *
  * Internal helper routine only, not part of API.
  *
@@ -195,8 +187,6 @@ static inline void CF_Codec_Store_uint64(CF_CFDP_uint64_t *pdst, uint64 val)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_Codec_Load_uint8
- *
  * Internal helper routine only, not part of API.
  *
  *-----------------------------------------------------------------*/
@@ -206,8 +196,6 @@ static inline void CF_Codec_Load_uint8(uint8 *pdst, const CF_CFDP_uint8_t *psrc)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_Codec_Load_uint16
  *
  * Internal helper routine only, not part of API.
  *
@@ -224,8 +212,6 @@ static inline void CF_Codec_Load_uint16(uint16 *pdst, const CF_CFDP_uint16_t *ps
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_Codec_Load_uint32
  *
  * Internal helper routine only, not part of API.
  *
@@ -246,8 +232,6 @@ static inline void CF_Codec_Load_uint32(uint32 *pdst, const CF_CFDP_uint32_t *ps
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_Codec_Load_uint64
  *
  * Internal helper routine only, not part of API.
  *
@@ -277,8 +261,6 @@ static inline void CF_Codec_Load_uint64(uint64 *pdst, const CF_CFDP_uint64_t *ps
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_CodecCheckSize
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -301,8 +283,6 @@ bool CF_CFDP_CodecCheckSize(CF_CodecState_t *state, size_t chunksize)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_DoEncodeChunk
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -320,8 +300,6 @@ void *CF_CFDP_DoEncodeChunk(CF_EncoderState_t *state, size_t chunksize)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_DoDecodeChunk
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -341,8 +319,6 @@ const void *CF_CFDP_DoDecodeChunk(CF_DecoderState_t *state, size_t chunksize)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_GetValueEncodedSize
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -361,8 +337,6 @@ uint8 CF_CFDP_GetValueEncodedSize(uint64 Value)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_EncodeIntegerInSize
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -388,8 +362,6 @@ void CF_EncodeIntegerInSize(CF_EncoderState_t *state, uint64 value, uint8 encode
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_EncodeHeaderWithoutSize
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -427,8 +399,6 @@ void CF_CFDP_EncodeHeaderWithoutSize(CF_EncoderState_t *state, CF_Logical_PduHea
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_EncodeHeaderFinalSize
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -459,8 +429,6 @@ void CF_CFDP_EncodeHeaderFinalSize(CF_EncoderState_t *state, CF_Logical_PduHeade
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_EncodeFileDirectiveHeader
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -478,8 +446,6 @@ void CF_CFDP_EncodeFileDirectiveHeader(CF_EncoderState_t *state, CF_Logical_PduF
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_EncodeLV
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -510,8 +476,6 @@ void CF_CFDP_EncodeLV(CF_EncoderState_t *state, CF_Logical_Lv_t *pllv)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_EncodeTLV
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -551,8 +515,6 @@ void CF_CFDP_EncodeTLV(CF_EncoderState_t *state, CF_Logical_Tlv_t *pltlv)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_EncodeSegmentRequest
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -571,8 +533,6 @@ void CF_CFDP_EncodeSegmentRequest(CF_EncoderState_t *state, CF_Logical_SegmentRe
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_EncodeAllTlv
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -589,8 +549,6 @@ void CF_CFDP_EncodeAllTlv(CF_EncoderState_t *state, CF_Logical_TlvList_t *pltlv)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_EncodeAllSegments
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -606,8 +564,6 @@ void CF_CFDP_EncodeAllSegments(CF_EncoderState_t *state, CF_Logical_SegmentList_
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_EncodeMd
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -632,8 +588,6 @@ void CF_CFDP_EncodeMd(CF_EncoderState_t *state, CF_Logical_PduMd_t *plmd)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_EncodeFileDataHeader
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -672,8 +626,6 @@ void CF_CFDP_EncodeFileDataHeader(CF_EncoderState_t *state, bool with_meta, CF_L
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_EncodeEof
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -696,8 +648,6 @@ void CF_CFDP_EncodeEof(CF_EncoderState_t *state, CF_Logical_PduEof_t *pleof)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_EncodeFin
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -719,8 +669,6 @@ void CF_CFDP_EncodeFin(CF_EncoderState_t *state, CF_Logical_PduFin_t *plfin)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_EncodeAck
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -745,8 +693,6 @@ void CF_CFDP_EncodeAck(CF_EncoderState_t *state, CF_Logical_PduAck_t *plack)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_EncodeNak
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -767,8 +713,6 @@ void CF_CFDP_EncodeNak(CF_EncoderState_t *state, CF_Logical_PduNak_t *plnak)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_EncodeCrc
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -785,8 +729,6 @@ void CF_CFDP_EncodeCrc(CF_EncoderState_t *state, uint32 *plcrc)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_DecodeIntegerInSize
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -815,8 +757,6 @@ uint64 CF_DecodeIntegerInSize(CF_DecoderState_t *state, uint8 decode_size)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_DecodeHeader
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -864,8 +804,6 @@ int32 CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_DecodeFileDirectiveHeader
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -886,8 +824,6 @@ void CF_CFDP_DecodeFileDirectiveHeader(CF_DecoderState_t *state, CF_Logical_PduF
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_DecodeLV
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -905,8 +841,6 @@ void CF_CFDP_DecodeLV(CF_DecoderState_t *state, CF_Logical_Lv_t *pllv)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_DecodeTLV
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -939,8 +873,6 @@ void CF_CFDP_DecodeTLV(CF_DecoderState_t *state, CF_Logical_Tlv_t *pltlv)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_DecodeSegmentRequest
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -958,8 +890,6 @@ void CF_CFDP_DecodeSegmentRequest(CF_DecoderState_t *state, CF_Logical_SegmentRe
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_DecodeMd
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -983,8 +913,6 @@ void CF_CFDP_DecodeMd(CF_DecoderState_t *state, CF_Logical_PduMd_t *plmd)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_DecodeFileDataHeader
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -1048,8 +976,6 @@ void CF_CFDP_DecodeFileDataHeader(CF_DecoderState_t *state, bool with_meta, CF_L
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_DecodeCrc
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -1066,8 +992,6 @@ void CF_CFDP_DecodeCrc(CF_DecoderState_t *state, uint32 *plcrc)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_DecodeEof
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -1090,8 +1014,6 @@ void CF_CFDP_DecodeEof(CF_DecoderState_t *state, CF_Logical_PduEof_t *pleof)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_DecodeFin
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -1112,8 +1034,6 @@ void CF_CFDP_DecodeFin(CF_DecoderState_t *state, CF_Logical_PduFin_t *plfin)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_DecodeAck
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -1136,8 +1056,6 @@ void CF_CFDP_DecodeAck(CF_DecoderState_t *state, CF_Logical_PduAck_t *plack)
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_DecodeNak
- *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
  *
@@ -1157,8 +1075,6 @@ void CF_CFDP_DecodeNak(CF_DecoderState_t *state, CF_Logical_PduNak_t *plnak)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_DecodeAllTlv
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail
@@ -1194,8 +1110,6 @@ void CF_CFDP_DecodeAllTlv(CF_DecoderState_t *state, CF_Logical_TlvList_t *pltlv,
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_DecodeAllSegments
  *
  * Application-scope internal function
  * See description in cf_codec.h for argument/return detail

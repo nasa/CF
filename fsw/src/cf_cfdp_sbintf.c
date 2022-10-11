@@ -54,8 +54,6 @@
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_MsgOutGet
- *
  * Application-scope internal function
  * See description in cf_cfdp_sbintf.h for argument/return detail
  *
@@ -140,8 +138,6 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
 
 /*----------------------------------------------------------------
  *
- * Function: CF_CFDP_Send
- *
  * Application-scope internal function
  * See description in cf_cfdp_sbintf.h for argument/return detail
  *
@@ -168,8 +164,6 @@ void CF_CFDP_Send(uint8 chan_num, const CF_Logical_PduBuffer_t *ph)
 }
 
 /*----------------------------------------------------------------
- *
- * Function: CF_CFDP_ReceiveMessage
  *
  * Application-scope internal function
  * See description in cf_cfdp_sbintf.h for argument/return detail

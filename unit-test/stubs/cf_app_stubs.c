@@ -33,7 +33,6 @@
  */
 void CF_AppMain(void)
 {
-
     UT_GenStub_Execute(CF_AppMain, Basic, NULL);
 }
 
@@ -44,7 +43,6 @@ void CF_AppMain(void)
  */
 void CF_CheckTables(void)
 {
-
     UT_GenStub_Execute(CF_CheckTables, Basic, NULL);
 }
 
@@ -55,7 +53,6 @@ void CF_CheckTables(void)
  */
 void CF_HkCmd(void)
 {
-
     UT_GenStub_Execute(CF_HkCmd, Basic, NULL);
 }
 
@@ -122,6 +119,5 @@ int32 CF_ValidateConfigTable(void *tbl_ptr)
  */
 void CF_WakeUp(void)
 {
-
     UT_GenStub_Execute(CF_WakeUp, Basic, NULL);
 }
