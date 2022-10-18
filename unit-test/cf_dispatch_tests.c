@@ -262,7 +262,7 @@ void Test_CF_AppPipe_UnrecognizedCommandEnterDefaultPath(void)
     /* Assert */
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_INVALID_MID);
+    UT_CF_AssertEventID(CF_MID_ERR_EID);
 }
 
 void add_CF_ProcessGroundCommand_tests(void)

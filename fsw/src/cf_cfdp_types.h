@@ -163,7 +163,6 @@ typedef enum
 
     /* keep last */
     CF_TxnStatus_MAX = 22
-
 } CF_TxnStatus_t;
 
 /**
