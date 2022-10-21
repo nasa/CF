@@ -968,7 +968,7 @@ CFE_Status_t CF_CFDP_InitEngine(void)
                                 nbuf);
         if (ret != CFE_SUCCESS)
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_INIT_PIPE, CFE_EVS_EventType_ERROR,
+            CFE_EVS_SendEvent(CF_CR_PIPE_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF: failed to create pipe %s, returned 0x%08lx", nbuf, (unsigned long)ret);
             break;
         }

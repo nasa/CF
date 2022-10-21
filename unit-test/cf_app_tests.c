@@ -630,7 +630,7 @@ void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
 
     /* Event from CF_Init and CF_AppMain */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 2);
-    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_EID_INF_INIT);
+    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_INIT_INF_EID);
     UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[1], CF_EID_ERR_INIT_MSG_RECV);
 
     /* Reset, return CFE_SUCCESS from CFE_SB_ReceiveBuffer and buffer NULL */
@@ -642,7 +642,7 @@ void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
 
     /* Event from CF_Init and CF_AppMain */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 2);
-    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_EID_INF_INIT);
+    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_INIT_INF_EID);
     UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[1], CF_EID_ERR_INIT_MSG_RECV);
 
     /* Reset, return non-error codes and non-NULL buffer */
@@ -659,7 +659,7 @@ void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
 
     /* Event from CF_Init */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_EID_INF_INIT);
+    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_INIT_INF_EID);
     UtAssert_STUB_COUNT(CFE_ES_RunLoop, 3);
 }
 

@@ -249,7 +249,7 @@ CFE_Status_t CF_Init(void)
     if (status == CFE_SUCCESS)
     {
         status =
-            CFE_EVS_SendEvent(CF_EID_INF_INIT, CFE_EVS_EventType_INFORMATION, "CF Initialized. Version %d.%d.%d.%d",
+            CFE_EVS_SendEvent(CF_INIT_INF_EID, CFE_EVS_EventType_INFORMATION, "CF Initialized. Version %d.%d.%d.%d",
                               CF_MAJOR_VERSION, CF_MINOR_VERSION, CF_REVISION, CF_MISSION_REV);
         if (status != CFE_SUCCESS)
         {
