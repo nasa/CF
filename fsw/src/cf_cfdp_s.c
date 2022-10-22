@@ -167,7 +167,7 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 by
             status = CF_WrappedLseek(t->fd, foffs, OS_SEEK_SET);
             if (status != foffs)
             {
-                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEEK_FD, CFE_EVS_EventType_ERROR,
+                CFE_EVS_SendEvent(CF_CFDP_S_SEEK_FD_ERR_EID, CFE_EVS_EventType_ERROR,
                                   "CF S%d(%lu:%lu): error seeking to offset %ld, got %ld", (t->state == CF_TxnState_S2),
                                   (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num, (long)foffs,
                                   (long)status);
@@ -181,7 +181,7 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 by
             status = CF_WrappedRead(t->fd, data_ptr, actual_bytes);
             if (status != actual_bytes)
             {
-                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_READ, CFE_EVS_EventType_ERROR,
+                CFE_EVS_SendEvent(CF_CFDP_S_READ_ERR_EID, CFE_EVS_EventType_ERROR,
                                   "CF S%d(%lu:%lu): error reading bytes: expected %ld, got %ld",
                                   (t->state == CF_TxnState_S2), (unsigned long)t->history->src_eid,
                                   (unsigned long)t->history->seq_num, (long)actual_bytes, (long)status);
@@ -200,7 +200,7 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 by
             }
             else if (status == CF_SEND_PDU_ERROR)
             {
-                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEND_FD, CFE_EVS_EventType_ERROR,
+                CFE_EVS_SendEvent(CF_CFDP_S_SEND_FD_ERR_EID, CFE_EVS_EventType_ERROR,
                                   "CF S%d(%lu:%lu): error sending fd", (t->state == CF_TxnState_S2),
                                   (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
                 ret = CF_ERROR;
@@ -351,7 +351,7 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
     {
         if (OS_FileOpenCheck(t->history->fnames.src_filename) == OS_SUCCESS)
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_ALREADY_OPEN, CFE_EVS_EventType_ERROR,
+            CFE_EVS_SendEvent(CF_CFDP_S_ALREADY_OPEN_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF S%d(%lu:%lu): file %s already open", (t->state == CF_TxnState_S2),
                               (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num,
                               t->history->fnames.src_filename);
@@ -364,7 +364,7 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
             ret = CF_WrappedOpenCreate(&t->fd, t->history->fnames.src_filename, OS_FILE_FLAG_NONE, OS_READ_ONLY);
             if (ret < 0)
             {
-                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_OPEN, CFE_EVS_EventType_ERROR,
+                CFE_EVS_SendEvent(CF_CFDP_S_OPEN_ERR_EID, CFE_EVS_EventType_ERROR,
                                   "CF S%d(%lu:%lu): failed to open file %s, error=%ld", (t->state == CF_TxnState_S2),
                                   (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num,
                                   t->history->fnames.src_filename, (long)ret);
@@ -379,7 +379,7 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
             status = CF_WrappedLseek(t->fd, 0, OS_SEEK_END);
             if (status < 0)
             {
-                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEEK_END, CFE_EVS_EventType_ERROR,
+                CFE_EVS_SendEvent(CF_CFDP_S_SEEK_END_ERR_EID, CFE_EVS_EventType_ERROR,
                                   "CF S%d(%lu:%lu): failed to seek end file %s, error=%ld",
                                   (t->state == CF_TxnState_S2), (unsigned long)t->history->src_eid,
                                   (unsigned long)t->history->seq_num, t->history->fnames.src_filename, (long)status);
@@ -395,7 +395,7 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
             status = CF_WrappedLseek(t->fd, 0, OS_SEEK_SET);
             if (status != 0)
             {
-                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEEK_BEG, CFE_EVS_EventType_ERROR,
+                CFE_EVS_SendEvent(CF_CFDP_S_SEEK_BEG_ERR_EID, CFE_EVS_EventType_ERROR,
                                   "CF S%d(%lu:%lu): failed to seek begin file %s, got %ld",
                                   (t->state == CF_TxnState_S2), (unsigned long)t->history->src_eid,
                                   (unsigned long)t->history->seq_num, t->history->fnames.src_filename, (long)status);
@@ -411,7 +411,7 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
         if (sret == CF_SEND_PDU_ERROR)
         {
             /* failed to send md */
-            CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEND_MD, CFE_EVS_EventType_ERROR, "CF S%d(%lu:%lu): failed to send md",
+            CFE_EVS_SendEvent(CF_CFDP_S_SEND_MD_ERR_EID, CFE_EVS_EventType_ERROR, "CF S%d(%lu:%lu): failed to send md",
                               (t->state == CF_TxnState_S2), (unsigned long)t->history->src_eid,
                               (unsigned long)t->history->seq_num);
             success = false;
@@ -460,7 +460,7 @@ void CF_CFDP_S_SubstateSendFinAck(CF_Transaction_t *t)
 void CF_CFDP_S2_EarlyFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     /* received early fin, so just cancel */
-    CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_EARLY_FIN, CFE_EVS_EventType_ERROR,
+    CFE_EVS_SendEvent(CF_CFDP_S_EARLY_FIN_ERR_EID, CFE_EVS_EventType_ERROR,
                       "CF S%d(%lu:%lu): got early FIN -- cancelling", (t->state == CF_TxnState_S2),
                       (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
     CF_CFDP_SetTxnStatus(t, CF_TxnStatus_EARLY_FIN);
@@ -531,14 +531,14 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
         CF_AppData.hk.channel_hk[t->chan_num].counters.recv.nak_segment_requests += nak->segment_list.num_segments;
         if (bad_sr)
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_INVALID_SR, CFE_EVS_EventType_ERROR,
+            CFE_EVS_SendEvent(CF_CFDP_S_INVALID_SR_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF S%d(%lu:%lu): received %d invalid NAK segment requests", (t->state == CF_TxnState_S2),
                               (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num, bad_sr);
         }
     }
     else
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_PDU_NAK, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_CFDP_S_PDU_NAK_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CF S%d(%lu:%lu): received invalid NAK PDU", (t->state == CF_TxnState_S2),
                           (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
         ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
@@ -581,7 +581,7 @@ void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     }
     else
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_PDU_EOF, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_CFDP_S_PDU_EOF_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CF S%d(%lu:%lu): received invalid EOF PDU", (t->state == CF_TxnState_S2),
                           (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
         ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
@@ -708,7 +708,7 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
     {
         if (CF_Timer_Expired(&t->inactivity_timer))
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_INACT_TIMER, CFE_EVS_EventType_ERROR,
+            CFE_EVS_SendEvent(CF_CFDP_S_INACT_TIMER_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF S2(%lu:%lu): inactivity timer expired", (unsigned long)t->history->src_eid,
                               (unsigned long)t->history->seq_num);
             CF_CFDP_SetTxnStatus(t, CF_TxnStatus_INACTIVITY_DETECTED);
@@ -732,7 +732,7 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
                         /* Check limit and handle if needed */
                         if (t->state_data.s.s2.acknak_count >= CF_AppData.config_table->chan[t->chan_num].ack_limit)
                         {
-                            CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_ACK_LIMIT, CFE_EVS_EventType_ERROR,
+                            CFE_EVS_SendEvent(CF_CFDP_S_ACK_LIMIT_ERR_EID, CFE_EVS_EventType_ERROR,
                                               "CF S2(%lu:%lu), ack limit reached, no eof-ack",
                                               (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
                             CF_CFDP_SetTxnStatus(t, CF_TxnStatus_ACK_LIMIT_NO_EOF);

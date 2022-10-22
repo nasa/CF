@@ -315,7 +315,7 @@ void Test_CF_CFDP_ReceiveMessage(void)
     config->local_eid              = 123;
     ph->pdu_header.destination_eid = ~config->local_eid;
     UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
-    UT_CF_AssertEventID(CF_EID_ERR_CFDP_INVALID_DST_EID);
+    UT_CF_AssertEventID(CF_CFDP_INVALID_DST_ERR_EID);
 
     /* recv correct destination_eid but CF_MAX_SIMULTANEOUS_RX hit */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &c, NULL, &t, &config);
@@ -323,7 +323,7 @@ void Test_CF_CFDP_ReceiveMessage(void)
     config->local_eid                                            = 123;
     ph->pdu_header.destination_eid                               = config->local_eid;
     UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(c));
-    UT_CF_AssertEventID(CF_EID_ERR_CFDP_RX_DROPPED);
+    UT_CF_AssertEventID(CF_CFDP_RX_DROPPED_ERR_EID);
 }
 
 void Test_CF_CFDP_Send(void)
@@ -392,7 +392,7 @@ void Test_CF_CFDP_MsgOutGet(void)
     /* no msg available from SB */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
     UtAssert_NULL(CF_CFDP_MsgOutGet(t, false));
-    UT_CF_AssertEventID(CF_EID_ERR_CFDP_NO_MSG);
+    UT_CF_AssertEventID(CF_CFDP_NO_MSG_ERR_EID);
 
     /* same, but the silent flag should suppress the event */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
