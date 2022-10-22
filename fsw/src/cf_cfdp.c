@@ -581,7 +581,7 @@ CFE_Status_t CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
      */
     if (CF_CFDP_DecodeHeader(ph->pdec, &ph->pdu_header) != CFE_SUCCESS)
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_PDU_TRUNCATION, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_PDU_TRUNCATION_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CF: PDU rejected due to EID/seq number field truncation");
         ++CF_AppData.hk.Payload.channel_hk[chan_num].counters.recv.error;
         ret = CF_ERROR;
@@ -594,7 +594,7 @@ CFE_Status_t CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
      */
     else if (CF_CODEC_IS_OK(ph->pdec) && ph->pdu_header.large_flag)
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_PDU_LARGE_FILE, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_PDU_LARGE_FILE_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CF: PDU with large file bit received (unsupported)");
         ++CF_AppData.hk.Payload.channel_hk[chan_num].counters.recv.error;
         ret = CF_ERROR;
@@ -608,7 +608,7 @@ CFE_Status_t CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
 
         if (!CF_CODEC_IS_OK(ph->pdec))
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_PDU_SHORT_HEADER, CFE_EVS_EventType_ERROR, "CF: PDU too short (%lu received)",
+            CFE_EVS_SendEvent(CF_PDU_SHORT_HEADER_ERR_EID, CFE_EVS_EventType_ERROR, "CF: PDU too short (%lu received)",
                               (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
             ++CF_AppData.hk.Payload.channel_hk[chan_num].counters.recv.error;
             ret = CF_SHORT_PDU_ERROR;
@@ -638,7 +638,7 @@ CFE_Status_t CF_CFDP_RecvMd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
     CF_CFDP_DecodeMd(ph->pdec, &ph->int_header.md);
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_PDU_MD_SHORT, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_PDU_MD_SHORT_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CF: metadata packet too short: %lu bytes received",
                           (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
@@ -660,7 +660,7 @@ CFE_Status_t CF_CFDP_RecvMd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
                                           &md->source_filename);
         if (lv_ret < 0)
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_PDU_INVALID_SRC_LEN, CFE_EVS_EventType_ERROR,
+            CFE_EVS_SendEvent(CF_PDU_INVALID_SRC_LEN_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF: metadata PDU rejected due to invalid length in source filename of 0x%02x",
                               md->source_filename.length);
             ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
@@ -672,7 +672,7 @@ CFE_Status_t CF_CFDP_RecvMd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
                                               sizeof(txn->history->fnames.dst_filename), &md->dest_filename);
             if (lv_ret < 0)
             {
-                CFE_EVS_SendEvent(CF_EID_ERR_PDU_INVALID_DST_LEN, CFE_EVS_EventType_ERROR,
+                CFE_EVS_SendEvent(CF_PDU_INVALID_DST_LEN_ERR_EID, CFE_EVS_EventType_ERROR,
                                   "CF: metadata PDU rejected due to invalid length in dest filename of 0x%02x",
                                   md->dest_filename.length);
                 ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
@@ -680,7 +680,7 @@ CFE_Status_t CF_CFDP_RecvMd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
             }
             else
             {
-                CFE_EVS_SendEvent(CF_EID_INF_PDU_MD_RECVD, CFE_EVS_EventType_INFORMATION,
+                CFE_EVS_SendEvent(CF_PDU_MD_RECVD_INF_EID, CFE_EVS_EventType_INFORMATION,
                                   "CF: md received for source: %s, dest: %s", txn->history->fnames.src_filename,
                                   txn->history->fnames.dst_filename);
             }
@@ -717,7 +717,7 @@ CFE_Status_t CF_CFDP_RecvFd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_PDU_FD_SHORT, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_PDU_FD_SHORT_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CF: filedata PDU too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_PROTOCOL_ERROR);
         ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
@@ -726,7 +726,7 @@ CFE_Status_t CF_CFDP_RecvFd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
     else if (ph->pdu_header.segment_meta_flag)
     {
         /* If recv PDU has the "segment_meta_flag" set, this is not currently handled in CF. */
-        CFE_EVS_SendEvent(CF_EID_ERR_PDU_FD_UNSUPPORTED, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_PDU_FD_UNSUPPORTED_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CF: filedata PDU with segment metadata received");
         CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_PROTOCOL_ERROR);
         ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
@@ -750,7 +750,7 @@ CFE_Status_t CF_CFDP_RecvEof(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_PDU_EOF_SHORT, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_PDU_EOF_SHORT_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CF: EOF PDU too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         ret = CF_SHORT_PDU_ERROR;
     }
@@ -772,7 +772,7 @@ CFE_Status_t CF_CFDP_RecvAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_PDU_ACK_SHORT, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_PDU_ACK_SHORT_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CF: ACK PDU too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         ret = CF_SHORT_PDU_ERROR;
     }
@@ -795,7 +795,7 @@ CFE_Status_t CF_CFDP_RecvFin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_PDU_FIN_SHORT, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_PDU_FIN_SHORT_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CF: FIN PDU too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         ret = CF_SHORT_PDU_ERROR;
     }
@@ -819,7 +819,7 @@ CFE_Status_t CF_CFDP_RecvNak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_PDU_NAK_SHORT, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_PDU_NAK_SHORT_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CF: NAK PDU too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         ret = CF_SHORT_PDU_ERROR;
     }
@@ -901,14 +901,14 @@ void CF_CFDP_RecvIdle(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
                 }
                 else
                 {
-                    CFE_EVS_SendEvent(CF_EID_ERR_CFDP_IDLE_MD, CFE_EVS_EventType_ERROR,
+                    CFE_EVS_SendEvent(CF_CFDP_IDLE_MD_ERR_EID, CFE_EVS_EventType_ERROR,
                                       "CF: got invalid md PDU -- abandoning transaction");
                     ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
                     /* leave state as idle, which will reset below */
                 }
                 break;
             default:
-                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_FD_UNHANDLED, CFE_EVS_EventType_ERROR,
+                CFE_EVS_SendEvent(CF_CFDP_FD_UNHANDLED_ERR_EID, CFE_EVS_EventType_ERROR,
                                   "CF: unhandled file directive code 0x%02x in idle state", fdh->directive_code);
                 ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
                 break;
@@ -963,7 +963,7 @@ CFE_Status_t CF_CFDP_InitEngine(void)
                                     CF_AppData.config_table->chan[i].pipe_depth_input);
         if (ret != CFE_SUCCESS)
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_INIT_SUB, CFE_EVS_EventType_ERROR,
+            CFE_EVS_SendEvent(CF_INIT_SUB_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF: failed to subscribe to MID 0x%lx, returned 0x%08lx",
                               (unsigned long)CF_AppData.config_table->chan[i].mid_input, (unsigned long)ret);
             break;
@@ -994,7 +994,7 @@ CFE_Status_t CF_CFDP_InitEngine(void)
 
             if (ret != OS_SUCCESS)
             {
-                CFE_EVS_SendEvent(CF_EID_ERR_INIT_SEM, CFE_EVS_EventType_ERROR,
+                CFE_EVS_SendEvent(CF_INIT_SEM_ERR_EID, CFE_EVS_EventType_ERROR,
                                   "CF: failed to get sem id for name %s, error=%ld",
                                   CF_AppData.config_table->chan[i].sem_name, (long)ret);
                 break;
@@ -1229,7 +1229,7 @@ void CF_CFDP_InitTxnTxFile(CF_Transaction_t *txn, CF_CFDP_Class_t cfdp_class, ui
 static void CF_CFDP_TxFile_Initiate(CF_Transaction_t *txn, CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan,
                                     uint8 priority, CF_EntityId_t dest_id)
 {
-    CFE_EVS_SendEvent(CF_EID_INF_CFDP_S_START_SEND, CFE_EVS_EventType_INFORMATION,
+    CFE_EVS_SendEvent(CF_CFDP_S_START_SEND_INF_EID, CFE_EVS_EventType_INFORMATION,
                       "CF: start class %d tx of file %lu:%.*s -> %lu:%.*s", cfdp_class + 1,
                       (unsigned long)CF_AppData.config_table->local_eid, CF_FILENAME_MAX_LEN,
                       txn->history->fnames.src_filename, (unsigned long)dest_id, CF_FILENAME_MAX_LEN,
@@ -1270,7 +1270,7 @@ CFE_Status_t CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, 
 
     if (chan->num_cmd_tx == CF_MAX_COMMANDED_PLAYBACK_FILES_PER_CHAN)
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_MAX_CMD_TX, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_CFDP_MAX_CMD_TX_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CF: max number of commanded files reached");
         ret = CF_ERROR;
     }
@@ -1310,7 +1310,7 @@ static CFE_Status_t CF_CFDP_PlaybackDir_Initiate(CF_Playback_t *pb, const char *
     ret = OS_DirectoryOpen(&pb->dir_id, src_filename);
     if (ret != OS_SUCCESS)
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_OPENDIR, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_CFDP_OPENDIR_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CF: failed to open playback directory %s, error=%ld", src_filename, (long)ret);
         ++CF_AppData.hk.Payload.channel_hk[chan].counters.fault.directory_read;
     }
@@ -1357,7 +1357,7 @@ CFE_Status_t CF_CFDP_PlaybackDir(const char *src_filename, const char *dst_filen
 
     if (i == CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN)
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_DIR_SLOT, CFE_EVS_EventType_ERROR, "CF: no playback dir slot available");
+        CFE_EVS_SendEvent(CF_CFDP_DIR_SLOT_ERR_EID, CFE_EVS_EventType_ERROR, "CF: no playback dir slot available");
         return CF_ERROR;
     }
 
@@ -1596,7 +1596,7 @@ void CF_CFDP_ResetTransaction(CF_Transaction_t *txn, int keep_history)
 
     if (txn->flags.com.q_index == CF_QueueIdx_FREE)
     {
-        CFE_EVS_SendEvent(CF_EID_DBG_RESET_FREED_XACT, CFE_EVS_EventType_DEBUG,
+        CFE_EVS_SendEvent(CF_RESET_FREED_XACT_DBG_EID, CFE_EVS_EventType_DEBUG,
                           "CF: attempt to reset a transaction that has already been freed");
         return;
     }
