@@ -495,9 +495,9 @@ CF_CFDP_ConditionCode_t CF_TxnStatus_To_ConditionCode(CF_TxnStatus_t txn_stat);
  * @par Assumptions, External Events, and Notes:
  *       None
  *
- * @param txn_stat   Transaction status
+ * @param cc   CFDP condition code
  *
- * @returns CFDP protocol condition code
+ * @returns Transaction status code
  */
 CF_TxnStatus_t CF_TxnStatus_From_ConditionCode(CF_CFDP_ConditionCode_t cc);
 

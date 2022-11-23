@@ -110,7 +110,7 @@ void CF_CFDP_R_Init(CF_Transaction_t *t);
  *       t must not be NULL.
  *
  * @param t  Pointer to the transaction object
- * @param cc Status Code value to set within transaction
+ * @param txn_stat Status Code value to set within transaction
  */
 void CF_CFDP_R2_SetFinTxnStatus(CF_Transaction_t *t, CF_TxnStatus_t txn_stat);
 
