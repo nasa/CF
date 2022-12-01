@@ -327,6 +327,28 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_RCVMSG_TIMEOUT (100)
 
 /**
+ * @brief Limits the number of retries to obtain the CF throttle sem
+ *
+ * @par Description
+ *      If the CF throttle sem is not available during CF startup, the initialization
+ *      will retry after a short delay.
+ *
+ * @sa CF_STARTUP_SEM_TASK_DELAY
+ */
+#define CF_STARTUP_SEM_MAX_RETRIES 25
+
+/**
+ * @brief Number of milliseconds to wait if CF throttle sem is not available
+ *
+ * @par Description
+ *      If the CF throttle sem is not available during CF startup, the initialization
+ *      will delay for this period of time before trying again
+ *
+ * @sa CF_STARTUP_SEM_MAX_RETRIES
+ */
+#define CF_STARTUP_SEM_TASK_DELAY 100
+
+/**
  * \brief Mission specific version number
  *
  *  \par Description:

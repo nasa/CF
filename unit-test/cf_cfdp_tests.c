@@ -863,12 +863,30 @@ void Test_CF_CFDP_InitEngine(void)
     UtAssert_INT32_EQ(CF_CFDP_InitEngine(), 0);
     UtAssert_BOOL_TRUE(CF_AppData.engine.enabled);
 
-    /* failure of OS_CountSemGetIdByName */
+    /* failure of OS_CountSemGetIdByName for non-name reason */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, NULL, &config);
     config->chan[0].sem_name[0] = 'u';
     UT_SetDefaultReturnValue(UT_KEY(OS_CountSemGetIdByName), OS_ERROR);
     UtAssert_INT32_EQ(CF_CFDP_InitEngine(), OS_ERROR);
     UtAssert_BOOL_FALSE(CF_AppData.engine.enabled);
+    UT_CF_AssertEventID(CF_EID_ERR_INIT_SEM);
+
+    /* Max retries of OS_CountSemGetIdByName - sem was never created at all  */
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, NULL, &config);
+    config->chan[0].sem_name[0] = 'u';
+    UT_SetDefaultReturnValue(UT_KEY(OS_CountSemGetIdByName), OS_ERR_NAME_NOT_FOUND);
+    UtAssert_INT32_EQ(CF_CFDP_InitEngine(), OS_ERR_NAME_NOT_FOUND);
+    UtAssert_BOOL_FALSE(CF_AppData.engine.enabled);
+    UT_CF_AssertEventID(CF_EID_ERR_INIT_SEM);
+
+    /* Retry of OS_CountSemGetIdByName, when sem was created late, and thus
+     * got return OS_ERR_NAME_NOT_FOUND followed by OS_SUCCESS */
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, NULL, &config);
+    config->chan[0].sem_name[0] = 'u';
+    UT_SetDefaultReturnValue(UT_KEY(OS_CountSemGetIdByName), OS_SUCCESS);
+    UT_SetDeferredRetcode(UT_KEY(OS_CountSemGetIdByName), 1, OS_ERR_NAME_NOT_FOUND);
+    UtAssert_INT32_EQ(CF_CFDP_InitEngine(), 0);
+    UtAssert_BOOL_TRUE(CF_AppData.engine.enabled);
 
     /* failure of CFE_SB_CreatePipe */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, NULL, &config);

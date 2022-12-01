@@ -990,8 +990,27 @@ int32 CF_CFDP_InitEngine(void)
 
         if (CF_AppData.config_table->chan[i].sem_name[0])
         {
-            ret = OS_CountSemGetIdByName(&CF_AppData.engine.channels[i].sem_id,
-                                         CF_AppData.config_table->chan[i].sem_name);
+            /*
+             * There is a start up race condition because CFE starts all apps at the same time,
+             * and if this sem is instantiated by another app, it may not be created yet.
+             *
+             * Therefore if OSAL returns OS_ERR_NAME_NOT_FOUND, assume this is what is going
+             * on, delay a bit and try again.
+             */
+            ret = OS_ERR_NAME_NOT_FOUND;
+            for (j = 0; j < CF_STARTUP_SEM_MAX_RETRIES; ++j)
+            {
+                ret = OS_CountSemGetIdByName(&CF_AppData.engine.channels[i].sem_id,
+                                             CF_AppData.config_table->chan[i].sem_name);
+
+                if (ret != OS_ERR_NAME_NOT_FOUND)
+                {
+                    break;
+                }
+
+                OS_TaskDelay(CF_STARTUP_SEM_TASK_DELAY);
+            }
+
             if (ret != OS_SUCCESS)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_INIT_SEM, CFE_EVS_EventType_ERROR,
