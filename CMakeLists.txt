@@ -1,8 +1,5 @@
 project(CFS_CF C)
 
-include_directories(fsw/src)
-include_directories(fsw/mission_inc)
-include_directories(fsw/platform_inc)
 include_directories(${CFS_IO_LIB_MISSION_DIR}/fsw/public_inc)
 
 set(APP_SRC_FILES
@@ -23,6 +20,9 @@ set(APP_SRC_FILES
 
 # Create the app module
 add_cfe_app(cf ${APP_SRC_FILES})
+
+# This permits direct access to public headers in the fsw/inc directory
+target_include_directories(cf PUBLIC fsw/inc)
 
 # configuration table
 add_cfe_tables(cf fsw/tables/cf_def_config.c)

@@ -63,6 +63,8 @@ add_cfe_coverage_stubs(cf_internal
 
 target_link_libraries(coverage-cf_internal-stubs ut_core_api_stubs ut_assert)
 target_include_directories(coverage-cf_internal-stubs PUBLIC utilities)
+target_include_directories(coverage-cf_internal-stubs PUBLIC ../fsw/inc)
+target_include_directories(coverage-cf_internal-stubs PUBLIC ../fsw/src)
 
 # Generate a dedicated "testrunner" executable for each test file
 # Accomplish this by cycling through all the app's source files,

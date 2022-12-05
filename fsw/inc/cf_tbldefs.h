@@ -26,7 +26,7 @@
 #define CF_TBLDEFS_H
 
 #include "cf_platform_cfg.h"
-#include "cf_cfdp_pdu.h"
+#include "cf_extern_typedefs.h"
 
 /**
  * \brief Configuration entry for directory polling

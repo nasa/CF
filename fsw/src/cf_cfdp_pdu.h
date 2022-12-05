@@ -41,7 +41,6 @@
 
 #include "common_types.h"
 #include "cf_platform_cfg.h"
-#include "cf_platform_cfg.h"
 
 #include <stddef.h>
 
@@ -214,21 +213,6 @@ typedef enum
     CF_CFDP_FileDirective_KEEP_ALIVE  = 12,
     CF_CFDP_FileDirective_INVALID_MAX = 13, /**< \brief Maximum used to limit range */
 } CF_CFDP_FileDirective_t;
-
-/**
- * @brief Values for CFDP file transfer class
- *
- * The CFDP specification prescribes two classes/modes of file
- * transfer protocol operation - unacknowledged/simple or
- * acknowledged/reliable.
- *
- * Defined per section 7.1 of CCSDS 727.0-B-5
- */
-typedef enum
-{
-    CF_CFDP_CLASS_1 = 0, /**< \brief CFDP class 1 - Unreliable transfer */
-    CF_CFDP_CLASS_2 = 1, /**< \brief CFDP class 2 - Reliable transfer */
-} CF_CFDP_Class_t;
 
 /**
  * @brief Values for "acknowledgment transfer status"

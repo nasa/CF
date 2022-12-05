@@ -34,6 +34,7 @@
 #include "common_types.h"
 #include "cf_cfdp_pdu.h"
 #include "cf_platform_cfg.h"
+#include "cf_msg.h"
 #include "cf_clist.h"
 #include "cf_chunk.h"
 #include "cf_timer.h"
@@ -112,18 +113,6 @@ typedef enum
     CF_RxEofRet_BAD_EOF        = 2,
     CF_RxEofRet_INVALID        = 3,
 } CF_RxEofRet_t;
-
-/**
- * @brief Cache of source and destination filename
- *
- * This pairs a source and destination file name together
- * to be retained for future reference in the transaction/history
- */
-typedef struct CF_TxnFilenames
-{
-    char src_filename[CF_FILENAME_MAX_LEN];
-    char dst_filename[CF_FILENAME_MAX_LEN];
-} CF_TxnFilenames_t;
 
 /**
  * @brief Direction identifier
@@ -390,21 +379,6 @@ typedef struct CF_Transaction
      */
     CF_StateFlags_t flags;
 } CF_Transaction_t;
-
-/**
- * @brief CF queue identifiers
- */
-typedef enum
-{
-    CF_QueueIdx_PEND      = 0, /**< \brief first one on this list is active */
-    CF_QueueIdx_TXA       = 1,
-    CF_QueueIdx_TXW       = 2,
-    CF_QueueIdx_RX        = 3,
-    CF_QueueIdx_HIST      = 4,
-    CF_QueueIdx_HIST_FREE = 5,
-    CF_QueueIdx_FREE      = 6,
-    CF_QueueIdx_NUM       = 7,
-} CF_QueueIdx_t;
 
 /**
  * @brief Identifies the type of timer tick being processed

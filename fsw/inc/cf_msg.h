@@ -28,7 +28,7 @@
 
 #include "cfe.h"
 #include "cf_platform_cfg.h"
-#include "cf_cfdp.h"
+#include "cf_extern_typedefs.h"
 #include "cf_tbldefs.h"
 
 #define CF_ALL_CHANNELS (255)
