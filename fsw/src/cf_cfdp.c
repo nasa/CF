@@ -1393,7 +1393,8 @@ int32 CF_CFDP_PlaybackDir(const char *src_filename, const char *dst_filename, CF
  *-----------------------------------------------------------------*/
 void CF_CFDP_ProcessPlaybackDirectory(CF_Channel_t *c, CF_Playback_t *p)
 {
-    os_dirent_t dirent;
+    CF_Transaction_t *pt;
+    os_dirent_t       dirent;
     /* either there's no transaction (first one) or the last one was finished, so check for a new one */
 
     memset(&dirent, 0, sizeof(dirent));
@@ -1413,27 +1414,25 @@ void CF_CFDP_ProcessPlaybackDirectory(CF_Channel_t *c, CF_Playback_t *p)
                 continue;
             }
 
-            {
-                CF_Transaction_t *pt = CF_FindUnusedTransaction(c);
-                CF_Assert(pt); /* should be impossible not to have one because there are limits on the number of uses of
-                                  them */
+            pt = CF_FindUnusedTransaction(c);
+            CF_Assert(pt); /* should be impossible not to have one because there are limits on the number of uses of
+                                them */
 
-                /* the -1 below is to make room for the slash */
-                snprintf(pt->history->fnames.src_filename, sizeof(pt->history->fnames.src_filename), "%.*s/%.*s",
-                         CF_FILENAME_MAX_PATH - 1, p->fnames.src_filename, CF_FILENAME_MAX_NAME - 1, dirent.FileName);
-                snprintf(pt->history->fnames.dst_filename, sizeof(pt->history->fnames.dst_filename), "%.*s/%.*s",
-                         CF_FILENAME_MAX_PATH - 1, p->fnames.dst_filename, CF_FILENAME_MAX_NAME - 1, dirent.FileName);
+            /* the -1 below is to make room for the slash */
+            snprintf(pt->history->fnames.src_filename, sizeof(pt->history->fnames.src_filename), "%.*s/%.*s",
+                     CF_FILENAME_MAX_PATH - 1, p->fnames.src_filename, CF_FILENAME_MAX_NAME - 1, dirent.FileName);
+            snprintf(pt->history->fnames.dst_filename, sizeof(pt->history->fnames.dst_filename), "%.*s/%.*s",
+                     CF_FILENAME_MAX_PATH - 1, p->fnames.dst_filename, CF_FILENAME_MAX_NAME - 1, dirent.FileName);
 
-                /* in case snprintf didn't have room for NULL terminator */
-                pt->history->fnames.src_filename[CF_FILENAME_MAX_LEN - 1] = 0;
-                pt->history->fnames.dst_filename[CF_FILENAME_MAX_LEN - 1] = 0;
+            /* in case snprintf didn't have room for NULL terminator */
+            pt->history->fnames.src_filename[CF_FILENAME_MAX_LEN - 1] = 0;
+            pt->history->fnames.dst_filename[CF_FILENAME_MAX_LEN - 1] = 0;
 
-                CF_CFDP_TxFile_Initiate(pt, p->cfdp_class, p->keep, (c - CF_AppData.engine.channels), p->priority,
-                                        p->dest_id);
+            CF_CFDP_TxFile_Initiate(pt, p->cfdp_class, p->keep, (c - CF_AppData.engine.channels), p->priority,
+                                    p->dest_id);
 
-                pt->p = p;
-                ++p->num_ts;
-            }
+            pt->p = p;
+            ++p->num_ts;
         }
         else
         {
