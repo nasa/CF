@@ -52,6 +52,8 @@ void CF_CList_InitNode(CF_CListNode_t *node)
  *-----------------------------------------------------------------*/
 void CF_CList_InsertFront(CF_CListNode_t **head, CF_CListNode_t *node)
 {
+    CF_CListNode_t *last;
+
     CF_Assert(head);
     CF_Assert(node);
     CF_Assert(node->next == node);
@@ -59,7 +61,7 @@ void CF_CList_InsertFront(CF_CListNode_t **head, CF_CListNode_t *node)
 
     if (*head)
     {
-        CF_CListNode_t *last = (*head)->prev;
+        last = (*head)->prev;
 
         node->next = *head;
         node->prev = last;
@@ -79,6 +81,8 @@ void CF_CList_InsertFront(CF_CListNode_t **head, CF_CListNode_t *node)
  *-----------------------------------------------------------------*/
 void CF_CList_InsertBack(CF_CListNode_t **head, CF_CListNode_t *node)
 {
+    CF_CListNode_t *last;
+
     CF_Assert(head);
     CF_Assert(node);
     CF_Assert(node->next == node);
@@ -90,7 +94,7 @@ void CF_CList_InsertBack(CF_CListNode_t **head, CF_CListNode_t *node)
     }
     else
     {
-        CF_CListNode_t *last = (*head)->prev;
+        last = (*head)->prev;
 
         node->next    = *head;
         (*head)->prev = node;

@@ -952,12 +952,15 @@ void CF_CFDP_RecvIdle(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 int32 CF_CFDP_InitEngine(void)
 {
     /* initialize all transaction nodes */
-    int                i;
-    int                j;
-    int                chunk_mem_offset = 0;
+    CF_History_t *     h;
     CF_Transaction_t * t                = CF_AppData.engine.transactions;
     CF_ChunkWrapper_t *c                = CF_AppData.engine.chunks;
     int32              ret              = CFE_SUCCESS;
+    int                chunk_mem_offset = 0;
+    int                i;
+    int                j;
+    int                k;
+    char               nbuf[64];
 
     static const int CF_DIR_MAX_CHUNKS[CF_Direction_NUM][CF_NUM_CHANNELS] = {CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION,
                                                                              CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION};
@@ -966,7 +969,6 @@ int32 CF_CFDP_InitEngine(void)
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
-        char nbuf[64];
         snprintf(nbuf, sizeof(nbuf) - 1, "%s%d", CF_CHANNEL_PIPE_PREFIX, i);
         ret = CFE_SB_CreatePipe(&CF_AppData.engine.channels[i].pipe, CF_AppData.config_table->chan[i].pipe_depth_input,
                                 nbuf);
@@ -1022,8 +1024,6 @@ int32 CF_CFDP_InitEngine(void)
 
         for (j = 0; j < CF_NUM_TRANSACTIONS_PER_CHANNEL; ++j, ++t)
         {
-            int k;
-
             t->chan_num = i;
             CF_FreeTransaction(t);
 
@@ -1039,7 +1039,7 @@ int32 CF_CFDP_InitEngine(void)
 
         for (j = 0; j < CF_NUM_HISTORIES_PER_CHANNEL; ++j)
         {
-            CF_History_t *h = &CF_AppData.engine.histories[(i * CF_NUM_HISTORIES_PER_CHANNEL) + j];
+            h = &CF_AppData.engine.histories[(i * CF_NUM_HISTORIES_PER_CHANNEL) + j];
             CF_CList_InitNode(&h->cl_node);
             CF_CList_InsertBack_Ex(&CF_AppData.engine.channels[i], CF_QueueIdx_HIST_FREE, &h->cl_node);
         }
@@ -1395,14 +1395,14 @@ void CF_CFDP_ProcessPlaybackDirectory(CF_Channel_t *c, CF_Playback_t *p)
 {
     CF_Transaction_t *pt;
     os_dirent_t       dirent;
+    int32             status;
+
     /* either there's no transaction (first one) or the last one was finished, so check for a new one */
 
     memset(&dirent, 0, sizeof(dirent));
 
     while (p->diropen && (p->num_ts < CF_NUM_TRANSACTIONS_PER_PLAYBACK))
     {
-        int32 status;
-
         CFE_ES_PerfLogEntry(CF_PERF_ID_DIRREAD);
         status = OS_DirectoryRead(p->dir_id, &dirent);
         CFE_ES_PerfLogExit(CF_PERF_ID_DIRREAD);
@@ -1500,15 +1500,21 @@ static void CF_CFDP_ProcessPlaybackDirectories(CF_Channel_t *c)
  *-----------------------------------------------------------------*/
 void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c)
 {
-    int i;
+    CF_Poll_t *         p;
+    CF_ChannelConfig_t *cc;
+    CF_PollDir_t *      pd;
+    int                 i;
+    int                 chan_index;
+    int                 count_check;
+    int                 ret;
 
     for (i = 0; i < CF_MAX_POLLING_DIR_PER_CHAN; ++i)
     {
-        CF_Poll_t *         p           = &c->poll[i];
-        int                 chan_index  = (c - CF_AppData.engine.channels);
-        CF_ChannelConfig_t *cc          = &CF_AppData.config_table->chan[chan_index];
-        CF_PollDir_t *      pd          = &cc->polldir[i];
-        int                 count_check = 0;
+        p           = &c->poll[i];
+        chan_index  = (c - CF_AppData.engine.channels);
+        cc          = &CF_AppData.config_table->chan[chan_index];
+        pd          = &cc->polldir[i];
+        count_check = 0;
 
         if (pd->enabled && pd->interval_sec)
         {
@@ -1524,8 +1530,8 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c)
                 else if (CF_Timer_Expired(&p->interval_timer))
                 {
                     /* the timer has expired */
-                    int ret = CF_CFDP_PlaybackDir_Initiate(&p->pb, pd->src_dir, pd->dst_dir, pd->cfdp_class, 0,
-                                                           chan_index, pd->priority, pd->dest_eid);
+                    ret = CF_CFDP_PlaybackDir_Initiate(&p->pb, pd->src_dir, pd->dst_dir, pd->cfdp_class, 0, chan_index,
+                                                       pd->priority, pd->dest_eid);
                     if (!ret)
                     {
                         p->timer_set = 0;
@@ -1562,13 +1568,14 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c)
  *-----------------------------------------------------------------*/
 void CF_CFDP_CycleEngine(void)
 {
-    int i;
+    CF_Channel_t *c;
+    int           i;
 
     if (CF_AppData.engine.enabled)
     {
         for (i = 0; i < CF_NUM_CHANNELS; ++i)
         {
-            CF_Channel_t *c                    = &CF_AppData.engine.channels[i];
+            c                                  = &CF_AppData.engine.channels[i];
             CF_AppData.engine.outgoing_counter = 0;
 
             /* consume all received messages, even if channel is frozen */

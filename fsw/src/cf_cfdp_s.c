@@ -263,11 +263,12 @@ void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *t)
 int CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
 {
     const CF_Chunk_t *c;
+    CF_SendRet_t      sret;
     int               ret = 0;
 
     if (t->flags.tx.md_need_send)
     {
-        CF_SendRet_t sret = CF_CFDP_SendMd(t);
+        sret = CF_CFDP_SendMd(t);
         if (sret == CF_SendRet_ERROR)
         {
             ret = -1; /* error occurred */
@@ -341,14 +342,13 @@ void CF_CFDP_S2_SubstateSendFileData(CF_Transaction_t *t)
  *-----------------------------------------------------------------*/
 void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
 {
-    bool         success = true;
-    int          status  = 0;
     CF_SendRet_t sret;
+    int32        ret;
+    int          status  = 0;
+    bool         success = true;
 
     if (!OS_ObjectIdDefined(t->fd))
     {
-        int32 ret;
-
         if (OS_FileOpenCheck(t->history->fnames.src_filename) == OS_SUCCESS)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_ALREADY_OPEN, CFE_EVS_EventType_ERROR,
@@ -699,7 +699,8 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
     /* Steven is not real happy with this function. There should be a better way to separate out
      * the logic by state so that it isn't a bunch of if statements for different flags
      */
-    bool early_exit = false;
+    CF_SendRet_t sret;
+    bool         early_exit = false;
 
     /* at each tick, various timers used by S are checked */
     /* first, check inactivity timer */
@@ -743,7 +744,7 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
                         }
                         else
                         {
-                            CF_SendRet_t sret = CF_CFDP_S_SendEof(t);
+                            sret = CF_CFDP_S_SendEof(t);
                             if (sret == CF_SendRet_NO_MSG)
                             {
                                 early_exit = true;

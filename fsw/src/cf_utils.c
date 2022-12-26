@@ -42,14 +42,16 @@
  *-----------------------------------------------------------------*/
 CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c)
 {
+    CF_CListNode_t *  n;
+    CF_Transaction_t *t;
+    int               q_index; /* initialized below in if */
+
     CF_Assert(c);
 
     if (c->qs[CF_QueueIdx_FREE])
     {
-        int q_index; /* initialized below in if */
-
-        CF_CListNode_t *  n = c->qs[CF_QueueIdx_FREE];
-        CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
+        n = c->qs[CF_QueueIdx_FREE];
+        t = container_of(n, CF_Transaction_t, cl_node);
 
         CF_CList_Remove_Ex(c, CF_QueueIdx_FREE, &t->cl_node);
 
@@ -327,6 +329,7 @@ void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q)
 {
     int           insert_back = 0;
     CF_Channel_t *c           = &CF_AppData.engine.channels[t->chan_num];
+
     CF_Assert(t->chan_num < CF_NUM_CHANNELS);
     CF_Assert(t->state != CF_TxnState_IDLE);
 

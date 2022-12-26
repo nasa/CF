@@ -260,6 +260,7 @@ void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
     CF_CListNode_t **expected_head;
     CF_CListNode_t * expected_cl_node;
     uint16           initial_q_size = Any_uint16_Except(0); /* 0 will CF_Assert */
+    uint16           updated_q_size;
 
     CF_CList_Remove_context_t context_clist_remove;
 
@@ -276,7 +277,7 @@ void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
     /* Act */
     CF_DequeueTransaction(&arg_t);
 
-    uint16 updated_q_size = CF_AppData.hk.channel_hk[arg_t.chan_num].q_size[arg_t.flags.com.q_index];
+    updated_q_size = CF_AppData.hk.channel_hk[arg_t.chan_num].q_size[arg_t.flags.com.q_index];
 
     /* Assert */
     UtAssert_ADDRESS_EQ(context_clist_remove.head, expected_head);
@@ -290,26 +291,26 @@ void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
 void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(void)
 {
     /* Arrange */
-    CF_Transaction_t  dummy_t;
-    CF_Transaction_t *arg_t          = &dummy_t;
-    uint8             dummy_chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
-    CF_CListNode_t ** expected_remove_head;
-    CF_CListNode_t *  expected_remove_node;
-    CF_CListNode_t ** expected_insert_back_head;
-    CF_CListNode_t *  expected_insert_back_node;
-    CF_QueueIdx_t     arg_q = Any_cf_queue_index_t();
+    CF_Transaction_t              dummy_t;
+    CF_Transaction_t *            arg_t          = &dummy_t;
+    uint8                         dummy_chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    CF_CListNode_t **             expected_remove_head;
+    CF_CListNode_t *              expected_remove_node;
+    CF_CListNode_t **             expected_insert_back_head;
+    CF_CListNode_t *              expected_insert_back_node;
+    CF_QueueIdx_t                 arg_q = Any_cf_queue_index_t();
+    CF_CList_Remove_context_t     context_clist_remove;
+    CF_CList_InsertBack_context_t context_clist_insert_back;
 
     memset(&dummy_t, 0, sizeof(dummy_t));
 
     arg_t->chan_num = dummy_chan_num;
 
-    CF_CList_Remove_context_t context_clist_remove;
     UT_SetDataBuffer(UT_KEY(CF_CList_Remove), &context_clist_remove, sizeof(context_clist_remove), false);
 
     expected_remove_head = &CF_AppData.engine.channels[arg_t->chan_num].qs[arg_t->flags.com.q_index];
     expected_remove_node = &arg_t->cl_node;
 
-    CF_CList_InsertBack_context_t context_clist_insert_back;
     UT_SetDataBuffer(UT_KEY(CF_CList_InsertBack), &context_clist_insert_back, sizeof(context_clist_insert_back), false);
 
     expected_insert_back_head = &CF_AppData.engine.channels[arg_t->chan_num].qs[arg_q];
@@ -345,8 +346,10 @@ void Test_CF_CList_Remove_Ex_Call_CF_CList_Remove_AndDecrement_q_size(void)
     CF_CListNode_t **expected_remove_head;
     CF_CListNode_t * expected_remove_node;
     uint16           initial_q_size = Any_uint16_Except(0);
+    uint16           updated_q_size;
 
     CF_CList_Remove_context_t context_clist_remove;
+
     UT_SetDataBuffer(UT_KEY(CF_CList_Remove), &context_clist_remove, sizeof(context_clist_remove), false);
 
     expected_remove_head = &arg_c->qs[arg_index];
@@ -357,7 +360,7 @@ void Test_CF_CList_Remove_Ex_Call_CF_CList_Remove_AndDecrement_q_size(void)
     /* Act */
     CF_CList_Remove_Ex(arg_c, arg_index, arg_node);
 
-    uint16 updated_q_size = CF_AppData.hk.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
+    updated_q_size = CF_AppData.hk.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CList_Remove, 1);
@@ -378,10 +381,12 @@ void Test_CF_CList_InsertAfter_Ex_Call_CF_CList_InsertAfter_AndIncrement_q_size(
     CF_CListNode_t * arg_start = &dummy_start;
     CF_CListNode_t   dummy_after;
     CF_CListNode_t * arg_after                  = &dummy_after;
-    uint16           initial_q_size             = Any_uint16();
     CF_CListNode_t **expected_insert_after_head = &arg_c->qs[arg_index];
+    uint16           initial_q_size             = Any_uint16();
+    uint16           updated_q_size;
 
     CF_CList_InsertAfter_context_t context_CF_CList_InsertAfter;
+
     UT_SetDataBuffer(UT_KEY(CF_CList_InsertAfter), &context_CF_CList_InsertAfter, sizeof(context_CF_CList_InsertAfter),
                      false);
 
@@ -390,7 +395,7 @@ void Test_CF_CList_InsertAfter_Ex_Call_CF_CList_InsertAfter_AndIncrement_q_size(
     /* Act */
     CF_CList_InsertAfter_Ex(arg_c, arg_index, arg_start, arg_after);
 
-    uint16 updated_q_size = CF_AppData.hk.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
+    updated_q_size = CF_AppData.hk.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CList_InsertAfter, 1);
@@ -413,6 +418,7 @@ void Test_CF_CList_InsertBack_Ex_Call_CF_CList_InsertBack_AndIncrement_q_size(vo
     uint16           initial_q_size = Any_uint16();
     CF_CListNode_t **expected_insert_back_head;
     CF_CListNode_t * expected_insert_back_node;
+    uint16           updated_q_size;
 
     CF_CList_InsertBack_context_t context_clist_insert_back;
     UT_SetDataBuffer(UT_KEY(CF_CList_InsertBack), &context_clist_insert_back, sizeof(context_clist_insert_back), false);
@@ -425,7 +431,7 @@ void Test_CF_CList_InsertBack_Ex_Call_CF_CList_InsertBack_AndIncrement_q_size(vo
     /* Act */
     CF_CList_InsertBack_Ex(arg_c, arg_index, arg_node);
 
-    uint16 updated_q_size = CF_AppData.hk.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
+    updated_q_size = CF_AppData.hk.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CList_InsertBack, 1);
@@ -683,11 +689,12 @@ void Test_CF_InsertSortPrio_Call_CF_CList_InsertBack_Ex_ListIsEmpty_AndSet_q_ind
     CF_CListNode_t ** expected_insert_back_head;
     CF_CListNode_t *  expected_insert_back_node;
 
+    CF_CList_InsertBack_context_t context_clist_insert_back;
+
     /* dummy_t settings to bypass CF_Assert */
     dummy_t.chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
     dummy_t.state    = Any_uint8_Except(CF_TxnState_IDLE);
 
-    CF_CList_InsertBack_context_t context_clist_insert_back;
     UT_SetDataBuffer(UT_KEY(CF_CList_InsertBack), &context_clist_insert_back, sizeof(context_clist_insert_back), false);
 
     /* setting (&CF_AppData.engine.channels[arg_t->chan_num])->qs[arg_q] to NULL
@@ -725,7 +732,9 @@ void Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q(voi
     CF_CListNode_t ** expected_insert_after_start;
     CF_CListNode_t ** expected_insert_after_after;
 
-    CF_CList_Traverse_R_context_t context_cf_clist_traverse_r;
+    CF_CList_Traverse_R_context_t  context_cf_clist_traverse_r;
+    CF_CList_InsertAfter_context_t context_CF_CList_InsertAfter;
+
     UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse_R), UT_AltHandler_CF_CList_Traverse_R_PRIO,
                           &context_cf_clist_traverse_r);
 
@@ -742,7 +751,6 @@ void Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q(voi
     context_cf_clist_traverse_r.context_t = &dummy_p_t;
 
     /* Arrange for CF_CList_InsertAfter_Ex */
-    CF_CList_InsertAfter_context_t context_CF_CList_InsertAfter;
     UT_SetDataBuffer(UT_KEY(CF_CList_InsertAfter), &context_CF_CList_InsertAfter, sizeof(context_CF_CList_InsertAfter),
                      false);
 
@@ -782,6 +790,8 @@ void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
     CF_CListNode_t *  expected_insert_back_node;
 
     CF_CList_Traverse_R_context_t context_cf_clist_traverse_r;
+    CF_CList_InsertBack_context_t context_clist_insert_back;
+
     UT_SetDataBuffer(UT_KEY(CF_CList_Traverse_R), &context_cf_clist_traverse_r, sizeof(context_cf_clist_traverse_r),
                      false);
 
@@ -804,7 +814,6 @@ void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
     expected_insert_back_node = &arg_t->cl_node;
 
     /* Arrange for CF_CList_InsertBack_Ex */
-    CF_CList_InsertBack_context_t context_clist_insert_back;
     UT_SetDataBuffer(UT_KEY(CF_CList_InsertBack), &context_clist_insert_back, sizeof(context_clist_insert_back), false);
 
     /* Act */
@@ -842,6 +851,8 @@ void Test_CF_TraverseAllTransactions_Impl_GetContainer_t_Call_args_fn_AndAdd_1_T
     void *                expected_context;
     int32                 result;
 
+    UT_Callback_CF_TraverseAllTransactions_context_t func_ptr_context;
+
     dummy_args.fn      = UT_Callback_CF_TraverseAllTransactions;
     dummy_args.context = dummy_context;
     dummy_args.counter = initial_args_counter;
@@ -852,7 +863,6 @@ void Test_CF_TraverseAllTransactions_Impl_GetContainer_t_Call_args_fn_AndAdd_1_T
     expected_t       = &dummy_t;
     expected_context = dummy_context;
 
-    UT_Callback_CF_TraverseAllTransactions_context_t func_ptr_context;
     UT_SetDataBuffer(UT_KEY(UT_Callback_CF_TraverseAllTransactions), &func_ptr_context, sizeof(func_ptr_context),
                      false);
 
@@ -883,18 +893,17 @@ void Test_CF_TraverseAllTransactions_CallOtherFunction_CF_Q_RX_TimesAndReturn_ar
     void *          arg_context    = &dummy_context;
     uint8           expected_count = CF_QueueIdx_RX - CF_QueueIdx_PEND + 1;
     CF_CListNode_t *expected_qs_nodes[expected_count];
+    int             i = 0;
 
-    CF_TraverseAllTransactions_fn_t arg_fn = UT_Callback_CF_TraverseAllTransactions;
+    CF_TraverseAllTransactions_fn_t                 arg_fn = UT_Callback_CF_TraverseAllTransactions;
+    CF_CList_Traverse_TRAVERSE_ALL_ARGS_T_context_t contexts_cf_clist_traverse[expected_count];
 
-    int i = 0;
     for (i = 0; i < expected_count; ++i)
     {
         dummy_c.qs[i] = (CF_CListNode_t *)&expected_qs_nodes[i];
     }
 
     /* set context */
-    CF_CList_Traverse_TRAVERSE_ALL_ARGS_T_context_t contexts_cf_clist_traverse[expected_count];
-
     /* this must use data buffer hack to pass multiple contexts */
     UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_TRAVERSE_ALL_ARGS_T, NULL);
     UT_SetDataBuffer(UT_KEY(CF_CList_Traverse), contexts_cf_clist_traverse, sizeof(contexts_cf_clist_traverse), false);
