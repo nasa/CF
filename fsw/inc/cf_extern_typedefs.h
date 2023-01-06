@@ -26,7 +26,7 @@
 #ifndef CF_EXTERN_TYPEDEFS_H
 #define CF_EXTERN_TYPEDEFS_H
 
-#include "cf_platform_cfg.h"
+#include <cf_platform_cfg.h>
 
 /**
  * @brief Values for CFDP file transfer class
