@@ -100,7 +100,8 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
         /* Allocate message buffer on success */
         if (os_status == OS_SUCCESS)
         {
-            CF_AppData.engine.out.msg = CFE_SB_AllocateMessageBuffer(offsetof(CF_PduTlmMsg_t, ph) + CF_MAX_PDU_SIZE);
+            CF_AppData.engine.out.msg = CFE_SB_AllocateMessageBuffer(offsetof(CF_PduTlmMsg_t, ph) + CF_MAX_PDU_SIZE +
+                                                                     CF_PDU_ENCAPSULATION_EXTRA_TRAILING_BYTES);
         }
 
         if (!CF_AppData.engine.out.msg)
@@ -153,6 +154,7 @@ void CF_CFDP_Send(uint8 chan_num, const CF_Logical_PduBuffer_t *ph)
     sb_msgsize = offsetof(CF_PduTlmMsg_t, ph);
     sb_msgsize += ph->pdu_header.header_encoded_length;
     sb_msgsize += ph->pdu_header.data_encoded_length;
+    sb_msgsize += CF_PDU_ENCAPSULATION_EXTRA_TRAILING_BYTES;
 
     CFE_MSG_SetSize(&CF_AppData.engine.out.msg->Msg, sb_msgsize);
     CFE_MSG_SetMsgTime(&CF_AppData.engine.out.msg->Msg, CFE_TIME_GetTime());
@@ -198,6 +200,16 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
         CFE_ES_PerfLogEntry(CF_PERF_ID_PDURCVD(chan_num));
         CFE_MSG_GetSize(&bufptr->Msg, &msg_size);
         CFE_MSG_GetType(&bufptr->Msg, &msg_type);
+        if (msg_size > CF_PDU_ENCAPSULATION_EXTRA_TRAILING_BYTES)
+        {
+            /* Ignore/subtract any fixed trailing bytes */
+            msg_size -= CF_PDU_ENCAPSULATION_EXTRA_TRAILING_BYTES;
+        }
+        else
+        {
+            /* bad message size - not supposed to happen */
+            msg_size = 0;
+        }
         if (msg_type == CFE_MSG_Type_Tlm)
         {
             CF_CFDP_DecodeStart(&CF_AppData.engine.in.decode, bufptr, ph, offsetof(CF_PduTlmMsg_t, ph), msg_size);
