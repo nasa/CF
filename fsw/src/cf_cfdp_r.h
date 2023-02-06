@@ -149,13 +149,13 @@ void CF_CFDP_R2_Reset(CF_Transaction_t *t);
  *       t must not be NULL.
  *
  *
- * @retval 0 on CRC match, otherwise error.
+ * @retval CFE_SUCCESS on CRC match, otherwise error.
  *
  *
  * @param t            Pointer to the transaction object
  * @param expected_crc Expected CRC
  */
-int CF_CFDP_R_CheckCrc(CF_Transaction_t *t, uint32 expected_crc);
+CFE_Status_t CF_CFDP_R_CheckCrc(CF_Transaction_t *t, uint32 expected_crc);
 
 /************************************************************************/
 /** @brief Checks R2 transaction state for transaction completion status.
@@ -184,13 +184,13 @@ void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak);
  *       t must not be NULL.
  *
  *
- * @retval 0 on success. Returns anything else on error.
+ * @retval CFE_SUCCESS on success. CF_ERROR on error.
  *
  *
  * @param t  Pointer to the transaction object
  * @param ph Pointer to the PDU information
  */
-int CF_CFDP_R_ProcessFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief Processing receive EOF common functionality for R1/R2.
@@ -204,13 +204,13 @@ int CF_CFDP_R_ProcessFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
  *       t must not be NULL. ph must not be NULL.
  *
  *
- * @retval 0 on success. Returns anything else on error.
+ * @retval CFE_SUCCESS on success. Returns anything else on error.
  *
  *
  * @param t  Pointer to the transaction object
  * @param ph Pointer to the PDU information
  */
-int CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+CFE_Status_t CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief Process receive EOF for R1.
@@ -303,11 +303,11 @@ void CF_CFDP_R2_GapCompute(const CF_ChunkList_t *chunks, const CF_Chunk_t *c, vo
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
  *
- * @retval 0 on success. Returns anything else on error.
+ * @retval CFE_SUCCESS on success. CF_ERROR on error.
  *
  * @param t  Pointer to the transaction object
  */
-int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t);
+CFE_Status_t CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t);
 
 /************************************************************************/
 /** @brief Calculate up to the configured amount of bytes of CRC.
@@ -326,11 +326,11 @@ int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t);
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
  *
- * @retval 0 on completion
- * @retval -1 on non-completion. Error status is stored in condition code.
+ * @retval CFE_SUCCESS on completion.
+ * @retval CF_ERROR on non-completion.
  *
  */
-int CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t);
+CFE_Status_t CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t);
 
 /************************************************************************/
 /** @brief Send a FIN pdu.
@@ -338,12 +338,12 @@ int CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t);
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
  *
- * @retval 0 on success. Returns anything else on error.
+ * @retval CFE_SUCCESS on success. CF_ERROR on error.
  *
  * @param t  Pointer to the transaction object
  *
  */
-int CF_CFDP_R2_SubstateSendFin(CF_Transaction_t *t);
+CFE_Status_t CF_CFDP_R2_SubstateSendFin(CF_Transaction_t *t);
 
 /************************************************************************/
 /** @brief Process receive FIN-ACK pdu.

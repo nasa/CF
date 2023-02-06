@@ -23,6 +23,7 @@
  * CFDP protocol data structure encode/decode implementation
  */
 
+#include "cf_app.h"
 #include "cf_cfdp_pdu.h"
 #include "cf_codec.h"
 #include "cf_events.h"
@@ -762,10 +763,10 @@ uint64 CF_DecodeIntegerInSize(CF_DecoderState_t *state, uint8 decode_size)
  * See description in cf_codec.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int32 CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh)
+CFE_Status_t CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh)
 {
     const CF_CFDP_PduHeader_t *peh; /* for decoding fixed sized fields */
-    int32                      ret = CFE_SUCCESS;
+    CFE_Status_t               ret = CFE_SUCCESS;
 
     /* decode the standard PDU header */
     peh = CF_DECODE_FIXED_CHUNK(state, CF_CFDP_PduHeader_t);
@@ -786,7 +787,7 @@ int32 CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh
         CF_Codec_Load_uint16(&(plh->data_encoded_length), &(peh->length));
         if ((plh->eid_length > sizeof(plh->source_eid)) || (plh->txn_seq_length > sizeof(plh->sequence_num)))
         {
-            ret = -1;
+            ret = CF_ERROR;
         }
         else
         {

@@ -3385,7 +3385,7 @@ void Test_CF_CmdValidateChunkSize_val_GreaterThan_pdu_fd_data_t_FailAndReturn_1(
     local_result = CF_CmdValidateChunkSize(arg_val, arg_chan_num);
 
     /* Assert */
-    UtAssert_True(local_result == 1, "CF_CmdValidateChunkSize returned %d and should be 1 (failed)", local_result);
+    UtAssert_True(local_result == -1, "CF_CmdValidateChunkSize returned %d and should be -1 (failed)", local_result);
 }
 
 void Test_CF_CmdValidateChunkSize_Any_val_GreaterThan_pdu_fd_data_t_FailAndReturn_1(void)
@@ -3399,7 +3399,7 @@ void Test_CF_CmdValidateChunkSize_Any_val_GreaterThan_pdu_fd_data_t_FailAndRetur
     local_result = CF_CmdValidateChunkSize(arg_val, arg_chan_num);
 
     /* Assert */
-    UtAssert_True(local_result == 1, "CF_CmdValidateChunkSize returned %d and should be 1 (failed)", local_result);
+    UtAssert_True(local_result == -1, "CF_CmdValidateChunkSize returned %d and should be -1 (failed)", local_result);
 }
 
 void Test_CF_CmdValidateChunkSize_val_SizeOf_pdu_fd_data_t_SuccessAndReturn_0(void)
@@ -3483,7 +3483,7 @@ void Test_CF_CmdValidateMaxOutgoing_WhenGiven_val_Is_0_And_sem_name_Is_NULL_Retu
     local_result = CF_CmdValidateMaxOutgoing(arg_val, arg_chan_num);
 
     /* Assert */
-    UtAssert_True(local_result == 1, "CF_CmdValidateMaxOutgoing returned %d and should be 1 (Success)", local_result);
+    UtAssert_True(local_result == -1, "CF_CmdValidateMaxOutgoing returned %d and should be -1 (failed)", local_result);
 }
 
 /*******************************************************************************

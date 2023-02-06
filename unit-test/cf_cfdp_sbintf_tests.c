@@ -301,7 +301,7 @@ void Test_CF_CFDP_ReceiveMessage(void)
 
     /* FIN handling special case, but failure of CF_CFDP_SendAck */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &c, NULL, &t, &config);
-    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendAck), 1, CF_SendRet_NO_MSG);
+    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendAck), 1, CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
     config->local_eid             = 123;
     ph->pdu_header.source_eid     = config->local_eid;
     ph->fdirective.directive_code = CF_CFDP_FileDirective_FIN;

@@ -109,10 +109,10 @@ void CF_CheckTables(void)
  * See description in cf_app.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int32 CF_ValidateConfigTable(void *tbl_ptr)
+CFE_Status_t CF_ValidateConfigTable(void *tbl_ptr)
 {
     CF_ConfigTable_t * tbl = (CF_ConfigTable_t *)tbl_ptr;
-    int32              ret; /* initialized below */
+    CFE_Status_t       ret; /* initialized below */
     static const int32 no_ticks_per_second = -1;
     static const int32 crc_alignment       = -2;
     static const int32 outgoing_chunk_size = -3;
@@ -148,9 +148,9 @@ int32 CF_ValidateConfigTable(void *tbl_ptr)
  * See description in cf_app.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int32 CF_TableInit(void)
+CFE_Status_t CF_TableInit(void)
 {
-    int32 status;
+    CFE_Status_t status;
 
     status = CFE_TBL_Register(&CF_AppData.config_handle, CF_CONFIG_TABLE_NAME, sizeof(CF_ConfigTable_t),
                               CFE_TBL_OPT_SNGL_BUFFER | CFE_TBL_OPT_LOAD_DUMP, CF_ValidateConfigTable);
@@ -203,9 +203,9 @@ int32 CF_TableInit(void)
  * See description in cf_app.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int32 CF_Init(void)
+CFE_Status_t CF_Init(void)
 {
-    int32                            status;
+    CFE_Status_t                     status;
     static const CFE_SB_MsgId_Atom_t MID_VALUES[] = {CF_CMD_MID, CF_SEND_HK_MID, CF_WAKE_UP_MID};
     uint32                           i;
 

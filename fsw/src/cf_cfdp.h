@@ -130,7 +130,7 @@ void CF_CFDP_SendEotPkt(CF_Transaction_t *t);
  * @returns anything else on error.
  *
  */
-int32 CF_CFDP_InitEngine(void);
+CFE_Status_t CF_CFDP_InitEngine(void);
 
 /************************************************************************/
 /** @brief Cycle the engine. Called once per wakeup.
@@ -169,10 +169,10 @@ void CF_CFDP_DisableEngine(void);
  * @param dest_id       Entity ID of remote receiver
  *
  * @retval #CFE_SUCCESS \copydoc CFE_SUCCESS
- * @returns Anything else on error.
+ * @returns CFE_SUCCESS on success. CF_ERROR on error.
  */
-int32 CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, CF_CFDP_Class_t cfdp_class, uint8 keep,
-                     uint8 chan, uint8 priority, CF_EntityId_t dest_id);
+CFE_Status_t CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, CF_CFDP_Class_t cfdp_class, uint8 keep,
+                            uint8 chan, uint8 priority, CF_EntityId_t dest_id);
 
 /************************************************************************/
 /** @brief Begin transmit of a directory.
@@ -193,10 +193,10 @@ int32 CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, CF_CFDP
  * @param dest_id       Entity ID of remote receiver
  *
  * @retval #CFE_SUCCESS \copydoc CFE_SUCCESS
- * @returns Anything else on error.
+ * @returns CFE_SUCCESS on success. CF_ERROR on error.
  */
-int32 CF_CFDP_PlaybackDir(const char *src_filename, const char *dst_filename, CF_CFDP_Class_t cfdp_class, uint8 keep,
-                          uint8 chan, uint8 priority, uint16 dest_id);
+CFE_Status_t CF_CFDP_PlaybackDir(const char *src_filename, const char *dst_filename, CF_CFDP_Class_t cfdp_class,
+                                 uint8 keep, uint8 chan, uint8 priority, uint16 dest_id);
 
 /************************************************************************/
 /** @brief Build the PDU header in the output buffer to prepare to send a packet.
@@ -227,12 +227,11 @@ CF_Logical_PduBuffer_t *CF_CFDP_ConstructPduHeader(const CF_Transaction_t *t, CF
  *
  * @param t              Pointer to the transaction object
  *
- * @returns CF_SendRet_t status code
- * @retval CF_SendRet_SUCCESS on success.
- * @retval CF_SendRet_NO_MSG if message buffer cannot be obtained.
- * @retval CF_SendRet_ERROR if an error occurred while building the packet.
+ * @returns CFE_Status_t status code
+ * @retval CFE_SUCCESS on success.
+ * @retval CF_SEND_PDU_NO_BUF_AVAIL_ERROR if message buffer cannot be obtained.
  */
-CF_SendRet_t CF_CFDP_SendMd(CF_Transaction_t *t);
+CFE_Status_t CF_CFDP_SendMd(CF_Transaction_t *t);
 
 /************************************************************************/
 /** @brief Send a previously-assembled filedata PDU for transmit.
@@ -248,10 +247,10 @@ CF_SendRet_t CF_CFDP_SendMd(CF_Transaction_t *t);
  * sends the PDU that was previously allocated and assembled.  As such, the
  * typical failure possibilities do not apply to this call.
  *
- * @returns CF_SendRet_t status code
- * @retval CF_SendRet_SUCCESS on success.
+ * @returns CFE_Status_t status code
+ * @retval CFE_SUCCESS on success. (error checks not yet implemented)
  */
-CF_SendRet_t CF_CFDP_SendFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+CFE_Status_t CF_CFDP_SendFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief Build a eof PDU for transmit.
@@ -261,12 +260,11 @@ CF_SendRet_t CF_CFDP_SendFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
  *
  * @param t   Pointer to the transaction object
  *
- * @returns CF_SendRet_t status code
- * @retval CF_SendRet_SUCCESS on success.
- * @retval CF_SendRet_NO_MSG if message buffer cannot be obtained.
- * @retval CF_SendRet_ERROR if an error occurred while building the packet.
+ * @returns CFE_Status_t status code
+ * @retval CFE_SUCCESS on success.
+ * @retval CF_SEND_PDU_NO_BUF_AVAIL_ERROR if message buffer cannot be obtained.
  */
-CF_SendRet_t CF_CFDP_SendEof(CF_Transaction_t *t);
+CFE_Status_t CF_CFDP_SendEof(CF_Transaction_t *t);
 
 /************************************************************************/
 /** @brief Build a ack PDU for transmit.
@@ -285,13 +283,11 @@ CF_SendRet_t CF_CFDP_SendEof(CF_Transaction_t *t);
  * @param peer_eid Remote entity ID
  * @param tsn      Transaction sequence number
  *
- * @returns CF_SendRet_t status code
- * @retval CF_SendRet_SUCCESS on success.
- * @retval CF_SendRet_NO_MSG if message buffer cannot be obtained.
- * @retval CF_SendRet_ERROR if an error occurred while building the packet.
- *
+ * @returns CFE_Status_t status code
+ * @retval CFE_SUCCESS on success.
+ * @retval CF_SEND_PDU_NO_BUF_AVAIL_ERROR if message buffer cannot be obtained.
  */
-CF_SendRet_t CF_CFDP_SendAck(CF_Transaction_t *t, CF_CFDP_AckTxnStatus_t ts, CF_CFDP_FileDirective_t dir_code,
+CFE_Status_t CF_CFDP_SendAck(CF_Transaction_t *t, CF_CFDP_AckTxnStatus_t ts, CF_CFDP_FileDirective_t dir_code,
                              CF_CFDP_ConditionCode_t cc, CF_EntityId_t peer_eid, CF_TransactionSeq_t tsn);
 
 /************************************************************************/
@@ -305,12 +301,11 @@ CF_SendRet_t CF_CFDP_SendAck(CF_Transaction_t *t, CF_CFDP_AckTxnStatus_t ts, CF_
  * @param fs    Final file status (retained or rejected, etc)
  * @param cc    Final CFDP condition code
  *
- * @returns CF_SendRet_t status code
- * @retval CF_SendRet_SUCCESS on success.
- * @retval CF_SendRet_NO_MSG if message buffer cannot be obtained.
- * @retval CF_SendRet_ERROR if an error occurred while building the packet.
+ * @returns CFE_Status_t status code
+ * @retval CFE_SUCCESS on success.
+ * @retval CF_SEND_PDU_NO_BUF_AVAIL_ERROR if message buffer cannot be obtained.
  */
-CF_SendRet_t CF_CFDP_SendFin(CF_Transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, CF_CFDP_FinFileStatus_t fs,
+CFE_Status_t CF_CFDP_SendFin(CF_Transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, CF_CFDP_FinFileStatus_t fs,
                              CF_CFDP_ConditionCode_t cc);
 
 /************************************************************************/
@@ -327,10 +322,11 @@ CF_SendRet_t CF_CFDP_SendFin(CF_Transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, 
  * encodes and sends the previously-assembled PDU buffer.  As such, the
  * typical failure possibilities do not apply to this call.
  *
- * @returns CF_SendRet_t status code
- * @retval CF_SendRet_SUCCESS on success.
+ * @returns CFE_Status_t status code
+ * @retval CFE_SUCCESS on success.
+ * @retval CF_SEND_PDU_NO_BUF_AVAIL_ERROR if message buffer cannot be obtained.
  */
-CF_SendRet_t CF_CFDP_SendNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+CFE_Status_t CF_CFDP_SendNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief Appends a single TLV value to the logical PDU data
@@ -361,11 +357,11 @@ void CF_CFDP_AppendTlv(CF_Logical_TlvList_t *ptlv_list, CF_CFDP_TlvType_t tlv_ty
  * @param ph       The logical PDU buffer being received
  *
  * @returns integer status code
- * @retval 0 on success
- * @retval -1 on error
- *
+ * @retval CFE_SUCCESS on success
+ * @retval CF_ERROR for general errors
+ * @retval CF_SHORT_PDU_ERROR if PDU too short
  */
-int CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph);
+CFE_Status_t CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief Unpack a metadata PDU from a received message.
@@ -380,10 +376,10 @@ int CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph);
  * @param ph   The logical PDU buffer being received
  *
  * @returns integer status code
- * @retval 0 on success
- * @retval -1 on error
+ * @retval CFE_SUCCESS on success
+ * @retval CF_PDU_METADATA_ERROR on error
  */
-int CF_CFDP_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+CFE_Status_t CF_CFDP_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief Unpack a file data PDU from a received message.
@@ -398,11 +394,11 @@ int CF_CFDP_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
  * @param ph   The logical PDU buffer being received
  *
  * @returns integer status code
- * @retval 0 on success
- * @retval -1 on error
- *
+ * @retval CFE_SUCCESS on success
+ * @retval CF_ERROR for general errors
+ * @retval CF_SHORT_PDU_ERROR PDU too short
  */
-int CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+CFE_Status_t CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief Unpack an eof PDU from a received message.
@@ -417,11 +413,10 @@ int CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
  * @param ph   The logical PDU buffer being received
  *
  * @returns integer status code
- * @retval 0 on success
- * @retval -1 on error
- *
+ * @retval CFE_SUCCESS on success
+ * @retval CF_SHORT_PDU_ERROR on error
  */
-int CF_CFDP_RecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+CFE_Status_t CF_CFDP_RecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief Unpack an ack PDU from a received message.
@@ -436,11 +431,10 @@ int CF_CFDP_RecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
  * @param ph   The logical PDU buffer being received
  *
  * @returns integer status code
- * @retval 0 on success
- * @retval -1 on error
- *
+ * @retval CFE_SUCCESS on success
+ * @retval CF_SHORT_PDU_ERROR on error
  */
-int CF_CFDP_RecvAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+CFE_Status_t CF_CFDP_RecvAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief Unpack an fin PDU from a received message.
@@ -455,11 +449,10 @@ int CF_CFDP_RecvAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
  * @param ph   The logical PDU buffer being received
  *
  * @returns integer status code
- * @retval 0 on success
- * @retval -1 on error
- *
+ * @retval CFE_SUCCESS on success
+ * @retval CF_SHORT_PDU_ERROR on error
  */
-int CF_CFDP_RecvFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+CFE_Status_t CF_CFDP_RecvFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief Unpack a nak PDU from a received message.
@@ -474,11 +467,10 @@ int CF_CFDP_RecvFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
  * @param ph   The logical PDU buffer being received
  *
  * @returns integer status code
- * @retval 0 on success
- * @retval -1 on error
- *
+ * @retval CFE_SUCCESS on success
+ * @retval CF_SHORT_PDU_ERROR on error
  */
-int CF_CFDP_RecvNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+CFE_Status_t CF_CFDP_RecvNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief Dispatch received packet to its handler.
@@ -546,7 +538,7 @@ void CF_CFDP_InitTxnTxFile(CF_Transaction_t *t, CF_CFDP_Class_t cfdp_class, uint
  * @param src_lv     Pointer to LV pair from logical PDU buffer
  *
  * @returns The resulting string length, NOT including termination character
- * @retval -1 on error
+ * @retval CF_ERROR on error
  */
 int CF_CFDP_CopyStringFromLV(char *buf, size_t buf_maxsz, const CF_Logical_Lv_t *src_lv);
 
@@ -610,7 +602,7 @@ void CF_CFDP_RecvIdle(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
  * @returns integer traversal code
  * @retval Always CF_LIST_CONT indicate list traversal should not exit early.
  */
-int CF_CFDP_CloseFiles(CF_CListNode_t *n, void *context);
+CFE_Status_t CF_CFDP_CloseFiles(CF_CListNode_t *n, void *context);
 
 /************************************************************************/
 /** @brief Cycle the current active tx or make a new one active.
@@ -648,7 +640,7 @@ void CF_CFDP_CycleTx(CF_Channel_t *c);
  * @retval CF_CLIST_EXIT when it's found, which terminates list traversal
  * @retval CF_CLIST_CONT when it's isn't found, which causes list traversal to continue
  */
-int CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context);
+CFE_Status_t CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context);
 
 /************************************************************************/
 /** @brief Call R and then S tick functions for all active transactions.
@@ -709,6 +701,6 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c);
  * @retval CF_CLIST_EXIT when it's found, which terminates list traversal
  * @retval CF_CLIST_CONT when it's isn't found, which causes list traversal to continue
  */
-int CF_CFDP_DoTick(CF_CListNode_t *node, void *context);
+CFE_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context);
 
 #endif /* !CF_CFDP_H */

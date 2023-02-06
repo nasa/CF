@@ -73,7 +73,7 @@ void CF_Timer_InitRelSec(CF_Timer_t *t, CF_Timer_Seconds_t rel_sec);
  * @retval 1 if expired
  * @retval 0 if not expired
  */
-int CF_Timer_Expired(const CF_Timer_t *t);
+bool CF_Timer_Expired(const CF_Timer_t *t);
 
 /************************************************************************/
 /** @brief Notify a timer object a tick has occurred.

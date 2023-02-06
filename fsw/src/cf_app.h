@@ -35,6 +35,25 @@
 #include "cf_cfdp.h"
 #include "cf_clist.h"
 
+/**************************************************************************
+ **
+ ** Macro definitions
+ **
+ **************************************************************************/
+
+/**
+ * \name CF Error Codes
+ * \{
+ */
+#define CF_ERROR                        -1 /**< \brief Generic CF error return code */
+#define CF_PDU_METADATA_ERROR           -2 /**< \brief Invalid metadata PDU */
+#define CF_SHORT_PDU_ERROR              -3 /**< \brief PDU too short */
+#define CF_REC_PDU_FSIZE_MISMATCH_ERROR -4 /**< \brief Receive PDU: EOF file size mismatch */
+#define CF_REC_PDU_BAD_EOF_ERROR        -5 /**< \brief Receive PDU: Invalid EOF packet */
+#define CF_SEND_PDU_NO_BUF_AVAIL_ERROR  -6 /**< \brief Send PDU: No send buffer available, throttling limit reached */
+#define CF_SEND_PDU_ERROR               -7 /**< \brief Send PDU: Send failed */
+/**\}*/
+
 /**
  * @brief The name of the application command pipe for CF
  */
@@ -44,6 +63,12 @@
  * @brief A common prefix for all data pipes for CF
  */
 #define CF_CHANNEL_PIPE_PREFIX ("CF_CHAN_")
+
+/*************************************************************************
+ **
+ ** Type definitions
+ **
+ **************************************************************************/
 
 /**
  * @brief The CF application global state structure
@@ -64,10 +89,22 @@ typedef struct
     CF_Engine_t engine;
 } CF_AppData_t;
 
+/**************************************************************************
+ **
+ ** Exported data
+ **
+ **************************************************************************/
+
 /**
  * @brief Singleton instance of the application global data
  */
 extern CF_AppData_t CF_AppData;
+
+/**************************************************************************
+ **
+ **  Function Prototypes
+ **
+ **************************************************************************/
 
 /************************************************************************/
 /** @brief Send CF housekeeping packet
@@ -105,7 +142,7 @@ void CF_CheckTables(void);
  * @retval Returns anything else on error.
  *
  */
-int32 CF_ValidateConfigTable(void *tbl_ptr);
+CFE_Status_t CF_ValidateConfigTable(void *tbl_ptr);
 
 /************************************************************************/
 /** @brief Load the table on application start
@@ -118,7 +155,7 @@ int32 CF_ValidateConfigTable(void *tbl_ptr);
  * @retval Returns anything else on error.
  *
  */
-int32 CF_TableInit(void);
+CFE_Status_t CF_TableInit(void);
 
 /************************************************************************/
 /** @brief CF app init function
@@ -135,7 +172,7 @@ int32 CF_TableInit(void);
  * @retval Returns anything else on error.
  *
  */
-int32 CF_Init(void);
+CFE_Status_t CF_Init(void);
 
 /************************************************************************/
 /** @brief CF wakeup function

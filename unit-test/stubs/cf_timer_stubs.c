@@ -31,7 +31,7 @@
  * Generated stub function for CF_Timer_Expired()
  * ----------------------------------------------------
  */
-int CF_Timer_Expired(const CF_Timer_t *t)
+bool CF_Timer_Expired(const CF_Timer_t *t)
 {
     UT_GenStub_SetupReturnBuffer(CF_Timer_Expired, int);
 

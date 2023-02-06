@@ -124,9 +124,9 @@ void CF_ChunkList_RemoveFromFirst(CF_ChunkList_t *chunks, CF_ChunkSize_t size)
  * Generated stub function for CF_Chunks_CombineNext()
  * ----------------------------------------------------
  */
-int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
+CFE_Status_t CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
-    UT_GenStub_SetupReturnBuffer(CF_Chunks_CombineNext, int);
+    UT_GenStub_SetupReturnBuffer(CF_Chunks_CombineNext, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_Chunks_CombineNext, CF_ChunkList_t *, chunks);
     UT_GenStub_AddParam(CF_Chunks_CombineNext, CF_ChunkIdx_t, i);
@@ -134,7 +134,7 @@ int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chun
 
     UT_GenStub_Execute(CF_Chunks_CombineNext, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_Chunks_CombineNext, int);
+    return UT_GenStub_GetReturnValue(CF_Chunks_CombineNext, CFE_Status_t);
 }
 
 /*

@@ -249,7 +249,7 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
                                               0); /* populate transaction with needed fields for CF_CFDP_SendAck() */
                         if (CF_CFDP_SendAck(&t_finack, CF_CFDP_AckTxnStatus_UNRECOGNIZED, CF_CFDP_FileDirective_FIN,
                                             ph->int_header.fin.cc, ph->pdu_header.destination_eid,
-                                            ph->pdu_header.sequence_num) != CF_SendRet_NO_MSG)
+                                            ph->pdu_header.sequence_num) != CF_SEND_PDU_NO_BUF_AVAIL_ERROR)
                         {
                             /* couldn't get output buffer -- don't care about a send error (oh well, can't send) but we
                              * do care that there was no message because c->cur will be set to this transaction */

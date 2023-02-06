@@ -620,9 +620,9 @@ void CF_CFDP_EncodeCrc(CF_EncoderState_t *state, uint32 *plcrc);
  * @param state  Decoder state object
  * @param plh    Pointer to logical PDU base header data
  * @retval #CFE_SUCCESS \copydoc CFE_SUCCESS
- * @retval Returns anything else on error.
+ * @retval CF_ERROR on error.
  */
-int32 CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh);
+CFE_Status_t CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh);
 
 /************************************************************************/
 /**

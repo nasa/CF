@@ -116,10 +116,10 @@ void CF_FreeTransaction(CF_Transaction_t *t)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Traverse_TransSeqArg_t *context)
+CFE_Status_t CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Traverse_TransSeqArg_t *context)
 {
     CF_Transaction_t *t   = container_of(n, CF_Transaction_t, cl_node);
-    int               ret = 0;
+    CFE_Status_t      ret = 0;
 
     if ((t->history->src_eid == context->src_eid) && (t->history->seq_num == context->transaction_sequence_number))
     {
@@ -168,14 +168,14 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_Transac
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h)
+CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h)
 {
     static const char *CF_DSTR[] = {"RX", "TX"}; /* conversion of CF_Direction_t to string */
 
-    int   i;
-    int32 ret;
-    int32 len;
-    char  linebuf[(CF_FILENAME_MAX_LEN * 2) + 128]; /* buffer for line data */
+    int          i;
+    CFE_Status_t ret;
+    int32        len;
+    char         linebuf[(CF_FILENAME_MAX_LEN * 2) + 128]; /* buffer for line data */
 
     for (i = 0; i < 3; ++i)
     {
@@ -202,11 +202,11 @@ int CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CMD_WHIST_WRITE, CFE_EVS_EventType_ERROR,
                               "CF: writing queue file failed, expected %ld got %ld", (long)len, (long)ret);
-            return -1;
+            return CF_ERROR;
         }
     }
 
-    return 0;
+    return CFE_SUCCESS;
 }
 
 /*----------------------------------------------------------------
@@ -215,7 +215,7 @@ int CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *arg)
+CFE_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *arg)
 {
     CF_Traverse_WriteHistoryFileArg_t *context = arg;
     CF_History_t *                     h       = container_of(n, CF_History_t, cl_node);
@@ -242,7 +242,7 @@ int CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *arg)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg)
+CFE_Status_t CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg)
 {
     CF_Traverse_WriteTxnFileArg_t *context = arg;
     CF_Transaction_t *             t       = container_of(n, CF_Transaction_t, cl_node);
@@ -264,7 +264,7 @@ int CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int32 CF_WriteTxnQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_QueueIdx_t q)
+CFE_Status_t CF_WriteTxnQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_QueueIdx_t q)
 {
     CF_Traverse_WriteTxnFileArg_t arg;
 
@@ -282,7 +282,7 @@ int32 CF_WriteTxnQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_QueueIdx_t q)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int32 CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_Direction_t dir)
+CFE_Status_t CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_Direction_t dir)
 {
     CF_Traverse_WriteHistoryFileArg_t arg;
 
@@ -301,7 +301,7 @@ int32 CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_Direction
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_PrioSearch(CF_CListNode_t *node, void *context)
+CFE_Status_t CF_PrioSearch(CF_CListNode_t *node, void *context)
 {
     CF_Transaction_t *         t = container_of(node, CF_Transaction_t, cl_node);
     CF_Traverse_PriorityArg_t *p = (CF_Traverse_PriorityArg_t *)context;
@@ -368,7 +368,7 @@ void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *args)
+CFE_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *args)
 {
     CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
     args->fn(t, args->context);
@@ -382,7 +382,7 @@ int CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *arg
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context)
+CFE_Status_t CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context)
 {
     CF_TraverseAll_Arg_t args = {fn, context, 0};
     CF_QueueIdx_t        queueidx;
@@ -398,10 +398,10 @@ int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t 
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context)
+CFE_Status_t CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context)
 {
-    int i;
-    int ret = 0;
+    int          i;
+    CFE_Status_t ret = 0;
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
         ret += CF_TraverseAllTransactions(CF_AppData.engine.channels + i, fn, context);
     return ret;
@@ -413,9 +413,9 @@ int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, 
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int32 CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 access)
+CFE_Status_t CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 access)
 {
-    int32 ret;
+    CFE_Status_t ret;
 
     CFE_ES_PerfLogEntry(CF_PERF_ID_FOPEN);
     ret = OS_OpenCreate(fd, fname, flags, access);
@@ -450,9 +450,9 @@ void CF_WrappedClose(osal_id_t fd)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size)
+CFE_Status_t CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size)
 {
-    int32 ret;
+    CFE_Status_t ret;
 
     CFE_ES_PerfLogEntry(CF_PERF_ID_FREAD);
     ret = OS_read(fd, buf, read_size);
@@ -466,9 +466,9 @@ int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size)
+CFE_Status_t CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size)
 {
-    int32 ret;
+    CFE_Status_t ret;
 
     CFE_ES_PerfLogEntry(CF_PERF_ID_FWRITE);
     ret = OS_write(fd, buf, write_size);
@@ -482,9 +482,9 @@ int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int32 CF_WrappedLseek(osal_id_t fd, off_t offset, int mode)
+CFE_Status_t CF_WrappedLseek(osal_id_t fd, off_t offset, int mode)
 {
-    int ret;
+    CFE_Status_t ret;
     CFE_ES_PerfLogEntry(CF_PERF_ID_FSEEK);
     ret = OS_lseek(fd, offset, mode);
     CFE_ES_PerfLogExit(CF_PERF_ID_FSEEK);

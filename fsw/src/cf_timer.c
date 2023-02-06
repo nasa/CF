@@ -62,7 +62,7 @@ void CF_Timer_InitRelSec(CF_Timer_t *t, uint32 rel_sec)
  * See description in cf_timer.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_Timer_Expired(const CF_Timer_t *t)
+bool CF_Timer_Expired(const CF_Timer_t *t)
 {
     return !t->tick;
 }

@@ -82,15 +82,15 @@ void CF_CFDP_R1_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
  * Generated stub function for CF_CFDP_R2_CalcCrcChunk()
  * ----------------------------------------------------
  */
-int CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t)
+CFE_Status_t CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_R2_CalcCrcChunk, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_R2_CalcCrcChunk, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_R2_CalcCrcChunk, CF_Transaction_t *, t);
 
     UT_GenStub_Execute(CF_CFDP_R2_CalcCrcChunk, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_R2_CalcCrcChunk, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_R2_CalcCrcChunk, CFE_Status_t);
 }
 
 /*
@@ -215,15 +215,15 @@ void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
  * Generated stub function for CF_CFDP_R2_SubstateSendFin()
  * ----------------------------------------------------
  */
-int CF_CFDP_R2_SubstateSendFin(CF_Transaction_t *t)
+CFE_Status_t CF_CFDP_R2_SubstateSendFin(CF_Transaction_t *t)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_R2_SubstateSendFin, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_R2_SubstateSendFin, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_R2_SubstateSendFin, CF_Transaction_t *, t);
 
     UT_GenStub_Execute(CF_CFDP_R2_SubstateSendFin, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_R2_SubstateSendFin, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_R2_SubstateSendFin, CFE_Status_t);
 }
 
 /*
@@ -243,16 +243,16 @@ void CF_CFDP_R_Cancel(CF_Transaction_t *t)
  * Generated stub function for CF_CFDP_R_CheckCrc()
  * ----------------------------------------------------
  */
-int CF_CFDP_R_CheckCrc(CF_Transaction_t *t, uint32 expected_crc)
+CFE_Status_t CF_CFDP_R_CheckCrc(CF_Transaction_t *t, uint32 expected_crc)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_R_CheckCrc, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_R_CheckCrc, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_R_CheckCrc, CF_Transaction_t *, t);
     UT_GenStub_AddParam(CF_CFDP_R_CheckCrc, uint32, expected_crc);
 
     UT_GenStub_Execute(CF_CFDP_R_CheckCrc, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_R_CheckCrc, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_R_CheckCrc, CFE_Status_t);
 }
 
 /*
@@ -272,16 +272,16 @@ void CF_CFDP_R_Init(CF_Transaction_t *t)
  * Generated stub function for CF_CFDP_R_ProcessFd()
  * ----------------------------------------------------
  */
-int CF_CFDP_R_ProcessFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_R_ProcessFd, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_R_ProcessFd, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_R_ProcessFd, CF_Transaction_t *, t);
     UT_GenStub_AddParam(CF_CFDP_R_ProcessFd, CF_Logical_PduBuffer_t *, ph);
 
     UT_GenStub_Execute(CF_CFDP_R_ProcessFd, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_R_ProcessFd, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_R_ProcessFd, CFE_Status_t);
 }
 
 /*
@@ -301,16 +301,16 @@ void CF_CFDP_R_SendInactivityEvent(CF_Transaction_t *t)
  * Generated stub function for CF_CFDP_R_SubstateRecvEof()
  * ----------------------------------------------------
  */
-int CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+CFE_Status_t CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_R_SubstateRecvEof, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_R_SubstateRecvEof, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_R_SubstateRecvEof, CF_Transaction_t *, t);
     UT_GenStub_AddParam(CF_CFDP_R_SubstateRecvEof, CF_Logical_PduBuffer_t *, ph);
 
     UT_GenStub_Execute(CF_CFDP_R_SubstateRecvEof, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_R_SubstateRecvEof, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_R_SubstateRecvEof, CFE_Status_t);
 }
 
 /*
@@ -318,15 +318,15 @@ int CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  * Generated stub function for CF_CFDP_R_SubstateSendNak()
  * ----------------------------------------------------
  */
-int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
+CFE_Status_t CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_R_SubstateSendNak, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_R_SubstateSendNak, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_R_SubstateSendNak, CF_Transaction_t *, t);
 
     UT_GenStub_Execute(CF_CFDP_R_SubstateSendNak, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_R_SubstateSendNak, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_R_SubstateSendNak, CFE_Status_t);
 }
 
 /*

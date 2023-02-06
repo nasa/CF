@@ -194,15 +194,15 @@ void CF_CFDP_S_Cancel(CF_Transaction_t *t)
  * Generated stub function for CF_CFDP_S_CheckAndRespondNak()
  * ----------------------------------------------------
  */
-int CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
+CFE_Status_t CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_S_CheckAndRespondNak, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_S_CheckAndRespondNak, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_S_CheckAndRespondNak, CF_Transaction_t *, t);
 
     UT_GenStub_Execute(CF_CFDP_S_CheckAndRespondNak, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_S_CheckAndRespondNak, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_S_CheckAndRespondNak, CFE_Status_t);
 }
 
 /*
@@ -210,15 +210,15 @@ int CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
  * Generated stub function for CF_CFDP_S_SendEof()
  * ----------------------------------------------------
  */
-CF_SendRet_t CF_CFDP_S_SendEof(CF_Transaction_t *t)
+CFE_Status_t CF_CFDP_S_SendEof(CF_Transaction_t *t)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_S_SendEof, CF_SendRet_t);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_S_SendEof, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_S_SendEof, CF_Transaction_t *, t);
 
     UT_GenStub_Execute(CF_CFDP_S_SendEof, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_S_SendEof, CF_SendRet_t);
+    return UT_GenStub_GetReturnValue(CF_CFDP_S_SendEof, CFE_Status_t);
 }
 
 /*
@@ -226,9 +226,9 @@ CF_SendRet_t CF_CFDP_S_SendEof(CF_Transaction_t *t)
  * Generated stub function for CF_CFDP_S_SendFileData()
  * ----------------------------------------------------
  */
-int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc)
+CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_S_SendFileData, int32);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_S_SendFileData, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_S_SendFileData, CF_Transaction_t *, t);
     UT_GenStub_AddParam(CF_CFDP_S_SendFileData, uint32, foffs);
@@ -237,7 +237,7 @@ int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_
 
     UT_GenStub_Execute(CF_CFDP_S_SendFileData, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_S_SendFileData, int32);
+    return UT_GenStub_GetReturnValue(CF_CFDP_S_SendFileData, CFE_Status_t);
 }
 
 /*
