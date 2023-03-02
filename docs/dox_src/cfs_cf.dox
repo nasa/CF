@@ -478,8 +478,12 @@
 
   <H2> Configuration </H2>
   CF uses two sets of configuration parameters: compile-time configurable parameters
-  in the cf_platform_cfg.h file and run-time configurable parameters in the cf_def_cfg.c
-  file.  Most parameters are included in the cf_def_cfg.c file for maximum flexibility.
+  in the cf_platform_cfg.h file and run-time configurable parameters in the cf_def_config.c
+  file.  Most parameters are included in the cf_def_config.c file for maximum flexibility.
+
+  cf_platform_cfg.h uses macro definitions for configurable options, while cf_def_config.c
+  uses a table. cf_def_config.c parameters can be accessed using the get/set functions
+  CF_CmdGetParam() and CF_CmdSetParam().
 
   CF expects to receive a CF_WAKEUP_MID message from the SCH (scheduler) app at a fixed
   rate. The number of wakeups per second is reflected in the configuration table. This
@@ -487,10 +491,10 @@
 
   <H3> Channels </H3>
 
-  CF version 3.0 has a concept of "channels" which have their own
-  configuration. The channel configuration is done in the cf_def_cfg and allows
-  message IDs for incoming and outgoing PDUs to be unique per channel. Each channel can be
-  configured with polling directories as well.
+  CF version 3.0 has a concept of "channels" which have their own configuration. The
+  channel configuration is done in the cf_def_config.c file and allows message IDs for
+  incoming and outgoing PDUs to be unique per channel. Each channel can be configured with
+  polling directories as well.
 
   <H3> Flow Control </H3>
 
