@@ -114,8 +114,9 @@ int CF_CFDP_R_CheckCrc(CF_Transaction_t *t, uint32 expected_crc)
  *-----------------------------------------------------------------*/
 void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
 {
-    int send_nak = 0;
-    int send_fin = 0;
+    uint32 ret;
+    int    send_nak = 0;
+    int    send_fin = 0;
     /* checking if r2 is complete. Check nak list, and send NAK if appropriate */
     /* if all data is present, then there will be no gaps in the chunk */
 
@@ -129,7 +130,7 @@ void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
         else
         {
             /* only look for 1 gap, since the goal here is just to know that there are gaps */
-            uint32 ret = CF_ChunkList_ComputeGaps(&t->chunks->chunks, 1, t->fsize, 0, NULL, NULL);
+            ret = CF_ChunkList_ComputeGaps(&t->chunks->chunks, 1, t->fsize, 0, NULL, NULL);
 
             if (ret)
             {
@@ -487,8 +488,8 @@ int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
                                    CF_AppData.config_table->local_eid, 1, t->history->seq_num, 1);
     CF_Logical_PduNak_t *nak;
     CF_SendRet_t         sret;
-
-    int ret = -1;
+    uint32               cret;
+    int                  ret = -1;
 
     if (ph)
     {
@@ -498,7 +499,6 @@ int CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
         {
             /* we have metadata, so send valid nak */
             CF_GapComputeArgs_t args = {t, nak};
-            uint32              cret;
 
             nak->scope_start = 0;
             cret             = CF_ChunkList_ComputeGaps(&t->chunks->chunks,
@@ -777,7 +777,10 @@ void CF_CFDP_R2_Recv_fin_ack(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  *-----------------------------------------------------------------*/
 void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    bool success = true;
+    char  fname[CF_FILENAME_MAX_LEN];
+    int   status;
+    int32 ret;
+    bool  success = true;
 
     /* it isn't an error to get another MD pdu, right? */
     if (!t->flags.rx.md_recv)
@@ -786,8 +789,6 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
         /* parse the md pdu. this will overwrite the transaction's history, which contains our filename. so let's
          * save the filename in a local buffer so it can be used with OS_mv upon successful parsing of
          * the md pdu */
-        char fname[CF_FILENAME_MAX_LEN];
-        int  status;
 
         strcpy(
             fname,
@@ -835,7 +836,7 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
                 }
                 else
                 {
-                    int32 ret =
+                    ret =
                         CF_WrappedOpenCreate(&t->fd, t->history->fnames.dst_filename, OS_FILE_FLAG_NONE, OS_READ_WRITE);
                     if (ret < 0)
                     {
@@ -959,7 +960,8 @@ void CF_CFDP_R_Tick(CF_Transaction_t *t, int *cont /* unused */)
      * the logic by state so that it isn't a bunch of if statements for different flags
      */
 
-    bool success = true;
+    CF_SendRet_t sret;
+    bool         success = true;
 
     /* at each tick, various timers used by R are checked */
     /* first, check inactivity timer */
@@ -983,8 +985,8 @@ void CF_CFDP_R_Tick(CF_Transaction_t *t, int *cont /* unused */)
         /* rx maintenance: possibly process send_eof_ack, send_nak or send_fin */
         if (t->flags.rx.send_ack)
         {
-            CF_SendRet_t sret = CF_CFDP_SendAck(t, CF_CFDP_AckTxnStatus_ACTIVE, CF_CFDP_FileDirective_EOF,
-                                                t->state_data.r.r2.eof_cc, t->history->peer_eid, t->history->seq_num);
+            sret = CF_CFDP_SendAck(t, CF_CFDP_AckTxnStatus_ACTIVE, CF_CFDP_FileDirective_EOF, t->state_data.r.r2.eof_cc,
+                                   t->history->peer_eid, t->history->seq_num);
             CF_Assert(sret != CF_SendRet_ERROR);
 
             /* if CF_SendRet_SUCCESS, then move on in the state machine. CF_CFDP_SendAck does not return

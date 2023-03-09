@@ -214,6 +214,7 @@ void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
  *-----------------------------------------------------------------*/
 int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_ChanActionFn_t fn, void *context)
 {
+    int i;
     int ret = 0;
 
     /* this function is generic for any ground command that takes a single channel
@@ -222,7 +223,6 @@ int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_ChanActionFn_
     if (cmd->data.byte[0] == CF_ALL_CHANNELS)
     {
         /* apply to all channels */
-        int i;
         for (i = 0; i < CF_NUM_CHANNELS; ++i)
             ret |= fn(i, context);
     }
@@ -334,13 +334,14 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSe
  *-----------------------------------------------------------------*/
 int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
 {
-    int ret = -1;
+    CF_Transaction_t *t;
+    int               ret = -1;
 
     if (cmd->chan == CF_COMPOUND_KEY)
     {
         /* special value 254 means to use the compound key (cmd->eid, cmd->ts) to find the transaction
          * to act upon */
-        CF_Transaction_t *t = CF_FindTransactionBySequenceNumberAllChannels(cmd->ts, cmd->eid);
+        t = CF_FindTransactionBySequenceNumberAllChannels(cmd->ts, cmd->eid);
         if (t)
         {
             fn(t, context);
@@ -587,12 +588,12 @@ void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg)
  *-----------------------------------------------------------------*/
 int CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolMsgArg_t *context)
 {
+    int i;
     int ret = 0;
     /* no need to bounds check chan_num, done in caller */
     if (context->msg->data.byte[1] == CF_ALL_POLLDIRS)
     {
         /* all polldirs in channel */
-        int i;
         for (i = 0; i < CF_MAX_POLLING_DIR_PER_CHAN; ++i)
             CF_AppData.config_table->chan[chan_num].polldir[i].enabled = context->barg;
     }

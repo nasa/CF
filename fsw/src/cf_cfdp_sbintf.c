@@ -182,6 +182,7 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
     CFE_MSG_Type_t    msg_type = CFE_MSG_Type_Invalid;
 
     CF_Logical_PduBuffer_t *ph;
+    CF_Transaction_t        t_finack;
 
     for (; count < CF_AppData.config_table->chan[chan_num].rx_max_messages_per_wakeup; ++count)
     {
@@ -243,8 +244,6 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
                 {
                     if (!CF_CFDP_RecvFin(t, ph))
                     {
-                        CF_Transaction_t t_finack;
-
                         memset(&t_finack, 0, sizeof(t_finack));
                         CF_CFDP_InitTxnTxFile(&t_finack, CF_CFDP_CLASS_2, 1, chan_num,
                                               0); /* populate transaction with needed fields for CF_CFDP_SendAck() */

@@ -385,6 +385,7 @@ uint32 Any_uint32_Except(uint32 exception)
 int32 Any_int32_LessThan(int32 ceiling)
 {
     int32 random_val;
+    int32 new_ceiling;
 
     if (ceiling > 0)
     {
@@ -392,8 +393,8 @@ int32 Any_int32_LessThan(int32 ceiling)
     }
     else
     {
-        int32 new_ceiling = abs(INT32_MIN - ceiling);
-        random_val        = ceiling - (rand() % new_ceiling);
+        new_ceiling = abs(INT32_MIN - ceiling);
+        random_val  = ceiling - (rand() % new_ceiling);
     }
 
     return random_val;
@@ -449,7 +450,8 @@ int Any_int_Except(int exception)
 
 int Any_int_GreaterThan(int floor) /* NOTE: INTMAX_MAX will fail, and is invalid value */
 {
-    int random_val;
+    int  random_val;
+    bool coin_toss;
 
     if (floor > 0)
     {
@@ -459,7 +461,7 @@ int Any_int_GreaterThan(int floor) /* NOTE: INTMAX_MAX will fail, and is invalid
     }
     else
     {
-        bool coin_toss = rand() % 2;
+        coin_toss = rand() % 2;
 
         if (coin_toss == HEADS)
         {
@@ -562,10 +564,11 @@ char *AnyFilenameOfLength(size_t length)
 char *AnyRandomStringOfTextOfLength(size_t length)
 {
     size_t i;
+    int    value;
 
     for (i = 0; i < length; ++i)
     {
-        int value               = 32 + (rand() % 95); /* ASCII 32 to 126 */
+        value                   = 32 + (rand() % 95); /* ASCII 32 to 126 */
         random_length_string[i] = (char)value;
     }
     random_length_string[i] = '\0';
@@ -576,10 +579,11 @@ char *AnyRandomStringOfTextOfLength(size_t length)
 char *AnyRandomStringOfLettersOfLength(size_t length)
 {
     size_t i;
+    int    value;
 
     for (i = 0; i < length; ++i)
     {
-        int value = 65 + (rand() % 26); /* ASCII 65 to 91 */
+        value = 65 + (rand() % 26); /* ASCII 65 to 91 */
 
         if (AnyCoinFlip() == HEADS)
         {
@@ -596,10 +600,11 @@ char *AnyRandomStringOfLettersOfLength(size_t length)
 void AnyRandomStringOfLettersOfLengthCopy(char *random_string, size_t length)
 {
     size_t i;
+    int    value;
 
     for (i = 0; i < (length - 1); ++i)
     {
-        int value = 65 + (rand() % 26); /* ASCII 65 to 91 */
+        value = 65 + (rand() % 26); /* ASCII 65 to 91 */
 
         if (AnyCoinFlip() == HEADS)
         {
