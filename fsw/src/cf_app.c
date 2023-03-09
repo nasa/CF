@@ -150,7 +150,7 @@ int32 CF_ValidateConfigTable(void *tbl_ptr)
  *-----------------------------------------------------------------*/
 int32 CF_TableInit(void)
 {
-    int32 status = CFE_SUCCESS;
+    int32 status;
 
     status = CFE_TBL_Register(&CF_AppData.config_handle, CF_CONFIG_TABLE_NAME, sizeof(CF_ConfigTable_t),
                               CFE_TBL_OPT_SNGL_BUFFER | CFE_TBL_OPT_LOAD_DUMP, CF_ValidateConfigTable);
@@ -205,7 +205,7 @@ int32 CF_TableInit(void)
  *-----------------------------------------------------------------*/
 int32 CF_Init(void)
 {
-    int32                            status       = CFE_SUCCESS;
+    int32                            status;
     static const CFE_SB_MsgId_Atom_t MID_VALUES[] = {CF_CMD_MID, CF_SEND_HK_MID, CF_WAKE_UP_MID};
     uint32                           i;
 

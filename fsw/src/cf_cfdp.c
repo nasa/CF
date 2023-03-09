@@ -1325,7 +1325,7 @@ static int32 CF_CFDP_PlaybackDir_Initiate(CF_Playback_t *p, const char *src_file
                                           CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority,
                                           CF_EntityId_t dest_id)
 {
-    int32 ret = CFE_SUCCESS;
+    int32 ret;
 
     /* make sure the directory can be open */
     ret = OS_DirectoryOpen(&p->dir_id, src_filename);
