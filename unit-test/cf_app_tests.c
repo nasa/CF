@@ -168,23 +168,23 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED(
 /* CF_ValidateConfigTable tests specific items */
 
 /* CF_ValidateConfigTable tests specific global variables */
-CF_ConfigTable_t dummy_table;
+CF_ConfigTable_t table;
 
 /* CF_ValidateConfigTable tests specific functions */
-void cf_config_table_tests_set_dummy_table_to_nominal(void)
+void cf_config_table_tests_set_table_to_nominal(void)
 {
-    /* all values for dummy_table.ticks_per_second nominal except 0 */
-    dummy_table.ticks_per_second = Any_uint32_Except(0);
+    /* all values for table.ticks_per_second nominal except 0 */
+    table.ticks_per_second = Any_uint32_Except(0);
     /* all values (except 0) & 3ff == 0 are nominal (1024 byte aligned) */
-    dummy_table.rx_crc_calc_bytes_per_wakeup = Any_uint32_Except(0) << 10;
+    table.rx_crc_calc_bytes_per_wakeup = Any_uint32_Except(0) << 10;
     /* all values less than sizeof(CF_CFDP_PduFileDataContent_t) are nominal */
-    dummy_table.outgoing_file_chunk_size = Any_uint16_LessThan(sizeof(CF_CFDP_PduFileDataContent_t));
+    table.outgoing_file_chunk_size = Any_uint16_LessThan(sizeof(CF_CFDP_PduFileDataContent_t));
 }
 
 void Setup_cf_config_table_tests(void)
 {
     cf_app_tests_Setup();
-    cf_config_table_tests_set_dummy_table_to_nominal();
+    cf_config_table_tests_set_table_to_nominal();
 }
 
 /* end CF_ValidateConfigTable tests specific items */
@@ -192,7 +192,7 @@ void Setup_cf_config_table_tests(void)
 void Test_CF_ValidateConfigTable_FailBecauseTableTicksPerSecondIs0(void)
 {
     /* Arrange */
-    CF_ConfigTable_t *arg_table = &dummy_table;
+    CF_ConfigTable_t *arg_table = &table;
     int32             result;
 
     arg_table->ticks_per_second = 0;
@@ -207,7 +207,7 @@ void Test_CF_ValidateConfigTable_FailBecauseTableTicksPerSecondIs0(void)
 void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0(void)
 {
     /* Arrange */
-    CF_ConfigTable_t *arg_table = &dummy_table;
+    CF_ConfigTable_t *arg_table = &table;
     int32             result;
 
     arg_table->ticks_per_second             = 1;
@@ -223,7 +223,7 @@ void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0(void)
 void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIsNot1024ByteAligned(void)
 {
     /* Arrange */
-    CF_ConfigTable_t *arg_table = &dummy_table;
+    CF_ConfigTable_t *arg_table = &table;
     int32             result;
 
     arg_table->ticks_per_second = 1;
@@ -242,7 +242,7 @@ void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIsNot1024ByteAlign
 void Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArray(void)
 {
     /* Arrange */
-    CF_ConfigTable_t *arg_table = &dummy_table;
+    CF_ConfigTable_t *arg_table = &table;
     int32             result;
 
     /* outgoing_file_chunk_size set to greater than sizeof(CF_CFDP_PduFileDataContent_t) */
@@ -260,7 +260,7 @@ void Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArra
 void Test_CF_ValidateConfigTable_Success(void)
 {
     /* Arange */
-    CF_ConfigTable_t *arg_table = &dummy_table;
+    CF_ConfigTable_t *arg_table = &table;
     int32             result;
 
     arg_table->ticks_per_second             = 1;
@@ -668,13 +668,13 @@ void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndV
     /* Arrange */
     CFE_SB_MsgId_t   forced_MsgID = CFE_SB_INVALID_MSG_ID;
     CFE_SB_Buffer_t  fake_msg;
-    CFE_SB_Buffer_t *dummy_msg = &fake_msg;
+    CFE_SB_Buffer_t *msg = &fake_msg;
 
     UT_SetDeferredRetcode(UT_KEY(CFE_ES_RunLoop), 1, true);
     UT_SetDefaultReturnValue(UT_KEY(CFE_ES_RunLoop), false);
 
     /* Actual data not used, just address is needed */
-    UT_SetDataBuffer(UT_KEY(CFE_SB_ReceiveBuffer), &dummy_msg, sizeof(dummy_msg), false);
+    UT_SetDataBuffer(UT_KEY(CFE_SB_ReceiveBuffer), &msg, sizeof(msg), false);
 
     /* Arrange unstubbable: CF_ProcessMsg, invalid ID */
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &forced_MsgID, sizeof(forced_MsgID), false);

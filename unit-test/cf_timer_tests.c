@@ -46,15 +46,15 @@ void cf_timer_tests_Teardown(void)
 void Test_CF_Timer_Sec2Ticks_ReturnExpectedValue(void)
 {
     /* Arrange */
-    CF_Timer_Seconds_t arg_sec                = Any_uint32();
-    uint32             dummy_ticks_per_second = Any_uint32();
-    CF_ConfigTable_t   dummy_config_table;
+    CF_Timer_Seconds_t arg_sec          = Any_uint32();
+    uint32             ticks_per_second = Any_uint32();
+    CF_ConfigTable_t   config_table;
 
-    CF_AppData.config_table                   = &dummy_config_table;
-    CF_AppData.config_table->ticks_per_second = dummy_ticks_per_second;
+    CF_AppData.config_table                   = &config_table;
+    CF_AppData.config_table->ticks_per_second = ticks_per_second;
 
     /* Act */
-    UtAssert_UINT32_EQ(CF_Timer_Sec2Ticks(arg_sec), arg_sec * dummy_ticks_per_second);
+    UtAssert_UINT32_EQ(CF_Timer_Sec2Ticks(arg_sec), arg_sec * ticks_per_second);
 }
 
 /*******************************************************************************
@@ -67,23 +67,23 @@ void Test_CF_Timer_InitRelSec_ReceiveExpectedValue(void)
 {
     /* Arrange */
     uint32      arg_rel_sec = Any_uint32();
-    CF_Timer_t  dummy_timer;
-    CF_Timer_t *arg_t = &dummy_timer;
+    CF_Timer_t  timer;
+    CF_Timer_t *arg_t = &timer;
 
     /* Arrange unstubbalbe: CF_Timer_Sec2Ticks in same file */
-    uint32           dummy_ticks_per_second = Any_uint32();
-    CF_ConfigTable_t dummy_config_table;
+    uint32           ticks_per_second = Any_uint32();
+    CF_ConfigTable_t config_table;
 
-    CF_AppData.config_table                   = &dummy_config_table;
-    CF_AppData.config_table->ticks_per_second = dummy_ticks_per_second;
+    CF_AppData.config_table                   = &config_table;
+    CF_AppData.config_table->ticks_per_second = ticks_per_second;
 
-    arg_t->tick = dummy_ticks_per_second;
+    arg_t->tick = ticks_per_second;
 
     /* Act */
     CF_Timer_InitRelSec(arg_t, arg_rel_sec);
 
     /* Assert */
-    UtAssert_UINT32_EQ(arg_t->tick, arg_rel_sec * dummy_ticks_per_second);
+    UtAssert_UINT32_EQ(arg_t->tick, arg_rel_sec * ticks_per_second);
 }
 
 /*******************************************************************************
@@ -95,9 +95,9 @@ void Test_CF_Timer_InitRelSec_ReceiveExpectedValue(void)
 void Test_CF_Timer_Expired_When_t_tick_Is_0_Return_1(void)
 {
     /* Arrange */
-    CF_Timer_t dummy_timer;
-    dummy_timer.tick                  = 0;
-    const CF_Timer_t *arg_t           = &dummy_timer;
+    CF_Timer_t timer;
+    timer.tick                        = 0;
+    const CF_Timer_t *arg_t           = &timer;
     int               expected_result = 1;
 
     /* Act */
@@ -107,9 +107,9 @@ void Test_CF_Timer_Expired_When_t_tick_Is_0_Return_1(void)
 void Test_CF_Timer_Expired_When_t_tick_Is_1_Return_0(void)
 {
     /* Arrange */
-    CF_Timer_t dummy_timer;
-    dummy_timer.tick                  = 1;
-    const CF_Timer_t *arg_t           = &dummy_timer;
+    CF_Timer_t timer;
+    timer.tick                        = 1;
+    const CF_Timer_t *arg_t           = &timer;
     int               expected_result = 0;
 
     /* Act */
@@ -119,9 +119,9 @@ void Test_CF_Timer_Expired_When_t_tick_Is_1_Return_0(void)
 void Test_CF_Timer_Expired_When_t_tick_IsAnyIntegerExcept_0_Return_0(void)
 {
     /* Arrange */
-    CF_Timer_t dummy_timer;
-    dummy_timer.tick                  = Any_int_Except(0);
-    const CF_Timer_t *arg_t           = &dummy_timer;
+    CF_Timer_t timer;
+    timer.tick                        = Any_int_Except(0);
+    const CF_Timer_t *arg_t           = &timer;
     int               expected_result = 0;
 
     /* Act */
@@ -138,8 +138,8 @@ void Test_CF_Timer_Tick_When_t_tick_Is_non0_Decrement_t_tick(void)
 {
     /* Arrange */
     uint32      initial_tick = Any_uint32_Except(0);
-    CF_Timer_t  dummy_t;
-    CF_Timer_t *arg_t = &dummy_t;
+    CF_Timer_t  t;
+    CF_Timer_t *arg_t = &t;
 
     arg_t->tick = initial_tick;
 
