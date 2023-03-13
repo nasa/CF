@@ -216,7 +216,7 @@ void Test_CF_CFDP_R_Tick(void)
 
     /* same as above, but SendAck fails */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
-    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendAck), 1, CF_SendRet_NO_MSG);
+    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendAck), 1, CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
     t->state                     = CF_TxnState_R2;
     t->flags.rx.send_ack         = true;
     t->flags.rx.inactivity_fired = true;
@@ -233,7 +233,7 @@ void Test_CF_CFDP_R_Tick(void)
 
     /* same as above, but CF_CFDP_R_SubstateSendNak fails */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
-    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendNak), 1, CF_SendRet_NO_MSG);
+    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendNak), 1, CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
     t->state                     = CF_TxnState_R2;
     t->flags.rx.send_nak         = true;
     t->flags.rx.inactivity_fired = true;
@@ -250,7 +250,7 @@ void Test_CF_CFDP_R_Tick(void)
 
     /* same as above, but CF_CFDP_R2_SubstateSendFin fails */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
-    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendFin), 1, CF_SendRet_NO_MSG);
+    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendFin), 1, CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
     t->state                     = CF_TxnState_R2;
     t->flags.rx.send_fin         = true;
     t->flags.rx.inactivity_fired = true;
@@ -625,13 +625,13 @@ void Test_CF_CFDP_R_SubstateRecvEof(void)
     t->flags.rx.md_recv = true;
     eof->size           = 100;
     t->fsize            = 300;
-    UtAssert_INT32_EQ(CF_CFDP_R_SubstateRecvEof(t, ph), CF_RxEofRet_FSIZE_MISMATCH);
+    UtAssert_INT32_EQ(CF_CFDP_R_SubstateRecvEof(t, ph), CF_REC_PDU_FSIZE_MISMATCH_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_R_SIZE_MISMATCH);
 
     /* with failure of CF_CFDP_RecvEof() */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_RecvEof), -1);
-    UtAssert_INT32_EQ(CF_CFDP_R_SubstateRecvEof(t, ph), CF_RxEofRet_BAD_EOF);
+    UtAssert_INT32_EQ(CF_CFDP_R_SubstateRecvEof(t, ph), CF_REC_PDU_BAD_EOF_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_R_PDU_EOF);
 
     /* these counters should have been updated during the test */
@@ -713,7 +713,7 @@ void Test_CF_CFDP_R2_SubstateRecvEof(void)
     UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1); /* unchanged */
 
     /* failure in CF_CFDP_R_SubstateRecvEof - not a stub, but calls CF_CFDP_RecvEof, which is. */
-    /* This will follow the CF_RxEofRet_BAD_EOF processing path, which just sets state to FILEDATA */
+    /* This will follow the CF_REC_PDU_BAD_EOF_ERROR processing path, which just sets state to FILEDATA */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvEof), 1, -1);
     UtAssert_VOIDCALL(CF_CFDP_R2_SubstateRecvEof(t, ph));
@@ -858,7 +858,7 @@ void Test_CF_CFDP_R_SubstateSendNak(void)
 
     /* same, but with failure of CF_CFDP_SendNak */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, &t, NULL);
-    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendNak), 1, CF_SendRet_NO_MSG);
+    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendNak), 1, CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
     UtAssert_INT32_EQ(CF_CFDP_R_SubstateSendNak(t), -1);
     UT_CF_AssertEventID(CF_EID_INF_CFDP_R_REQUEST_MD);
     UtAssert_STUB_COUNT(CF_CFDP_SendNak, 2);
@@ -892,7 +892,7 @@ void Test_CF_CFDP_R_SubstateSendNak(void)
     /* this also should use the max chunks instead of count */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, &t, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_ChunkList_ComputeGaps), 1, 1);
-    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendNak), 1, CF_SendRet_NO_MSG);
+    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendNak), 1, CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
     t->flags.rx.md_recv = true;
     t->chunks           = &chunks;
     UtAssert_INT32_EQ(CF_CFDP_R_SubstateSendNak(t), -1);
@@ -999,7 +999,7 @@ void Test_CF_CFDP_R2_SubstateSendFin(void)
 
     /* failure in CF_CFDP_SendFin */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
-    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendFin), 1, CF_SendRet_NO_MSG);
+    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendFin), 1, CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
     UtAssert_INT32_EQ(CF_CFDP_R2_SubstateSendFin(t), -1);
 
     /* non-success transaction status code */
@@ -1074,21 +1074,21 @@ void Test_CF_CFDP_R2_RecvMd(void)
 
     /* OS_mv failure */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
-    UT_SetDeferredRetcode(UT_KEY(OS_mv), 1, -1);
+    UT_SetDeferredRetcode(UT_KEY(OS_mv), 1, CF_ERROR);
     UtAssert_VOIDCALL(CF_CFDP_R2_RecvMd(t, ph));
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_R_RENAME);
     UtAssert_INT32_EQ(t->history->txn_stat, CF_TxnStatus_FILESTORE_REJECTION);
 
     /* reopen failure */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
-    UT_SetDeferredRetcode(UT_KEY(CF_WrappedOpenCreate), 1, -1);
+    UT_SetDeferredRetcode(UT_KEY(CF_WrappedOpenCreate), 1, CF_ERROR);
     UtAssert_VOIDCALL(CF_CFDP_R2_RecvMd(t, ph));
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_R_OPEN);
     UtAssert_INT32_EQ(t->history->txn_stat, CF_TxnStatus_FILESTORE_REJECTION);
 
     /* CF_CFDP_RecvMd failure */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
-    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvMd), 1, -1);
+    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvMd), 1, CF_PDU_METADATA_ERROR);
     UtAssert_VOIDCALL(CF_CFDP_R2_RecvMd(t, ph));
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_R_PDU_MD);
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error, 1);

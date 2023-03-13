@@ -129,13 +129,13 @@ void CF_CFDP_S_Cancel(CF_Transaction_t *t);
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
  *
- * @retval CF_SendRet_SUCCESS on success.
- * @retval CF_SendRet_NO_MSG if message buffer cannot be obtained.
- * @retval CF_SendRet_ERROR if an error occurred while building the packet.
+ * @retval CFE_SUCCESS on success.
+ * @retval CF_SEND_PDU_NO_BUF_AVAIL_ERROR if message buffer cannot be obtained.
+ * @retval CF_SEND_PDU_ERROR if an error occurred while building the packet.
  *
  * @param t  Pointer to the transaction object
  */
-CF_SendRet_t CF_CFDP_S_SendEof(CF_Transaction_t *t);
+CFE_Status_t CF_CFDP_S_SendEof(CF_Transaction_t *t);
 
 /************************************************************************/
 /** @brief Sends an eof for S1.
@@ -168,7 +168,8 @@ void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *t);
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
  *
- * @returns The number of bytes sent in the file data PDU, or negative value on error
+ * @returns The number of bytes sent in the file data PDU (CFE_SUCCESS,
+ *          i.e. 0, if no bytes were processed), or CF_ERROR on error
  *
  * @param t     Pointer to the transaction object
  * @param foffs Position in file to send data from
@@ -176,7 +177,7 @@ void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *t);
  * @param calc_crc Enable CRC/Checksum calculation
  *
  */
-int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc);
+CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc);
 
 /************************************************************************/
 /** @brief Standard state function to send the next file data PDU for active transaction.
@@ -204,13 +205,13 @@ void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *t);
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
  *
- * @returns  negative value if error.
+ * @returns CF_ERROR if error.
  * @retval 0 if no NAK processed.
  * @retval 1 if NAK processed.
  *
  * @param t     Pointer to the transaction object
  */
-int CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t);
+CFE_Status_t CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t);
 
 /************************************************************************/
 /** @brief Send filedata handling for S2.

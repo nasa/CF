@@ -269,19 +269,19 @@ void Test_CF_CFDP_RecvPh(void)
     /* decode error, fixed part */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, NULL, NULL);
     CF_CODEC_SET_DONE(ph->pdec);
-    UtAssert_INT32_EQ(CF_CFDP_RecvPh(UT_CFDP_CHANNEL, ph), -1);
+    UtAssert_INT32_EQ(CF_CFDP_RecvPh(UT_CFDP_CHANNEL, ph), CF_SHORT_PDU_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_SHORT_HEADER);
 
     /* decode error, large file bit set */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, NULL, NULL);
     ph->pdu_header.large_flag = true;
-    UtAssert_INT32_EQ(CF_CFDP_RecvPh(UT_CFDP_CHANNEL, ph), -1);
+    UtAssert_INT32_EQ(CF_CFDP_RecvPh(UT_CFDP_CHANNEL, ph), CF_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_LARGE_FILE);
 
     /* decode error, insufficient storage for EID or seq num */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, NULL, NULL);
-    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_DecodeHeader), 1, -1);
-    UtAssert_INT32_EQ(CF_CFDP_RecvPh(UT_CFDP_CHANNEL, ph), -1);
+    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_DecodeHeader), 1, CF_ERROR);
+    UtAssert_INT32_EQ(CF_CFDP_RecvPh(UT_CFDP_CHANNEL, ph), CF_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_TRUNCATION);
 }
 
@@ -312,24 +312,24 @@ void Test_CF_CFDP_RecvMd(void)
     UtAssert_STRINGBUF_EQ(md->source_filename.data_ptr, md->source_filename.length, h->fnames.src_filename,
                           sizeof(h->fnames.src_filename));
 
-    /* deode errors: fixed part */
+    /* decode errors: fixed part */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     CF_CODEC_SET_DONE(ph->pdec);
-    UtAssert_INT32_EQ(CF_CFDP_RecvMd(t, ph), -1);
+    UtAssert_INT32_EQ(CF_CFDP_RecvMd(t, ph), CF_PDU_METADATA_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_MD_SHORT);
 
     /* decode errors: LV dest filename too long */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     md                       = &ph->int_header.md;
     md->dest_filename.length = CF_FILENAME_MAX_LEN + 1;
-    UtAssert_INT32_EQ(CF_CFDP_RecvMd(t, ph), -1);
+    UtAssert_INT32_EQ(CF_CFDP_RecvMd(t, ph), CF_PDU_METADATA_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_INVALID_DST_LEN);
 
     /* decode errors: LV source filename too long */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     md                         = &ph->int_header.md;
     md->source_filename.length = CF_FILENAME_MAX_LEN + 1;
-    UtAssert_INT32_EQ(CF_CFDP_RecvMd(t, ph), -1);
+    UtAssert_INT32_EQ(CF_CFDP_RecvMd(t, ph), CF_PDU_METADATA_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_INVALID_SRC_LEN);
 }
 
@@ -352,24 +352,24 @@ void Test_CF_CFDP_RecvFd(void)
     UtAssert_INT32_EQ(CF_CFDP_RecvFd(t, ph), 0);
     UtAssert_UINT32_EQ(ph->int_header.fd.data_len, 10);
 
-    /* deode errors: fixed part */
+    /* decode errors: fixed part */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     CF_CODEC_SET_DONE(ph->pdec);
-    UtAssert_INT32_EQ(CF_CFDP_RecvFd(t, ph), -1);
+    UtAssert_INT32_EQ(CF_CFDP_RecvFd(t, ph), CF_SHORT_PDU_ERROR);
     UtAssert_INT32_EQ(t->history->txn_stat, CF_TxnStatus_PROTOCOL_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_FD_SHORT);
 
-    /* deode errors: crc part */
+    /* decode errors: crc part */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     ph->pdu_header.crc_flag    = 1;
     ph->int_header.fd.data_len = sizeof(CF_CFDP_uint32_t) - 1;
-    UtAssert_INT32_EQ(CF_CFDP_RecvFd(t, ph), -1);
+    UtAssert_INT32_EQ(CF_CFDP_RecvFd(t, ph), CF_SHORT_PDU_ERROR);
     UtAssert_BOOL_FALSE(CF_CODEC_IS_OK(ph->pdec));
 
     /* with segment metadata (unimplemented) */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     ph->pdu_header.segment_meta_flag = 1;
-    UtAssert_INT32_EQ(CF_CFDP_RecvFd(t, ph), -1);
+    UtAssert_INT32_EQ(CF_CFDP_RecvFd(t, ph), CF_ERROR);
     UtAssert_INT32_EQ(t->history->txn_stat, CF_TxnStatus_PROTOCOL_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_FD_UNSUPPORTED);
 }
@@ -387,10 +387,10 @@ void Test_CF_CFDP_RecvEof(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     UtAssert_INT32_EQ(CF_CFDP_RecvEof(t, ph), 0);
 
-    /* deode errors: fixed part */
+    /* decode errors: fixed part */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     CF_CODEC_SET_DONE(ph->pdec);
-    UtAssert_INT32_EQ(CF_CFDP_RecvEof(t, ph), -1);
+    UtAssert_INT32_EQ(CF_CFDP_RecvEof(t, ph), CF_SHORT_PDU_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_EOF_SHORT);
 }
 
@@ -406,10 +406,10 @@ void Test_CF_CFDP_RecvAck(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     UtAssert_INT32_EQ(CF_CFDP_RecvAck(t, ph), 0);
 
-    /* deode errors: fixed part */
+    /* decode errors: fixed part */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     CF_CODEC_SET_DONE(ph->pdec);
-    UtAssert_INT32_EQ(CF_CFDP_RecvAck(t, ph), -1);
+    UtAssert_INT32_EQ(CF_CFDP_RecvAck(t, ph), CF_SHORT_PDU_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_ACK_SHORT);
 }
 
@@ -426,10 +426,10 @@ void Test_CF_CFDP_RecvFin(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     UtAssert_INT32_EQ(CF_CFDP_RecvFin(t, ph), 0);
 
-    /* deode errors: fixed part */
+    /* decode errors: fixed part */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     CF_CODEC_SET_DONE(ph->pdec);
-    UtAssert_INT32_EQ(CF_CFDP_RecvFin(t, ph), -1);
+    UtAssert_INT32_EQ(CF_CFDP_RecvFin(t, ph), CF_SHORT_PDU_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_FIN_SHORT);
 }
 
@@ -446,10 +446,10 @@ void Test_CF_CFDP_RecvNak(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     UtAssert_INT32_EQ(CF_CFDP_RecvNak(t, ph), 0);
 
-    /* deode errors: fixed part */
+    /* decode errors: fixed part */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     CF_CODEC_SET_DONE(ph->pdec);
-    UtAssert_INT32_EQ(CF_CFDP_RecvNak(t, ph), -1);
+    UtAssert_INT32_EQ(CF_CFDP_RecvNak(t, ph), CF_SHORT_PDU_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_NAK_SHORT);
 }
 
@@ -593,7 +593,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_ConstructPduHeader(const CF_Transaction_t *t, CF
 void Test_CF_CFDP_SendMd(void)
 {
     /* Test case for:
-        CF_SendRet_t     CF_CFDP_SendMd(CF_Transaction_t *t);
+        CFE_Status_t     CF_CFDP_SendMd(CF_Transaction_t *t);
      */
 
     CF_Transaction_t *      t;
@@ -603,7 +603,7 @@ void Test_CF_CFDP_SendMd(void)
 
     /* setup without a tx message */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
-    UtAssert_INT32_EQ(CF_CFDP_SendMd(t), CF_SendRet_NO_MSG);
+    UtAssert_INT32_EQ(CF_CFDP_SendMd(t), CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, &h, &t, NULL);
     md = &ph->int_header.md;
@@ -611,7 +611,7 @@ void Test_CF_CFDP_SendMd(void)
     strncpy(h->fnames.src_filename, "src1", sizeof(h->fnames.src_filename));
     t->state = CF_TxnState_S1;
     t->fsize = 1234;
-    UtAssert_INT32_EQ(CF_CFDP_SendMd(t), CF_SendRet_SUCCESS);
+    UtAssert_INT32_EQ(CF_CFDP_SendMd(t), CFE_SUCCESS);
     UtAssert_UINT32_EQ(md->size, t->fsize);
     UtAssert_STRINGBUF_EQ(md->dest_filename.data_ptr, md->dest_filename.length, h->fnames.dst_filename,
                           sizeof(h->fnames.dst_filename));
@@ -625,7 +625,7 @@ void Test_CF_CFDP_SendMd(void)
     strncpy(h->fnames.src_filename, "src2", sizeof(h->fnames.src_filename));
     t->state = CF_TxnState_S2;
     t->fsize = 5678;
-    UtAssert_INT32_EQ(CF_CFDP_SendMd(t), CF_SendRet_SUCCESS);
+    UtAssert_INT32_EQ(CF_CFDP_SendMd(t), CFE_SUCCESS);
     UtAssert_UINT32_EQ(md->size, t->fsize);
     UtAssert_UINT32_EQ(md->dest_filename.length, sizeof(h->fnames.dst_filename));
     UtAssert_STRINGBUF_EQ(md->source_filename.data_ptr, md->source_filename.length, h->fnames.src_filename,
@@ -635,20 +635,20 @@ void Test_CF_CFDP_SendMd(void)
 void Test_CF_CFDP_SendFd(void)
 {
     /* Test case for:
-        CF_SendRet_t     CF_CFDP_SendFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+        CFE_Status_t     CF_CFDP_SendFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
     */
 
     CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, &t, NULL);
-    UtAssert_INT32_EQ(CF_CFDP_SendFd(t, ph), CF_SendRet_SUCCESS);
+    UtAssert_INT32_EQ(CF_CFDP_SendFd(t, ph), CFE_SUCCESS);
 
     /* Hit CF_CFDP_SetPduLength condition where final_pos < the header_encoded_length */
     ph->pdu_header.header_encoded_length = CF_CODEC_GET_POSITION(ph->penc) + 1;
     ph->pdu_header.data_encoded_length   = 0;
 
-    UtAssert_INT32_EQ(CF_CFDP_SendFd(t, ph), CF_SendRet_SUCCESS);
+    UtAssert_INT32_EQ(CF_CFDP_SendFd(t, ph), CFE_SUCCESS);
 
     UtAssert_UINT32_EQ(ph->pdu_header.data_encoded_length, 0);
 }
@@ -656,7 +656,7 @@ void Test_CF_CFDP_SendFd(void)
 void Test_CF_CFDP_SendEof(void)
 {
     /* Test case for:
-        CF_SendRet_t     CF_CFDP_SendEof(CF_Transaction_t *t);
+        CFE_Status_t     CF_CFDP_SendEof(CF_Transaction_t *t);
      */
 
     CF_Transaction_t *      t;
@@ -666,19 +666,19 @@ void Test_CF_CFDP_SendEof(void)
 
     /* setup without a tx message */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
-    UtAssert_INT32_EQ(CF_CFDP_SendEof(t), CF_SendRet_NO_MSG);
+    UtAssert_INT32_EQ(CF_CFDP_SendEof(t), CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
 
     /* nominal */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, &t, NULL);
     eof = &ph->int_header.eof;
-    UtAssert_INT32_EQ(CF_CFDP_SendEof(t), CF_SendRet_SUCCESS);
+    UtAssert_INT32_EQ(CF_CFDP_SendEof(t), CFE_SUCCESS);
     UtAssert_ZERO(eof->tlv_list.num_tlv);
 
     /* test with a transaction error status, which should append a TLV */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, &h, &t, NULL);
     eof = &ph->int_header.eof;
     UT_SetDefaultReturnValue(UT_KEY(CF_TxnStatus_To_ConditionCode), CF_CFDP_ConditionCode_FILESTORE_REJECTION);
-    UtAssert_INT32_EQ(CF_CFDP_SendEof(t), CF_SendRet_SUCCESS);
+    UtAssert_INT32_EQ(CF_CFDP_SendEof(t), CFE_SUCCESS);
     UtAssert_UINT32_EQ(eof->tlv_list.num_tlv, 1);
     UtAssert_STUB_COUNT(CF_CFDP_Send, 2);
 }
@@ -686,7 +686,7 @@ void Test_CF_CFDP_SendEof(void)
 void Test_CF_CFDP_SendAck(void)
 {
     /* Test case for:
-        CF_SendRet_t CF_CFDP_SendAck(CF_Transaction_t *t, CF_CFDP_AckTxnStatus_t ts, CF_CFDP_FileDirective_t dir_code,
+        CFE_Status_t CF_CFDP_SendAck(CF_Transaction_t *t, CF_CFDP_AckTxnStatus_t ts, CF_CFDP_FileDirective_t dir_code,
                                     CF_CFDP_ConditionCode_t cc, CF_EntityId_t peer_eid, CF_TransactionSeq_t tsn);
      */
 
@@ -698,7 +698,7 @@ void Test_CF_CFDP_SendAck(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
     UtAssert_INT32_EQ(CF_CFDP_SendAck(t, CF_CFDP_AckTxnStatus_ACTIVE, CF_CFDP_FileDirective_EOF,
                                       CF_CFDP_ConditionCode_NO_ERROR, 1, 42),
-                      CF_SendRet_NO_MSG);
+                      CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
 
     /* nominal as receiver */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, &t, NULL);
@@ -706,7 +706,7 @@ void Test_CF_CFDP_SendAck(void)
     t->state = CF_TxnState_R2;
     UtAssert_INT32_EQ(CF_CFDP_SendAck(t, CF_CFDP_AckTxnStatus_ACTIVE, CF_CFDP_FileDirective_EOF,
                                       CF_CFDP_ConditionCode_NO_ERROR, 1, 42),
-                      CF_SendRet_SUCCESS);
+                      CFE_SUCCESS);
     UtAssert_UINT32_EQ(ack->ack_directive_code, CF_CFDP_FileDirective_EOF);
     UtAssert_UINT32_EQ(ack->ack_subtype_code, 1);
     UtAssert_UINT32_EQ(ack->txn_status, CF_CFDP_AckTxnStatus_ACTIVE);
@@ -718,7 +718,7 @@ void Test_CF_CFDP_SendAck(void)
     t->state = CF_TxnState_S2;
     UtAssert_INT32_EQ(CF_CFDP_SendAck(t, CF_CFDP_AckTxnStatus_ACTIVE, CF_CFDP_FileDirective_EOF,
                                       CF_CFDP_ConditionCode_NO_ERROR, 1, 42),
-                      CF_SendRet_SUCCESS);
+                      CFE_SUCCESS);
     UtAssert_UINT32_EQ(ack->ack_directive_code, CF_CFDP_FileDirective_EOF);
     UtAssert_UINT32_EQ(ack->ack_subtype_code, 1);
     UtAssert_UINT32_EQ(ack->txn_status, CF_CFDP_AckTxnStatus_ACTIVE);
@@ -730,7 +730,7 @@ void Test_CF_CFDP_SendAck(void)
     t->state = CF_TxnState_R2;
     UtAssert_INT32_EQ(CF_CFDP_SendAck(t, CF_CFDP_AckTxnStatus_TERMINATED, CF_CFDP_FileDirective_FIN,
                                       CF_CFDP_ConditionCode_FILESTORE_REJECTION, 1, 42),
-                      CF_SendRet_SUCCESS);
+                      CFE_SUCCESS);
     UtAssert_UINT32_EQ(ack->ack_directive_code, CF_CFDP_FileDirective_FIN);
     UtAssert_UINT32_EQ(ack->ack_subtype_code, 1);
     UtAssert_UINT32_EQ(ack->txn_status, CF_CFDP_AckTxnStatus_TERMINATED);
@@ -740,7 +740,7 @@ void Test_CF_CFDP_SendAck(void)
 void Test_CF_CFDP_SendFin(void)
 {
     /* Test case for:
-        CF_SendRet_t CF_CFDP_SendFin(CF_Transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, CF_CFDP_FinFileStatus_t fs,
+        CFE_Status_t CF_CFDP_SendFin(CF_Transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, CF_CFDP_FinFileStatus_t fs,
                                     CF_CFDP_ConditionCode_t cc);
      */
 
@@ -752,14 +752,14 @@ void Test_CF_CFDP_SendFin(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
     UtAssert_INT32_EQ(CF_CFDP_SendFin(t, CF_CFDP_FinDeliveryCode_COMPLETE, CF_CFDP_FinFileStatus_RETAINED,
                                       CF_CFDP_ConditionCode_NO_ERROR),
-                      CF_SendRet_NO_MSG);
+                      CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
 
     /* nominal */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, &t, NULL);
     fin = &ph->int_header.fin;
     UtAssert_INT32_EQ(CF_CFDP_SendFin(t, CF_CFDP_FinDeliveryCode_COMPLETE, CF_CFDP_FinFileStatus_RETAINED,
                                       CF_CFDP_ConditionCode_NO_ERROR),
-                      CF_SendRet_SUCCESS);
+                      CFE_SUCCESS);
     UtAssert_ZERO(fin->tlv_list.num_tlv);
     UtAssert_UINT32_EQ(fin->delivery_code, CF_CFDP_FinDeliveryCode_COMPLETE);
     UtAssert_UINT32_EQ(fin->file_status, CF_CFDP_FinFileStatus_RETAINED);
@@ -770,7 +770,7 @@ void Test_CF_CFDP_SendFin(void)
     fin = &ph->int_header.fin;
     UtAssert_INT32_EQ(CF_CFDP_SendFin(t, CF_CFDP_FinDeliveryCode_INCOMPLETE, CF_CFDP_FinFileStatus_DISCARDED,
                                       CF_CFDP_ConditionCode_FILESTORE_REJECTION),
-                      CF_SendRet_SUCCESS);
+                      CFE_SUCCESS);
     UtAssert_UINT32_EQ(fin->delivery_code, CF_CFDP_FinDeliveryCode_INCOMPLETE);
     UtAssert_UINT32_EQ(fin->file_status, CF_CFDP_FinFileStatus_DISCARDED);
     UtAssert_UINT32_EQ(fin->cc, CF_CFDP_ConditionCode_FILESTORE_REJECTION);
@@ -781,17 +781,17 @@ void Test_CF_CFDP_SendFin(void)
 void Test_CF_CFDP_SendNak(void)
 {
     /* Test case for:
-        CF_SendRet_t CF_CFDP_SendNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
+        CFE_Status_t CF_CFDP_SendNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
      */
     CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, &ph, NULL, NULL, &t, NULL);
-    UtAssert_INT32_EQ(CF_CFDP_SendNak(t, ph), CF_SendRet_NO_MSG);
+    UtAssert_INT32_EQ(CF_CFDP_SendNak(t, ph), CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, &t, NULL);
     t->state = CF_TxnState_S2;
-    UtAssert_INT32_EQ(CF_CFDP_SendNak(t, ph), CF_SendRet_SUCCESS);
+    UtAssert_INT32_EQ(CF_CFDP_SendNak(t, ph), CFE_SUCCESS);
 
     UtAssert_STUB_COUNT(CF_CFDP_Send, 1);
 }
@@ -835,11 +835,11 @@ void Test_CF_CFDP_FindUnusedTransaction(void)
     CF_Logical_PduBuffer_t *ph;
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, &ph, NULL, NULL, &t, NULL);
-    UtAssert_INT32_EQ(CF_CFDP_SendNak(t, ph), CF_SendRet_NO_MSG);
+    UtAssert_INT32_EQ(CF_CFDP_SendNak(t, ph), CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, &t, NULL);
     t->state = CF_TxnState_S2;
-    UtAssert_INT32_EQ(CF_CFDP_SendNak(t, ph), CF_SendRet_SUCCESS);
+    UtAssert_INT32_EQ(CF_CFDP_SendNak(t, ph), CFE_SUCCESS);
 
     UtAssert_STUB_COUNT(CF_CFDP_Send, 1);
 }

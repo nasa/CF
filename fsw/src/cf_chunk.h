@@ -278,7 +278,7 @@ int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_
  * @retval 0 if not combined
  *
  */
-int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk);
+CFE_Status_t CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk);
 
 /************************************************************************/
 /** @brief Finds the smallest size out of all chunks.

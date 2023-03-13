@@ -167,10 +167,10 @@ int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_
  * See description in cf_chunk.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
+CFE_Status_t CF_Chunks_CombineNext(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
     CF_ChunkIdx_t    combined_i = i;
-    int              ret        = 0;
+    CFE_Status_t     ret        = 0;
     CF_ChunkOffset_t chunk_end  = chunk->offset + chunk->size;
 
     /* Assert no rollover, only possible as a bug */

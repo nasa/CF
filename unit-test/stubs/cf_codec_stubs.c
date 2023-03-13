@@ -161,16 +161,16 @@ void CF_CFDP_DecodeFin(CF_DecoderState_t *state, CF_Logical_PduFin_t *plfin)
  * Generated stub function for CF_CFDP_DecodeHeader()
  * ----------------------------------------------------
  */
-int32 CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh)
+CFE_Status_t CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader_t *plh)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_DecodeHeader, int32);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_DecodeHeader, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_DecodeHeader, CF_DecoderState_t *, state);
     UT_GenStub_AddParam(CF_CFDP_DecodeHeader, CF_Logical_PduHeader_t *, plh);
 
     UT_GenStub_Execute(CF_CFDP_DecodeHeader, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_DecodeHeader, int32);
+    return UT_GenStub_GetReturnValue(CF_CFDP_DecodeHeader, CFE_Status_t);
 }
 
 /*

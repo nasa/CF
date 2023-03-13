@@ -229,7 +229,7 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_Transac
  * @retval 0 when it isn't found, which causes list traversal to continue
  *
  */
-int CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Traverse_TransSeqArg_t *context);
+CFE_Status_t CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Traverse_TransSeqArg_t *context);
 
 /************************************************************************/
 /** @brief Write a single history to a file.
@@ -247,10 +247,10 @@ int CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Traverse_Trans
  * @param fd Open File descriptor to write to
  * @param h  Pointer to CF history object to write
  *
- * @retval 0 on success
- * @retval -1 on error
+ * @retval CFE_SUCCESS on success
+ * @retval CF_ERROR on error
  */
-int CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h);
+CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h);
 
 /************************************************************************/
 /** @brief Write a transaction-based queue's transaction history to a file.
@@ -265,7 +265,7 @@ int CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h);
  * @retval 0 on success
  * @retval 1 on error
  */
-int32 CF_WriteTxnQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_QueueIdx_t q);
+CFE_Status_t CF_WriteTxnQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_QueueIdx_t q);
 
 /************************************************************************/
 /** @brief Write a history-based queue's entries to a file.
@@ -280,7 +280,7 @@ int32 CF_WriteTxnQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_QueueIdx_t q)
  * @retval 0 on success
  * @retval 1 on error
  */
-int32 CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_Direction_t dir);
+CFE_Status_t CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_Direction_t dir);
 
 /************************************************************************/
 /** @brief Insert a transaction into a priority sorted transaction queue.
@@ -311,7 +311,7 @@ void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q);
  *
  * @returns Number of transactions traversed
  */
-int CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context);
+CFE_Status_t CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context);
 
 /************************************************************************/
 /** @brief Traverses all transactions on all channels and performs an operation on them.
@@ -341,7 +341,7 @@ int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, 
  *
  * @retval 0 for do not exit early (always continue)
  */
-int CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *args);
+CFE_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *args);
 
 /************************************************************************/
 /** @brief Writes a human readable representation of a history queue entry to a file
@@ -361,7 +361,7 @@ int CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *arg
  * @retval CF_CLIST_CONT if everything is going well
  * @retval CF_CLIST_EXIT if a write error occurred, which means traversal should stop
  */
-int CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *arg);
+CFE_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *arg);
 
 /************************************************************************/
 /** @brief Writes a human readable representation of a transaction history entry to a file
@@ -378,7 +378,7 @@ int CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *arg);
  * @retval CF_CLIST_CONT if everything is going well
  * @retval CF_CLIST_EXIT if a write error occurred, which means traversal should stop
  */
-int CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg);
+CFE_Status_t CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg);
 
 /************************************************************************/
 /** @brief Searches for the first transaction with a lower priority than given.
@@ -393,7 +393,7 @@ int CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg);
  * @retval CF_CLIST_CONT when it isn't found, which causes list traversal to continue
  *
  */
-int CF_PrioSearch(CF_CListNode_t *node, void *context);
+CFE_Status_t CF_PrioSearch(CF_CListNode_t *node, void *context);
 
 /************************************************************************/
 /** @brief Wrap the filesystem open call with a perf counter.
@@ -410,7 +410,7 @@ int CF_PrioSearch(CF_CListNode_t *node, void *context);
  *
  * @returns Status code from OSAL
  */
-int32 CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 access);
+CFE_Status_t CF_WrappedOpenCreate(osal_id_t *fd, const char *fname, int32 flags, int32 access);
 
 /************************************************************************/
 /** @brief Wrap the filesystem close call with a perf counter.
@@ -439,7 +439,7 @@ void CF_WrappedClose(osal_id_t fd);
  *
  * @returns Status code from OSAL (byte count or error code)
  */
-int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size);
+CFE_Status_t CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size);
 
 /************************************************************************/
 /** @brief Wrap the filesystem write call with a perf counter.
@@ -455,7 +455,7 @@ int32 CF_WrappedRead(osal_id_t fd, void *buf, size_t read_size);
  *
  * @returns Status code from OSAL (byte count or error code)
  */
-int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size);
+CFE_Status_t CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size);
 
 /************************************************************************/
 /** @brief Wrap the filesystem lseek call with a perf counter.
@@ -471,7 +471,7 @@ int32 CF_WrappedWrite(osal_id_t fd, const void *buf, size_t write_size);
  *
  * @returns Status code from OSAL (byte count or error code)
  */
-int32 CF_WrappedLseek(osal_id_t fd, off_t offset, int mode);
+CFE_Status_t CF_WrappedLseek(osal_id_t fd, off_t offset, int mode);
 
 /************************************************************************/
 /** @brief Converts the internal transaction status to a CFDP condition code

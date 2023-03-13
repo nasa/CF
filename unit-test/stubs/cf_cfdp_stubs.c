@@ -74,16 +74,16 @@ void CF_CFDP_CancelTransaction(CF_Transaction_t *t)
  * Generated stub function for CF_CFDP_CloseFiles()
  * ----------------------------------------------------
  */
-int CF_CFDP_CloseFiles(CF_CListNode_t *n, void *context)
+CFE_Status_t CF_CFDP_CloseFiles(CF_CListNode_t *n, void *context)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_CloseFiles, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_CloseFiles, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_CloseFiles, CF_CListNode_t *, n);
     UT_GenStub_AddParam(CF_CFDP_CloseFiles, void *, context);
 
     UT_GenStub_Execute(CF_CFDP_CloseFiles, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_CloseFiles, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_CloseFiles, CFE_Status_t);
 }
 
 /*
@@ -155,16 +155,16 @@ void CF_CFDP_CycleTx(CF_Channel_t *c)
  * Generated stub function for CF_CFDP_CycleTxFirstActive()
  * ----------------------------------------------------
  */
-int CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context)
+CFE_Status_t CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_CycleTxFirstActive, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_CycleTxFirstActive, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_CycleTxFirstActive, CF_CListNode_t *, node);
     UT_GenStub_AddParam(CF_CFDP_CycleTxFirstActive, void *, context);
 
     UT_GenStub_Execute(CF_CFDP_CycleTxFirstActive, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_CycleTxFirstActive, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_CycleTxFirstActive, CFE_Status_t);
 }
 
 /*
@@ -212,16 +212,16 @@ void CF_CFDP_DispatchRecv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  * Generated stub function for CF_CFDP_DoTick()
  * ----------------------------------------------------
  */
-int CF_CFDP_DoTick(CF_CListNode_t *node, void *context)
+CFE_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_DoTick, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_DoTick, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_DoTick, CF_CListNode_t *, node);
     UT_GenStub_AddParam(CF_CFDP_DoTick, void *, context);
 
     UT_GenStub_Execute(CF_CFDP_DoTick, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_DoTick, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_DoTick, CFE_Status_t);
 }
 
 /*
@@ -246,13 +246,13 @@ void CF_CFDP_EncodeStart(CF_EncoderState_t *penc, void *msgbuf, CF_Logical_PduBu
  * Generated stub function for CF_CFDP_InitEngine()
  * ----------------------------------------------------
  */
-int32 CF_CFDP_InitEngine(void)
+CFE_Status_t CF_CFDP_InitEngine(void)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_InitEngine, int32);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_InitEngine, CFE_Status_t);
 
     UT_GenStub_Execute(CF_CFDP_InitEngine, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_InitEngine, int32);
+    return UT_GenStub_GetReturnValue(CF_CFDP_InitEngine, CFE_Status_t);
 }
 
 /*
@@ -276,10 +276,10 @@ void CF_CFDP_InitTxnTxFile(CF_Transaction_t *t, CF_CFDP_Class_t cfdp_class, uint
  * Generated stub function for CF_CFDP_PlaybackDir()
  * ----------------------------------------------------
  */
-int32 CF_CFDP_PlaybackDir(const char *src_filename, const char *dst_filename, CF_CFDP_Class_t cfdp_class, uint8 keep,
-                          uint8 chan, uint8 priority, uint16 dest_id)
+CFE_Status_t CF_CFDP_PlaybackDir(const char *src_filename, const char *dst_filename, CF_CFDP_Class_t cfdp_class,
+                                 uint8 keep, uint8 chan, uint8 priority, uint16 dest_id)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_PlaybackDir, int32);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_PlaybackDir, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_PlaybackDir, const char *, src_filename);
     UT_GenStub_AddParam(CF_CFDP_PlaybackDir, const char *, dst_filename);
@@ -291,7 +291,7 @@ int32 CF_CFDP_PlaybackDir(const char *src_filename, const char *dst_filename, CF
 
     UT_GenStub_Execute(CF_CFDP_PlaybackDir, Basic, UT_DefaultHandler_CF_CFDP_PlaybackDir);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_PlaybackDir, int32);
+    return UT_GenStub_GetReturnValue(CF_CFDP_PlaybackDir, CFE_Status_t);
 }
 
 /*
@@ -324,16 +324,16 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c)
  * Generated stub function for CF_CFDP_RecvAck()
  * ----------------------------------------------------
  */
-int CF_CFDP_RecvAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+CFE_Status_t CF_CFDP_RecvAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvAck, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvAck, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_RecvAck, CF_Transaction_t *, t);
     UT_GenStub_AddParam(CF_CFDP_RecvAck, CF_Logical_PduBuffer_t *, ph);
 
     UT_GenStub_Execute(CF_CFDP_RecvAck, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_RecvAck, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_RecvAck, CFE_Status_t);
 }
 
 /*
@@ -354,16 +354,16 @@ void CF_CFDP_RecvDrop(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  * Generated stub function for CF_CFDP_RecvEof()
  * ----------------------------------------------------
  */
-int CF_CFDP_RecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+CFE_Status_t CF_CFDP_RecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvEof, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvEof, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_RecvEof, CF_Transaction_t *, t);
     UT_GenStub_AddParam(CF_CFDP_RecvEof, CF_Logical_PduBuffer_t *, ph);
 
     UT_GenStub_Execute(CF_CFDP_RecvEof, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_RecvEof, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_RecvEof, CFE_Status_t);
 }
 
 /*
@@ -371,16 +371,16 @@ int CF_CFDP_RecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  * Generated stub function for CF_CFDP_RecvFd()
  * ----------------------------------------------------
  */
-int CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+CFE_Status_t CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvFd, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvFd, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_RecvFd, CF_Transaction_t *, t);
     UT_GenStub_AddParam(CF_CFDP_RecvFd, CF_Logical_PduBuffer_t *, ph);
 
     UT_GenStub_Execute(CF_CFDP_RecvFd, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_RecvFd, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_RecvFd, CFE_Status_t);
 }
 
 /*
@@ -388,16 +388,16 @@ int CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  * Generated stub function for CF_CFDP_RecvFin()
  * ----------------------------------------------------
  */
-int CF_CFDP_RecvFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+CFE_Status_t CF_CFDP_RecvFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvFin, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvFin, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_RecvFin, CF_Transaction_t *, t);
     UT_GenStub_AddParam(CF_CFDP_RecvFin, CF_Logical_PduBuffer_t *, ph);
 
     UT_GenStub_Execute(CF_CFDP_RecvFin, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_RecvFin, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_RecvFin, CFE_Status_t);
 }
 
 /*
@@ -418,16 +418,16 @@ void CF_CFDP_RecvIdle(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  * Generated stub function for CF_CFDP_RecvMd()
  * ----------------------------------------------------
  */
-int CF_CFDP_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+CFE_Status_t CF_CFDP_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvMd, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvMd, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_RecvMd, CF_Transaction_t *, t);
     UT_GenStub_AddParam(CF_CFDP_RecvMd, CF_Logical_PduBuffer_t *, ph);
 
     UT_GenStub_Execute(CF_CFDP_RecvMd, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_RecvMd, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_RecvMd, CFE_Status_t);
 }
 
 /*
@@ -435,16 +435,16 @@ int CF_CFDP_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  * Generated stub function for CF_CFDP_RecvNak()
  * ----------------------------------------------------
  */
-int CF_CFDP_RecvNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+CFE_Status_t CF_CFDP_RecvNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvNak, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvNak, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_RecvNak, CF_Transaction_t *, t);
     UT_GenStub_AddParam(CF_CFDP_RecvNak, CF_Logical_PduBuffer_t *, ph);
 
     UT_GenStub_Execute(CF_CFDP_RecvNak, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_RecvNak, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_RecvNak, CFE_Status_t);
 }
 
 /*
@@ -482,10 +482,10 @@ void CF_CFDP_ResetTransaction(CF_Transaction_t *t, int keep_history)
  * Generated stub function for CF_CFDP_SendAck()
  * ----------------------------------------------------
  */
-CF_SendRet_t CF_CFDP_SendAck(CF_Transaction_t *t, CF_CFDP_AckTxnStatus_t ts, CF_CFDP_FileDirective_t dir_code,
+CFE_Status_t CF_CFDP_SendAck(CF_Transaction_t *t, CF_CFDP_AckTxnStatus_t ts, CF_CFDP_FileDirective_t dir_code,
                              CF_CFDP_ConditionCode_t cc, CF_EntityId_t peer_eid, CF_TransactionSeq_t tsn)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_SendAck, CF_SendRet_t);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_SendAck, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_SendAck, CF_Transaction_t *, t);
     UT_GenStub_AddParam(CF_CFDP_SendAck, CF_CFDP_AckTxnStatus_t, ts);
@@ -496,7 +496,7 @@ CF_SendRet_t CF_CFDP_SendAck(CF_Transaction_t *t, CF_CFDP_AckTxnStatus_t ts, CF_
 
     UT_GenStub_Execute(CF_CFDP_SendAck, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_SendAck, CF_SendRet_t);
+    return UT_GenStub_GetReturnValue(CF_CFDP_SendAck, CFE_Status_t);
 }
 
 /*
@@ -504,15 +504,15 @@ CF_SendRet_t CF_CFDP_SendAck(CF_Transaction_t *t, CF_CFDP_AckTxnStatus_t ts, CF_
  * Generated stub function for CF_CFDP_SendEof()
  * ----------------------------------------------------
  */
-CF_SendRet_t CF_CFDP_SendEof(CF_Transaction_t *t)
+CFE_Status_t CF_CFDP_SendEof(CF_Transaction_t *t)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_SendEof, CF_SendRet_t);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_SendEof, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_SendEof, CF_Transaction_t *, t);
 
     UT_GenStub_Execute(CF_CFDP_SendEof, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_SendEof, CF_SendRet_t);
+    return UT_GenStub_GetReturnValue(CF_CFDP_SendEof, CFE_Status_t);
 }
 
 /*
@@ -532,16 +532,16 @@ void CF_CFDP_SendEotPkt(CF_Transaction_t *t)
  * Generated stub function for CF_CFDP_SendFd()
  * ----------------------------------------------------
  */
-CF_SendRet_t CF_CFDP_SendFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+CFE_Status_t CF_CFDP_SendFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_SendFd, CF_SendRet_t);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_SendFd, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_SendFd, CF_Transaction_t *, t);
     UT_GenStub_AddParam(CF_CFDP_SendFd, CF_Logical_PduBuffer_t *, ph);
 
     UT_GenStub_Execute(CF_CFDP_SendFd, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_SendFd, CF_SendRet_t);
+    return UT_GenStub_GetReturnValue(CF_CFDP_SendFd, CFE_Status_t);
 }
 
 /*
@@ -549,10 +549,10 @@ CF_SendRet_t CF_CFDP_SendFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
  * Generated stub function for CF_CFDP_SendFin()
  * ----------------------------------------------------
  */
-CF_SendRet_t CF_CFDP_SendFin(CF_Transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, CF_CFDP_FinFileStatus_t fs,
+CFE_Status_t CF_CFDP_SendFin(CF_Transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, CF_CFDP_FinFileStatus_t fs,
                              CF_CFDP_ConditionCode_t cc)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_SendFin, CF_SendRet_t);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_SendFin, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_SendFin, CF_Transaction_t *, t);
     UT_GenStub_AddParam(CF_CFDP_SendFin, CF_CFDP_FinDeliveryCode_t, dc);
@@ -561,7 +561,7 @@ CF_SendRet_t CF_CFDP_SendFin(CF_Transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, 
 
     UT_GenStub_Execute(CF_CFDP_SendFin, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_SendFin, CF_SendRet_t);
+    return UT_GenStub_GetReturnValue(CF_CFDP_SendFin, CFE_Status_t);
 }
 
 /*
@@ -569,15 +569,15 @@ CF_SendRet_t CF_CFDP_SendFin(CF_Transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, 
  * Generated stub function for CF_CFDP_SendMd()
  * ----------------------------------------------------
  */
-CF_SendRet_t CF_CFDP_SendMd(CF_Transaction_t *t)
+CFE_Status_t CF_CFDP_SendMd(CF_Transaction_t *t)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_SendMd, CF_SendRet_t);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_SendMd, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_SendMd, CF_Transaction_t *, t);
 
     UT_GenStub_Execute(CF_CFDP_SendMd, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_SendMd, CF_SendRet_t);
+    return UT_GenStub_GetReturnValue(CF_CFDP_SendMd, CFE_Status_t);
 }
 
 /*
@@ -585,16 +585,16 @@ CF_SendRet_t CF_CFDP_SendMd(CF_Transaction_t *t)
  * Generated stub function for CF_CFDP_SendNak()
  * ----------------------------------------------------
  */
-CF_SendRet_t CF_CFDP_SendNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
+CFE_Status_t CF_CFDP_SendNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_SendNak, CF_SendRet_t);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_SendNak, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_SendNak, CF_Transaction_t *, t);
     UT_GenStub_AddParam(CF_CFDP_SendNak, CF_Logical_PduBuffer_t *, ph);
 
     UT_GenStub_Execute(CF_CFDP_SendNak, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_SendNak, CF_SendRet_t);
+    return UT_GenStub_GetReturnValue(CF_CFDP_SendNak, CFE_Status_t);
 }
 
 /*
@@ -627,10 +627,10 @@ void CF_CFDP_TickTransactions(CF_Channel_t *c)
  * Generated stub function for CF_CFDP_TxFile()
  * ----------------------------------------------------
  */
-int32 CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, CF_CFDP_Class_t cfdp_class, uint8 keep,
-                     uint8 chan, uint8 priority, CF_EntityId_t dest_id)
+CFE_Status_t CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, CF_CFDP_Class_t cfdp_class, uint8 keep,
+                            uint8 chan, uint8 priority, CF_EntityId_t dest_id)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_TxFile, int32);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_TxFile, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_TxFile, const char *, src_filename);
     UT_GenStub_AddParam(CF_CFDP_TxFile, const char *, dst_filename);
@@ -642,5 +642,5 @@ int32 CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, CF_CFDP
 
     UT_GenStub_Execute(CF_CFDP_TxFile, Basic, UT_DefaultHandler_CF_CFDP_TxFile);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_TxFile, int32);
+    return UT_GenStub_GetReturnValue(CF_CFDP_TxFile, CFE_Status_t);
 }

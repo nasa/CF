@@ -239,7 +239,7 @@
 #define CF_EID_ERR_PDU_SHORT_HEADER (41)
 
 /**
- * \brief CF Metadata PDU Too Shourt Event ID
+ * \brief CF Metadata PDU Too Short Event ID
  *
  *  \par Type: ERROR
  *

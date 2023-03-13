@@ -57,7 +57,7 @@ static inline void CF_CFDP_S_Reset(CF_Transaction_t *t)
  * See description in cf_cfdp_s.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CF_SendRet_t CF_CFDP_S_SendEof(CF_Transaction_t *t)
+CFE_Status_t CF_CFDP_S_SendEof(CF_Transaction_t *t)
 {
     if (!t->flags.com.crc_calc)
     {
@@ -78,7 +78,7 @@ void CF_CFDP_S1_SubstateSendEof(CF_Transaction_t *t)
     /* this looks weird, but the idea is we want to reset the transaction if some error occurs while sending
      * and we want to reset the transaction if no error occurs. But, if we couldn't send because there are
      * no buffers, then we need to try and send again next time. */
-    if (CF_CFDP_S_SendEof(t) != CF_SendRet_NO_MSG)
+    if (CF_CFDP_S_SendEof(t) != CF_SEND_PDU_NO_BUF_AVAIL_ERROR)
     {
         CF_CFDP_S_Reset(t); /* all done, so clean up */
     }
@@ -108,11 +108,11 @@ void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *t)
  * See description in cf_cfdp_s.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc)
+CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc)
 {
     bool                            success = true;
     int                             status  = 0;
-    int32                           ret     = -1;
+    CFE_Status_t                    ret     = CF_ERROR;
     CF_Logical_PduBuffer_t *        ph      = CF_CFDP_ConstructPduHeader(t, 0, CF_AppData.config_table->local_eid,
                                                             t->history->peer_eid, 0, t->history->seq_num, 1);
     CF_Logical_PduFileDataHeader_t *fd;
@@ -121,7 +121,7 @@ int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_
 
     if (!ph)
     {
-        ret     = 0; /* couldn't get message, so no bytes sent. Will try again next time */
+        ret     = CFE_SUCCESS; /* couldn't get message, so no bytes sent. Will try again next time */
         success = false;
     }
     else
@@ -194,16 +194,16 @@ int32 CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 bytes_to_
         {
             t->state_data.s.cached_pos += status;
             status = CF_CFDP_SendFd(t, ph);
-            if (status == CF_SendRet_NO_MSG)
+            if (status == CF_SEND_PDU_NO_BUF_AVAIL_ERROR)
             {
-                ret = 0; /* no bytes were processed */
+                ret = CFE_SUCCESS; /* no bytes were processed */
             }
-            else if (status == CF_SendRet_ERROR)
+            else if (status == CF_SEND_PDU_ERROR)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEND_FD, CFE_EVS_EventType_ERROR,
                                   "CF S%d(%lu:%lu): error sending fd", (t->state == CF_TxnState_S2),
                                   (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
-                ret = -1;
+                ret = CF_ERROR;
             }
             else
             {
@@ -260,26 +260,26 @@ void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *t)
  * See description in cf_cfdp_s.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
+CFE_Status_t CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
 {
     const CF_Chunk_t *c;
-    CF_SendRet_t      sret;
-    int               ret = 0;
+    CFE_Status_t      sret;
+    CFE_Status_t      ret = 0;
 
     if (t->flags.tx.md_need_send)
     {
         sret = CF_CFDP_SendMd(t);
-        if (sret == CF_SendRet_ERROR)
+        if (sret == CF_SEND_PDU_ERROR)
         {
-            ret = -1; /* error occurred */
+            ret = CF_ERROR; /* error occurred */
         }
         else
         {
-            if (sret == CF_SendRet_SUCCESS)
+            if (sret == CFE_SUCCESS)
             {
                 t->flags.tx.md_need_send = 0;
             }
-            /* unless CF_SendRet_ERROR, return 1 to keep caller from sending file data */
+            /* unless CF_SEND_PDU_ERROR, return 1 to keep caller from sending file data */
             ret = 1; /* 1 means nak processed, so don't send filedata */
         }
     }
@@ -297,7 +297,7 @@ int CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *t)
             }
             else if (ret < 0)
             {
-                ret = -1; /* error occurred */
+                ret = CF_ERROR; /* error occurred */
             }
             else
             {
@@ -342,7 +342,7 @@ void CF_CFDP_S2_SubstateSendFileData(CF_Transaction_t *t)
  *-----------------------------------------------------------------*/
 void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
 {
-    CF_SendRet_t sret;
+    CFE_Status_t sret;
     int32        ret;
     int          status  = 0;
     bool         success = true;
@@ -408,7 +408,7 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
     if (success)
     {
         sret = CF_CFDP_SendMd(t);
-        if (sret == CF_SendRet_ERROR)
+        if (sret == CF_SEND_PDU_ERROR)
         {
             /* failed to send md */
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEND_MD, CFE_EVS_EventType_ERROR, "CF S%d(%lu:%lu): failed to send md",
@@ -416,12 +416,12 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t)
                               (unsigned long)t->history->seq_num);
             success = false;
         }
-        else if (sret == CF_SendRet_SUCCESS)
+        else if (sret == CFE_SUCCESS)
         {
             /* once metadata is sent, switch to filedata mode */
             t->state_data.s.sub_state = CF_TxSubState_FILEDATA;
         }
-        /* if sret==CF_SendRet_NO_MSG, then try to send md again next cycle */
+        /* if sret==CF_SEND_PDU_NO_BUF_AVAIL_ERROR, then try to send md again next cycle */
     }
 
     if (!success)
@@ -444,7 +444,7 @@ void CF_CFDP_S_SubstateSendFinAck(CF_Transaction_t *t)
 {
     /* if send, or error, reset. if no message, try again next cycle */
     if (CF_CFDP_SendAck(t, CF_CFDP_AckTxnStatus_ACTIVE, CF_CFDP_FileDirective_FIN, t->state_data.s.s2.fin_cc,
-                        t->history->peer_eid, t->history->seq_num) != CF_SendRet_NO_MSG)
+                        t->history->peer_eid, t->history->seq_num) != CF_SEND_PDU_NO_BUF_AVAIL_ERROR)
     {
         CF_CFDP_SetTxnStatus(t, CF_TxnStatus_NO_ERROR);
         CF_CFDP_S_Reset(t);
@@ -699,7 +699,7 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
     /* Steven is not real happy with this function. There should be a better way to separate out
      * the logic by state so that it isn't a bunch of if statements for different flags
      */
-    CF_SendRet_t sret;
+    CFE_Status_t sret;
     bool         early_exit = false;
 
     /* at each tick, various timers used by S are checked */
@@ -745,11 +745,11 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont /* unused */)
                         else
                         {
                             sret = CF_CFDP_S_SendEof(t);
-                            if (sret == CF_SendRet_NO_MSG)
+                            if (sret == CF_SEND_PDU_NO_BUF_AVAIL_ERROR)
                             {
                                 early_exit = true;
                             }
-                            else if (sret == CF_SendRet_ERROR)
+                            else if (sret == CF_SEND_PDU_ERROR)
                             {
                                 CF_CFDP_SetTxnStatus(t, CF_TxnStatus_SEND_EOF_FAILURE);
                                 CF_CFDP_S_Reset(t); /* can't go on, error occurred */

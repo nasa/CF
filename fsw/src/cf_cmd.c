@@ -212,10 +212,10 @@ void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_ChanActionFn_t fn, void *context)
+CFE_Status_t CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_ChanActionFn_t fn, void *context)
 {
-    int i;
-    int ret = 0;
+    int          i;
+    CFE_Status_t ret = 0;
 
     /* this function is generic for any ground command that takes a single channel
      * argument which must be less than CF_NUM_CHANNELS or 255 which is a special
@@ -235,7 +235,7 @@ int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_ChanActionFn_
         /* bad parameter */
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_CHAN_PARAM, CFE_EVS_EventType_ERROR,
                           "CF: %s: channel parameter out of range. received %d", errstr, cmd->byte[0]);
-        ret = -1;
+        ret = CF_ERROR;
     }
 
     return ret;
@@ -247,11 +247,11 @@ int CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_ChanActionFn_
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_DoFreezeThaw(uint8 chan_num, const CF_ChanAction_BoolArg_t *context)
+CFE_Status_t CF_DoFreezeThaw(uint8 chan_num, const CF_ChanAction_BoolArg_t *context)
 {
     /* no need to bounds check chan_num, done in caller */
     CF_AppData.hk.channel_hk[chan_num].frozen = context->barg;
-    return 0;
+    return CFE_SUCCESS;
 }
 
 /*----------------------------------------------------------------
@@ -332,10 +332,10 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSe
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
+CFE_Status_t CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
 {
     CF_Transaction_t *t;
-    int               ret = -1;
+    CFE_Status_t      ret = CF_ERROR;
 
     if (cmd->chan == CF_COMPOUND_KEY)
     {
@@ -527,11 +527,11 @@ void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_DoEnableDisableDequeue(uint8 chan_num, const CF_ChanAction_BoolArg_t *context)
+CFE_Status_t CF_DoEnableDisableDequeue(uint8 chan_num, const CF_ChanAction_BoolArg_t *context)
 {
     /* no need to bounds check chan_num, done in caller */
     CF_AppData.config_table->chan[chan_num].dequeue_enabled = context->barg;
-    return 0;
+    return CFE_SUCCESS;
 }
 
 /*----------------------------------------------------------------
@@ -586,10 +586,10 @@ void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolMsgArg_t *context)
+CFE_Status_t CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolMsgArg_t *context)
 {
-    int i;
-    int ret = 0;
+    int          i;
+    CFE_Status_t ret = CFE_SUCCESS;
     /* no need to bounds check chan_num, done in caller */
     if (context->msg->byte[1] == CF_ALL_POLLDIRS)
     {
@@ -606,7 +606,7 @@ int CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolMsgArg_t *
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_POLLDIR_INVALID, CFE_EVS_EventType_ERROR,
                           "CF: enable/disable polldir: invalid polldir %d on channel %d", context->msg->byte[1],
                           chan_num);
-        ret = -1;
+        ret = CF_ERROR;
     }
 
     return ret;
@@ -668,7 +668,7 @@ void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c)
+CFE_Status_t CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c)
 {
     CF_History_t *h = container_of(n, CF_History_t, cl_node);
     CF_ResetHistory(c, h); /* ok to reset transaction since it's in PEND it hasn't started yet */
@@ -681,7 +681,7 @@ int CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_PurgeTransaction(CF_CListNode_t *n, void *ignored)
+CFE_Status_t CF_PurgeTransaction(CF_CListNode_t *n, void *ignored)
 {
     CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
     CF_CFDP_ResetTransaction(t, 0);
@@ -694,9 +694,9 @@ int CF_PurgeTransaction(CF_CListNode_t *n, void *ignored)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
+CFE_Status_t CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
 {
-    int ret = 0;
+    CFE_Status_t ret = CFE_SUCCESS;
     /* no need to bounds check chan_num, done in caller */
     CF_Channel_t *c = &CF_AppData.engine.channels[chan_num];
 
@@ -721,7 +721,7 @@ int CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
         default:
             CFE_EVS_SendEvent(CF_EID_ERR_CMD_PURGE_ARG, CFE_EVS_EventType_ERROR, "CF: purge queue invalid arg %d",
                               cmd->byte[1]);
-            ret = -1;
+            ret = CF_ERROR;
             break;
     }
 
@@ -898,12 +898,12 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_CmdValidateChunkSize(uint32 val, uint8 chan_num /* ignored */)
+CFE_Status_t CF_CmdValidateChunkSize(uint32 val, uint8 chan_num /* ignored */)
 {
-    int ret = 0;
+    CFE_Status_t ret = CFE_SUCCESS;
     if (val > sizeof(CF_CFDP_PduFileDataContent_t))
     {
-        ret = 1; /* failed */
+        ret = CF_ERROR; /* failed */
     }
     return ret;
 }
@@ -914,14 +914,14 @@ int CF_CmdValidateChunkSize(uint32 val, uint8 chan_num /* ignored */)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-int CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
+CFE_Status_t CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
 {
-    int ret = 0;
+    CFE_Status_t ret = CFE_SUCCESS;
 
     if (!val && !CF_AppData.config_table->chan[chan_num].sem_name[0])
     {
         /* can't have unlimited messages and no semaphore */
-        ret = 1; /* failed */
+        ret = CF_ERROR; /* failed */
     }
 
     return ret;

@@ -104,17 +104,6 @@ typedef enum
 } CF_RxSubState_t;
 
 /**
- * @brief Special return values from some receive PDU processing functions
- */
-typedef enum
-{
-    CF_RxEofRet_SUCCESS        = 0,
-    CF_RxEofRet_FSIZE_MISMATCH = 1,
-    CF_RxEofRet_BAD_EOF        = 2,
-    CF_RxEofRet_INVALID        = 3,
-} CF_RxEofRet_t;
-
-/**
  * @brief Direction identifier
  *
  * Differentiates between send and receive history entries
@@ -480,16 +469,5 @@ typedef struct CF_Engine
     uint32 outgoing_counter;
     uint8  enabled;
 } CF_Engine_t;
-
-/**
- * @brief Special return values from some send PDU processing functions
- */
-typedef enum
-{
-    CF_SendRet_SUCCESS = 0, /**< \brief Successfully sent */
-    CF_SendRet_NO_MSG  = 1, /**< \brief No send buffer available, throttling limit reached */
-    CF_SendRet_ERROR   = 2, /**< \brief the send itself failed */
-    CF_SendRet_FAILURE = 3, /**< \brief generic failure message not relating to message send */
-} CF_SendRet_t;
 
 #endif
