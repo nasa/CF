@@ -62,7 +62,7 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
     CF_UnionArgsCmd_t *cmd      = (CF_UnionArgsCmd_t *)msg;
     static const char *names[5] = {"all", "cmd", "fault", "up", "down"};
     /* 0=all, 1=cmd, 2=fault 3=up 4=down */
-    uint8 param = cmd->data.byte[0];
+    uint8 param = cmd->byte[0];
     int   i;
     int   acc = 1;
 
@@ -220,21 +220,21 @@ CFE_Status_t CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_Chan
     /* this function is generic for any ground command that takes a single channel
      * argument which must be less than CF_NUM_CHANNELS or 255 which is a special
      * value that means apply command to all channels */
-    if (cmd->data.byte[0] == CF_ALL_CHANNELS)
+    if (cmd->byte[0] == CF_ALL_CHANNELS)
     {
         /* apply to all channels */
         for (i = 0; i < CF_NUM_CHANNELS; ++i)
             ret |= fn(i, context);
     }
-    else if (cmd->data.byte[0] < CF_NUM_CHANNELS)
+    else if (cmd->byte[0] < CF_NUM_CHANNELS)
     {
-        ret = fn(cmd->data.byte[0], context);
+        ret = fn(cmd->byte[0], context);
     }
     else
     {
         /* bad parameter */
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_CHAN_PARAM, CFE_EVS_EventType_ERROR,
-                          "CF: %s: channel parameter out of range. received %d", errstr, cmd->data.byte[0]);
+                          "CF: %s: channel parameter out of range. received %d", errstr, cmd->byte[0]);
         ret = CF_ERROR;
     }
 
@@ -591,20 +591,20 @@ CFE_Status_t CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolM
     int          i;
     CFE_Status_t ret = CFE_SUCCESS;
     /* no need to bounds check chan_num, done in caller */
-    if (context->msg->data.byte[1] == CF_ALL_POLLDIRS)
+    if (context->msg->byte[1] == CF_ALL_POLLDIRS)
     {
         /* all polldirs in channel */
         for (i = 0; i < CF_MAX_POLLING_DIR_PER_CHAN; ++i)
             CF_AppData.config_table->chan[chan_num].polldir[i].enabled = context->barg;
     }
-    else if (context->msg->data.byte[1] < CF_MAX_POLLING_DIR_PER_CHAN)
+    else if (context->msg->byte[1] < CF_MAX_POLLING_DIR_PER_CHAN)
     {
-        CF_AppData.config_table->chan[chan_num].polldir[context->msg->data.byte[1]].enabled = context->barg;
+        CF_AppData.config_table->chan[chan_num].polldir[context->msg->byte[1]].enabled = context->barg;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_POLLDIR_INVALID, CFE_EVS_EventType_ERROR,
-                          "CF: enable/disable polldir: invalid polldir %d on channel %d", context->msg->data.byte[1],
+                          "CF: enable/disable polldir: invalid polldir %d on channel %d", context->msg->byte[1],
                           chan_num);
         ret = CF_ERROR;
     }
@@ -703,7 +703,7 @@ CFE_Status_t CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
     int pend = 0;
     int hist = 0;
 
-    switch (cmd->data.byte[1])
+    switch (cmd->byte[1])
     {
         case 0: /* pend */
             pend = 1;
@@ -720,7 +720,7 @@ CFE_Status_t CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
 
         default:
             CFE_EVS_SendEvent(CF_EID_ERR_CMD_PURGE_ARG, CFE_EVS_EventType_ERROR, "CF: purge queue invalid arg %d",
-                              cmd->data.byte[1]);
+                              cmd->byte[1]);
             ret = CF_ERROR;
             break;
     }
