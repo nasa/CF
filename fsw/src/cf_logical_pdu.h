@@ -251,7 +251,7 @@ typedef struct CF_Logical_PduFin
  */
 typedef struct CF_Logical_PduAck
 {
-    uint8                   ack_directive_code; /**< \brief directive code of the PDU being ack'ed */
+    uint8                   ack_directive_code; /**< \brief directive code of the PDU being ACK'ed */
     uint8                   ack_subtype_code;   /**< \brief depends on ack_directive_code  */
     CF_CFDP_ConditionCode_t cc;
     CF_CFDP_AckTxnStatus_t  txn_status;

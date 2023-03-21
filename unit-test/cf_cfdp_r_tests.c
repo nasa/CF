@@ -458,7 +458,7 @@ void Test_CF_CFDP_R_CheckCrc(void)
      */
     CF_Transaction_t *t;
 
-    /* crc mismatch, class 1 */
+    /* CRC mismatch, class 1 */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &t, NULL);
     t->state      = CF_TxnState_R1;
     t->crc.result = 0xdeadbeef;
@@ -466,7 +466,7 @@ void Test_CF_CFDP_R_CheckCrc(void)
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_R_CRC);
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[t->chan_num].counters.fault.crc_mismatch, 1);
 
-    /* crc mismatch, class 2 */
+    /* CRC mismatch, class 2 */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &t, NULL);
     t->state      = CF_TxnState_R2;
     t->crc.result = 0xdeadbeef;
@@ -474,7 +474,7 @@ void Test_CF_CFDP_R_CheckCrc(void)
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_R_CRC);
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[t->chan_num].counters.fault.crc_mismatch, 2);
 
-    /* crc match */
+    /* CRC match */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &t, NULL);
     t->crc.result = 0xc0ffee;
     UtAssert_INT32_EQ(CF_CFDP_R_CheckCrc(t, 0xc0ffee), 0);
@@ -499,7 +499,7 @@ void Test_CF_CFDP_R2_Complete(void)
     UT_SetDeferredRetcode(UT_KEY(CF_TxnStatus_IsError), 1, true);
     UtAssert_VOIDCALL(CF_CFDP_R2_Complete(t, 0));
 
-    /* nominal, send nak */
+    /* nominal, send NAK */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &t, &config);
     config->chan[t->chan_num].nak_limit = 2;
     UtAssert_VOIDCALL(CF_CFDP_R2_Complete(t, 1));
@@ -528,7 +528,7 @@ void Test_CF_CFDP_R2_Complete(void)
     UtAssert_BOOL_TRUE(t->flags.rx.send_fin);
     UtAssert_BOOL_TRUE(t->flags.rx.complete);
 
-    /* with gaps, this should send nak */
+    /* with gaps, this should send NAK */
     UT_SetDeferredRetcode(UT_KEY(CF_ChunkList_ComputeGaps), 1, 1);
     UtAssert_VOIDCALL(CF_CFDP_R2_Complete(t, 1));
     UtAssert_BOOL_TRUE(t->flags.rx.send_nak);
@@ -992,7 +992,7 @@ void Test_CF_CFDP_R2_SubstateSendFin(void)
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
     UtAssert_INT32_EQ(CF_CFDP_R2_SubstateSendFin(t), 0);
 
-    /* crc failure - can get this by having rx_crc_calc_bytes_per_wakeup less than fsize */
+    /* CRC failure - can get this by having rx_crc_calc_bytes_per_wakeup less than fsize */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
     t->fsize = 100;
     UtAssert_INT32_EQ(CF_CFDP_R2_SubstateSendFin(t), -1);
@@ -1007,7 +1007,7 @@ void Test_CF_CFDP_R2_SubstateSendFin(void)
     UT_SetDeferredRetcode(UT_KEY(CF_TxnStatus_IsError), 1, true);
     UtAssert_INT32_EQ(CF_CFDP_R2_SubstateSendFin(t), 0);
 
-    /* already calculated crc */
+    /* already calculated CRC */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
     t->flags.com.crc_calc = true;
     UtAssert_INT32_EQ(CF_CFDP_R2_SubstateSendFin(t), 0);
@@ -1056,14 +1056,14 @@ void Test_CF_CFDP_R2_RecvMd(void)
     t->flags.rx.md_recv = true;
     UtAssert_VOIDCALL(CF_CFDP_R2_RecvMd(t, ph));
 
-    /* eof already received, file size match */
+    /* EOF already received, file size match */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     t->fsize                    = 100;
     t->state_data.r.r2.eof_size = 100;
     t->flags.rx.eof_recv        = true;
     UtAssert_VOIDCALL(CF_CFDP_R2_RecvMd(t, ph));
 
-    /* eof already received, file size different */
+    /* EOF already received, file size different */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     t->fsize                    = 100;
     t->state_data.r.r2.eof_size = 120;

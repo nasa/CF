@@ -192,12 +192,7 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
             break; /* no more messages */
         }
 
-        /* NOTE: this code originally stored current msg buffer in a global, but
-           going forward this should _NOT_ be used.  It is still set just in case
-           some code depends on it (mostly just UT at this point).  FSW should pass
-           the pointer to the current PDU to any function that needs it (ph here). */
-        CF_AppData.engine.in.msg = bufptr;
-        ph                       = &CF_AppData.engine.in.rx_pdudata;
+        ph = &CF_AppData.engine.in.rx_pdudata;
         CFE_ES_PerfLogEntry(CF_PERF_ID_PDURCVD(chan_num));
         CFE_MSG_GetSize(&bufptr->Msg, &msg_size);
         CFE_MSG_GetType(&bufptr->Msg, &msg_type);
@@ -221,7 +216,7 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
         }
         if (!CF_CFDP_RecvPh(chan_num, ph))
         {
-            /* got a valid pdu -- look it up by sequence number */
+            /* got a valid PDU -- look it up by sequence number */
             t = CF_FindTransactionBySequenceNumber(c, ph->pdu_header.sequence_num, ph->pdu_header.source_eid);
             if (t)
             {
@@ -285,7 +280,7 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
                         CF_Assert(t);
                         t->history->dir = CF_Direction_RX;
 
-                        /* set default fin status */
+                        /* set default FIN status */
                         t->state_data.r.r2.dc = CF_CFDP_FinDeliveryCode_INCOMPLETE;
                         t->state_data.r.r2.fs = CF_CFDP_FinFileStatus_DISCARDED;
 
@@ -305,5 +300,4 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
 
         CFE_ES_PerfLogExit(CF_PERF_ID_PDURCVD(chan_num));
     }
-    CF_AppData.engine.in.msg = NULL;
 }

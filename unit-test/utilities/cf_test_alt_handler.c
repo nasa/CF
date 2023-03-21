@@ -133,7 +133,7 @@ void UT_AltHandler_CF_CList_Traverse_R_PRIO(void *UserObj, UT_EntryKey_t FuncKey
 /*----------------------------------------------------------------
  *
  * A handler for CF_TraverseAllTransactions which _sets_ the opaque context
- * pointer as a int* object.  The value is taken from the UserObj opaque pointer.
+ * pointer as an int* object.  The value is taken from the UserObj opaque pointer.
  *
  *-----------------------------------------------------------------*/
 void UT_AltHandler_CF_TraverseAllTransactions_All_Channels_Set_Context(void *UserObj, UT_EntryKey_t FuncKey,

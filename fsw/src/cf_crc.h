@@ -49,7 +49,7 @@ typedef struct CF_Crc
 void CF_CRC_Start(CF_Crc_t *c);
 
 /************************************************************************/
-/** @brief Digest a chunk for crc calculation.
+/** @brief Digest a chunk for CRC calculation.
  *
  * @par Description
  *       Does the CRC calculation, and stores an index into the given
@@ -66,7 +66,7 @@ void CF_CRC_Start(CF_Crc_t *c);
 void CF_CRC_Digest(CF_Crc_t *c, const uint8 *data, int len);
 
 /************************************************************************/
-/** @brief Finalize a crc calculation.
+/** @brief Finalize a CRC calculation.
  *
  * @par Description
  *       Checks the index and if it isn't 0, does the final calculations

@@ -19,7 +19,7 @@
 
 /**
  * @file
- *  @brief Stubs file for the CF Application main cfdp engine and pdu parsing file
+ *  @brief Stubs file for the CF Application main CFDP engine and PDU parsing file
  *
  *  This file contains two sets of functions. The first is what is needed
  *  to deal with CFDP PDUs. Specifically validating them for correctness

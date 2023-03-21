@@ -34,7 +34,7 @@
 /**
  * @brief PDU command encapsulation structure
  *
- * This encapsulates a CFDP pdu into a format that is sent or received over the
+ * This encapsulates a CFDP PDU into a format that is sent or received over the
  * software bus, adding "command" encapsulation (even though these are not really
  * commands).
  *
@@ -50,7 +50,7 @@ typedef struct CF_PduCmdMsg
 /**
  * @brief PDU send encapsulation structure
  *
- * This encapsulates a CFDP pdu into a format that is sent or received over the
+ * This encapsulates a CFDP PDU into a format that is sent or received over the
  * software bus, adding "telemetry" encapsulation (even though these are not really
  * telemetry items).
  *

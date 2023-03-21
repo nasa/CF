@@ -61,13 +61,13 @@ typedef struct CF_ChannelConfig
     uint32 nak_timer_s;        /**< \brief Non-acknowledge timer in seconds */
     uint32 inactivity_timer_s; /**< \brief Inactivity timer in seconds */
 
-    uint8 ack_limit; /**< number of times to retry ACK (for ex, send fin and wait for fin-ack) */
+    uint8 ack_limit; /**< number of times to retry ACK (for ex, send FIN and wait for fin-ack) */
     uint8 nak_limit; /**< number of times to retry NAK before giving up (resets on a single response */
 
     CFE_SB_MsgId_Atom_t mid_input;  /**< \brief msgid integer value for incoming messages */
     CFE_SB_MsgId_Atom_t mid_output; /**< \brief msgid integer value for outgoing messages */
 
-    uint16 pipe_depth_input; /**< \brief depth of pipe to receive incoming pdu */
+    uint16 pipe_depth_input; /**< \brief depth of pipe to receive incoming PDU */
 
     CF_PollDir_t polldir[CF_MAX_POLLING_DIR_PER_CHAN]; /**< \brief Configuration for polled directories */
 
@@ -81,9 +81,9 @@ typedef struct CF_ChannelConfig
  */
 typedef struct CF_ConfigTable
 {
-    uint32 ticks_per_second;             /**< \brief expected ticks per second to cfdp app */
+    uint32 ticks_per_second;             /**< \brief expected ticks per second to CFDP app */
     uint32 rx_crc_calc_bytes_per_wakeup; /**< \brief max number of bytes per wakeup to calculate
-                                          * r2 crc for recvd file (must be 1024-byte aligned)
+                                          * r2 CRC for recvd file (must be 1024-byte aligned)
                                           */
 
     CF_EntityId_t local_eid; /**< \brief the local entity ID of the CF app */

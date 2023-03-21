@@ -341,11 +341,11 @@ void Test_CF_CFDP_RecvFd(void)
     CF_Transaction_t *      t;
     CF_Logical_PduBuffer_t *ph;
 
-    /* nominal call, no crc */
+    /* nominal call, no CRC */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     UtAssert_INT32_EQ(CF_CFDP_RecvFd(t, ph), 0);
 
-    /* nominal call, with crc */
+    /* nominal call, with CRC */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     ph->pdu_header.crc_flag    = 1;
     ph->int_header.fd.data_len = 10 + sizeof(CF_CFDP_uint32_t);
@@ -359,7 +359,7 @@ void Test_CF_CFDP_RecvFd(void)
     UtAssert_INT32_EQ(t->history->txn_stat, CF_TxnStatus_PROTOCOL_ERROR);
     UT_CF_AssertEventID(CF_EID_ERR_PDU_FD_SHORT);
 
-    /* decode errors: crc part */
+    /* decode errors: CRC part */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &t, NULL);
     ph->pdu_header.crc_flag    = 1;
     ph->int_header.fd.data_len = sizeof(CF_CFDP_uint32_t) - 1;

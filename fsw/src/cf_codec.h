@@ -54,7 +54,7 @@ typedef struct CF_EncoderState
 } CF_EncoderState_t;
 
 /**
- * @brief Current state of an decode operation
+ * @brief Current state of a decode operation
  *
  * State structure for decodes
  */

@@ -20,7 +20,7 @@
 /**
  * @file
  *
- *  The CF Application cfdp engine and packet parsing header file
+ *  The CF Application CFDP engine and packet parsing header file
  */
 
 #ifndef CF_CFDP_H
@@ -118,7 +118,7 @@ void CF_CFDP_SetTxnStatus(CF_Transaction_t *t, CF_TxnStatus_t txn_stat);
 void CF_CFDP_SendEotPkt(CF_Transaction_t *t);
 
 /************************************************************************/
-/** @brief Initialization function for the cfdp engine
+/** @brief Initialization function for the CFDP engine
  *
  * @par Description
  *       Performs all initialization of the CFDP engine
@@ -142,7 +142,7 @@ CFE_Status_t CF_CFDP_InitEngine(void);
 void CF_CFDP_CycleEngine(void);
 
 /************************************************************************/
-/** @brief Disables the cfdp engine and resets all state in it.
+/** @brief Disables the CFDP engine and resets all state in it.
  *
  * @par Assumptions, External Events, and Notes:
  *       None
@@ -253,7 +253,7 @@ CFE_Status_t CF_CFDP_SendMd(CF_Transaction_t *t);
 CFE_Status_t CF_CFDP_SendFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
-/** @brief Build a eof PDU for transmit.
+/** @brief Build an EOF PDU for transmit.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -267,7 +267,7 @@ CFE_Status_t CF_CFDP_SendFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 CFE_Status_t CF_CFDP_SendEof(CF_Transaction_t *t);
 
 /************************************************************************/
-/** @brief Build a ack PDU for transmit.
+/** @brief Build an ACK PDU for transmit.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -291,7 +291,7 @@ CFE_Status_t CF_CFDP_SendAck(CF_Transaction_t *t, CF_CFDP_AckTxnStatus_t ts, CF_
                              CF_CFDP_ConditionCode_t cc, CF_EntityId_t peer_eid, CF_TransactionSeq_t tsn);
 
 /************************************************************************/
-/** @brief Build a fin PDU for transmit.
+/** @brief Build a FIN PDU for transmit.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -309,7 +309,7 @@ CFE_Status_t CF_CFDP_SendFin(CF_Transaction_t *t, CF_CFDP_FinDeliveryCode_t dc, 
                              CF_CFDP_ConditionCode_t cc);
 
 /************************************************************************/
-/** @brief Send a previously-assembled nak PDU for transmit.
+/** @brief Send a previously-assembled NAK PDU for transmit.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -401,7 +401,7 @@ CFE_Status_t CF_CFDP_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 CFE_Status_t CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
-/** @brief Unpack an eof PDU from a received message.
+/** @brief Unpack an EOF PDU from a received message.
  *
  * This should only be invoked for buffers that have been identified
  * as an end of file PDU.
@@ -419,7 +419,7 @@ CFE_Status_t CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 CFE_Status_t CF_CFDP_RecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
-/** @brief Unpack an ack PDU from a received message.
+/** @brief Unpack an ACK PDU from a received message.
  *
  * This should only be invoked for buffers that have been identified
  * as an acknowledgment PDU.
@@ -437,10 +437,10 @@ CFE_Status_t CF_CFDP_RecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 CFE_Status_t CF_CFDP_RecvAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
-/** @brief Unpack an fin PDU from a received message.
+/** @brief Unpack an FIN PDU from a received message.
  *
  * This should only be invoked for buffers that have been identified
- * as an final PDU.
+ * as a final PDU.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -455,10 +455,10 @@ CFE_Status_t CF_CFDP_RecvAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 CFE_Status_t CF_CFDP_RecvFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
-/** @brief Unpack a nak PDU from a received message.
+/** @brief Unpack a NAK PDU from a received message.
  *
  * This should only be invoked for buffers that have been identified
- * as an negative/non-acknowledgment PDU.
+ * as a negative/non-acknowledgment PDU.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -516,7 +516,7 @@ void CF_CFDP_CancelTransaction(CF_Transaction_t *t);
  */
 void CF_CFDP_InitTxnTxFile(CF_Transaction_t *t, CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority);
 
-/* functions to handle LVs (length-value, cfdp spec) */
+/* functions to handle LVs (length-value, CFDP spec) */
 /* returns number of bytes copied, or -1 on error */
 
 /************************************************************************/
@@ -543,10 +543,10 @@ void CF_CFDP_InitTxnTxFile(CF_Transaction_t *t, CF_CFDP_Class_t cfdp_class, uint
 int CF_CFDP_CopyStringFromLV(char *buf, size_t buf_maxsz, const CF_Logical_Lv_t *src_lv);
 
 /************************************************************************/
-/** @brief Arm the ack timer
+/** @brief Arm the ACK timer
  *
  * @par Description
- *       Helper function to arm the ack timer and set the flag.
+ *       Helper function to arm the ACK timer and set the flag.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -576,8 +576,8 @@ void CF_CFDP_RecvDrop(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
  * @par Description
  *       An idle transaction has never had message processing performed on it.
  *       Typically, the first packet received for a transaction would be
- *       the metadata pdu. There's a special case for R2 where the metadata
- *       pdu could be missed, and filedata comes in instead. In that case,
+ *       the metadata PDU. There's a special case for R2 where the metadata
+ *       PDU could be missed, and filedata comes in instead. In that case,
  *       an R2 transaction must still be started.
  *
  * @par Assumptions, External Events, and Notes:
@@ -628,7 +628,7 @@ void CF_CFDP_CycleTx(CF_Channel_t *c);
  * @par Description
  *       There can only be one active tx transaction per engine cycle.
  *       This function finds the first active, and then sends file
- *       data pdus until there are no outgoing message buffers.
+ *       data PDUs until there are no outgoing message buffers.
  *
  * @par Assumptions, External Events, and Notes:
  *       node must not be NULL. Context must not be NULL.

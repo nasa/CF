@@ -77,7 +77,7 @@ void CF_CFDP_R2_Reset(CF_Transaction_t *t)
     }
     else
     {
-        /* not waiting for fin ack, so trigger send fin */
+        /* not waiting for FIN ACK, so trigger send FIN */
         t->flags.rx.send_fin = 1;
     }
 }
@@ -95,7 +95,7 @@ CFE_Status_t CF_CFDP_R_CheckCrc(CF_Transaction_t *t, uint32 expected_crc)
     if (t->crc.result != expected_crc)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_CRC, CFE_EVS_EventType_ERROR,
-                          "CF R%d(%lu:%lu): crc mismatch for R trans. got 0x%08lx expected 0x%08lx",
+                          "CF R%d(%lu:%lu): CRC mismatch for R trans. got 0x%08lx expected 0x%08lx",
                           (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
                           (unsigned long)t->history->seq_num, (unsigned long)t->crc.result,
                           (unsigned long)expected_crc);
@@ -117,12 +117,12 @@ void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
     uint32 ret;
     int    send_nak = 0;
     int    send_fin = 0;
-    /* checking if r2 is complete. Check nak list, and send NAK if appropriate */
+    /* checking if r2 is complete. Check NAK list, and send NAK if appropriate */
     /* if all data is present, then there will be no gaps in the chunk */
 
     if (!CF_TxnStatus_IsError(t->history->txn_stat))
     {
-        /* first, check if md is received. If not, send specialized nak */
+        /* first, check if md is received. If not, send specialized NAK */
         if (!t->flags.rx.md_recv)
         {
             send_nak = 1;
@@ -134,12 +134,12 @@ void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
 
             if (ret)
             {
-                /* there is at least 1 gap, so send a nak */
+                /* there is at least 1 gap, so send a NAK */
                 send_nak = 1;
             }
             else if (t->flags.rx.eof_recv)
             {
-                /* the eof was received, and there are no NAKs -- process completion in send fin state */
+                /* the EOF was received, and there are no NAKs -- process completion in send FIN state */
                 send_fin = 1;
             }
         }
@@ -153,7 +153,7 @@ void CF_CFDP_R2_Complete(CF_Transaction_t *t, int ok_to_send_nak)
             if (t->state_data.r.r2.acknak_count >= CF_AppData.config_table->chan[t->chan_num].nak_limit)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_NAK_LIMIT, CFE_EVS_EventType_ERROR,
-                                  "CF R%d(%lu:%lu): nak limited reach", (t->state == CF_TxnState_R2),
+                                  "CF R%d(%lu:%lu): NAK limited reach", (t->state == CF_TxnState_R2),
                                   (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
                 send_fin = 1;
                 ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.nak_limit;
@@ -261,7 +261,7 @@ CFE_Status_t CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer
         if (t->flags.rx.md_recv && (eof->size != t->fsize))
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_SIZE_MISMATCH, CFE_EVS_EventType_ERROR,
-                              "CF R%d(%lu:%lu): eof file size mismatch: got %lu expected %lu",
+                              "CF R%d(%lu:%lu): EOF file size mismatch: got %lu expected %lu",
                               (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
                               (unsigned long)t->history->seq_num, (unsigned long)eof->size, (unsigned long)t->fsize);
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.file_size_mismatch;
@@ -270,7 +270,7 @@ CFE_Status_t CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer
     }
     else
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_PDU_EOF, CFE_EVS_EventType_ERROR, "CF R%d(%lu:%lu): invalid eof packet",
+        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_PDU_EOF, CFE_EVS_EventType_ERROR, "CF R%d(%lu:%lu): invalid EOF packet",
                           (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
                           (unsigned long)t->history->seq_num);
         ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
@@ -298,7 +298,7 @@ void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 
     if (ret == CFE_SUCCESS)
     {
-        /* Verify crc */
+        /* Verify CRC */
         if (CF_CFDP_R_CheckCrc(t, crc) == 0)
         {
             /* successfully processed the file */
@@ -308,7 +308,7 @@ void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     }
 
     /* after exit, always reset since we are done */
-    /* reset even if the eof failed -- class 1, so it won't come again! */
+    /* reset even if the EOF failed -- class 1, so it won't come again! */
     CF_CFDP_R1_Reset(t);
 }
 
@@ -327,20 +327,20 @@ void CF_CFDP_R2_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     {
         ret = CF_CFDP_R_SubstateRecvEof(t, ph);
 
-        /* did receiving eof succeed? */
+        /* did receiving EOF succeed? */
         if (ret == CFE_SUCCESS)
         {
             eof = &ph->int_header.eof;
 
             t->flags.rx.eof_recv = 1;
 
-            /* need to remember the eof crc for later */
+            /* need to remember the EOF CRC for later */
             t->state_data.r.r2.eof_crc  = eof->crc;
             t->state_data.r.r2.eof_size = eof->size;
 
-            /* always ack the EOF, even if we're not done */
+            /* always ACK the EOF, even if we're not done */
             t->state_data.r.r2.eof_cc = eof->cc;
-            t->flags.rx.send_ack      = 1; /* defer sending ack to tick handling */
+            t->flags.rx.send_ack      = 1; /* defer sending ACK to tick handling */
 
             /* only check for complete if EOF with no errors */
             if (t->state_data.r.r2.eof_cc == CF_CFDP_ConditionCode_NO_ERROR)
@@ -355,7 +355,7 @@ void CF_CFDP_R2_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
         }
         else
         {
-            /* bad eof sent? */
+            /* bad EOF sent? */
             if (ret == CF_REC_PDU_FSIZE_MISMATCH_ERROR)
             {
                 CF_CFDP_R2_SetFinTxnStatus(t, CF_TxnStatus_FILE_SIZE_ERROR);
@@ -379,7 +379,7 @@ void CF_CFDP_R1_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
 {
     int ret;
 
-    /* got file data pdu? */
+    /* got file data PDU? */
     ret = CF_CFDP_RecvFd(t, ph);
     if (ret == 0)
     {
@@ -388,7 +388,7 @@ void CF_CFDP_R1_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
 
     if (ret == 0)
     {
-        /* class 1 digests crc */
+        /* class 1 digests CRC */
         CF_CRC_Digest(&t->crc, ph->int_header.fd.data_ptr, ph->int_header.fd.data_len);
     }
     else
@@ -412,7 +412,7 @@ void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
     /* this function is only entered for data PDUs */
     fd = &ph->int_header.fd;
 
-    /* got file data pdu? */
+    /* got file data PDU? */
     ret = CF_CFDP_RecvFd(t, ph);
     if (ret == 0)
     {
@@ -421,7 +421,7 @@ void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
 
     if (ret == 0)
     {
-        /* class 2 does crc at FIN, but track gaps */
+        /* class 2 does CRC at FIN, but track gaps */
         CF_ChunkListAdd(&t->chunks->chunks, fd->offset, fd->data_len);
 
         if (t->flags.rx.fd_nak_sent)
@@ -431,7 +431,7 @@ void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
 
         if (!t->flags.rx.complete)
         {
-            CF_CFDP_ArmAckTimer(t); /* re-arm ack timer, since we got data */
+            CF_CFDP_ArmAckTimer(t); /* re-arm ACK timer, since we got data */
         }
 
         t->state_data.r.r2.acknak_count = 0;
@@ -497,7 +497,7 @@ CFE_Status_t CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
 
         if (t->flags.rx.md_recv)
         {
-            /* we have metadata, so send valid nak */
+            /* we have metadata, so send valid NAK */
             CF_GapComputeArgs_t args = {t, nak};
 
             nak->scope_start = 0;
@@ -515,10 +515,10 @@ CFE_Status_t CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
             }
             else
             {
-                /* gaps are present, so let's send the nak pdu */
+                /* gaps are present, so let's send the NAK PDU */
                 nak->scope_end          = 0;
                 sret                    = CF_CFDP_SendNak(t, ph);
-                t->flags.rx.fd_nak_sent = 1; /* latch that at least one nak has been sent requesting filedata */
+                t->flags.rx.fd_nak_sent = 1; /* latch that at least one NAK has been sent requesting filedata */
                 CF_Assert(sret != CF_SEND_PDU_ERROR); /* NOTE: this CF_Assert is here because CF_CFDP_SendNak()
                                                      does not return CF_SEND_PDU_ERROR, so if it's ever added to
                                                      that function we need to test handling it here */
@@ -531,7 +531,7 @@ CFE_Status_t CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t)
         }
         else
         {
-            /* need to send simple nak packet to request metadata pdu again */
+            /* need to send simple NAK packet to request metadata PDU again */
             /* after doing so, transition to recv md state */
             CFE_EVS_SendEvent(CF_EID_INF_CFDP_R_REQUEST_MD, CFE_EVS_EventType_INFORMATION,
                               "CF R%d(%lu:%lu): requesting MD", (t->state == CF_TxnState_R2),
@@ -570,7 +570,7 @@ void CF_CFDP_R_Init(CF_Transaction_t *t)
     {
         if (!t->flags.rx.md_recv)
         {
-            /* we need to make a temp file and then do a NAK for md pdu */
+            /* we need to make a temp file and then do a NAK for md PDU */
             /* the transaction already has a history, and that has a buffer that we can use to
              * hold the temp filename */
             /* the -1 below is to make room for the slash */
@@ -690,10 +690,10 @@ CFE_Status_t CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t)
         /* all bytes calculated, so now check */
         if (!CF_CFDP_R_CheckCrc(t, t->state_data.r.r2.eof_crc))
         {
-            /* crc matched! We are happy */
+            /* CRC matched! We are happy */
             t->keep = 1; /* save the file */
 
-            /* set fin pdu status */
+            /* set FIN PDU status */
             t->state_data.r.r2.dc = CF_CFDP_FinDeliveryCode_COMPLETE;
             t->state_data.r.r2.fs = CF_CFDP_FinFileStatus_RETAINED;
         }
@@ -723,7 +723,7 @@ CFE_Status_t CF_CFDP_R2_SubstateSendFin(CF_Transaction_t *t)
 
     if (!CF_TxnStatus_IsError(t->history->txn_stat) && !t->flags.com.crc_calc)
     {
-        /* no error, and haven't checked crc -- so start checking it */
+        /* no error, and haven't checked CRC -- so start checking it */
         if (CF_CFDP_R2_CalcCrcChunk(t))
         {
             ret = CF_ERROR; /* signal to caller to re-enter next tick */
@@ -736,7 +736,7 @@ CFE_Status_t CF_CFDP_R2_SubstateSendFin(CF_Transaction_t *t)
                                CF_TxnStatus_To_ConditionCode(t->history->txn_stat));
         CF_Assert(sret != CF_SEND_PDU_ERROR); /* CF_CFDP_SendFin does not return CF_SEND_PDU_ERROR */
         t->state_data.r.sub_state =
-            CF_RxSubState_WAIT_FOR_FIN_ACK; /* whether or not fin send successful, ok to transition state */
+            CF_RxSubState_WAIT_FOR_FIN_ACK; /* whether or not FIN send successful, ok to transition state */
         if (sret != CFE_SUCCESS)
         {
             ret = CF_ERROR;
@@ -757,7 +757,7 @@ void CF_CFDP_R2_Recv_fin_ack(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     if (!CF_CFDP_RecvAck(t, ph))
     {
-        /* got fin ack, so time to close the state */
+        /* got fin-ack, so time to close the state */
         CF_CFDP_R2_Reset(t);
     }
     else
@@ -782,13 +782,13 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     int32 ret;
     bool  success = true;
 
-    /* it isn't an error to get another MD pdu, right? */
+    /* it isn't an error to get another MD PDU, right? */
     if (!t->flags.rx.md_recv)
     {
         /* NOTE: t->flags.rx.md_recv always 1 in R1, so this is R2 only */
-        /* parse the md pdu. this will overwrite the transaction's history, which contains our filename. so let's
+        /* parse the md PDU. this will overwrite the transaction's history, which contains our filename. so let's
          * save the filename in a local buffer so it can be used with OS_mv upon successful parsing of
-         * the md pdu */
+         * the md PDU */
 
         strcpy(
             fname,
@@ -796,14 +796,14 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
         status = CF_CFDP_RecvMd(t, ph);
         if (!status)
         {
-            /* successfully obtained md pdu */
+            /* successfully obtained md PDU */
             if (t->flags.rx.eof_recv)
             {
-                /* eof was received, so check that md and eof sizes match */
+                /* EOF was received, so check that md and EOF sizes match */
                 if (t->state_data.r.r2.eof_size != t->fsize)
                 {
                     CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_EOF_MD_SIZE, CFE_EVS_EventType_ERROR,
-                                      "CF R%d(%lu:%lu): eof/md size mismatch md: %lu, eof: %lu",
+                                      "CF R%d(%lu:%lu): EOF/md size mismatch md: %lu, EOF: %lu",
                                       (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
                                       (unsigned long)t->history->seq_num, (unsigned long)t->fsize,
                                       (unsigned long)t->state_data.r.r2.eof_size);
@@ -855,7 +855,7 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
                 {
                     t->state_data.r.cached_pos      = 0; /* reset psn due to open */
                     t->flags.rx.md_recv             = 1;
-                    t->state_data.r.r2.acknak_count = 0; /* in case part of nak */
+                    t->state_data.r.r2.acknak_count = 0; /* in case part of NAK */
                     CF_CFDP_R2_Complete(t, 1);           /* check for completion now that md is received */
                 }
             }
@@ -866,7 +866,7 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
                               (t->state == CF_TxnState_R2), (unsigned long)t->history->src_eid,
                               (unsigned long)t->history->seq_num);
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
-            /* do nothing here, since it will be nak'd again later */
+            /* do nothing here, since it will be NAK'd again later */
         }
     }
 }
@@ -1019,7 +1019,7 @@ void CF_CFDP_R_Tick(CF_Transaction_t *t, int *cont /* unused */)
         {
             if (CF_Timer_Expired(&t->ack_timer))
             {
-                /* ack timer expired, so check for completion */
+                /* ACK timer expired, so check for completion */
                 if (!t->flags.rx.complete)
                 {
                     CF_CFDP_R2_Complete(t, 1);
@@ -1033,7 +1033,7 @@ void CF_CFDP_R_Tick(CF_Transaction_t *t, int *cont /* unused */)
                     if (t->state_data.r.r2.acknak_count >= CF_AppData.config_table->chan[t->chan_num].ack_limit)
                     {
                         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_ACK_LIMIT, CFE_EVS_EventType_ERROR,
-                                          "CF R2(%lu:%lu): ack limit reached, no fin-ack",
+                                          "CF R2(%lu:%lu): ACK limit reached, no fin-ack",
                                           (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
                         CF_CFDP_SetTxnStatus(t, CF_TxnStatus_ACK_LIMIT_NO_FIN);
                         ++CF_AppData.hk.channel_hk[t->chan_num].counters.fault.ack_limit;
@@ -1048,7 +1048,7 @@ void CF_CFDP_R_Tick(CF_Transaction_t *t, int *cont /* unused */)
 
                 if (success)
                 {
-                    CF_CFDP_ArmAckTimer(t); /* whether sending fin or waiting for more filedata, need ack timer armed */
+                    CF_CFDP_ArmAckTimer(t); /* whether sending FIN or waiting for more filedata, need ACK timer armed */
                 }
             }
             else
