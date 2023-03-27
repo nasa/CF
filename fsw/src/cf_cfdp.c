@@ -1601,7 +1601,10 @@ void CF_CFDP_CycleEngine(void)
  *-----------------------------------------------------------------*/
 void CF_CFDP_ResetTransaction(CF_Transaction_t *t, int keep_history)
 {
-    CF_Channel_t *c = &CF_AppData.engine.channels[t->chan_num];
+    char *        filename;
+    char          destination[OS_MAX_PATH_LEN];
+    int32         status = -1;
+    CF_Channel_t *c      = &CF_AppData.engine.channels[t->chan_num];
     CF_Assert(t->chan_num < CF_NUM_CHANNELS);
 
     CF_CFDP_SendEotPkt(t);
@@ -1615,7 +1618,22 @@ void CF_CFDP_ResetTransaction(CF_Transaction_t *t, int keep_history)
         {
             if (CF_CFDP_IsSender(t))
             {
-                OS_remove(t->history->fnames.src_filename);
+                /* If move directory is defined attempt move */
+                if (CF_AppData.config_table->chan[t->chan_num].move_dir[0] != 0)
+                {
+                    filename = strrchr(t->history->fnames.src_filename, '/');
+                    if (filename != NULL)
+                    {
+                        snprintf(destination, sizeof(destination), "%s%s",
+                                 CF_AppData.config_table->chan[t->chan_num].move_dir, filename);
+                        status = OS_mv(t->history->fnames.src_filename, destination);
+                    }
+                }
+
+                if (status != OS_SUCCESS)
+                {
+                    OS_remove(t->history->fnames.src_filename);
+                }
             }
             else
             {

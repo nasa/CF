@@ -73,6 +73,7 @@ typedef struct CF_ChannelConfig
 
     char  sem_name[OS_MAX_API_NAME]; /**< \brief name of throttling semaphore in TO */
     uint8 dequeue_enabled;           /**< \brief if 1, then the channel will make pending transactions active */
+    char  move_dir[OS_MAX_PATH_LEN]; /**< \brief Move directory if not empty */
 } CF_ChannelConfig_t;
 
 /**

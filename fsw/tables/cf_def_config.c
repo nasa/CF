@@ -56,28 +56,28 @@ CF_ConfigTable_t CF_config_table = {
           {
               0 /* zero fill unused polling directory slots */
           }},
-         "", /* throttle sem, empty string means no throttle */
-         1,  /* dequeue enable flag (1 = enabled) */
+         "",            /* throttle sem, empty string means no throttle */
+         1,             /* dequeue enable flag (1 = enabled) */
+         .move_dir = "" /* If not empty, will attempt move instead of delete on TX file complete */
      },
-     {
-         /* channel 1 */
-         5,      /* max number of outgoing messages per wakeup */
-         5,      /* max number of rx messages per wakeup */
-         3,      /* ack timer */
-         3,      /* nak timer */
-         30,     /* inactivity timer */
-         4,      /* ack limit */
-         4,      /* nak limit */
-         0x18c9, /* input message id */
-         0x08c3, /* output message id */
-         16,     /* input pipe depth */
-         {       /* polling directory configuration for CF_MAX_POOLING_DIR_PER_CHAN */
-          {
-              0 /* zero fill unused polling directory slots */
-          }},
-         "", /* throttle sem, empty string means no throttle */
-         1   /* dequeue enable flag (1 = enabled) */
-     }},
+     {        /* channel 1 */
+      5,      /* max number of outgoing messages per wakeup */
+      5,      /* max number of rx messages per wakeup */
+      3,      /* ack timer */
+      3,      /* nak timer */
+      30,     /* inactivity timer */
+      4,      /* ack limit */
+      4,      /* nak limit */
+      0x18c9, /* input message id */
+      0x08c3, /* output message id */
+      16,     /* input pipe depth */
+      {       /* polling directory configuration for CF_MAX_POOLING_DIR_PER_CHAN */
+       {
+           0 /* zero fill unused polling directory slots */
+       }},
+      "", /* throttle sem, empty string means no throttle */
+      1,  /* dequeue enable flag (1 = enabled) */
+      .move_dir = ""}},
     480,       /* outgoing_file_chunk_size */
     "/cf/tmp", /* temporary file directory */
 };
