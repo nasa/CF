@@ -190,11 +190,12 @@ void CF_WakeUp(void);
 /** @brief CF message processing function
  *
  * @par Description
- *       Initializes all aspects of the CF application. Messages,
- *       pipes, events, table, and the cfdp engine.
+ *       Process message packets received via the Software Bus command pipe
  *
  * @par Assumptions, External Events, and Notes:
  *       msg must not be NULL.
+ *
+ * @param[in] msg Software Bus message pointer
  *
  */
 void CF_ProcessMsg(CFE_SB_Buffer_t *msg);
