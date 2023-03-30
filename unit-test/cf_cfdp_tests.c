@@ -1364,22 +1364,49 @@ void Test_CF_CFDP_ResetTransaction(void)
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(t, 1));
     UtAssert_STUB_COUNT(CF_FreeTransaction, 1);
 
+    UT_ResetState(UT_KEY(CF_FreeTransaction));
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, &h, &t, NULL);
     t->fd    = OS_ObjectIdFromInteger(1);
     h->dir   = CF_Direction_TX;
     t->state = CF_TxnState_S1;
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(t, 1));
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(t, 0));
-    UtAssert_STUB_COUNT(CF_FreeTransaction, 3);
+    UtAssert_STUB_COUNT(CF_FreeTransaction, 2);
 
+    /* Transmit with move_dir set, without '/' in filename */
+    UT_ResetState(UT_KEY(OS_remove));
+    snprintf(CF_AppData.config_table->chan[t->chan_num].move_dir,
+             sizeof(CF_AppData.config_table->chan[t->chan_num].move_dir), "/test");
+    memset(t->history->fnames.src_filename, 0, sizeof(t->history->fnames.src_filename));
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(t, 0));
+    UtAssert_STUB_COUNT(OS_mv, 0);
+    UtAssert_STUB_COUNT(OS_remove, 1);
+
+    /* Transmit with move_dir set with '/' in filename */
+    UT_ResetState(UT_KEY(OS_remove));
+    snprintf(t->history->fnames.src_filename, sizeof(t->history->fnames.src_filename), "/ram/test");
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(t, 0));
+    UtAssert_STUB_COUNT(OS_mv, 1);
+    UtAssert_STUB_COUNT(OS_remove, 0);
+
+    /* Move failure */
+    UT_ResetState(UT_KEY(OS_remove));
+    UT_ResetState(UT_KEY(OS_mv));
+    UT_SetDefaultReturnValue(UT_KEY(OS_mv), -1);
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(t, 0));
+    UtAssert_STUB_COUNT(OS_mv, 1);
+    UtAssert_STUB_COUNT(OS_remove, 1);
+
+    UT_ResetState(UT_KEY(CF_FreeTransaction));
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, &h, &t, NULL);
     t->fd    = OS_ObjectIdFromInteger(1);
     h->dir   = CF_Direction_RX;
     t->state = CF_TxnState_R1;
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(t, 1));
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(t, 0));
-    UtAssert_STUB_COUNT(CF_FreeTransaction, 5);
+    UtAssert_STUB_COUNT(CF_FreeTransaction, 2);
 
+    UT_ResetState(UT_KEY(CF_FreeTransaction));
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
     t->fd    = OS_ObjectIdFromInteger(1);
     h->dir   = CF_Direction_TX;
@@ -1387,13 +1414,14 @@ void Test_CF_CFDP_ResetTransaction(void)
     t->state = CF_TxnState_S1;
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(t, 1));
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(t, 0));
-    UtAssert_STUB_COUNT(CF_FreeTransaction, 7);
+    UtAssert_STUB_COUNT(CF_FreeTransaction, 2);
 
     /* coverage completeness:
      * test decrement of c->num_cmd_tx
      * test decrement of playback num_ts
      * test reset of "cur" pointer
      */
+    UT_ResetState(UT_KEY(CF_FreeTransaction));
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &c, &h, &t, NULL);
     pb.num_ts          = 10;
     t->p               = &pb;
@@ -1406,7 +1434,7 @@ void Test_CF_CFDP_ResetTransaction(void)
     UtAssert_NULL(c->cur);
     UtAssert_UINT32_EQ(pb.num_ts, 9);
     UtAssert_UINT32_EQ(c->num_cmd_tx, 7);
-    UtAssert_STUB_COUNT(CF_FreeTransaction, 8);
+    UtAssert_STUB_COUNT(CF_FreeTransaction, 1);
 }
 
 void Test_CF_CFDP_SetTxnStatus(void)
