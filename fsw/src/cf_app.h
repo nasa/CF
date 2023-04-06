@@ -139,7 +139,7 @@ void CF_CheckTables(void);
  *
  *
  * @retval #CFE_SUCCESS \copydoc CFE_SUCCESS
- * @retval Returns anything else on error.
+ * @retval CFE_STATUS_VALIDATION_FAILURE if the config table fails one of the validation checks
  *
  */
 CFE_Status_t CF_ValidateConfigTable(void *tbl_ptr);
