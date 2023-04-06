@@ -32,7 +32,7 @@
 #include "cf_cfdp_types.h"
 
 /************************************************************************/
-/** @brief S1 receive pdu processing.
+/** @brief S1 receive PDU processing.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -43,7 +43,7 @@
 void CF_CFDP_S1_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
-/** @brief S2 receive pdu processing.
+/** @brief S2 receive PDU processing.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -102,7 +102,7 @@ void CF_CFDP_S_Tick(CF_Transaction_t *t, int *cont);
  *       t must not be NULL. cont must not be NULL.
  *
  * @param t  Pointer to the transaction object
- * @param cont Set to 1 if a nak was generated
+ * @param cont Set to 1 if a NAK was generated
  */
 void CF_CFDP_S_Tick_Nak(CF_Transaction_t *t, int *cont);
 
@@ -124,7 +124,7 @@ void CF_CFDP_S_Cancel(CF_Transaction_t *t);
  ************************************************************************/
 
 /************************************************************************/
-/** @brief Send an eof pdu.
+/** @brief Send an EOF PDU.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -138,7 +138,7 @@ void CF_CFDP_S_Cancel(CF_Transaction_t *t);
 CFE_Status_t CF_CFDP_S_SendEof(CF_Transaction_t *t);
 
 /************************************************************************/
-/** @brief Sends an eof for S1.
+/** @brief Sends an EOF for S1.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -158,12 +158,12 @@ void CF_CFDP_S1_SubstateSendEof(CF_Transaction_t *t);
 void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *t);
 
 /************************************************************************/
-/** @brief Helper function to populate the pdu with file data and send it.
+/** @brief Helper function to populate the PDU with file data and send it.
  *
  * @par Description
  *       This function checks the file offset cache and if the desired
  *       location is where the file offset is, it can skip a seek() call.
- *       The file is read into the filedata pdu and then the pdu is sent.
+ *       The file is read into the filedata PDU and then the PDU is sent.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -183,7 +183,7 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 by
 /** @brief Standard state function to send the next file data PDU for active transaction.
  *
  * @par Description
- *       During the transfer of active transaction file data pdus, the file
+ *       During the transfer of active transaction file data PDUs, the file
  *       offset is saved. This function sends the next chunk of data. If
  *       the file offset equals the file size, then transition to the EOF
  *       state.
@@ -196,10 +196,10 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *t, uint32 foffs, uint32 by
 void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *t);
 
 /************************************************************************/
-/** @brief Respond to a nak by sending filedata pdus as response.
+/** @brief Respond to a NAK by sending filedata PDUs as response.
  *
  * @par Description
- *       Checks to see if a metadata pdu or filedata re-transmits must
+ *       Checks to see if a metadata PDU or filedata re-transmits must
  *       occur.
  *
  * @par Assumptions, External Events, and Notes:
@@ -252,7 +252,7 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *t);
 void CF_CFDP_S_SubstateSendFinAck(CF_Transaction_t *t);
 
 /************************************************************************/
-/** @brief A fin was received before file complete, so abandon the transaction.
+/** @brief A FIN was received before file complete, so abandon the transaction.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL. ph must not be NULL.
@@ -274,7 +274,7 @@ void CF_CFDP_S2_EarlyFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 void CF_CFDP_S2_Fin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
-/** @brief S2 NAK pdu received handling.
+/** @brief S2 NAK PDU received handling.
  *
  * @par Description
  *       Stores the segment requests from the NAK packet in the chunks
@@ -301,11 +301,11 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
-/** @brief S2 received ack pdu in wait for EOF-ACK state.
+/** @brief S2 received ACK PDU in wait for EOF-ACK state.
  *
  * @par Description
  *       This function will trigger a state transition to CF_TxSubState_WAIT_FOR_FIN,
- *       which waits for a FIN pdu.
+ *       which waits for a FIN PDU.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL. ph must not be NULL.

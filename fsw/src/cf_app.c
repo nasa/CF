@@ -125,7 +125,7 @@ CFE_Status_t CF_ValidateConfigTable(void *tbl_ptr)
     else if (!tbl->rx_crc_calc_bytes_per_wakeup || (tbl->rx_crc_calc_bytes_per_wakeup & 0x3ff))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_INIT_CRC_ALIGN, CFE_EVS_EventType_ERROR,
-                          "CF: config table has rx crc size not aligned with 1024");
+                          "CF: config table has rx CRC size not aligned with 1024");
         ret = crc_alignment; /* must be 1024-byte aligned */
     }
     else if (tbl->outgoing_file_chunk_size > sizeof(CF_CFDP_PduFileDataContent_t))

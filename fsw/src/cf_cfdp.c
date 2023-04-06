@@ -20,7 +20,7 @@
 /**
  * @file
  *
- *  The CF Application main cfdp engine and pdu parsing implementation
+ *  The CF Application main CFDP engine and PDU parsing implementation
  *
  *  This file contains two sets of functions. The first is what is needed
  *  to deal with CFDP PDUs. Specifically validating them for correctness
@@ -251,7 +251,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_ConstructPduHeader(const CF_Transaction_t *t, CF
         hdr = &ph->pdu_header;
 
         hdr->version   = 1;
-        hdr->pdu_type  = (directive_code == 0); /* set to '1' for file data pdu, '0' for a directive pdu */
+        hdr->pdu_type  = (directive_code == 0); /* set to '1' for file data PDU, '0' for a directive PDU */
         hdr->direction = (towards_sender != 0); /* set to '1' for toward sender, '0' for toward receiver */
         hdr->txm_mode  = (CF_CFDP_GetClass(t) == CF_CFDP_CLASS_1); /* set to '1' for class 1 data, '0' for class 2 */
 
@@ -284,8 +284,8 @@ CF_Logical_PduBuffer_t *CF_CFDP_ConstructPduHeader(const CF_Transaction_t *t, CF
          */
         CF_CFDP_EncodeHeaderWithoutSize(ph->penc, hdr);
 
-        /* If directive code is zero, the pdu is a file data pdu which has no directive code field.
-         * So only set if non-zero, otherwise it will write a 0 to a byte in a file data pdu where we
+        /* If directive code is zero, the PDU is a file data PDU which has no directive code field.
+         * So only set if non-zero, otherwise it will write a 0 to a byte in a file data PDU where we
          * don't necessarily want a 0. */
         if (directive_code)
         {
@@ -370,7 +370,7 @@ CFE_Status_t CF_CFDP_SendFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 
     /* this should check if any encoding error occurred */
 
-    /* update pdu length */
+    /* update PDU length */
     CF_CFDP_SetPduLength(ph);
     CF_CFDP_Send(t->chan_num, ph);
 
@@ -597,7 +597,7 @@ CFE_Status_t CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
     if (CF_CFDP_DecodeHeader(ph->pdec, &ph->pdu_header) != CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_TRUNCATION, CFE_EVS_EventType_ERROR,
-                          "CF: pdu rejected due to eid/seq number field truncation");
+                          "CF: PDU rejected due to EID/seq number field truncation");
         ++CF_AppData.hk.channel_hk[chan_num].counters.recv.error;
         ret = CF_ERROR;
     }
@@ -610,7 +610,7 @@ CFE_Status_t CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
     else if (CF_CODEC_IS_OK(ph->pdec) && ph->pdu_header.large_flag)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_LARGE_FILE, CFE_EVS_EventType_ERROR,
-                          "CF: pdu with large file bit received (unsupported)");
+                          "CF: PDU with large file bit received (unsupported)");
         ++CF_AppData.hk.channel_hk[chan_num].counters.recv.error;
         ret = CF_ERROR;
     }
@@ -623,14 +623,14 @@ CFE_Status_t CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
 
         if (!CF_CODEC_IS_OK(ph->pdec))
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_PDU_SHORT_HEADER, CFE_EVS_EventType_ERROR, "CF: pdu too short (%lu received)",
+            CFE_EVS_SendEvent(CF_EID_ERR_PDU_SHORT_HEADER, CFE_EVS_EventType_ERROR, "CF: PDU too short (%lu received)",
                               (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
             ++CF_AppData.hk.channel_hk[chan_num].counters.recv.error;
             ret = CF_SHORT_PDU_ERROR;
         }
         else
         {
-            /* pdu is ok, so continue processing */
+            /* PDU is ok, so continue processing */
             ++CF_AppData.hk.channel_hk[chan_num].counters.recv.pdu;
         }
     }
@@ -676,7 +676,7 @@ CFE_Status_t CF_CFDP_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
         if (lv_ret < 0)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_PDU_INVALID_SRC_LEN, CFE_EVS_EventType_ERROR,
-                              "CF: metadata pdu rejected due to invalid length in source filename of 0x%02x",
+                              "CF: metadata PDU rejected due to invalid length in source filename of 0x%02x",
                               md->source_filename.length);
             ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
             ret = CF_PDU_METADATA_ERROR;
@@ -688,7 +688,7 @@ CFE_Status_t CF_CFDP_RecvMd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
             if (lv_ret < 0)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_PDU_INVALID_DST_LEN, CFE_EVS_EventType_ERROR,
-                                  "CF: metadata pdu rejected due to invalid length in dest filename of 0x%02x",
+                                  "CF: metadata PDU rejected due to invalid length in dest filename of 0x%02x",
                                   md->dest_filename.length);
                 ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
                 ret = CF_PDU_METADATA_ERROR;
@@ -733,7 +733,7 @@ CFE_Status_t CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_FD_SHORT, CFE_EVS_EventType_ERROR,
-                          "CF: filedata pdu too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
+                          "CF: filedata PDU too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         CF_CFDP_SetTxnStatus(t, CF_TxnStatus_PROTOCOL_ERROR);
         ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
         ret = CF_SHORT_PDU_ERROR;
@@ -742,7 +742,7 @@ CFE_Status_t CF_CFDP_RecvFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     {
         /* If recv PDU has the "segment_meta_flag" set, this is not currently handled in CF. */
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_FD_UNSUPPORTED, CFE_EVS_EventType_ERROR,
-                          "CF: filedata pdu with segment metadata received");
+                          "CF: filedata PDU with segment metadata received");
         CF_CFDP_SetTxnStatus(t, CF_TxnStatus_PROTOCOL_ERROR);
         ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
         ret = CF_ERROR;
@@ -766,7 +766,7 @@ CFE_Status_t CF_CFDP_RecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_EOF_SHORT, CFE_EVS_EventType_ERROR,
-                          "CF: eof pdu too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
+                          "CF: EOF PDU too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         ret = CF_SHORT_PDU_ERROR;
     }
 
@@ -788,7 +788,7 @@ CFE_Status_t CF_CFDP_RecvAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_ACK_SHORT, CFE_EVS_EventType_ERROR,
-                          "CF: ack pdu too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
+                          "CF: ACK PDU too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         ret = CF_SHORT_PDU_ERROR;
     }
 
@@ -811,7 +811,7 @@ CFE_Status_t CF_CFDP_RecvFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_FIN_SHORT, CFE_EVS_EventType_ERROR,
-                          "CF: fin pdu too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
+                          "CF: FIN PDU too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         ret = CF_SHORT_PDU_ERROR;
     }
 
@@ -835,7 +835,7 @@ CFE_Status_t CF_CFDP_RecvNak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     if (!CF_CODEC_IS_OK(ph->pdec))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_PDU_NAK_SHORT, CFE_EVS_EventType_ERROR,
-                          "CF: nak pdu too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
+                          "CF: NAK PDU too short: %lu bytes received", (unsigned long)CF_CODEC_GET_SIZE(ph->pdec));
         ret = CF_SHORT_PDU_ERROR;
     }
 
@@ -917,7 +917,7 @@ void CF_CFDP_RecvIdle(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
                 else
                 {
                     CFE_EVS_SendEvent(CF_EID_ERR_CFDP_IDLE_MD, CFE_EVS_EventType_ERROR,
-                                      "CF: got invalid md pdu -- abandoning transaction");
+                                      "CF: got invalid md PDU -- abandoning transaction");
                     ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
                     /* leave state as idle, which will reset below */
                 }
@@ -1068,7 +1068,7 @@ CFE_Status_t CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context)
         CF_Assert(t->flags.com.q_index == CF_QueueIdx_TXA); /* huh? */
 
         /* if no more messages, then c->cur will be set.
-         * If the transaction sent the last filedata pdu and eof, it will move itself
+         * If the transaction sent the last filedata PDU and EOF, it will move itself
          * off the active queue. Run until either of these occur. */
         while (!args->c->cur && t->flags.com.q_index == CF_QueueIdx_TXA)
         {
@@ -1098,9 +1098,9 @@ void CF_CFDP_CycleTx(CF_Channel_t *c)
     {
         args = (CF_CFDP_CycleTx_args_t) {c, 0};
 
-        /* loop through as long as there are pending transactions, and a message buffer to send their pdus on */
+        /* loop through as long as there are pending transactions, and a message buffer to send their PDUs on */
 
-        /* NOTE: tick processing is higher priority than sending new filedata pdus, so only send however many
+        /* NOTE: tick processing is higher priority than sending new filedata PDUs, so only send however many
          * PDUs that can be sent once we get to here */
         if (!c->cur)
         { /* don't enter if cur is set, since we need to pick up where we left off on tick processing next wakeup */
@@ -1186,7 +1186,7 @@ void CF_CFDP_TickTransactions(CF_Channel_t *c)
             if (args.early_exit)
             {
                 /* early exit means we ran out of available outgoing messages this wakeup.
-                 * If current tick type is nak response, then reset tick type. It would be
+                 * If current tick type is NAK response, then reset tick type. It would be
                  * bad to let NAK response starve out RX or TXW ticks on the next cycle.
                  *
                  * If RX ticks use up all available messages, then we pick up where we left

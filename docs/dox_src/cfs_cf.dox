@@ -24,7 +24,7 @@
   This document provides a design and operational overview along with a complete specification
   for the commands and telemetry associated with the CFS CFDP (CF) application software.
 
-  The document is intended primarily for users of the software (operations personal, test
+  The document is intended primarily for users of the software (operations personnel, test
   engineers, and maintenance personnel).  The deployment guide section, is intended for mission
   developers when deploying and configuring the CF application software for a mission
   flight software build environment.
@@ -110,7 +110,7 @@
 
   The CFS CFDP application is a CFDP implementation written specifically for CFS.
   The goal was bounded, small,
-  time and space efficent implementation of the CFDP features necessary for flight.
+  time and space-efficient implementation of the CFDP features necessary for flight.
   CF implements Class 1 and 2 send and receive, as well as logic to cancel, suspend,
   resume, abandon, freeze, etc.  Messages utilize "zero-copy" software bus buffers.
   CF configuration is mainly through the configuration table.
@@ -130,7 +130,7 @@
   The CF Application has an operational interface consisting of one table, two
   different telemetry messages and twenty commands.
 
-  CF is an event driven, single threaded application that wakes up when one of
+  CF is an event-driven, single-threaded application that wakes up when one of
   the following four messages are received on its software bus pipe. Ground
   command, Housekeeping Request command, Incoming PDU or the Wake-up command.
   The Wake-up command tells CF to do file transaction processing. This command
@@ -145,9 +145,9 @@
     config for static memory limits and the configuration table for dynamic timing and functionality limits.
   - Much smaller code footprint. CF 3.0 is light-weight flight-only app. It does not provide any ground engine support.
 
-  For simplicity, the examples through-out this document refer to a typical
+  For simplicity, the examples throughout this document refer to a typical
   operational scenario whereby the peer to the CF application is located on the
-  ground. The CF applications knows only of incoming file transactions and
+  ground. The CF application knows only of incoming file transactions and
   outgoing file transactions. The terms uplink, downlink and playback are
   often used, but only apply when the peer is located on the ground. CF may be
   configured to have more than one peer. One peer may be located onboard the
@@ -164,7 +164,7 @@
   <H2> Initialization </H2>
 
   CF initialization is the same for Power On Resets and Processor Resets.
-  Standard application initialization activites are performed such as status and
+  Standard application initialization activities are performed such as status and
   tracking initialization, message initialization and subscription, table
   initialization and registering with event services.
 
@@ -174,7 +174,7 @@
 
   -# Send any pending message required for RX transaction
   -# Re-send any message required for TX transaction if timer expired (for example,
-     send EOF, or re-send EOF if ack timer expired)
+     send EOF, or re-send EOF if ACK timer expired)
   -# Send a filedata PDU in response to a NAK request. Per wakeup, one will be sent
      per each transaction in the TX wait state.
   -# Once all TX wait transactions have processed their needs to send, the currently
@@ -196,7 +196,7 @@
    When/if the metadata is received for that transaction, OS_mv is used to transition
    the temporary file to the desired destination location.  Note that OS_mv attempts
    a rename first (faster but does not work across file systems), and if that
-   fails then attempts a copy/delete (slower).  Due to this the most efficent
+   fails then attempts a copy/delete (slower).  Due to this the most efficient
    temporary directory configuration is for it to be on the same file system as the
    destination.  Note that currently this only impacts class 2 RX with an out
    of order metadata packet, but there's future work being considered to
@@ -208,7 +208,7 @@
 
   The CF application has a single internal core referred to as the engine. The
   engine is capable of transmitting and receiving a configurable number of
-  transactions simultaneously.The engine builds outgoing Protocol Data Units
+  transactions simultaneously. The engine builds outgoing Protocol Data Units
   (PDUs) and interprets the incoming PDUs. It handles all details regarding the
   CFDP standard protocol which is defined in the CCSDS 727.0-B-4 Blue Book. The
   engine processes the file transactions when it is 'cycled'. The number of
@@ -331,7 +331,7 @@
   moved to the active queue when the transaction begins. After the transaction
   is complete the queue entry is moved to the history queue. The queues may be
   viewed by command at any time. The pending queue reads may be enabled or
-  disabled at anytime. Each channel has a dedicated throttling semaphore, peer
+  disabled at any time. Each channel has a dedicated throttling semaphore, peer
   entity ID, message ID for outgoing PDUs and a configurable number of polling
   directories. File output transactions may occur simultaneously on different
   channels. The engine processes all active outgoing transactions in a
@@ -443,7 +443,7 @@
   the transaction begins, then moves to the history queue when the transaction is
   complete.
 
-  The history queue has a sliding window affect. When the queue is full and a
+  The history queue has a sliding window effect. When the queue is full and a
   new transaction needs to be added, the oldest transaction will be removed,
   making room for the new transaction.
 
@@ -452,7 +452,7 @@
   the memory for the queue will be available.
 
   For incoming file transactions, CF uses a statically allocated buffer for the
-  incoming pdu. The size of this buffer is defined by the platform configuration
+  incoming PDU. The size of this buffer is defined by the platform configuration
   parameter, CF_MAX_PDU_SIZE. The incoming PDU's are copied from the Software Bus
   into this buffer and then passed to the engine.
 
@@ -622,7 +622,7 @@ CF_UnionArgs_Payload_t;
 \endverbatim
 
     The command parameter byte[0] identifies which category of counters to
-        reset.counters.The value should be set to one of five possible values defined in the reset enumeration.
+        reset.counters. The value should be set to one of five possible values defined in the reset enumeration.
 
   \verbatim typedef enum {
             CF_Reset_all     = 0, 
@@ -823,7 +823,7 @@ CF_UnionArgs_Payload_t;
   suspended. Canceling is always a better option than abandoning. 
   
   NOTE: When a suspended transaction is cancelled, the cancel does not take 
-  affect until the transaction is resumed.
+  effect until the transaction is resumed.
 
   \verbatim 
   typedef struct CF_TransactionCmd
@@ -894,7 +894,7 @@ CF_UnionArgs_Payload_t;
   indicating the reason for failure.
   
   NOTE: If a Cancel command is received by CF on an outgoing transaction that 
-  is suspended, the cancel does not take affect until the transaction is 
+  is suspended, the cancel does not take effect until the transaction is 
   resumed.  
 
 
@@ -1095,7 +1095,7 @@ CF_UnionArgs_Payload_t;
   This command is used to enable reading from the pending queue on a particular
   channel. It has one parameter (channel) and is sent when the pending queue
   reads are disabled for that channel. The pending queue holds the names of the
-  files that are waiting to be sent out by CF. This command has no affect on
+  files that are waiting to be sent out by CF. This command has no effect on
   incoming file transactions.
 
   When the command is executed successfully, the command counter is incremented
@@ -1137,7 +1137,7 @@ CF_UnionArgs_Payload_t;
   
 
   When the command is executed successfully, the command counter is incremented
-  and the an event message will be generated.
+  and then an event message will be generated.
 
   If the command is not successful, the command error counter will increment and
   an error event will be generated indicating the reason for failure.  
@@ -1227,7 +1227,7 @@ CF_UnionArgs_Payload_t;
   keep polling directories disabled when they are not actively receiving files.
   
   When the command is executed successfully, the command counter is incremented
-  and and event message will be generated.
+  and an event message will be generated.
 
   If the command is not successful, the command error counter will increment and
   an error event will be generated indicating the reason for failure.  
@@ -1322,7 +1322,7 @@ CF_UnionArgs_Payload_t;
 #CF_CMD_MID with command code #CF_DISABLE_ENGINE_CC. The command has no
   command parameters and is used to disable engine processing.  
   Note configuration table updates can be performed while the engine is disabled, 
-  and when the engine is re-enabled the new configuration will take affect.
+  and when the engine is re-enabled the new configuration will take effect.
   
   Prev: \ref cfscfcfgpg <BR>
   Next: \ref cfscftlmpg
@@ -1390,7 +1390,7 @@ CF_UnionArgs_Payload_t;
   the application is started. CF supports table updates during runtime only when
   the engine is disabled.
       
-  CF utilzes a CFS table for run-time configuration defined by #CF_ConfigTable_t.  The channel
+  CF utilizes a CFS table for run-time configuration defined by #CF_ConfigTable_t.  The channel
   configuration is in #CF_ConfigTable_t.chan which contains a polling element defined by
   #CF_PollDir_t.
 
@@ -1414,7 +1414,7 @@ CF_UnionArgs_Payload_t;
 
   The stack size for the CF application must be monitored and must be no less
   than 16384 bytes. Depending on the CF configuration, the stack size may need
-  to be set higher than 16384. The stack size is specified int he cfe_es_startup.scr
+  to be set higher than 16384. The stack size is specified in the cfe_es_startup.scr
   file that is located in the /mission/build/xxx/exe area.
   
   Poll directories must not have subdirectories, otherwise errors will occur

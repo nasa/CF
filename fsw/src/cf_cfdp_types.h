@@ -229,7 +229,7 @@ typedef struct CF_Poll
  */
 typedef struct CF_TxS2_Data
 {
-    uint8 fin_cc; /**< \brief remember the cc in the received fin pdu to echo in eof-fin */
+    uint8 fin_cc; /**< \brief remember the cc in the received FIN PDU to echo in eof-fin */
     uint8 acknak_count;
 } CF_TxS2_Data_t;
 
@@ -254,7 +254,7 @@ typedef struct CF_RxS2_Data
     uint32                    rx_crc_calc_bytes;
     CF_CFDP_FinDeliveryCode_t dc;
     CF_CFDP_FinFileStatus_t   fs;
-    uint8                     eof_cc; /**< \brief remember the cc in the received eof pdu to echo in eof-ack */
+    uint8                     eof_cc; /**< \brief remember the cc in the received EOF PDU to echo in eof-ack */
     uint8                     acknak_count;
 } CF_RxS2_Data_t;
 
@@ -295,7 +295,7 @@ typedef struct CF_Flags_Rx
     bool send_ack;
     bool inactivity_fired; /**< \brief used for r2 */
     bool complete;         /**< \brief r2 */
-    bool fd_nak_sent;      /**< \brief latches that at least one nak has been sent for file data */
+    bool fd_nak_sent;      /**< \brief latches that at least one NAK has been sent for file data */
 } CF_Flags_Rx_t;
 
 /**

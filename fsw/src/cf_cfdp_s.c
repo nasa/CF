@@ -461,7 +461,7 @@ void CF_CFDP_S2_EarlyFin(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     /* received early fin, so just cancel */
     CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_EARLY_FIN, CFE_EVS_EventType_ERROR,
-                      "CF S%d(%lu:%lu): got early fin -- cancelling", (t->state == CF_TxnState_S2),
+                      "CF S%d(%lu:%lu): got early FIN -- cancelling", (t->state == CF_TxnState_S2),
                       (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
     CF_CFDP_SetTxnStatus(t, CF_TxnStatus_EARLY_FIN);
     CF_CFDP_S_Reset(t);
@@ -505,7 +505,7 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 
             if (sr->offset_start == 0 && sr->offset_end == 0)
             {
-                /* need to re-send metadata pdu */
+                /* need to re-send metadata PDU */
                 t->flags.tx.md_need_send = 1;
             }
             else
@@ -532,14 +532,14 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
         if (bad_sr)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_INVALID_SR, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%lu:%lu): received %d invalid nak segment requests", (t->state == CF_TxnState_S2),
+                              "CF S%d(%lu:%lu): received %d invalid NAK segment requests", (t->state == CF_TxnState_S2),
                               (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num, bad_sr);
         }
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_PDU_NAK, CFE_EVS_EventType_ERROR,
-                          "CF S%d(%lu:%lu): received invalid nak pdu", (t->state == CF_TxnState_S2),
+                          "CF S%d(%lu:%lu): received invalid NAK PDU", (t->state == CF_TxnState_S2),
                           (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
         ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
     }
@@ -567,7 +567,7 @@ void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
 {
     if (!CF_CFDP_RecvAck(t, ph))
     {
-        /* don't send fin if error. Don't check the eof CC, just go with
+        /* don't send FIN if error. Don't check the EOF CC, just go with
          * the stored one we sent before */
         if (CF_TxnStatus_IsError(t->history->txn_stat))
         {
@@ -576,13 +576,13 @@ void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
         else
         {
             t->state_data.s.sub_state    = CF_TxSubState_WAIT_FOR_FIN;
-            t->flags.com.ack_timer_armed = 0; /* just wait for fin now, nothing to re-send */
+            t->flags.com.ack_timer_armed = 0; /* just wait for FIN now, nothing to re-send */
         }
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_PDU_EOF, CFE_EVS_EventType_ERROR,
-                          "CF S%d(%lu:%lu): received invalid eof pdu", (t->state == CF_TxnState_S2),
+                          "CF S%d(%lu:%lu): received invalid EOF PDU", (t->state == CF_TxnState_S2),
                           (unsigned long)t->history->src_eid, (unsigned long)t->history->seq_num);
         ++CF_AppData.hk.channel_hk[t->chan_num].counters.recv.error;
     }

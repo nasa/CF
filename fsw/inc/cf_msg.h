@@ -823,7 +823,7 @@ typedef enum
      *  \par Description
      *       Disable engine processing.  Note configuration table updates
      *       can be performed while the engine is disabled, and when the engine is
-     *       re-enabled the new configuration will take affect.
+     *       re-enabled the new configuration will take effect.
      *
      *  \par Command Structure
      *       #CF_NoArgsCmd_t

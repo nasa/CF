@@ -459,7 +459,7 @@ void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg);
 void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg);
 
 /************************************************************************/
-/** @brief Checks if the value is less than or equal to the max pdu size.
+/** @brief Checks if the value is less than or equal to the max PDU size.
  *
  * @par Assumptions, External Events, and Notes:
  *       None

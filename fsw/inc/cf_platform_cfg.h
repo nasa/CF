@@ -104,12 +104,12 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_NUM_CHANNELS (2)
 
 /**
- *  @brief Max NAK segments supported in a NAK pdu
+ *  @brief Max NAK segments supported in a NAK PDU
  *
  *  @par Description:
- *       When a NAK pdu is sent or received, this is the max number of
+ *       When a NAK PDU is sent or received, this is the max number of
  *       segment requests supported. This number should match the ground
- *       cfdp engine configuration as well.
+ *       CFDP engine configuration as well.
  *
  *  @par Limits:
  *
@@ -123,14 +123,14 @@ typedef uint32 CF_TransactionSeq_t;
  *       Number of chunks per transaction per channel (RX).
  *
  * CHUNKS -
- * A chunk is a representation of a range range (offset, size) of data received by a receiver.
+ * A chunk is a representation of a range (offset, size) of data received by a receiver.
  *
  * Class 2 CFDP deals with NAK, so received data must be tracked for receivers in order to generate
  * the NAK. The sender must also keep track of NAK requests and send new file data PDUs as a result.
  * (array size must be CF_NUM_CHANNELS)
  * CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION is an array for each channel indicating the number of chunks per transaction
- * CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION is an array for each channel indicate the number of chunks to keep track of
- * NAK requests from the receiver per transaction
+ * CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION is an array for each channel indicating the number of chunks to keep track
+ * of NAK requests from the receiver per transaction
  *
  *  @par Limits:
  *
@@ -244,7 +244,7 @@ typedef uint32 CF_TransactionSeq_t;
  *
  *  @par Description:
  *       The max PDU size across all channels in the system. Keep in mind that
- *       the max filedata pdu will be smaller than this. This size includes
+ *       the max filedata PDU will be smaller than this. This size includes
  *       the PDU headers and everything. While this is the max value for all
  *       channels, the outgoing_file_chunk_size in the configuration table
  *       is different for each channel so a smaller size can be used.
@@ -304,10 +304,10 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_FILENAME_MAX_LEN (CF_FILENAME_MAX_NAME + CF_FILENAME_MAX_PATH)
 
 /**
- *  @brief R2 crc calc chunk size
+ *  @brief R2 CRC calc chunk size
  *
  *  @par Description
- *       R2 performs crc calculation upon file completion in chunks. This is the size
+ *       R2 performs CRC calculation upon file completion in chunks. This is the size
  *       of the buffer. The larger the size the more stack will be used, but
  *       the faster it can go. The overall number of bytes calculated per wakeup
  *       is set in the configuration table.

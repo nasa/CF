@@ -43,7 +43,7 @@ typedef struct
 } CF_GapComputeArgs_t;
 
 /************************************************************************/
-/** @brief R1 receive pdu processing.
+/** @brief R1 receive PDU processing.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -54,7 +54,7 @@ typedef struct
 void CF_CFDP_R1_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
-/** @brief R2 receive pdu processing.
+/** @brief R2 receive PDU processing.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -71,7 +71,7 @@ void CF_CFDP_R2_Recv(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
  *       This function is called on every transaction by the engine on
  *       every CF wakeup. This is where flags are checked to send ACK,
  *       NAK, and FIN. It checks for inactivity timer and processes the
- *       ack timer. The ack timer is what triggers re-sends of PDUs
+ *       ACK timer. The ACK timer is what triggers re-sends of PDUs
  *       that require acknowledgment.
  *
  * @par Assumptions, External Events, and Notes:
@@ -196,7 +196,7 @@ CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph
 /** @brief Processing receive EOF common functionality for R1/R2.
  *
  * @par Description
- *       This function is used for both R1 and R2 eof receive. It calls
+ *       This function is used for both R1 and R2 EOF receive. It calls
  *       the unmarshaling function and then checks known transaction
  *       data against the PDU.
  *
@@ -216,7 +216,7 @@ CFE_Status_t CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer
 /** @brief Process receive EOF for R1.
  *
  * @par Description
- *       Only need to confirm crc for R1.
+ *       Only need to confirm CRC for R1.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL. ph must not be NULL.
@@ -265,7 +265,7 @@ void CF_CFDP_R1_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
  *       since there may be gaps. Instead, insert file received range
  *       data into chunks. Once NAK has been received, this function
  *       always checks for completion. This function also re-arms
- *       the ack timer.
+ *       the ACK timer.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL. ph must not be NULL.
@@ -291,13 +291,13 @@ void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
 void CF_CFDP_R2_GapCompute(const CF_ChunkList_t *chunks, const CF_Chunk_t *c, void *opaque);
 
 /************************************************************************/
-/** @brief Send a NAK pdu for R2.
+/** @brief Send a NAK PDU for R2.
  *
  * @par Description
- *       NAK pdu is sent when there are gaps in the received data. The
- *       chunks class tracks this and generates the nak pdu by calculating
+ *       NAK PDU is sent when there are gaps in the received data. The
+ *       chunks class tracks this and generates the NAK PDU by calculating
  *       gaps internally and calling CF_CFDP_R2_GapCompute(). There is a special
- *       case where if a metadata pdu has not been received, then a nak
+ *       case where if a metadata PDU has not been received, then a NAK
  *       packet will be sent to request another.
  *
  * @par Assumptions, External Events, and Notes:
@@ -316,10 +316,10 @@ CFE_Status_t CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t);
  *       The configuration table has a number of bytes to calculate per
  *       transaction per wakeup. At each wakeup, the file is read and
  *       this number of bytes are calculated. This function will set
- *       the checksum error condition code if the final crc does not match.
+ *       the checksum error condition code if the final CRC does not match.
  *
  * @par PTFO
- *       Increase throughput by consuming all crc bytes per wakeup in
+ *       Increase throughput by consuming all CRC bytes per wakeup in
  *       transaction-order. This would require a change to the meaning
  *       of the value in the configuration table.
  *
@@ -333,7 +333,7 @@ CFE_Status_t CF_CFDP_R_SubstateSendNak(CF_Transaction_t *t);
 CFE_Status_t CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t);
 
 /************************************************************************/
-/** @brief Send a FIN pdu.
+/** @brief Send a FIN PDU.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL.
@@ -346,7 +346,7 @@ CFE_Status_t CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *t);
 CFE_Status_t CF_CFDP_R2_SubstateSendFin(CF_Transaction_t *t);
 
 /************************************************************************/
-/** @brief Process receive FIN-ACK pdu.
+/** @brief Process receive FIN-ACK PDU.
  *
  * @par Description
  *       This is the end of an R2 transaction. Simply reset the transaction
@@ -361,14 +361,14 @@ CFE_Status_t CF_CFDP_R2_SubstateSendFin(CF_Transaction_t *t);
 void CF_CFDP_R2_Recv_fin_ack(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
-/** @brief Process receive metadata pdu for R2.
+/** @brief Process receive metadata PDU for R2.
  *
  * @par Description
  *       It's possible that metadata PDU was missed in cf_cfdp.c, or that
  *       it was re-sent. This function checks if it was already processed,
  *       and if not, handles it. If there was a temp file opened due to
- *       missed metadata pdu, it will move the file to the correct
- *       destination according to the metadata pdu.
+ *       missed metadata PDU, it will move the file to the correct
+ *       destination according to the metadata PDU.
  *
  * @par Assumptions, External Events, and Notes:
  *       t must not be NULL. ph must not be NULL.

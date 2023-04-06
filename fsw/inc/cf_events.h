@@ -512,7 +512,7 @@
  *
  *  \par Cause:
  *
- *  Condition that triggers a ACK occurred that would meet or exceed the ACK limit
+ *  Condition that triggers an ACK occurred that would meet or exceed the ACK limit
  */
 #define CF_EID_ERR_CFDP_R_ACK_LIMIT (73)
 
@@ -798,7 +798,7 @@
  *
  *  \par Cause:
  *
- *  Bad segment request values in recived NAK PDU relating
+ *  Bad segment request values in received NAK PDU relating
  *  to a current transaction
  */
 #define CF_EID_ERR_CFDP_S_INVALID_SR (100)
@@ -810,7 +810,7 @@
  *
  *  \par Cause:
  *
- *  Failure processing recived NAK PDU relating
+ *  Failure processing received NAK PDU relating
  *  to a current transaction
  */
 #define CF_EID_ERR_CFDP_S_PDU_NAK (101)

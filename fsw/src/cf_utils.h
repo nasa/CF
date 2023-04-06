@@ -512,7 +512,7 @@ CF_TxnStatus_t CF_TxnStatus_From_ConditionCode(CF_CFDP_ConditionCode_t cc);
  * @param txn_stat   Transaction status
  *
  * @returns Boolean value indicating if the transaction is in an errorred state
- * @retval true if the an error has occurred during the transaction
+ * @retval true if an error has occurred during the transaction
  * @retval false if no error has occurred during the transaction yet
  */
 bool CF_TxnStatus_IsError(CF_TxnStatus_t txn_stat);

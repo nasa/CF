@@ -162,7 +162,7 @@ CFE_Status_t CF_TableInit(void);
  *
  * @par Description
  *       Initializes all aspects of the CF application. Messages,
- *       pipes, events, table, and the cfdp engine.
+ *       pipes, events, table, and the CFDP engine.
  *
  * @par Assumptions, External Events, and Notes:
  *       This must only be called once.

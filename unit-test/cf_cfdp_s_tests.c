@@ -432,7 +432,7 @@ void Test_CF_CFDP_S_SendFileData(void)
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(t, offset, read_size, true), 0);
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[t->chan_num].counters.sent.file_data_bytes, cumulative_read);
 
-    /* nominal, smaller than chunk, no crc */
+    /* nominal, smaller than chunk, no CRC */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, &config);
     config->outgoing_file_chunk_size = 150;
     t->fsize                         = 300;
@@ -441,7 +441,7 @@ void Test_CF_CFDP_S_SendFileData(void)
     cumulative_read += read_size;
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[t->chan_num].counters.sent.file_data_bytes, cumulative_read);
 
-    /* nominal, larger than PDU, no crc */
+    /* nominal, larger than PDU, no CRC */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, &config);
     config->outgoing_file_chunk_size = CF_MAX_PDU_SIZE * 2;
     t->fsize                         = CF_MAX_PDU_SIZE * 2;
@@ -452,7 +452,7 @@ void Test_CF_CFDP_S_SendFileData(void)
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[t->chan_num].counters.sent.file_data_bytes, cumulative_read);
     UtAssert_STUB_COUNT(CF_CRC_Digest, 0);
 
-    /* nominal, larger than chunk, with crc */
+    /* nominal, larger than chunk, with CRC */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, &config);
     config->outgoing_file_chunk_size = 50;
     read_size                        = 100;

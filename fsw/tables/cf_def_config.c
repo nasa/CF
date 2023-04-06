@@ -27,18 +27,18 @@
 
 CF_ConfigTable_t CF_config_table = {
     10,    /* ticks_per_second */
-    16384, /* max number of bytes per wakeup to calculate r2 recv file crc */
+    16384, /* max number of bytes per wakeup to calculate r2 recv file CRC */
     25,    /* local entity id */
     {      /* channel configuration for CF_NUM_CHANNELS */
      {
          /* channel 0 */
          5,      /* max number of outgoing messages per wakeup */
          5,      /* max number of rx messages per wakeup */
-         3,      /* ack timer */
-         3,      /* nak timer */
+         3,      /* ACK timer */
+         3,      /* NAK timer */
          30,     /* inactivity timer */
-         4,      /* ack limit */
-         4,      /* nak limit */
+         4,      /* ACK limit */
+         4,      /* NAK limit */
          0x18c8, /* input message id */
          0x08c2, /* output message id */
          16,     /* input pipe depth */
