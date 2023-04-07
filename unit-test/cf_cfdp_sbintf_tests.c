@@ -372,18 +372,18 @@ void Test_CF_CFDP_MsgOutGet(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &c, NULL, &t, NULL);
     c->sem_id = OS_ObjectIdFromInteger(123);
     UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(t, false));
-    UT_SetDefaultReturnValue(UT_KEY(OS_CountSemTimedWait), OS_ERROR_TIMEOUT);
+    UT_SetDeferredRetcode(UT_KEY(OS_CountSemTimedWait), 1, OS_ERROR_TIMEOUT);
     UtAssert_NULL(CF_CFDP_MsgOutGet(t, false));
-    UT_CF_AssertEventID(CF_EID_ERR_CFDP_NO_MSG);
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* transaction is suspended */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
     t->flags.com.suspended = 1;
     UtAssert_NULL(CF_CFDP_MsgOutGet(t, false));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* channel is frozen */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &t, NULL);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
     CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].frozen = 1;
     UtAssert_NULL(CF_CFDP_MsgOutGet(t, false));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
@@ -394,7 +394,7 @@ void Test_CF_CFDP_MsgOutGet(void)
     UtAssert_NULL(CF_CFDP_MsgOutGet(t, false));
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_NO_MSG);
 
-    /* same, but the silent flag should supress the event */
+    /* same, but the silent flag should suppress the event */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &t, NULL);
     UtAssert_NULL(CF_CFDP_MsgOutGet(t, true));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
