@@ -111,28 +111,22 @@ void CF_CheckTables(void)
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_ValidateConfigTable(void *tbl_ptr)
 {
-    CF_ConfigTable_t * tbl = (CF_ConfigTable_t *)tbl_ptr;
-    CFE_Status_t       ret; /* initialized below */
-    static const int32 no_ticks_per_second = -1;
-    static const int32 crc_alignment       = -2;
-    static const int32 outgoing_chunk_size = -3;
+    CF_ConfigTable_t *tbl = (CF_ConfigTable_t *)tbl_ptr;
+    CFE_Status_t      ret = CFE_STATUS_VALIDATION_FAILURE;
 
     if (!tbl->ticks_per_second)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_INIT_TPS, CFE_EVS_EventType_ERROR, "CF: config table has zero ticks per second");
-        ret = no_ticks_per_second;
     }
     else if (!tbl->rx_crc_calc_bytes_per_wakeup || (tbl->rx_crc_calc_bytes_per_wakeup & 0x3ff))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_INIT_CRC_ALIGN, CFE_EVS_EventType_ERROR,
                           "CF: config table has rx CRC size not aligned with 1024");
-        ret = crc_alignment; /* must be 1024-byte aligned */
     }
     else if (tbl->outgoing_file_chunk_size > sizeof(CF_CFDP_PduFileDataContent_t))
     {
         CFE_EVS_SendEvent(CF_EID_ERR_INIT_OUTGOING_SIZE, CFE_EVS_EventType_ERROR,
                           "CF: config table has outgoing file chunk size too large");
-        ret = outgoing_chunk_size; /* must be smaller than file data character array */
     }
     else
     {

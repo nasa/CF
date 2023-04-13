@@ -201,7 +201,7 @@ void Test_CF_ValidateConfigTable_FailBecauseTableTicksPerSecondIs0(void)
     result = CF_ValidateConfigTable(arg_table);
 
     /* Assert */
-    UtAssert_INT32_EQ(result, -1);
+    UtAssert_INT32_EQ(result, CFE_STATUS_VALIDATION_FAILURE);
 }
 
 void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0(void)
@@ -217,7 +217,7 @@ void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0(void)
     result = CF_ValidateConfigTable(arg_table);
 
     /* Assert */
-    UtAssert_INT32_EQ(result, -2);
+    UtAssert_INT32_EQ(result, CFE_STATUS_VALIDATION_FAILURE);
 }
 
 void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIsNot1024ByteAligned(void)
@@ -236,7 +236,7 @@ void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIsNot1024ByteAlign
     result = CF_ValidateConfigTable(arg_table);
 
     /* Assert */
-    UtAssert_INT32_EQ(result, -2);
+    UtAssert_INT32_EQ(result, CFE_STATUS_VALIDATION_FAILURE);
 }
 
 void Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArray(void)
@@ -254,7 +254,7 @@ void Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArra
     result = CF_ValidateConfigTable(arg_table);
 
     /* Assert */
-    UtAssert_INT32_EQ(result, -3);
+    UtAssert_INT32_EQ(result, CFE_STATUS_VALIDATION_FAILURE);
 }
 
 void Test_CF_ValidateConfigTable_Success(void)
