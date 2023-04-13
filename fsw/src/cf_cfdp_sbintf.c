@@ -107,7 +107,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
         if (!CF_AppData.engine.out.msg)
         {
             c->cur = t; /* remember where we were for next time */
-            if (!silent)
+            if (!silent && (os_status == OS_SUCCESS))
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CFDP_NO_MSG, CFE_EVS_EventType_ERROR,
                                   "CF: no output message buffer available");
