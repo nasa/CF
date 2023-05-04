@@ -1137,27 +1137,29 @@ void Test_CF_CFDP_ProcessPollingDirectories(void)
     pdcfg = &config->chan[UT_CFDP_CHANNEL].polldir[0];
     poll  = &c->poll[0];
 
-    /* nominal call, w/engine disabled (noop) */
+    /* nominal call, polldir disabled (noop) */
     UtAssert_VOIDCALL(CF_CFDP_ProcessPollingDirectories(c));
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].poll_counter, 0);
 
-    /* nominal call, w/engine enabled, polldir enabled but interval_sec == 0 */
-    CF_AppData.engine.enabled = 1;
-    pdcfg->enabled            = 1;
+    /* nominal call, polldir enabled but interval_sec == 0 */
+    /* Will tick because CF_Timer_Expired stub returns 0 by default (not expired) */
+    pdcfg->enabled = 1;
     UtAssert_VOIDCALL(CF_CFDP_ProcessPollingDirectories(c));
-    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].poll_counter, 0);
+    UtAssert_BOOL_FALSE(poll->timer_set);
+    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].poll_counter, 1);
+    UtAssert_STUB_COUNT(CF_Timer_Tick, 1);
 
     /* with interval_sec nonzero the timer should get set, but not tick */
     pdcfg->interval_sec = 1;
     UtAssert_VOIDCALL(CF_CFDP_ProcessPollingDirectories(c));
     UtAssert_BOOL_TRUE(poll->timer_set);
-    UtAssert_STUB_COUNT(CF_Timer_Tick, 0);
+    UtAssert_STUB_COUNT(CF_Timer_Tick, 1);
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].poll_counter, 1);
 
     /* call again should tick */
     UtAssert_VOIDCALL(CF_CFDP_ProcessPollingDirectories(c));
     UtAssert_BOOL_TRUE(poll->timer_set);
-    UtAssert_STUB_COUNT(CF_Timer_Tick, 1);
+    UtAssert_STUB_COUNT(CF_Timer_Tick, 2);
 
     /* call again timer should expire and start a playback */
     UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, true);

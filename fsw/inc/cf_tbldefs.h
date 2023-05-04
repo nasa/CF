@@ -33,11 +33,7 @@
  */
 typedef struct CF_PollDir
 {
-    uint32 interval_sec; /**<
-                          * \brief number of seconds to wait before trying a new directory.
-                          *
-                          * Must be >0 or slot is inactive.
-                          */
+    uint32 interval_sec; /**< \brief number of seconds to wait before trying a new directory */
 
     uint8           priority;   /**< \brief priority to use when placing transactions on the pending queue */
     CF_CFDP_Class_t cfdp_class; /**< \brief the CFDP class to send */

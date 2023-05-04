@@ -1510,12 +1510,11 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c)
         pd          = &cc->polldir[i];
         count_check = 0;
 
-        if (pd->enabled && pd->interval_sec)
+        if (pd->enabled)
         {
-            /* only handle polling for polldirs configured with a non-zero interval */
             if (!p->pb.busy && !p->pb.num_ts)
             {
-                if (!p->timer_set)
+                if (!p->timer_set && pd->interval_sec)
                 {
                     /* timer was not set, so set it now */
                     CF_Timer_InitRelSec(&p->interval_timer, pd->interval_sec);
@@ -1539,7 +1538,9 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *c)
                     }
                 }
                 else
+                {
                     CF_Timer_Tick(&p->interval_timer);
+                }
             }
             else
             {
