@@ -299,7 +299,7 @@ void CF_CFDP_R1_SubstateRecvEof(CF_Transaction_t *t, CF_Logical_PduBuffer_t *ph)
     if (ret == CFE_SUCCESS)
     {
         /* Verify CRC */
-        if (CF_CFDP_R_CheckCrc(t, crc) == 0)
+        if (CF_CFDP_R_CheckCrc(t, crc) == CFE_SUCCESS)
         {
             /* successfully processed the file */
             t->keep = 1; /* save the file */
@@ -381,12 +381,12 @@ void CF_CFDP_R1_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
 
     /* got file data PDU? */
     ret = CF_CFDP_RecvFd(t, ph);
-    if (ret == 0)
+    if (ret == CFE_SUCCESS)
     {
         ret = CF_CFDP_R_ProcessFd(t, ph);
     }
 
-    if (ret == 0)
+    if (ret == CFE_SUCCESS)
     {
         /* class 1 digests CRC */
         CF_CRC_Digest(&t->crc, ph->int_header.fd.data_ptr, ph->int_header.fd.data_len);
@@ -414,12 +414,12 @@ void CF_CFDP_R2_SubstateRecvFileData(CF_Transaction_t *t, CF_Logical_PduBuffer_t
 
     /* got file data PDU? */
     ret = CF_CFDP_RecvFd(t, ph);
-    if (ret == 0)
+    if (ret == CFE_SUCCESS)
     {
         ret = CF_CFDP_R_ProcessFd(t, ph);
     }
 
-    if (ret == 0)
+    if (ret == CFE_SUCCESS)
     {
         /* class 2 does CRC at FIN, but track gaps */
         CF_ChunkListAdd(&t->chunks->chunks, fd->offset, fd->data_len);

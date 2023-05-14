@@ -488,7 +488,7 @@ CFE_Status_t CF_CmdValidateChunkSize(uint32 val, uint8 chan_num);
  * @retval CF_ERROR if failed (val is not allowed)
  *
  */
-int CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num);
+CFE_Status_t CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num);
 
 /************************************************************************/
 /** @brief Perform a configuration get/set operation.

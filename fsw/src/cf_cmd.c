@@ -937,7 +937,7 @@ CFE_Status_t CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
 void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num)
 {
     CF_ConfigTable_t *config;
-    int               acc;
+    CFE_Status_t      status = CF_ERROR;
     bool              valid_set;
     struct
     {
@@ -946,7 +946,6 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
         int (*fn)(uint32, uint8 chan_num);
     } item;
 
-    acc       = -1; /* -1 means to reject */
     valid_set = false;
     config    = CF_AppData.config_table;
     memset(&item, 0, sizeof(item));
@@ -1030,7 +1029,7 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
 
         if (valid_set)
         {
-            acc = 0;
+            status = CFE_SUCCESS;
 
             CFE_EVS_SendEvent(CF_EID_INF_CMD_GETSET1, CFE_EVS_EventType_INFORMATION,
                               "CF: setting parameter id %d to %lu", param_id, (unsigned long)value);
@@ -1053,7 +1052,7 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
     }
     else
     {
-        acc = 0;
+        status = CFE_SUCCESS;
 
         /* Read value depending on its size */
         if (item.size == sizeof(uint32))
@@ -1074,7 +1073,7 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
                           (unsigned long)value);
     }
 
-    if (acc == 0)
+    if (status == CFE_SUCCESS)
     {
         ++CF_AppData.HkPacket.CommandCounter;
     }

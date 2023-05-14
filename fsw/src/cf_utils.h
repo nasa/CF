@@ -324,7 +324,7 @@ CFE_Status_t CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransacti
  *
  * @returns Number of transactions traversed
  */
-int CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context);
+CFE_Status_t CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context);
 
 /************************************************************************/
 /** @brief List traversal function performs operation on every active transaction.
