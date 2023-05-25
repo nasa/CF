@@ -3,7 +3,7 @@ name: CodeQl Analysis
 on:
   push:
   pull_request:
-  
+
 
 jobs:
   codeql:

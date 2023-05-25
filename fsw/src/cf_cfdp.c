@@ -1605,7 +1605,7 @@ void CF_CFDP_ResetTransaction(CF_Transaction_t *t, int keep_history)
 {
     char *        filename;
     char          destination[OS_MAX_PATH_LEN];
-    int32         status = -1;
+    osal_status_t status = OS_ERROR;
     CF_Channel_t *c      = &CF_AppData.engine.channels[t->chan_num];
     CF_Assert(t->chan_num < CF_NUM_CHANNELS);
 

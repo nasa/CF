@@ -812,7 +812,8 @@ void Test_CF_DoChanAction_WhenChanNumberEq_CF_NUM_CHANNELS_Return_neg1_And_SendE
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_CHAN_PARAM);
 
-    UtAssert_True(local_result == -1, "CF_DoChanAction returned %d and should be -1 (cmd->byte[0] >= CF_NUM_CHANNELS)",
+    UtAssert_True(local_result == CF_ERROR,
+                  "CF_DoChanAction returned %d and should be -1 (CF_ERROR) (cmd->byte[0] >= CF_NUM_CHANNELS)",
                   local_result);
 }
 
@@ -855,7 +856,8 @@ void Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent(void)
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_CHAN_PARAM);
 
-    UtAssert_True(local_result == -1, "CF_DoChanAction returned %d and should be -1 (cmd->byte[0] >= CF_NUM_CHANNELS)",
+    UtAssert_True(local_result == CF_ERROR,
+                  "CF_DoChanAction returned %d and should be -1 (CF_ERROR) (cmd->byte[0] >= CF_NUM_CHANNELS)",
                   local_result);
 }
 
@@ -871,7 +873,7 @@ void Test_CF_DoFreezeThaw_Set_frozen_ToGiven_context_barg_AndReturn_0(void)
     uint8                          arg_chan_num = Any_cf_channel();
     CF_ChanAction_BoolArg_t        context;
     const CF_ChanAction_BoolArg_t *arg_context;
-    int                            local_result;
+    CFE_Status_t                   local_result;
 
     context.barg = Any_bool_arg_t_barg();
 
@@ -888,7 +890,8 @@ void Test_CF_DoFreezeThaw_Set_frozen_ToGiven_context_barg_AndReturn_0(void)
     UtAssert_True(CF_AppData.HkPacket.channel_hk[arg_chan_num].frozen == context.barg,
                   "CF_DoFreezeThaw set frozen to %d and should be %d (context->barg))",
                   CF_AppData.HkPacket.channel_hk[arg_chan_num].frozen, context.barg);
-    UtAssert_True(local_result == 0, "CF_DoFreezeThaw returned %d and should be 0 (only returns 0)", local_result);
+    UtAssert_True(local_result == CFE_SUCCESS,
+                  "CF_DoFreezeThaw returned %d and should be 0 (CFE_SUCCESS) (only returns 0)", local_result);
 }
 
 /**************************************************************************
@@ -1771,7 +1774,7 @@ void Test_CF_DoEnableDisablePolldir_When_CF_ALL_CHANNELS_SetAllPolldirsInChannel
     uint8                       arg_chan_num = Any_cf_channel();
     uint8                       expected_enabled;
     uint8                       current_polldir = 0;
-    int                         local_result;
+    CFE_Status_t                local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
     memset(&config_table, 0, sizeof(config_table));
@@ -1795,7 +1798,8 @@ void Test_CF_DoEnableDisablePolldir_When_CF_ALL_CHANNELS_SetAllPolldirsInChannel
                       CF_AppData.config_table->chan[arg_chan_num].polldir[current_polldir].enabled, expected_enabled);
     }
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-    UtAssert_True(local_result == 0, "CF_DoEnableDisablePolldir returned %d and should be 0", local_result);
+    UtAssert_True(local_result == CFE_SUCCESS, "CF_DoEnableDisablePolldir returned %d and should be 0 (CFE_SUCCESS)",
+                  local_result);
 }
 
 void Test_CF_DoEnableDisablePolldir_WhenSetToSpecificPolldirSetPolldirFrom_context_ChannelEnabledTo_context_barg(void)
@@ -1842,7 +1846,7 @@ void Test_CF_DoEnableDisablePolldir_FailPolldirEq_CF_MAX_POLLING_DIR_PER_CHAN_An
     CF_ChanAction_BoolMsgArg_t  context;
     CF_ChanAction_BoolMsgArg_t *arg_context = &context;
     CF_ConfigTable_t            config_table;
-    int                         local_result;
+    CFE_Status_t                local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -1859,7 +1863,8 @@ void Test_CF_DoEnableDisablePolldir_FailPolldirEq_CF_MAX_POLLING_DIR_PER_CHAN_An
     /* Assert */
     UT_CF_AssertEventID(CF_EID_ERR_CMD_POLLDIR_INVALID);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UtAssert_True(local_result == -1, "CF_DoEnableDisablePolldir returned %d and should be -1", local_result);
+    UtAssert_True(local_result == CF_ERROR, "CF_DoEnableDisablePolldir returned %d and should be -1 (CF_ERROR)",
+                  local_result);
 }
 
 void Test_CF_DoEnableDisablePolldir_FailAnyBadPolldirSendEvent(void)
@@ -1871,7 +1876,7 @@ void Test_CF_DoEnableDisablePolldir_FailAnyBadPolldirSendEvent(void)
     CF_ChanAction_BoolMsgArg_t  context;
     CF_ChanAction_BoolMsgArg_t *arg_context = &context;
     CF_ConfigTable_t            config_table;
-    int                         local_result;
+    CFE_Status_t                local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -1888,7 +1893,8 @@ void Test_CF_DoEnableDisablePolldir_FailAnyBadPolldirSendEvent(void)
     /* Assert */
     UT_CF_AssertEventID(CF_EID_ERR_CMD_POLLDIR_INVALID);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UtAssert_True(local_result == -1, "CF_DoEnableDisablePolldir returned %d and should be -1", local_result);
+    UtAssert_True(local_result == CF_ERROR, "CF_DoEnableDisablePolldir returned %d and should be -1 (CF_ERROR)",
+                  local_result);
 }
 
 /*******************************************************************************
@@ -2120,7 +2126,7 @@ void Test_CF_DoPurgeQueue_PendOnly(void)
     CF_Channel_t *                      c;
     CF_CListNode_t                      start;
     CF_CListNode_t *                    expected_start = &start;
-    int                                 local_result;
+    CFE_Status_t                        local_result;
     CF_CList_Traverse_POINTER_context_t context_CF_CList_Traverse;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -2143,7 +2149,8 @@ void Test_CF_DoPurgeQueue_PendOnly(void)
     UtAssert_True(context_CF_CList_Traverse.fn == CF_PurgeTransaction,
                   "context_CF_CList_Traverse.fn ==  CF_PurgeTransaction");
     UtAssert_ADDRESS_EQ(context_CF_CList_Traverse.context, NULL);
-    UtAssert_True(local_result == 0, "CF_DoPurgeQueue returned %d and should be 0", local_result);
+    UtAssert_True(local_result == CFE_SUCCESS, "CF_DoPurgeQueue returned %d and should be 0 (CFE_SUCCESS)",
+                  local_result);
 }
 
 void Test_CF_DoPurgeQueue_HistoryOnly(void)
@@ -2155,7 +2162,7 @@ void Test_CF_DoPurgeQueue_HistoryOnly(void)
     CF_Channel_t *                      c;
     CF_CListNode_t                      start;
     CF_CListNode_t *                    expected_start = &start;
-    int                                 local_result;
+    CFE_Status_t                        local_result;
     CF_CList_Traverse_POINTER_context_t context_CF_CList_Traverse;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -2180,7 +2187,8 @@ void Test_CF_DoPurgeQueue_HistoryOnly(void)
     UtAssert_True(context_CF_CList_Traverse.fn == (CF_CListFn_t)CF_PurgeHistory,
                   "context_CF_CList_Traverse.fn ==  (CF_CListFn_t )CF_PurgeHistory");
     UtAssert_ADDRESS_EQ(context_CF_CList_Traverse.context, c);
-    UtAssert_True(local_result == 0, "CF_DoPurgeQueue returned %d and should be 0", local_result);
+    UtAssert_True(local_result == CFE_SUCCESS, "CF_DoPurgeQueue returned %d and should be 0 (CFE_SUCCESS)",
+                  local_result);
 }
 
 void Test_CF_DoPurgeQueue_Both(void)
@@ -2194,7 +2202,7 @@ void Test_CF_DoPurgeQueue_Both(void)
     CF_CListNode_t *                    expected_pend_start = &pend_start;
     CF_CListNode_t                      history_start;
     CF_CListNode_t *                    expected_history_start = &history_start;
-    int                                 local_result;
+    CFE_Status_t                        local_result;
     CF_CList_Traverse_POINTER_context_t context_CF_CList_Traverse[2];
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -2225,7 +2233,8 @@ void Test_CF_DoPurgeQueue_Both(void)
     UtAssert_True(context_CF_CList_Traverse[1].fn == (CF_CListFn_t)CF_PurgeHistory,
                   "context_CF_CList_Traverse[1].fn ==  (CF_CListFn_t )CF_PurgeHistory");
     UtAssert_ADDRESS_EQ(context_CF_CList_Traverse[1].context, c);
-    UtAssert_True(local_result == 0, "CF_DoPurgeQueue returned %d and should be 0", local_result);
+    UtAssert_True(local_result == CFE_SUCCESS, "CF_DoPurgeQueue returned %d and should be 0 (CFE_SUCCESS)",
+                  local_result);
 }
 
 void Test_CF_DoPurgeQueue_GivenBad_data_byte_1_SendEventAndReturn_neg1(void)
@@ -2234,7 +2243,7 @@ void Test_CF_DoPurgeQueue_GivenBad_data_byte_1_SendEventAndReturn_neg1(void)
     uint8                     arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t utbuf;
     CF_UnionArgsCmd_t *       arg_cmd = &utbuf.ua;
-    int                       local_result;
+    CFE_Status_t              local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2246,7 +2255,7 @@ void Test_CF_DoPurgeQueue_GivenBad_data_byte_1_SendEventAndReturn_neg1(void)
     UT_GetStubCount(UT_KEY(CF_CList_Traverse));
 
     /* Assert */
-    UtAssert_True(local_result == -1, "CF_DoPurgeQueue returned %d and should be -1", local_result);
+    UtAssert_True(local_result == CF_ERROR, "CF_DoPurgeQueue returned %d and should be -1 (CF_ERROR)", local_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_PURGE_ARG);
     UtAssert_STUB_COUNT(CF_CList_Traverse, 0);
@@ -2258,7 +2267,7 @@ void Test_CF_DoPurgeQueue_AnyGivenBad_data_byte_1_SendEventAndReturn_neg1(void)
     uint8                     arg_chan_num = Any_cf_channel();
     CF_UT_cmd_unionargs_buf_t utbuf;
     CF_UnionArgsCmd_t *       arg_cmd = &utbuf.ua;
-    int                       local_result;
+    CFE_Status_t              local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
@@ -2270,7 +2279,7 @@ void Test_CF_DoPurgeQueue_AnyGivenBad_data_byte_1_SendEventAndReturn_neg1(void)
     UT_GetStubCount(UT_KEY(CF_CList_Traverse));
 
     /* Assert */
-    UtAssert_True(local_result == -1, "CF_DoPurgeQueue returned %d and should be -1", local_result);
+    UtAssert_True(local_result == CF_ERROR, "CF_DoPurgeQueue returned %d and should be -1 (CF_ERROR)", local_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_PURGE_ARG);
     UtAssert_STUB_COUNT(CF_CList_Traverse, 0);
@@ -3381,57 +3390,61 @@ void Test_CF_CmdWriteQueue_Success_type_DownAnd_q_Pend(void)
 void Test_CF_CmdValidateChunkSize_val_GreaterThan_pdu_fd_data_t_FailAndReturn_1(void)
 {
     /* Arrange */
-    uint8  arg_chan_num = Any_uint8(); /* value labeled as 'ignored' in func def */
-    uint32 arg_val      = sizeof(CF_CFDP_PduFileDataContent_t) + 1;
-    int    local_result;
+    uint8        arg_chan_num = Any_uint8(); /* value labeled as 'ignored' in func def */
+    uint32       arg_val      = sizeof(CF_CFDP_PduFileDataContent_t) + 1;
+    CFE_Status_t local_result;
 
     /* Act */
     local_result = CF_CmdValidateChunkSize(arg_val, arg_chan_num);
 
     /* Assert */
-    UtAssert_True(local_result == -1, "CF_CmdValidateChunkSize returned %d and should be -1 (failed)", local_result);
+    UtAssert_True(local_result == CF_ERROR, "CF_CmdValidateChunkSize returned %d and should be -1 (CF_ERROR)",
+                  local_result);
 }
 
 void Test_CF_CmdValidateChunkSize_Any_val_GreaterThan_pdu_fd_data_t_FailAndReturn_1(void)
 {
     /* Arrange */
-    uint8  arg_chan_num = Any_uint8(); /* value labeled as 'ignored' in func def */
-    uint32 arg_val      = Any_uint32_GreaterThan(sizeof(CF_CFDP_PduFileDataContent_t));
-    int    local_result;
+    uint8        arg_chan_num = Any_uint8(); /* value labeled as 'ignored' in func def */
+    uint32       arg_val      = Any_uint32_GreaterThan(sizeof(CF_CFDP_PduFileDataContent_t));
+    CFE_Status_t local_result;
 
     /* Act */
     local_result = CF_CmdValidateChunkSize(arg_val, arg_chan_num);
 
     /* Assert */
-    UtAssert_True(local_result == -1, "CF_CmdValidateChunkSize returned %d and should be -1 (failed)", local_result);
+    UtAssert_True(local_result == CF_ERROR, "CF_CmdValidateChunkSize returned %d and should be -1 (CF_ERROR)",
+                  local_result);
 }
 
 void Test_CF_CmdValidateChunkSize_val_SizeOf_pdu_fd_data_t_SuccessAndReturn_0(void)
 {
     /* Arrange */
-    uint8  arg_chan_num = Any_uint8(); /* value labeled as 'ignored' in func def */
-    uint32 arg_val      = sizeof(CF_CFDP_PduFileDataContent_t);
-    int    local_result;
+    uint8        arg_chan_num = Any_uint8(); /* value labeled as 'ignored' in func def */
+    uint32       arg_val      = sizeof(CF_CFDP_PduFileDataContent_t);
+    CFE_Status_t local_result;
 
     /* Act */
     local_result = CF_CmdValidateChunkSize(arg_val, arg_chan_num);
 
     /* Assert */
-    UtAssert_True(local_result == 0, "CF_CmdValidateChunkSize returned %d and should be 0 (success)", local_result);
+    UtAssert_True(local_result == CFE_SUCCESS, "CF_CmdValidateChunkSize returned %d and should be 0 (CFE_SUCCESS)",
+                  local_result);
 }
 
 void Test_CF_CmdValidateChunkSize_val_LessThanOrEqSizeOf_pdu_fd_data_t_SuccessAndReturn_0(void)
 {
     /* Arrange */
-    uint8  arg_chan_num = Any_uint8(); /* value labeled as 'ignored' in func def */
-    uint32 arg_val      = Any_uint32_LessThan_or_EqualTo(sizeof(CF_CFDP_PduFileDataContent_t));
-    int    local_result;
+    uint8        arg_chan_num = Any_uint8(); /* value labeled as 'ignored' in func def */
+    uint32       arg_val      = Any_uint32_LessThan_or_EqualTo(sizeof(CF_CFDP_PduFileDataContent_t));
+    CFE_Status_t local_result;
 
     /* Act */
     local_result = CF_CmdValidateChunkSize(arg_val, arg_chan_num);
 
     /* Assert */
-    UtAssert_True(local_result == 0, "CF_CmdValidateChunkSize returned %d and should be 0 (success)", local_result);
+    UtAssert_True(local_result == CFE_SUCCESS, "CF_CmdValidateChunkSize returned %d and should be 0 (CFE_SUCCESS)",
+                  local_result);
 }
 
 /*******************************************************************************
@@ -3445,13 +3458,14 @@ void Test_CF_CmdValidateMaxOutgoing_WhenGiven_val_IsNot_0_Return_0_Success(void)
     /* Arrange */
     uint32 arg_val      = Any_uint32_Except(0);
     uint8  arg_chan_num = Any_uint8(); /* Any_uint8() used here because it shows value does not matter in this test */
-    int    local_result;
+    CFE_Status_t local_result;
 
     /* Act */
     local_result = CF_CmdValidateMaxOutgoing(arg_val, arg_chan_num);
 
     /* Assert */
-    UtAssert_True(local_result == 0, "CF_CmdValidateMaxOutgoing returned %d and should be 0 (Success)", local_result);
+    UtAssert_True(local_result == CFE_SUCCESS, "CF_CmdValidateMaxOutgoing returned %d and should be 0 (CFE_SUCCESS)",
+                  local_result);
 }
 
 void Test_CF_CmdValidateMaxOutgoing_WhenGiven_val_Is_0_But_sem_name_IsNot_NULL_Return_0_Success(void)
@@ -3460,7 +3474,7 @@ void Test_CF_CmdValidateMaxOutgoing_WhenGiven_val_Is_0_But_sem_name_IsNot_NULL_R
     uint32 arg_val      = 0;
     uint8  arg_chan_num = Any_cf_chan_num(); /* Any_cf_chan_num used here because value matters to this test */
     CF_ConfigTable_t config_table;
-    int              local_result;
+    CFE_Status_t     local_result;
 
     CF_AppData.config_table = &config_table;
     memset(CF_AppData.config_table->chan[arg_chan_num].sem_name, (char)Any_uint8_Except(0), 1);
@@ -3469,7 +3483,8 @@ void Test_CF_CmdValidateMaxOutgoing_WhenGiven_val_Is_0_But_sem_name_IsNot_NULL_R
     local_result = CF_CmdValidateMaxOutgoing(arg_val, arg_chan_num);
 
     /* Assert */
-    UtAssert_True(local_result == 0, "CF_CmdValidateMaxOutgoing returned %d and should be 0 (Success)", local_result);
+    UtAssert_True(local_result == CFE_SUCCESS, "CF_CmdValidateMaxOutgoing returned %d and should be 0 (CFE_SUCCESS)",
+                  local_result);
 }
 
 void Test_CF_CmdValidateMaxOutgoing_WhenGiven_val_Is_0_And_sem_name_Is_NULL_Return_1_Fail(void)
@@ -3478,7 +3493,7 @@ void Test_CF_CmdValidateMaxOutgoing_WhenGiven_val_Is_0_And_sem_name_Is_NULL_Retu
     uint32 arg_val      = 0;
     uint8  arg_chan_num = Any_cf_chan_num(); /* Any_cf_chan_num used here because value matters to this test */
     CF_ConfigTable_t config_table;
-    int              local_result;
+    CFE_Status_t     local_result;
 
     CF_AppData.config_table = &config_table;
     memset(CF_AppData.config_table->chan[arg_chan_num].sem_name, (char)0, 1);
@@ -3487,7 +3502,8 @@ void Test_CF_CmdValidateMaxOutgoing_WhenGiven_val_Is_0_And_sem_name_Is_NULL_Retu
     local_result = CF_CmdValidateMaxOutgoing(arg_val, arg_chan_num);
 
     /* Assert */
-    UtAssert_True(local_result == -1, "CF_CmdValidateMaxOutgoing returned %d and should be -1 (failed)", local_result);
+    UtAssert_True(local_result == CF_ERROR, "CF_CmdValidateMaxOutgoing returned %d and should be -1 (CF_ERROR)",
+                  local_result);
 }
 
 /*******************************************************************************
