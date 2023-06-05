@@ -31,9 +31,9 @@
  * Generated stub function for CF_AppPipe()
  * ----------------------------------------------------
  */
-void CF_AppPipe(const CFE_SB_Buffer_t *msg)
+void CF_AppPipe(const CFE_SB_Buffer_t *BufPtr)
 {
-    UT_GenStub_AddParam(CF_AppPipe, const CFE_SB_Buffer_t *, msg);
+    UT_GenStub_AddParam(CF_AppPipe, const CFE_SB_Buffer_t *, BufPtr);
 
     UT_GenStub_Execute(CF_AppPipe, Basic, NULL);
 }
@@ -43,9 +43,9 @@ void CF_AppPipe(const CFE_SB_Buffer_t *msg)
  * Generated stub function for CF_ProcessGroundCommand()
  * ----------------------------------------------------
  */
-void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *msg)
+void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *BufPtr)
 {
-    UT_GenStub_AddParam(CF_ProcessGroundCommand, const CFE_SB_Buffer_t *, msg);
+    UT_GenStub_AddParam(CF_ProcessGroundCommand, const CFE_SB_Buffer_t *, BufPtr);
 
     UT_GenStub_Execute(CF_ProcessGroundCommand, Basic, NULL);
 }

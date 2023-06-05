@@ -101,11 +101,11 @@ typedef struct CF_DisableEngineCmd
  *
  * For command details see #CF_RESET_CC
  */
-typedef struct CF_ResetCmd
+typedef struct CF_ResetCountersCmd
 {
     CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
     CF_UnionArgs_Payload_t  Payload;       /**< \brief Generic command arguments */
-} CF_ResetCmd_t;
+} CF_ResetCountersCmd_t;
 
 /**
  * \brief Freeze command structure

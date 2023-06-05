@@ -46,6 +46,6 @@ void UT_DefaultHandler_CF_ProcessGroundCommand(void *UserObj, UT_EntryKey_t Func
 
     if (ctxt)
     {
-        *ctxt = UT_Hook_GetArgValueByName(Context, "msg", CFE_SB_Buffer_t *);
+        *ctxt = UT_Hook_GetArgValueByName(Context, "BufPtr", CFE_SB_Buffer_t *);
     }
 }

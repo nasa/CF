@@ -39,13 +39,13 @@
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *msg)
+void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *BufPtr)
 {
     typedef void (*const handler_fn_t)(const void *);
 
     static handler_fn_t fns[] = {
         [CF_NOOP_CC]                = (handler_fn_t)CF_NoopCmd,
-        [CF_RESET_CC]               = (handler_fn_t)CF_ResetCmd,
+        [CF_RESET_CC]               = (handler_fn_t)CF_ResetCountersCmd,
         [CF_TX_FILE_CC]             = (handler_fn_t)CF_TxFileCmd,
         [CF_PLAYBACK_DIR_CC]        = (handler_fn_t)CF_PlaybackDirCmd,
         [CF_FREEZE_CC]              = (handler_fn_t)CF_FreezeCmd,
@@ -68,7 +68,7 @@ void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *msg)
 
     static const uint16 expected_lengths[] = {
         [CF_NOOP_CC]                = sizeof(CF_NoopCmd_t),
-        [CF_RESET_CC]               = sizeof(CF_ResetCmd_t),
+        [CF_RESET_CC]               = sizeof(CF_ResetCountersCmd_t),
         [CF_TX_FILE_CC]             = sizeof(CF_TxFileCmd_t),
         [CF_PLAYBACK_DIR_CC]        = sizeof(CF_PlaybackDirCmd_t),
         [CF_FREEZE_CC]              = sizeof(CF_FreezeCmd_t),
@@ -92,11 +92,11 @@ void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *msg)
     CFE_MSG_FcnCode_t cmd = 0;
     size_t            len = 0;
 
-    CFE_MSG_GetFcnCode(&msg->Msg, &cmd);
+    CFE_MSG_GetFcnCode(&BufPtr->Msg, &cmd);
 
     if (cmd < (sizeof(expected_lengths) / sizeof(expected_lengths[0])))
     {
-        CFE_MSG_GetSize(&msg->Msg, &len);
+        CFE_MSG_GetSize(&BufPtr->Msg, &len);
 
         /* first, verify command length */
         if (len == expected_lengths[cmd])
@@ -104,7 +104,7 @@ void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *msg)
             /* if valid, process command */
             if (fns[cmd])
             {
-                fns[cmd](msg);
+                fns[cmd](BufPtr);
             }
         }
         else
@@ -129,30 +129,30 @@ void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *msg)
  * See description in cf_app.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_AppPipe(const CFE_SB_Buffer_t *msg)
+void CF_AppPipe(const CFE_SB_Buffer_t *BufPtr)
 {
-    CFE_SB_MsgId_t msg_id = CFE_SB_INVALID_MSG_ID;
+    CFE_SB_MsgId_t MessageID = CFE_SB_INVALID_MSG_ID;
 
-    CFE_MSG_GetMsgId(&msg->Msg, &msg_id);
+    CFE_MSG_GetMsgId(&BufPtr->Msg, &MessageID);
 
-    switch (CFE_SB_MsgIdToValue(msg_id))
+    switch (CFE_SB_MsgIdToValue(MessageID))
     {
         case CF_CMD_MID:
-            CF_ProcessGroundCommand(msg);
+            CF_ProcessGroundCommand(BufPtr);
             break;
 
         case CF_WAKE_UP_MID:
-            CF_WakeupCmd((const CF_WakeupCmd_t *)msg);
+            CF_WakeupCmd((const CF_WakeupCmd_t *)BufPtr);
             break;
 
         case CF_SEND_HK_MID:
-            CF_SendHkCmd((const CF_SendHkCmd_t *)msg);
+            CF_SendHkCmd((const CF_SendHkCmd_t *)BufPtr);
             break;
 
         default:
             ++CF_AppData.hk.Payload.counters.err;
             CFE_EVS_SendEvent(CF_MID_ERR_EID, CFE_EVS_EventType_ERROR, "CF: invalid command packet id=0x%lx",
-                              (unsigned long)CFE_SB_MsgIdToValue(msg_id));
+                              (unsigned long)CFE_SB_MsgIdToValue(MessageID));
             break;
     }
 }

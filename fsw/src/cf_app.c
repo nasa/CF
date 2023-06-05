@@ -71,7 +71,7 @@ void CF_CheckTables(void)
         {
             CFE_EVS_SendEvent(CF_INIT_TBL_CHECK_REL_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF: error in CFE_TBL_ReleaseAddress (check), returned 0x%08lx", (unsigned long)status);
-            CF_AppData.run_status = CFE_ES_RunStatus_APP_ERROR;
+            CF_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
         }
 
         status = CFE_TBL_Manage(CF_AppData.config_handle);
@@ -79,7 +79,7 @@ void CF_CheckTables(void)
         {
             CFE_EVS_SendEvent(CF_INIT_TBL_CHECK_MAN_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF: error in CFE_TBL_Manage (check), returned 0x%08lx", (unsigned long)status);
-            CF_AppData.run_status = CFE_ES_RunStatus_APP_ERROR;
+            CF_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
         }
 
         status = CFE_TBL_GetAddress((void *)&CF_AppData.config_table, CF_AppData.config_handle);
@@ -87,7 +87,7 @@ void CF_CheckTables(void)
         {
             CFE_EVS_SendEvent(CF_INIT_TBL_CHECK_GA_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF: failed to get table address (check), returned 0x%08lx", (unsigned long)status);
-            CF_AppData.run_status = CFE_ES_RunStatus_APP_ERROR;
+            CF_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
         }
     }
 }
@@ -186,13 +186,16 @@ CFE_Status_t CF_TableInit(void)
  * See description in cf_app.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_Init(void)
+CFE_Status_t CF_AppInit(void)
 {
     CFE_Status_t              status;
     const CFE_SB_MsgId_Atom_t MID_VALUES[] = {CF_CMD_MID, CF_SEND_HK_MID, CF_WAKE_UP_MID};
     uint32                    i;
 
-    CF_AppData.run_status = CFE_ES_RunStatus_APP_RUN;
+    CF_AppData.RunStatus = CFE_ES_RunStatus_APP_RUN;
+
+    /* Zero-out global data structure */
+    memset(&CF_AppData, 0, sizeof(CF_AppData));
 
     CFE_MSG_Init(CFE_MSG_PTR(CF_AppData.hk.TelemetryHeader), CFE_SB_ValueToMsgId(CF_HK_TLM_MID), sizeof(CF_AppData.hk));
 
@@ -203,11 +206,11 @@ CFE_Status_t CF_Init(void)
     }
     else
     {
-        status = CFE_SB_CreatePipe(&CF_AppData.cmd_pipe, CF_PIPE_DEPTH, CF_PIPE_NAME);
+        status = CFE_SB_CreatePipe(&CF_AppData.CmdPipe, CF_PIPE_DEPTH, CF_PIPE_NAME);
         if (status != CFE_SUCCESS)
         {
-            CFE_ES_WriteToSysLog("CF app: error creating pipe %s, returned 0x%08lx", CF_PIPE_NAME,
-                                 (unsigned long)status);
+            CFE_EVS_SendEvent(CF_CR_PIPE_ERR_EID, CFE_EVS_EventType_ERROR,
+                              "CF app: error creating pipe %s, returned 0x%08lx", CF_PIPE_NAME, (unsigned long)status);
         }
     }
 
@@ -215,7 +218,7 @@ CFE_Status_t CF_Init(void)
     {
         for (i = 0; i < (sizeof(MID_VALUES) / sizeof(MID_VALUES[0])); ++i)
         {
-            status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(MID_VALUES[i]), CF_AppData.cmd_pipe);
+            status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(MID_VALUES[i]), CF_AppData.CmdPipe);
             if (status != CFE_SUCCESS)
             {
                 CFE_ES_WriteToSysLog("CF app: failed to subscribe to MID 0x%04lx, returned 0x%08lx",
@@ -237,13 +240,8 @@ CFE_Status_t CF_Init(void)
 
     if (status == CFE_SUCCESS)
     {
-        status =
-            CFE_EVS_SendEvent(CF_INIT_INF_EID, CFE_EVS_EventType_INFORMATION, "CF Initialized. Version %d.%d.%d.%d",
-                              CF_MAJOR_VERSION, CF_MINOR_VERSION, CF_REVISION, CF_MISSION_REV);
-        if (status != CFE_SUCCESS)
-        {
-            CFE_ES_WriteToSysLog("CF: error sending init event, returned 0x%08lx", (unsigned long)status);
-        }
+        CFE_EVS_SendEvent(CF_INIT_INF_EID, CFE_EVS_EventType_INFORMATION, "CF Initialized. Version %d.%d.%d.%d",
+                          CF_MAJOR_VERSION, CF_MINOR_VERSION, CF_REVISION, CF_MISSION_REV);
     }
 
     return status;
@@ -258,38 +256,32 @@ CFE_Status_t CF_Init(void)
 void CF_AppMain(void)
 {
     int32            status;
-    CFE_SB_Buffer_t *msg;
+    CFE_SB_Buffer_t *BufPtr = NULL;
 
     CFE_ES_PerfLogEntry(CF_PERF_ID_APPMAIN);
 
-    status = CF_Init();
+    status = CF_AppInit();
     if (status != CFE_SUCCESS)
     {
-        CF_AppData.run_status = CFE_ES_RunStatus_APP_ERROR;
+        CF_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
     }
 
-    msg = NULL;
-
-    while (CFE_ES_RunLoop(&CF_AppData.run_status))
+    while (CFE_ES_RunLoop(&CF_AppData.RunStatus))
     {
         CFE_ES_PerfLogExit(CF_PERF_ID_APPMAIN);
 
-        status = CFE_SB_ReceiveBuffer(&msg, CF_AppData.cmd_pipe, CF_RCVMSG_TIMEOUT);
+        status = CFE_SB_ReceiveBuffer(&BufPtr, CF_AppData.CmdPipe, CF_RCVMSG_TIMEOUT);
         CFE_ES_PerfLogEntry(CF_PERF_ID_APPMAIN);
 
-        /*
-         * note that CFE_SB_ReceiveBuffer() guarantees that a CFE_SUCCESS status is accompanied by
-         * a valid (non-NULL) output message pointer.  However the unit test can force this condition.
-         */
-        if (status == CFE_SUCCESS && msg != NULL)
+        if (status == CFE_SUCCESS)
         {
-            CF_AppPipe(msg);
+            CF_AppPipe(BufPtr);
         }
         else if (status != CFE_SB_TIME_OUT && status != CFE_SB_NO_MESSAGE)
         {
             CFE_EVS_SendEvent(CF_INIT_MSG_RECV_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF: exiting due to CFE_SB_ReceiveBuffer error 0x%08lx", (unsigned long)status);
-            CF_AppData.run_status = CFE_ES_RunStatus_APP_ERROR;
+            CF_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
         }
         else
         {
@@ -298,5 +290,5 @@ void CF_AppMain(void)
     }
 
     CFE_ES_PerfLogExit(CF_PERF_ID_APPMAIN);
-    CFE_ES_ExitApp(CF_AppData.run_status);
+    CFE_ES_ExitApp(CF_AppData.RunStatus);
 }
