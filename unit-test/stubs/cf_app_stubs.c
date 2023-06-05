@@ -50,16 +50,16 @@ void CF_CheckTables(void)
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_Init()
+ * Generated stub function for CF_AppInit()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_Init(void)
+CFE_Status_t CF_AppInit(void)
 {
-    UT_GenStub_SetupReturnBuffer(CF_Init, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_AppInit, CFE_Status_t);
 
-    UT_GenStub_Execute(CF_Init, Basic, NULL);
+    UT_GenStub_Execute(CF_AppInit, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_Init, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_AppInit, CFE_Status_t);
 }
 
 /*

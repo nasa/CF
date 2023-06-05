@@ -125,7 +125,7 @@ void Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForT
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 1);
 }
 
-void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_msg(void)
+void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_NoopCmd_With_msg(void)
 {
     /* Arrange */
     CFE_SB_Buffer_t   utbuf;
@@ -277,9 +277,9 @@ void add_CF_ProcessGroundCommand_tests(void)
         Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForThatCommandSendEventAndFailure,
         cf_dispatch_tests_Setup, cf_dispatch_tests_Teardown,
         "Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForThatCommandSendEventAndFailure");
-    UtTest_Add(Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_msg, cf_dispatch_tests_Setup,
+    UtTest_Add(Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_NoopCmd_With_msg, cf_dispatch_tests_Setup,
                cf_dispatch_tests_Teardown,
-               "Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_msg");
+               "Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_NoopCmd_With_msg");
     UtTest_Add(Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_12_Is_NULL,
                cf_dispatch_tests_Setup, cf_dispatch_tests_Teardown,
                "Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_12_Is_NULL");
