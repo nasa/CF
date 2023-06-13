@@ -524,7 +524,7 @@ CFE_Status_t CF_WriteQueueCmd(const CF_WriteQueueCmd_t *msg);
  * @retval CF_ChanAction_Status_ERROR if failed (val is greater than max PDU)
  *
  */
-CF_ChanAction_Status_t CF_CmdValidateChunkSize(uint32 val, uint8 chan_num);
+CF_ChanAction_Status_t CF_CmdValidateChunkSize(CF_ChunkSize_t val, uint8 chan_num);
 
 /************************************************************************/
 /** @brief Checks if the value is within allowable range as outgoing packets per wakeup

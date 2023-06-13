@@ -50,9 +50,9 @@ void CF_CRC_Start(CF_Crc_t *crc)
  * See description in cf_crc.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CRC_Digest(CF_Crc_t *crc, const uint8 *data, int len)
+void CF_CRC_Digest(CF_Crc_t *crc, const uint8 *data, size_t len)
 {
-    int i = 0;
+    size_t i = 0;
 
     for (; i < len; ++i)
     {

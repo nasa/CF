@@ -3304,7 +3304,7 @@ void Test_CF_CmdValidateChunkSize_val_GreaterThan_pdu_fd_data_t_FailAndReturn_1(
 {
     /* Arrange */
     uint8                  arg_chan_num = Any_uint8(); /* value labeled as 'ignored' in func def */
-    uint32                 arg_val      = sizeof(CF_CFDP_PduFileDataContent_t) + 1;
+    size_t                 arg_val      = sizeof(CF_CFDP_PduFileDataContent_t) + 1;
     CF_ChanAction_Status_t local_result;
 
     /* Act */
@@ -3332,7 +3332,7 @@ void Test_CF_CmdValidateChunkSize_val_SizeOf_pdu_fd_data_t_SuccessAndReturn_0(vo
 {
     /* Arrange */
     uint8                  arg_chan_num = Any_uint8(); /* value labeled as 'ignored' in func def */
-    uint32                 arg_val      = sizeof(CF_CFDP_PduFileDataContent_t);
+    size_t                 arg_val      = sizeof(CF_CFDP_PduFileDataContent_t);
     CF_ChanAction_Status_t local_result;
 
     /* Act */

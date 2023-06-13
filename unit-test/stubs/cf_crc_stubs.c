@@ -31,11 +31,11 @@
  * Generated stub function for CF_CRC_Digest()
  * ----------------------------------------------------
  */
-void CF_CRC_Digest(CF_Crc_t *crc, const uint8 *data, int len)
+void CF_CRC_Digest(CF_Crc_t *crc, const uint8 *data, size_t len)
 {
     UT_GenStub_AddParam(CF_CRC_Digest, CF_Crc_t *, crc);
     UT_GenStub_AddParam(CF_CRC_Digest, const uint8 *, data);
-    UT_GenStub_AddParam(CF_CRC_Digest, int, len);
+    UT_GenStub_AddParam(CF_CRC_Digest, size_t, len);
 
     UT_GenStub_Execute(CF_CRC_Digest, Basic, NULL);
 }
