@@ -41,15 +41,6 @@
  */
 
 /**
- * \brief Housekeeping command counters
- */
-typedef struct CF_HkCmdCounters
-{
-    uint16 cmd; /**< \brief Command success counter */
-    uint16 err; /**< \brief Command error counter */
-} CF_HkCmdCounters_t;
-
-/**
  * \brief Housekeeping sent counters
  */
 typedef struct CF_HkSent
@@ -122,9 +113,10 @@ typedef struct CF_HkChannel_Data
  */
 typedef struct CF_HkPacket
 {
-    CFE_MSG_TelemetryHeader_t tlm_header; /**< \brief Telemetry header */
-    CF_HkCmdCounters_t        counters;   /**< \brief Command counters */
-    uint8                     spare[4];   /**< \brief Alignment spare (CF_HkCmdCounters_t is 4 bytes) */
+    CFE_MSG_TelemetryHeader_t tlm_header;          /**< \brief Telemetry header */
+    uint8                     CommandCounter;      /**< \brief Command success counter */
+    uint8                     CommandErrorCounter; /**< \brief Command error counter */
+    uint8                     spare[6];            /**< \brief Alignment spare */
 
     CF_HkChannel_Data_t channel_hk[CF_NUM_CHANNELS]; /**< \brief Per channel housekeeping data */
 } CF_HkPacket_t;
@@ -179,7 +171,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_NOOP
      *
      *  \par Error Conditions
@@ -187,7 +179,7 @@ typedef enum
      *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -211,7 +203,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_RESET
      *
      *  \par Error Conditions
@@ -220,7 +212,7 @@ typedef enum
      *       - Invalid counter type, #CF_EID_ERR_CMD_RESET_INVALID
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -239,7 +231,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_TX_FILE
      *
      *  \par Error Conditions
@@ -249,7 +241,7 @@ typedef enum
      *       - Transaction initialization failure, #CF_EID_ERR_CMD_TX_FILE
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -271,7 +263,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_PLAYBACK_DIR
      *
      *  \par Error Conditions
@@ -281,7 +273,7 @@ typedef enum
      *       - Playback initialization failure, #CF_EID_ERR_CMD_PLAYBACK_DIR
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -306,7 +298,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_FREEZE
      *
      *  \par Error Conditions
@@ -316,7 +308,7 @@ typedef enum
      *       - Command processing failure, #CF_EID_ERR_CMD_FREEZE
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -340,7 +332,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_THAW
      *
      *  \par Error Conditions
@@ -350,7 +342,7 @@ typedef enum
      *       - Command processing failure, #CF_EID_ERR_CMD_THAW
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -374,7 +366,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_SUSPRES
      *
      *  \par Error Conditions
@@ -386,7 +378,7 @@ typedef enum
      *       - No matching transaction, #CF_EID_ERR_CMD_SUSPRES_CHAN
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -410,7 +402,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_SUSPRES
      *
      *  \par Error Conditions
@@ -422,7 +414,7 @@ typedef enum
      *       - No matching transaction, #CF_EID_ERR_CMD_SUSPRES_CHAN
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -445,7 +437,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_CANCEL
      *
      *  \par Error Conditions
@@ -456,7 +448,7 @@ typedef enum
      *       - No matching transaction, #CF_EID_ERR_CMD_CANCEL_CHAN
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -479,7 +471,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_ABANDON
      *
      *  \par Error Conditions
@@ -490,7 +482,7 @@ typedef enum
      *       - No matching transaction, #CF_EID_ERR_CMD_ABANDON_CHAN
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -511,7 +503,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_GETSET1
      *
      *  \par Error Conditions
@@ -522,7 +514,7 @@ typedef enum
      *       - Parameter value failed validation, #CF_EID_ERR_CMD_GETSET_VALIDATE
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -543,7 +535,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_GETSET2
      *
      *  \par Error Conditions
@@ -553,7 +545,7 @@ typedef enum
      *       - Invalid channel number, #CF_EID_ERR_CMD_GETSET_CHAN
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -574,7 +566,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_WQ
      *
      *  \par Error Conditions
@@ -589,7 +581,7 @@ typedef enum
      *       - Write TX history data failed, #CF_EID_ERR_CMD_WQ_WRITEHIST_TX
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -612,7 +604,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_ENABLE_DEQUEUE
      *
      *  \par Error Conditions
@@ -622,7 +614,7 @@ typedef enum
      *       - Enable dequeue failed, #CF_EID_ERR_CMD_ENABLE_DEQUEUE
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -645,7 +637,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_DISABLE_DEQUEUE
      *
      *  \par Error Conditions
@@ -655,7 +647,7 @@ typedef enum
      *       - Disable dequeue failed, #CF_EID_INF_CMD_DISABLE_DEQUEUE
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -684,7 +676,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_ENABLE_POLLDIR
      *
      *  \par Error Conditions
@@ -695,7 +687,7 @@ typedef enum
      *       - Enable directory polling failed, #CF_EID_ERR_CMD_ENABLE_POLLDIR
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -724,7 +716,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_DISABLE_POLLDIR
      *
      *  \par Error Conditions
@@ -735,7 +727,7 @@ typedef enum
      *       - Disable directory polling failed, #CF_EID_ERR_CMD_DISABLE_POLLDIR
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -765,7 +757,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_PURGE_QUEUE
      *
      *  \par Error Conditions
@@ -776,7 +768,7 @@ typedef enum
      *       - Purge queue failed, #CF_EID_ERR_CMD_PURGE_QUEUE
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -798,7 +790,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_ENABLE_ENGINE
      *
      *  \par Error Conditions
@@ -808,7 +800,7 @@ typedef enum
      *       - Engine already enabled, #CF_EID_ERR_CMD_ENG_ALREADY_ENA
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
@@ -831,7 +823,7 @@ typedef enum
      *  \par Command Verification
      *       Successful execution of this command may be verified with
      *       the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+     *       - #CF_HkPacket_t.CommandCounter will increment
      *       - #CF_EID_INF_CMD_DISABLE_ENGINE
      *
      *  \par Error Conditions
@@ -840,7 +832,7 @@ typedef enum
      *       - Engine already disabled, #CF_EID_ERR_CMD_ENG_ALREADY_DIS
      *
      *  \par Evidence of failure may be found in the following telemetry:
-     *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+     *       - #CF_HkPacket_t.CommandErrorCounter will increment
      *
      *  \par Criticality
      *       None
