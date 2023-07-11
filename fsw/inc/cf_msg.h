@@ -871,6 +871,16 @@ typedef struct CF_NoArgsCmd
 } CF_NoArgsCmd_t;
 
 /**
+ * \brief Command payload argument union to support 4 uint8's, 2 uint16's or 1 uint32
+ */
+typedef union CF_UnionArgs_Payload
+{
+    uint32 dword;    /**< \brief Generic uint32 argument */
+    uint16 hword[2]; /**< \brief Generic uint16 array of arguments */
+    uint8  byte[4];  /**< \brief Generic uint8 array of arguments */
+} CF_UnionArgs_Payload_t;
+
+/**
  * \brief Generic command structure with arguments supports common handling on multiple command types
  *
  * For command details see #CF_RESET_CC, #CF_FREEZE_CC, #CF_THAW_CC, #CF_ENABLE_DEQUEUE_CC,
@@ -879,7 +889,7 @@ typedef struct CF_NoArgsCmd
 typedef struct
 {
     CFE_MSG_CommandHeader_t cmd_header; /**< \brief Command header */
-    uint8                   byte[4];    /**< \brief Generic uint8 array of arguments */
+    CF_UnionArgs_Payload_t  data;       /**< \brief Generic command arguments */
 } CF_UnionArgsCmd_t;
 
 /**
