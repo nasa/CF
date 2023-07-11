@@ -205,7 +205,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIsEqTo_5_SendEventAndRejectCommand(vo
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    msg->byte[0] = 5; /* 5 is size of 'names' */
+    msg->data.byte[0] = 5; /* 5 is size of 'names' */
 
     CF_AppData.HkPacket.CommandErrorCounter = initial_hk_err_counter;
 
@@ -229,7 +229,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIsGreaterThan_5_SendEventAndRejectCom
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    msg->byte[0] = Any_uint8_GreaterThan(5); /* 5 is size of 'names' */
+    msg->data.byte[0] = Any_uint8_GreaterThan(5); /* 5 is size of 'names' */
 
     CF_AppData.HkPacket.CommandErrorCounter = initial_hk_err_counter;
 
@@ -252,8 +252,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_command_AndResetHkCmdAndErrCountSe
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    msg->byte[0] = CF_Reset_command;
-
+    msg->data.byte[0] = CF_Reset_command;
     CF_AppData.HkPacket.CommandCounter      = Any_uint16_Except(0);
     CF_AppData.HkPacket.CommandErrorCounter = Any_uint16_Except(0);
 
@@ -278,7 +277,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_fault_ResetAllHkFaultCountSendEven
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    msg->byte[0] = CF_Reset_fault;
+    msg->data.byte[0] = CF_Reset_fault;
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
@@ -338,7 +337,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_up_AndResetAllHkRecvCountSendEvent
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    msg->byte[0] = CF_Reset_up;
+    msg->data.byte[0] = CF_Reset_up;
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
@@ -386,7 +385,7 @@ void Test_CF_CmdReset_tests_SWhenCommandByteIs_down_AndResetAllHkSentCountendEve
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    msg->byte[0] = CF_Reset_down;
+    msg->data.byte[0] = CF_Reset_down;
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
@@ -427,7 +426,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_all_AndResetAllMemValuesSendEvent(
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    msg->byte[0] = CF_Reset_all;
+    msg->data.byte[0] = CF_Reset_all;
 
     CF_AppData.HkPacket.CommandCounter      = Any_uint16_Except(0);
     CF_AppData.HkPacket.CommandErrorCounter = Any_uint16_Except(0);
@@ -654,7 +653,7 @@ void Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1(void)
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    arg_cmd->byte[0] = CF_ALL_CHANNELS;
+    arg_cmd->data.byte[0] = CF_ALL_CHANNELS;
 
     UT_SetDeferredRetcode(UT_KEY(Chan_action_fn_t), random_fn_call, 1);
 
@@ -683,7 +682,7 @@ void Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAll_fn_return_1_Return_1(void)
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    arg_cmd->byte[0] = CF_ALL_CHANNELS;
+    arg_cmd->data.byte[0] = CF_ALL_CHANNELS;
 
     UT_SetDefaultReturnValue(UT_KEY(Chan_action_fn_t), 1);
 
@@ -712,7 +711,7 @@ void Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0(void)
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    arg_cmd->byte[0] = CF_ALL_CHANNELS;
+    arg_cmd->data.byte[0] = CF_ALL_CHANNELS;
 
     UT_SetDefaultReturnValue(UT_KEY(Chan_action_fn_t), 0);
 
@@ -741,7 +740,7 @@ void Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_1_Return_1(void)
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    arg_cmd->byte[0] = Any_cf_channel();
+    arg_cmd->data.byte[0] = Any_cf_channel();
 
     UT_SetDefaultReturnValue(UT_KEY(Chan_action_fn_t), 1);
 
@@ -770,7 +769,7 @@ void Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_0_Return_1(void)
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    arg_cmd->byte[0] = Any_cf_channel();
+    arg_cmd->data.byte[0] = Any_cf_channel();
 
     UT_SetDefaultReturnValue(UT_KEY(Chan_action_fn_t), 0);
 
@@ -799,7 +798,7 @@ void Test_CF_DoChanAction_WhenChanNumberEq_CF_NUM_CHANNELS_Return_neg1_And_SendE
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    arg_cmd->byte[0] = CF_NUM_CHANNELS;
+    arg_cmd->data.byte[0] = CF_NUM_CHANNELS;
 
     /* Act */
     local_result = CF_DoChanAction(arg_cmd, arg_errstr, arg_fn, arg_context);
@@ -812,9 +811,8 @@ void Test_CF_DoChanAction_WhenChanNumberEq_CF_NUM_CHANNELS_Return_neg1_And_SendE
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_CHAN_PARAM);
 
-    UtAssert_True(local_result == CF_ERROR,
-                  "CF_DoChanAction returned %d and should be -1 (CF_ERROR) (cmd->byte[0] >= CF_NUM_CHANNELS)",
-                  local_result);
+    UtAssert_True(local_result == -1,
+                  "CF_DoChanAction returned %d and should be -1 (cmd->data.byte[0] >= CF_NUM_CHANNELS)", local_result);
 }
 
 void Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent(void)
@@ -832,16 +830,16 @@ void Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent(void)
     memset(&utbuf, 0, sizeof(utbuf));
 
     /* force CF_ALL_CHANNELS to not be a selection possibility */
-    arg_cmd->byte[0] = CF_ALL_CHANNELS;
-    while (arg_cmd->byte[0] == CF_ALL_CHANNELS)
+    arg_cmd->data.byte[0] = CF_ALL_CHANNELS;
+    while (arg_cmd->data.byte[0] == CF_ALL_CHANNELS)
     {
         if (catastrophe_count == 10) /* 10 is arbitrary */
         {
             UtAssert_Message(UTASSERT_CASETYPE_ABORT, __FILE__, __LINE__,
-                             "CANNOT make arg_cmd->byte[0] != CF_ALL_CHANNELS in 10 tries");
+                             "CANNOT make arg_cmd->data.byte[0] != CF_ALL_CHANNELS in 10 tries");
         }
 
-        arg_cmd->byte[0] = Any_uint8_GreaterThan_or_EqualTo(CF_NUM_CHANNELS);
+        arg_cmd->data.byte[0] = Any_uint8_GreaterThan_or_EqualTo(CF_NUM_CHANNELS);
         ++catastrophe_count;
     }
 
@@ -856,9 +854,8 @@ void Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent(void)
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CMD_CHAN_PARAM);
 
-    UtAssert_True(local_result == CF_ERROR,
-                  "CF_DoChanAction returned %d and should be -1 (CF_ERROR) (cmd->byte[0] >= CF_NUM_CHANNELS)",
-                  local_result);
+    UtAssert_True(local_result == -1,
+                  "CF_DoChanAction returned %d and should be -1 (cmd->data.byte[0] >= CF_NUM_CHANNELS)", local_result);
 }
 
 /*******************************************************************************
@@ -914,7 +911,7 @@ void Test_CF_CmdFreeze_Set_frozen_To_1_AndAcceptCommand(void)
     memset(&utbuf, 0, sizeof(utbuf));
 
     /* Arrange unstubbable: CF_DoChanAction */
-    msg->byte[0] = chan_num;
+    msg->data.byte[0] = chan_num;
 
     CF_AppData.HkPacket.CommandCounter = initial_hk_cmd_counter;
 
@@ -944,7 +941,7 @@ void Test_CF_CmdFreeze_Set_frozen_To_1_AndRejectCommand(void)
     memset(&utbuf, 0, sizeof(utbuf));
 
     /* Arrange unstubbable: CF_DoChanAction */
-    msg->byte[0] = CF_NUM_CHANNELS + 1;
+    msg->data.byte[0] = CF_NUM_CHANNELS + 1;
 
     CF_AppData.HkPacket.CommandCounter = 0;
 
@@ -977,7 +974,7 @@ void Test_CF_CmdThaw_Set_frozen_To_0_AndAcceptCommand(void)
     memset(&utbuf, 0, sizeof(utbuf));
 
     /* Arrange unstubbable: CF_DoChanAction */
-    msg->byte[0] = chan_num;
+    msg->data.byte[0] = chan_num;
 
     CF_AppData.HkPacket.CommandCounter = initial_hk_cmd_counter;
 
@@ -1007,7 +1004,7 @@ void Test_CF_CmdThaw_Set_frozen_To_0_AndRejectCommand(void)
     memset(&utbuf, 0, sizeof(utbuf));
 
     /* Arrange unstubbable: CF_DoChanAction */
-    msg->byte[0] = CF_NUM_CHANNELS + 1;
+    msg->data.byte[0] = CF_NUM_CHANNELS + 1;
 
     CF_AppData.HkPacket.CommandCounter = 0;
 
@@ -1633,7 +1630,7 @@ void Test_CF_CmdEnableDequeue_Success(void)
     CF_AppData.config_table = &config_table;
 
     /* Arrange unstubbable: CF_DoChanAction */
-    msg->byte[0] = chan_num;
+    msg->data.byte[0] = chan_num;
 
     CF_AppData.HkPacket.CommandCounter = initial_hk_cmd_counter;
 
@@ -1671,7 +1668,7 @@ void Test_CF_CmdEnableDequeue_Failure(void)
     CF_AppData.config_table = &config_table;
 
     /* Arrange unstubbable: CF_DoChanAction */
-    msg->byte[0] = CF_NUM_CHANNELS + 1;
+    msg->data.byte[0] = CF_NUM_CHANNELS + 1;
 
     CF_AppData.HkPacket.CommandErrorCounter = 0;
 
@@ -1708,7 +1705,7 @@ void Test_CF_CmdDisableDequeue_Success(void)
     CF_AppData.config_table = &config_table;
 
     /* Arrange unstubbable: CF_DoChanAction */
-    msg->byte[0] = chan_num;
+    msg->data.byte[0] = chan_num;
 
     CF_AppData.HkPacket.CommandCounter = initial_hk_cmd_counter;
 
@@ -1744,7 +1741,7 @@ void Test_CF_CmdDisableDequeue_Failure(void)
     CF_AppData.config_table = &config_table;
 
     /* Arrange unstubbable: CF_DoChanAction */
-    msg->byte[0] = CF_NUM_CHANNELS + 1;
+    msg->data.byte[0] = CF_NUM_CHANNELS + 1;
 
     CF_AppData.HkPacket.CommandErrorCounter = 0;
 
@@ -1781,7 +1778,7 @@ void Test_CF_DoEnableDisablePolldir_When_CF_ALL_CHANNELS_SetAllPolldirsInChannel
 
     CF_AppData.config_table = &config_table;
 
-    msg->byte[1] = CF_ALL_CHANNELS;
+    msg->data.byte[1] = CF_ALL_CHANNELS;
 
     context.msg      = msg;
     context.barg     = Any_bool_arg_t_barg();
@@ -1820,7 +1817,7 @@ void Test_CF_DoEnableDisablePolldir_WhenSetToSpecificPolldirSetPolldirFrom_conte
 
     CF_AppData.config_table = &config_table;
 
-    msg->byte[1] = polldir;
+    msg->data.byte[1] = polldir;
 
     context.msg      = msg;
     context.barg     = Any_bool_arg_t_barg();
@@ -1852,7 +1849,7 @@ void Test_CF_DoEnableDisablePolldir_FailPolldirEq_CF_MAX_POLLING_DIR_PER_CHAN_An
 
     CF_AppData.config_table = &config_table;
 
-    msg->byte[1] = CF_MAX_POLLING_DIR_PER_CHAN;
+    msg->data.byte[1] = CF_MAX_POLLING_DIR_PER_CHAN;
 
     context.msg  = msg;
     context.barg = Any_bool_arg_t_barg();
@@ -1882,7 +1879,7 @@ void Test_CF_DoEnableDisablePolldir_FailAnyBadPolldirSendEvent(void)
 
     CF_AppData.config_table = &config_table;
 
-    msg->byte[1] = CF_MAX_POLLING_DIR_PER_CHAN;
+    msg->data.byte[1] = CF_MAX_POLLING_DIR_PER_CHAN;
 
     context.msg  = msg;
     context.barg = Any_bool_arg_t_barg();
@@ -1920,10 +1917,10 @@ void Test_CF_CmdEnablePolldir_SuccessWhenActionSuccess(void)
     CF_AppData.config_table = &config_table;
 
     /* Arrange unstubbable: CF_DoChanAction */
-    msg->byte[0] = channel;
+    msg->data.byte[0] = channel;
 
     /* Arrange unstubbable: CF_DoEnableDisablePolldir */
-    msg->byte[1] = polldir;
+    msg->data.byte[1] = polldir;
 
     CF_AppData.HkPacket.CommandCounter = initial_hk_cmd_counter;
 
@@ -1955,11 +1952,10 @@ void Test_CF_CmdEnablePolldir_FailWhenActionFail(void)
     memset(&utbuf, 0, sizeof(utbuf));
 
     /* Arrange unstubbable: CF_DoChanAction */
-    msg->byte[0] = channel;
+    msg->data.byte[0] = channel;
 
     /* Arrange unstubbable: CF_DoEnableDisablePolldir */
-    msg->byte[1] = error_polldir;
-
+    msg->data.byte[1] = error_polldir;
     CF_AppData.HkPacket.CommandErrorCounter = initial_hk_err_counter;
 
     /* Act */
@@ -1997,10 +1993,10 @@ void Test_CF_CmdDisablePolldir_SuccessWhenActionSuccess(void)
     CF_AppData.config_table = &config_table;
 
     /* Arrange unstubbable: CF_DoChanAction */
-    msg->byte[0] = channel;
+    msg->data.byte[0] = channel;
 
     /* Arrange unstubbable: CF_DoEnableDisablePolldir */
-    msg->byte[1] = polldir;
+    msg->data.byte[1] = polldir;
 
     CF_AppData.HkPacket.CommandCounter = initial_hk_cmd_counter;
 
@@ -2032,10 +2028,10 @@ void Test_CF_CmdDisablePolldir_FailWhenActionFail(void)
     memset(&utbuf, 0, sizeof(utbuf));
 
     /* Arrange unstubbable: CF_DoChanAction */
-    msg->byte[0] = channel;
+    msg->data.byte[0] = channel;
 
     /* Arrange unstubbable: CF_DoEnableDisablePolldir */
-    msg->byte[1] = error_polldir;
+    msg->data.byte[1] = error_polldir;
 
     CF_AppData.HkPacket.CommandErrorCounter = initial_hk_err_counter;
 
@@ -2131,7 +2127,7 @@ void Test_CF_DoPurgeQueue_PendOnly(void)
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    arg_cmd->byte[1] = 0; /* pend */
+    arg_cmd->data.byte[1] = 0; /* pend */
     UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_POINTER,
                           &context_CF_CList_Traverse);
 
@@ -2167,7 +2163,7 @@ void Test_CF_DoPurgeQueue_HistoryOnly(void)
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    arg_cmd->byte[1] = 1; /* history */
+    arg_cmd->data.byte[1] = 1; /* history */
 
     /* set correct context type for CF_CList_Traverse stub */
     UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_POINTER,
@@ -2207,7 +2203,7 @@ void Test_CF_DoPurgeQueue_Both(void)
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    arg_cmd->byte[1] = 2; /* both */
+    arg_cmd->data.byte[1] = 2; /* both */
 
     /* set correct context type for CF_CList_Traverse stub */
     /* this must use data buffer hack to pass multiple contexts */
@@ -2247,7 +2243,7 @@ void Test_CF_DoPurgeQueue_GivenBad_data_byte_1_SendEventAndReturn_neg1(void)
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    arg_cmd->byte[1] = 3; /* 3 is first default value */
+    arg_cmd->data.byte[1] = 3; /* 3 is first default value */
 
     /* Act */
     local_result = CF_DoPurgeQueue(arg_chan_num, arg_cmd);
@@ -2271,7 +2267,7 @@ void Test_CF_DoPurgeQueue_AnyGivenBad_data_byte_1_SendEventAndReturn_neg1(void)
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    arg_cmd->byte[1] = Any_uint8_GreaterThan_or_EqualTo(3);
+    arg_cmd->data.byte[1] = Any_uint8_GreaterThan_or_EqualTo(3);
 
     /* Act */
     local_result = CF_DoPurgeQueue(arg_chan_num, arg_cmd);
@@ -2304,10 +2300,10 @@ void Test_CF_CmdPurgeQueue_FailWhenActionFail(void)
     memset(&utbuf, 0, sizeof(utbuf));
 
     /* Arrange unstubbable: CF_DoChanAction */
-    msg->byte[0] = channel;
+    msg->data.byte[0] = channel;
 
     /* Arrange unstubbable: CF_DoPurgeQueue */
-    msg->byte[1] = error_purge;
+    msg->data.byte[1] = error_purge;
 
     CF_AppData.HkPacket.CommandErrorCounter = initial_hk_err_counter;
 
@@ -2334,7 +2330,7 @@ void Test_CF_CmdPurgeQueue_SuccessWhenActionSuccess(void)
     memset(&utbuf, 0, sizeof(utbuf));
 
     /* Arrange unstubbable: CF_DoChanAction */
-    msg->byte[0] = channel;
+    msg->data.byte[0] = channel;
 
     CF_AppData.HkPacket.CommandCounter = 0;
 
