@@ -77,7 +77,7 @@
  */
 typedef struct
 {
-    CF_HkPacket_t HkPacket;
+    CF_HkPacket_t hk;
 
     uint32 run_status;
 

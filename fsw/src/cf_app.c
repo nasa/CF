@@ -46,8 +46,8 @@ CF_AppData_t CF_AppData;
  *-----------------------------------------------------------------*/
 void CF_HkCmd(void)
 {
-    CFE_MSG_SetMsgTime(&CF_AppData.HkPacket.tlm_header.Msg, CFE_TIME_GetTime());
-    /* return value ignored */ CFE_SB_TransmitMsg(&CF_AppData.HkPacket.tlm_header.Msg, true);
+    CFE_MSG_SetMsgTime(&CF_AppData.hk.tlm_header.Msg, CFE_TIME_GetTime());
+    /* return value ignored */ CFE_SB_TransmitMsg(&CF_AppData.hk.tlm_header.Msg, true);
 }
 
 /*----------------------------------------------------------------
@@ -205,7 +205,7 @@ CFE_Status_t CF_Init(void)
 
     CF_AppData.run_status = CFE_ES_RunStatus_APP_RUN;
 
-    CFE_MSG_Init(&CF_AppData.HkPacket.tlm_header.Msg, CFE_SB_ValueToMsgId(CF_HK_TLM_MID), sizeof(CF_AppData.HkPacket));
+    CFE_MSG_Init(&CF_AppData.hk.tlm_header.Msg, CFE_SB_ValueToMsgId(CF_HK_TLM_MID), sizeof(CF_AppData.hk));
 
     status = CFE_EVS_Register(NULL, 0, CFE_EVS_EventFilter_BINARY);
     if (status != CFE_SUCCESS)
@@ -301,7 +301,7 @@ void CF_ProcessMsg(CFE_SB_Buffer_t *msg)
             break;
 
         default:
-            ++CF_AppData.HkPacket.CommandErrorCounter;
+            ++CF_AppData.hk.counters.err;
             CFE_EVS_SendEvent(CF_EID_ERR_INIT_CMD_LENGTH, CFE_EVS_EventType_ERROR,
                               "CF: invalid command packet id=0x%lx", (unsigned long)CFE_SB_MsgIdToValue(msg_id));
             break;

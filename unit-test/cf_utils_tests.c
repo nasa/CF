@@ -127,7 +127,7 @@ void Test_CF_ResetHistory(void)
 
     memset(&h, 0, sizeof(h));
 
-    CF_AppData.HkPacket.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_HIST] = 4;
+    CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_HIST] = 4;
 
     /* nominal call */
     UtAssert_VOIDCALL(CF_ResetHistory(&CF_AppData.engine.channels[UT_CFDP_CHANNEL], &h));
@@ -145,10 +145,10 @@ void Test_CF_FindUnusedTransaction(void)
     memset(&hist, 0, sizeof(hist));
     memset(&txn, 0, sizeof(txn));
     memset(&CF_AppData, 0, sizeof(CF_AppData));
-    c = &CF_AppData.engine.channels[UT_CFDP_CHANNEL];
-    CF_AppData.HkPacket.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_FREE]      = 2;
-    CF_AppData.HkPacket.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_HIST_FREE] = 1;
-    CF_AppData.HkPacket.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_HIST]      = 1;
+    c                                                                  = &CF_AppData.engine.channels[UT_CFDP_CHANNEL];
+    CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_FREE] = 2;
+    CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_HIST_FREE] = 1;
+    CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_HIST]      = 1;
 
     UtAssert_NULL(CF_FindUnusedTransaction(c));
 
@@ -272,12 +272,12 @@ void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
     expected_head    = &CF_AppData.engine.channels[arg_t.chan_num].qs[arg_t.flags.com.q_index];
     expected_cl_node = &arg_t.cl_node;
 
-    CF_AppData.HkPacket.channel_hk[arg_t.chan_num].q_size[arg_t.flags.com.q_index] = initial_q_size;
+    CF_AppData.hk.channel_hk[arg_t.chan_num].q_size[arg_t.flags.com.q_index] = initial_q_size;
 
     /* Act */
     CF_DequeueTransaction(&arg_t);
 
-    updated_q_size = CF_AppData.HkPacket.channel_hk[arg_t.chan_num].q_size[arg_t.flags.com.q_index];
+    updated_q_size = CF_AppData.hk.channel_hk[arg_t.chan_num].q_size[arg_t.flags.com.q_index];
 
     /* Assert */
     UtAssert_ADDRESS_EQ(context_clist_remove.head, expected_head);
@@ -317,7 +317,7 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
     expected_insert_back_node = &arg_t->cl_node;
 
     /* Queue size needes to be >= 1 */
-    CF_AppData.HkPacket.channel_hk[arg_t->chan_num].q_size[arg_t->flags.com.q_index] = 1;
+    CF_AppData.hk.channel_hk[arg_t->chan_num].q_size[arg_t->flags.com.q_index] = 1;
 
     /* Act */
     CF_MoveTransaction(arg_t, arg_q);
@@ -355,12 +355,12 @@ void Test_CF_CList_Remove_Ex_Call_CF_CList_Remove_AndDecrement_q_size(void)
     expected_remove_head = &arg_c->qs[arg_index];
     expected_remove_node = arg_node;
 
-    CF_AppData.HkPacket.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index] = initial_q_size;
+    CF_AppData.hk.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index] = initial_q_size;
 
     /* Act */
     CF_CList_Remove_Ex(arg_c, arg_index, arg_node);
 
-    updated_q_size = CF_AppData.HkPacket.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
+    updated_q_size = CF_AppData.hk.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CList_Remove, 1);
@@ -390,12 +390,12 @@ void Test_CF_CList_InsertAfter_Ex_Call_CF_CList_InsertAfter_AndIncrement_q_size(
     UT_SetDataBuffer(UT_KEY(CF_CList_InsertAfter), &context_CF_CList_InsertAfter, sizeof(context_CF_CList_InsertAfter),
                      false);
 
-    CF_AppData.HkPacket.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index] = initial_q_size;
+    CF_AppData.hk.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index] = initial_q_size;
 
     /* Act */
     CF_CList_InsertAfter_Ex(arg_c, arg_index, arg_start, arg_after);
 
-    updated_q_size = CF_AppData.HkPacket.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
+    updated_q_size = CF_AppData.hk.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CList_InsertAfter, 1);
@@ -426,12 +426,12 @@ void Test_CF_CList_InsertBack_Ex_Call_CF_CList_InsertBack_AndIncrement_q_size(vo
     expected_insert_back_head = &arg_c->qs[arg_index];
     expected_insert_back_node = arg_node;
 
-    CF_AppData.HkPacket.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index] = initial_q_size;
+    CF_AppData.hk.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index] = initial_q_size;
 
     /* Act */
     CF_CList_InsertBack_Ex(arg_c, arg_index, arg_node);
 
-    updated_q_size = CF_AppData.HkPacket.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
+    updated_q_size = CF_AppData.hk.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CList_InsertBack, 1);
