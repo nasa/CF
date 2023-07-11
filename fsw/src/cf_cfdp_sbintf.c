@@ -85,7 +85,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
         success = false;
     }
 
-    if (success && !CF_AppData.HkPacket.channel_hk[t->chan_num].frozen && !t->flags.com.suspended)
+    if (success && !CF_AppData.hk.channel_hk[t->chan_num].frozen && !t->flags.com.suspended)
     {
         /* first, check if there's room in the pipe for the message we want to build */
         if (OS_ObjectIdDefined(c->sem_id))
@@ -160,7 +160,7 @@ void CF_CFDP_Send(uint8 chan_num, const CF_Logical_PduBuffer_t *ph)
     CFE_MSG_SetMsgTime(&CF_AppData.engine.out.msg->Msg, CFE_TIME_GetTime());
     CFE_SB_TransmitBuffer(CF_AppData.engine.out.msg, true);
 
-    ++CF_AppData.HkPacket.channel_hk[chan_num].counters.sent.pdu;
+    ++CF_AppData.hk.channel_hk[chan_num].counters.sent.pdu;
 
     CF_AppData.engine.out.msg = NULL;
 }
@@ -252,7 +252,7 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
                         }
 
                         /* NOTE: recv and recv_spurious will both be incremented */
-                        ++CF_AppData.HkPacket.channel_hk[chan_num].counters.recv.spurious;
+                        ++CF_AppData.hk.channel_hk[chan_num].counters.recv.spurious;
                     }
 
                     CFE_ES_PerfLogExit(CF_PERF_ID_PDURCVD(chan_num));
@@ -264,7 +264,7 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
                 if (ph->pdu_header.destination_eid == CF_AppData.config_table->local_eid)
                 {
                     /* we didn't find a match, so assign it to a transaction */
-                    if (CF_AppData.HkPacket.channel_hk[chan_num].q_size[CF_QueueIdx_RX] == CF_MAX_SIMULTANEOUS_RX)
+                    if (CF_AppData.hk.channel_hk[chan_num].q_size[CF_QueueIdx_RX] == CF_MAX_SIMULTANEOUS_RX)
                     {
                         CFE_EVS_SendEvent(
                             CF_EID_ERR_CFDP_RX_DROPPED, CFE_EVS_EventType_ERROR,
