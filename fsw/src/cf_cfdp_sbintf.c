@@ -118,7 +118,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
         if (success)
         {
             CFE_MSG_Init(&CF_AppData.engine.out.msg->Msg,
-                         CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[t->chan_num].mid_output), 0);
+                         CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[t->chan_num].mid_output), offsetof(CF_PduTlmMsg_t, ph));
             ++CF_AppData.engine.outgoing_counter; /* even if max_outgoing_messages_per_wakeup is 0 (unlimited), it's ok
                                                     to inc this */
 
