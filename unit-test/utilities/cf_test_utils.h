@@ -261,7 +261,6 @@ uint64       Any_uint64_Except(uint64 exception);
 unsigned int Any_unsigned_int(void);
 int          Any_int(void);
 int          Any_int_Except(int exception);
-int          Any_int_GreaterThan(int floor);
 int          Any_int_Negative(void);
 int          Any_int_Positive(void);
 int          Any_int_PositiveExcept(int exception);
