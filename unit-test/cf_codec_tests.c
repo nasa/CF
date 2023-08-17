@@ -54,12 +54,17 @@ void Test_CF_CFDP_GetValueEncodedSize(void)
     UtAssert_UINT32_EQ(CF_CFDP_GetValueEncodedSize(16777216), 4);
     UtAssert_UINT32_EQ(CF_CFDP_GetValueEncodedSize(UINT32_MAX), 4);
 
+#ifdef UINT64_C
     /*
      * This next case uses UINT64_C macro to force promotion so the +1 is done as 64-bit,
-     * otherwise the UINT32_MAX is a 32-bit value and +1 results in 0.
+     * otherwise the UINT32_MAX is a 32-bit value and +1 results in 0.  Not all systems have
+	 * UINT64_C so these will be skipped in that case.
      */
     UtAssert_UINT32_EQ(CF_CFDP_GetValueEncodedSize(UINT32_MAX + UINT64_C(1)), 5);
+#endif
+#ifdef UINT64_MAX
     UtAssert_UINT32_EQ(CF_CFDP_GetValueEncodedSize(UINT64_MAX), 8);
+#endif
 }
 
 void Test_CF_EncodeIntegerInSize(void)

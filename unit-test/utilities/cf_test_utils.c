@@ -448,38 +448,6 @@ int Any_int_Except(int exception)
     return random_val;
 }
 
-int Any_int_GreaterThan(int floor) /* NOTE: INTMAX_MAX will fail, and is invalid value */
-{
-    int  random_val;
-    bool coin_toss;
-
-    if (floor > 0)
-    {
-        random_val = (int)(rand() % (INTMAX_MAX - floor - 1)); /* -1 for greater than */
-
-        random_val += floor + 1;
-    }
-    else
-    {
-        coin_toss = rand() % 2;
-
-        if (coin_toss == HEADS)
-        {
-            random_val = (int)(rand() % (-floor)); /* floor is negative, -floor inverts to positive */
-            /* 0 to INTMAX_MAX becomes -1 to INTMAX_MIN */
-            random_val *= -1; /* flip sign */
-            random_val += -1; /* subtract 1, 0 becomes -1 */
-        }
-        else
-        {
-            random_val = (int)(rand() % (INTMAX_MAX)); /* floor is negative, random will be positive so any positive (or
-                                                          zero) will work */
-        }
-    }
-
-    return random_val;
-}
-
 int Any_int_Negative(void)
 {
     return ((rand() % MAX_INT) * -1) - 1; /* *-1 flips sign, -1 for 0 and MIN_INT */
