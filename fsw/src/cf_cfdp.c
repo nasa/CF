@@ -1712,7 +1712,7 @@ void CF_CFDP_SendEotPkt(CF_Transaction_t *t)
 
     if (PktBuf != NULL)
     {
-        CFE_MSG_Init(&PktBuf->eot.tlm_header.Msg, CFE_SB_ValueToMsgId(CF_EOT_TLM_MID), sizeof(*PktBuf));
+        CFE_MSG_Init(&PktBuf->eot.tlm_header.Msg, CFE_SB_ValueToMsgId(CF_EOT_TLM_MID), sizeof(PktBuf->eot));
 
         PktBuf->eot.channel    = t->chan_num;
         PktBuf->eot.direction  = t->history->dir;
