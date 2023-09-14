@@ -48,7 +48,7 @@ void CF_CmdNoop(CFE_SB_Buffer_t *msg)
 {
     CFE_EVS_SendEvent(CF_EID_INF_CMD_NOOP, CFE_EVS_EventType_INFORMATION, "CF: No-Op received, Version %d.%d.%d.%d",
                       CF_MAJOR_VERSION, CF_MINOR_VERSION, CF_REVISION, CF_MISSION_REV);
-    ++CF_AppData.hk.counters.cmd;
+    ++CF_AppData.HkPacket.CommandCounter;
 }
 
 /*----------------------------------------------------------------
@@ -70,7 +70,7 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_RESET_INVALID, CFE_EVS_EventType_ERROR,
                           "CF: Received RESET COUNTERS command with invalid parameter %d", param);
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
     else
     {
@@ -81,8 +81,9 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
         if ((param == CF_Reset_all) || (param == CF_Reset_command))
         {
             /* command counters */
-            memset(&CF_AppData.hk.counters, 0, sizeof(CF_AppData.hk.counters));
-            acc = 0; /* don't increment accept counter on command counter reset */
+            CF_AppData.HkPacket.CommandCounter      = 0;
+            CF_AppData.HkPacket.CommandErrorCounter = 0;
+            acc                                     = 0; /* don't increment accept counter on command counter reset */
         }
 
         /* if the param is CF_Reset_fault, or all counters */
@@ -90,8 +91,8 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
         {
             /* fault counters */
             for (i = 0; i < CF_NUM_CHANNELS; ++i)
-                memset(&CF_AppData.hk.channel_hk[i].counters.fault, 0,
-                       sizeof(CF_AppData.hk.channel_hk[i].counters.fault));
+                memset(&CF_AppData.HkPacket.channel_hk[i].counters.fault, 0,
+                       sizeof(CF_AppData.HkPacket.channel_hk[i].counters.fault));
         }
 
         /* if the param is CF_Reset_up, or all counters */
@@ -99,8 +100,8 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
         {
             /* up counters */
             for (i = 0; i < CF_NUM_CHANNELS; ++i)
-                memset(&CF_AppData.hk.channel_hk[i].counters.recv, 0,
-                       sizeof(CF_AppData.hk.channel_hk[i].counters.recv));
+                memset(&CF_AppData.HkPacket.channel_hk[i].counters.recv, 0,
+                       sizeof(CF_AppData.HkPacket.channel_hk[i].counters.recv));
         }
 
         /* if the param is CF_Reset_down, or all counters */
@@ -108,13 +109,13 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
         {
             /* down counters */
             for (i = 0; i < CF_NUM_CHANNELS; ++i)
-                memset(&CF_AppData.hk.channel_hk[i].counters.sent, 0,
-                       sizeof(CF_AppData.hk.channel_hk[i].counters.sent));
+                memset(&CF_AppData.HkPacket.channel_hk[i].counters.sent, 0,
+                       sizeof(CF_AppData.HkPacket.channel_hk[i].counters.sent));
         }
 
         if (acc)
         {
-            ++CF_AppData.hk.counters.cmd;
+            ++CF_AppData.HkPacket.CommandCounter;
         }
     }
 }
@@ -140,7 +141,7 @@ void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_BAD_PARAM, CFE_EVS_EventType_ERROR,
                           "CF: bad parameter in CF_CmdTxFile(): chan=%u, class=%u keep=%u", (unsigned int)tx->chan_num,
                           (unsigned int)tx->cfdp_class, (unsigned int)tx->keep);
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
         return;
     }
 
@@ -153,12 +154,12 @@ void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_TX_FILE, CFE_EVS_EventType_INFORMATION,
                           "CF: file transfer successfully initiated");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.HkPacket.CommandCounter;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_TX_FILE, CFE_EVS_EventType_ERROR, "CF: file transfer initiation failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
 }
 
@@ -183,7 +184,7 @@ void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_BAD_PARAM, CFE_EVS_EventType_ERROR,
                           "CF: bad parameter in CF_CmdPlaybackDir(): chan=%u, class=%u keep=%u",
                           (unsigned int)tx->chan_num, (unsigned int)tx->cfdp_class, (unsigned int)tx->keep);
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
         return;
     }
 
@@ -196,13 +197,13 @@ void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_PLAYBACK_DIR, CFE_EVS_EventType_INFORMATION,
                           "CF: directory playback initiation successful");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.HkPacket.CommandCounter;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_PLAYBACK_DIR, CFE_EVS_EventType_ERROR,
                           "CF: directory playback initiation failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
 }
 
@@ -250,7 +251,7 @@ CFE_Status_t CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_Chan
 CFE_Status_t CF_DoFreezeThaw(uint8 chan_num, const CF_ChanAction_BoolArg_t *context)
 {
     /* no need to bounds check chan_num, done in caller */
-    CF_AppData.hk.channel_hk[chan_num].frozen = context->barg;
+    CF_AppData.HkPacket.channel_hk[chan_num].frozen = context->barg;
     return CFE_SUCCESS;
 }
 
@@ -267,12 +268,12 @@ void CF_CmdFreeze(CFE_SB_Buffer_t *msg)
     if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "freeze", (CF_ChanActionFn_t)CF_DoFreezeThaw, &barg) == CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_FREEZE, CFE_EVS_EventType_INFORMATION, "CF: freeze successful");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.HkPacket.CommandCounter;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_FREEZE, CFE_EVS_EventType_ERROR, "CF: freeze cmd failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
 }
 
@@ -289,12 +290,12 @@ void CF_CmdThaw(CFE_SB_Buffer_t *msg)
     if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "thaw", (CF_ChanActionFn_t)CF_DoFreezeThaw, &barg) == CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_THAW, CFE_EVS_EventType_INFORMATION, "CF: thaw successful");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.HkPacket.CommandCounter;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_THAW, CFE_EVS_EventType_ERROR, "CF: thaw cmd failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
 }
 
@@ -416,20 +417,20 @@ void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
         /* A single transaction was mached, and it was already set the same way */
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_SUSPRES_SAME, CFE_EVS_EventType_ERROR,
                           "CF: %s cmd: setting suspend flag to current value of %d", msgstr[action], action);
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
     else if (ret <= 0)
     {
         /* No transaction was matched for the given combination of chan + eid + ts  */
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_SUSPRES_CHAN, CFE_EVS_EventType_ERROR, "CF: %s cmd: no transaction found",
                           msgstr[action]);
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_SUSPRES, CFE_EVS_EventType_INFORMATION,
                           "CF: %s cmd: setting suspend flag to %d", msgstr[action], action);
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.HkPacket.CommandCounter;
     }
 }
 
@@ -478,13 +479,13 @@ void CF_CmdCancel(CFE_SB_Buffer_t *msg)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_CANCEL, CFE_EVS_EventType_INFORMATION,
                           "CF: cancel transaction successfully initiated");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.HkPacket.CommandCounter;
     }
     else
     {
         /* No transaction was matched for the given combination of chan + eid + ts  */
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_CANCEL_CHAN, CFE_EVS_EventType_ERROR, "CF: cancel cmd: no transaction found");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
 }
 
@@ -510,14 +511,14 @@ void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
     if (CF_TsnChanAction((CF_TransactionCmd_t *)msg, "abandon", CF_CmdAbandon_Txn, NULL) > 0)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_ABANDON, CFE_EVS_EventType_INFORMATION, "CF: abandon successful");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.HkPacket.CommandCounter;
     }
     else
     {
         /* No transaction was matched for the given combination of chan + eid + ts  */
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_ABANDON_CHAN, CFE_EVS_EventType_ERROR,
                           "CF: abandon cmd: no transaction found");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
 }
 
@@ -548,12 +549,12 @@ void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
                         &barg) == CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_ENABLE_DEQUEUE, CFE_EVS_EventType_INFORMATION, "CF: dequeue enabled");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.HkPacket.CommandCounter;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_ENABLE_DEQUEUE, CFE_EVS_EventType_ERROR, "CF: enable dequeue cmd failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
 }
 
@@ -571,12 +572,12 @@ void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg)
                         &barg) == CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_DISABLE_DEQUEUE, CFE_EVS_EventType_INFORMATION, "CF: dequeue disabled");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.HkPacket.CommandCounter;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_DISABLE_DEQUEUE, CFE_EVS_EventType_ERROR, "CF: disable dequeue cmd failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
 }
 
@@ -627,13 +628,13 @@ void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_ENABLE_POLLDIR, CFE_EVS_EventType_INFORMATION,
                           "CF: enabled polling directory");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.HkPacket.CommandCounter;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_ENABLE_POLLDIR, CFE_EVS_EventType_ERROR,
                           "CF: enable polling directory cmd failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
 }
 
@@ -652,13 +653,13 @@ void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_DISABLE_POLLDIR, CFE_EVS_EventType_INFORMATION,
                           "CF: disabled polling directory");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.HkPacket.CommandCounter;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_DISABLE_POLLDIR, CFE_EVS_EventType_ERROR,
                           "CF: disable polling directory cmd failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
 }
 
@@ -750,12 +751,12 @@ void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
         CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_PURGE_QUEUE, CFE_EVS_EventType_INFORMATION, "CF: queue purged");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.HkPacket.CommandCounter;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_PURGE_QUEUE, CFE_EVS_EventType_ERROR, "CF: purge queue cmd failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
 }
 
@@ -777,7 +778,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
     if (wq->chan >= CF_NUM_CHANNELS)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_CHAN, CFE_EVS_EventType_ERROR, "CF: write queue invalid channel arg");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
         success = false;
     }
     /* only invalid combination is up direction, pending queue */
@@ -785,7 +786,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_ARGS, CFE_EVS_EventType_ERROR,
                           "CF: write queue invalid command parameters");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
         success = false;
     }
     else
@@ -797,7 +798,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_OPEN, CFE_EVS_EventType_ERROR, "CF: write queue failed to open file %s",
                               wq->filename);
-            ++CF_AppData.hk.counters.err;
+            ++CF_AppData.HkPacket.CommandErrorCounter;
             success = false;
         }
     }
@@ -814,7 +815,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_RX, CFE_EVS_EventType_ERROR,
                                   "CF: write queue failed to write CF_QueueIdx_RX data");
                 CF_WrappedClose(fd);
-                ++CF_AppData.hk.counters.err;
+                ++CF_AppData.HkPacket.CommandErrorCounter;
                 success = false;
             }
         }
@@ -827,7 +828,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEHIST_RX, CFE_EVS_EventType_ERROR,
                                   "CF: write queue failed to write history RX data");
                 CF_WrappedClose(fd);
-                ++CF_AppData.hk.counters.err;
+                ++CF_AppData.HkPacket.CommandErrorCounter;
                 success = false;
             }
         }
@@ -849,7 +850,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
                     CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_TX, CFE_EVS_EventType_ERROR,
                                       "CF: write queue failed to write q index %d", qs[i]);
                     CF_WrappedClose(fd);
-                    ++CF_AppData.hk.counters.err;
+                    ++CF_AppData.HkPacket.CommandErrorCounter;
                     success = false;
                     break;
                 }
@@ -865,7 +866,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_PEND, CFE_EVS_EventType_ERROR,
                                   "CF: write queue failed to write pending queue");
                 CF_WrappedClose(fd);
-                ++CF_AppData.hk.counters.err;
+                ++CF_AppData.HkPacket.CommandErrorCounter;
                 success = false;
             }
         }
@@ -879,7 +880,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEHIST_TX, CFE_EVS_EventType_ERROR,
                                   "CF: write queue failed to write CF_QueueIdx_TX data");
                 CF_WrappedClose(fd);
-                ++CF_AppData.hk.counters.err;
+                ++CF_AppData.HkPacket.CommandErrorCounter;
                 success = false;
             }
         }
@@ -888,7 +889,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
     if (success)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_WQ, CFE_EVS_EventType_INFORMATION, "CF: write queue successful");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.HkPacket.CommandCounter;
     }
 }
 
@@ -1074,11 +1075,11 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
 
     if (status == CFE_SUCCESS)
     {
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.HkPacket.CommandCounter;
     }
     else
     {
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
 }
 
@@ -1119,20 +1120,20 @@ void CF_CmdEnableEngine(CFE_SB_Buffer_t *msg)
         if (CF_CFDP_InitEngine() == CFE_SUCCESS)
         {
             CFE_EVS_SendEvent(CF_EID_INF_CMD_ENABLE_ENGINE, CFE_EVS_EventType_INFORMATION, "CF: enabled CFDP engine");
-            ++CF_AppData.hk.counters.cmd;
+            ++CF_AppData.HkPacket.CommandCounter;
         }
         else
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CMD_ENABLE_ENGINE, CFE_EVS_EventType_ERROR,
                               "CF: failed to re-initialize and enable CFDP engine");
-            ++CF_AppData.hk.counters.err;
+            ++CF_AppData.HkPacket.CommandErrorCounter;
         }
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_ENG_ALREADY_ENA, CFE_EVS_EventType_ERROR,
                           "CF: received enable engine command while engine already enabled");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
 }
 
@@ -1148,13 +1149,13 @@ void CF_CmdDisableEngine(CFE_SB_Buffer_t *msg)
     {
         CF_CFDP_DisableEngine();
         CFE_EVS_SendEvent(CF_EID_INF_CMD_DISABLE_ENGINE, CFE_EVS_EventType_INFORMATION, "CF: disabled CFDP engine");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.HkPacket.CommandCounter;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_ENG_ALREADY_DIS, CFE_EVS_EventType_ERROR,
                           "CF: received disable engine command while engine already disabled");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
 }
 
@@ -1243,13 +1244,13 @@ void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
             CFE_EVS_SendEvent(CF_EID_ERR_CMD_GCMD_LEN, CFE_EVS_EventType_ERROR,
                               "CF: invalid ground command length for command 0x%02x, expected %d got %zd", cmd,
                               expected_lengths[cmd], len);
-            ++CF_AppData.hk.counters.err;
+            ++CF_AppData.HkPacket.CommandErrorCounter;
         }
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_GCMD_CC, CFE_EVS_EventType_ERROR,
                           "CF: invalid ground command packet cmd_code=0x%02x", cmd);
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.HkPacket.CommandErrorCounter;
     }
 }
