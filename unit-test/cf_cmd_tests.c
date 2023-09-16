@@ -184,7 +184,7 @@ void Test_CF_CmdNoop_SendNoopEventAndAcceptCommand(void)
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_NOOP);
+    UT_CF_AssertEventID(CF_NOOP_INF_EID);
     /* Assert to show counter incremented */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
 }
@@ -214,7 +214,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIsEqTo_5_SendEventAndRejectCommand(vo
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_RESET_INVALID);
+    UT_CF_AssertEventID(CF_CMD_RESET_INVALID_ERR_EID);
     /* Assert incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
 }
@@ -238,7 +238,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIsGreaterThan_5_SendEventAndRejectCom
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_RESET_INVALID);
+    UT_CF_AssertEventID(CF_CMD_RESET_INVALID_ERR_EID);
     /* Assert incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
 }
@@ -261,7 +261,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_command_AndResetHkCmdAndErrCountSe
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_RESET);
+    UT_CF_AssertEventID(CF_RESET_INF_EID);
     UtAssert_ZERO(CF_AppData.hk.counters.cmd);
     UtAssert_ZERO(CF_AppData.hk.counters.err);
 }
@@ -302,7 +302,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_fault_ResetAllHkFaultCountSendEven
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_RESET);
+    UT_CF_AssertEventID(CF_RESET_INF_EID);
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
@@ -356,7 +356,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_up_AndResetAllHkRecvCountSendEvent
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_RESET);
+    UT_CF_AssertEventID(CF_RESET_INF_EID);
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
@@ -401,7 +401,7 @@ void Test_CF_CmdReset_tests_SWhenCommandByteIs_down_AndResetAllHkSentCountendEve
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_RESET);
+    UT_CF_AssertEventID(CF_RESET_INF_EID);
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
@@ -469,7 +469,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_all_AndResetAllMemValuesSendEvent(
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_RESET);
+    UT_CF_AssertEventID(CF_RESET_INF_EID);
 
     UtAssert_ZERO(CF_AppData.hk.counters.cmd);
     UtAssert_ZERO(CF_AppData.hk.counters.err);
@@ -515,7 +515,7 @@ void Test_CF_CmdTxFile(void)
     UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_TX_FILE);
+    UT_CF_AssertEventID(CF_CMD_TX_FILE_INF_EID);
 
     UT_CF_ResetEventCapture();
     memset(msg, 0, sizeof(*msg));
@@ -523,21 +523,21 @@ void Test_CF_CmdTxFile(void)
     UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 2);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_TX_FILE);
+    UT_CF_AssertEventID(CF_CMD_TX_FILE_INF_EID);
 
     /* out of range arguments: bad class */
     UT_CF_ResetEventCapture();
     memset(msg, 0, sizeof(*msg));
     msg->cfdp_class = 10;
     UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UT_CF_AssertEventID(CF_CMD_BAD_PARAM_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 
     UT_CF_ResetEventCapture();
     memset(msg, 0, sizeof(*msg));
     msg->cfdp_class = -10;
     UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UT_CF_AssertEventID(CF_CMD_BAD_PARAM_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 2);
 
     /* out of range arguments: bad channel */
@@ -545,7 +545,7 @@ void Test_CF_CmdTxFile(void)
     memset(msg, 0, sizeof(*msg));
     msg->chan_num = CF_NUM_CHANNELS;
     UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UT_CF_AssertEventID(CF_CMD_BAD_PARAM_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 3);
 
     /* out of range arguments: bad keep */
@@ -553,7 +553,7 @@ void Test_CF_CmdTxFile(void)
     memset(msg, 0, sizeof(*msg));
     msg->keep = 15;
     UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UT_CF_AssertEventID(CF_CMD_BAD_PARAM_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 4);
 
     /* CF_CFDP_TxFile fails*/
@@ -561,7 +561,7 @@ void Test_CF_CmdTxFile(void)
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_TxFile), -1);
     memset(msg, 0, sizeof(*msg));
     UtAssert_VOIDCALL(CF_CmdTxFile(&utbuf.buf));
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_TX_FILE);
+    UT_CF_AssertEventID(CF_CMD_TX_FILE_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 5);
 }
 
@@ -596,14 +596,14 @@ void Test_CF_CmdPlaybackDir(void)
     memset(msg, 0, sizeof(*msg));
     msg->cfdp_class = 10;
     UtAssert_VOIDCALL(CF_CmdPlaybackDir(&utbuf.buf));
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UT_CF_AssertEventID(CF_CMD_BAD_PARAM_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 
     UT_CF_ResetEventCapture();
     memset(msg, 0, sizeof(*msg));
     msg->cfdp_class = -10;
     UtAssert_VOIDCALL(CF_CmdPlaybackDir(&utbuf.buf));
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UT_CF_AssertEventID(CF_CMD_BAD_PARAM_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 2);
 
     /* out of range arguments: bad channel */
@@ -611,7 +611,7 @@ void Test_CF_CmdPlaybackDir(void)
     memset(msg, 0, sizeof(*msg));
     msg->chan_num = CF_NUM_CHANNELS;
     UtAssert_VOIDCALL(CF_CmdPlaybackDir(&utbuf.buf));
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UT_CF_AssertEventID(CF_CMD_BAD_PARAM_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 3);
 
     /* out of range arguments: bad keep */
@@ -619,7 +619,7 @@ void Test_CF_CmdPlaybackDir(void)
     memset(msg, 0, sizeof(*msg));
     msg->keep = 15;
     UtAssert_VOIDCALL(CF_CmdPlaybackDir(&utbuf.buf));
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_BAD_PARAM);
+    UT_CF_AssertEventID(CF_CMD_BAD_PARAM_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 4);
 
     /* CF_CFDP_PlaybackDir fails*/
@@ -627,7 +627,7 @@ void Test_CF_CmdPlaybackDir(void)
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_PlaybackDir), -1);
     memset(msg, 0, sizeof(*msg));
     UtAssert_VOIDCALL(CF_CmdPlaybackDir(&utbuf.buf));
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_PLAYBACK_DIR);
+    UT_CF_AssertEventID(CF_CMD_PLAYBACK_DIR_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 5);
 }
 
@@ -807,7 +807,7 @@ void Test_CF_DoChanAction_WhenChanNumberEq_CF_NUM_CHANNELS_Return_neg1_And_SendE
     /* Assert */
     UtAssert_STUB_COUNT(Chan_action_fn_t, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_CHAN_PARAM);
+    UT_CF_AssertEventID(CF_CMD_CHAN_PARAM_ERR_EID);
 
     UtAssert_True(local_result == -1,
                   "CF_DoChanAction returned %d and should be -1 (cmd->data.byte[0] >= CF_NUM_CHANNELS)", local_result);
@@ -850,7 +850,7 @@ void Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent(void)
     /* Assert */
     UtAssert_STUB_COUNT(Chan_action_fn_t, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_CHAN_PARAM);
+    UT_CF_AssertEventID(CF_CMD_CHAN_PARAM_ERR_EID);
 
     UtAssert_True(local_result == -1,
                   "CF_DoChanAction returned %d and should be -1 (cmd->data.byte[0] >= CF_NUM_CHANNELS)", local_result);
@@ -925,7 +925,7 @@ void Test_CF_CmdFreeze_Set_frozen_To_1_AndAcceptCommand(void)
                   "CF_AppData.hk.counters.cmd is %d and should be 1 more than %d", CF_AppData.hk.counters.cmd,
                   initial_hk_cmd_counter);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_FREEZE);
+    UT_CF_AssertEventID(CF_CMD_FREEZE_INF_EID);
 }
 
 void Test_CF_CmdFreeze_Set_frozen_To_1_AndRejectCommand(void)
@@ -949,7 +949,7 @@ void Test_CF_CmdFreeze_Set_frozen_To_1_AndRejectCommand(void)
     /* Assert */
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_FREEZE);
+    UT_CF_AssertEventID(CF_CMD_FREEZE_ERR_EID);
 }
 
 /*******************************************************************************
@@ -988,7 +988,7 @@ void Test_CF_CmdThaw_Set_frozen_To_0_AndAcceptCommand(void)
                   "CF_AppData.hk.counters.cmd is %d and should be 1 more than %d", CF_AppData.hk.counters.cmd,
                   initial_hk_cmd_counter);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_THAW);
+    UT_CF_AssertEventID(CF_CMD_THAW_INF_EID);
 }
 
 void Test_CF_CmdThaw_Set_frozen_To_0_AndRejectCommand(void)
@@ -1012,7 +1012,7 @@ void Test_CF_CmdThaw_Set_frozen_To_0_AndRejectCommand(void)
     /* Assert */
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_THAW);
+    UT_CF_AssertEventID(CF_CMD_THAW_ERR_EID);
 }
 
 /*******************************************************************************
@@ -1135,7 +1135,7 @@ void Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionNotF
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_TRANS_NOT_FOUND);
+    UT_CF_AssertEventID(CF_CMD_TRANS_NOT_FOUND_ERR_EID);
 
     UtAssert_STUB_COUNT(Dummy_CF_TsnChanAction_fn_t, 0);
 }
@@ -1250,7 +1250,7 @@ void Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid(void)
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_TSN_CHAN_INVALID);
+    UT_CF_AssertEventID(CF_CMD_TSN_CHAN_INVALID_ERR_EID);
 }
 
 /*******************************************************************************
@@ -1351,7 +1351,7 @@ void Test_CF_DoSuspRes(void)
     UT_SetDeferredRetcode(UT_KEY(CF_TraverseAllTransactions), 1, 1);
     UtAssert_VOIDCALL(CF_DoSuspRes(cmd, 1));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_SUSPRES);
+    UT_CF_AssertEventID(CF_CMD_SUSPRES_INF_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
 
     /* Output the CF_ChanAction_SuspResArg_t back to the caller, to set the "same" flag to 1 */
@@ -1362,7 +1362,7 @@ void Test_CF_DoSuspRes(void)
     UT_SetHandlerFunction(UT_KEY(CF_TraverseAllTransactions), UT_AltHandler_CF_TraverseAllTransactions_SetSuspResArg,
                           &utargs);
     UtAssert_VOIDCALL(CF_DoSuspRes(cmd, 0));
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_SUSPRES_SAME);
+    UT_CF_AssertEventID(CF_CMD_SUSPRES_SAME_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 2);
 
     /* Output the CF_ChanAction_SuspResArg_t back to the caller, to set the "same" flag to 1 */
@@ -1372,7 +1372,7 @@ void Test_CF_DoSuspRes(void)
     UT_SetDeferredRetcode(UT_KEY(CF_TraverseAllTransactions), 1, 10);
     UtAssert_VOIDCALL(CF_DoSuspRes(cmd, 1));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_SUSPRES);
+    UT_CF_AssertEventID(CF_CMD_SUSPRES_INF_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 2);
 }
 
@@ -1398,8 +1398,8 @@ void Test_CF_CmdSuspend_Call_CF_DoSuspRes_WithGiven_msg_And_action_1(void)
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 2);
-    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_EID_ERR_CMD_TSN_CHAN_INVALID);
-    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[1], CF_EID_ERR_CMD_SUSPRES_CHAN);
+    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_CMD_TSN_CHAN_INVALID_ERR_EID);
+    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[1], CF_CMD_SUSPRES_CHAN_ERR_EID);
 
     /* Assert incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
@@ -1427,8 +1427,8 @@ void Test_CF_CmdResume_Call_CF_DoSuspRes_WithGiven_msg_And_action_0(void)
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 2);
-    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_EID_ERR_CMD_TSN_CHAN_INVALID);
-    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[1], CF_EID_ERR_CMD_SUSPRES_CHAN);
+    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_CMD_TSN_CHAN_INVALID_ERR_EID);
+    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[1], CF_CMD_SUSPRES_CHAN_ERR_EID);
 
     /* Assert incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
@@ -1481,7 +1481,7 @@ void Test_CF_CmdCancel_Success(void)
     UtAssert_STUB_COUNT(CF_TraverseAllTransactions, 1);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_CANCEL);
+    UT_CF_AssertEventID(CF_CMD_CANCEL_INF_EID);
 }
 
 void Test_CF_CmdCancel_Failure(void)
@@ -1500,7 +1500,7 @@ void Test_CF_CmdCancel_Failure(void)
     /* Assert */
     UtAssert_STUB_COUNT(CF_TraverseAllTransactions, 1);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_CANCEL_CHAN);
+    UT_CF_AssertEventID(CF_CMD_CANCEL_CHAN_ERR_EID);
 }
 
 /*******************************************************************************
@@ -1553,7 +1553,7 @@ void Test_CF_CmdAbandon_Success(void)
     UtAssert_STUB_COUNT(CF_TraverseAllTransactions, 1);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_ABANDON);
+    UT_CF_AssertEventID(CF_CMD_ABANDON_INF_EID);
 }
 
 void Test_CF_CmdAbandon_Failure(void)
@@ -1572,7 +1572,7 @@ void Test_CF_CmdAbandon_Failure(void)
     /* Assert */
     UtAssert_STUB_COUNT(CF_TraverseAllTransactions, 1);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_ABANDON_CHAN);
+    UT_CF_AssertEventID(CF_CMD_ABANDON_CHAN_ERR_EID);
 }
 
 /*******************************************************************************
@@ -1645,7 +1645,7 @@ void Test_CF_CmdEnableDequeue_Success(void)
                   "THE BEHAVIOR BUT IT IS NOT",
                   CF_AppData.hk.counters.cmd, initial_hk_cmd_counter);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_ENABLE_DEQUEUE);
+    UT_CF_AssertEventID(CF_CMD_ENABLE_DEQUEUE_INF_EID);
 }
 
 void Test_CF_CmdEnableDequeue_Failure(void)
@@ -1674,7 +1674,7 @@ void Test_CF_CmdEnableDequeue_Failure(void)
     /* Assert */
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_ENABLE_DEQUEUE);
+    UT_CF_AssertEventID(CF_CMD_ENABLE_DEQUEUE_ERR_EID);
 }
 
 /*******************************************************************************
@@ -1718,7 +1718,7 @@ void Test_CF_CmdDisableDequeue_Success(void)
                   "CF_AppData.hk.counters.cmd is %d and should be 1 more than %d", CF_AppData.hk.counters.cmd,
                   initial_hk_cmd_counter);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_DISABLE_DEQUEUE);
+    UT_CF_AssertEventID(CF_CMD_DISABLE_DEQUEUE_INF_EID);
 }
 
 void Test_CF_CmdDisableDequeue_Failure(void)
@@ -1747,7 +1747,7 @@ void Test_CF_CmdDisableDequeue_Failure(void)
     /* Assert */
     /* Assert for CF_DoFreezeThaw */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_DISABLE_DEQUEUE);
+    UT_CF_AssertEventID(CF_CMD_DISABLE_DEQUEUE_ERR_EID);
 }
 
 /*******************************************************************************
@@ -1854,7 +1854,7 @@ void Test_CF_DoEnableDisablePolldir_FailPolldirEq_CF_MAX_POLLING_DIR_PER_CHAN_An
     local_result = CF_DoEnableDisablePolldir(arg_chan_num, arg_context);
 
     /* Assert */
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_POLLDIR_INVALID);
+    UT_CF_AssertEventID(CF_CMD_POLLDIR_INVALID_ERR_EID);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UtAssert_True(local_result == CF_ERROR, "CF_DoEnableDisablePolldir returned %d and should be -1 (CF_ERROR)",
                   local_result);
@@ -1884,7 +1884,7 @@ void Test_CF_DoEnableDisablePolldir_FailAnyBadPolldirSendEvent(void)
     local_result = CF_DoEnableDisablePolldir(arg_chan_num, arg_context);
 
     /* Assert */
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_POLLDIR_INVALID);
+    UT_CF_AssertEventID(CF_CMD_POLLDIR_INVALID_ERR_EID);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UtAssert_True(local_result == CF_ERROR, "CF_DoEnableDisablePolldir returned %d and should be -1 (CF_ERROR)",
                   local_result);
@@ -1932,7 +1932,7 @@ void Test_CF_CmdEnablePolldir_SuccessWhenActionSuccess(void)
     UtAssert_True(CF_AppData.hk.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
                   "CF_AppData.hk.counters.cmd is %d and should be 1 more than %d", CF_AppData.hk.counters.cmd,
                   initial_hk_cmd_counter);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_ENABLE_POLLDIR);
+    UT_CF_AssertEventID(CF_CMD_ENABLE_POLLDIR_INF_EID);
 }
 
 void Test_CF_CmdEnablePolldir_FailWhenActionFail(void)
@@ -1963,7 +1963,7 @@ void Test_CF_CmdEnablePolldir_FailWhenActionFail(void)
     UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
                   "CF_AppData.hk.counters.err is %d and should be 1 more than %d", CF_AppData.hk.counters.err,
                   initial_hk_err_counter);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_ENABLE_POLLDIR);
+    UT_CF_AssertEventID(CF_CMD_ENABLE_POLLDIR_ERR_EID);
 }
 
 /*******************************************************************************
@@ -2008,7 +2008,7 @@ void Test_CF_CmdDisablePolldir_SuccessWhenActionSuccess(void)
     UtAssert_True(CF_AppData.hk.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
                   "CF_AppData.hk.counters.cmd is %d and should be 1 more than %d", CF_AppData.hk.counters.cmd,
                   initial_hk_cmd_counter);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_DISABLE_POLLDIR);
+    UT_CF_AssertEventID(CF_CMD_DISABLE_POLLDIR_INF_EID);
 }
 
 void Test_CF_CmdDisablePolldir_FailWhenActionFail(void)
@@ -2040,7 +2040,7 @@ void Test_CF_CmdDisablePolldir_FailWhenActionFail(void)
     UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
                   "CF_AppData.hk.counters.err is %d and should be 1 more than %d", CF_AppData.hk.counters.err,
                   initial_hk_err_counter);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_DISABLE_POLLDIR);
+    UT_CF_AssertEventID(CF_CMD_DISABLE_POLLDIR_ERR_EID);
 }
 
 /*******************************************************************************
@@ -2249,7 +2249,7 @@ void Test_CF_DoPurgeQueue_GivenBad_data_byte_1_SendEventAndReturn_neg1(void)
     /* Assert */
     UtAssert_True(local_result == CF_ERROR, "CF_DoPurgeQueue returned %d and should be -1 (CF_ERROR)", local_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_PURGE_ARG);
+    UT_CF_AssertEventID(CF_CMD_PURGE_ARG_ERR_EID);
     UtAssert_STUB_COUNT(CF_CList_Traverse, 0);
 }
 
@@ -2273,7 +2273,7 @@ void Test_CF_DoPurgeQueue_AnyGivenBad_data_byte_1_SendEventAndReturn_neg1(void)
     /* Assert */
     UtAssert_True(local_result == CF_ERROR, "CF_DoPurgeQueue returned %d and should be -1 (CF_ERROR)", local_result);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_PURGE_ARG);
+    UT_CF_AssertEventID(CF_CMD_PURGE_ARG_ERR_EID);
     UtAssert_STUB_COUNT(CF_CList_Traverse, 0);
 }
 
@@ -2312,7 +2312,7 @@ void Test_CF_CmdPurgeQueue_FailWhenActionFail(void)
     UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
                   "CF_AppData.hk.counters.err is %d and should be 1 more than %d", CF_AppData.hk.counters.err,
                   initial_hk_err_counter);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_PURGE_QUEUE);
+    UT_CF_AssertEventID(CF_CMD_PURGE_QUEUE_ERR_EID);
 }
 
 void Test_CF_CmdPurgeQueue_SuccessWhenActionSuccess(void)
@@ -2338,7 +2338,7 @@ void Test_CF_CmdPurgeQueue_SuccessWhenActionSuccess(void)
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_PURGE_QUEUE);
+    UT_CF_AssertEventID(CF_CMD_PURGE_QUEUE_INF_EID);
 }
 
 /*******************************************************************************
@@ -2367,7 +2367,7 @@ void Test_CF_CmdWriteQueue_When_chan_Eq_CF_NUM_CAHNNELS_SendEventAndRejectComman
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_CHAN);
+    UT_CF_AssertEventID(CF_CMD_WQ_CHAN_ERR_EID);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
 }
@@ -2392,7 +2392,7 @@ void Test_CF_CmdWriteQueue_When_chan_GreaterThan_CF_NUM_CAHNNELS_SendEventAndRej
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_CHAN);
+    UT_CF_AssertEventID(CF_CMD_WQ_CHAN_ERR_EID);
 
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
@@ -2422,7 +2422,7 @@ void Test_CF_CmdWriteQueue_WhenUpAndPendingQueueSendEventAndRejectCommand(void)
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_ARGS);
+    UT_CF_AssertEventID(CF_CMD_WQ_ARGS_ERR_EID);
 
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
@@ -2464,7 +2464,7 @@ void Test_CF_CmdWriteQueue_When_CF_WrappedCreat_Fails_type_Is_type_up_And_queue_
     UtAssert_STUB_COUNT(CF_WrappedOpenCreate, 1);
     UtAssert_INT32_EQ(context_CF_WrappedOpenCreate.access, OS_WRITE_ONLY);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_OPEN);
+    UT_CF_AssertEventID(CF_CMD_WQ_OPEN_ERR_EID);
 
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
@@ -2506,7 +2506,7 @@ void Test_CF_CmdWriteQueue_When_CF_WrappedCreat_Fails_type_IsNot_type_up_And_que
     UtAssert_STUB_COUNT(CF_WrappedOpenCreate, 1);
     UtAssert_INT32_EQ(context_CF_WrappedOpenCreate.access, OS_WRITE_ONLY);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_OPEN);
+    UT_CF_AssertEventID(CF_CMD_WQ_OPEN_ERR_EID);
 
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
@@ -2554,7 +2554,7 @@ void Test_CF_CmdWriteQueue_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedC
     /* Assert */
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_WRITEQ_RX);
+    UT_CF_AssertEventID(CF_CMD_WQ_WRITEQ_RX_ERR_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
@@ -2605,7 +2605,7 @@ void Test_CF_CmdWriteQueue_When_CF_WriteTxnQueueDataToFile_FailsAnd_wq_IsUpAnd_q
     /* Assert */
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_WRITEQ_RX);
+    UT_CF_AssertEventID(CF_CMD_WQ_WRITEQ_RX_ERR_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
@@ -2656,7 +2656,7 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsUpA
     /* Assert */
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_WRITEHIST_RX);
+    UT_CF_AssertEventID(CF_CMD_WQ_WRITEHIST_RX_ERR_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
@@ -2707,7 +2707,7 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnFirstCallAnd_wq
     /* Assert */
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_WRITEQ_TX);
+    UT_CF_AssertEventID(CF_CMD_WQ_WRITEQ_TX_ERR_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
@@ -2760,7 +2760,7 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryDataToFile_FailsOnSecondCallAnd_w
     /* Assert */
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 2);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_WRITEQ_TX);
+    UT_CF_AssertEventID(CF_CMD_WQ_WRITEQ_TX_ERR_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
@@ -2811,7 +2811,7 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
     /* Assert */
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_WRITEQ_PEND);
+    UT_CF_AssertEventID(CF_CMD_WQ_WRITEQ_PEND_ERR_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
@@ -2862,7 +2862,7 @@ void Test_CF_CmdWriteQueue_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
     /* Assert */
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_WQ_WRITEHIST_TX);
+    UT_CF_AssertEventID(CF_CMD_WQ_WRITEHIST_TX_ERR_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
@@ -2911,7 +2911,7 @@ void Test_CF_CmdWriteQueue_Success_type_AllAnd_q_All(void)
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 4);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 2);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_WQ);
+    UT_CF_AssertEventID(CF_CMD_WQ_INF_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -2956,7 +2956,7 @@ void Test_CF_CmdWriteQueue_Success_type_AllAnd_q_History(void)
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 2);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_WQ);
+    UT_CF_AssertEventID(CF_CMD_WQ_INF_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -3001,7 +3001,7 @@ void Test_CF_CmdWriteQueue_Success_type_AllAnd_q_Active(void)
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 3);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_WQ);
+    UT_CF_AssertEventID(CF_CMD_WQ_INF_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -3046,7 +3046,7 @@ void Test_CF_CmdWriteQueue_Success_type_AllAnd_q_Pend(void)
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_WQ);
+    UT_CF_AssertEventID(CF_CMD_WQ_INF_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -3095,7 +3095,7 @@ void Test_CF_CmdWriteQueue_Success_type_UpAnd_q_All(void)
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_WQ);
+    UT_CF_AssertEventID(CF_CMD_WQ_INF_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -3140,7 +3140,7 @@ void Test_CF_CmdWriteQueue_Success_type_UpAnd_q_History(void)
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_WQ);
+    UT_CF_AssertEventID(CF_CMD_WQ_INF_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -3185,7 +3185,7 @@ void Test_CF_CmdWriteQueue_Success_type_UpAnd_q_Active(void)
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_WQ);
+    UT_CF_AssertEventID(CF_CMD_WQ_INF_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -3232,7 +3232,7 @@ void Test_CF_CmdWriteQueue_Success_type_DownAnd_q_All(void)
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 3);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_WQ);
+    UT_CF_AssertEventID(CF_CMD_WQ_INF_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -3277,7 +3277,7 @@ void Test_CF_CmdWriteQueue_Success_type_DownAnd_q_History(void)
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_WQ);
+    UT_CF_AssertEventID(CF_CMD_WQ_INF_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -3322,7 +3322,7 @@ void Test_CF_CmdWriteQueue_Success_type_DownAnd_q_Active(void)
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 2);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_WQ);
+    UT_CF_AssertEventID(CF_CMD_WQ_INF_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -3367,7 +3367,7 @@ void Test_CF_CmdWriteQueue_Success_type_DownAnd_q_Pend(void)
     UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_WQ);
+    UT_CF_AssertEventID(CF_CMD_WQ_INF_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 0);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -3525,7 +3525,7 @@ void Test_CF_CmdGetSetParam(void)
     {
         UT_CF_ResetEventCapture();
         UtAssert_VOIDCALL(CF_CmdGetSetParam(1, param_id, 1 + param_id, UT_CFDP_CHANNEL));
-        UT_CF_AssertEventID(CF_EID_INF_CMD_GETSET1);
+        UT_CF_AssertEventID(CF_CMD_GETSET1_INF_EID);
         UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, ++expected_count);
     }
 
@@ -3546,27 +3546,27 @@ void Test_CF_CmdGetSetParam(void)
     {
         UT_CF_ResetEventCapture();
         UtAssert_VOIDCALL(CF_CmdGetSetParam(0, param_id, 1, UT_CFDP_CHANNEL));
-        UT_CF_AssertEventID(CF_EID_INF_CMD_GETSET2);
+        UT_CF_AssertEventID(CF_CMD_GETSET2_INF_EID);
         UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, ++expected_count);
     }
 
     /* Bad param ID */
     UT_CF_ResetEventCapture();
     UtAssert_VOIDCALL(CF_CmdGetSetParam(0, CF_GetSet_ValueID_MAX, 0, UT_CFDP_CHANNEL));
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_GETSET_PARAM);
+    UT_CF_AssertEventID(CF_CMD_GETSET_PARAM_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 
     /* Bad channel ID */
     UT_CF_ResetEventCapture();
     UtAssert_VOIDCALL(CF_CmdGetSetParam(0, 0, 0, CF_NUM_CHANNELS + 1));
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_GETSET_CHAN);
+    UT_CF_AssertEventID(CF_CMD_GETSET_CHAN_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 2);
 
     /* Validation fail */
     UT_CF_ResetEventCapture();
     UtAssert_VOIDCALL(CF_CmdGetSetParam(1, CF_GetSet_ValueID_outgoing_file_chunk_size,
                                         100 + sizeof(CF_CFDP_PduFileDataContent_t), UT_CFDP_CHANNEL));
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_GETSET_VALIDATE);
+    UT_CF_AssertEventID(CF_CMD_GETSET_VALIDATE_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 3);
 }
 
@@ -3597,7 +3597,7 @@ void Test_CF_CmdSetParam_Call_CF_CmdGetSetParam_With_cmd_key_And_cmd_value(void)
     /* Assert */
     UtAssert_UINT32_EQ(CF_AppData.config_table->ticks_per_second, utbuf.sp.value);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_EID_INF_CMD_GETSET1);
+    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_CMD_GETSET1_INF_EID);
     /* Assert for incremented counter() */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
 }
@@ -3628,7 +3628,7 @@ void Test_CF_CmdGetParam_Call_CF_CmdGetSetParam_With_cmd_data_byte_0_AndConstant
     /* Assert */
     /* Note actual value not tested, just flow */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_EID_INF_CMD_GETSET2);
+    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_CMD_GETSET2_INF_EID);
     /* Assert for incremented counter() */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
 }
@@ -3660,7 +3660,7 @@ void Test_CF_CmdEnableEngine_WithEngineNotEnableInitSuccessAndIncrementCmdCounte
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_InitEngine, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_ENABLE_ENGINE);
+    UT_CF_AssertEventID(CF_CMD_ENABLE_ENGINE_INF_EID);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
 }
@@ -3686,7 +3686,7 @@ void Test_CF_CmdEnableEngine_WithEngineNotEnableFailsInitSendEventAndIncrementEr
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_InitEngine, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_ENABLE_ENGINE);
+    UT_CF_AssertEventID(CF_CMD_ENABLE_ENGINE_ERR_EID);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
 }
@@ -3709,7 +3709,7 @@ void Test_CF_CmdEnableEngine_WithEngineEnableFailsSendEventAndIncrementErrCounte
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_InitEngine, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_ENG_ALREADY_ENA);
+    UT_CF_AssertEventID(CF_CMD_ENG_ALREADY_ENA_ERR_EID);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
 }
@@ -3736,7 +3736,7 @@ void Test_CF_CmdDisableEngine_SuccessWhenEngineEnabledAndIncrementCmdCounter(voi
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_DisableEngine, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_DISABLE_ENGINE);
+    UT_CF_AssertEventID(CF_CMD_DISABLE_ENGINE_INF_EID);
 
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -3758,7 +3758,7 @@ void Test_CF_CmdDisableEngine_WhenEngineDisabledAndIncrementErrCounterThenFail(v
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_DisableEngine, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_ENG_ALREADY_DIS);
+    UT_CF_AssertEventID(CF_CMD_ENG_ALREADY_DIS_ERR_EID);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
     UtAssert_True(CF_AppData.hk.counters.err == (uint16)(initial_hk_err_counter + 1),
@@ -3792,7 +3792,7 @@ void Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_GCMD_CC);
+    UT_CF_AssertEventID(CF_CC_ERR_EID);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 }
@@ -3817,7 +3817,7 @@ void Test_CF_ProcessGroundCommand_When_cmd_GreaterThan_CF_NUM_COMMANDS_FailAndSe
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_GCMD_CC);
+    UT_CF_AssertEventID(CF_CC_ERR_EID);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 }
@@ -3844,7 +3844,7 @@ void Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForT
     UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
     UtAssert_STUB_COUNT(CFE_MSG_GetSize, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_CMD_GCMD_LEN);
+    UT_CF_AssertEventID(CF_CMD_LEN_ERR_EID);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.err, 1);
 }
@@ -3872,7 +3872,7 @@ void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_m
     UtAssert_STUB_COUNT(CFE_MSG_GetSize, 1);
     /* Assert for CF_CmdNoop */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_INF_CMD_NOOP);
+    UT_CF_AssertEventID(CF_NOOP_INF_EID);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.hk.counters.cmd, 1);
 }
