@@ -270,7 +270,7 @@ void Test_CF_CFDP_S_Tick(void)
     config->chan[txn->chan_num].ack_limit = 10;
     txn->state                            = CF_TxnState_S2;
     txn->flags.com.ack_timer_armed        = true;
-    txn->state_data.send.sub_state           = CF_TxSubState_WAIT_FOR_EOF_ACK;
+    txn->state_data.send.sub_state        = CF_TxSubState_WAIT_FOR_EOF_ACK;
     UtAssert_VOIDCALL(CF_CFDP_S_Tick(txn, &cont));
     UtAssert_STUB_COUNT(CF_CFDP_SendEof, 1);
 
@@ -280,8 +280,8 @@ void Test_CF_CFDP_S_Tick(void)
     config->chan[txn->chan_num].ack_limit = 10;
     txn->state                            = CF_TxnState_S2;
     txn->flags.com.ack_timer_armed        = true;
-    txn->state_data.send.sub_state           = CF_TxSubState_WAIT_FOR_EOF_ACK;
-    txn->state_data.send.s2.acknak_count     = 9;
+    txn->state_data.send.sub_state        = CF_TxSubState_WAIT_FOR_EOF_ACK;
+    txn->state_data.send.s2.acknak_count  = 9;
     UtAssert_VOIDCALL(CF_CFDP_S_Tick(txn, &cont));
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_S_ACK_LIMIT);
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.ack_limit, 1);
@@ -293,7 +293,7 @@ void Test_CF_CFDP_S_Tick(void)
     config->chan[txn->chan_num].ack_limit = 10;
     txn->state                            = CF_TxnState_S2;
     txn->flags.com.ack_timer_armed        = true;
-    txn->state_data.send.sub_state           = CF_TxSubState_WAIT_FOR_EOF_ACK;
+    txn->state_data.send.sub_state        = CF_TxSubState_WAIT_FOR_EOF_ACK;
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendEof), 1, CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
     UtAssert_VOIDCALL(CF_CFDP_S_Tick(txn, &cont));
 
@@ -303,13 +303,13 @@ void Test_CF_CFDP_S_Tick(void)
     config->chan[txn->chan_num].ack_limit = 10;
     txn->state                            = CF_TxnState_S2;
     txn->flags.com.ack_timer_armed        = true;
-    txn->state_data.send.sub_state           = CF_TxSubState_WAIT_FOR_EOF_ACK;
+    txn->state_data.send.sub_state        = CF_TxSubState_WAIT_FOR_EOF_ACK;
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendEof), 1, CF_SEND_PDU_ERROR);
     UtAssert_VOIDCALL(CF_CFDP_S_Tick(txn, &cont));
     UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 3);
 
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
-    txn->state                  = CF_TxnState_S2;
+    txn->state                     = CF_TxnState_S2;
     txn->state_data.send.sub_state = CF_TxSubState_SEND_FIN_ACK;
     UtAssert_VOIDCALL(CF_CFDP_S_Tick(txn, &cont));
     UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 4);
@@ -435,7 +435,7 @@ void Test_CF_CFDP_S_SendFileData(void)
     /* nominal, smaller than chunk, no CRC */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
     config->outgoing_file_chunk_size = 150;
-    txn->fsize                         = 300;
+    txn->fsize                       = 300;
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, read_size);
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(txn, offset, read_size, false), read_size);
     cumulative_read += read_size;
@@ -444,7 +444,7 @@ void Test_CF_CFDP_S_SendFileData(void)
     /* nominal, larger than PDU, no CRC */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
     config->outgoing_file_chunk_size = CF_MAX_PDU_SIZE * 2;
-    txn->fsize                         = CF_MAX_PDU_SIZE * 2;
+    txn->fsize                       = CF_MAX_PDU_SIZE * 2;
     read_size                        = CF_MAX_PDU_SIZE;
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, read_size);
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(txn, offset, read_size * 2, false), read_size);
@@ -456,7 +456,7 @@ void Test_CF_CFDP_S_SendFileData(void)
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
     config->outgoing_file_chunk_size = 50;
     read_size                        = 100;
-    txn->fsize                         = 300;
+    txn->fsize                       = 300;
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, config->outgoing_file_chunk_size);
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(txn, offset, read_size, true), config->outgoing_file_chunk_size);
     cumulative_read += config->outgoing_file_chunk_size;
@@ -468,7 +468,7 @@ void Test_CF_CFDP_S_SendFileData(void)
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendFd), 1, CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, read_size);
     config->outgoing_file_chunk_size = read_size;
-    txn->fsize                         = 300;
+    txn->fsize                       = 300;
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(txn, offset, read_size, true), 0);
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.sent.file_data_bytes, cumulative_read);
 
@@ -477,7 +477,7 @@ void Test_CF_CFDP_S_SendFileData(void)
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendFd), 1, CF_SEND_PDU_ERROR);
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, read_size);
     config->outgoing_file_chunk_size = read_size;
-    txn->fsize                         = 300;
+    txn->fsize                       = 300;
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(txn, offset, read_size, true), -1);
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_S_SEND_FD);
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.sent.file_data_bytes, cumulative_read);
@@ -486,7 +486,7 @@ void Test_CF_CFDP_S_SendFileData(void)
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, -1);
     config->outgoing_file_chunk_size = read_size;
-    txn->fsize                         = 300;
+    txn->fsize                       = 300;
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(txn, offset, read_size, true), -1);
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.sent.file_data_bytes, cumulative_read);
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_read, 1);
@@ -498,7 +498,7 @@ void Test_CF_CFDP_S_SendFileData(void)
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedLseek), 1, offset);
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, read_size);
     config->outgoing_file_chunk_size = read_size;
-    txn->fsize                         = 300;
+    txn->fsize                       = 300;
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(txn, offset, read_size, true), read_size);
     cumulative_read += read_size;
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.sent.file_data_bytes, cumulative_read);
@@ -507,7 +507,7 @@ void Test_CF_CFDP_S_SendFileData(void)
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedLseek), 1, -1);
     config->outgoing_file_chunk_size = read_size;
-    txn->fsize                         = 300;
+    txn->fsize                       = 300;
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(txn, offset, read_size, true), -1);
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.sent.file_data_bytes, cumulative_read);
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_seek, 1);
@@ -529,8 +529,8 @@ void Test_CF_CFDP_S_SubstateSendFileData(void)
     /* nominal, whole file at once */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
     config->outgoing_file_chunk_size = CF_MAX_PDU_SIZE;
-    txn->state_data.send.sub_state        = CF_TxSubState_FILEDATA;
-    txn->fsize                         = CF_MAX_PDU_SIZE / 2;
+    txn->state_data.send.sub_state   = CF_TxSubState_FILEDATA;
+    txn->fsize                       = CF_MAX_PDU_SIZE / 2;
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, txn->fsize);
     UtAssert_VOIDCALL(CF_CFDP_S_SubstateSendFileData(txn));
     UtAssert_UINT32_EQ(txn->state_data.send.sub_state, CF_TxSubState_EOF);
@@ -539,8 +539,8 @@ void Test_CF_CFDP_S_SubstateSendFileData(void)
     /* nominal, less than whole file at once */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
     config->outgoing_file_chunk_size = CF_MAX_PDU_SIZE / 2;
-    txn->state_data.send.sub_state        = CF_TxSubState_FILEDATA;
-    txn->fsize                         = CF_MAX_PDU_SIZE;
+    txn->state_data.send.sub_state   = CF_TxSubState_FILEDATA;
+    txn->fsize                       = CF_MAX_PDU_SIZE;
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, config->outgoing_file_chunk_size);
     UtAssert_VOIDCALL(CF_CFDP_S_SubstateSendFileData(txn));
     UtAssert_UINT32_EQ(txn->state_data.send.sub_state, CF_TxSubState_FILEDATA);
@@ -598,8 +598,8 @@ void Test_CF_CFDP_S_CheckAndRespondNak(void)
     /* with chunklist - this will send file data, which needs to be set up for */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
     config->outgoing_file_chunk_size = CF_MAX_PDU_SIZE;
-    txn->fsize                         = ut_chunk.size;
-    txn->chunks                        = &chunks;
+    txn->fsize                       = ut_chunk.size;
+    txn->chunks                      = &chunks;
     UT_SetHandlerFunction(UT_KEY(CF_ChunkList_GetFirstChunk), UT_AltHandler_GenericPointerReturn, &ut_chunk);
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, ut_chunk.size);
     UtAssert_INT32_EQ(CF_CFDP_S_CheckAndRespondNak(txn), 1);
@@ -607,8 +607,8 @@ void Test_CF_CFDP_S_CheckAndRespondNak(void)
     /* with chunklist - failure to send file data */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
     config->outgoing_file_chunk_size = CF_MAX_PDU_SIZE;
-    txn->fsize                         = ut_chunk.size;
-    txn->chunks                        = &chunks;
+    txn->fsize                       = ut_chunk.size;
+    txn->chunks                      = &chunks;
     UT_SetHandlerFunction(UT_KEY(CF_ChunkList_GetFirstChunk), UT_AltHandler_GenericPointerReturn, &ut_chunk);
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, -1);
     UtAssert_INT32_EQ(CF_CFDP_S_CheckAndRespondNak(txn), -1);
@@ -616,8 +616,8 @@ void Test_CF_CFDP_S_CheckAndRespondNak(void)
     /* with chunklist but CF_CFDP_S_SendFileData returning 0 (nothing to send) */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
     config->outgoing_file_chunk_size = CF_MAX_PDU_SIZE;
-    txn->fsize                         = ut_chunk.size;
-    txn->chunks                        = &chunks;
+    txn->fsize                       = ut_chunk.size;
+    txn->chunks                      = &chunks;
     UT_SetHandlerFunction(UT_KEY(CF_ChunkList_GetFirstChunk), UT_AltHandler_GenericPointerReturn, &ut_chunk);
     UT_ResetState(UT_KEY(CF_CFDP_ConstructPduHeader)); /* Returns NULL by default */
     UtAssert_INT32_EQ(CF_CFDP_S_CheckAndRespondNak(txn), 0);
@@ -790,7 +790,7 @@ void Test_CF_CFDP_S2_Nak(void)
     nak->segment_list.num_segments = 2;
     nak->segment_list.segments[0]  = (CF_Logical_SegmentRequest_t) {0, 200};
     nak->segment_list.segments[1]  = (CF_Logical_SegmentRequest_t) {200, 300};
-    txn->fsize                       = 300;
+    txn->fsize                     = 300;
     UtAssert_VOIDCALL(CF_CFDP_S2_Nak(txn, ph));
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.nak_segment_requests, 3);
 
@@ -801,7 +801,7 @@ void Test_CF_CFDP_S2_Nak(void)
     nak->segment_list.segments[0]  = (CF_Logical_SegmentRequest_t) {200, 100};
     nak->segment_list.segments[1]  = (CF_Logical_SegmentRequest_t) {100, 400};
     nak->segment_list.segments[2]  = (CF_Logical_SegmentRequest_t) {400, 0};
-    txn->fsize                       = 300;
+    txn->fsize                     = 300;
     UtAssert_VOIDCALL(CF_CFDP_S2_Nak(txn, ph));
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.nak_segment_requests, 6);
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_S_INVALID_SR);

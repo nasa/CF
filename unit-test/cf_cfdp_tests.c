@@ -702,7 +702,7 @@ void Test_CF_CFDP_SendAck(void)
 
     /* nominal as receiver */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, &txn, NULL);
-    ack      = &ph->int_header.ack;
+    ack        = &ph->int_header.ack;
     txn->state = CF_TxnState_R2;
     UtAssert_INT32_EQ(CF_CFDP_SendAck(txn, CF_CFDP_AckTxnStatus_ACTIVE, CF_CFDP_FileDirective_EOF,
                                       CF_CFDP_ConditionCode_NO_ERROR, 1, 42),
@@ -714,7 +714,7 @@ void Test_CF_CFDP_SendAck(void)
 
     /* nominal as sender */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, &txn, NULL);
-    ack      = &ph->int_header.ack;
+    ack        = &ph->int_header.ack;
     txn->state = CF_TxnState_S2;
     UtAssert_INT32_EQ(CF_CFDP_SendAck(txn, CF_CFDP_AckTxnStatus_ACTIVE, CF_CFDP_FileDirective_EOF,
                                       CF_CFDP_ConditionCode_NO_ERROR, 1, 42),
@@ -726,7 +726,7 @@ void Test_CF_CFDP_SendAck(void)
 
     /* still success path but with non-nominal values */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, &txn, NULL);
-    ack      = &ph->int_header.ack;
+    ack        = &ph->int_header.ack;
     txn->state = CF_TxnState_R2;
     UtAssert_INT32_EQ(CF_CFDP_SendAck(txn, CF_CFDP_AckTxnStatus_TERMINATED, CF_CFDP_FileDirective_FIN,
                                       CF_CFDP_ConditionCode_FILESTORE_REJECTION, 1, 42),
@@ -1062,7 +1062,7 @@ void Test_CF_CFDP_CycleTxFirstActive(void)
     /* nominal, with chan->cur set non-null, should skip loop and return 1 */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &args.chan, NULL, &txn, NULL);
     txn->flags.com.q_index = CF_QueueIdx_TXA; /* must be this */
-    args.chan->cur          = txn;
+    args.chan->cur         = txn;
     UtAssert_INT32_EQ(CF_CFDP_CycleTxFirstActive(&txn->cl_node, &args), 1);
     UtAssert_BOOL_TRUE(args.ran_one);
 
@@ -1072,7 +1072,7 @@ void Test_CF_CFDP_CycleTxFirstActive(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
     txn->state             = CF_TxnState_S1;
     txn->flags.com.q_index = CF_QueueIdx_TXA; /* must be this */
-    args.chan->cur          = NULL;
+    args.chan->cur         = NULL;
     UT_SetHookFunction(UT_KEY(CF_CFDP_TxStateDispatch), Ut_Hook_StateHandler_SetQIndex, NULL);
     UtAssert_INT32_EQ(CF_CFDP_CycleTxFirstActive(&txn->cl_node, &args), 1);
 }
@@ -1102,7 +1102,7 @@ void Test_CF_CFDP_DoTick(void)
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &args.chan, NULL, &txn, NULL);
     args.chan->cur = &txn2;
-    args.cont   = true;
+    args.cont      = true;
     UtAssert_INT32_EQ(CF_CFDP_DoTick(&txn->cl_node, &args), CF_CLIST_CONT);
     UtAssert_BOOL_TRUE(args.cont);
 
@@ -1113,7 +1113,7 @@ void Test_CF_CFDP_DoTick(void)
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &args.chan, NULL, &txn, NULL);
     txn->flags.com.suspended = 1;
-    args.cont              = true;
+    args.cont                = true;
     UtAssert_INT32_EQ(CF_CFDP_DoTick(&txn->cl_node, &args), CF_CLIST_CONT);
     UtAssert_BOOL_TRUE(args.cont);
 
@@ -1368,9 +1368,9 @@ void Test_CF_CFDP_ResetTransaction(void)
 
     UT_ResetState(UT_KEY(CF_FreeTransaction));
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, &history, &txn, NULL);
-    txn->fd    = OS_ObjectIdFromInteger(1);
-    history->dir   = CF_Direction_TX;
-    txn->state = CF_TxnState_S1;
+    txn->fd      = OS_ObjectIdFromInteger(1);
+    history->dir = CF_Direction_TX;
+    txn->state   = CF_TxnState_S1;
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 1));
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));
     UtAssert_STUB_COUNT(CF_FreeTransaction, 2);
@@ -1401,19 +1401,19 @@ void Test_CF_CFDP_ResetTransaction(void)
 
     UT_ResetState(UT_KEY(CF_FreeTransaction));
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, &history, &txn, NULL);
-    txn->fd    = OS_ObjectIdFromInteger(1);
-    history->dir   = CF_Direction_RX;
-    txn->state = CF_TxnState_R1;
+    txn->fd      = OS_ObjectIdFromInteger(1);
+    history->dir = CF_Direction_RX;
+    txn->state   = CF_TxnState_R1;
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 1));
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));
     UtAssert_STUB_COUNT(CF_FreeTransaction, 2);
 
     UT_ResetState(UT_KEY(CF_FreeTransaction));
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
-    txn->fd    = OS_ObjectIdFromInteger(1);
-    history->dir   = CF_Direction_TX;
-    txn->keep  = 1;
-    txn->state = CF_TxnState_S1;
+    txn->fd      = OS_ObjectIdFromInteger(1);
+    history->dir = CF_Direction_TX;
+    txn->keep    = 1;
+    txn->state   = CF_TxnState_S1;
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 1));
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));
     UtAssert_STUB_COUNT(CF_FreeTransaction, 2);
@@ -1425,12 +1425,12 @@ void Test_CF_CFDP_ResetTransaction(void)
      */
     UT_ResetState(UT_KEY(CF_FreeTransaction));
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, &history, &txn, NULL);
-    pb.num_ts          = 10;
-    txn->pb               = &pb;
-    chan->cur             = txn;
+    pb.num_ts            = 10;
+    txn->pb              = &pb;
+    chan->cur            = txn;
     txn->flags.tx.cmd_tx = 5;
-    chan->num_cmd_tx      = 8;
-    history->dir             = CF_Direction_TX;
+    chan->num_cmd_tx     = 8;
+    history->dir         = CF_Direction_TX;
     txn->state           = CF_TxnState_S1;
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 1));
     UtAssert_NULL(chan->cur);

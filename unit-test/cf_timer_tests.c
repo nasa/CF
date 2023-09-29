@@ -138,8 +138,8 @@ void Test_CF_Timer_Tick_When_t_tick_Is_non0_Decrement_t_tick(void)
 {
     /* Arrange */
     uint32      initial_tick = Any_uint32_Except(0);
-    CF_Timer_t  txn;
-    CF_Timer_t *arg_t = &txn;
+    CF_Timer_t  timer;
+    CF_Timer_t *arg_t = &timer;
 
     arg_t->tick = initial_tick;
 

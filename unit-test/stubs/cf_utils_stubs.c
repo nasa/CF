@@ -41,8 +41,9 @@ void UT_DefaultHandler_CF_WriteTxnQueueDataToFile(void *, UT_EntryKey_t, const U
  * Generated stub function for CF_FindTransactionBySequenceNumber()
  * ----------------------------------------------------
  */
-CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *chan, CF_TransactionSeq_t transaction_sequence_number,
-                                                     CF_EntityId_t src_eid)
+CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *      chan,
+                                                     CF_TransactionSeq_t transaction_sequence_number,
+                                                     CF_EntityId_t       src_eid)
 {
     UT_GenStub_SetupReturnBuffer(CF_FindTransactionBySequenceNumber, CF_Transaction_t *);
 

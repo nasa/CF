@@ -2,7 +2,7 @@
  * NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
  * Application version 3.0.0”
  *
- * Copyright (chan) 2019 United States Government as represented by the
+ * Copyright (c) 2019 United States Government as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All Rights Reserved.
  *
@@ -113,9 +113,9 @@ void UT_DefaultHandler_CF_WriteTxnQueueDataToFile(void *UserObj, UT_EntryKey_t F
 
     if (ctxt)
     {
-        ctxt->fd       = UT_Hook_GetArgValueByName(Context, "fd", int32);
-        ctxt->chan     = UT_Hook_GetArgValueByName(Context, "chan", CF_Channel_t *);
-        ctxt->queue    = UT_Hook_GetArgValueByName(Context, "queue", CF_QueueIdx_t);
+        ctxt->fd    = UT_Hook_GetArgValueByName(Context, "fd", int32);
+        ctxt->chan  = UT_Hook_GetArgValueByName(Context, "chan", CF_Channel_t *);
+        ctxt->queue = UT_Hook_GetArgValueByName(Context, "queue", CF_QueueIdx_t);
     }
 }
 

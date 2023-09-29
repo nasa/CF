@@ -213,8 +213,9 @@ void CF_FreeTransaction(CF_Transaction_t *txn);
  * @returns Pointer to the given transaction if found
  * @retval  NULL if the transaction is not found
  */
-CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *chan, CF_TransactionSeq_t transaction_sequence_number,
-                                                     CF_EntityId_t src_eid);
+CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *      chan,
+                                                     CF_TransactionSeq_t transaction_sequence_number,
+                                                     CF_EntityId_t       src_eid);
 
 /************************************************************************/
 /** @brief List traversal function to check if the desired sequence number matches.

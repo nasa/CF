@@ -282,7 +282,7 @@ void Test_CF_CFDP_ReceiveMessage(void)
     config->local_eid             = 123;
     ph->pdu_header.source_eid     = config->local_eid;
     ph->fdirective.directive_code = CF_CFDP_FileDirective_FIN;
-    chan->cur                        = txn;
+    chan->cur                     = txn;
     UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.spurious, 1);
     UtAssert_STUB_COUNT(CF_CFDP_SendAck, 1);
@@ -296,8 +296,8 @@ void Test_CF_CFDP_ReceiveMessage(void)
     ph->fdirective.directive_code = CF_CFDP_FileDirective_FIN;
     UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.spurious, 1); /* no increment */
-    UtAssert_STUB_COUNT(CF_CFDP_SendAck, 1);                                             /* no increment */
-    UtAssert_NULL(chan->cur);                                                               /* cleared */
+    UtAssert_STUB_COUNT(CF_CFDP_SendAck, 1);                                               /* no increment */
+    UtAssert_NULL(chan->cur);                                                              /* cleared */
 
     /* FIN handling special case, but failure of CF_CFDP_SendAck */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, &config);
@@ -305,10 +305,10 @@ void Test_CF_CFDP_ReceiveMessage(void)
     config->local_eid             = 123;
     ph->pdu_header.source_eid     = config->local_eid;
     ph->fdirective.directive_code = CF_CFDP_FileDirective_FIN;
-    chan->cur                        = txn;
+    chan->cur                     = txn;
     UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
     UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.spurious, 2); /* this does get increment */
-    UtAssert_ADDRESS_EQ(chan->cur, txn);                                                      /* not changed */
+    UtAssert_ADDRESS_EQ(chan->cur, txn);                                                   /* not changed */
 
     /* recv but not the correct destination_eid */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, &config);
@@ -320,8 +320,8 @@ void Test_CF_CFDP_ReceiveMessage(void)
     /* recv correct destination_eid but CF_MAX_SIMULTANEOUS_RX hit */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, &config);
     CF_AppData.hk.channel_hk[txn->chan_num].q_size[CF_QueueIdx_RX] = CF_MAX_SIMULTANEOUS_RX;
-    config->local_eid                                            = 123;
-    ph->pdu_header.destination_eid                               = config->local_eid;
+    config->local_eid                                              = 123;
+    ph->pdu_header.destination_eid                                 = config->local_eid;
     UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_RX_DROPPED);
 }

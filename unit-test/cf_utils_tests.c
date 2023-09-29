@@ -95,7 +95,7 @@ static void UT_Callback_CF_TraverseAllTransactions(CF_Transaction_t *txn, void *
 
     if (ctxt)
     {
-        ctxt->txn       = txn;
+        ctxt->txn     = txn;
         ctxt->context = context;
     }
 }
@@ -109,7 +109,7 @@ static void UT_AltHandler_CF_CList_Traverse_SeqArg_SetTxn(void *UserObj, UT_Entr
                                                           const UT_StubContext_t *Context)
 {
     CF_Traverse_TransSeqArg_t *arg = UT_Hook_GetArgValueByName(Context, "context", CF_Traverse_TransSeqArg_t *);
-    arg->txn                         = UserObj;
+    arg->txn                       = UserObj;
 }
 
 /*******************************************************************************
@@ -145,7 +145,7 @@ void Test_CF_FindUnusedTransaction(void)
     memset(&hist, 0, sizeof(hist));
     memset(&txn, 0, sizeof(txn));
     memset(&CF_AppData, 0, sizeof(CF_AppData));
-    chan                                                                  = &CF_AppData.engine.channels[UT_CFDP_CHANNEL];
+    chan                                                               = &CF_AppData.engine.channels[UT_CFDP_CHANNEL];
     CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_FREE] = 2;
     CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_HIST_FREE] = 1;
     CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_HIST]      = 1;

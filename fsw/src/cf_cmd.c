@@ -768,7 +768,7 @@ void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
 void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
 {
     CF_WriteQueueCmd_t *wq      = (CF_WriteQueueCmd_t *)msg;
-    CF_Channel_t *      chan       = &CF_AppData.engine.channels[wq->chan];
+    CF_Channel_t *      chan    = &CF_AppData.engine.channels[wq->chan];
     osal_id_t           fd      = OS_OBJECT_ID_UNDEFINED;
     bool                success = true;
     int32               ret;

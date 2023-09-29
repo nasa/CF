@@ -33,7 +33,7 @@
  */
 typedef struct CF_CFDP_CycleTx_args
 {
-    CF_Channel_t *chan;       /**< \brief channel structure */
+    CF_Channel_t *chan;    /**< \brief channel structure */
     int           ran_one; /**< \brief should be set to 1 if a transaction was cycled */
 } CF_CFDP_CycleTx_args_t;
 
@@ -42,7 +42,7 @@ typedef struct CF_CFDP_CycleTx_args
  */
 typedef struct CF_CFDP_Tick_args
 {
-    CF_Channel_t *chan;                       /**< \brief channel structure */
+    CF_Channel_t *chan;                    /**< \brief channel structure */
     void (*fn)(CF_Transaction_t *, int *); /**< \brief function pointer */
     int early_exit;                        /**< \brief early exit result */
     int cont;                              /**< \brief if 1, then re-traverse the list */

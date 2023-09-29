@@ -195,7 +195,7 @@ typedef struct CF_ChunkWrapper
 /**
  * @brief CF Playback entry
  *
- * Keeps the state of CF pb requests
+ * Keeps the state of CF playback requests
  */
 typedef struct CF_Playback
 {
@@ -385,7 +385,7 @@ typedef enum
  *
  * This keeps the state of CF channels
  *
- * Each CF channel has a separate transaction list, PDU throttle, pb,
+ * Each CF channel has a separate transaction list, PDU throttle, playback,
  * and poll state, as well as separate addresses on the underlying message
  * transport (e.g. SB).
  */

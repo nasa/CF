@@ -61,7 +61,7 @@
 CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool silent)
 {
     /* if channel is frozen, do not take message */
-    CF_Channel_t *          chan       = CF_AppData.engine.channels + txn->chan_num;
+    CF_Channel_t *          chan    = CF_AppData.engine.channels + txn->chan_num;
     bool                    success = true;
     CF_Logical_PduBuffer_t *ret;
     int32                   os_status;
@@ -81,8 +81,8 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool sile
          CF_AppData.config_table->chan[txn->chan_num].max_outgoing_messages_per_wakeup))
     {
         /* no more messages this wakeup allowed */
-        chan->cur  = txn; /* remember where we were for next time */
-        success = false;
+        chan->cur = txn; /* remember where we were for next time */
+        success   = false;
     }
 
     if (success && !CF_AppData.hk.channel_hk[txn->chan_num].frozen && !txn->flags.com.suspended)
@@ -118,7 +118,8 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool sile
         if (success)
         {
             CFE_MSG_Init(&CF_AppData.engine.out.msg->Msg,
-                         CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[txn->chan_num].mid_output), offsetof(CF_PduTlmMsg_t, ph));
+                         CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[txn->chan_num].mid_output),
+                         offsetof(CF_PduTlmMsg_t, ph));
             ++CF_AppData.engine.outgoing_counter; /* even if max_outgoing_messages_per_wakeup is 0 (unlimited), it's ok
                                                     to inc this */
 

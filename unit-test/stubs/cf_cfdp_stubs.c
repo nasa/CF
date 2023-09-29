@@ -135,6 +135,7 @@ int CF_CFDP_CopyStringFromLV(char *buf, size_t buf_maxsz, const CF_Logical_Lv_t 
  */
 void CF_CFDP_CycleEngine(void)
 {
+
     UT_GenStub_Execute(CF_CFDP_CycleEngine, Basic, NULL);
 }
 
@@ -191,6 +192,7 @@ void CF_CFDP_DecodeStart(CF_DecoderState_t *pdec, const void *msgbuf, CF_Logical
  */
 void CF_CFDP_DisableEngine(void)
 {
+
     UT_GenStub_Execute(CF_CFDP_DisableEngine, Basic, NULL);
 }
 
@@ -452,16 +454,16 @@ CFE_Status_t CF_CFDP_RecvNak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
  * Generated stub function for CF_CFDP_RecvPh()
  * ----------------------------------------------------
  */
-int CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
+CFE_Status_t CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvPh, int);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvPh, CFE_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_RecvPh, uint8, chan_num);
     UT_GenStub_AddParam(CF_CFDP_RecvPh, CF_Logical_PduBuffer_t *, ph);
 
     UT_GenStub_Execute(CF_CFDP_RecvPh, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_RecvPh, int);
+    return UT_GenStub_GetReturnValue(CF_CFDP_RecvPh, CFE_Status_t);
 }
 
 /*

@@ -2,7 +2,7 @@
  * NASA Docket No. GSC-18,447-1, and identified as “CFS CFDP (CF)
  * Application version 3.0.0”
  *
- * Copyright (chan) 2019 United States Government as represented by the
+ * Copyright (c) 2019 United States Government as represented by the
  * Administrator of the National Aeronautics and Space Administration.
  * All Rights Reserved.
  *

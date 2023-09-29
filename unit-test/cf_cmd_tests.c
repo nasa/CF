@@ -157,7 +157,7 @@ void Dummy_CF_TsnChanAction_fn_t(CF_Transaction_t *txn, void *context)
 
     if (ctxt)
     {
-        ctxt->txn       = txn;
+        ctxt->txn     = txn;
         ctxt->context = context;
     }
 
@@ -252,7 +252,7 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_command_AndResetHkCmdAndErrCountSe
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    msg->data.byte[0] = CF_Reset_command;
+    msg->data.byte[0]          = CF_Reset_command;
     CF_AppData.hk.counters.cmd = Any_uint16_Except(0);
     CF_AppData.hk.counters.err = Any_uint16_Except(0);
 
@@ -1951,7 +1951,7 @@ void Test_CF_CmdEnablePolldir_FailWhenActionFail(void)
     msg->data.byte[0] = channel;
 
     /* Arrange unstubbable: CF_DoEnableDisablePolldir */
-    msg->data.byte[1] = error_polldir;
+    msg->data.byte[1]          = error_polldir;
     CF_AppData.hk.counters.err = initial_hk_err_counter;
 
     /* Act */

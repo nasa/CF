@@ -33,13 +33,13 @@
  */
 bool CF_Timer_Expired(const CF_Timer_t *txn)
 {
-    UT_GenStub_SetupReturnBuffer(CF_Timer_Expired, int);
+    UT_GenStub_SetupReturnBuffer(CF_Timer_Expired, bool);
 
     UT_GenStub_AddParam(CF_Timer_Expired, const CF_Timer_t *, txn);
 
     UT_GenStub_Execute(CF_Timer_Expired, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_Timer_Expired, int);
+    return UT_GenStub_GetReturnValue(CF_Timer_Expired, bool);
 }
 
 /*

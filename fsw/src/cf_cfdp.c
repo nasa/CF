@@ -346,7 +346,8 @@ CFE_Status_t CF_CFDP_SendMd(CF_Transaction_t *txn)
         md->source_filename.length =
             CF_strnlen(txn->history->fnames.src_filename, sizeof(txn->history->fnames.src_filename));
         md->source_filename.data_ptr = txn->history->fnames.src_filename;
-        md->dest_filename.length = CF_strnlen(txn->history->fnames.dst_filename, sizeof(txn->history->fnames.dst_filename));
+        md->dest_filename.length =
+            CF_strnlen(txn->history->fnames.dst_filename, sizeof(txn->history->fnames.dst_filename));
         md->dest_filename.data_ptr = txn->history->fnames.dst_filename;
 
         CF_CFDP_EncodeMd(ph->penc, md);
@@ -683,8 +684,8 @@ CFE_Status_t CF_CFDP_RecvMd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
         }
         else
         {
-            lv_ret = CF_CFDP_CopyStringFromLV(txn->history->fnames.dst_filename, sizeof(txn->history->fnames.dst_filename),
-                                              &md->dest_filename);
+            lv_ret = CF_CFDP_CopyStringFromLV(txn->history->fnames.dst_filename,
+                                              sizeof(txn->history->fnames.dst_filename), &md->dest_filename);
             if (lv_ret < 0)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_PDU_INVALID_DST_LEN, CFE_EVS_EventType_ERROR,
@@ -947,8 +948,8 @@ CFE_Status_t CF_CFDP_InitEngine(void)
 {
     /* initialize all transaction nodes */
     CF_History_t *     history;
-    CF_Transaction_t * txn                = CF_AppData.engine.transactions;
-    CF_ChunkWrapper_t *cw                = CF_AppData.engine.chunks;
+    CF_Transaction_t * txn              = CF_AppData.engine.transactions;
+    CF_ChunkWrapper_t *cw               = CF_AppData.engine.chunks;
     CFE_Status_t       ret              = CFE_SUCCESS;
     int                chunk_mem_offset = 0;
     int                i;
@@ -1056,7 +1057,7 @@ CFE_Status_t CF_CFDP_InitEngine(void)
 CFE_Status_t CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context)
 {
     CF_CFDP_CycleTx_args_t *args = (CF_CFDP_CycleTx_args_t *)context;
-    CF_Transaction_t *      txn    = container_of(node, CF_Transaction_t, cl_node);
+    CF_Transaction_t *      txn  = container_of(node, CF_Transaction_t, cl_node);
     CFE_Status_t            ret  = 1; /* default option is exit traversal */
 
     if (txn->flags.com.suspended)
@@ -1136,7 +1137,7 @@ CFE_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context)
 {
     CFE_Status_t         ret  = CF_CLIST_CONT; /* CF_CLIST_CONT means don't tick one, keep looking for cur */
     CF_CFDP_Tick_args_t *args = (CF_CFDP_Tick_args_t *)context;
-    CF_Transaction_t *   txn    = container_of(node, CF_Transaction_t, cl_node);
+    CF_Transaction_t *   txn  = container_of(node, CF_Transaction_t, cl_node);
     if (!args->chan->cur || (args->chan->cur == txn))
     {
         /* found where we left off, so clear that and move on */
@@ -1387,7 +1388,7 @@ CFE_Status_t CF_CFDP_PlaybackDir(const char *src_filename, const char *dst_filen
  *-----------------------------------------------------------------*/
 void CF_CFDP_ProcessPlaybackDirectory(CF_Channel_t *chan, CF_Playback_t *pb)
 {
-    CF_Transaction_t *pt;
+    CF_Transaction_t *txn;
     os_dirent_t       dirent;
     int32             status;
 
@@ -1408,24 +1409,24 @@ void CF_CFDP_ProcessPlaybackDirectory(CF_Channel_t *chan, CF_Playback_t *pb)
                 continue;
             }
 
-            pt = CF_FindUnusedTransaction(chan);
+            txn = CF_FindUnusedTransaction(chan);
             CF_Assert(pt); /* should be impossible not to have one because there are limits on the number of uses of
                                 them */
 
             /* the -1 below is to make room for the slash */
-            snprintf(pt->history->fnames.src_filename, sizeof(pt->history->fnames.src_filename), "%.*s/%.*s",
+            snprintf(txn->history->fnames.src_filename, sizeof(txn->history->fnames.src_filename), "%.*s/%.*s",
                      CF_FILENAME_MAX_PATH - 1, pb->fnames.src_filename, CF_FILENAME_MAX_NAME - 1, dirent.FileName);
-            snprintf(pt->history->fnames.dst_filename, sizeof(pt->history->fnames.dst_filename), "%.*s/%.*s",
+            snprintf(txn->history->fnames.dst_filename, sizeof(txn->history->fnames.dst_filename), "%.*s/%.*s",
                      CF_FILENAME_MAX_PATH - 1, pb->fnames.dst_filename, CF_FILENAME_MAX_NAME - 1, dirent.FileName);
 
             /* in case snprintf didn't have room for NULL terminator */
-            pt->history->fnames.src_filename[CF_FILENAME_MAX_LEN - 1] = 0;
-            pt->history->fnames.dst_filename[CF_FILENAME_MAX_LEN - 1] = 0;
+            txn->history->fnames.src_filename[CF_FILENAME_MAX_LEN - 1] = 0;
+            txn->history->fnames.dst_filename[CF_FILENAME_MAX_LEN - 1] = 0;
 
-            CF_CFDP_TxFile_Initiate(pt, pb->cfdp_class, pb->keep, (chan - CF_AppData.engine.channels), pb->priority,
+            CF_CFDP_TxFile_Initiate(txn, pb->cfdp_class, pb->keep, (chan - CF_AppData.engine.channels), pb->priority,
                                     pb->dest_id);
 
-            pt->pb = pb;
+            txn->pb = pb;
             ++pb->num_ts;
         }
         else
@@ -1504,7 +1505,7 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *chan)
 
     for (i = 0; i < CF_MAX_POLLING_DIR_PER_CHAN; ++i)
     {
-        poll           = &chan->poll[i];
+        poll        = &chan->poll[i];
         chan_index  = (chan - CF_AppData.engine.channels);
         cc          = &CF_AppData.config_table->chan[chan_index];
         pd          = &cc->polldir[i];
@@ -1523,8 +1524,8 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *chan)
                 else if (CF_Timer_Expired(&poll->interval_timer))
                 {
                     /* the timer has expired */
-                    ret = CF_CFDP_PlaybackDir_Initiate(&poll->pb, pd->src_dir, pd->dst_dir, pd->cfdp_class, 0, chan_index,
-                                                       pd->priority, pd->dest_eid);
+                    ret = CF_CFDP_PlaybackDir_Initiate(&poll->pb, pd->src_dir, pd->dst_dir, pd->cfdp_class, 0,
+                                                       chan_index, pd->priority, pd->dest_eid);
                     if (!ret)
                     {
                         poll->timer_set = 0;
@@ -1570,7 +1571,7 @@ void CF_CFDP_CycleEngine(void)
     {
         for (i = 0; i < CF_NUM_CHANNELS; ++i)
         {
-            chan                                  = &CF_AppData.engine.channels[i];
+            chan                               = &CF_AppData.engine.channels[i];
             CF_AppData.engine.outgoing_counter = 0;
 
             /* consume all received messages, even if channel is frozen */
@@ -1606,7 +1607,7 @@ void CF_CFDP_ResetTransaction(CF_Transaction_t *txn, int keep_history)
     char *        filename;
     char          destination[OS_MAX_PATH_LEN];
     osal_status_t status = OS_ERROR;
-    CF_Channel_t *chan      = &CF_AppData.engine.channels[txn->chan_num];
+    CF_Channel_t *chan   = &CF_AppData.engine.channels[txn->chan_num];
     CF_Assert(txn->chan_num < CF_NUM_CHANNELS);
 
     CF_CFDP_SendEotPkt(txn);

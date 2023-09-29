@@ -38,7 +38,7 @@
  */
 typedef struct
 {
-    CF_Transaction_t *   txn;   /**< \brief Current transaction being processed */
+    CF_Transaction_t *   txn; /**< \brief Current transaction being processed */
     CF_Logical_PduNak_t *nak; /**< \brief Current NAK PDU contents */
 } CF_GapComputeArgs_t;
 

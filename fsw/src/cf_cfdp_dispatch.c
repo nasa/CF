@@ -63,7 +63,8 @@ void CF_CFDP_R_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_DC_INV, CFE_EVS_EventType_ERROR,
                               "CF R%d(%lu:%lu): received PDU with invalid directive code %d for sub-state %d",
                               (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
-                              (unsigned long)txn->history->seq_num, fdh->directive_code, txn->state_data.receive.sub_state);
+                              (unsigned long)txn->history->seq_num, fdh->directive_code,
+                              txn->state_data.receive.sub_state);
         }
     }
     else
@@ -122,7 +123,8 @@ void CF_CFDP_S_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_DC_INV, CFE_EVS_EventType_ERROR,
                               "CF S%d(%lu:%lu): received PDU with invalid directive code %d for sub-state %d",
                               (txn->state == CF_TxnState_S2), (unsigned long)txn->history->src_eid,
-                              (unsigned long)txn->history->seq_num, fdh->directive_code, txn->state_data.send.sub_state);
+                              (unsigned long)txn->history->seq_num, fdh->directive_code,
+                              txn->state_data.send.sub_state);
         }
     }
     else

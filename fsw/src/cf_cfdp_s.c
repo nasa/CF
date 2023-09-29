@@ -92,7 +92,7 @@ void CF_CFDP_S1_SubstateSendEof(CF_Transaction_t *txn)
  *-----------------------------------------------------------------*/
 void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *txn)
 {
-    txn->state_data.send.sub_state    = CF_TxSubState_WAIT_FOR_EOF_ACK;
+    txn->state_data.send.sub_state = CF_TxSubState_WAIT_FOR_EOF_ACK;
     txn->flags.com.ack_timer_armed = 1; /* will cause tick to see ack_timer as expired, and act */
 
     /* no longer need to send file data PDU except in the case of NAK response */
@@ -168,9 +168,9 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 
             if (status != foffs)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEEK_FD, CFE_EVS_EventType_ERROR,
-                                  "CF S%d(%lu:%lu): error seeking to offset %ld, got %ld", (txn->state == CF_TxnState_S2),
-                                  (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num, (long)foffs,
-                                  (long)status);
+                                  "CF S%d(%lu:%lu): error seeking to offset %ld, got %ld",
+                                  (txn->state == CF_TxnState_S2), (unsigned long)txn->history->src_eid,
+                                  (unsigned long)txn->history->seq_num, (long)foffs, (long)status);
                 ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_seek;
                 success = false;
             }
@@ -369,7 +369,7 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *txn)
                                   (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
                                   txn->history->fnames.src_filename, (long)ret);
                 ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_open;
-                txn->fd   = OS_OBJECT_ID_UNDEFINED; /* just in case */
+                txn->fd = OS_OBJECT_ID_UNDEFINED; /* just in case */
                 success = false;
             }
         }
@@ -382,7 +382,8 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *txn)
                 CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEEK_END, CFE_EVS_EventType_ERROR,
                                   "CF S%d(%lu:%lu): failed to seek end file %s, error=%ld",
                                   (txn->state == CF_TxnState_S2), (unsigned long)txn->history->src_eid,
-                                  (unsigned long)txn->history->seq_num, txn->history->fnames.src_filename, (long)status);
+                                  (unsigned long)txn->history->seq_num, txn->history->fnames.src_filename,
+                                  (long)status);
                 ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_seek;
                 success = false;
             }
@@ -398,7 +399,8 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *txn)
                 CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEEK_BEG, CFE_EVS_EventType_ERROR,
                                   "CF S%d(%lu:%lu): failed to seek begin file %s, got %ld",
                                   (txn->state == CF_TxnState_S2), (unsigned long)txn->history->src_eid,
-                                  (unsigned long)txn->history->seq_num, txn->history->fnames.src_filename, (long)status);
+                                  (unsigned long)txn->history->seq_num, txn->history->fnames.src_filename,
+                                  (long)status);
                 ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_seek;
                 success = false;
             }
@@ -532,8 +534,9 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
         if (bad_sr)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_INVALID_SR, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%lu:%lu): received %d invalid NAK segment requests", (txn->state == CF_TxnState_S2),
-                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num, bad_sr);
+                              "CF S%d(%lu:%lu): received %d invalid NAK segment requests",
+                              (txn->state == CF_TxnState_S2), (unsigned long)txn->history->src_eid,
+                              (unsigned long)txn->history->seq_num, bad_sr);
         }
     }
     else
@@ -575,7 +578,7 @@ void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
         }
         else
         {
-            txn->state_data.send.sub_state    = CF_TxSubState_WAIT_FOR_FIN;
+            txn->state_data.send.sub_state = CF_TxSubState_WAIT_FOR_FIN;
             txn->flags.com.ack_timer_armed = 0; /* just wait for FIN now, nothing to re-send */
         }
     }
@@ -730,11 +733,13 @@ void CF_CFDP_S_Tick(CF_Transaction_t *txn, int *cont /* unused */)
                         ++txn->state_data.send.s2.acknak_count;
 
                         /* Check limit and handle if needed */
-                        if (txn->state_data.send.s2.acknak_count >= CF_AppData.config_table->chan[txn->chan_num].ack_limit)
+                        if (txn->state_data.send.s2.acknak_count >=
+                            CF_AppData.config_table->chan[txn->chan_num].ack_limit)
                         {
                             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_ACK_LIMIT, CFE_EVS_EventType_ERROR,
                                               "CF S2(%lu:%lu), ack limit reached, no eof-ack",
-                                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
+                                              (unsigned long)txn->history->src_eid,
+                                              (unsigned long)txn->history->seq_num);
                             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_ACK_LIMIT_NO_EOF);
                             ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.ack_limit;
 
