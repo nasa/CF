@@ -40,7 +40,7 @@ typedef struct CF_Traverse_TransSeqArg
 {
     CF_TransactionSeq_t transaction_sequence_number;
     CF_EntityId_t       src_eid;
-    CF_Transaction_t *  t; /**< \brief output transaction pointer */
+    CF_Transaction_t *  txn; /**< \brief output transaction pointer */
 } CF_Traverse_TransSeqArg_t;
 
 /**
@@ -82,10 +82,10 @@ typedef struct CF_Traverse_WriteTxnFileArg
 /**
  * @brief Callback function type for use with CF_TraverseAllTransactions()
  *
- * @param t Pointer to current transaction being traversed
+ * @param txn Pointer to current transaction being traversed
  * @param context Opaque object passed from initial call
  */
-typedef void (*CF_TraverseAllTransactions_fn_t)(CF_Transaction_t *t, void *context);
+typedef void (*CF_TraverseAllTransactions_fn_t)(CF_Transaction_t *txn, void *context);
 
 /**
  * @brief Argument structure for use with CF_TraverseAllTransactions()
@@ -106,7 +106,7 @@ typedef struct CF_TraverseAll_Arg
  */
 typedef struct CF_Traverse_PriorityArg
 {
-    CF_Transaction_t *t; /**< \brief OUT: holds value of transaction with which to call CF_CList_InsertAfter on */
+    CF_Transaction_t *txn; /**< \brief OUT: holds value of transaction with which to call CF_CList_InsertAfter on */
     uint8             priority; /**< \brief seeking this priority */
 } CF_Traverse_PriorityArg_t;
 
@@ -119,57 +119,57 @@ typedef struct CF_Traverse_PriorityArg
  * otherwise if the structure is zero'd out the queue
  * will become corrupted due to other nodes on the queue
  * pointing to an invalid node */
-static inline void CF_DequeueTransaction(CF_Transaction_t *t)
+static inline void CF_DequeueTransaction(CF_Transaction_t *txn)
 {
-    CF_Assert(t && (t->chan_num < CF_NUM_CHANNELS));
-    CF_CList_Remove(&CF_AppData.engine.channels[t->chan_num].qs[t->flags.com.q_index], &t->cl_node);
-    CF_Assert(CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index]); /* sanity check */
-    --CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index];
+    CF_Assert(txn && (txn->chan_num < CF_NUM_CHANNELS));
+    CF_CList_Remove(&CF_AppData.engine.channels[txn->chan_num].qs[txn->flags.com.q_index], &txn->cl_node);
+    CF_Assert(CF_AppData.hk.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index]); /* sanity check */
+    --CF_AppData.hk.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index];
 }
 
-static inline void CF_MoveTransaction(CF_Transaction_t *t, CF_QueueIdx_t q)
+static inline void CF_MoveTransaction(CF_Transaction_t *txn, CF_QueueIdx_t queue)
 {
-    CF_Assert(t && (t->chan_num < CF_NUM_CHANNELS));
-    CF_CList_Remove(&CF_AppData.engine.channels[t->chan_num].qs[t->flags.com.q_index], &t->cl_node);
-    CF_Assert(CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index]); /* sanity check */
-    --CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index];
-    CF_CList_InsertBack(&CF_AppData.engine.channels[t->chan_num].qs[q], &t->cl_node);
-    t->flags.com.q_index = q;
-    ++CF_AppData.hk.channel_hk[t->chan_num].q_size[t->flags.com.q_index];
+    CF_Assert(txn && (txn->chan_num < CF_NUM_CHANNELS));
+    CF_CList_Remove(&CF_AppData.engine.channels[txn->chan_num].qs[txn->flags.com.q_index], &txn->cl_node);
+    CF_Assert(CF_AppData.hk.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index]); /* sanity check */
+    --CF_AppData.hk.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index];
+    CF_CList_InsertBack(&CF_AppData.engine.channels[txn->chan_num].qs[queue], &txn->cl_node);
+    txn->flags.com.q_index = queue;
+    ++CF_AppData.hk.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index];
 }
 
-static inline void CF_CList_Remove_Ex(CF_Channel_t *c, CF_QueueIdx_t queueidx, CF_CListNode_t *node)
+static inline void CF_CList_Remove_Ex(CF_Channel_t *chan, CF_QueueIdx_t queueidx, CF_CListNode_t *node)
 {
-    CF_CList_Remove(&c->qs[queueidx], node);
-    CF_Assert(CF_AppData.hk.channel_hk[c - CF_AppData.engine.channels].q_size[queueidx]); /* sanity check */
-    --CF_AppData.hk.channel_hk[c - CF_AppData.engine.channels].q_size[queueidx];
+    CF_CList_Remove(&chan->qs[queueidx], node);
+    CF_Assert(CF_AppData.hk.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx]); /* sanity check */
+    --CF_AppData.hk.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx];
 }
 
-static inline void CF_CList_InsertAfter_Ex(CF_Channel_t *c, CF_QueueIdx_t queueidx, CF_CListNode_t *start,
+static inline void CF_CList_InsertAfter_Ex(CF_Channel_t *chan, CF_QueueIdx_t queueidx, CF_CListNode_t *start,
                                            CF_CListNode_t *after)
 {
-    CF_CList_InsertAfter(&c->qs[queueidx], start, after);
-    ++CF_AppData.hk.channel_hk[c - CF_AppData.engine.channels].q_size[queueidx];
+    CF_CList_InsertAfter(&chan->qs[queueidx], start, after);
+    ++CF_AppData.hk.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx];
 }
 
-static inline void CF_CList_InsertBack_Ex(CF_Channel_t *c, CF_QueueIdx_t queueidx, CF_CListNode_t *node)
+static inline void CF_CList_InsertBack_Ex(CF_Channel_t *chan, CF_QueueIdx_t queueidx, CF_CListNode_t *node)
 {
-    CF_CList_InsertBack(&c->qs[queueidx], node);
-    ++CF_AppData.hk.channel_hk[c - CF_AppData.engine.channels].q_size[queueidx];
+    CF_CList_InsertBack(&chan->qs[queueidx], node);
+    ++CF_AppData.hk.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx];
 }
 
 /************************************************************************/
 /** @brief Find an unused transaction on a channel.
  *
  * @par Assumptions, External Events, and Notes:
- *       c must not be NULL.
+ *       chan must not be NULL.
  *
- * @param c Pointer to the CF channel
+ * @param chan Pointer to the CF channel
  *
  * @returns Pointer to a free transaction
  * @retval  NULL if no free transactions available.
  */
-CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c);
+CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *chan);
 
 /************************************************************************/
 /** @brief Returns a history structure back to its unused state.
@@ -179,22 +179,22 @@ CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c);
  *       from its current queue and put it back on CF_QueueIdx_HIST_FREE.
  *
  * @par Assumptions, External Events, and Notes:
- *       c must not be NULL. h must not be NULL.
+ *       chan must not be NULL. history must not be NULL.
  *
- * @param c Pointer to the CF channel
- * @param h Pointer to the history entry
+ * @param chan Pointer to the CF channel
+ * @param history Pointer to the history entry
  */
-void CF_ResetHistory(CF_Channel_t *c, CF_History_t *h);
+void CF_ResetHistory(CF_Channel_t *chan, CF_History_t *history);
 
 /************************************************************************/
 /** @brief Frees and resets a transaction and returns it for later use.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t Pointer to the transaction object
+ * @param txn Pointer to the transaction object
  */
-void CF_FreeTransaction(CF_Transaction_t *t);
+void CF_FreeTransaction(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief Finds an active transaction by sequence number.
@@ -204,32 +204,33 @@ void CF_FreeTransaction(CF_Transaction_t *t);
  *       transaction and looks for the requested transaction.
  *
  * @par Assumptions, External Events, and Notes:
- *       c must not be NULL.
+ *       chan must not be NULL.
  *
- * @param c Pointer to the CF channel
+ * @param chan Pointer to the CF channel
  * @param transaction_sequence_number  Sequence number to find
  * @param src_eid                      Entity ID associated with sequence number
  *
  * @returns Pointer to the given transaction if found
  * @retval  NULL if the transaction is not found
  */
-CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_TransactionSeq_t transaction_sequence_number,
-                                                     CF_EntityId_t src_eid);
+CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *      chan,
+                                                     CF_TransactionSeq_t transaction_sequence_number,
+                                                     CF_EntityId_t       src_eid);
 
 /************************************************************************/
 /** @brief List traversal function to check if the desired sequence number matches.
  *
  * @par Assumptions, External Events, and Notes:
- *       context must not be NULL. n must not be NULL.
+ *       context must not be NULL. node must not be NULL.
  *
- * @param n         Pointer to node currently being traversed
+ * @param node         Pointer to node currently being traversed
  * @param context   Pointer to state object passed through from initial call
  *
  * @retval 1 when it's found, which terminates list traversal
  * @retval 0 when it isn't found, which causes list traversal to continue
  *
  */
-CFE_Status_t CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Traverse_TransSeqArg_t *context);
+CFE_Status_t CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *node, CF_Traverse_TransSeqArg_t *context);
 
 /************************************************************************/
 /** @brief Write a single history to a file.
@@ -245,42 +246,42 @@ CFE_Status_t CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Trave
  *       fd should be a valid file descriptor, open for writing.
  *
  * @param fd Open File descriptor to write to
- * @param h  Pointer to CF history object to write
+ * @param history  Pointer to CF history object to write
  *
  * @retval CFE_SUCCESS on success
  * @retval CF_ERROR on error
  */
-CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h);
+CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *history);
 
 /************************************************************************/
 /** @brief Write a transaction-based queue's transaction history to a file.
  *
  * @par Assumptions, External Events, and Notes:
- *       c must not be NULL.
+ *       chan must not be NULL.
  *
  * @param fd Open File descriptor to write to
- * @param c  Pointer to associated CF channel object
- * @param q  Queue Index to write
+ * @param chan  Pointer to associated CF channel object
+ * @param queue  Queue Index to write
  *
  * @retval 0 on success
  * @retval 1 on error
  */
-CFE_Status_t CF_WriteTxnQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_QueueIdx_t q);
+CFE_Status_t CF_WriteTxnQueueDataToFile(osal_id_t fd, CF_Channel_t *chan, CF_QueueIdx_t queue);
 
 /************************************************************************/
 /** @brief Write a history-based queue's entries to a file.
  *
  * @par Assumptions, External Events, and Notes:
- *       c must not be NULL.
+ *       chan must not be NULL.
  *
  * @param fd  Open File descriptor to write to
- * @param c   Pointer to associated CF channel object
+ * @param chan   Pointer to associated CF channel object
  * @param dir Direction to match/filter
  *
  * @retval 0 on success
  * @retval 1 on error
  */
-CFE_Status_t CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_Direction_t dir);
+CFE_Status_t CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *chan, CF_Direction_t dir);
 
 /************************************************************************/
 /** @brief Insert a transaction into a priority sorted transaction queue.
@@ -292,26 +293,26 @@ CFE_Status_t CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_Di
  *       would be the next lower priority.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t  Pointer to the transaction object
- * @param q  Index of queue to insert into
+ * @param txn  Pointer to the transaction object
+ * @param queue  Index of queue to insert into
  */
-void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q);
+void CF_InsertSortPrio(CF_Transaction_t *txn, CF_QueueIdx_t queue);
 
 /************************************************************************/
 /** @brief Traverses all transactions on all active queues and performs an operation on them.
  *
  * @par Assumptions, External Events, and Notes:
- *       c must not be NULL. fn must be a valid function. context must not be NULL.
+ *       chan must not be NULL. fn must be a valid function. context must not be NULL.
  *
- * @param c       Channel to operate on
+ * @param chan       Channel to operate on
  * @param fn      Callback to invoke for all traversed transactions
  * @param context Opaque object to pass to all callbacks
  *
  * @returns Number of transactions traversed
  */
-CFE_Status_t CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context);
+CFE_Status_t CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransactions_fn_t fn, void *context);
 
 /************************************************************************/
 /** @brief Traverses all transactions on all channels and performs an operation on them.
@@ -334,14 +335,14 @@ CFE_Status_t CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_
  *       on that transaction.
  *
  * @par Assumptions, External Events, and Notes:
- *       n must not be NULL. args must not be NULL.
+ *       node must not be NULL. args must not be NULL.
  *
- * @param n    Node being currently traversed
+ * @param node    Node being currently traversed
  * @param args Intermediate context object from initial call
  *
  * @retval 0 for do not exit early (always continue)
  */
-CFE_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *args);
+CFE_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *node, CF_TraverseAll_Arg_t *args);
 
 /************************************************************************/
 /** @brief Writes a human readable representation of a history queue entry to a file
@@ -353,15 +354,15 @@ CFE_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_A
  * to the file.
  *
  * @par Assumptions, External Events, and Notes:
- *       n must not be NULL. arg must not be NULL.
+ *       node must not be NULL. arg must not be NULL.
  *
- * @param n   Node being currently traversed
+ * @param node   Node being currently traversed
  * @param arg Pointer to CF_Traverse_WriteHistoryFileArg_t indicating the file information
  *
  * @retval CF_CLIST_CONT if everything is going well
  * @retval CF_CLIST_EXIT if a write error occurred, which means traversal should stop
  */
-CFE_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *arg);
+CFE_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *node, void *arg);
 
 /************************************************************************/
 /** @brief Writes a human readable representation of a transaction history entry to a file
@@ -370,15 +371,15 @@ CFE_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *a
  * CF_Traverse() to write transaction queue entries to the file.
  *
  * @par Assumptions, External Events, and Notes:
- *       n must not be NULL. arg must not be NULL.
+ *       node must not be NULL. arg must not be NULL.
  *
- * @param n   Node being currently traversed
+ * @param node   Node being currently traversed
  * @param arg Pointer to CF_Traverse_WriteTxnFileArg_t indicating the file information
  *
  * @retval CF_CLIST_CONT if everything is going well
  * @retval CF_CLIST_EXIT if a write error occurred, which means traversal should stop
  */
-CFE_Status_t CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg);
+CFE_Status_t CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *node, void *arg);
 
 /************************************************************************/
 /** @brief Searches for the first transaction with a lower priority than given.

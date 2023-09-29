@@ -232,12 +232,12 @@ CFE_Status_t CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_T
 /** @brief Set the suspended bit in a transaction.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL. context must not be NULL.
+ *       txn must not be NULL. context must not be NULL.
  *
- * @param t         Pointer to the transaction object
+ * @param txn         Pointer to the transaction object
  * @param context   Pointer to CF_ChanAction_SuspResArg_t structure from initial call
  */
-void CF_DoSuspRes_Txn(CF_Transaction_t *t, CF_ChanAction_SuspResArg_t *context);
+void CF_DoSuspRes_Txn(CF_Transaction_t *txn, CF_ChanAction_SuspResArg_t *context);
 
 /************************************************************************/
 /** @brief Handle transaction suspend and resume commands.
@@ -280,12 +280,12 @@ void CF_CmdResume(CFE_SB_Buffer_t *msg);
  * This helper function is used with CF_TsnChanAction() to cancel matched transactions
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t        Pointer to transaction object
+ * @param txn        Pointer to transaction object
  * @param ignored  Not used by this function
  */
-void CF_CmdCancel_Txn(CF_Transaction_t *t, void *ignored);
+void CF_CmdCancel_Txn(CF_Transaction_t *txn, void *ignored);
 
 /************************************************************************/
 /** @brief Handle a cancel ground command.
@@ -305,10 +305,10 @@ void CF_CmdCancel(CFE_SB_Buffer_t *msg);
  * @par Assumptions, External Events, and Notes:
  *       msg must not be NULL.
  *
- * @param t        Pointer to transaction object
+ * @param txn        Pointer to transaction object
  * @param ignored  Not used by this function
  */
-void CF_CmdAbandon_Txn(CF_Transaction_t *t, void *ignored);
+void CF_CmdAbandon_Txn(CF_Transaction_t *txn, void *ignored);
 
 /************************************************************************/
 /** @brief Handle an abandon ground command.
@@ -395,14 +395,14 @@ void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg);
  * This helper function is used in conjunction with CF_CList_Traverse()
  *
  * @par Assumptions, External Events, and Notes:
- *       n must not be NULL. c must not be NULL.
+ *       node must not be NULL. chan must not be NULL.
  *
- * @param n  Current list node being traversed
- * @param c  Channel pointer passed through as opaque object
+ * @param node  Current list node being traversed
+ * @param chan  Channel pointer passed through as opaque object
  *
  * @returns Always #CF_CLIST_CONT to process all entries
  */
-CFE_Status_t CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c);
+CFE_Status_t CF_PurgeHistory(CF_CListNode_t *node, CF_Channel_t *chan);
 
 /************************************************************************/
 /** @brief Purge the pending transaction queue.
@@ -410,14 +410,14 @@ CFE_Status_t CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c);
  * This helper function is used in conjunction with CF_CList_Traverse()
  *
  * @par Assumptions, External Events, and Notes:
- *       n must not be NULL.
+ *       node must not be NULL.
  *
- * @param n  Current list node being traversed
+ * @param node  Current list node being traversed
  * @param ignored  Not used by this implementation
  *
  * @returns Always #CF_CLIST_CONT to process all entries
  */
-CFE_Status_t CF_PurgeTransaction(CF_CListNode_t *n, void *ignored);
+CFE_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignored);
 
 /************************************************************************/
 /** @brief Channel action command to perform purge queue operations.

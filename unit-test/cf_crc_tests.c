@@ -23,62 +23,62 @@
 void Test_CF_CRC_Start(void)
 {
     /* Arrange */
-    CF_Crc_t c;
+    CF_Crc_t crc;
 
-    memset(&c, 0xFF, sizeof(c));
+    memset(&crc, 0xFF, sizeof(crc));
 
     /* Act */
-    UtAssert_VOIDCALL(CF_CRC_Start(&c));
+    UtAssert_VOIDCALL(CF_CRC_Start(&crc));
 
     /* Assert */
-    UtAssert_ZERO(c.working);
-    UtAssert_ZERO(c.result);
-    UtAssert_ZERO(c.index);
+    UtAssert_ZERO(crc.working);
+    UtAssert_ZERO(crc.result);
+    UtAssert_ZERO(crc.index);
 }
 
 void Test_CF_CRC_Digest(void)
 {
-    CF_Crc_t c;
+    CF_Crc_t crc;
     uint8    data[] = {1, 2, 3, 4, 5};
 
     /* Already tested, so OK to use */
-    CF_CRC_Start(&c);
+    CF_CRC_Start(&crc);
 
-    /* Zero length should leave c as zeros */
-    UtAssert_VOIDCALL(CF_CRC_Digest(&c, NULL, 0));
-    UtAssert_ZERO(c.working);
-    UtAssert_ZERO(c.result);
-    UtAssert_ZERO(c.index);
+    /* Zero length should leave crc as zeros */
+    UtAssert_VOIDCALL(CF_CRC_Digest(&crc, NULL, 0));
+    UtAssert_ZERO(crc.working);
+    UtAssert_ZERO(crc.result);
+    UtAssert_ZERO(crc.index);
 
     /* Digest data and confirm */
-    UtAssert_VOIDCALL(CF_CRC_Digest(&c, data, sizeof(data)));
-    UtAssert_UINT32_EQ(c.working, (data[1] << 24) + (data[2] << 16) + (data[3] << 8) + data[4]);
-    UtAssert_UINT32_EQ(c.result, (data[0] << 24) + (data[1] << 16) + (data[2] << 8) + data[3]);
-    UtAssert_UINT32_EQ(c.index, 1);
+    UtAssert_VOIDCALL(CF_CRC_Digest(&crc, data, sizeof(data)));
+    UtAssert_UINT32_EQ(crc.working, (data[1] << 24) + (data[2] << 16) + (data[3] << 8) + data[4]);
+    UtAssert_UINT32_EQ(crc.result, (data[0] << 24) + (data[1] << 16) + (data[2] << 8) + data[3]);
+    UtAssert_UINT32_EQ(crc.index, 1);
 }
 
 void Test_CF_CRC_Finalize(void)
 {
-    CF_Crc_t c;
+    CF_Crc_t crc;
     uint8    data[] = {1, 2, 3, 4, 5};
 
     /* Already tested, so OK to use */
-    CF_CRC_Start(&c);
+    CF_CRC_Start(&crc);
 
-    /* Test with clear c */
-    UtAssert_VOIDCALL(CF_CRC_Finalize(&c));
-    UtAssert_ZERO(c.working);
-    UtAssert_ZERO(c.result);
-    UtAssert_ZERO(c.index);
+    /* Test with clear crc */
+    UtAssert_VOIDCALL(CF_CRC_Finalize(&crc));
+    UtAssert_ZERO(crc.working);
+    UtAssert_ZERO(crc.result);
+    UtAssert_ZERO(crc.index);
 
     /* Already tested, so OK to use */
-    CF_CRC_Digest(&c, data, sizeof(data));
+    CF_CRC_Digest(&crc, data, sizeof(data));
 
-    /* Test with filled in c */
-    UtAssert_VOIDCALL(CF_CRC_Finalize(&c));
-    UtAssert_ZERO(c.working);
-    UtAssert_UINT32_EQ(c.result, ((data[0] + data[4]) << 24) + (data[1] << 16) + (data[2] << 8) + data[3]);
-    UtAssert_ZERO(c.index);
+    /* Test with filled in crc */
+    UtAssert_VOIDCALL(CF_CRC_Finalize(&crc));
+    UtAssert_ZERO(crc.working);
+    UtAssert_UINT32_EQ(crc.result, ((data[0] + data[4]) << 24) + (data[1] << 16) + (data[2] << 8) + data[3]);
+    UtAssert_ZERO(crc.index);
 }
 
 void UtTest_Setup(void)

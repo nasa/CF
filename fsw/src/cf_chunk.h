@@ -57,10 +57,10 @@ typedef struct CF_ChunkList
  * @brief Function for use with CF_ChunkList_ComputeGaps()
  *
  * @param cs Pointer to the CF_ChunkList_t object
- * @param c  Pointer to the chunk being currently processed
+ * @param chunk  Pointer to the chunk being currently processed
  * @param opaque Opaque pointer passed through from initial call
  */
-typedef void (*CF_ChunkList_ComputeGapFn_t)(const CF_ChunkList_t *cs, const CF_Chunk_t *c, void *opaque);
+typedef void (*CF_ChunkList_ComputeGapFn_t)(const CF_ChunkList_t *cs, const CF_Chunk_t *chunk, void *opaque);
 
 /**
  * @brief Selects the larger of the two passed-in offsets

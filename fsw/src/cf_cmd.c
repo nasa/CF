@@ -334,17 +334,17 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSe
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
 {
-    CF_Transaction_t *t;
+    CF_Transaction_t *txn;
     CFE_Status_t      ret = CF_ERROR;
 
     if (cmd->chan == CF_COMPOUND_KEY)
     {
         /* special value 254 means to use the compound key (cmd->eid, cmd->ts) to find the transaction
          * to act upon */
-        t = CF_FindTransactionBySequenceNumberAllChannels(cmd->ts, cmd->eid);
-        if (t)
+        txn = CF_FindTransactionBySequenceNumberAllChannels(cmd->ts, cmd->eid);
+        if (txn)
         {
-            fn(t, context);
+            fn(txn, context);
             ret = 1; /* because one transaction was matched - this should return a count */
         }
         else
@@ -379,16 +379,16 @@ CFE_Status_t CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_T
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_DoSuspRes_Txn(CF_Transaction_t *t, CF_ChanAction_SuspResArg_t *context)
+void CF_DoSuspRes_Txn(CF_Transaction_t *txn, CF_ChanAction_SuspResArg_t *context)
 {
-    CF_Assert(t);
-    if (t->flags.com.suspended == context->action)
+    CF_Assert(txn);
+    if (txn->flags.com.suspended == context->action)
     {
         context->same = 1;
     }
     else
     {
-        t->flags.com.suspended = context->action;
+        txn->flags.com.suspended = context->action;
     }
 }
 
@@ -461,9 +461,9 @@ void CF_CmdResume(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdCancel_Txn(CF_Transaction_t *t, void *ignored)
+void CF_CmdCancel_Txn(CF_Transaction_t *txn, void *ignored)
 {
-    CF_CFDP_CancelTransaction(t);
+    CF_CFDP_CancelTransaction(txn);
 }
 
 /*----------------------------------------------------------------
@@ -494,9 +494,9 @@ void CF_CmdCancel(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdAbandon_Txn(CF_Transaction_t *t, void *ignored)
+void CF_CmdAbandon_Txn(CF_Transaction_t *txn, void *ignored)
 {
-    CF_CFDP_ResetTransaction(t, 0);
+    CF_CFDP_ResetTransaction(txn, 0);
 }
 
 /*----------------------------------------------------------------
@@ -668,10 +668,10 @@ void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c)
+CFE_Status_t CF_PurgeHistory(CF_CListNode_t *node, CF_Channel_t *chan)
 {
-    CF_History_t *h = container_of(n, CF_History_t, cl_node);
-    CF_ResetHistory(c, h); /* ok to reset transaction since it's in PEND it hasn't started yet */
+    CF_History_t *history = container_of(node, CF_History_t, cl_node);
+    CF_ResetHistory(chan, history); /* ok to reset transaction since it's in PEND it hasn't started yet */
     return CF_CLIST_CONT;
 }
 
@@ -681,10 +681,10 @@ CFE_Status_t CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_PurgeTransaction(CF_CListNode_t *n, void *ignored)
+CFE_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignored)
 {
-    CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
-    CF_CFDP_ResetTransaction(t, 0);
+    CF_Transaction_t *txn = container_of(node, CF_Transaction_t, cl_node);
+    CF_CFDP_ResetTransaction(txn, 0);
     return CF_CLIST_CONT;
 }
 
@@ -698,7 +698,7 @@ CFE_Status_t CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
 {
     CFE_Status_t ret = CFE_SUCCESS;
     /* no need to bounds check chan_num, done in caller */
-    CF_Channel_t *c = &CF_AppData.engine.channels[chan_num];
+    CF_Channel_t *chan = &CF_AppData.engine.channels[chan_num];
 
     int pend = 0;
     int hist = 0;
@@ -727,12 +727,12 @@ CFE_Status_t CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
 
     if (pend)
     {
-        CF_CList_Traverse(c->qs[CF_QueueIdx_PEND], CF_PurgeTransaction, NULL);
+        CF_CList_Traverse(chan->qs[CF_QueueIdx_PEND], CF_PurgeTransaction, NULL);
     }
 
     if (hist)
     {
-        CF_CList_Traverse(c->qs[CF_QueueIdx_HIST], (CF_CListFn_t)CF_PurgeHistory, c);
+        CF_CList_Traverse(chan->qs[CF_QueueIdx_HIST], (CF_CListFn_t)CF_PurgeHistory, chan);
     }
 
     return ret;
@@ -768,7 +768,7 @@ void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
 void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
 {
     CF_WriteQueueCmd_t *wq      = (CF_WriteQueueCmd_t *)msg;
-    CF_Channel_t *      c       = &CF_AppData.engine.channels[wq->chan];
+    CF_Channel_t *      chan    = &CF_AppData.engine.channels[wq->chan];
     osal_id_t           fd      = OS_OBJECT_ID_UNDEFINED;
     bool                success = true;
     int32               ret;
@@ -808,7 +808,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
         /* process uplink queue data */
         if ((wq->queue == CF_Queue_all) || (wq->queue == CF_Queue_active))
         {
-            ret = CF_WriteTxnQueueDataToFile(fd, c, CF_QueueIdx_RX);
+            ret = CF_WriteTxnQueueDataToFile(fd, chan, CF_QueueIdx_RX);
             if (ret)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_RX, CFE_EVS_EventType_ERROR,
@@ -821,7 +821,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
 
         if (success && ((wq->queue == CF_Queue_all) || (wq->queue == CF_Queue_history)))
         {
-            ret = CF_WriteHistoryQueueDataToFile(fd, c, CF_Direction_RX);
+            ret = CF_WriteHistoryQueueDataToFile(fd, chan, CF_Direction_RX);
             if (ret)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEHIST_RX, CFE_EVS_EventType_ERROR,
@@ -843,7 +843,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
             static const int qs[2] = {CF_QueueIdx_TXA, CF_QueueIdx_TXW};
             for (i = 0; i < 2; ++i)
             {
-                ret = CF_WriteTxnQueueDataToFile(fd, c, qs[i]);
+                ret = CF_WriteTxnQueueDataToFile(fd, chan, qs[i]);
                 if (ret)
                 {
                     CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_TX, CFE_EVS_EventType_ERROR,
@@ -859,7 +859,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
         if (success && ((wq->queue == CF_Queue_all) || (wq->queue == CF_Queue_pend)))
         {
             /* write pending queue */
-            ret = CF_WriteTxnQueueDataToFile(fd, c, CF_QueueIdx_PEND);
+            ret = CF_WriteTxnQueueDataToFile(fd, chan, CF_QueueIdx_PEND);
             if (ret)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_PEND, CFE_EVS_EventType_ERROR,
@@ -873,7 +873,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
         if (success && ((wq->queue == CF_Queue_all) || (wq->queue == CF_Queue_history)))
         {
             /* write history queue */
-            ret = CF_WriteHistoryQueueDataToFile(fd, c, CF_Direction_TX);
+            ret = CF_WriteHistoryQueueDataToFile(fd, chan, CF_Direction_TX);
             if (ret)
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEHIST_TX, CFE_EVS_EventType_ERROR,

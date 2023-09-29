@@ -58,10 +58,10 @@
  * See description in cf_cfdp_sbintf.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent)
+CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool silent)
 {
     /* if channel is frozen, do not take message */
-    CF_Channel_t *          c       = CF_AppData.engine.channels + t->chan_num;
+    CF_Channel_t *          chan    = CF_AppData.engine.channels + txn->chan_num;
     bool                    success = true;
     CF_Logical_PduBuffer_t *ret;
     int32                   os_status;
@@ -76,21 +76,21 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
         CF_AppData.engine.out.msg = NULL;
     }
 
-    if (CF_AppData.config_table->chan[t->chan_num].max_outgoing_messages_per_wakeup &&
+    if (CF_AppData.config_table->chan[txn->chan_num].max_outgoing_messages_per_wakeup &&
         (CF_AppData.engine.outgoing_counter ==
-         CF_AppData.config_table->chan[t->chan_num].max_outgoing_messages_per_wakeup))
+         CF_AppData.config_table->chan[txn->chan_num].max_outgoing_messages_per_wakeup))
     {
         /* no more messages this wakeup allowed */
-        c->cur  = t; /* remember where we were for next time */
-        success = false;
+        chan->cur = txn; /* remember where we were for next time */
+        success   = false;
     }
 
-    if (success && !CF_AppData.hk.channel_hk[t->chan_num].frozen && !t->flags.com.suspended)
+    if (success && !CF_AppData.hk.channel_hk[txn->chan_num].frozen && !txn->flags.com.suspended)
     {
         /* first, check if there's room in the pipe for the message we want to build */
-        if (OS_ObjectIdDefined(c->sem_id))
+        if (OS_ObjectIdDefined(chan->sem_id))
         {
-            os_status = OS_CountSemTimedWait(c->sem_id, 0);
+            os_status = OS_CountSemTimedWait(chan->sem_id, 0);
         }
         else
         {
@@ -106,7 +106,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
 
         if (!CF_AppData.engine.out.msg)
         {
-            c->cur = t; /* remember where we were for next time */
+            chan->cur = txn; /* remember where we were for next time */
             if (!silent && (os_status == OS_SUCCESS))
             {
                 CFE_EVS_SendEvent(CF_EID_ERR_CFDP_NO_MSG, CFE_EVS_EventType_ERROR,
@@ -118,7 +118,8 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
         if (success)
         {
             CFE_MSG_Init(&CF_AppData.engine.out.msg->Msg,
-                         CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[t->chan_num].mid_output), offsetof(CF_PduTlmMsg_t, ph));
+                         CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[txn->chan_num].mid_output),
+                         offsetof(CF_PduTlmMsg_t, ph));
             ++CF_AppData.engine.outgoing_counter; /* even if max_outgoing_messages_per_wakeup is 0 (unlimited), it's ok
                                                     to inc this */
 
@@ -171,12 +172,12 @@ void CF_CFDP_Send(uint8 chan_num, const CF_Logical_PduBuffer_t *ph)
  * See description in cf_cfdp_sbintf.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
+void CF_CFDP_ReceiveMessage(CF_Channel_t *chan)
 {
-    CF_Transaction_t *t; /* initialized below */
+    CF_Transaction_t *txn; /* initialized below */
     uint32            count = 0;
     int32             status;
-    const int         chan_num = (c - CF_AppData.engine.channels);
+    const int         chan_num = (chan - CF_AppData.engine.channels);
     CFE_SB_Buffer_t * bufptr;
     CFE_MSG_Size_t    msg_size;
     CFE_MSG_Type_t    msg_type = CFE_MSG_Type_Invalid;
@@ -186,7 +187,7 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
 
     for (; count < CF_AppData.config_table->chan[chan_num].rx_max_messages_per_wakeup; ++count)
     {
-        status = CFE_SB_ReceiveBuffer(&bufptr, c->pipe, CFE_SB_POLL);
+        status = CFE_SB_ReceiveBuffer(&bufptr, chan->pipe, CFE_SB_POLL);
         if (status != CFE_SUCCESS)
         {
             break; /* no more messages */
@@ -217,12 +218,12 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
         if (!CF_CFDP_RecvPh(chan_num, ph))
         {
             /* got a valid PDU -- look it up by sequence number */
-            t = CF_FindTransactionBySequenceNumber(c, ph->pdu_header.sequence_num, ph->pdu_header.source_eid);
-            if (t)
+            txn = CF_FindTransactionBySequenceNumber(chan, ph->pdu_header.sequence_num, ph->pdu_header.source_eid);
+            if (txn)
             {
                 /* found one! Send it to the transaction state processor */
-                CF_Assert(t->state > CF_TxnState_IDLE);
-                CF_CFDP_DispatchRecv(t, ph);
+                CF_Assert(txn->state > CF_TxnState_IDLE);
+                CF_CFDP_DispatchRecv(txn, ph);
             }
             else
             {
@@ -237,7 +238,7 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
                 if (ph->pdu_header.source_eid == CF_AppData.config_table->local_eid &&
                     ph->fdirective.directive_code == CF_CFDP_FileDirective_FIN)
                 {
-                    if (!CF_CFDP_RecvFin(t, ph))
+                    if (!CF_CFDP_RecvFin(txn, ph))
                     {
                         memset(&t_finack, 0, sizeof(t_finack));
                         CF_CFDP_InitTxnTxFile(&t_finack, CF_CFDP_CLASS_2, 1, chan_num,
@@ -247,8 +248,8 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
                                             ph->pdu_header.sequence_num) != CF_SEND_PDU_NO_BUF_AVAIL_ERROR)
                         {
                             /* couldn't get output buffer -- don't care about a send error (oh well, can't send) but we
-                             * do care that there was no message because c->cur will be set to this transaction */
-                            c->cur = NULL; /* do not remember temp transaction for next time */
+                             * do care that there was no message because chan->cur will be set to this transaction */
+                            chan->cur = NULL; /* do not remember temp transaction for next time */
                         }
 
                         /* NOTE: recv and recv_spurious will both be incremented */
@@ -271,22 +272,22 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
                             "CF: dropping packet from %lu transaction number 0x%08lx due max RX transactions reached",
                             (unsigned long)ph->pdu_header.source_eid, (unsigned long)ph->pdu_header.sequence_num);
 
-                        /* NOTE: as there is no transaction (t) associated with this, there is no known channel,
+                        /* NOTE: as there is no transaction (txn) associated with this, there is no known channel,
                             and therefore no known counter to account it to (because dropped is per-chan) */
                     }
                     else
                     {
-                        t = CF_FindUnusedTransaction(c);
-                        CF_Assert(t);
-                        t->history->dir = CF_Direction_RX;
+                        txn = CF_FindUnusedTransaction(chan);
+                        CF_Assert(txn);
+                        txn->history->dir = CF_Direction_RX;
 
                         /* set default FIN status */
-                        t->state_data.r.r2.dc = CF_CFDP_FinDeliveryCode_INCOMPLETE;
-                        t->state_data.r.r2.fs = CF_CFDP_FinFileStatus_DISCARDED;
+                        txn->state_data.receive.r2.dc = CF_CFDP_FinDeliveryCode_INCOMPLETE;
+                        txn->state_data.receive.r2.fs = CF_CFDP_FinFileStatus_DISCARDED;
 
-                        t->flags.com.q_index = CF_QueueIdx_RX;
-                        CF_CList_InsertBack_Ex(c, t->flags.com.q_index, &t->cl_node);
-                        CF_CFDP_DispatchRecv(t, ph); /* will enter idle state */
+                        txn->flags.com.q_index = CF_QueueIdx_RX;
+                        CF_CList_InsertBack_Ex(chan, txn->flags.com.q_index, &txn->cl_node);
+                        CF_CFDP_DispatchRecv(txn, ph); /* will enter idle state */
                     }
                 }
                 else

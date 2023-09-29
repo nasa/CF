@@ -31,15 +31,15 @@
  * Generated stub function for CF_Timer_Expired()
  * ----------------------------------------------------
  */
-bool CF_Timer_Expired(const CF_Timer_t *t)
+bool CF_Timer_Expired(const CF_Timer_t *txn)
 {
-    UT_GenStub_SetupReturnBuffer(CF_Timer_Expired, int);
+    UT_GenStub_SetupReturnBuffer(CF_Timer_Expired, bool);
 
-    UT_GenStub_AddParam(CF_Timer_Expired, const CF_Timer_t *, t);
+    UT_GenStub_AddParam(CF_Timer_Expired, const CF_Timer_t *, txn);
 
     UT_GenStub_Execute(CF_Timer_Expired, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_Timer_Expired, int);
+    return UT_GenStub_GetReturnValue(CF_Timer_Expired, bool);
 }
 
 /*
@@ -47,9 +47,9 @@ bool CF_Timer_Expired(const CF_Timer_t *t)
  * Generated stub function for CF_Timer_InitRelSec()
  * ----------------------------------------------------
  */
-void CF_Timer_InitRelSec(CF_Timer_t *t, CF_Timer_Seconds_t rel_sec)
+void CF_Timer_InitRelSec(CF_Timer_t *txn, CF_Timer_Seconds_t rel_sec)
 {
-    UT_GenStub_AddParam(CF_Timer_InitRelSec, CF_Timer_t *, t);
+    UT_GenStub_AddParam(CF_Timer_InitRelSec, CF_Timer_t *, txn);
     UT_GenStub_AddParam(CF_Timer_InitRelSec, CF_Timer_Seconds_t, rel_sec);
 
     UT_GenStub_Execute(CF_Timer_InitRelSec, Basic, NULL);
@@ -76,9 +76,9 @@ uint32 CF_Timer_Sec2Ticks(CF_Timer_Seconds_t sec)
  * Generated stub function for CF_Timer_Tick()
  * ----------------------------------------------------
  */
-void CF_Timer_Tick(CF_Timer_t *t)
+void CF_Timer_Tick(CF_Timer_t *txn)
 {
-    UT_GenStub_AddParam(CF_Timer_Tick, CF_Timer_t *, t);
+    UT_GenStub_AddParam(CF_Timer_Tick, CF_Timer_t *, txn);
 
     UT_GenStub_Execute(CF_Timer_Tick, Basic, NULL);
 }

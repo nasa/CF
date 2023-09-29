@@ -125,7 +125,7 @@ void UT_AltHandler_CF_CList_Traverse_R_PRIO(void *UserObj, UT_EntryKey_t FuncKey
         /* This handler is a little different in that it sets the output to the caller */
         if (arg)
         {
-            arg->t = ctxt->context_t;
+            arg->txn = ctxt->context_t;
         }
     }
 }

@@ -54,36 +54,36 @@ typedef struct CF_Timer
 /** @brief Initialize a timer with a relative number of seconds.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t         Timer object to initialize
+ * @param txn         Timer object to initialize
  * @param rel_sec   Relative number of seconds
  */
-void CF_Timer_InitRelSec(CF_Timer_t *t, CF_Timer_Seconds_t rel_sec);
+void CF_Timer_InitRelSec(CF_Timer_t *txn, CF_Timer_Seconds_t rel_sec);
 
 /************************************************************************/
 /** @brief Check if a timer has expired.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t         Timer object to check
+ * @param txn         Timer object to check
  *
  * @returns status code indicating whether timer has expired
  * @retval 1 if expired
  * @retval 0 if not expired
  */
-bool CF_Timer_Expired(const CF_Timer_t *t);
+bool CF_Timer_Expired(const CF_Timer_t *txn);
 
 /************************************************************************/
 /** @brief Notify a timer object a tick has occurred.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t         Timer object to tick
+ * @param txn         Timer object to tick
  */
-void CF_Timer_Tick(CF_Timer_t *t);
+void CF_Timer_Tick(CF_Timer_t *txn);
 
 /************************************************************************/
 /** @brief Converts seconds into scheduler ticks.

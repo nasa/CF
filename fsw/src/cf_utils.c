@@ -40,39 +40,39 @@
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c)
+CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *chan)
 {
-    CF_CListNode_t *  n;
-    CF_Transaction_t *t;
+    CF_CListNode_t *  node;
+    CF_Transaction_t *txn;
     int               q_index; /* initialized below in if */
 
-    CF_Assert(c);
+    CF_Assert(chan);
 
-    if (c->qs[CF_QueueIdx_FREE])
+    if (chan->qs[CF_QueueIdx_FREE])
     {
-        n = c->qs[CF_QueueIdx_FREE];
-        t = container_of(n, CF_Transaction_t, cl_node);
+        node = chan->qs[CF_QueueIdx_FREE];
+        txn  = container_of(node, CF_Transaction_t, cl_node);
 
-        CF_CList_Remove_Ex(c, CF_QueueIdx_FREE, &t->cl_node);
+        CF_CList_Remove_Ex(chan, CF_QueueIdx_FREE, &txn->cl_node);
 
         /* now that a transaction is acquired, must also acquire a history slot to go along with it */
-        if (c->qs[CF_QueueIdx_HIST_FREE])
+        if (chan->qs[CF_QueueIdx_HIST_FREE])
         {
             q_index = CF_QueueIdx_HIST_FREE;
         }
         else
         {
             /* no free history, so take the oldest one from the channel's history queue */
-            CF_Assert(c->qs[CF_QueueIdx_HIST]);
+            CF_Assert(chan->qs[CF_QueueIdx_HIST]);
             q_index = CF_QueueIdx_HIST;
         }
 
-        t->history      = container_of(c->qs[q_index], CF_History_t, cl_node);
-        t->history->dir = CF_Direction_NUM; /* start with no direction */
+        txn->history      = container_of(chan->qs[q_index], CF_History_t, cl_node);
+        txn->history->dir = CF_Direction_NUM; /* start with no direction */
 
-        CF_CList_Remove_Ex(c, q_index, &t->history->cl_node);
+        CF_CList_Remove_Ex(chan, q_index, &txn->history->cl_node);
 
-        return t;
+        return txn;
     }
     else
     {
@@ -86,10 +86,10 @@ CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *c)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_ResetHistory(CF_Channel_t *c, CF_History_t *h)
+void CF_ResetHistory(CF_Channel_t *chan, CF_History_t *history)
 {
-    CF_CList_Remove_Ex(c, CF_QueueIdx_HIST, &h->cl_node);
-    CF_CList_InsertBack_Ex(c, CF_QueueIdx_HIST_FREE, &h->cl_node);
+    CF_CList_Remove_Ex(chan, CF_QueueIdx_HIST, &history->cl_node);
+    CF_CList_InsertBack_Ex(chan, CF_QueueIdx_HIST_FREE, &history->cl_node);
 }
 
 /*----------------------------------------------------------------
@@ -98,16 +98,16 @@ void CF_ResetHistory(CF_Channel_t *c, CF_History_t *h)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_FreeTransaction(CF_Transaction_t *t)
+void CF_FreeTransaction(CF_Transaction_t *txn)
 {
-    uint8 c = t->chan_num;
-    memset(t, 0, sizeof(*t));
-    t->flags.com.q_index = CF_QueueIdx_FREE;
-    t->fd                = OS_OBJECT_ID_UNDEFINED;
-    t->chan_num          = c;
-    t->state             = CF_TxnState_IDLE; /* NOTE: this is redundant as long as CF_TxnState_IDLE == 0 */
-    CF_CList_InitNode(&t->cl_node);
-    CF_CList_InsertBack_Ex(&CF_AppData.engine.channels[c], CF_QueueIdx_FREE, &t->cl_node);
+    uint8 chan = txn->chan_num;
+    memset(txn, 0, sizeof(*txn));
+    txn->flags.com.q_index = CF_QueueIdx_FREE;
+    txn->fd                = OS_OBJECT_ID_UNDEFINED;
+    txn->chan_num          = chan;
+    txn->state             = CF_TxnState_IDLE; /* NOTE: this is redundant as long as CF_TxnState_IDLE == 0 */
+    CF_CList_InitNode(&txn->cl_node);
+    CF_CList_InsertBack_Ex(&CF_AppData.engine.channels[chan], CF_QueueIdx_FREE, &txn->cl_node);
 }
 
 /*----------------------------------------------------------------
@@ -116,15 +116,15 @@ void CF_FreeTransaction(CF_Transaction_t *t)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Traverse_TransSeqArg_t *context)
+CFE_Status_t CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *node, CF_Traverse_TransSeqArg_t *context)
 {
-    CF_Transaction_t *t   = container_of(n, CF_Transaction_t, cl_node);
+    CF_Transaction_t *txn = container_of(node, CF_Transaction_t, cl_node);
     CFE_Status_t      ret = 0;
 
-    if ((t->history->src_eid == context->src_eid) && (t->history->seq_num == context->transaction_sequence_number))
+    if ((txn->history->src_eid == context->src_eid) && (txn->history->seq_num == context->transaction_sequence_number))
     {
-        context->t = t;
-        ret        = 1; /* exit early */
+        context->txn = txn;
+        ret          = 1; /* exit early */
     }
 
     return ret;
@@ -136,25 +136,26 @@ CFE_Status_t CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *n, CF_Trave
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_TransactionSeq_t transaction_sequence_number,
-                                                     CF_EntityId_t src_eid)
+CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *      chan,
+                                                     CF_TransactionSeq_t transaction_sequence_number,
+                                                     CF_EntityId_t       src_eid)
 {
     /* need to find transaction by sequence number. It will either be the active transaction (front of Q_PEND),
      * or on Q_TX or Q_RX. Once a transaction moves to history, then it's done.
      *
      * Let's put CF_QueueIdx_RX up front, because most RX packets will be file data PDUs */
     CF_Traverse_TransSeqArg_t ctx    = {transaction_sequence_number, src_eid, NULL};
-    CF_CListNode_t *          ptrs[] = {c->qs[CF_QueueIdx_RX], c->qs[CF_QueueIdx_PEND], c->qs[CF_QueueIdx_TXA],
-                              c->qs[CF_QueueIdx_TXW]};
+    CF_CListNode_t *          ptrs[] = {chan->qs[CF_QueueIdx_RX], chan->qs[CF_QueueIdx_PEND], chan->qs[CF_QueueIdx_TXA],
+                              chan->qs[CF_QueueIdx_TXW]};
     int                       i;
     CF_Transaction_t *        ret = NULL;
 
     for (i = 0; i < (sizeof(ptrs) / sizeof(ptrs[0])); ++i)
     {
         CF_CList_Traverse(ptrs[i], (CF_CListFn_t)CF_FindTransactionBySequenceNumber_Impl, &ctx);
-        if (ctx.t)
+        if (ctx.txn)
         {
-            ret = ctx.t;
+            ret = ctx.txn;
             break;
         }
     }
@@ -168,7 +169,7 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *c, CF_Transac
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h)
+CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *history)
 {
     static const char *CF_DSTR[] = {"RX", "TX"}; /* conversion of CF_Direction_t to string */
 
@@ -182,17 +183,17 @@ CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h)
         switch (i)
         {
             case 0:
-                CF_Assert(h->dir < CF_Direction_NUM);
+                CF_Assert(history->dir < CF_Direction_NUM);
                 snprintf(linebuf, sizeof(linebuf), "SEQ (%lu, %lu)\tDIR: %s\tPEER %lu\tSTAT: %d\t",
-                         (unsigned long)h->src_eid, (unsigned long)h->seq_num, CF_DSTR[h->dir],
-                         (unsigned long)h->peer_eid, (int)h->txn_stat);
+                         (unsigned long)history->src_eid, (unsigned long)history->seq_num, CF_DSTR[history->dir],
+                         (unsigned long)history->peer_eid, (int)history->txn_stat);
                 break;
             case 1:
-                snprintf(linebuf, sizeof(linebuf), "SRC: %s\t", h->fnames.src_filename);
+                snprintf(linebuf, sizeof(linebuf), "SRC: %s\t", history->fnames.src_filename);
                 break;
             case 2:
             default:
-                snprintf(linebuf, sizeof(linebuf), "DST: %s\n", h->fnames.dst_filename);
+                snprintf(linebuf, sizeof(linebuf), "DST: %s\n", history->fnames.dst_filename);
                 break;
         }
 
@@ -215,15 +216,15 @@ CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *h)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *arg)
+CFE_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *node, void *arg)
 {
     CF_Traverse_WriteHistoryFileArg_t *context = arg;
-    CF_History_t *                     h       = container_of(n, CF_History_t, cl_node);
+    CF_History_t *                     history = container_of(node, CF_History_t, cl_node);
 
     /* if filter_dir is CF_Direction_NUM, this means both directions (all match) */
-    if (context->filter_dir == CF_Direction_NUM || h->dir == context->filter_dir)
+    if (context->filter_dir == CF_Direction_NUM || history->dir == context->filter_dir)
     {
-        if (CF_WriteHistoryEntryToFile(context->fd, h) < 0)
+        if (CF_WriteHistoryEntryToFile(context->fd, history) < 0)
         {
             /* failed */
             context->error = true;
@@ -242,12 +243,12 @@ CFE_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *n, void *a
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg)
+CFE_Status_t CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *node, void *arg)
 {
     CF_Traverse_WriteTxnFileArg_t *context = arg;
-    CF_Transaction_t *             t       = container_of(n, CF_Transaction_t, cl_node);
+    CF_Transaction_t *             txn     = container_of(node, CF_Transaction_t, cl_node);
 
-    if (CF_WriteHistoryEntryToFile(context->fd, t->history) < 0)
+    if (CF_WriteHistoryEntryToFile(context->fd, txn->history) < 0)
     {
         /* failed */
         context->error = true;
@@ -264,7 +265,7 @@ CFE_Status_t CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *n, void *arg)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_WriteTxnQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_QueueIdx_t q)
+CFE_Status_t CF_WriteTxnQueueDataToFile(osal_id_t fd, CF_Channel_t *chan, CF_QueueIdx_t queue)
 {
     CF_Traverse_WriteTxnFileArg_t arg;
 
@@ -272,7 +273,7 @@ CFE_Status_t CF_WriteTxnQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_QueueI
     arg.error   = false;
     arg.counter = 0;
 
-    CF_CList_Traverse(c->qs[q], CF_Traverse_WriteTxnQueueEntryToFile, &arg);
+    CF_CList_Traverse(chan->qs[queue], CF_Traverse_WriteTxnQueueEntryToFile, &arg);
     return arg.error;
 }
 
@@ -282,7 +283,7 @@ CFE_Status_t CF_WriteTxnQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_QueueI
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_Direction_t dir)
+CFE_Status_t CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *chan, CF_Direction_t dir)
 {
     CF_Traverse_WriteHistoryFileArg_t arg;
 
@@ -291,7 +292,7 @@ CFE_Status_t CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_Di
     arg.error      = false;
     arg.counter    = 0;
 
-    CF_CList_Traverse(c->qs[CF_QueueIdx_HIST], CF_Traverse_WriteHistoryQueueEntryToFile, &arg);
+    CF_CList_Traverse(chan->qs[CF_QueueIdx_HIST], CF_Traverse_WriteHistoryQueueEntryToFile, &arg);
     return arg.error;
 }
 
@@ -303,16 +304,16 @@ CFE_Status_t CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *c, CF_Di
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_PrioSearch(CF_CListNode_t *node, void *context)
 {
-    CF_Transaction_t *         t = container_of(node, CF_Transaction_t, cl_node);
-    CF_Traverse_PriorityArg_t *p = (CF_Traverse_PriorityArg_t *)context;
+    CF_Transaction_t *         txn = container_of(node, CF_Transaction_t, cl_node);
+    CF_Traverse_PriorityArg_t *arg = (CF_Traverse_PriorityArg_t *)context;
 
-    if (t->priority <= p->priority)
+    if (txn->priority <= arg->priority)
     {
         /* found it!
          *
          * the current transaction's prio is less than desired (higher)
          */
-        p->t = t;
+        arg->txn = txn;
         return CF_CLIST_EXIT;
     }
 
@@ -325,29 +326,29 @@ CFE_Status_t CF_PrioSearch(CF_CListNode_t *node, void *context)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q)
+void CF_InsertSortPrio(CF_Transaction_t *txn, CF_QueueIdx_t queue)
 {
     int           insert_back = 0;
-    CF_Channel_t *c           = &CF_AppData.engine.channels[t->chan_num];
+    CF_Channel_t *chan        = &CF_AppData.engine.channels[txn->chan_num];
 
-    CF_Assert(t->chan_num < CF_NUM_CHANNELS);
-    CF_Assert(t->state != CF_TxnState_IDLE);
+    CF_Assert(txn->chan_num < CF_NUM_CHANNELS);
+    CF_Assert(txn->state != CF_TxnState_IDLE);
 
     /* look for proper position on PEND queue for this transaction.
      * This is a simple priority sort. */
 
-    if (!c->qs[q])
+    if (!chan->qs[queue])
     {
         /* list is empty, so just insert */
         insert_back = 1;
     }
     else
     {
-        CF_Traverse_PriorityArg_t p = {NULL, t->priority};
-        CF_CList_Traverse_R(c->qs[q], CF_PrioSearch, &p);
-        if (p.t)
+        CF_Traverse_PriorityArg_t arg = {NULL, txn->priority};
+        CF_CList_Traverse_R(chan->qs[queue], CF_PrioSearch, &arg);
+        if (arg.txn)
         {
-            CF_CList_InsertAfter_Ex(c, q, &p.t->cl_node, &t->cl_node);
+            CF_CList_InsertAfter_Ex(chan, queue, &arg.txn->cl_node, &txn->cl_node);
         }
         else
         {
@@ -357,9 +358,9 @@ void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q)
 
     if (insert_back)
     {
-        CF_CList_InsertBack_Ex(c, q, &t->cl_node);
+        CF_CList_InsertBack_Ex(chan, queue, &txn->cl_node);
     }
-    t->flags.com.q_index = q;
+    txn->flags.com.q_index = queue;
 }
 
 /*----------------------------------------------------------------
@@ -368,10 +369,10 @@ void CF_InsertSortPrio(CF_Transaction_t *t, CF_QueueIdx_t q)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_Arg_t *args)
+CFE_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *node, CF_TraverseAll_Arg_t *args)
 {
-    CF_Transaction_t *t = container_of(n, CF_Transaction_t, cl_node);
-    args->fn(t, args->context);
+    CF_Transaction_t *txn = container_of(node, CF_Transaction_t, cl_node);
+    args->fn(txn, args->context);
     ++args->counter;
     return CF_CLIST_CONT;
 }
@@ -382,12 +383,12 @@ CFE_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *n, CF_TraverseAll_A
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_TraverseAllTransactions(CF_Channel_t *c, CF_TraverseAllTransactions_fn_t fn, void *context)
+CFE_Status_t CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransactions_fn_t fn, void *context)
 {
     CF_TraverseAll_Arg_t args = {fn, context, 0};
     CF_QueueIdx_t        queueidx;
     for (queueidx = CF_QueueIdx_PEND; queueidx <= CF_QueueIdx_RX; ++queueidx)
-        CF_CList_Traverse(c->qs[queueidx], (CF_CListFn_t)CF_TraverseAllTransactions_Impl, &args);
+        CF_CList_Traverse(chan->qs[queueidx], (CF_CListFn_t)CF_TraverseAllTransactions_Impl, &args);
 
     return args.counter;
 }

@@ -123,7 +123,7 @@ void UT_DefaultHandler_CF_CFDP_ResetTransaction(void *UserObj, UT_EntryKey_t Fun
 
     if (ctxt)
     {
-        ctxt->t            = UT_Hook_GetArgValueByName(Context, "t", CF_Transaction_t *);
+        ctxt->txn          = UT_Hook_GetArgValueByName(Context, "txn", CF_Transaction_t *);
         ctxt->keep_history = UT_Hook_GetArgValueByName(Context, "keep_history", int);
     }
 }
@@ -140,6 +140,6 @@ void UT_DefaultHandler_CF_CFDP_CancelTransaction(void *UserObj, UT_EntryKey_t Fu
 
     if (ctxt)
     {
-        *ctxt = UT_Hook_GetArgValueByName(Context, "t", CF_Transaction_t *);
+        *ctxt = UT_Hook_GetArgValueByName(Context, "txn", CF_Transaction_t *);
     }
 }

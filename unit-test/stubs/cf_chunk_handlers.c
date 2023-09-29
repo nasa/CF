@@ -47,6 +47,6 @@
  *-----------------------------------------------------------------*/
 void UT_DefaultHandler_CF_ChunkList_GetFirstChunk(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
-    CF_Chunk_t *c = NULL;
-    UT_Stub_SetReturnValue(FuncKey, c);
+    CF_Chunk_t *chunk = NULL;
+    UT_Stub_SetReturnValue(FuncKey, chunk);
 }

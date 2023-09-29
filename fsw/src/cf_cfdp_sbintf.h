@@ -75,15 +75,15 @@ typedef struct CF_PduTlmMsg
  *       printed in the case of no buffer available.
  *
  * @par Assumptions, External Events, and Notes:
- *       t must not be NULL.
+ *       txn must not be NULL.
  *
- * @param t      Pointer to the transaction object
+ * @param txn      Pointer to the transaction object
  * @param silent If true, suppresses error events if no message can be allocated
  *
  * @returns Pointer to a CF_Logical_PduBuffer_t on success.
  * @retval  NULL on error
  */
-CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent);
+CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool silent);
 
 /************************************************************************/
 /** @brief Sends the current output buffer via the software bus.
@@ -101,11 +101,11 @@ void CF_CFDP_Send(uint8 chan_num, const CF_Logical_PduBuffer_t *ph);
 /** @brief Process received message on channel PDU input pipe.
  *
  * @par Assumptions, External Events, and Notes:
- *       c must be a member of the array within the CF_AppData global object
+ *       chan must be a member of the array within the CF_AppData global object
  *
- * @param c       Channel to receive message on
+ * @param chan       Channel to receive message on
  *
  */
-void CF_CFDP_ReceiveMessage(CF_Channel_t *c);
+void CF_CFDP_ReceiveMessage(CF_Channel_t *chan);
 
 #endif /* !CF_CFDP_SBINTF_H */

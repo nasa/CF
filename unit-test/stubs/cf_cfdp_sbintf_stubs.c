@@ -33,11 +33,11 @@ void UT_DefaultHandler_CF_CFDP_MsgOutGet(void *, UT_EntryKey_t, const UT_StubCon
  * Generated stub function for CF_CFDP_MsgOutGet()
  * ----------------------------------------------------
  */
-CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent)
+CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool silent)
 {
     UT_GenStub_SetupReturnBuffer(CF_CFDP_MsgOutGet, CF_Logical_PduBuffer_t *);
 
-    UT_GenStub_AddParam(CF_CFDP_MsgOutGet, const CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CFDP_MsgOutGet, const CF_Transaction_t *, txn);
     UT_GenStub_AddParam(CF_CFDP_MsgOutGet, bool, silent);
 
     UT_GenStub_Execute(CF_CFDP_MsgOutGet, Basic, UT_DefaultHandler_CF_CFDP_MsgOutGet);
@@ -50,9 +50,9 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *t, bool silent
  * Generated stub function for CF_CFDP_ReceiveMessage()
  * ----------------------------------------------------
  */
-void CF_CFDP_ReceiveMessage(CF_Channel_t *c)
+void CF_CFDP_ReceiveMessage(CF_Channel_t *chan)
 {
-    UT_GenStub_AddParam(CF_CFDP_ReceiveMessage, CF_Channel_t *, c);
+    UT_GenStub_AddParam(CF_CFDP_ReceiveMessage, CF_Channel_t *, chan);
 
     UT_GenStub_Execute(CF_CFDP_ReceiveMessage, Basic, NULL);
 }

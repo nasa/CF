@@ -45,9 +45,9 @@ void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
  * Generated stub function for CF_CmdAbandon_Txn()
  * ----------------------------------------------------
  */
-void CF_CmdAbandon_Txn(CF_Transaction_t *t, void *ignored)
+void CF_CmdAbandon_Txn(CF_Transaction_t *txn, void *ignored)
 {
-    UT_GenStub_AddParam(CF_CmdAbandon_Txn, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CmdAbandon_Txn, CF_Transaction_t *, txn);
     UT_GenStub_AddParam(CF_CmdAbandon_Txn, void *, ignored);
 
     UT_GenStub_Execute(CF_CmdAbandon_Txn, Basic, NULL);
@@ -70,9 +70,9 @@ void CF_CmdCancel(CFE_SB_Buffer_t *msg)
  * Generated stub function for CF_CmdCancel_Txn()
  * ----------------------------------------------------
  */
-void CF_CmdCancel_Txn(CF_Transaction_t *t, void *ignored)
+void CF_CmdCancel_Txn(CF_Transaction_t *txn, void *ignored)
 {
-    UT_GenStub_AddParam(CF_CmdCancel_Txn, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_CmdCancel_Txn, CF_Transaction_t *, txn);
     UT_GenStub_AddParam(CF_CmdCancel_Txn, void *, ignored);
 
     UT_GenStub_Execute(CF_CmdCancel_Txn, Basic, NULL);
@@ -448,9 +448,9 @@ void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
  * Generated stub function for CF_DoSuspRes_Txn()
  * ----------------------------------------------------
  */
-void CF_DoSuspRes_Txn(CF_Transaction_t *t, CF_ChanAction_SuspResArg_t *context)
+void CF_DoSuspRes_Txn(CF_Transaction_t *txn, CF_ChanAction_SuspResArg_t *context)
 {
-    UT_GenStub_AddParam(CF_DoSuspRes_Txn, CF_Transaction_t *, t);
+    UT_GenStub_AddParam(CF_DoSuspRes_Txn, CF_Transaction_t *, txn);
     UT_GenStub_AddParam(CF_DoSuspRes_Txn, CF_ChanAction_SuspResArg_t *, context);
 
     UT_GenStub_Execute(CF_DoSuspRes_Txn, Basic, NULL);
@@ -490,12 +490,12 @@ void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
  * Generated stub function for CF_PurgeHistory()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c)
+CFE_Status_t CF_PurgeHistory(CF_CListNode_t *node, CF_Channel_t *chan)
 {
     UT_GenStub_SetupReturnBuffer(CF_PurgeHistory, CFE_Status_t);
 
-    UT_GenStub_AddParam(CF_PurgeHistory, CF_CListNode_t *, n);
-    UT_GenStub_AddParam(CF_PurgeHistory, CF_Channel_t *, c);
+    UT_GenStub_AddParam(CF_PurgeHistory, CF_CListNode_t *, node);
+    UT_GenStub_AddParam(CF_PurgeHistory, CF_Channel_t *, chan);
 
     UT_GenStub_Execute(CF_PurgeHistory, Basic, NULL);
 
@@ -507,11 +507,11 @@ CFE_Status_t CF_PurgeHistory(CF_CListNode_t *n, CF_Channel_t *c)
  * Generated stub function for CF_PurgeTransaction()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_PurgeTransaction(CF_CListNode_t *n, void *ignored)
+CFE_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignored)
 {
     UT_GenStub_SetupReturnBuffer(CF_PurgeTransaction, CFE_Status_t);
 
-    UT_GenStub_AddParam(CF_PurgeTransaction, CF_CListNode_t *, n);
+    UT_GenStub_AddParam(CF_PurgeTransaction, CF_CListNode_t *, node);
     UT_GenStub_AddParam(CF_PurgeTransaction, void *, ignored);
 
     UT_GenStub_Execute(CF_PurgeTransaction, Basic, NULL);

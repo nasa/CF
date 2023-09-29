@@ -298,21 +298,21 @@ void CF_ChunkListAdd(CF_ChunkList_t *chunks, CF_ChunkOffset_t offset, CF_ChunkSi
  *-----------------------------------------------------------------*/
 void CF_ChunkList_RemoveFromFirst(CF_ChunkList_t *chunks, CF_ChunkSize_t size)
 {
-    CF_Chunk_t *c = &chunks->chunks[0]; /* front is always 0 */
+    CF_Chunk_t *chunk = &chunks->chunks[0]; /* front is always 0 */
 
-    if (size > c->size)
+    if (size > chunk->size)
     {
-        size = c->size;
+        size = chunk->size;
     }
-    c->size -= size;
+    chunk->size -= size;
 
-    if (!c->size)
+    if (!chunk->size)
     {
         CF_Chunks_EraseChunk(chunks, 0);
     }
     else
     {
-        c->offset += size;
+        chunk->offset += size;
     }
 }
 
@@ -366,7 +366,7 @@ uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_
     CF_ChunkIdx_t    i   = 0;
     CF_ChunkOffset_t next_off;
     CF_ChunkOffset_t gap_start;
-    CF_Chunk_t       c;
+    CF_Chunk_t       chunk;
 
     CF_Assert(total); /* does it make sense to have a 0 byte file? */
     CF_Assert(start < total);
@@ -374,11 +374,11 @@ uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_
     /* simple case: there is no chunk data, which means there is a single gap of the entire size */
     if (!chunks->count)
     {
-        c.offset = 0;
-        c.size   = total;
+        chunk.offset = 0;
+        chunk.size   = total;
         if (compute_gap_fn)
         {
-            compute_gap_fn(chunks, &c, opaque);
+            compute_gap_fn(chunks, &chunk, opaque);
         }
         ret = 1;
     }
@@ -387,11 +387,11 @@ uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_
         /* Handle initial gap if needed */
         if (start < chunks->chunks[0].offset)
         {
-            c.offset = start;
-            c.size   = chunks->chunks[0].offset - start;
+            chunk.offset = start;
+            chunk.size   = chunks->chunks[0].offset - start;
             if (compute_gap_fn)
             {
-                compute_gap_fn(chunks, &c, opaque);
+                compute_gap_fn(chunks, &chunk, opaque);
             }
             ret = 1;
         }
@@ -401,8 +401,8 @@ uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_
             next_off  = (i == (chunks->count - 1)) ? total : chunks->chunks[i + 1].offset;
             gap_start = (chunks->chunks[i].offset + chunks->chunks[i].size);
 
-            c.offset = (gap_start > start) ? gap_start : start;
-            c.size   = (next_off - c.offset);
+            chunk.offset = (gap_start > start) ? gap_start : start;
+            chunk.size   = (next_off - chunk.offset);
 
             if (gap_start >= total)
             {
@@ -413,7 +413,7 @@ uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_
                 /* Only report if gap finishes after start */
                 if (compute_gap_fn)
                 {
-                    compute_gap_fn(chunks, &c, opaque);
+                    compute_gap_fn(chunks, &chunk, opaque);
                 }
                 ++ret;
             }

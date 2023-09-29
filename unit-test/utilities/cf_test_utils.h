@@ -87,7 +87,7 @@ typedef struct
 
 typedef struct
 {
-    CF_Channel_t *      c;
+    CF_Channel_t *      chan;
     CF_TransactionSeq_t transaction_sequence_number;
     CF_EntityId_t       src_eid;
     CF_Transaction_t *  forced_return;
@@ -102,14 +102,14 @@ typedef struct
 
 typedef struct
 {
-    CF_Transaction_t *t;
+    CF_Transaction_t *txn;
     int               keep_history;
 } CF_CFDP_ResetTransaction_context_t;
 
 typedef struct
 {
-    CF_Channel_t *c;
-    CF_History_t *h;
+    CF_Channel_t *chan;
+    CF_History_t *history;
 } CF_CFDP_ResetHistory_context_t;
 
 typedef struct
@@ -122,20 +122,20 @@ typedef struct
 typedef struct
 {
     int32         fd;
-    CF_Channel_t *c;
-    CF_QueueIdx_t q;
+    CF_Channel_t *chan;
+    CF_QueueIdx_t queue;
 } CF_WriteTxnQueueDataToFile_context_t;
 
 typedef struct
 {
     int32          fd;
-    CF_Channel_t * c;
+    CF_Channel_t * chan;
     CF_Direction_t dir;
 } CF_WriteHistoryQueueDataToFile_context_t;
 
 typedef struct
 {
-    CF_Channel_t *                  c;
+    CF_Channel_t *                  chan;
     CF_TraverseAllTransactions_fn_t fn;
     void *                          context;
 } CF_TraverseAllTransactions_context_t;

@@ -52,8 +52,8 @@ void UT_DefaultHandler_CF_ResetHistory(void *UserObj, UT_EntryKey_t FuncKey, con
 
     if (ctxt)
     {
-        ctxt->c = UT_Hook_GetArgValueByName(Context, "c", CF_Channel_t *);
-        ctxt->h = UT_Hook_GetArgValueByName(Context, "h", CF_History_t *);
+        ctxt->chan    = UT_Hook_GetArgValueByName(Context, "chan", CF_Channel_t *);
+        ctxt->history = UT_Hook_GetArgValueByName(Context, "history", CF_History_t *);
     }
 }
 
@@ -72,7 +72,7 @@ void UT_DefaultHandler_CF_FindTransactionBySequenceNumber(void *UserObj, UT_Entr
 
     if (ctxt)
     {
-        ctxt->c = UT_Hook_GetArgValueByName(Context, "c", CF_Channel_t *);
+        ctxt->chan = UT_Hook_GetArgValueByName(Context, "chan", CF_Channel_t *);
         ctxt->transaction_sequence_number =
             UT_Hook_GetArgValueByName(Context, "transaction_sequence_number", CF_TransactionSeq_t);
         ctxt->src_eid = UT_Hook_GetArgValueByName(Context, "src_eid", CF_EntityId_t);
@@ -113,9 +113,9 @@ void UT_DefaultHandler_CF_WriteTxnQueueDataToFile(void *UserObj, UT_EntryKey_t F
 
     if (ctxt)
     {
-        ctxt->fd = UT_Hook_GetArgValueByName(Context, "fd", int32);
-        ctxt->c  = UT_Hook_GetArgValueByName(Context, "c", CF_Channel_t *);
-        ctxt->q  = UT_Hook_GetArgValueByName(Context, "q", CF_QueueIdx_t);
+        ctxt->fd    = UT_Hook_GetArgValueByName(Context, "fd", int32);
+        ctxt->chan  = UT_Hook_GetArgValueByName(Context, "chan", CF_Channel_t *);
+        ctxt->queue = UT_Hook_GetArgValueByName(Context, "queue", CF_QueueIdx_t);
     }
 }
 
@@ -133,9 +133,9 @@ void UT_DefaultHandler_CF_WriteHistoryQueueDataToFile(void *UserObj, UT_EntryKey
 
     if (ctxt)
     {
-        ctxt->fd  = UT_Hook_GetArgValueByName(Context, "fd", int32);
-        ctxt->c   = UT_Hook_GetArgValueByName(Context, "c", CF_Channel_t *);
-        ctxt->dir = UT_Hook_GetArgValueByName(Context, "dir", CF_Direction_t);
+        ctxt->fd   = UT_Hook_GetArgValueByName(Context, "fd", int32);
+        ctxt->chan = UT_Hook_GetArgValueByName(Context, "chan", CF_Channel_t *);
+        ctxt->dir  = UT_Hook_GetArgValueByName(Context, "dir", CF_Direction_t);
     }
 }
 
@@ -151,7 +151,7 @@ void UT_DefaultHandler_CF_TraverseAllTransactions(void *UserObj, UT_EntryKey_t F
 
     if (ctxt)
     {
-        ctxt->c       = UT_Hook_GetArgValueByName(Context, "c", CF_Channel_t *);
+        ctxt->chan    = UT_Hook_GetArgValueByName(Context, "chan", CF_Channel_t *);
         ctxt->fn      = UT_Hook_GetArgValueByName(Context, "fn", CF_TraverseAllTransactions_fn_t);
         ctxt->context = UT_Hook_GetArgValueByName(Context, "context", void *);
     }
