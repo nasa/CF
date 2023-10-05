@@ -210,7 +210,7 @@
   engine is capable of transmitting and receiving a configurable number of
   transactions simultaneously. The engine builds outgoing Protocol Data Units
   (PDUs) and interprets the incoming PDUs. It handles all details regarding the
-  CFDP standard protocol which is defined in the CCSDS 727.0-B-4 Blue Book. The
+  CFDP standard protocol which is defined in the CCSDS 727.0-B-5 Blue Book. The
   engine processes the file transactions when it is 'cycled'. The number of
   engine cycles per wake up is a configuration parameter defined in the table.
   At most one PDU will be sent on a single engine cycle.
@@ -1405,7 +1405,7 @@ CF_UnionArgs_Payload_t;
   CF is currently limited by the Software Bus performance.  Future work may
   include implementing a point-to-point interface for high speed transfers.
 
-  The CFDP standard CCSDS 727.0-B-4 allows a variety of data-type sizes for
+  The CFDP standard CCSDS 727.0-B-5 allows a variety of data-type sizes for
   Source and Destination Entity ID's, Transaction ID and PDU Header length.
   Currently, this application does not support the following:
   1. an Entity ID length other than the size defined in cf_platform_cfg.h
@@ -1432,11 +1432,11 @@ CF_UnionArgs_Payload_t;
   Not Respected'.
   
   This version of CF does not support keep alive procedures that are detailed in
-  section 4.1.6.5 of CFDP CCSDS 727.0-B-4 Blue Book.
+  section 4.1.6.5 of CFDP CCSDS 727.0-B-5 Blue Book.
   
   Invalid file structures are not supported by this version of the CF
   application. Invalid file structures are described in 4.1.6.1.1.8 of CFDP
-  CCSDS 727.0-B-4 Blue Book and apply only when record boundaries are respected
+  CCSDS 727.0-B-5 Blue Book and apply only when record boundaries are respected
   (see segmentation control above).
 
   Only transmission modes unacknowledged (class 1) and acknowledged (class 2) are
