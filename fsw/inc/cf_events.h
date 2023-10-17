@@ -364,6 +364,19 @@
  */
 
 /**
+ * \brief Attempt to reset a transaction that has already been freed
+ *
+ *  \par Type: DEBUG
+ *
+ *  \par Cause:
+ *
+ *  Can be induced via various off-nominal conditions - such as sending a META-data PDU
+ *  with an invalid file destination.
+ *  
+ */
+#define CF_EID_DBG_RESET_FREED_XACT (59)
+
+/**
  * \brief CF PDU Received Without Existing Transaction, Dropped Due To Max RX Reached Event ID
  *
  *  \par Type: ERROR

@@ -1360,6 +1360,12 @@ void Test_CF_CFDP_ResetTransaction(void)
 
     memset(&pb, 0, sizeof(pb));
 
+    /* Attempt to reset a transaction that has already been freed*/
+    UT_ResetState(UT_KEY(CF_FreeTransaction));
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
+    txn->flags.com.q_index = CF_QueueIdx_FREE;
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));  
+
     /* nominal call */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
     CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].q_size[txn->flags.com.q_index] = 10;
