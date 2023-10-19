@@ -1125,7 +1125,7 @@ void CF_CFDP_DecodeAllSegments(CF_DecoderState_t *state, CF_Logical_SegmentList_
     {
         --limit;
 
-        if (plseg->num_segments >= CF_PDU_MAX_TLV)
+        if (plseg->num_segments >= CF_PDU_MAX_SEGMENTS)
         {
             /* too many */
             CF_CODEC_SET_DONE(state);
