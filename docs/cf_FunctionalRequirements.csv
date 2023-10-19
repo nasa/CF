@@ -17,6 +17,7 @@ CF2002.1.2,CF2002.1.2,"CF shall detect the following scenarios and identify them
 4. File-Size Error
 5. NAK Limit Reached
 6. Inactivity Limit Reached",Fault scenarios explicitly listed and tested for specification compliance.
+CF2002.1.3,CF2002.1.3,"CF shall issue issue a DEBUG message if an attempt is made to reset a transaction that has already been freed"
 CF3000,CF3000,"When CF receives a ""Transfer File"" command, CF shall play back the file indicated by the command-specified: filename, source path, destination path, keep/delete flag, service class, priority, channel, and peer-entity id. ","Also referred to as ""playback file"" command. Basic function of file transfer required to operate cFS flight systems. "
 CF3000.1,CF3000.1,"When CF receives a ""Transfer File"" command, if the command-specified is open, CF reject the command.",Open files are in a uncertain state and may change during transfer potential containing erroneous data or cause other undefined behaviors
 CF3000.2,CF3000.2,
