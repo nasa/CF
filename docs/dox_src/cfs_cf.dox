@@ -13,6 +13,7 @@
      <LI> \subpage cfscfeventspg
      <LI> \subpage cfscfcons
      <LI> \subpage cfscffaqs
+     <LI> \subpage cfscflessons
   </UL>
 **/
 
@@ -99,7 +100,7 @@
 
   CF sends and receives file information and file-data in Protocol Data Units
   (PDUs) that are compliant with the CFDP standard protocol defined in the CCSDS
-  727.0-B-4 Blue Book. The PDUs are transferred to and from the CF application
+  727.0-B-5 Blue Book. The PDUs are transferred to and from the CF application
   via CCSDS packets on the software bus. The system must be configured to get
   the PDU packets from the peer to the software bus (and vice-versa).
 
@@ -1450,7 +1451,7 @@ CF_UnionArgs_Payload_t;
     <LI> Unable to subscribe to the CF Housekeeping Request Message  <BR>
     <LI> Unable to register for cFE Event Services  <BR>
     <LI> Unable to register the CF Configuration Table with cFE Table Services  <BR>
-    <LI> Unable to load the CF Configuration Table with a defaut table file  <BR>
+    <LI> Unable to load the CF Configuration Table with a default table file  <BR>
     <LI> Unable to acquire a pointer to the CF Configuration Table  <BR>
   </UL>
   
@@ -1466,4 +1467,36 @@ CF_UnionArgs_Payload_t;
   \page cfscffaqs CFS CFDP Frequently Asked Questions
 
   No CF specific FAQ's have been identified/documented.
+
+  Prev: \ref cfscfcons <BR>
+  Next: \ref cfscflessons
+**/
+
+/**
+  \page cfscflessons CFS CFDP Lessons Learned
+
+  These are the lessons learned setting up CF application:
+
+  <UL>
+    <LI> If you get a "PDU too short":</LI>
+      <UL> 
+        <LI> The ground system might not be setting the "length" in the CCSDS header correctly. </LI>
+      </UL>
+    <LI> If you get an "EOF PUD too short"  or missing 2 bytes from an uploaded file: </LI>
+      <UL>
+        <LI> The current version of CF does not support PDU CRC. The ground system needs to set the "CRC Flag" to false. </LI> 
+      </UL>
+    <LI> If you get a "CRC mismatch for R trans": </LI>
+      <UL>
+        <LI> This is referencing the "checksum" and not the "PDU CRC". </LI>
+        <LI> Make sure you are using the modular checksum calculation (Type 0) in your ground system. </LI>
+        <LI> The PDU can be truncated. Check the "max PDU size" in your CF application and the "max ingest" of the CI application (increase as necessary).
+        Otherwise set the "max file segment" smaller in the ground system. </LI>
+      </UL>
+    <LI> If you get an "inactivity timer expired" after the ground system sends an EOF PDU:</LI>
+      <UL>
+        <LI> If you are sending the file in acknowledge mode, it could be the checksum calculation is taking longer than your "inactivity timer". You can
+        increase the "inactivity timer" or increase the "max number of bytes per wakeup to calculate CRC". </LI>
+      </UL>
+  </UL>
 **/
