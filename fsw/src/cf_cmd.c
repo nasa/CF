@@ -46,7 +46,7 @@
  *-----------------------------------------------------------------*/
 void CF_CmdNoop(CFE_SB_Buffer_t *msg)
 {
-    CFE_EVS_SendEvent(CF_EID_INF_CMD_NOOP, CFE_EVS_EventType_INFORMATION, "CF: No-Op received, Version %d.%d.%d.%d",
+    CFE_EVS_SendEvent(CF_NOOP_INF_EID, CFE_EVS_EventType_INFORMATION, "CF: No-Op received, Version %d.%d.%d.%d",
                       CF_MAJOR_VERSION, CF_MINOR_VERSION, CF_REVISION, CF_MISSION_REV);
     ++CF_AppData.hk.counters.cmd;
 }
@@ -74,8 +74,8 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
     }
     else
     {
-        CFE_EVS_SendEvent(CF_EID_INF_CMD_RESET, CFE_EVS_EventType_INFORMATION,
-                          "CF: Received RESET COUNTERS command: %s", names[param]);
+        CFE_EVS_SendEvent(CF_RESET_INF_EID, CFE_EVS_EventType_INFORMATION, "CF: Received RESET COUNTERS command: %s",
+                          names[param]);
 
         /* if the param is CF_Reset_command, or all counters */
         if ((param == CF_Reset_all) || (param == CF_Reset_command))
@@ -1240,7 +1240,7 @@ void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
         }
         else
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_CMD_GCMD_LEN, CFE_EVS_EventType_ERROR,
+            CFE_EVS_SendEvent(CF_CMD_LEN_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF: invalid ground command length for command 0x%02x, expected %d got %zd", cmd,
                               expected_lengths[cmd], len);
             ++CF_AppData.hk.counters.err;
@@ -1248,8 +1248,8 @@ void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
     }
     else
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_CMD_GCMD_CC, CFE_EVS_EventType_ERROR,
-                          "CF: invalid ground command packet cmd_code=0x%02x", cmd);
+        CFE_EVS_SendEvent(CF_CC_ERR_EID, CFE_EVS_EventType_ERROR, "CF: invalid ground command packet cmd_code=0x%02x",
+                          cmd);
         ++CF_AppData.hk.counters.err;
     }
 }

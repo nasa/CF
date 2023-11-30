@@ -180,11 +180,11 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_NOOP
+     *       - #CF_NOOP_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
@@ -212,11 +212,11 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_RESET
+     *       - #CF_RESET_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Invalid counter type, #CF_EID_ERR_CMD_RESET_INVALID
      *
      *  \par Evidence of failure may be found in the following telemetry:
@@ -244,7 +244,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Invalid parameter, #CF_EID_ERR_CMD_BAD_PARAM
      *       - Transaction initialization failure, #CF_EID_ERR_CMD_TX_FILE
      *
@@ -276,7 +276,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Invalid parameter, #CF_EID_ERR_CMD_BAD_PARAM
      *       - Playback initialization failure, #CF_EID_ERR_CMD_PLAYBACK_DIR
      *
@@ -311,7 +311,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
      *       - Command processing failure, #CF_EID_ERR_CMD_FREEZE
      *
@@ -345,7 +345,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
      *       - Command processing failure, #CF_EID_ERR_CMD_THAW
      *
@@ -379,7 +379,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Transaction not found using compound key, #CF_EID_ERR_CMD_TRANS_NOT_FOUND
      *       - Invalid channel number, #CF_EID_ERR_CMD_TSN_CHAN_INVALID
      *       - Already in requested state, #CF_EID_ERR_CMD_SUSPRES_SAME
@@ -415,7 +415,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Transaction not found using compound key, #CF_EID_ERR_CMD_TRANS_NOT_FOUND
      *       - Invalid channel number, #CF_EID_ERR_CMD_TSN_CHAN_INVALID
      *       - Already in requested state, #CF_EID_ERR_CMD_SUSPRES_SAME
@@ -450,7 +450,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Transaction not found using compound key, #CF_EID_ERR_CMD_TRANS_NOT_FOUND
      *       - Invalid channel number, #CF_EID_ERR_CMD_TSN_CHAN_INVALID
      *       - No matching transaction, #CF_EID_ERR_CMD_CANCEL_CHAN
@@ -484,7 +484,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Transaction not found using compound key, #CF_EID_ERR_CMD_TRANS_NOT_FOUND
      *       - Invalid channel number, #CF_EID_ERR_CMD_TSN_CHAN_INVALID
      *       - No matching transaction, #CF_EID_ERR_CMD_ABANDON_CHAN
@@ -516,7 +516,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Invalid configuration parameter key, #CF_EID_ERR_CMD_GETSET_PARAM
      *       - Invalid channel number, #CF_EID_ERR_CMD_GETSET_CHAN
      *       - Parameter value failed validation, #CF_EID_ERR_CMD_GETSET_VALIDATE
@@ -548,7 +548,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Invalid configuration parameter key, #CF_EID_ERR_CMD_GETSET_PARAM
      *       - Invalid channel number, #CF_EID_ERR_CMD_GETSET_CHAN
      *
@@ -579,7 +579,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Invalid parameter combination, #CF_EID_ERR_CMD_WQ_ARGS
      *       - Invalid channel number, #CF_EID_ERR_CMD_WQ_CHAN
      *       - Open file to write failed, #CF_EID_ERR_CMD_WQ_OPEN
@@ -617,7 +617,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
      *       - Enable dequeue failed, #CF_EID_ERR_CMD_ENABLE_DEQUEUE
      *
@@ -650,7 +650,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
      *       - Disable dequeue failed, #CF_EID_INF_CMD_DISABLE_DEQUEUE
      *
@@ -689,7 +689,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
      *       - Invalid polling directory index, #CF_EID_ERR_CMD_POLLDIR_INVALID
      *       - Enable directory polling failed, #CF_EID_ERR_CMD_ENABLE_POLLDIR
@@ -729,7 +729,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
      *       - Invalid polling directory index, #CF_EID_ERR_CMD_POLLDIR_INVALID
      *       - Disable directory polling failed, #CF_EID_ERR_CMD_DISABLE_POLLDIR
@@ -770,7 +770,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
      *       - Invalid purge queue argument, #CF_EID_ERR_CMD_PURGE_ARG
      *       - Purge queue failed, #CF_EID_ERR_CMD_PURGE_QUEUE
@@ -803,7 +803,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Engine initialization failed, #CF_EID_ERR_CMD_ENABLE_ENGINE
      *       - Engine already enabled, #CF_EID_ERR_CMD_ENG_ALREADY_ENA
      *
@@ -836,7 +836,7 @@ typedef enum
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
-     *       - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+     *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Engine already disabled, #CF_EID_ERR_CMD_ENG_ALREADY_DIS
      *
      *  \par Evidence of failure may be found in the following telemetry:

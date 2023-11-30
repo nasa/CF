@@ -44,7 +44,7 @@
  *
  *  Successful completion of application initialization
  */
-#define CF_EID_INF_INIT (20)
+#define CF_INIT_INF_EID (20)
 
 /**
  * \brief CF Check Table Release Address Failed Event ID
@@ -166,7 +166,7 @@
  *
  *  Failure from create pipe call during engine channel initialization
  */
-#define CF_EID_ERR_INIT_PIPE (31)
+#define CF_CR_PIPE_ERR_EID (31)
 
 /**
  * \brief CF Channel Message Subscription Failed Event ID
@@ -910,7 +910,7 @@
  *
  *  Receipt of NOOP command
  */
-#define CF_EID_INF_CMD_NOOP (110)
+#define CF_NOOP_INF_EID (110)
 
 /**
  * \brief CF Reset Counters Command Received Event ID
@@ -921,7 +921,7 @@
  *
  *  Receipt and successful processing of reset counters command
  */
-#define CF_EID_INF_CMD_RESET (111)
+#define CF_RESET_INF_EID (111)
 
 /**
  * \brief CF Set Parameter Command Received Event ID
@@ -1361,7 +1361,7 @@
  *
  *  Received command length verification failure
  */
-#define CF_EID_ERR_CMD_GCMD_LEN (151)
+#define CF_CMD_LEN_ERR_EID (151)
 
 /**
  * \brief CF Command Code Invalid Event ID
@@ -1372,7 +1372,7 @@
  *
  *  Received command code unrecognized
  */
-#define CF_EID_ERR_CMD_GCMD_CC (152)
+#define CF_CC_ERR_EID (152)
 
 /**
  * \brief CF Write Entry To File Failed Event ID
