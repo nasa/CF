@@ -19,17 +19,22 @@
 
 /**
  * @file
+ *   CFS CFDP (CF) Application Public Definitions
  *
- *  CF application platform configuration.
- *  These options are used to configure application behavior.
+ * This provides default values for configurable items that affect
+ * the interface(s) of this module.  This includes the CMD/TLM message
+ * interface, tables definitions, and any other data products that
+ * serve to exchange information with other entities.
+ *
+ * @note This file may be overridden/superceded by mission-provided defintions
+ * either by overriding this header or by generating definitions from a command/data
+ * dictionary tool.
  */
+#ifndef CF_INTERFACE_CFG_H
+#define CF_INTERFACE_CFG_H
 
-#ifndef CF_PLATFORM_CFG_H
-#define CF_PLATFORM_CFG_H
-
-/*************************************************************************
- * Macro definitions
- *************************************************************************/
+#include "common_types.h"
+#include "cfe_mission_cfg.h"
 
 /**
  * \defgroup cfscfplatformcfg CFS CFDP Platform Configuration
@@ -52,7 +57,7 @@
  *        CF_ConfigPacket_t, set config params command
  *        CF_TxFileCmd_t, transmit file command
  *        CF_PlaybackDirCmd_t, equivalent to above
- *        CF_TransactionCmd_t, any command that selects a transaction based on EID
+ *        CF_Transaction_Payload_t, any command that selects a transaction based on EID
  *
  * @par Limits
  *         Must be one of uint8, uint16, uint32, uint64.
@@ -71,25 +76,12 @@ typedef uint32 CF_EntityId_t;
  *
  * @note This type is used in several CF commands, and so changing the size
  *       of this type will affect the following structure:
- *        CF_TransactionCmd_t, any command that selects a transaction based on TSN
+ *        CF_Transaction_Payload_t, any command that selects a transaction based on TSN
  *
  * @par Limits
  *         Must be one of uint8, uint16, uint32, uint64.
  */
 typedef uint32 CF_TransactionSeq_t;
-
-/**
- *  @brief Application Pipe Depth
- *
- *  @par Description:
- *       Dictates the pipe depth of the cf command pipe.
- *
- *  @par Limits:
- *		 The minimum size of this parameter is 1
- *       The maximum size dictated by cFE platform configuration
- *		 parameter is CFE_SB_MAX_PIPE_DEPTH
- */
-#define CF_PIPE_DEPTH (32)
 
 /**
  *  @brief Number of channels
@@ -117,44 +109,6 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_NAK_MAX_SEGMENTS (58)
 
 /**
- *  @brief RX chunks per transaction (per channel)
- *
- *  @par Description:
- *       Number of chunks per transaction per channel (RX).
- *
- * CHUNKS -
- * A chunk is a representation of a range (offset, size) of data received by a receiver.
- *
- * Class 2 CFDP deals with NAK, so received data must be tracked for receivers in order to generate
- * the NAK. The sender must also keep track of NAK requests and send new file data PDUs as a result.
- * (array size must be CF_NUM_CHANNELS)
- * CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION is an array for each channel indicating the number of chunks per transaction
- * CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION is an array for each channel indicating the number of chunks to keep track
- * of NAK requests from the receiver per transaction
- *
- *  @par Limits:
- *
- */
-#define CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION \
-    {                                            \
-        CF_NAK_MAX_SEGMENTS, CF_NAK_MAX_SEGMENTS \
-    }
-
-/**
- *  @brief TX chunks per transaction (per channel)
- *
- *  @par Description:
- *       Number of chunks per transaction per channel (TX).
- *
- *  @par Limits:
- *
- */
-#define CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION \
-    {                                            \
-        CF_NAK_MAX_SEGMENTS, CF_NAK_MAX_SEGMENTS \
-    }
-
-/**
  *  @brief Total number of chunks (tx, rx, all channels)
  *
  *  @par Description:
@@ -168,42 +122,6 @@ typedef uint32 CF_TransactionSeq_t;
 /* (in other words, the summation of all elements in CF_CHANNEL_NUM_R/TX_CHUNKS_PER_TRANSACTION */
 #define CF_TOTAL_CHUNKS (CF_NAK_MAX_SEGMENTS * 4)
 
-/* definitions that affect file queuing */
-/**
- *  @brief Number of max commanded playback files per chan.
- *
- *  @par Description:
- *       This is the max number of outstanding ground commanded file transmits per channel.
- *
- *  @par Limits:
- *
- */
-#define CF_MAX_COMMANDED_PLAYBACK_FILES_PER_CHAN (10)
-
-/**
- *  @brief Max number of simultaneous file receives.
- *
- *  @par Description:
- *       Each channel can support this number of file receive transactions at a time.
- *
- *  @par Limits:
- *
- */
-#define CF_MAX_SIMULTANEOUS_RX (5)
-
-/* definitions that affect execution */
-
-/**
- *  @brief Max number of commanded playback directories per channel.
- *
- *  @par Description:
- *       Each channel can support this number of ground commanded directory playbacks.
- *
- *  @par Limits:
- *
- */
-#define CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN (2)
-
 /**
  *  @brief Max number of polling directories per channel.
  *
@@ -215,29 +133,6 @@ typedef uint32 CF_TransactionSeq_t;
  *
  */
 #define CF_MAX_POLLING_DIR_PER_CHAN (5)
-
-/**
- *  @brief Number of transactions per playback directory.
- *
- *  @par Description:
- *       Each playback/polling directory operation will be able to have this
- *       many active transfers at a time pending or active.
- *
- *  @par Limits:
- *
- */
-#define CF_NUM_TRANSACTIONS_PER_PLAYBACK (5)
-
-/**
- *  @brief Number of histories per channel
- *
- *  @par Description:
- *       Each channel can support this number of file receive transactions at a time.
- *
- *  @par Limits:
- *       65536 is the current max.
- */
-#define CF_NUM_HISTORIES_PER_CHANNEL (256)
 
 /**
  *  @brief Max PDU size.
@@ -256,36 +151,12 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_MAX_PDU_SIZE (512)
 
 /**
- *  @brief Name of the CF Configuration Table
- *
- *  @par Description:
- *       This parameter defines the name of the CF Configuration Table.
- *
- *  @par Limits
- *       The length of this string, including the NULL terminator cannot exceed
- *       the #OS_MAX_PATH_LEN value.
- */
-#define CF_CONFIG_TABLE_NAME ("config_table")
-
-/**
- *  @brief CF Configuration Table Filename
- *
- *  @par Description:
- *       The value of this constant defines the filename of the CF Config Table
- *
- *  @par Limits
- *       The length of this string, including the NULL terminator cannot exceed
- *       the #OS_MAX_PATH_LEN value.
- */
-#define CF_CONFIG_TABLE_FILENAME ("/cf/cf_def_config.tbl")
-
-/**
  *  @brief Maximum file name length.
  *
  *  @par Limits:
  *
  */
-#define CF_FILENAME_MAX_NAME (OS_MAX_FILE_NAME)
+#define CF_FILENAME_MAX_NAME CFE_MISSION_MAX_FILE_LEN
 
 /**
  *  @brief Maximum file path (not including file name)
@@ -293,7 +164,7 @@ typedef uint32 CF_TransactionSeq_t;
  *  @par Limits:
  *
  */
-#define CF_FILENAME_MAX_PATH (OS_MAX_PATH_LEN - OS_MAX_FILE_NAME)
+#define CF_FILENAME_MAX_PATH (CFE_MISSION_MAX_PATH_LEN - CFE_MISSION_MAX_FILE_LEN)
 
 /**
  *  @brief Max filename and path length.
@@ -301,52 +172,7 @@ typedef uint32 CF_TransactionSeq_t;
  *  @par Limits:
  *
  */
-#define CF_FILENAME_MAX_LEN (CF_FILENAME_MAX_NAME + CF_FILENAME_MAX_PATH)
-
-/**
- *  @brief R2 CRC calc chunk size
- *
- *  @par Description
- *       R2 performs CRC calculation upon file completion in chunks. This is the size
- *       of the buffer. The larger the size the more stack will be used, but
- *       the faster it can go. The overall number of bytes calculated per wakeup
- *       is set in the configuration table.
- *
- *  @par Limits:
- *
- */
-#define CF_R2_CRC_CHUNK_SIZE (1024)
-
-#if CF_FILENAME_MAX_LEN > OS_MAX_PATH_LEN
-#error CF_FILENAME_MAX_LEN must be <= OS_MAX_PATH_LEN
-#endif
-
-/**
- *  @brief Number of milliseconds to wait for a SB message
- */
-#define CF_RCVMSG_TIMEOUT (100)
-
-/**
- * @brief Limits the number of retries to obtain the CF throttle sem
- *
- * @par Description
- *      If the CF throttle sem is not available during CF startup, the initialization
- *      will retry after a short delay.
- *
- * @sa CF_STARTUP_SEM_TASK_DELAY
- */
-#define CF_STARTUP_SEM_MAX_RETRIES 25
-
-/**
- * @brief Number of milliseconds to wait if CF throttle sem is not available
- *
- * @par Description
- *      If the CF throttle sem is not available during CF startup, the initialization
- *      will delay for this period of time before trying again
- *
- * @sa CF_STARTUP_SEM_MAX_RETRIES
- */
-#define CF_STARTUP_SEM_TASK_DELAY 100
+#define CF_FILENAME_MAX_LEN CFE_MISSION_MAX_PATH_LEN
 
 /**
  * @brief Number of trailing bytes to add to CFDP PDU
@@ -388,4 +214,4 @@ typedef uint32 CF_TransactionSeq_t;
 
 /**\}*/
 
-#endif /* !CF_PLATFORM_CFG_H */
+#endif

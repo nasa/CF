@@ -484,7 +484,7 @@
 
   cf_platform_cfg.h uses macro definitions for configurable options, while cf_def_config.c
   uses a table. cf_def_config.c parameters can be accessed using the get/set functions
-  CF_CmdGetParam() and CF_CmdSetParam().
+  CF_GetParamCmd() and CF_SetParamCmd().
 
   CF expects to receive a CF_WAKEUP_MID message from the SCH (scheduler) app at a fixed
   rate. The number of wakeups per second is reflected in the configuration table. This
@@ -615,9 +615,9 @@
      *       - 4 = down counters
      typedef union CF_UnionArgs_Payload
      {
-         uint32 dword;    
-         uint16 hword[2]; 
-         uint8  byte[4];  
+         uint32 dword;
+         uint16 hword[2];
+         uint8  byte[4];
      }
 CF_UnionArgs_Payload_t;
 \endverbatim
@@ -626,44 +626,44 @@ CF_UnionArgs_Payload_t;
         reset.counters. The value should be set to one of five possible values defined in the reset enumeration.
 
   \verbatim typedef enum {
-            CF_Reset_all     = 0, 
-            CF_Reset_command = 1, 
-            CF_Reset_fault   = 2, 
-            CF_Reset_up      = 3, 
-            CF_Reset_down    = 4  
+            CF_Reset_all     = 0,
+            CF_Reset_command = 1,
+            CF_Reset_fault   = 2,
+            CF_Reset_up      = 3,
+            CF_Reset_down    = 4
         } CF_Reset_t;
   \endverbatim
 
 
 
   <H2> Transmit File Command </H2>
-    
+
   The CF Transmit File command is sent to CF using message ID #CF_CMD_MID with
   command code #CF_TX_FILE_CC.
-  
+
   This command is used to queue a file to be sent by the CF application. To
   'transmit' a file means to output, or send a file.
-  
+
   When the command is executed successfully, the command counter will increment
   and an event will be generated.
-  
+
   If the command is not successful, the command error counter will increment and
   an error event will be generated indicating the reason for failure.
 
   \verbatim
   typedef struct CF_TxFileCmd
   {
-      CFE_MSG_CommandHeader_t cmd_header;                        
-      uint8                   cfdp_class;                        
-      uint8                   keep;                              
-      uint8                   chan_num;                          
-      uint8                   priority;                          
-      CF_EntityId_t           dest_id;                           
-      char                    src_filename[CF_FILENAME_MAX_LEN]; 
-      char                    dst_filename[CF_FILENAME_MAX_LEN]; 
+      CFE_MSG_CommandHeader_t cmd_header;
+      uint8                   cfdp_class;
+      uint8                   keep;
+      uint8                   chan_num;
+      uint8                   priority;
+      CF_EntityId_t           dest_id;
+      char                    src_filename[CF_FILENAME_MAX_LEN];
+      char                    dst_filename[CF_FILENAME_MAX_LEN];
   } CF_TxFileCmd_t;
   \endverbatim
-  
+
   The first parameter, \c cfdp_class, identifies whether the file will be transferred
   using #CF_CFDP_CLASS_1 or #CF_CFDP_CLASS_2. For Class 1 transfers, CF will send the data
   once and expect no feedback from the peer. Class 2 transfers are more reliable
@@ -673,22 +673,22 @@ CF_UnionArgs_Payload_t;
   or preserved by CF after the transfer successfully completes. To have the file
   deleted by CF, set this parameter to zero. If this parameter is set to one,
   the file will not be deleted. Regardless of the setting, if the file-transfer
-  is not successful the file will not be deleted. 
-  
+  is not successful the file will not be deleted.
+
   The third parameter, \c chan_num, specifies the output channel in which the
   file will be sent. The value range for this parameter is 0 to
   (#CF_NUM_CHANNELS - 1). #CF_NUM_CHANNELS is specified in the
   CF platform configuration file.
-    
+
   The fourth parameter, \c priority, specifies where the file is placed on the
-  pending queue. High priority files are placed at the front of the queue. A 
+  pending queue. High priority files are placed at the front of the queue. A
   value of zero is the highest priority. A value of 255 is the lowest priority.
-    
+
   The fifth parameter, \c src_filename, specifies the path name and filename to
   send. This parameter is a string with max size equal to #CF_FILENAME_MAX_LEN
   bytes. The src_filename must be an existing file. The string must begin
   with a forward slash, have no spaces and be properly terminated.
-  
+
   The last parameter, \c dst_filename, specifies the destination path name and
   filename. This parameter is a string with max size equal to #CF_FILENAME_MAX_LEN
   bytes. This parameter is delivered to the peer so that the peer knows
@@ -698,19 +698,19 @@ CF_UnionArgs_Payload_t;
   string is not NULL, CF requires that it is properly terminated and contains no
   spaces. This parameter can be used to rename the file after it's received at
   the destination.
-  
-  
-  
+
+
+
   <H2> Playback Directory Command </H2>
-  
+
   The CF Playback Directory command is sent to CF using message ID #CF_CMD_MID
   with command code #CF_PLAYBACK_DIR_CC.  The command causes an event message
   to be generated. This command is used to queue the files that are located
   in the specified directory at the time the command is received.
-  
+
   If the command is not successful, the command error counter will increment and
   an error event will be generated indicating the reason for failure.
-  
+
   To 'playback' a directory means to send all files in that directory. To queue
   the files for sending, the class must be 1 or 2, the channel must be in-use,
   the files must be closed and not be active or pending, the preserve parameter
@@ -718,22 +718,22 @@ CF_UnionArgs_Payload_t;
   properly terminated. The src_filename must begin and end with a forward slash. All
   possible values for Priority are valid. A priority value of zero is the
   highest priority.
-      
+
   \verbatim
   typedef CF_TxFileCmd_t CF_PlaybackDirCmd_t;
   typedef struct CF_TxFileCmd
   {
-      CFE_MSG_CommandHeader_t cmd_header;                        
-      uint8                   cfdp_class;                        
-      uint8                   keep;                              
-      uint8                   chan_num;                          
-      uint8                   priority;                          
-      CF_EntityId_t           dest_id;                           
-      char                    src_filename[CF_FILENAME_MAX_LEN]; 
-      char                    dst_filename[CF_FILENAME_MAX_LEN]; 
+      CFE_MSG_CommandHeader_t cmd_header;
+      uint8                   cfdp_class;
+      uint8                   keep;
+      uint8                   chan_num;
+      uint8                   priority;
+      CF_EntityId_t           dest_id;
+      char                    src_filename[CF_FILENAME_MAX_LEN];
+      char                    dst_filename[CF_FILENAME_MAX_LEN];
   } CF_TxFileCmd_t;
   \endverbatim
-    
+
   The first parameter, \c cfdp_class, identifies whether the files will be
   transferred using #CF_CFDP_CLASS_1 or #CF_CFDP_CLASS_2. For Class 1 transfers, CF will
   send the data once and expect no feedback from the peer. Class 2 transfers are
@@ -744,138 +744,136 @@ CF_UnionArgs_Payload_t;
   or preserved by CF after the transfer successfully completes. To have the
   files deleted by CF, set this parameter to zero. If this parameter is set to
   one, the file will not be deleted. Regardless of the setting, if the
-  file-transfer is not successful the file will not be deleted. 
+  file-transfer is not successful the file will not be deleted.
 
   The third parameter, \c chan_num, specifies the output channel in which the files
   will be sent. All files in the directory will be sent on the specified
   channel. The value range for this parameter is 0 to (#CF_NUM_CHANNELS
   - 1). #CF_NUM_CHANNELS is specified in the CF platform configuration
   file.
-  
+
   The fourth parameter, \c priority, specifies where the files are placed on the
   pending queue. All files in the directory will be queued with the given
   priority. High priority files are placed at the front of the queue. A value of
   zero is the highest priority. A value of 255 is the lowest priority.
-    
+
   The fifth parameter, \c src_filename, specifies the path name where the files are
   located. The string must have no spaces, be properly terminated and have a
   forward slash as the last character. This parameter is a string with max size
   equal to #CF_FILENAME_MAX_LEN characters.
-  
+
   The last parameter, \c dst_filename, specifies where the files are to be stored
   after they are received by the peer. This parameter is a string with max size
   equal to #CF_FILENAME_MAX_LEN bytes. This parameter is delivered to the peer so
   that the peer knows where to store the file. The peer engine dictates the requirements
   of this string. The CF application allows this string to be NULL in which case the
-  peer engine will store the incoming files in the default directory. If the string 
+  peer engine will store the incoming files in the default directory. If the string
   is not NULL, CF requires that it is properly terminated, contains no spaces and ends
-  with a forward slash. There is no way to rename the files at the destination as in 
+  with a forward slash. There is no way to rename the files at the destination as in
   the Playback File command.
 
-  
+
   <H2> Freeze Command </H2>
-  
+
   The CF Freeze command is sent to CF using message ID #CF_CMD_MID with command
   code #CF_FREEZE_CC. The freeze command has no command parameters. This command
   is used to freeze all transactions. The freeze command should be applied to
-  both the source and destination peers at nearly the same time. 
-  
+  both the source and destination peers at nearly the same time.
+
   When the command is executed successfully, the command counter is incremented
   and an event message will be generated. This event message is an
   'Informational' type and is NOT filtered by default. If the command is not successful,
   the command error counter will increment and an error event will be generated
   indicating the reason for failure.
-   
- 
+
+
   <H2> Thaw Command </H2>
-  
+
   The CF Thaw command is sent to CF using message ID #CF_CMD_MID with command
   code #CF_THAW_CC. The thaw command has no command parameters. This command is
   used to thaw all transactions that were commanded to 'freeze' earlier. The
   thaw command should be applied to both the source and destination peers at
   nearly the same time.
-  
+
   When the command is executed successfully, the command counter is incremented
   and an event message will be generated. This event message is an
   'Informational' type and is NOT filtered by default. If the command is not successful,
   the command error counter will increment and an error event will be generated
   indicating the reason for failure.
 
-  
+
   <H2> Suspend Command </H2>
-  
+
   The CF Suspend command is sent to CF using message ID #CF_CMD_MID with command
   code #CF_SUSPEND_CC. This command is used to suspend one or all transactions.
   The suspend command has one command parameter that indicates what transaction
   to suspend. See details below.  The suspend command should be applied to both
-  the source and destination peers at nearly the same time.  
-  
+  the source and destination peers at nearly the same time.
+
   When the command is executed successfully, the command counter is incremented
   and an event message will be generated. This event message is an
   'Informational' type and is NOT filtered by default. If the command is not successful,
   the command error counter will increment and an error event will be generated
   indicating the reason for failure.
-  
+
   NOTE: Suspending an outgoing transaction before EOF is sent, will pause the
   flow of PDUs on that channel. This happens because the next file is started
   when the current file EOF is sent. If a user wishes to stop the current transaction
   (before the EOF is sent) and still allow the next pending file to begin, the
   current transaction should be cancelled (or abandoned) in lieu of being
-  suspended. Canceling is always a better option than abandoning. 
-  
-  NOTE: When a suspended transaction is cancelled, the cancel does not take 
+  suspended. Canceling is always a better option than abandoning.
+
+  NOTE: When a suspended transaction is cancelled, the cancel does not take
   effect until the transaction is resumed.
 
-  \verbatim 
-  typedef struct CF_TransactionCmd
+  \verbatim
+  typedef struct CF_Transaction_Payload
   {
-      CFE_MSG_CommandHeader_t cmd_header; 
-      CF_TransactionSeq_t     ts;         
-      CF_EntityId_t           eid;        
-      uint8                   chan;       
-      uint8                   spare[3];   
-  } CF_TransactionCmd_t;
+      CF_TransactionSeq_t     ts;
+      CF_EntityId_t           eid;
+      uint8                   chan;
+      uint8                   spare[3];
+  } CF_Transaction_Payload_t;
 
   \endverbatim
 
   The \c ts parameter specifies the transaction sequence number to suspend.
   The \c eid parameter specifies the entity id used in the transaction.
   The \c chan parameter can specify a single channel, all channels, or the channel
-  corresponding to the transaction sequence number.  
-    
-  
+  corresponding to the transaction sequence number.
+
+
   <H2> Resume Command </H2>
-  
+
   The CF Resume command is sent to CF using message ID #CF_CMD_MID with command
   code #CF_RESUME_CC. This command is used to resume a suspended transaction or
   all transactions. The resume command has one command parameter that indicates
   what transaction to resume. See details below.  The resume command should be
   applied to both the source and destination peers at nearly the same time.
-  
+
   When the command is executed successfully, the command counter is incremented
   and an event message will be generated. This event message is an
   'Informational' type and is NOT filtered by default. If the command is not successful,
   the command error counter will increment and an error event will be generated
   indicating the reason for failure.
 
-  \verbatim 
-  typedef struct CF_TransactionCmd
+  \verbatim
+  typedef struct CF_Transaction_Payload
   {
-      CFE_MSG_CommandHeader_t cmd_header; 
-      CF_TransactionSeq_t     ts;         
-      CF_EntityId_t           eid;        
-      uint8                   chan;       
-      uint8                   spare[3];   
-  } CF_TransactionCmd_t;
+      CF_TransactionSeq_t     ts;
+      CF_EntityId_t           eid;
+      uint8                   chan;
+      uint8                   spare[3];
+  } CF_Transaction_Payload_t;
 
   \endverbatim
 
   The \c ts parameter specifies the transaction sequence number to resume.
   The \c eid parameter specifies the entity id used in the transaction.
   The \c chan parameter can specify a single channel, all channels, or the channel
-  corresponding to the transaction sequence number.  
-    
-  
+  corresponding to the transaction sequence number.
+
+
   <H2> Cancel Command </H2>
 
   The CF Cancel command is sent to CF using message ID #CF_CMD_MID with command
@@ -885,7 +883,7 @@ CF_UnionArgs_Payload_t;
   to the source entity only. For example, uplink transactions should be
   cancelled at the ground engine. The CF application should not receive a cancel
   command in this case. The CF application will learn of the cancel request
-  through the protocol messages. Downlink transactions and outgoing transactions 
+  through the protocol messages. Downlink transactions and outgoing transactions
   (with respect to CF)  should be cancelled by sending this CF cancel command.
 
   When the command is executed successfully, the command counter is incremented
@@ -893,157 +891,155 @@ CF_UnionArgs_Payload_t;
   'Informational' type and is NOT filtered by default. If the command is not successful,
   the command error counter will increment and an error event will be generated
   indicating the reason for failure.
-  
-  NOTE: If a Cancel command is received by CF on an outgoing transaction that 
-  is suspended, the cancel does not take effect until the transaction is 
-  resumed.  
+
+  NOTE: If a Cancel command is received by CF on an outgoing transaction that
+  is suspended, the cancel does not take effect until the transaction is
+  resumed.
 
 
-  \verbatim 
-  typedef struct CF_TransactionCmd
+  \verbatim
+  typedef struct CF_Transaction_Payload
   {
-      CFE_MSG_CommandHeader_t cmd_header; 
-      CF_TransactionSeq_t     ts;         
-      CF_EntityId_t           eid;        
-      uint8                   chan;       
-      uint8                   spare[3];   
-  } CF_TransactionCmd_t;
+      CF_TransactionSeq_t     ts;
+      CF_EntityId_t           eid;
+      uint8                   chan;
+      uint8                   spare[3];
+  } CF_Transaction_Payload_t;
 
   \endverbatim
 
   The \c ts parameter specifies the transaction sequence number to cancel.
   The \c eid parameter specifies the entity id used in the transaction.
   The \c chan parameter can specify a single channel, all channels, or the channel
-  corresponding to the transaction sequence number.  
+  corresponding to the transaction sequence number.
 
-  
+
   <H2> Abandon Command </H2>
-  
+
   The CF Abandon command is sent to CF using message ID #CF_CMD_MID with command
   code #CF_ABANDON_CC. This command is used to abandon a transaction or all
   transactions. The abandon command has one command parameter that indicates
   what transaction to abandon. See details below.  The abandon command should be
-  applied to both the source and destination peers at nearly the same time. 
+  applied to both the source and destination peers at nearly the same time.
 
   When the command is executed successfully, the command counter is incremented
-  and an event message will be generated. This event message is an 'Informational' 
+  and an event message will be generated. This event message is an 'Informational'
   type and is NOT filtered by default.
-  
-  If the command is not successful, the command error counter will increment and 
+
+  If the command is not successful, the command error counter will increment and
   an error event will be generated indicating the reason for failure.
   When the command is executed successfully, the command counter is incremented
   and an event message will be generated. This event message is an
   'Informational' type and is NOT filtered by default. If the command is not successful,
   the command error counter will increment and an error event will be generated
   indicating the reason for failure.
-  
+
   NOTE: Unlike the cancel command, if a suspended transaction is abandoned, the
   transaction will be abandoned at the time the abandon command is received.
   Likewise, if a frozen transaction is abandoned, the transaction will be
   abandoned when the abandoned cmd is received.
-    
-  \verbatim 
-  typedef struct CF_TransactionCmd
+
+  \verbatim
+  typedef struct CF_Transaction_Payload
   {
-      CFE_MSG_CommandHeader_t cmd_header; 
-      CF_TransactionSeq_t     ts;         
-      CF_EntityId_t           eid;        
-      uint8                   chan;       
-      uint8                   spare[3];   
-  } CF_TransactionCmd_t;
+      CF_TransactionSeq_t     ts;
+      CF_EntityId_t           eid;
+      uint8                   chan;
+      uint8                   spare[3];
+  } CF_Transaction_Payload_t;
 
   \endverbatim
 
   The \c ts parameter specifies the transaction sequence number to abandon.
   The \c eid parameter specifies the entity id used in the transaction.
   The \c chan parameter can specify a single channel, all channels, or the channel
-  corresponding to the transaction sequence number.  
-  
-  
-  
+  corresponding to the transaction sequence number.
+
+
+
   <H2> Set MIB Parameter Command </H2>
-  
+
   The CF Set MIB Parameter command is sent to CF using message ID #CF_CMD_MID
   with command code #CF_SET_MIB_PARAM_CC. This command is used to change the
   flight engine Message Information Base (MIB). The MIB is a term used in the
   CCSDS blue book that can be interpreted as the engine configuration
   parameters. The command has two command parameters, Param indicates which
-  parameter to change, and Value indicates the new setting. 
-  
+  parameter to change, and Value indicates the new setting.
+
   When the command is executed successfully, the command counter is incremented
-  and an event message will be generated displaying the parameter values received. 
+  and an event message will be generated displaying the parameter values received.
   This event message is an 'Informational' type and is NOT filtered by default.
-  
+
   If the command is not successful, the command error counter will increment and
   an error event will be generated indicating the reason for failure.
-    
+
   This command may be used to change any flight MIB parameter.
-  
-  NOTE: Changing these parameters will change the actual table values, thereby 
+
+  NOTE: Changing these parameters will change the actual table values, thereby
   changing the checksum of the CF configuration table.
-      
-  \verbatim 
+
+  \verbatim
   typedef struct CF_SetParamCmd
   {
-      CFE_MSG_CommandHeader_t cmd_header; 
-      uint32                  value;      
-      uint8                   key;        
-      uint8                   chan_num;   
-      uint8                   spare[2];   
+      CFE_MSG_CommandHeader_t cmd_header;
+      uint32                  value;
+      uint8                   key;
+      uint8                   chan_num;
+      uint8                   spare[2];
   } CF_SetParamCmd_t;
 
   \endverbatim
 
   The \c value parameter specifies the new value of the engine
   parameter.
-    
+
   The \c key parameter specifies which engine parameter to set.
-  
+
   The \c chan_num parameter specifies the channel number to set.
-    
-  
+
+
   <H2> Get MIB Parameter Command </H2>
-  
+
   The CF Set MIB Parameter command is sent to CF using message ID #CF_CMD_MID
   with command code #CF_GET_MIB_PARAM_CC. This command is used to view a single
   Message Information Base (MIB) parameter. The MIB is a term used in the CCSDS
-  blue book that can be interpreted as the engine configuration parameters. 
-    
+  blue book that can be interpreted as the engine configuration parameters.
+
   The command has two command parameter, key indicates which parameter to
   view and the channel number specifies the channel configuration to use.
   The parameter given and its current setting will be displayed in the event.
-  
+
   When the command is executed successfully, the command counter is incremented
-  and an event message will be generated displaying the given parameter value 
-  and the current setting for that parameter. This event message is an 'Informational' 
-  type and is NOT filtered by default. 
-  
+  and an event message will be generated displaying the given parameter value
+  and the current setting for that parameter. This event message is an 'Informational'
+  type and is NOT filtered by default.
+
   If the command is not successful, the command error counter will increment and
   an error event will be generated indicating the reason for failure.
-      
-  This command may be used to view any flight MIB parameter.  
-     
-  \verbatim 
+
+  This command may be used to view any flight MIB parameter.
+
+  \verbatim
   typedef struct CF_GetParamCmd
   {
-      CFE_MSG_CommandHeader_t cmd_header; 
-      uint8                   key;        
-      uint8                   chan_num;   
+      CFE_MSG_CommandHeader_t cmd_header;
+      uint8                   key;
+      uint8                   chan_num;
   } CF_GetParamCmd_t;
 
   \endverbatim
-    
+
   The \c key parameter specifies which engine parameter to get.
-  
+
   The \c chan_num parameter specifies the channel number to get the data from.
-    
-    
+
+
   <H2> Write Queue Information Command </H2>
-  
+
 
   The CF Write Queue Information command is sent to CF using message ID
-#CF_CMD_MID with command code #CF_WRITE_QUEUE_CC.  
-  
+#CF_CMD_MID with command code #CF_WRITE_QUEUE_CC.
+
   This command is used to write the contents of a single queue to a file. CF has
   a pending, queue, an active queue and a history queue for each output channel.
   CF also has an active queue and a history queue for incoming transactions.
@@ -1052,47 +1048,47 @@ CF_UnionArgs_Payload_t;
   and an event message will be generated.
 
   If the command is not successful, the command error counter will increment and
-  an error event will be generated indicating the reason for failure.  
-    
+  an error event will be generated indicating the reason for failure.
+
   \verbatim
   typedef struct CF_WriteQueueCmd
   {
-      CFE_MSG_CommandHeader_t cmd_header; 
-      uint8                   type;       
-      uint8                   chan;       
-      uint8                   queue;      
-      uint8                   spare;      
+      CFE_MSG_CommandHeader_t cmd_header;
+      uint8                   type;
+      uint8                   chan;
+      uint8                   queue;
+      uint8                   spare;
 
-      char filename[CF_FILENAME_MAX_LEN]; 
+      char filename[CF_FILENAME_MAX_LEN];
   } CF_WriteQueueCmd_t;
 
   \endverbatim
-  
-  The first parameter, \c type, specifies the queue type. The queue type may be 
+
+  The first parameter, \c type, specifies the queue type. The queue type may be
   uplink (incoming), or downlink (outgoing), or both,
 
   The second parameter, \c chan, is necessary only if the type parameter is set
   to a value of two (downlink). If the Type parameter is set to a value of one
-  (uplink), the code does not read this parameter. Chan specifies the downlink 
-  channel that owns the queue. The value range for this parameter is 0 to 
-  (#CF_NUM_CHANNELS - 1). #CF_NUM_CHANNELS is specified in the 
+  (uplink), the code does not read this parameter. Chan specifies the downlink
+  channel that owns the queue. The value range for this parameter is 0 to
+  (#CF_NUM_CHANNELS - 1). #CF_NUM_CHANNELS is specified in the
   CF platform configuration file.
-  
-  The third parameter, \c queue, identifies which queue contents will be written 
-  to the file. A value of 0 for pending queue, 1 for active and 2 for history.  
-  Because there is no uplink pending queue, a value of zero is not valid when 
-  the Type parameter is set to one (uplink). 
+
+  The third parameter, \c queue, identifies which queue contents will be written
+  to the file. A value of 0 for pending queue, 1 for active and 2 for history.
+  Because there is no uplink pending queue, a value of zero is not valid when
+  the Type parameter is set to one (uplink).
 
   The fourth parameter, \c filename, specifies the name of the file that will
   receive the queue data. This parameter is a string with max size equal to
 #CF_FILENAME_MAX_LEN bytes specified in the CF platform configuration file.
 
-  
+
   <H2> Enable Dequeue Command </H2>
-  
+
   The CF Enable Dequeue command is sent to CF using message ID #CF_CMD_MID with
-  command code #CF_ENABLE_DEQUEUE_CC. 
-  
+  command code #CF_ENABLE_DEQUEUE_CC.
+
   This command is used to enable reading from the pending queue on a particular
   channel. It has one parameter (channel) and is sent when the pending queue
   reads are disabled for that channel. The pending queue holds the names of the
@@ -1103,70 +1099,70 @@ CF_UnionArgs_Payload_t;
   and an event message will be generated.
 
   If the command is not successful, the command error counter will increment and
-  an error event will be generated indicating the reason for failure.  
-  
+  an error event will be generated indicating the reason for failure.
+
   \verbatim
        *       Command Structure
        *       #CF_UnionArgs_Payload_t where byte[0] specifies the channel number or all channels
        *       - 255 = all channels
-       *       - else = single channel  
+       *       - else = single channel
        typedef union CF_UnionArgs_Payload
   {
-      uint32 dword;    
-      uint16 hword[2]; 
-      uint8  byte[4];  
+      uint32 dword;
+      uint16 hword[2];
+      uint8  byte[4];
   } CF_UnionArgs_Payload_t;
-  \endverbatim  
+  \endverbatim
 
   The first and only parameter, \c byte[0], specifies which pending queue to enable.
-  Each channel has one pending queue. The value range for this parameter is 0 to 
+  Each channel has one pending queue. The value range for this parameter is 0 to
   255. A value of 255 specifies all channels. All other values are for a single channel.
 
 
   <H2> Disable Dequeue Command </H2>
- 
+
   The CF Enable Dequeue command is sent to CF using message ID #CF_CMD_MID with
-  command code #CF_DISABLE_DEQUEUE_CC. 
-  
+  command code #CF_DISABLE_DEQUEUE_CC.
+
   This command is used to disable reading from the pending queue on a particular
-  channel. It has one parameter (channel) and sent when the user would like to 
-  stop sending files on a particular channel. 
-  
-  NOTE: This command does not stop a file transaction that is in progress on the 
-  specified channel. Use the cancel command to stop a file transaction that is 
+  channel. It has one parameter (channel) and sent when the user would like to
+  stop sending files on a particular channel.
+
+  NOTE: This command does not stop a file transaction that is in progress on the
+  specified channel. Use the cancel command to stop a file transaction that is
   in progress.
-  
+
 
   When the command is executed successfully, the command counter is incremented
   and then an event message will be generated.
 
   If the command is not successful, the command error counter will increment and
-  an error event will be generated indicating the reason for failure.  
-  
+  an error event will be generated indicating the reason for failure.
+
   \verbatim
        *       Command Structure
        *       #CF_UnionArgs_Payload_t where byte[0] specifies the channel number or all channels
        *       - 255 = all channels
-       *       - else = single channel  
+       *       - else = single channel
 
        typedef union CF_UnionArgs_Payload
   {
-      uint32 dword;    
-      uint16 hword[2]; 
-      uint8  byte[4];  
+      uint32 dword;
+      uint16 hword[2];
+      uint8  byte[4];
   } CF_UnionArgs_Payload_t;
-  \endverbatim  
+  \endverbatim
 
   The first and only parameter, \c byte[0], specifies which pending queue to enable.
-  Each channel has one pending queue. The value range for this parameter is 0 to 
+  Each channel has one pending queue. The value range for this parameter is 0 to
   255. A value of 255 specifies all channels. All other values are for a single channel.
 
 
   <H2> Enable Directory Polling Command </H2>
-  
+
   The CF Enable Directory Polling command is sent to CF using message ID
-#CF_CMD_MID with command code #CF_ENABLE_DIR_POLLING_CC. 
-  
+#CF_CMD_MID with command code #CF_ENABLE_DIR_POLLING_CC.
+
   This command is used to enable one or all polling directories on a particular
   channel. CF will check polling directories for filenames and queue them for
   output, only if the polling directory is enabled. Polling directory processing
@@ -1174,13 +1170,13 @@ CF_UnionArgs_Payload_t;
   and looping through hidden files, closed files and files that have already
   been queued can take a substantial amount of CPU time. It is recommended to
   keep polling directories disabled when they are not actively receiving files.
-  
+
   When the command is executed successfully, the command counter is incremented
-  and an event message will be generated.  
+  and an event message will be generated.
 
   If the command is not successful, the command error counter will increment and
-  an error event will be generated indicating the reason for failure.  
-  
+  an error event will be generated indicating the reason for failure.
+
   \verbatim
      *       Command Structure
      *       #CF_UnionArgs_Payload_t
@@ -1196,29 +1192,29 @@ CF_UnionArgs_Payload_t;
 
      typedef union CF_UnionArgs_Payload
   {
-      uint32 dword;    
-      uint16 hword[2]; 
-      uint8  byte[4];  
+      uint32 dword;
+      uint16 hword[2];
+      uint8  byte[4];
   } CF_UnionArgs_Payload_t;
-  \endverbatim  
+  \endverbatim
 
-  The first parameter, \c byte[0], specifies which channel contains the polling 
-  directory to enable. The value range for this parameter is 0 to 255. A value 
+  The first parameter, \c byte[0], specifies which channel contains the polling
+  directory to enable. The value range for this parameter is 0 to 255. A value
   of 255 specifies all channels. All other values are for a single channel.
-  
+
   The second parameter, \c byte[1], specifies which polling directory to enable. To
   enable all polling directories on a specific channel, set this parameter to
   0xFF. The polling directories are numbered from zero to
   (CF_MAX_POLLING_DIRS_PER_CHAN - 1). CF_MAX_POLLING_DIRS_PER_CHAN is specified
   in the CF platform configuration file. The polling directory number may be obtained
-  by viewing the contents of the CF configuration table.  
-  
+  by viewing the contents of the CF configuration table.
+
 
   <H2> Disable Directory Polling Command </H2>
-  
+
   The CF Enable Directory Polling command is sent to CF using message ID
-#CF_CMD_MID with command code #CF_DISABLE_DIR_POLLING_CC. 
-  
+#CF_CMD_MID with command code #CF_DISABLE_DIR_POLLING_CC.
+
   This command is used to disable one or all polling directories on a particular
   channel. CF will check polling directories for filenames and queue them for
   output, only if the polling directory is enabled. Polling directory processing
@@ -1226,13 +1222,13 @@ CF_UnionArgs_Payload_t;
   and looping through hidden files, closed files and files that have already
   been queued can take a substantial amount of CPU time. It is recommended to
   keep polling directories disabled when they are not actively receiving files.
-  
+
   When the command is executed successfully, the command counter is incremented
   and an event message will be generated.
 
   If the command is not successful, the command error counter will increment and
-  an error event will be generated indicating the reason for failure.  
-  
+  an error event will be generated indicating the reason for failure.
+
   \verbatim
      *       Command Structure
      *       #CF_UnionArgs_Payload_t
@@ -1248,29 +1244,29 @@ CF_UnionArgs_Payload_t;
 
      typedef union CF_UnionArgs_Payload
   {
-      uint32 dword;    
-      uint16 hword[2]; 
-      uint8  byte[4];  
+      uint32 dword;
+      uint16 hword[2];
+      uint8  byte[4];
   } CF_UnionArgs_Payload_t;
-  \endverbatim  
+  \endverbatim
 
-  The first parameter, \c byte[0], specifies which channel contains the polling 
-  directory to disable. The value range for this parameter is 0 to 255. A value 
+  The first parameter, \c byte[0], specifies which channel contains the polling
+  directory to disable. The value range for this parameter is 0 to 255. A value
   of 255 specifies all channels. All other values are for a single channel.
-  
+
   The second parameter, \c byte[1], specifies which polling directory to disable. To
   disable all polling directories on a specific channel, set this parameter to
   0xFF. The polling directories are numbered from zero to
   (CF_MAX_POLLING_DIRS_PER_CHAN - 1). CF_MAX_POLLING_DIRS_PER_CHAN is specified
   in the CF platform configuration file. The polling directory number may be obtained
-  by viewing the contents of the CF configuration table.  
+  by viewing the contents of the CF configuration table.
 
 
   <H2> Purge Queue Command </H2>
-  
+
   The CF Write Queue Information command is sent to CF using message ID
-#CF_CMD_MID with command code #CF_PURGE_QUEUE_CC.  
-  
+#CF_CMD_MID with command code #CF_PURGE_QUEUE_CC.
+
   This command is used to remove all entries on a single queue. CF has a
   pending queue, an active queue, and a history queue for each channel.
   Only the pending and history queues can be purged.
@@ -1279,7 +1275,7 @@ CF_UnionArgs_Payload_t;
   and an event message will be generated indicating that the node has been removed.
 
   If the command is not successful, the command error counter will increment and
-  an error event will be generated indicating the reason for failure.  
+  an error event will be generated indicating the reason for failure.
 
   \verbatim
      *       Command Structure
@@ -1297,34 +1293,34 @@ CF_UnionArgs_Payload_t;
 
      typedef union CF_UnionArgs_Payload
   {
-      uint32 dword;    
-      uint16 hword[2]; 
-      uint8  byte[4];  
+      uint32 dword;
+      uint16 hword[2];
+      uint8  byte[4];
   } CF_UnionArgs_Payload_t;
-  \endverbatim  
+  \endverbatim
 
   The first parameter, \c byte[0], specifies a single channel id or a value
   indicating all channels.
-      
-  The second parameter, \c byte[1], identifies which queue will be purged. 
-  A value of 0 for pending queue, 1 for history and 2 for both.  
- 
+
+  The second parameter, \c byte[1], identifies which queue will be purged.
+  A value of 0 for pending queue, 1 for history and 2 for both.
+
   <H2> Enable Engine Command </H2>
-  
+
   The CF Enable Engine command is sent to CF using message ID
 #CF_CMD_MID with command code #CF_ENABLE_ENGINE_CC. The command has no
-  command parameters and is used to reinitialize engine and enable processing.  
+  command parameters and is used to reinitialize engine and enable processing.
   Note configuration table updates are not processed while the engine is enabled.
 
 
   <H2> Enable Disable Command </H2>
-  
+
   The CF Enable Engine command is sent to CF using message ID
 #CF_CMD_MID with command code #CF_DISABLE_ENGINE_CC. The command has no
-  command parameters and is used to disable engine processing.  
-  Note configuration table updates can be performed while the engine is disabled, 
+  command parameters and is used to disable engine processing.
+  Note configuration table updates can be performed while the engine is disabled,
   and when the engine is re-enabled the new configuration will take effect.
-  
+
   Prev: \ref cfscfcfgpg <BR>
   Next: \ref cfscftlmpg
 **/
@@ -1338,29 +1334,29 @@ CF_UnionArgs_Payload_t;
  *
  * \ref cfscftlm
  *
- 
+
   Prev: \ref cfscfcmdspg <BR>
   Next: \ref cfscfeventspg
  */
 
 /**
   \page cfscftlmdesc CFS CFDP Telemetry Descriptions
-  
+
   <H2> CF Housekeeping Telemetry Packet </H2>
-  
+
   The Housekeeping Telemetry packet is sent by CF to the software bus on
   command. When CF receives the CF_SEND_HK_MID command, a packet is constructed
   and sent by CF. CF typically receives this command every four or five seconds.
-  
-  
+
+
   <H2> CF End of Transaction Packet </H2>
-  
-  The End of Transaction packet is sent to the software bus upon completion 
+
+  The End of Transaction packet is sent to the software bus upon completion
   of a file send or receive transaction. A packet with message ID #CF_EOT_TLM_MID is
   constructed and sent by CF. The packet contains information about the last
   completed transaction which includes sequence number, channel, direction, state,
   status, EID, file size, CRC result, and filenames.
-    
+
   Prev: \ref cfscftlmpg <BR>
   Next: \ref cfscftbl
 **/
@@ -1382,15 +1378,15 @@ CF_UnionArgs_Payload_t;
 
   The CF application has one table used for configuration. This table is
   accessed during initialization and updated by CF when changes to the table
-  parameters are made through CF commands or CFE table services. 
-  
+  parameters are made through CF commands or CFE table services.
+
   The table contains default configuration settings. Many table configuration
   settings can be adjusted by command. These adjustments will modify the table
   and are therefore reflected if the table is dumped. These adjustments will
   also change the table checksum. The configuration table is loaded at the time
   the application is started. CF supports table updates during runtime only when
   the engine is disabled.
-      
+
   CF utilizes a CFS table for run-time configuration defined by #CF_ConfigTable_t.  The channel
   configuration is in #CF_ConfigTable_t.chan which contains a polling element defined by
   #CF_PollDir_t.
@@ -1411,19 +1407,19 @@ CF_UnionArgs_Payload_t;
   Currently, this application does not support the following:
   1. an Entity ID length other than the size defined in cf_platform_cfg.h
   2. a transaction ID length other than the size defined in cf_platform_cfg.h
-  3. a PDU header size greater than CF_CFDP_MAX_HEADER_SIZE bytes 
+  3. a PDU header size greater than CF_CFDP_MAX_HEADER_SIZE bytes
 
   The stack size for the CF application must be monitored and must be no less
   than 16384 bytes. Depending on the CF configuration, the stack size may need
   to be set higher than 16384. The stack size is specified in the cfe_es_startup.scr
   file that is located in the /mission/build/xxx/exe area.
-  
+
   Poll directories must not have subdirectories, otherwise errors will occur
   at put request time.
 
-  All files in polling directories must be closed. 
+  All files in polling directories must be closed.
 
-  The same file cannot be sent on two channels at same time. 
+  The same file cannot be sent on two channels at same time.
 
   Spaces are not allowed in filenames.
 
@@ -1431,10 +1427,10 @@ CF_UnionArgs_Payload_t;
   version of CFS CF application. All outgoing transactions will have the
   segmentation control bit in the meta-data PDU set to - 'Recorded Boundaries
   Not Respected'.
-  
+
   This version of CF does not support keep alive procedures that are detailed in
   section 4.1.6.5 of CFDP CCSDS 727.0-B-5 Blue Book.
-  
+
   Invalid file structures are not supported by this version of the CF
   application. Invalid file structures are described in 4.1.6.1.1.8 of CFDP
   CCSDS 727.0-B-5 Blue Book and apply only when record boundaries are respected
@@ -1442,9 +1438,9 @@ CF_UnionArgs_Payload_t;
 
   Only transmission modes unacknowledged (class 1) and acknowledged (class 2) are
   supported by the CF application.
-  
+
   The CFDP Application will fail on startup if the following conditions are not met:
-  
+
   <UL>
     <LI> Unable to create a Software Bus Pipe  <BR>
     <LI> Unable to subscribe to the CF Command Message  <BR>
@@ -1454,10 +1450,10 @@ CF_UnionArgs_Payload_t;
     <LI> Unable to load the CF Configuration Table with a default table file  <BR>
     <LI> Unable to acquire a pointer to the CF Configuration Table  <BR>
   </UL>
-  
+
   Each one of these conditions will generate a unique event message and will cause the CF
   Application to terminate before processing any CF command pipe messages.
-  
+
   Prev: \ref cfscfeventspg <BR>
   Next: \ref cfscffaqs
 
@@ -1479,12 +1475,12 @@ CF_UnionArgs_Payload_t;
 
   <UL>
     <LI> If you get a "PDU too short":</LI>
-      <UL> 
+      <UL>
         <LI> The ground system might not be setting the "length" in the CCSDS header correctly. </LI>
       </UL>
     <LI> If you get an "EOF PUD too short"  or missing 2 bytes from an uploaded file: </LI>
       <UL>
-        <LI> The current version of CF does not support PDU CRC. The ground system needs to set the "CRC Flag" to false. </LI> 
+        <LI> The current version of CF does not support PDU CRC. The ground system needs to set the "CRC Flag" to false. </LI>
       </UL>
     <LI> If you get a "CRC mismatch for R trans": </LI>
       <UL>

@@ -44,11 +44,11 @@
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdNoop(CFE_SB_Buffer_t *msg)
+void CF_NoopCmd(const CF_NoopCmd_t *msg)
 {
     CFE_EVS_SendEvent(CF_NOOP_INF_EID, CFE_EVS_EventType_INFORMATION, "CF: No-Op received, Version %d.%d.%d.%d",
                       CF_MAJOR_VERSION, CF_MINOR_VERSION, CF_REVISION, CF_MISSION_REV);
-    ++CF_AppData.hk.counters.cmd;
+    ++CF_AppData.hk.Payload.counters.cmd;
 }
 
 /*----------------------------------------------------------------
@@ -57,12 +57,12 @@ void CF_CmdNoop(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdReset(CFE_SB_Buffer_t *msg)
+void CF_ResetCmd(const CF_ResetCmd_t *msg)
 {
-    CF_UnionArgsCmd_t *cmd      = (CF_UnionArgsCmd_t *)msg;
-    static const char *names[5] = {"all", "cmd", "fault", "up", "down"};
+    const CF_UnionArgs_Payload_t *data     = &msg->Payload;
+    static const char *           names[5] = {"all", "cmd", "fault", "up", "down"};
     /* 0=all, 1=cmd, 2=fault 3=up 4=down */
-    uint8 param = cmd->data.byte[0];
+    uint8 param = data->byte[0];
     int   i;
     int   acc = 1;
 
@@ -70,7 +70,7 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_RESET_INVALID, CFE_EVS_EventType_ERROR,
                           "CF: Received RESET COUNTERS command with invalid parameter %d", param);
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
     else
     {
@@ -81,7 +81,7 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
         if ((param == CF_Reset_all) || (param == CF_Reset_command))
         {
             /* command counters */
-            memset(&CF_AppData.hk.counters, 0, sizeof(CF_AppData.hk.counters));
+            memset(&CF_AppData.hk.Payload.counters, 0, sizeof(CF_AppData.hk.Payload.counters));
             acc = 0; /* don't increment accept counter on command counter reset */
         }
 
@@ -90,8 +90,8 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
         {
             /* fault counters */
             for (i = 0; i < CF_NUM_CHANNELS; ++i)
-                memset(&CF_AppData.hk.channel_hk[i].counters.fault, 0,
-                       sizeof(CF_AppData.hk.channel_hk[i].counters.fault));
+                memset(&CF_AppData.hk.Payload.channel_hk[i].counters.fault, 0,
+                       sizeof(CF_AppData.hk.Payload.channel_hk[i].counters.fault));
         }
 
         /* if the param is CF_Reset_up, or all counters */
@@ -99,8 +99,8 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
         {
             /* up counters */
             for (i = 0; i < CF_NUM_CHANNELS; ++i)
-                memset(&CF_AppData.hk.channel_hk[i].counters.recv, 0,
-                       sizeof(CF_AppData.hk.channel_hk[i].counters.recv));
+                memset(&CF_AppData.hk.Payload.channel_hk[i].counters.recv, 0,
+                       sizeof(CF_AppData.hk.Payload.channel_hk[i].counters.recv));
         }
 
         /* if the param is CF_Reset_down, or all counters */
@@ -108,13 +108,13 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
         {
             /* down counters */
             for (i = 0; i < CF_NUM_CHANNELS; ++i)
-                memset(&CF_AppData.hk.channel_hk[i].counters.sent, 0,
-                       sizeof(CF_AppData.hk.channel_hk[i].counters.sent));
+                memset(&CF_AppData.hk.Payload.channel_hk[i].counters.sent, 0,
+                       sizeof(CF_AppData.hk.Payload.channel_hk[i].counters.sent));
         }
 
         if (acc)
         {
-            ++CF_AppData.hk.counters.cmd;
+            ++CF_AppData.hk.Payload.counters.cmd;
         }
     }
 }
@@ -125,9 +125,9 @@ void CF_CmdReset(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
+void CF_TxFileCmd(const CF_TxFileCmd_t *msg)
 {
-    CF_TxFileCmd_t *tx = (CF_TxFileCmd_t *)msg;
+    const CF_TxFile_Payload_t *tx = &msg->Payload;
 
     /*
      * This needs to validate all its inputs.
@@ -138,27 +138,29 @@ void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
         tx->keep > 1)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_BAD_PARAM, CFE_EVS_EventType_ERROR,
-                          "CF: bad parameter in CF_CmdTxFile(): chan=%u, class=%u keep=%u", (unsigned int)tx->chan_num,
+                          "CF: bad parameter in CF_TxFileCmd(): chan=%u, class=%u keep=%u", (unsigned int)tx->chan_num,
                           (unsigned int)tx->cfdp_class, (unsigned int)tx->keep);
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
         return;
     }
 
+#ifdef jphfix
     /* make sure that the src and dst filenames are null terminated */
     tx->src_filename[sizeof(tx->src_filename) - 1] = 0;
     tx->dst_filename[sizeof(tx->dst_filename) - 1] = 0;
+#endif
 
     if (CF_CFDP_TxFile(tx->src_filename, tx->dst_filename, tx->cfdp_class, tx->keep, tx->chan_num, tx->priority,
                        tx->dest_id) == CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_TX_FILE, CFE_EVS_EventType_INFORMATION,
                           "CF: file transfer successfully initiated");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_TX_FILE, CFE_EVS_EventType_ERROR, "CF: file transfer initiation failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
 }
 
@@ -168,9 +170,9 @@ void CF_CmdTxFile(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
+void CF_PlaybackDirCmd(const CF_PlaybackDirCmd_t *msg)
 {
-    CF_PlaybackDirCmd_t *tx = (CF_PlaybackDirCmd_t *)msg;
+    const CF_TxFile_Payload_t *tx = &msg->Payload;
 
     /*
      * This needs to validate all its inputs.
@@ -181,28 +183,30 @@ void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
         tx->keep > 1)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_BAD_PARAM, CFE_EVS_EventType_ERROR,
-                          "CF: bad parameter in CF_CmdPlaybackDir(): chan=%u, class=%u keep=%u",
+                          "CF: bad parameter in CF_PlaybackDirCmd(): chan=%u, class=%u keep=%u",
                           (unsigned int)tx->chan_num, (unsigned int)tx->cfdp_class, (unsigned int)tx->keep);
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
         return;
     }
 
+#ifdef jphfix
     /* make sure that the src and dst filenames are null terminated */
     tx->src_filename[sizeof(tx->src_filename) - 1] = 0;
     tx->dst_filename[sizeof(tx->dst_filename) - 1] = 0;
+#endif
 
     if (CF_CFDP_PlaybackDir(tx->src_filename, tx->dst_filename, tx->cfdp_class, tx->keep, tx->chan_num, tx->priority,
                             tx->dest_id) == CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_PLAYBACK_DIR, CFE_EVS_EventType_INFORMATION,
                           "CF: directory playback initiation successful");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_PLAYBACK_DIR, CFE_EVS_EventType_ERROR,
                           "CF: directory playback initiation failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
 }
 
@@ -212,7 +216,8 @@ void CF_CmdPlaybackDir(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_ChanActionFn_t fn, void *context)
+CFE_Status_t CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const char *errstr, CF_ChanActionFn_t fn,
+                             void *context)
 {
     int          i;
     CFE_Status_t ret = 0;
@@ -220,21 +225,21 @@ CFE_Status_t CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_Chan
     /* this function is generic for any ground command that takes a single channel
      * argument which must be less than CF_NUM_CHANNELS or 255 which is a special
      * value that means apply command to all channels */
-    if (cmd->data.byte[0] == CF_ALL_CHANNELS)
+    if (data->byte[0] == CF_ALL_CHANNELS)
     {
         /* apply to all channels */
         for (i = 0; i < CF_NUM_CHANNELS; ++i)
             ret |= fn(i, context);
     }
-    else if (cmd->data.byte[0] < CF_NUM_CHANNELS)
+    else if (data->byte[0] < CF_NUM_CHANNELS)
     {
-        ret = fn(cmd->data.byte[0], context);
+        ret = fn(data->byte[0], context);
     }
     else
     {
         /* bad parameter */
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_CHAN_PARAM, CFE_EVS_EventType_ERROR,
-                          "CF: %s: channel parameter out of range. received %d", errstr, cmd->data.byte[0]);
+                          "CF: %s: channel parameter out of range. received %d", errstr, data->byte[0]);
         ret = -1;
     }
 
@@ -250,7 +255,7 @@ CFE_Status_t CF_DoChanAction(CF_UnionArgsCmd_t *cmd, const char *errstr, CF_Chan
 CFE_Status_t CF_DoFreezeThaw(uint8 chan_num, const CF_ChanAction_BoolArg_t *context)
 {
     /* no need to bounds check chan_num, done in caller */
-    CF_AppData.hk.channel_hk[chan_num].frozen = context->barg;
+    CF_AppData.hk.Payload.channel_hk[chan_num].frozen = context->barg;
     return CFE_SUCCESS;
 }
 
@@ -260,19 +265,19 @@ CFE_Status_t CF_DoFreezeThaw(uint8 chan_num, const CF_ChanAction_BoolArg_t *cont
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdFreeze(CFE_SB_Buffer_t *msg)
+void CF_FreezeCmd(const CF_FreezeCmd_t *msg)
 {
     CF_ChanAction_BoolArg_t barg = {1}; /* param is frozen, so 1 means freeze */
 
-    if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "freeze", (CF_ChanActionFn_t)CF_DoFreezeThaw, &barg) == CFE_SUCCESS)
+    if (CF_DoChanAction(&msg->Payload, "freeze", (CF_ChanActionFn_t)CF_DoFreezeThaw, &barg) == CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_FREEZE, CFE_EVS_EventType_INFORMATION, "CF: freeze successful");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_FREEZE, CFE_EVS_EventType_ERROR, "CF: freeze cmd failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
 }
 
@@ -282,19 +287,19 @@ void CF_CmdFreeze(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdThaw(CFE_SB_Buffer_t *msg)
+void CF_ThawCmd(const CF_ThawCmd_t *msg)
 {
     CF_ChanAction_BoolArg_t barg = {0}; /* param is frozen, so 0 means thawed */
 
-    if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "thaw", (CF_ChanActionFn_t)CF_DoFreezeThaw, &barg) == CFE_SUCCESS)
+    if (CF_DoChanAction(&msg->Payload, "thaw", (CF_ChanActionFn_t)CF_DoFreezeThaw, &barg) == CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_THAW, CFE_EVS_EventType_INFORMATION, "CF: thaw successful");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_THAW, CFE_EVS_EventType_ERROR, "CF: thaw cmd failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
 }
 
@@ -332,16 +337,17 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSe
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_TsnChanAction_fn_t fn, void *context)
+CFE_Status_t CF_TsnChanAction(const CF_Transaction_Payload_t *data, const char *cmdstr, CF_TsnChanAction_fn_t fn,
+                              void *context)
 {
     CF_Transaction_t *txn;
     CFE_Status_t      ret = CF_ERROR;
 
-    if (cmd->chan == CF_COMPOUND_KEY)
+    if (data->chan == CF_COMPOUND_KEY)
     {
-        /* special value 254 means to use the compound key (cmd->eid, cmd->ts) to find the transaction
+        /* special value 254 means to use the compound key (data->eid, data->ts) to find the transaction
          * to act upon */
-        txn = CF_FindTransactionBySequenceNumberAllChannels(cmd->ts, cmd->eid);
+        txn = CF_FindTransactionBySequenceNumberAllChannels(data->ts, data->eid);
         if (txn)
         {
             fn(txn, context);
@@ -351,23 +357,23 @@ CFE_Status_t CF_TsnChanAction(CF_TransactionCmd_t *cmd, const char *cmdstr, CF_T
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CMD_TRANS_NOT_FOUND, CFE_EVS_EventType_ERROR,
                               "CF: %s cmd: failed to find transaction for (eid %lu, ts %lu)", cmdstr,
-                              (unsigned long)cmd->eid, (unsigned long)cmd->ts);
+                              (unsigned long)data->eid, (unsigned long)data->ts);
         }
     }
-    else if (cmd->chan == CF_ALL_CHANNELS)
+    else if (data->chan == CF_ALL_CHANNELS)
     {
         /* perform action on all channels, all transactions */
         ret = CF_TraverseAllTransactions_All_Channels(fn, context);
     }
-    else if (cmd->chan < CF_NUM_CHANNELS)
+    else if (data->chan < CF_NUM_CHANNELS)
     {
         /* perform action on a specific channel, all transactions */
-        ret = CF_TraverseAllTransactions(CF_AppData.engine.channels + cmd->chan, fn, context);
+        ret = CF_TraverseAllTransactions(CF_AppData.engine.channels + data->chan, fn, context);
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_TSN_CHAN_INVALID, CFE_EVS_EventType_ERROR, "CF: %s cmd: invalid channel %d",
-                          cmdstr, cmd->chan);
+                          cmdstr, data->chan);
     }
 
     return ret;
@@ -398,12 +404,12 @@ void CF_DoSuspRes_Txn(CF_Transaction_t *txn, CF_ChanAction_SuspResArg_t *context
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
+void CF_DoSuspRes(const CF_Transaction_Payload_t *payload, uint8 action)
 {
     /* ok to not bounds check action, because the caller is using it in two places with constant values 0 or 1 */
     static const char *        msgstr[] = {"resume", "suspend"};
     CF_ChanAction_SuspResArg_t args     = {0, action};
-    int ret = CF_TsnChanAction(cmd, msgstr[action], (CF_TsnChanAction_fn_t)CF_DoSuspRes_Txn, &args);
+    int ret = CF_TsnChanAction(payload, msgstr[action], (CF_TsnChanAction_fn_t)CF_DoSuspRes_Txn, &args);
 
     /*
      * Note that this command may affect multiple transactions, depending on the value of the "chan" argument.
@@ -416,20 +422,20 @@ void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
         /* A single transaction was mached, and it was already set the same way */
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_SUSPRES_SAME, CFE_EVS_EventType_ERROR,
                           "CF: %s cmd: setting suspend flag to current value of %d", msgstr[action], action);
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
     else if (ret <= 0)
     {
         /* No transaction was matched for the given combination of chan + eid + ts  */
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_SUSPRES_CHAN, CFE_EVS_EventType_ERROR, "CF: %s cmd: no transaction found",
                           msgstr[action]);
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_SUSPRES, CFE_EVS_EventType_INFORMATION,
                           "CF: %s cmd: setting suspend flag to %d", msgstr[action], action);
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
 }
 
@@ -439,9 +445,9 @@ void CF_DoSuspRes(CF_TransactionCmd_t *cmd, uint8 action)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdSuspend(CFE_SB_Buffer_t *msg)
+void CF_SuspendCmd(const CF_SuspendCmd_t *msg)
 {
-    CF_DoSuspRes((CF_TransactionCmd_t *)msg, 1);
+    CF_DoSuspRes(&msg->Payload, 1);
 }
 
 /*----------------------------------------------------------------
@@ -450,9 +456,9 @@ void CF_CmdSuspend(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdResume(CFE_SB_Buffer_t *msg)
+void CF_ResumeCmd(const CF_ResumeCmd_t *msg)
 {
-    CF_DoSuspRes((CF_TransactionCmd_t *)msg, 0);
+    CF_DoSuspRes(&msg->Payload, 0);
 }
 
 /*----------------------------------------------------------------
@@ -472,19 +478,19 @@ void CF_CmdCancel_Txn(CF_Transaction_t *txn, void *ignored)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdCancel(CFE_SB_Buffer_t *msg)
+void CF_CancelCmd(const CF_CancelCmd_t *msg)
 {
-    if (CF_TsnChanAction((CF_TransactionCmd_t *)msg, "cancel", CF_CmdCancel_Txn, NULL) > 0)
+    if (CF_TsnChanAction(&msg->Payload, "cancel", CF_CmdCancel_Txn, NULL) > 0)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_CANCEL, CFE_EVS_EventType_INFORMATION,
                           "CF: cancel transaction successfully initiated");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
     else
     {
         /* No transaction was matched for the given combination of chan + eid + ts  */
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_CANCEL_CHAN, CFE_EVS_EventType_ERROR, "CF: cancel cmd: no transaction found");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
 }
 
@@ -505,19 +511,19 @@ void CF_CmdAbandon_Txn(CF_Transaction_t *txn, void *ignored)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdAbandon(CFE_SB_Buffer_t *msg)
+void CF_AbandonCmd(const CF_AbandonCmd_t *msg)
 {
-    if (CF_TsnChanAction((CF_TransactionCmd_t *)msg, "abandon", CF_CmdAbandon_Txn, NULL) > 0)
+    if (CF_TsnChanAction(&msg->Payload, "abandon", CF_CmdAbandon_Txn, NULL) > 0)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_ABANDON, CFE_EVS_EventType_INFORMATION, "CF: abandon successful");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
     else
     {
         /* No transaction was matched for the given combination of chan + eid + ts  */
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_ABANDON_CHAN, CFE_EVS_EventType_ERROR,
                           "CF: abandon cmd: no transaction found");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
 }
 
@@ -540,20 +546,20 @@ CFE_Status_t CF_DoEnableDisableDequeue(uint8 chan_num, const CF_ChanAction_BoolA
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
+void CF_EnableDequeueCmd(const CF_EnableDequeueCmd_t *msg)
 {
     CF_ChanAction_BoolArg_t barg = {1};
 
-    if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "enable_dequeue", (CF_ChanActionFn_t)CF_DoEnableDisableDequeue,
-                        &barg) == CFE_SUCCESS)
+    if (CF_DoChanAction(&msg->Payload, "enable_dequeue", (CF_ChanActionFn_t)CF_DoEnableDisableDequeue, &barg) ==
+        CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_ENABLE_DEQUEUE, CFE_EVS_EventType_INFORMATION, "CF: dequeue enabled");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_ENABLE_DEQUEUE, CFE_EVS_EventType_ERROR, "CF: enable dequeue cmd failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
 }
 
@@ -563,20 +569,20 @@ void CF_CmdEnableDequeue(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdDisableDequeue(CFE_SB_Buffer_t *msg)
+void CF_DisableDequeueCmd(const CF_DisableDequeueCmd_t *msg)
 {
     CF_ChanAction_BoolArg_t barg = {0};
 
-    if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "disable_dequeue", (CF_ChanActionFn_t)CF_DoEnableDisableDequeue,
-                        &barg) == CFE_SUCCESS)
+    if (CF_DoChanAction(&msg->Payload, "disable_dequeue", (CF_ChanActionFn_t)CF_DoEnableDisableDequeue, &barg) ==
+        CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_DISABLE_DEQUEUE, CFE_EVS_EventType_INFORMATION, "CF: dequeue disabled");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_DISABLE_DEQUEUE, CFE_EVS_EventType_ERROR, "CF: disable dequeue cmd failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
 }
 
@@ -591,20 +597,20 @@ CFE_Status_t CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolM
     int          i;
     CFE_Status_t ret = CFE_SUCCESS;
     /* no need to bounds check chan_num, done in caller */
-    if (context->msg->data.byte[1] == CF_ALL_POLLDIRS)
+    if (context->data->byte[1] == CF_ALL_POLLDIRS)
     {
         /* all polldirs in channel */
         for (i = 0; i < CF_MAX_POLLING_DIR_PER_CHAN; ++i)
             CF_AppData.config_table->chan[chan_num].polldir[i].enabled = context->barg;
     }
-    else if (context->msg->data.byte[1] < CF_MAX_POLLING_DIR_PER_CHAN)
+    else if (context->data->byte[1] < CF_MAX_POLLING_DIR_PER_CHAN)
     {
-        CF_AppData.config_table->chan[chan_num].polldir[context->msg->data.byte[1]].enabled = context->barg;
+        CF_AppData.config_table->chan[chan_num].polldir[context->data->byte[1]].enabled = context->barg;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_POLLDIR_INVALID, CFE_EVS_EventType_ERROR,
-                          "CF: enable/disable polldir: invalid polldir %d on channel %d", context->msg->data.byte[1],
+                          "CF: enable/disable polldir: invalid polldir %d on channel %d", context->data->byte[1],
                           chan_num);
         ret = CF_ERROR;
     }
@@ -618,22 +624,22 @@ CFE_Status_t CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolM
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
+void CF_EnablePolldirCmd(const CF_EnableDirPollingCmd_t *msg)
 {
-    CF_ChanAction_BoolMsgArg_t barg = {(CF_UnionArgsCmd_t *)msg, 1};
+    CF_ChanAction_BoolMsgArg_t barg = {&msg->Payload, 1};
 
-    if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "enable_polldir", (CF_ChanActionFn_t)CF_DoEnableDisablePolldir,
-                        &barg) == CFE_SUCCESS)
+    if (CF_DoChanAction(&msg->Payload, "enable_polldir", (CF_ChanActionFn_t)CF_DoEnableDisablePolldir, &barg) ==
+        CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_ENABLE_POLLDIR, CFE_EVS_EventType_INFORMATION,
                           "CF: enabled polling directory");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_ENABLE_POLLDIR, CFE_EVS_EventType_ERROR,
                           "CF: enable polling directory cmd failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
 }
 
@@ -643,22 +649,22 @@ void CF_CmdEnablePolldir(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdDisablePolldir(CFE_SB_Buffer_t *msg)
+void CF_DisablePolldirCmd(const CF_DisableDirPollingCmd_t *msg)
 {
-    CF_ChanAction_BoolMsgArg_t barg = {(CF_UnionArgsCmd_t *)msg, 0};
+    CF_ChanAction_BoolMsgArg_t barg = {&msg->Payload, 0};
 
-    if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "disable_polldir", (CF_ChanActionFn_t)CF_DoEnableDisablePolldir,
-                        &barg) == CFE_SUCCESS)
+    if (CF_DoChanAction(&msg->Payload, "disable_polldir", (CF_ChanActionFn_t)CF_DoEnableDisablePolldir, &barg) ==
+        CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_DISABLE_POLLDIR, CFE_EVS_EventType_INFORMATION,
                           "CF: disabled polling directory");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_DISABLE_POLLDIR, CFE_EVS_EventType_ERROR,
                           "CF: disable polling directory cmd failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
 }
 
@@ -694,16 +700,17 @@ CFE_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignored)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
+CFE_Status_t CF_DoPurgeQueue(uint8 chan_num, void *arg)
 {
     CFE_Status_t ret = CFE_SUCCESS;
     /* no need to bounds check chan_num, done in caller */
-    CF_Channel_t *chan = &CF_AppData.engine.channels[chan_num];
+    CF_Channel_t *                chan = &CF_AppData.engine.channels[chan_num];
+    const CF_UnionArgs_Payload_t *data = ((CF_ChanAction_MsgArg_t *)arg)->data;
 
     int pend = 0;
     int hist = 0;
 
-    switch (cmd->data.byte[1])
+    switch (data->byte[1])
     {
         case 0: /* pend */
             pend = 1;
@@ -720,7 +727,7 @@ CFE_Status_t CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
 
         default:
             CFE_EVS_SendEvent(CF_EID_ERR_CMD_PURGE_ARG, CFE_EVS_EventType_ERROR, "CF: purge queue invalid arg %d",
-                              cmd->data.byte[1]);
+                              data->byte[1]);
             ret = -1;
             break;
     }
@@ -744,18 +751,18 @@ CFE_Status_t CF_DoPurgeQueue(uint8 chan_num, CF_UnionArgsCmd_t *cmd)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
+void CF_PurgeQueueCmd(const CF_PurgeQueueCmd_t *msg)
 {
-    if (CF_DoChanAction((CF_UnionArgsCmd_t *)msg, "purge_queue", (CF_ChanActionFn_t)CF_DoPurgeQueue, msg) ==
-        CFE_SUCCESS)
+    CF_ChanAction_MsgArg_t arg = {&msg->Payload};
+    if (CF_DoChanAction(&msg->Payload, "purge_queue", (CF_ChanActionFn_t)CF_DoPurgeQueue, &arg) == CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_PURGE_QUEUE, CFE_EVS_EventType_INFORMATION, "CF: queue purged");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_PURGE_QUEUE, CFE_EVS_EventType_ERROR, "CF: purge queue cmd failed");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
 }
 
@@ -765,19 +772,20 @@ void CF_CmdPurgeQueue(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
+void CF_WriteQueueCmd(const CF_WriteQueueCmd_t *msg)
 {
-    CF_WriteQueueCmd_t *wq      = (CF_WriteQueueCmd_t *)msg;
-    CF_Channel_t *      chan    = &CF_AppData.engine.channels[wq->chan];
-    osal_id_t           fd      = OS_OBJECT_ID_UNDEFINED;
-    bool                success = true;
-    int32               ret;
+    const CF_WriteQueue_Payload_t *wq = &msg->Payload;
+
+    CF_Channel_t *chan    = &CF_AppData.engine.channels[wq->chan];
+    osal_id_t     fd      = OS_OBJECT_ID_UNDEFINED;
+    bool          success = true;
+    int32         ret;
 
     /* check the commands for validity */
     if (wq->chan >= CF_NUM_CHANNELS)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_CHAN, CFE_EVS_EventType_ERROR, "CF: write queue invalid channel arg");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
         success = false;
     }
     /* only invalid combination is up direction, pending queue */
@@ -785,7 +793,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_ARGS, CFE_EVS_EventType_ERROR,
                           "CF: write queue invalid command parameters");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
         success = false;
     }
     else
@@ -797,7 +805,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_OPEN, CFE_EVS_EventType_ERROR, "CF: write queue failed to open file %s",
                               wq->filename);
-            ++CF_AppData.hk.counters.err;
+            ++CF_AppData.hk.Payload.counters.err;
             success = false;
         }
     }
@@ -814,7 +822,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_RX, CFE_EVS_EventType_ERROR,
                                   "CF: write queue failed to write CF_QueueIdx_RX data");
                 CF_WrappedClose(fd);
-                ++CF_AppData.hk.counters.err;
+                ++CF_AppData.hk.Payload.counters.err;
                 success = false;
             }
         }
@@ -827,7 +835,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEHIST_RX, CFE_EVS_EventType_ERROR,
                                   "CF: write queue failed to write history RX data");
                 CF_WrappedClose(fd);
-                ++CF_AppData.hk.counters.err;
+                ++CF_AppData.hk.Payload.counters.err;
                 success = false;
             }
         }
@@ -849,7 +857,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
                     CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_TX, CFE_EVS_EventType_ERROR,
                                       "CF: write queue failed to write q index %d", qs[i]);
                     CF_WrappedClose(fd);
-                    ++CF_AppData.hk.counters.err;
+                    ++CF_AppData.hk.Payload.counters.err;
                     success = false;
                     break;
                 }
@@ -865,7 +873,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEQ_PEND, CFE_EVS_EventType_ERROR,
                                   "CF: write queue failed to write pending queue");
                 CF_WrappedClose(fd);
-                ++CF_AppData.hk.counters.err;
+                ++CF_AppData.hk.Payload.counters.err;
                 success = false;
             }
         }
@@ -879,7 +887,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
                 CFE_EVS_SendEvent(CF_EID_ERR_CMD_WQ_WRITEHIST_TX, CFE_EVS_EventType_ERROR,
                                   "CF: write queue failed to write CF_QueueIdx_TX data");
                 CF_WrappedClose(fd);
-                ++CF_AppData.hk.counters.err;
+                ++CF_AppData.hk.Payload.counters.err;
                 success = false;
             }
         }
@@ -888,7 +896,7 @@ void CF_CmdWriteQueue(CFE_SB_Buffer_t *msg)
     if (success)
     {
         CFE_EVS_SendEvent(CF_EID_INF_CMD_WQ, CFE_EVS_EventType_INFORMATION, "CF: write queue successful");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
 }
 
@@ -933,7 +941,7 @@ CFE_Status_t CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num)
+void CF_GetSetParamCmd(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num)
 {
     CF_ConfigTable_t *config;
     CFE_Status_t      status = CF_ERROR;
@@ -1074,11 +1082,11 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
 
     if (status == CFE_SUCCESS)
     {
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
     else
     {
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
 }
 
@@ -1088,10 +1096,11 @@ void CF_CmdGetSetParam(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdSetParam(CFE_SB_Buffer_t *msg)
+void CF_SetParamCmd(const CF_SetParamCmd_t *msg)
 {
-    CF_SetParamCmd_t *cmd = (CF_SetParamCmd_t *)msg;
-    CF_CmdGetSetParam(1, cmd->key, cmd->value, cmd->chan_num);
+    const CF_SetParam_Payload_t *cmd = &msg->Payload;
+
+    CF_GetSetParamCmd(1, cmd->key, cmd->value, cmd->chan_num);
 }
 
 /*----------------------------------------------------------------
@@ -1100,10 +1109,11 @@ void CF_CmdSetParam(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdGetParam(CFE_SB_Buffer_t *msg)
+void CF_GetParamCmd(const CF_GetParamCmd_t *msg)
 {
-    CF_GetParamCmd_t *cmd = (CF_GetParamCmd_t *)msg;
-    CF_CmdGetSetParam(0, cmd->key, 0, cmd->chan_num);
+    const CF_GetParam_Payload_t *cmd = &msg->Payload;
+
+    CF_GetSetParamCmd(0, cmd->key, 0, cmd->chan_num);
 }
 
 /*----------------------------------------------------------------
@@ -1112,27 +1122,27 @@ void CF_CmdGetParam(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdEnableEngine(CFE_SB_Buffer_t *msg)
+void CF_EnableEngineCmd(const CF_EnableEngineCmd_t *msg)
 {
     if (!CF_AppData.engine.enabled)
     {
         if (CF_CFDP_InitEngine() == CFE_SUCCESS)
         {
             CFE_EVS_SendEvent(CF_EID_INF_CMD_ENABLE_ENGINE, CFE_EVS_EventType_INFORMATION, "CF: enabled CFDP engine");
-            ++CF_AppData.hk.counters.cmd;
+            ++CF_AppData.hk.Payload.counters.cmd;
         }
         else
         {
             CFE_EVS_SendEvent(CF_EID_ERR_CMD_ENABLE_ENGINE, CFE_EVS_EventType_ERROR,
                               "CF: failed to re-initialize and enable CFDP engine");
-            ++CF_AppData.hk.counters.err;
+            ++CF_AppData.hk.Payload.counters.err;
         }
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_ENG_ALREADY_ENA, CFE_EVS_EventType_ERROR,
                           "CF: received enable engine command while engine already enabled");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
 }
 
@@ -1142,19 +1152,19 @@ void CF_CmdEnableEngine(CFE_SB_Buffer_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdDisableEngine(CFE_SB_Buffer_t *msg)
+void CF_DisableEngineCmd(const CF_DisableEngineCmd_t *msg)
 {
     if (CF_AppData.engine.enabled)
     {
         CF_CFDP_DisableEngine();
         CFE_EVS_SendEvent(CF_EID_INF_CMD_DISABLE_ENGINE, CFE_EVS_EventType_INFORMATION, "CF: disabled CFDP engine");
-        ++CF_AppData.hk.counters.cmd;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
     else
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_ENG_ALREADY_DIS, CFE_EVS_EventType_ERROR,
                           "CF: received disable engine command while engine already disabled");
-        ++CF_AppData.hk.counters.err;
+        ++CF_AppData.hk.Payload.counters.err;
     }
 }
 
@@ -1166,58 +1176,60 @@ void CF_CmdDisableEngine(CFE_SB_Buffer_t *msg)
  *-----------------------------------------------------------------*/
 void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
 {
-    static void (*const fns[CF_NUM_COMMANDS])(CFE_SB_Buffer_t *) = {
-        CF_CmdNoop,        /* CF_NOOP_CC */
-        CF_CmdReset,       /* CF_RESET_CC */
-        CF_CmdTxFile,      /* CF_TX_FILE_CC */
-        CF_CmdPlaybackDir, /* CF_PLAYBACK_DIR_CC */
-        CF_CmdFreeze,      /* CF_FREEZE_CC */
-        CF_CmdThaw,        /* CF_THAW_CC */
-        CF_CmdSuspend,     /* CF_SUSPEND_CC */
-        CF_CmdResume,      /* CF_RESUME_CC */
-        CF_CmdCancel,      /* CF_CANCEL_CC */
-        CF_CmdAbandon,     /* CF_ABANDON_CC */
-        CF_CmdSetParam,    /* CF_SET_MIB_PARAM_CC */
-        CF_CmdGetParam,    /* CF_GET_MIB_PARAM_CC */
+    typedef void (*const handler_fn_t)(const void *);
+
+    static handler_fn_t fns[CF_NUM_COMMANDS] = {
+        (handler_fn_t)CF_NoopCmd,        /* CF_NOOP_CC */
+        (handler_fn_t)CF_ResetCmd,       /* CF_RESET_CC */
+        (handler_fn_t)CF_TxFileCmd,      /* CF_TX_FILE_CC */
+        (handler_fn_t)CF_PlaybackDirCmd, /* CF_PLAYBACK_DIR_CC */
+        (handler_fn_t)CF_FreezeCmd,      /* CF_FREEZE_CC */
+        (handler_fn_t)CF_ThawCmd,        /* CF_THAW_CC */
+        (handler_fn_t)CF_SuspendCmd,     /* CF_SUSPEND_CC */
+        (handler_fn_t)CF_ResumeCmd,      /* CF_RESUME_CC */
+        (handler_fn_t)CF_CancelCmd,      /* CF_CANCEL_CC */
+        (handler_fn_t)CF_AbandonCmd,     /* CF_ABANDON_CC */
+        (handler_fn_t)CF_SetParamCmd,    /* CF_SET_MIB_PARAM_CC */
+        (handler_fn_t)CF_GetParamCmd,    /* CF_GET_MIB_PARAM_CC */
         NULL,
         NULL,
         NULL,
-        CF_CmdWriteQueue,     /* CF_WRITE_QUEUE_CC */
-        CF_CmdEnableDequeue,  /* CF_ENABLE_DEQUEUE_CC */
-        CF_CmdDisableDequeue, /* CF_DISABLE_DEQUEUE_CC */
-        CF_CmdEnablePolldir,  /* CF_ENABLE_DIR_POLLING_CC */
-        CF_CmdDisablePolldir, /* CF_DISABLE_DIR_POLLING_CC */
+        (handler_fn_t)CF_WriteQueueCmd,     /* CF_WRITE_QUEUE_CC */
+        (handler_fn_t)CF_EnableDequeueCmd,  /* CF_ENABLE_DEQUEUE_CC */
+        (handler_fn_t)CF_DisableDequeueCmd, /* CF_DISABLE_DEQUEUE_CC */
+        (handler_fn_t)CF_EnablePolldirCmd,  /* CF_ENABLE_DIR_POLLING_CC */
+        (handler_fn_t)CF_DisablePolldirCmd, /* CF_DISABLE_DIR_POLLING_CC */
         NULL,
-        CF_CmdPurgeQueue,    /* CF_PURGE_QUEUE_CC */
-        CF_CmdEnableEngine,  /* CF_ENABLE_ENGINE_CC */
-        CF_CmdDisableEngine, /* CF_DISABLE_ENGINE_CC */
+        (handler_fn_t)CF_PurgeQueueCmd,    /* CF_PURGE_QUEUE_CC */
+        (handler_fn_t)CF_EnableEngineCmd,  /* CF_ENABLE_ENGINE_CC */
+        (handler_fn_t)CF_DisableEngineCmd, /* CF_DISABLE_ENGINE_CC */
     };
 
     static const uint16 expected_lengths[CF_NUM_COMMANDS] = {
-        sizeof(CF_NoArgsCmd_t),      /* CF_NOOP_CC */
-        sizeof(CF_UnionArgsCmd_t),   /* CF_RESET_CC */
+        sizeof(CF_NoopCmd_t),        /* CF_NOOP_CC */
+        sizeof(CF_ResetCmd_t),       /* CF_RESET_CC */
         sizeof(CF_TxFileCmd_t),      /* CF_TX_FILE_CC */
         sizeof(CF_PlaybackDirCmd_t), /* CF_PLAYBACK_DIR_CC */
-        sizeof(CF_UnionArgsCmd_t),   /* CF_FREEZE_CC */
-        sizeof(CF_UnionArgsCmd_t),   /* CF_THAW_CC */
-        sizeof(CF_TransactionCmd_t), /* CF_SUSPEND_CC */
-        sizeof(CF_TransactionCmd_t), /* CF_RESUME_CC */
-        sizeof(CF_TransactionCmd_t), /* CF_CANCEL_CC */
-        sizeof(CF_TransactionCmd_t), /* CF_ABANDON_CC */
+        sizeof(CF_FreezeCmd_t),      /* CF_FREEZE_CC */
+        sizeof(CF_ThawCmd_t),        /* CF_THAW_CC */
+        sizeof(CF_SuspendCmd_t),     /* CF_SUSPEND_CC */
+        sizeof(CF_ResumeCmd_t),      /* CF_RESUME_CC */
+        sizeof(CF_CancelCmd_t),      /* CF_CANCEL_CC */
+        sizeof(CF_AbandonCmd_t),     /* CF_ABANDON_CC */
         sizeof(CF_SetParamCmd_t),    /* CF_SET_MIB_PARAM_CC */
         sizeof(CF_GetParamCmd_t),    /* CF_GET_MIB_PARAM_CC */
         0,
         0,
         0,
-        sizeof(CF_WriteQueueCmd_t), /* CF_WRITE_QUEUE_CC */
-        sizeof(CF_UnionArgsCmd_t),  /* CF_ENABLE_DEQUEUE_CC */
-        sizeof(CF_UnionArgsCmd_t),  /* CF_DISABLE_DEQUEUE_CC */
-        sizeof(CF_UnionArgsCmd_t),  /* CF_ENABLE_DIR_POLLING_CC */
-        sizeof(CF_UnionArgsCmd_t),  /* CF_DISABLE_DIR_POLLING_CC */
+        sizeof(CF_WriteQueueCmd_t),        /* CF_WRITE_QUEUE_CC */
+        sizeof(CF_EnableDequeueCmd_t),     /* CF_ENABLE_DEQUEUE_CC */
+        sizeof(CF_DisableDequeueCmd_t),    /* CF_DISABLE_DEQUEUE_CC */
+        sizeof(CF_EnableDirPollingCmd_t),  /* CF_ENABLE_DIR_POLLING_CC */
+        sizeof(CF_DisableDirPollingCmd_t), /* CF_DISABLE_DIR_POLLING_CC */
         0,
-        sizeof(CF_UnionArgsCmd_t), /* CF_PURGE_QUEUE_CC */
-        sizeof(CF_NoArgsCmd_t),    /* CF_ENABLE_ENGINE_CC */
-        sizeof(CF_NoArgsCmd_t),    /* CF_DISABLE_ENGINE_CC */
+        sizeof(CF_UnionArgs_Payload_t), /* CF_PURGE_QUEUE_CC */
+        sizeof(CF_EnableEngineCmd_t),   /* CF_ENABLE_ENGINE_CC */
+        sizeof(CF_DisableEngineCmd_t),  /* CF_DISABLE_ENGINE_CC */
     };
 
     CFE_MSG_FcnCode_t cmd = 0;
@@ -1243,13 +1255,13 @@ void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
             CFE_EVS_SendEvent(CF_CMD_LEN_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF: invalid ground command length for command 0x%02x, expected %d got %zd", cmd,
                               expected_lengths[cmd], len);
-            ++CF_AppData.hk.counters.err;
+            ++CF_AppData.hk.Payload.counters.err;
         }
     }
     else
     {
-        CFE_EVS_SendEvent(CF_CC_ERR_EID, CFE_EVS_EventType_ERROR, "CF: invalid ground command packet cmd_code=0x%02x",
-                          cmd);
-        ++CF_AppData.hk.counters.err;
+        CFE_EVS_SendEvent(CF_CC_ERR_EID, CFE_EVS_EventType_ERROR,
+                          "CF: invalid ground command packet cmd_code=0x%02x", cmd);
+        ++CF_AppData.hk.Payload.counters.err;
     }
 }

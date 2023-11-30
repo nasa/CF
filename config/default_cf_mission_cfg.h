@@ -19,31 +19,19 @@
 
 /**
  * @file
- *  The CF Application Message IDs header file
+ *
+ * CFS CFDP (CF) Application Mission Configuration Header File
+ *
+ * This is a compatibility header for the "mission_cfg.h" file that has
+ * traditionally provided public config definitions for each CFS app.
+ *
+ * @note This file may be overridden/superceded by mission-provided defintions
+ * either by overriding this header or by generating definitions from a command/data
+ * dictionary tool.
  */
+#ifndef CF_MISSION_CFG_H
+#define CF_MISSION_CFG_H
 
-#ifndef CF_MSGIDS_H
-#define CF_MSGIDS_H
+#include "cf_interface_cfg.h"
 
-/**
- * \defgroup cfscfcmdmid CFS CFDP Command Message IDs
- * \{
- */
-
-#define CF_CMD_MID     (0x18B3) /**< \brief Message ID for commands */
-#define CF_SEND_HK_MID (0x18B4) /**< \brief Message ID to request housekeeping telemetry */
-#define CF_WAKE_UP_MID (0x18B5) /**< \brief Message ID for waking up the processing cycle */
-
-/**\}*/
-
-/**
- * \defgroup cfscftlmmid CFS CFDP Telemetry Message IDs
- * \{
- */
-
-#define CF_HK_TLM_MID  (0x08B0) /**< \brief Message ID for housekeeping telemetry */
-#define CF_EOT_TLM_MID (0x08B3) /**< \brief Message ID for end of transaction telemetry */
-
-/**\}*/
-
-#endif /* !CF_MSGIDS_H */
+#endif
