@@ -193,30 +193,16 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 
         if (success)
         {
             txn->state_data.send.cached_pos += status;
-            status = CF_CFDP_SendFd(txn, ph);
-            if (status == CF_SEND_PDU_NO_BUF_AVAIL_ERROR)
-            {
-                ret = CFE_SUCCESS; /* no bytes were processed */
-            }
-            else if (status == CF_SEND_PDU_ERROR)
-            {
-                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_S_SEND_FD, CFE_EVS_EventType_ERROR,
-                                  "CF S%d(%lu:%lu): error sending fd", (txn->state == CF_TxnState_S2),
-                                  (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
-                ret = CF_ERROR;
-            }
-            else
-            {
-                CF_AppData.hk.channel_hk[txn->chan_num].counters.sent.file_data_bytes += actual_bytes;
+            CF_CFDP_SendFd(txn, ph); /* CF_CFDP_SendFd only returns CFE_SUCCESS */
 
-                CF_Assert((foffs + actual_bytes) <= txn->fsize); /* sanity check */
-                if (calc_crc)
-                {
-                    CF_CRC_Digest(&txn->crc, fd->data_ptr, fd->data_len);
-                }
-
-                ret = actual_bytes;
+            CF_AppData.hk.channel_hk[txn->chan_num].counters.sent.file_data_bytes += actual_bytes;
+            CF_Assert((foffs + actual_bytes) <= txn->fsize); /* sanity check */
+            if (calc_crc)
+            {
+                CF_CRC_Digest(&txn->crc, fd->data_ptr, fd->data_len);
             }
+
+            ret = actual_bytes;
         }
     }
 
@@ -752,12 +738,6 @@ void CF_CFDP_S_Tick(CF_Transaction_t *txn, int *cont /* unused */)
                             sret = CF_CFDP_S_SendEof(txn);
                             if (sret == CF_SEND_PDU_NO_BUF_AVAIL_ERROR)
                             {
-                                early_exit = true;
-                            }
-                            else if (sret == CF_SEND_PDU_ERROR)
-                            {
-                                CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_SEND_EOF_FAILURE);
-                                CF_CFDP_S_Reset(txn); /* can't go on, error occurred */
                                 early_exit = true;
                             }
 
