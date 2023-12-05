@@ -123,39 +123,39 @@ static inline void CF_DequeueTransaction(CF_Transaction_t *txn)
 {
     CF_Assert(txn && (txn->chan_num < CF_NUM_CHANNELS));
     CF_CList_Remove(&CF_AppData.engine.channels[txn->chan_num].qs[txn->flags.com.q_index], &txn->cl_node);
-    CF_Assert(CF_AppData.hk.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index]); /* sanity check */
-    --CF_AppData.hk.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index];
+    CF_Assert(CF_AppData.hk.Payload.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index]); /* sanity check */
+    --CF_AppData.hk.Payload.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index];
 }
 
 static inline void CF_MoveTransaction(CF_Transaction_t *txn, CF_QueueIdx_t queue)
 {
     CF_Assert(txn && (txn->chan_num < CF_NUM_CHANNELS));
     CF_CList_Remove(&CF_AppData.engine.channels[txn->chan_num].qs[txn->flags.com.q_index], &txn->cl_node);
-    CF_Assert(CF_AppData.hk.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index]); /* sanity check */
-    --CF_AppData.hk.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index];
+    CF_Assert(CF_AppData.hk.Payload.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index]); /* sanity check */
+    --CF_AppData.hk.Payload.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index];
     CF_CList_InsertBack(&CF_AppData.engine.channels[txn->chan_num].qs[queue], &txn->cl_node);
     txn->flags.com.q_index = queue;
-    ++CF_AppData.hk.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index];
+    ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index];
 }
 
 static inline void CF_CList_Remove_Ex(CF_Channel_t *chan, CF_QueueIdx_t queueidx, CF_CListNode_t *node)
 {
     CF_CList_Remove(&chan->qs[queueidx], node);
-    CF_Assert(CF_AppData.hk.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx]); /* sanity check */
-    --CF_AppData.hk.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx];
+    CF_Assert(CF_AppData.hk.Payload.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx]); /* sanity check */
+    --CF_AppData.hk.Payload.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx];
 }
 
 static inline void CF_CList_InsertAfter_Ex(CF_Channel_t *chan, CF_QueueIdx_t queueidx, CF_CListNode_t *start,
                                            CF_CListNode_t *after)
 {
     CF_CList_InsertAfter(&chan->qs[queueidx], start, after);
-    ++CF_AppData.hk.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx];
+    ++CF_AppData.hk.Payload.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx];
 }
 
 static inline void CF_CList_InsertBack_Ex(CF_Channel_t *chan, CF_QueueIdx_t queueidx, CF_CListNode_t *node)
 {
     CF_CList_InsertBack(&chan->qs[queueidx], node);
-    ++CF_AppData.hk.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx];
+    ++CF_AppData.hk.Payload.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx];
 }
 
 /************************************************************************/

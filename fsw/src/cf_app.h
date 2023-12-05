@@ -29,6 +29,7 @@
 #include "cfe.h"
 
 #include "cf_msg.h"
+#include "cf_tbl.h"
 #include "cf_msgids.h"
 #include "cf_tbldefs.h"
 #include "cf_platform_cfg.h"

@@ -18,15 +18,21 @@
  ************************************************************************/
 
 /**
- * \file
- *  The CF Application Table Definitions header file
+ * @file
+ *   Specification for the CFS CFDP (CF) table related
+ *   constant definitions.
+ *
+ * @note
+ *   These Macro definitions have been put in this file (instead of
+ *   cf_tbl.h). DO NOT PUT ANY TYPEDEFS OR
+ *   STRUCTURE DEFINITIONS IN THIS FILE!
+ *   ADD THEM TO cf_tbl.h IF NEEDED!
  */
-
 #ifndef CF_TBLDEFS_H
 #define CF_TBLDEFS_H
 
-#include <cf_platform_cfg.h>
-#include <cf_extern_typedefs.h>
+#include "cf_mission_cfg.h"
+#include "cf_extern_typedefs.h"
 
 /**
  * \brief Configuration entry for directory polling
@@ -72,23 +78,13 @@ typedef struct CF_ChannelConfig
     char  move_dir[OS_MAX_PATH_LEN]; /**< \brief Move directory if not empty */
 } CF_ChannelConfig_t;
 
-/**
- * \brief Top-level CFDP configuration structure
+
+/*
+ * Previously, the entire definition of the CF table was in this file, now it is split.
+ * For backward compatibility with existing CF table definitions, include the other part here.
  */
-typedef struct CF_ConfigTable
-{
-    uint32 ticks_per_second;             /**< \brief expected ticks per second to CFDP app */
-    uint32 rx_crc_calc_bytes_per_wakeup; /**< \brief max number of bytes per wakeup to calculate
-                                          * r2 CRC for recvd file (must be 1024-byte aligned)
-                                          */
+#ifndef CF_OMIT_DEPRECATED
+#include "cf_tblstruct.h"
+#endif
 
-    CF_EntityId_t local_eid; /**< \brief the local entity ID of the CF app */
-
-    CF_ChannelConfig_t chan[CF_NUM_CHANNELS]; /**< \brief Channel configuration */
-
-    uint16 outgoing_file_chunk_size;    /**< maximum size of outgoing file data PDUs - must be
-                                         *   smaller than file data character array */
-    char tmp_dir[CF_FILENAME_MAX_PATH]; /**< directory to put temp files */
-} CF_ConfigTable_t;
-
-#endif /* !CF_TBLDEFS_H */
+#endif

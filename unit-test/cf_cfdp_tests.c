@@ -479,7 +479,7 @@ void Test_CF_CFDP_RecvIdle(void)
     /* setup for FindUnusedChunks */
     memset(&ut_unused_chunks, 0, sizeof(ut_unused_chunks));
     CF_AppData.engine.channels[UT_CFDP_CHANNEL].cs[CF_Direction_RX] = &ut_unused_chunks.cl_node;
-    CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].q_size[0]             = 4;
+    CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].q_size[0]     = 4;
     UT_SetHandlerFunction(UT_KEY(CF_CList_Pop), UT_AltHandler_GenericPointerReturn, &ut_unused_chunks.cl_node);
 
     /* nominal call, file data, class 1 */
@@ -1015,9 +1015,9 @@ void Test_CF_CFDP_CycleTx(void)
 
     /* need to set dequeue_enabled so it enters the actual logic */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, &config);
-    CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].q_size[0] = 10;
-    CF_AppData.engine.enabled                           = 1;
-    config->chan[UT_CFDP_CHANNEL].dequeue_enabled       = 1;
+    CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].q_size[0] = 10;
+    CF_AppData.engine.enabled                                   = 1;
+    config->chan[UT_CFDP_CHANNEL].dequeue_enabled               = 1;
 
     /* nominal call, w/chan->cur non-null */
     chan->cur = txn;
@@ -1139,14 +1139,14 @@ void Test_CF_CFDP_ProcessPollingDirectories(void)
 
     /* nominal call, polldir disabled (noop) */
     UtAssert_VOIDCALL(CF_CFDP_ProcessPollingDirectories(chan));
-    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].poll_counter, 0);
+    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].poll_counter, 0);
 
     /* nominal call, polldir enabled but interval_sec == 0 */
     /* Will tick because CF_Timer_Expired stub returns 0 by default (not expired) */
     pdcfg->enabled = 1;
     UtAssert_VOIDCALL(CF_CFDP_ProcessPollingDirectories(chan));
     UtAssert_BOOL_FALSE(poll->timer_set);
-    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].poll_counter, 1);
+    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].poll_counter, 1);
     UtAssert_STUB_COUNT(CF_Timer_Tick, 1);
 
     /* with interval_sec nonzero the timer should get set, but not tick */
@@ -1154,7 +1154,7 @@ void Test_CF_CFDP_ProcessPollingDirectories(void)
     UtAssert_VOIDCALL(CF_CFDP_ProcessPollingDirectories(chan));
     UtAssert_BOOL_TRUE(poll->timer_set);
     UtAssert_STUB_COUNT(CF_Timer_Tick, 1);
-    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].poll_counter, 1);
+    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].poll_counter, 1);
 
     /* call again should tick */
     UtAssert_VOIDCALL(CF_CFDP_ProcessPollingDirectories(chan));
@@ -1166,7 +1166,7 @@ void Test_CF_CFDP_ProcessPollingDirectories(void)
     UtAssert_VOIDCALL(CF_CFDP_ProcessPollingDirectories(chan));
     UtAssert_BOOL_FALSE(poll->timer_set);
     UtAssert_BOOL_TRUE(poll->pb.busy);
-    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].poll_counter, 1);
+    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].poll_counter, 1);
 
     /* make an error occur in CF_CFDP_PlaybackDir_Initiate() */
     poll->pb.busy   = false; /* above would have set it true */
@@ -1196,7 +1196,7 @@ void Test_CF_CFDP_ProcessPollingDirectories(void)
     /* test that call to CF_CFDP_UpdatePollPbCounted will decrement back to 0 again */
     pdcfg->enabled = 0;
     UtAssert_VOIDCALL(CF_CFDP_ProcessPollingDirectories(chan));
-    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].poll_counter, 0);
+    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].poll_counter, 0);
 }
 
 void Test_CF_CFDP_ProcessPlaybackDirectory(void)
@@ -1339,11 +1339,11 @@ void Test_CF_CFDP_CycleEngine(void)
     UtAssert_VOIDCALL(CF_CFDP_CycleEngine());
 
     /* enabled but frozen */
-    CF_AppData.engine.enabled                        = 1;
-    CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].frozen = 1;
+    CF_AppData.engine.enabled                                = 1;
+    CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].frozen = 1;
     UtAssert_VOIDCALL(CF_CFDP_CycleEngine());
 
-    CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].frozen = 0;
+    CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].frozen = 0;
     UtAssert_VOIDCALL(CF_CFDP_CycleEngine());
 }
 
@@ -1364,11 +1364,11 @@ void Test_CF_CFDP_ResetTransaction(void)
     UT_ResetState(UT_KEY(CF_FreeTransaction));
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
     txn->flags.com.q_index = CF_QueueIdx_FREE;
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));  
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));
 
     /* nominal call */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
-    CF_AppData.hk.channel_hk[UT_CFDP_CHANNEL].q_size[txn->flags.com.q_index] = 10;
+    CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].q_size[txn->flags.com.q_index] = 10;
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 1));
     UtAssert_STUB_COUNT(CF_FreeTransaction, 1);
 
@@ -1470,8 +1470,8 @@ void Test_CF_CFDP_SetTxnStatus(void)
 
 void Test_CF_CFDP_SendEotPkt(void)
 {
-    CF_EotPktBuf_t  PktBuf;
-    CF_EotPktBuf_t *PktBufPtr;
+    CF_EotPacket_t  PktBuf;
+    CF_EotPacket_t *PktBufPtr;
 
     CF_Transaction_t *txn;
     CF_Playback_t     pb;

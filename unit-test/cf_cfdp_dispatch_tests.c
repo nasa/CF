@@ -154,7 +154,7 @@ void Test_CF_CFDP_R_DispatchRecv(void)
     UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     ph->fdirective.directive_code = CF_CFDP_FileDirective_INVALID_MAX;
     UtAssert_VOIDCALL(CF_CFDP_R_DispatchRecv(txn, ph, &dispatch, NULL));
-    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.spurious, 1);
+    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.spurious, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_R_DC_INV);
 
     /* file data with error */
@@ -162,7 +162,7 @@ void Test_CF_CFDP_R_DispatchRecv(void)
     ph->pdu_header.pdu_type = 1;
     UT_SetDeferredRetcode(UT_KEY(CF_TxnStatus_IsError), 1, true);
     UtAssert_VOIDCALL(CF_CFDP_R_DispatchRecv(txn, ph, &dispatch, NULL));
-    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.dropped, 1);
+    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.dropped, 1);
 
     /* test actual dispatch */
     UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
@@ -206,7 +206,7 @@ void Test_CF_CFDP_S_DispatchRecv(void)
     UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     ph->fdirective.directive_code = CF_CFDP_FileDirective_INVALID_MAX;
     UtAssert_VOIDCALL(CF_CFDP_S_DispatchRecv(txn, ph, &dispatch));
-    UtAssert_UINT32_EQ(CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.spurious, 1);
+    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.spurious, 1);
     UT_CF_AssertEventID(CF_EID_ERR_CFDP_S_DC_INV);
 
     /* file data PDU, not expected in this type of txn */

@@ -99,7 +99,7 @@ CFE_Status_t CF_CFDP_R_CheckCrc(CF_Transaction_t *txn, uint32 expected_crc)
                           (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
                           (unsigned long)txn->history->seq_num, (unsigned long)txn->crc.result,
                           (unsigned long)expected_crc);
-        ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.crc_mismatch;
+        ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.crc_mismatch;
         ret = 1;
     }
 
@@ -156,7 +156,7 @@ void CF_CFDP_R2_Complete(CF_Transaction_t *txn, int ok_to_send_nak)
                                   "CF R%d(%lu:%lu): NAK limited reach", (txn->state == CF_TxnState_R2),
                                   (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
                 send_fin = 1;
-                ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.nak_limit;
+                ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.nak_limit;
                 /* don't use CF_CFDP_R2_SetFinTxnStatus because many places in this function set send_fin */
                 CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_NAK_LIMIT_REACHED);
                 txn->state_data.receive.r2.acknak_count = 0; /* reset for fin/ack */
@@ -213,7 +213,7 @@ CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *
                               (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
                               (long)fd->offset, (long)fret);
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILE_SIZE_ERROR);
-            ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_seek;
+            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek;
             ret = CF_ERROR; /* connection will reset in caller */
         }
     }
@@ -228,13 +228,13 @@ CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *
                               (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
                               (long)fd->data_len, (long)fret);
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
-            ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_write;
+            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_write;
             ret = CF_ERROR; /* connection will reset in caller */
         }
         else
         {
             txn->state_data.receive.cached_pos = fd->data_len + fd->offset;
-            CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.file_data_bytes += fd->data_len;
+            CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.file_data_bytes += fd->data_len;
         }
     }
 
@@ -265,7 +265,7 @@ CFE_Status_t CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *txn, CF_Logical_PduBuff
                               (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
                               (unsigned long)txn->history->seq_num, (unsigned long)eof->size,
                               (unsigned long)txn->fsize);
-            ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_size_mismatch;
+            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_size_mismatch;
             ret = CF_REC_PDU_FSIZE_MISMATCH_ERROR;
         }
     }
@@ -274,7 +274,7 @@ CFE_Status_t CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *txn, CF_Logical_PduBuff
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_PDU_EOF, CFE_EVS_EventType_ERROR, "CF R%d(%lu:%lu): invalid EOF packet",
                           (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
                           (unsigned long)txn->history->seq_num);
-        ++CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.error;
+        ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
         ret = CF_REC_PDU_BAD_EOF_ERROR;
     }
 
@@ -525,7 +525,7 @@ CFE_Status_t CF_CFDP_R_SubstateSendNak(CF_Transaction_t *txn)
                                                      that function we need to test handling it here */
                 if (sret == CFE_SUCCESS)
                 {
-                    CF_AppData.hk.channel_hk[txn->chan_num].counters.sent.nak_segment_requests += cret;
+                    CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.sent.nak_segment_requests += cret;
                     ret = CFE_SUCCESS;
                 }
             }
@@ -594,7 +594,7 @@ void CF_CFDP_R_Init(CF_Transaction_t *txn)
                           "CF R%d(%lu:%lu): failed to create file %s for writing, error=%ld",
                           (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
                           (unsigned long)txn->history->seq_num, txn->history->fnames.dst_filename, (long)ret);
-        ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_open;
+        ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_open;
         txn->fd = OS_OBJECT_ID_UNDEFINED; /* just in case */
         if (txn->state == CF_TxnState_R2)
         {
@@ -661,7 +661,7 @@ CFE_Status_t CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *txn)
                                   (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
                                   (unsigned long)txn->state_data.receive.r2.rx_crc_calc_bytes, (long)fret);
                 CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILE_SIZE_ERROR);
-                ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_seek;
+                ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek;
                 success = false;
                 break;
             }
@@ -675,7 +675,7 @@ CFE_Status_t CF_CFDP_R2_CalcCrcChunk(CF_Transaction_t *txn)
                               (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
                               (unsigned long)txn->history->seq_num, (unsigned long)read_size, (long)fret);
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILE_SIZE_ERROR);
-            ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_read;
+            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_read;
             success = false;
             break;
         }
@@ -766,7 +766,7 @@ void CF_CFDP_R2_Recv_fin_ack(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
         CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_PDU_FINACK, CFE_EVS_EventType_ERROR, "CF R%d(%lu:%lu): invalid fin-ack",
                           (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
                           (unsigned long)txn->history->seq_num);
-        ++CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.error;
+        ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
     }
 }
 
@@ -808,7 +808,7 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
                                       (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
                                       (unsigned long)txn->history->seq_num, (unsigned long)txn->fsize,
                                       (unsigned long)txn->state_data.receive.r2.eof_size);
-                    ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_size_mismatch;
+                    ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_size_mismatch;
                     CF_CFDP_R2_SetFinTxnStatus(txn, CF_TxnStatus_FILE_SIZE_ERROR);
                     success = false;
                 }
@@ -832,7 +832,7 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
                                       (unsigned long)txn->history->seq_num, (long)status);
                     txn->fd = OS_OBJECT_ID_UNDEFINED;
                     CF_CFDP_R2_SetFinTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
-                    ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_rename;
+                    ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_rename;
                     success = false;
                 }
                 else
@@ -846,7 +846,7 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
                                           (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
                                           (unsigned long)txn->history->seq_num, (long)ret);
                         CF_CFDP_R2_SetFinTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
-                        ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.file_open;
+                        ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_open;
                         txn->fd = OS_OBJECT_ID_UNDEFINED; /* just in case */
                         success = false;
                     }
@@ -866,7 +866,7 @@ void CF_CFDP_R2_RecvMd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
             CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_PDU_MD, CFE_EVS_EventType_ERROR, "CF R%d(%lu:%lu): invalid md received",
                               (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
                               (unsigned long)txn->history->seq_num);
-            ++CF_AppData.hk.channel_hk[txn->chan_num].counters.recv.error;
+            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
             /* do nothing here, since it will be NAK'd again later */
         }
     }
@@ -946,7 +946,7 @@ void CF_CFDP_R_SendInactivityEvent(CF_Transaction_t *txn)
     CFE_EVS_SendEvent(CF_EID_ERR_CFDP_R_INACT_TIMER, CFE_EVS_EventType_ERROR,
                       "CF R%d(%lu:%lu): inactivity timer expired", (txn->state == CF_TxnState_R2),
                       (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
-    ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.inactivity_timer;
+    ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.inactivity_timer;
 }
 
 /*----------------------------------------------------------------
@@ -1038,7 +1038,7 @@ void CF_CFDP_R_Tick(CF_Transaction_t *txn, int *cont /* unused */)
                                           "CF R2(%lu:%lu): ACK limit reached, no fin-ack",
                                           (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
                         CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_ACK_LIMIT_NO_FIN);
-                        ++CF_AppData.hk.channel_hk[txn->chan_num].counters.fault.ack_limit;
+                        ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.ack_limit;
                         CF_CFDP_R2_Reset(txn);
                         success = false;
                     }
