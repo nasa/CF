@@ -1723,7 +1723,7 @@ void CF_CFDP_SendEotPkt(CF_Transaction_t *txn)
     {
         EotPktPtr = (void *)BufPtr;
 
-        CFE_MSG_Init(&EotPktPtr->TelemetryHeader.Msg, CFE_SB_ValueToMsgId(CF_EOT_TLM_MID), sizeof(*EotPktPtr));
+        CFE_MSG_Init(CFE_MSG_PTR(EotPktPtr->TelemetryHeader), CFE_SB_ValueToMsgId(CF_EOT_TLM_MID), sizeof(*EotPktPtr));
 
         EotPktPtr->Payload.channel    = txn->chan_num;
         EotPktPtr->Payload.direction  = txn->history->dir;
@@ -1739,7 +1739,7 @@ void CF_CFDP_SendEotPkt(CF_Transaction_t *txn)
         /*
         ** Timestamp and send eod of transaction telemetry
         */
-        CFE_SB_TimeStampMsg(&EotPktPtr->TelemetryHeader.Msg);
+        CFE_SB_TimeStampMsg(CFE_MSG_PTR(EotPktPtr->TelemetryHeader));
         CFE_SB_TransmitBuffer(BufPtr, true);
     }
 }
