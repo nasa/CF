@@ -26,18 +26,20 @@
 #include "cf_cmd.h"
 #include "utgenstub.h"
 
-void UT_DefaultHandler_CF_ProcessGroundCommand(void *, UT_EntryKey_t, const UT_StubContext_t *);
-
 /*
  * ----------------------------------------------------
  * Generated stub function for CF_AbandonCmd()
  * ----------------------------------------------------
  */
-void CF_AbandonCmd(const CF_AbandonCmd_t *msg)
+CFE_Status_t CF_AbandonCmd(const CF_AbandonCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_AbandonCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_AbandonCmd, const CF_AbandonCmd_t *, msg);
 
     UT_GenStub_Execute(CF_AbandonCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_AbandonCmd, CFE_Status_t);
 }
 
 /*
@@ -45,11 +47,15 @@ void CF_AbandonCmd(const CF_AbandonCmd_t *msg)
  * Generated stub function for CF_CancelCmd()
  * ----------------------------------------------------
  */
-void CF_CancelCmd(const CF_CancelCmd_t *msg)
+CFE_Status_t CF_CancelCmd(const CF_CancelCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_CancelCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_CancelCmd, const CF_CancelCmd_t *, msg);
 
     UT_GenStub_Execute(CF_CancelCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_CancelCmd, CFE_Status_t);
 }
 
 /*
@@ -117,11 +123,31 @@ CFE_Status_t CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
  * Generated stub function for CF_DisableDequeueCmd()
  * ----------------------------------------------------
  */
-void CF_DisableDequeueCmd(const CF_DisableDequeueCmd_t *msg)
+CFE_Status_t CF_DisableDequeueCmd(const CF_DisableDequeueCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_DisableDequeueCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_DisableDequeueCmd, const CF_DisableDequeueCmd_t *, msg);
 
     UT_GenStub_Execute(CF_DisableDequeueCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_DisableDequeueCmd, CFE_Status_t);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_DisableDirPollingCmd()
+ * ----------------------------------------------------
+ */
+CFE_Status_t CF_DisableDirPollingCmd(const CF_DisableDirPollingCmd_t *msg)
+{
+    UT_GenStub_SetupReturnBuffer(CF_DisableDirPollingCmd, CFE_Status_t);
+
+    UT_GenStub_AddParam(CF_DisableDirPollingCmd, const CF_DisableDirPollingCmd_t *, msg);
+
+    UT_GenStub_Execute(CF_DisableDirPollingCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_DisableDirPollingCmd, CFE_Status_t);
 }
 
 /*
@@ -129,23 +155,15 @@ void CF_DisableDequeueCmd(const CF_DisableDequeueCmd_t *msg)
  * Generated stub function for CF_DisableEngineCmd()
  * ----------------------------------------------------
  */
-void CF_DisableEngineCmd(const CF_DisableEngineCmd_t *msg)
+CFE_Status_t CF_DisableEngineCmd(const CF_DisableEngineCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_DisableEngineCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_DisableEngineCmd, const CF_DisableEngineCmd_t *, msg);
 
     UT_GenStub_Execute(CF_DisableEngineCmd, Basic, NULL);
-}
 
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_DisablePolldirCmd()
- * ----------------------------------------------------
- */
-void CF_DisablePolldirCmd(const CF_DisableDirPollingCmd_t *msg)
-{
-    UT_GenStub_AddParam(CF_DisablePolldirCmd, const CF_DisableDirPollingCmd_t *, msg);
-
-    UT_GenStub_Execute(CF_DisablePolldirCmd, Basic, NULL);
+    return UT_GenStub_GetReturnValue(CF_DisableEngineCmd, CFE_Status_t);
 }
 
 /*
@@ -267,11 +285,31 @@ void CF_DoSuspRes_Txn(CF_Transaction_t *txn, CF_ChanAction_SuspResArg_t *context
  * Generated stub function for CF_EnableDequeueCmd()
  * ----------------------------------------------------
  */
-void CF_EnableDequeueCmd(const CF_EnableDequeueCmd_t *msg)
+CFE_Status_t CF_EnableDequeueCmd(const CF_EnableDequeueCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_EnableDequeueCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_EnableDequeueCmd, const CF_EnableDequeueCmd_t *, msg);
 
     UT_GenStub_Execute(CF_EnableDequeueCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_EnableDequeueCmd, CFE_Status_t);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_EnableDirPollingCmd()
+ * ----------------------------------------------------
+ */
+CFE_Status_t CF_EnableDirPollingCmd(const CF_EnableDirPollingCmd_t *msg)
+{
+    UT_GenStub_SetupReturnBuffer(CF_EnableDirPollingCmd, CFE_Status_t);
+
+    UT_GenStub_AddParam(CF_EnableDirPollingCmd, const CF_EnableDirPollingCmd_t *, msg);
+
+    UT_GenStub_Execute(CF_EnableDirPollingCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_EnableDirPollingCmd, CFE_Status_t);
 }
 
 /*
@@ -279,23 +317,15 @@ void CF_EnableDequeueCmd(const CF_EnableDequeueCmd_t *msg)
  * Generated stub function for CF_EnableEngineCmd()
  * ----------------------------------------------------
  */
-void CF_EnableEngineCmd(const CF_EnableEngineCmd_t *msg)
+CFE_Status_t CF_EnableEngineCmd(const CF_EnableEngineCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_EnableEngineCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_EnableEngineCmd, const CF_EnableEngineCmd_t *, msg);
 
     UT_GenStub_Execute(CF_EnableEngineCmd, Basic, NULL);
-}
 
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_EnablePolldirCmd()
- * ----------------------------------------------------
- */
-void CF_EnablePolldirCmd(const CF_EnableDirPollingCmd_t *msg)
-{
-    UT_GenStub_AddParam(CF_EnablePolldirCmd, const CF_EnableDirPollingCmd_t *, msg);
-
-    UT_GenStub_Execute(CF_EnablePolldirCmd, Basic, NULL);
+    return UT_GenStub_GetReturnValue(CF_EnableEngineCmd, CFE_Status_t);
 }
 
 /*
@@ -320,11 +350,15 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSe
  * Generated stub function for CF_FreezeCmd()
  * ----------------------------------------------------
  */
-void CF_FreezeCmd(const CF_FreezeCmd_t *msg)
+CFE_Status_t CF_FreezeCmd(const CF_FreezeCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_FreezeCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_FreezeCmd, const CF_FreezeCmd_t *, msg);
 
     UT_GenStub_Execute(CF_FreezeCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_FreezeCmd, CFE_Status_t);
 }
 
 /*
@@ -332,11 +366,15 @@ void CF_FreezeCmd(const CF_FreezeCmd_t *msg)
  * Generated stub function for CF_GetParamCmd()
  * ----------------------------------------------------
  */
-void CF_GetParamCmd(const CF_GetParamCmd_t *msg)
+CFE_Status_t CF_GetParamCmd(const CF_GetParamCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_GetParamCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_GetParamCmd, const CF_GetParamCmd_t *, msg);
 
     UT_GenStub_Execute(CF_GetParamCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_GetParamCmd, CFE_Status_t);
 }
 
 /*
@@ -359,11 +397,15 @@ void CF_GetSetParamCmd(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
  * Generated stub function for CF_NoopCmd()
  * ----------------------------------------------------
  */
-void CF_NoopCmd(const CF_NoopCmd_t *msg)
+CFE_Status_t CF_NoopCmd(const CF_NoopCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_NoopCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_NoopCmd, const CF_NoopCmd_t *, msg);
 
     UT_GenStub_Execute(CF_NoopCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_NoopCmd, CFE_Status_t);
 }
 
 /*
@@ -371,23 +413,15 @@ void CF_NoopCmd(const CF_NoopCmd_t *msg)
  * Generated stub function for CF_PlaybackDirCmd()
  * ----------------------------------------------------
  */
-void CF_PlaybackDirCmd(const CF_PlaybackDirCmd_t *msg)
+CFE_Status_t CF_PlaybackDirCmd(const CF_PlaybackDirCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_PlaybackDirCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_PlaybackDirCmd, const CF_PlaybackDirCmd_t *, msg);
 
     UT_GenStub_Execute(CF_PlaybackDirCmd, Basic, NULL);
-}
 
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_ProcessGroundCommand()
- * ----------------------------------------------------
- */
-void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
-{
-    UT_GenStub_AddParam(CF_ProcessGroundCommand, CFE_SB_Buffer_t *, msg);
-
-    UT_GenStub_Execute(CF_ProcessGroundCommand, Basic, UT_DefaultHandler_CF_ProcessGroundCommand);
+    return UT_GenStub_GetReturnValue(CF_PlaybackDirCmd, CFE_Status_t);
 }
 
 /*
@@ -412,11 +446,15 @@ CFE_Status_t CF_PurgeHistory(CF_CListNode_t *node, CF_Channel_t *chan)
  * Generated stub function for CF_PurgeQueueCmd()
  * ----------------------------------------------------
  */
-void CF_PurgeQueueCmd(const CF_PurgeQueueCmd_t *msg)
+CFE_Status_t CF_PurgeQueueCmd(const CF_PurgeQueueCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_PurgeQueueCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_PurgeQueueCmd, const CF_PurgeQueueCmd_t *, msg);
 
     UT_GenStub_Execute(CF_PurgeQueueCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_PurgeQueueCmd, CFE_Status_t);
 }
 
 /*
@@ -441,11 +479,15 @@ CFE_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignored)
  * Generated stub function for CF_ResetCmd()
  * ----------------------------------------------------
  */
-void CF_ResetCmd(const CF_ResetCmd_t *msg)
+CFE_Status_t CF_ResetCmd(const CF_ResetCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_ResetCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_ResetCmd, const CF_ResetCmd_t *, msg);
 
     UT_GenStub_Execute(CF_ResetCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_ResetCmd, CFE_Status_t);
 }
 
 /*
@@ -453,11 +495,31 @@ void CF_ResetCmd(const CF_ResetCmd_t *msg)
  * Generated stub function for CF_ResumeCmd()
  * ----------------------------------------------------
  */
-void CF_ResumeCmd(const CF_ResumeCmd_t *msg)
+CFE_Status_t CF_ResumeCmd(const CF_ResumeCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_ResumeCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_ResumeCmd, const CF_ResumeCmd_t *, msg);
 
     UT_GenStub_Execute(CF_ResumeCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_ResumeCmd, CFE_Status_t);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_SendHkCmd()
+ * ----------------------------------------------------
+ */
+CFE_Status_t CF_SendHkCmd(const CF_SendHkCmd_t *msg)
+{
+    UT_GenStub_SetupReturnBuffer(CF_SendHkCmd, CFE_Status_t);
+
+    UT_GenStub_AddParam(CF_SendHkCmd, const CF_SendHkCmd_t *, msg);
+
+    UT_GenStub_Execute(CF_SendHkCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_SendHkCmd, CFE_Status_t);
 }
 
 /*
@@ -465,11 +527,15 @@ void CF_ResumeCmd(const CF_ResumeCmd_t *msg)
  * Generated stub function for CF_SetParamCmd()
  * ----------------------------------------------------
  */
-void CF_SetParamCmd(const CF_SetParamCmd_t *msg)
+CFE_Status_t CF_SetParamCmd(const CF_SetParamCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_SetParamCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_SetParamCmd, const CF_SetParamCmd_t *, msg);
 
     UT_GenStub_Execute(CF_SetParamCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_SetParamCmd, CFE_Status_t);
 }
 
 /*
@@ -477,11 +543,15 @@ void CF_SetParamCmd(const CF_SetParamCmd_t *msg)
  * Generated stub function for CF_SuspendCmd()
  * ----------------------------------------------------
  */
-void CF_SuspendCmd(const CF_SuspendCmd_t *msg)
+CFE_Status_t CF_SuspendCmd(const CF_SuspendCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_SuspendCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_SuspendCmd, const CF_SuspendCmd_t *, msg);
 
     UT_GenStub_Execute(CF_SuspendCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_SuspendCmd, CFE_Status_t);
 }
 
 /*
@@ -489,11 +559,15 @@ void CF_SuspendCmd(const CF_SuspendCmd_t *msg)
  * Generated stub function for CF_ThawCmd()
  * ----------------------------------------------------
  */
-void CF_ThawCmd(const CF_ThawCmd_t *msg)
+CFE_Status_t CF_ThawCmd(const CF_ThawCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_ThawCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_ThawCmd, const CF_ThawCmd_t *, msg);
 
     UT_GenStub_Execute(CF_ThawCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_ThawCmd, CFE_Status_t);
 }
 
 /*
@@ -501,12 +575,12 @@ void CF_ThawCmd(const CF_ThawCmd_t *msg)
  * Generated stub function for CF_TsnChanAction()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_TsnChanAction(const CF_Transaction_Payload_t *payload, const char *cmdstr, CF_TsnChanAction_fn_t fn,
+CFE_Status_t CF_TsnChanAction(const CF_Transaction_Payload_t *data, const char *cmdstr, CF_TsnChanAction_fn_t fn,
                               void *context)
 {
     UT_GenStub_SetupReturnBuffer(CF_TsnChanAction, CFE_Status_t);
 
-    UT_GenStub_AddParam(CF_TsnChanAction, const CF_Transaction_Payload_t *, payload);
+    UT_GenStub_AddParam(CF_TsnChanAction, const CF_Transaction_Payload_t *, data);
     UT_GenStub_AddParam(CF_TsnChanAction, const char *, cmdstr);
     UT_GenStub_AddParam(CF_TsnChanAction, CF_TsnChanAction_fn_t, fn);
     UT_GenStub_AddParam(CF_TsnChanAction, void *, context);
@@ -521,11 +595,31 @@ CFE_Status_t CF_TsnChanAction(const CF_Transaction_Payload_t *payload, const cha
  * Generated stub function for CF_TxFileCmd()
  * ----------------------------------------------------
  */
-void CF_TxFileCmd(const CF_TxFileCmd_t *msg)
+CFE_Status_t CF_TxFileCmd(const CF_TxFileCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_TxFileCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_TxFileCmd, const CF_TxFileCmd_t *, msg);
 
     UT_GenStub_Execute(CF_TxFileCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_TxFileCmd, CFE_Status_t);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_WakeupCmd()
+ * ----------------------------------------------------
+ */
+CFE_Status_t CF_WakeupCmd(const CF_WakeupCmd_t *msg)
+{
+    UT_GenStub_SetupReturnBuffer(CF_WakeupCmd, CFE_Status_t);
+
+    UT_GenStub_AddParam(CF_WakeupCmd, const CF_WakeupCmd_t *, msg);
+
+    UT_GenStub_Execute(CF_WakeupCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_WakeupCmd, CFE_Status_t);
 }
 
 /*
@@ -533,9 +627,13 @@ void CF_TxFileCmd(const CF_TxFileCmd_t *msg)
  * Generated stub function for CF_WriteQueueCmd()
  * ----------------------------------------------------
  */
-void CF_WriteQueueCmd(const CF_WriteQueueCmd_t *msg)
+CFE_Status_t CF_WriteQueueCmd(const CF_WriteQueueCmd_t *msg)
 {
+    UT_GenStub_SetupReturnBuffer(CF_WriteQueueCmd, CFE_Status_t);
+
     UT_GenStub_AddParam(CF_WriteQueueCmd, const CF_WriteQueueCmd_t *, msg);
 
     UT_GenStub_Execute(CF_WriteQueueCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_WriteQueueCmd, CFE_Status_t);
 }

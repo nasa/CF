@@ -42,48 +42,6 @@
  */
 
 /**
- * @brief Entity id size
- *
- * @par Description:
- *      The maximum size of the entity id as expected for all CFDP packets.
- *      CF supports the spec's variable size of EID, where the actual size is
- *      selected at runtime, and therefore the size in CFDP PDUs may be smaller
- *      than the size specified here.  This type only establishes the maximum
- *      size (and therefore maximum value) that an EID may be.
- *
- * @note This type is used in several CF commands, and so changing the size
- *       of this type will affect the following structs:
- *        CF_ConfigTable_t, configuration table - will change size of file
- *        CF_ConfigPacket_t, set config params command
- *        CF_TxFileCmd_t, transmit file command
- *        CF_PlaybackDirCmd_t, equivalent to above
- *        CF_Transaction_Payload_t, any command that selects a transaction based on EID
- *
- * @par Limits
- *         Must be one of uint8, uint16, uint32, uint64.
- */
-typedef uint32 CF_EntityId_t;
-
-/**
- * @brief transaction sequence number size
- *
- * @par Description:
- *      The max size of the transaction sequence number as expected for all CFDP packets.
- *      CF supports the spec's variable size of TSN, where the actual size is
- *      selected at runtime, and therefore the size in CFDP PDUs may be smaller
- *      than the size specified here.  This type only establishes the maximum
- *      size (and therefore maximum value) that a TSN may be.
- *
- * @note This type is used in several CF commands, and so changing the size
- *       of this type will affect the following structure:
- *        CF_Transaction_Payload_t, any command that selects a transaction based on TSN
- *
- * @par Limits
- *         Must be one of uint8, uint16, uint32, uint64.
- */
-typedef uint32 CF_TransactionSeq_t;
-
-/**
  *  @brief Number of channels
  *
  *  @par Description:
@@ -107,20 +65,6 @@ typedef uint32 CF_TransactionSeq_t;
  *
  */
 #define CF_NAK_MAX_SEGMENTS (58)
-
-/**
- *  @brief Total number of chunks (tx, rx, all channels)
- *
- *  @par Description:
- *       Must be equal to the sum of all values input in CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION
- *       and CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION.
- *
- *  @par Limits:
- *
- */
-/* CF_TOTAL_CHUNKS must be equal to the total number of chunks per rx/tx transactions per channel */
-/* (in other words, the summation of all elements in CF_CHANNEL_NUM_R/TX_CHUNKS_PER_TRANSACTION */
-#define CF_TOTAL_CHUNKS (CF_NAK_MAX_SEGMENTS * 4)
 
 /**
  *  @brief Max number of polling directories per channel.
@@ -159,14 +103,6 @@ typedef uint32 CF_TransactionSeq_t;
 #define CF_FILENAME_MAX_NAME CFE_MISSION_MAX_FILE_LEN
 
 /**
- *  @brief Maximum file path (not including file name)
- *
- *  @par Limits:
- *
- */
-#define CF_FILENAME_MAX_PATH (CFE_MISSION_MAX_PATH_LEN - CFE_MISSION_MAX_FILE_LEN)
-
-/**
  *  @brief Max filename and path length.
  *
  *  @par Limits:
@@ -195,22 +131,6 @@ typedef uint32 CF_TransactionSeq_t;
  *       maximum size of an SB message.
  */
 #define CF_PDU_ENCAPSULATION_EXTRA_TRAILING_BYTES 0
-
-/**
- * \brief Mission specific version number
- *
- *  \par Description:
- *       An application version number consists of four parts:
- *       major version number, minor version number, revision
- *       number and mission specific revision number. The mission
- *       specific revision number is defined here such
- *       that missions can manage as a configuration definition
- *
- *  \par Limits:
- *       Must be defined as a numeric value that is greater than
- *       or equal to zero.
- */
-#define CF_MISSION_REV 0
 
 /**\}*/
 

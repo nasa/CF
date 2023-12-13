@@ -20,6 +20,7 @@
 /* cf testing includes */
 #include "cf_test_utils.h"
 #include "cf_events.h"
+#include "cf_dispatch.h"
 #include "cf_app.h"
 #include "cf_cmd.h"
 
@@ -57,23 +58,6 @@ void UT_UpdatedDefaultHandler_CFE_SB_ReceiveBuffer(void *UserObj, UT_EntryKey_t 
     CFE_SB_Buffer_t **BufPtr = UT_Hook_GetArgValueByName(Context, "BufPtr", CFE_SB_Buffer_t **);
 
     UT_Stub_CopyToLocal(UT_KEY(CFE_SB_ReceiveBuffer), BufPtr, sizeof(*BufPtr));
-}
-
-/*******************************************************************************
-**
-**  CF_HkCmd tests - full coverage
-**
-*******************************************************************************/
-
-void Test_CF_HkCmd(void)
-{
-    /* Act */
-    CF_HkCmd();
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_SetMsgTime, 1);
-    UtAssert_STUB_COUNT(CFE_SB_TransmitMsg, 1);
-    UtAssert_STUB_COUNT(CFE_TIME_GetTime, 1);
 }
 
 /*******************************************************************************
@@ -484,104 +468,6 @@ void Test_CF_Init_Success(void)
 
 /*******************************************************************************
 **
-**  CF_WakeUp tests
-**
-*******************************************************************************/
-
-void Test_CF_WakeUp(void)
-{
-    /* Arrange */
-    /* No Arrange Required */
-
-    /* Act */
-    CF_WakeUp();
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CF_CFDP_CycleEngine, 1);
-}
-
-/*******************************************************************************
-**
-**  CF_ProcessMsg tests
-**
-*******************************************************************************/
-
-void Test_CF_ProcessMsg_ProcessGroundCommand(void)
-{
-    /* Arrange */
-    CFE_SB_Buffer_t sbbuf;
-    CFE_SB_MsgId_t  forced_MsgID = CFE_SB_ValueToMsgId(CF_CMD_MID);
-
-    memset(&sbbuf, 0, sizeof(sbbuf));
-
-    /* CFE_MSG_GetMsgId uses return by ref */
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &forced_MsgID, sizeof(forced_MsgID), false);
-
-    /* Act */
-    CF_ProcessMsg(&sbbuf);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_GetMsgId, 1);
-    UtAssert_STUB_COUNT(CF_ProcessGroundCommand, 1);
-}
-
-void Test_CF_ProcessMsg_WakeUp(void)
-{
-    /* Arrange */
-    CFE_SB_Buffer_t sbbuf;
-    CFE_SB_MsgId_t  forced_MsgID = CFE_SB_ValueToMsgId(CF_WAKE_UP_MID);
-
-    memset(&sbbuf, 0, sizeof(sbbuf));
-
-    /* CFE_MSG_GetMsgId uses return by ref */
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &forced_MsgID, sizeof(forced_MsgID), false);
-
-    /* Act */
-    CF_ProcessMsg(&sbbuf);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_GetMsgId, 1);
-    UtAssert_STUB_COUNT(CF_CFDP_CycleEngine, 1);
-}
-
-void Test_CF_ProcessMsg_SendHk(void)
-{
-    CFE_SB_Buffer_t sbbuf;
-    CFE_SB_MsgId_t  forced_MsgID = CFE_SB_ValueToMsgId(CF_SEND_HK_MID);
-
-    memset(&sbbuf, 0, sizeof(sbbuf));
-
-    /* CFE_MSG_GetMsgId uses return by ref */
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &forced_MsgID, sizeof(forced_MsgID), false);
-
-    /* Act */
-    CF_ProcessMsg(&sbbuf);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_GetMsgId, 1);
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-    UtAssert_STUB_COUNT(CFE_MSG_SetMsgTime, 1); /* Confirms CF_HkCmd path was taken */
-}
-
-void Test_CF_ProcessMsg_UnrecognizedCommandEnterDefaultPath(void)
-{
-    /* Arrange */
-    CFE_SB_MsgId_t   forced_MsgID = CFE_SB_INVALID_MSG_ID;
-    CFE_SB_Buffer_t *arg_msg      = NULL;
-
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &forced_MsgID, sizeof(forced_MsgID), false);
-
-    /* Act */
-    CF_ProcessMsg(arg_msg);
-
-    /* Assert */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 1);
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_INIT_CMD_LENGTH);
-}
-
-/*******************************************************************************
-**
 **  CF_AppMain tests
 **
 *******************************************************************************/
@@ -663,7 +549,7 @@ void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
     UtAssert_STUB_COUNT(CFE_ES_RunLoop, 3);
 }
 
-void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndValid_msg_Call_CF_ProcessMsg(void)
+void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndValid_msg_Call_CF_AppPipe(void)
 {
     /* Arrange */
     CFE_SB_MsgId_t   forced_MsgID = CFE_SB_INVALID_MSG_ID;
@@ -676,7 +562,7 @@ void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndV
     /* Actual data not used, just address is needed */
     UT_SetDataBuffer(UT_KEY(CFE_SB_ReceiveBuffer), &msg, sizeof(msg), false);
 
-    /* Arrange unstubbable: CF_ProcessMsg, invalid ID */
+    /* Arrange unstubbable: CF_AppPipe, invalid ID */
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &forced_MsgID, sizeof(forced_MsgID), false);
 
     /* Act */
@@ -686,10 +572,8 @@ void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndV
     UtAssert_STUB_COUNT(CFE_ES_PerfLogAdd, 4);
     UtAssert_STUB_COUNT(CFE_ES_RunLoop, 2);
     UtAssert_STUB_COUNT(CFE_ES_ExitApp, 1);
-    /* Assert for CF_Init call and CF_ProcessMsg */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 2);
-    /* Assert for CF_ProcessMsg */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 1);
+    /* Assert for CF_Init call */
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
 }
 
 /*******************************************************************************
@@ -697,11 +581,6 @@ void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndV
 **  cf_app_tests UtTest_Add groups
 **
 *******************************************************************************/
-
-void add_CF_HkCmd_tests(void)
-{
-    UtTest_Add(Test_CF_HkCmd, cf_app_tests_Setup, CF_App_Tests_Teardown, "Test_CF_HkCmd");
-}
 
 void add_CF_CheckTables_tests(void)
 {
@@ -782,21 +661,6 @@ void add_CF_Init_tests(void)
     UtTest_Add(Test_CF_Init_Success, cf_app_tests_Setup, CF_App_Tests_Teardown, "Test_CF_Init_Success");
 }
 
-void add_CF_WakeUp_tests(void)
-{
-    UtTest_Add(Test_CF_WakeUp, cf_app_tests_Setup, CF_App_Tests_Teardown, "Test_CF_WakeUp");
-}
-
-void add_CF_ProcessMsg_tests(void)
-{
-    UtTest_Add(Test_CF_ProcessMsg_ProcessGroundCommand, cf_app_tests_Setup, CF_App_Tests_Teardown,
-               "Test_CF_ProcessMsg_ProcessGroundCommand");
-    UtTest_Add(Test_CF_ProcessMsg_WakeUp, cf_app_tests_Setup, CF_App_Tests_Teardown, "Test_CF_ProcessMsg_WakeUp");
-    UtTest_Add(Test_CF_ProcessMsg_SendHk, cf_app_tests_Setup, CF_App_Tests_Teardown, "Test_CF_ProcessMsg_SendHk");
-    UtTest_Add(Test_CF_ProcessMsg_UnrecognizedCommandEnterDefaultPath, cf_app_tests_Setup, CF_App_Tests_Teardown,
-               "Test_CF_ProcessMsg_UnrecognizedCommandEnterDefaultPath");
-}
-
 void add_CF_AppMain_tests(void)
 {
     UtTest_Add(
@@ -806,10 +670,9 @@ void add_CF_AppMain_tests(void)
         "ERROR");
     UtTest_Add(Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases, cf_app_tests_Setup, CF_App_Tests_Teardown,
                "Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases");
-    UtTest_Add(
-        Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndValid_msg_Call_CF_ProcessMsg,
-        cf_app_tests_Setup, CF_App_Tests_Teardown,
-        "Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndValid_msg_Call_CF_ProcessMsg");
+    UtTest_Add(Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndValid_msg_Call_CF_AppPipe,
+               cf_app_tests_Setup, CF_App_Tests_Teardown,
+               "Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndValid_msg_Call_CF_AppPipe");
 }
 
 /*******************************************************************************
@@ -822,8 +685,6 @@ void UtTest_Setup(void)
 {
     TestUtil_InitializeRandomSeed();
 
-    add_CF_HkCmd_tests();
-
     add_CF_CheckTables_tests();
 
     add_CF_ValidateConfigTable_tests();
@@ -831,10 +692,6 @@ void UtTest_Setup(void)
     add_CF_TableInit_tests();
 
     add_CF_Init_tests();
-
-    add_CF_WakeUp_tests();
-
-    add_CF_ProcessMsg_tests();
 
     add_CF_AppMain_tests();
 }

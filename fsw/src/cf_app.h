@@ -32,6 +32,7 @@
 #include "cf_tbl.h"
 #include "cf_msgids.h"
 #include "cf_tbldefs.h"
+#include "cf_mission_cfg.h"
 #include "cf_platform_cfg.h"
 #include "cf_cfdp.h"
 #include "cf_clist.h"
@@ -108,17 +109,6 @@ extern CF_AppData_t CF_AppData;
  **************************************************************************/
 
 /************************************************************************/
-/** @brief Send CF housekeeping packet
- *
- * @par Description
- *      The command to send the CF housekeeping packet
- *
- * @par Assumptions, External Events, and Notes:
- *      None
- */
-void CF_HkCmd(void);
-
-/************************************************************************/
 /** @brief Checks to see if a table update is pending, and perform it.
  *
  * @par Description
@@ -174,32 +164,6 @@ CFE_Status_t CF_TableInit(void);
  *
  */
 CFE_Status_t CF_Init(void);
-
-/************************************************************************/
-/** @brief CF wakeup function
- *
- * @par Description
- *       Performs a single engine cycle for each wakeup
- *
- * @par Assumptions, External Events, and Notes:
- *       None
- *
- */
-void CF_WakeUp(void);
-
-/************************************************************************/
-/** @brief CF message processing function
- *
- * @par Description
- *       Process message packets received via the Software Bus command pipe
- *
- * @par Assumptions, External Events, and Notes:
- *       msg must not be NULL.
- *
- * @param[in] msg Software Bus message pointer
- *
- */
-void CF_ProcessMsg(CFE_SB_Buffer_t *msg);
 
 /************************************************************************/
 /** @brief CF app entry point

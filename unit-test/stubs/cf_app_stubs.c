@@ -50,17 +50,6 @@ void CF_CheckTables(void)
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_HkCmd()
- * ----------------------------------------------------
- */
-void CF_HkCmd(void)
-{
-
-    UT_GenStub_Execute(CF_HkCmd, Basic, NULL);
-}
-
-/*
- * ----------------------------------------------------
  * Generated stub function for CF_Init()
  * ----------------------------------------------------
  */
@@ -71,18 +60,6 @@ CFE_Status_t CF_Init(void)
     UT_GenStub_Execute(CF_Init, Basic, NULL);
 
     return UT_GenStub_GetReturnValue(CF_Init, CFE_Status_t);
-}
-
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_ProcessMsg()
- * ----------------------------------------------------
- */
-void CF_ProcessMsg(CFE_SB_Buffer_t *msg)
-{
-    UT_GenStub_AddParam(CF_ProcessMsg, CFE_SB_Buffer_t *, msg);
-
-    UT_GenStub_Execute(CF_ProcessMsg, Basic, NULL);
 }
 
 /*
@@ -113,15 +90,4 @@ CFE_Status_t CF_ValidateConfigTable(void *tbl_ptr)
     UT_GenStub_Execute(CF_ValidateConfigTable, Basic, NULL);
 
     return UT_GenStub_GetReturnValue(CF_ValidateConfigTable, CFE_Status_t);
-}
-
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_WakeUp()
- * ----------------------------------------------------
- */
-void CF_WakeUp(void)
-{
-
-    UT_GenStub_Execute(CF_WakeUp, Basic, NULL);
 }

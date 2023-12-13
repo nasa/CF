@@ -87,6 +87,32 @@ typedef struct CF_ChanAction_MsgArg
 } CF_ChanAction_MsgArg_t;
 
 /************************************************************************/
+/** @brief Send CF housekeeping packet
+ *
+ * @par Description
+ *      The command to send the CF housekeeping packet
+ *
+ * @par Assumptions, External Events, and Notes:
+ *      None
+ *
+ * @param msg   Pointer to command message
+ */
+CFE_Status_t CF_SendHkCmd(const CF_SendHkCmd_t *msg);
+
+/************************************************************************/
+/** @brief CF wakeup function
+ *
+ * @par Description
+ *       Performs a single engine cycle for each wakeup
+ *
+ * @par Assumptions, External Events, and Notes:
+ *       None
+ *
+ * @param msg   Pointer to command message
+ */
+CFE_Status_t CF_WakeupCmd(const CF_WakeupCmd_t *msg);
+
+/************************************************************************/
 /** @brief The no-operation command.
  *
  * @par Description
@@ -100,7 +126,7 @@ typedef struct CF_ChanAction_MsgArg
  *
  * @param msg   Pointer to command message
  */
-void CF_NoopCmd(const CF_NoopCmd_t *msg);
+CFE_Status_t CF_NoopCmd(const CF_NoopCmd_t *msg);
 
 /************************************************************************/
 /** @brief The reset counters command.
@@ -116,7 +142,7 @@ void CF_NoopCmd(const CF_NoopCmd_t *msg);
  *
  * @param msg   Pointer to command message
  */
-void CF_ResetCmd(const CF_ResetCmd_t *msg);
+CFE_Status_t CF_ResetCmd(const CF_ResetCmd_t *msg);
 
 /************************************************************************/
 /** @brief Ground command to start a file transfer.
@@ -131,7 +157,7 @@ void CF_ResetCmd(const CF_ResetCmd_t *msg);
  * @param msg   Pointer to command message
  *
  */
-void CF_TxFileCmd(const CF_TxFileCmd_t *msg);
+CFE_Status_t CF_TxFileCmd(const CF_TxFileCmd_t *msg);
 
 /************************************************************************/
 /** @brief Ground command to start directory playback.
@@ -145,7 +171,7 @@ void CF_TxFileCmd(const CF_TxFileCmd_t *msg);
  *
  * @param msg   Pointer to command message
  */
-void CF_PlaybackDirCmd(const CF_PlaybackDirCmd_t *msg);
+CFE_Status_t CF_PlaybackDirCmd(const CF_PlaybackDirCmd_t *msg);
 
 /************************************************************************/
 /** @brief Common logic for all channel-based commands.
@@ -191,7 +217,7 @@ CFE_Status_t CF_DoFreezeThaw(uint8 chan_num, const CF_ChanAction_BoolArg_t *cont
  *
  * @param msg   Pointer to command message
  */
-void CF_FreezeCmd(const CF_FreezeCmd_t *msg);
+CFE_Status_t CF_FreezeCmd(const CF_FreezeCmd_t *msg);
 
 /************************************************************************/
 /** @brief Thaw a channel.
@@ -201,7 +227,7 @@ void CF_FreezeCmd(const CF_FreezeCmd_t *msg);
  *
  * @param msg   Pointer to command message
  */
-void CF_ThawCmd(const CF_ThawCmd_t *msg);
+CFE_Status_t CF_ThawCmd(const CF_ThawCmd_t *msg);
 
 /************************************************************************/
 /** @brief Search for a transaction across all channels.
@@ -274,7 +300,7 @@ void CF_DoSuspRes(const CF_Transaction_Payload_t *payload, uint8 action);
  *
  * @param msg   Pointer to command message
  */
-void CF_SuspendCmd(const CF_SuspendCmd_t *msg);
+CFE_Status_t CF_SuspendCmd(const CF_SuspendCmd_t *msg);
 
 /************************************************************************/
 /** @brief Handle transaction resume command.
@@ -284,7 +310,7 @@ void CF_SuspendCmd(const CF_SuspendCmd_t *msg);
  *
  * @param msg   Pointer to command message
  */
-void CF_ResumeCmd(const CF_ResumeCmd_t *msg);
+CFE_Status_t CF_ResumeCmd(const CF_ResumeCmd_t *msg);
 
 /************************************************************************/
 /** @brief tsn chan action to cancel a transaction.
@@ -307,7 +333,7 @@ void CF_CmdCancel_Txn(CF_Transaction_t *txn, void *ignored);
  *
  * @param msg   Pointer to command message
  */
-void CF_CancelCmd(const CF_CancelCmd_t *msg);
+CFE_Status_t CF_CancelCmd(const CF_CancelCmd_t *msg);
 
 /************************************************************************/
 /** @brief tsn chan action to abandon a transaction.
@@ -330,7 +356,7 @@ void CF_CmdAbandon_Txn(CF_Transaction_t *txn, void *ignored);
  *
  * @param msg   Pointer to command message
  */
-void CF_AbandonCmd(const CF_AbandonCmd_t *msg);
+CFE_Status_t CF_AbandonCmd(const CF_AbandonCmd_t *msg);
 
 /************************************************************************/
 /** @brief Sets the dequeue enable/disable flag for a channel.
@@ -354,7 +380,7 @@ CFE_Status_t CF_DoEnableDisableDequeue(uint8 chan_num, const CF_ChanAction_BoolA
  *
  * @param msg   Pointer to command message
  */
-void CF_EnableDequeueCmd(const CF_EnableDequeueCmd_t *msg);
+CFE_Status_t CF_EnableDequeueCmd(const CF_EnableDequeueCmd_t *msg);
 
 /************************************************************************/
 /** @brief Handle a disable dequeue ground command.
@@ -364,7 +390,7 @@ void CF_EnableDequeueCmd(const CF_EnableDequeueCmd_t *msg);
  *
  * @param msg   Pointer to command message
  */
-void CF_DisableDequeueCmd(const CF_DisableDequeueCmd_t *msg);
+CFE_Status_t CF_DisableDequeueCmd(const CF_DisableDequeueCmd_t *msg);
 
 /************************************************************************/
 /** @brief Sets the enable/disable flag for the specified polling directory.
@@ -389,7 +415,7 @@ CFE_Status_t CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolM
  *
  * @param msg   Pointer to command message
  */
-void CF_EnablePolldirCmd(const CF_EnableDirPollingCmd_t *msg);
+CFE_Status_t CF_EnableDirPollingCmd(const CF_EnableDirPollingCmd_t *msg);
 
 /************************************************************************/
 /** @brief Disable a polling dir ground command.
@@ -399,7 +425,7 @@ void CF_EnablePolldirCmd(const CF_EnableDirPollingCmd_t *msg);
  *
  * @param msg   Pointer to command message
  */
-void CF_DisablePolldirCmd(const CF_DisableDirPollingCmd_t *msg);
+CFE_Status_t CF_DisableDirPollingCmd(const CF_DisableDirPollingCmd_t *msg);
 
 /************************************************************************/
 /** @brief Purge the history queue for the given channel.
@@ -458,7 +484,7 @@ CFE_Status_t CF_DoPurgeQueue(uint8 chan_num, void *arg);
  *
  * @param msg   Pointer to command message
  */
-void CF_PurgeQueueCmd(const CF_PurgeQueueCmd_t *msg);
+CFE_Status_t CF_PurgeQueueCmd(const CF_PurgeQueueCmd_t *msg);
 
 /************************************************************************/
 /** @brief Ground command to write a file with queue information.
@@ -468,7 +494,7 @@ void CF_PurgeQueueCmd(const CF_PurgeQueueCmd_t *msg);
  *
  * @param msg   Pointer to command message
  */
-void CF_WriteQueueCmd(const CF_WriteQueueCmd_t *msg);
+CFE_Status_t CF_WriteQueueCmd(const CF_WriteQueueCmd_t *msg);
 
 /************************************************************************/
 /** @brief Checks if the value is less than or equal to the max PDU size.
@@ -530,7 +556,7 @@ void CF_GetSetParamCmd(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
  *
  * @param msg   Pointer to command message
  */
-void CF_SetParamCmd(const CF_SetParamCmd_t *msg);
+CFE_Status_t CF_SetParamCmd(const CF_SetParamCmd_t *msg);
 
 /************************************************************************/
 /** @brief Ground command to set a configuration parameter.
@@ -540,7 +566,7 @@ void CF_SetParamCmd(const CF_SetParamCmd_t *msg);
  *
  * @param msg   Pointer to command message
  */
-void CF_GetParamCmd(const CF_GetParamCmd_t *msg);
+CFE_Status_t CF_GetParamCmd(const CF_GetParamCmd_t *msg);
 
 /************************************************************************/
 /** @brief Ground command enable engine.
@@ -550,7 +576,7 @@ void CF_GetParamCmd(const CF_GetParamCmd_t *msg);
  *
  * @param msg   Pointer to command message
  */
-void CF_EnableEngineCmd(const CF_EnableEngineCmd_t *msg);
+CFE_Status_t CF_EnableEngineCmd(const CF_EnableEngineCmd_t *msg);
 
 /************************************************************************/
 /** @brief Ground command disable engine.
@@ -560,16 +586,6 @@ void CF_EnableEngineCmd(const CF_EnableEngineCmd_t *msg);
  *
  * @param msg   Pointer to command message
  */
-void CF_DisableEngineCmd(const CF_DisableEngineCmd_t *msg);
-
-/************************************************************************/
-/** @brief Process any ground command contained in the given message.
- *
- * @par Assumptions, External Events, and Notes:
- *       msg must not be NULL.
- *
- * @param msg   Pointer to command message
- */
-void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg);
+CFE_Status_t CF_DisableEngineCmd(const CF_DisableEngineCmd_t *msg);
 
 #endif

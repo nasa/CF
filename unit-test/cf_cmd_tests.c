@@ -23,7 +23,6 @@
 #include "cf_events.h"
 #include "cf_test_alt_handler.h"
 
-
 /*******************************************************************************
 **
 **  cf_cmd_tests Setup and Teardown
@@ -242,7 +241,6 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_fault_ResetAllHkFaultCountSendEven
         CF_AppData.hk.Payload.channel_hk[i].counters.fault.nak_limit          = Any_uint16_Except(0);
         CF_AppData.hk.Payload.channel_hk[i].counters.fault.ack_limit          = Any_uint16_Except(0);
         CF_AppData.hk.Payload.channel_hk[i].counters.fault.inactivity_timer   = Any_uint16_Except(0);
-        CF_AppData.hk.Payload.channel_hk[i].counters.fault.spare              = Any_uint16_Except(0);
     }
 
     CF_AppData.hk.Payload.counters.cmd = initial_hk_cmd_counter;
@@ -267,7 +265,6 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_fault_ResetAllHkFaultCountSendEven
         UtAssert_ZERO(CF_AppData.hk.Payload.channel_hk[i].counters.fault.nak_limit);
         UtAssert_ZERO(CF_AppData.hk.Payload.channel_hk[i].counters.fault.ack_limit);
         UtAssert_ZERO(CF_AppData.hk.Payload.channel_hk[i].counters.fault.inactivity_timer);
-        UtAssert_ZERO(CF_AppData.hk.Payload.channel_hk[i].counters.fault.spare);
         UtAssert_MemCmpValue(&CF_AppData.hk.Payload.channel_hk[i].counters.fault, 0,
                              sizeof(&CF_AppData.hk.Payload.channel_hk[i].counters.fault),
                              "fault channel %d was completely cleared to 0", i);
@@ -391,7 +388,6 @@ void Test_CF_CmdReset_tests_WhenCommandByteIs_all_AndResetAllMemValuesSendEvent(
         CF_AppData.hk.Payload.channel_hk[i].counters.fault.nak_limit          = Any_uint16_Except(0);
         CF_AppData.hk.Payload.channel_hk[i].counters.fault.ack_limit          = Any_uint16_Except(0);
         CF_AppData.hk.Payload.channel_hk[i].counters.fault.inactivity_timer   = Any_uint16_Except(0);
-        CF_AppData.hk.Payload.channel_hk[i].counters.fault.spare              = Any_uint16_Except(0);
     }
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
@@ -1860,7 +1856,7 @@ void Test_CF_CmdEnablePolldir_SuccessWhenActionSuccess(void)
     CF_AppData.hk.Payload.counters.cmd = initial_hk_cmd_counter;
 
     /* Act */
-    CF_EnablePolldirCmd(&utbuf);
+    CF_EnableDirPollingCmd(&utbuf);
 
     /* Assert */
     /* Assert for CF_DoEnableDisablePolldir */
@@ -1894,7 +1890,7 @@ void Test_CF_CmdEnablePolldir_FailWhenActionFail(void)
     CF_AppData.hk.Payload.counters.err = initial_hk_err_counter;
 
     /* Act */
-    CF_EnablePolldirCmd(&utbuf);
+    CF_EnableDirPollingCmd(&utbuf);
 
     /* Assert */
     /* Assert for CF_DoEnableDisablePolldir */
@@ -1936,7 +1932,7 @@ void Test_CF_CmdDisablePolldir_SuccessWhenActionSuccess(void)
     CF_AppData.hk.Payload.counters.cmd = initial_hk_cmd_counter;
 
     /* Act */
-    CF_DisablePolldirCmd(&utbuf);
+    CF_DisableDirPollingCmd(&utbuf);
 
     /* Assert */
     /* Assert for CF_DoEnableDisablePolldir */
@@ -1971,7 +1967,7 @@ void Test_CF_CmdDisablePolldir_FailWhenActionFail(void)
     CF_AppData.hk.Payload.counters.err = initial_hk_err_counter;
 
     /* Act */
-    CF_DisablePolldirCmd(&utbuf);
+    CF_DisableDirPollingCmd(&utbuf);
 
     /* Assert */
     /* Assert for CF_DoEnableDisablePolldir */
@@ -3715,136 +3711,37 @@ void Test_CF_CmdDisableEngine_WhenEngineDisabledAndIncrementErrCounterThenFail(v
 
 /*******************************************************************************
 **
-**  CF_ProcessGroundCommand tests
+**  CF_SendHkCmd tests - full coverage
 **
 *******************************************************************************/
 
-void Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent(void)
+void Test_CF_SendHkCmd(void)
 {
-    /* Arrange */
-    CFE_SB_Buffer_t   utbuf;
-    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = CF_NUM_COMMANDS;
-
-    memset(&utbuf, 0, sizeof(utbuf));
-
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
-                     sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    /* CFE_MSG_GetSize does not matter for Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent
-     */
-
     /* Act */
-    CF_ProcessGroundCommand(&utbuf);
+    CF_SendHkCmd(NULL);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_CC_ERR_EID);
-    /* Assert for incremented counter */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 1);
+    UtAssert_STUB_COUNT(CFE_MSG_SetMsgTime, 1);
+    UtAssert_STUB_COUNT(CFE_SB_TransmitMsg, 1);
+    UtAssert_STUB_COUNT(CFE_TIME_GetTime, 1);
 }
 
-void Test_CF_ProcessGroundCommand_When_cmd_GreaterThan_CF_NUM_COMMANDS_FailAndSendEvent(void)
+/*******************************************************************************
+**
+**  CF_WakeupCmd tests
+**
+*******************************************************************************/
+
+void Test_CF_WakeupCmd(void)
 {
     /* Arrange */
-    CFE_SB_Buffer_t   utbuf;
-    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = CF_NUM_COMMANDS + 1;
-
-    memset(&utbuf, 0, sizeof(utbuf));
-
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
-                     sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    /* CFE_MSG_GetSize does not matter for Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent
-     */
+    /* No Arrange Required */
 
     /* Act */
-    CF_ProcessGroundCommand(&utbuf);
+    CF_WakeupCmd(NULL);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_CC_ERR_EID);
-    /* Assert for incremented counter */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 1);
-}
-
-void Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForThatCommandSendEventAndFailure(void)
-{
-    /* Arrange */
-    CFE_SB_Buffer_t   utbuf;
-    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = CF_NOOP_CC;
-    CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize    = sizeof(CF_NoopCmd_t) + 1; /* Invalid size */
-
-    memset(&utbuf, 0, sizeof(utbuf));
-
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
-                     sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &forced_return_CFE_MSG_GetSize, sizeof(forced_return_CFE_MSG_GetSize),
-                     false);
-
-    /* Act */
-    CF_ProcessGroundCommand(&utbuf);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_STUB_COUNT(CFE_MSG_GetSize, 1);
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_CMD_LEN_ERR_EID);
-    /* Assert for incremented counter */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 1);
-}
-
-void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_msg(void)
-{
-    /* Arrange */
-    CFE_SB_Buffer_t   utbuf;
-    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = CF_NOOP_CC;
-    CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize    = sizeof(CF_NoopCmd_t); /* Valid size */
-
-    memset(&utbuf, 0, sizeof(utbuf));
-
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
-                     sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &forced_return_CFE_MSG_GetSize, sizeof(forced_return_CFE_MSG_GetSize),
-                     false);
-
-    /* Act */
-    CF_ProcessGroundCommand(&utbuf);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_STUB_COUNT(CFE_MSG_GetSize, 1);
-    /* Assert for CF_CmdNoop */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_NOOP_INF_EID);
-    /* Assert for incremented counter */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, 1);
-}
-
-/* Hit a NULL entry to exercise that conditional and no action */
-void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_12_Is_NULL(void)
-{
-    /* Arrange */
-    CFE_SB_Buffer_t   utbuf;
-    CFE_MSG_FcnCode_t forced_return_CFE_MSG_GetFcnCode = 0x0C; /* 0x0C forces a null slot */
-    CFE_MSG_Size_t    forced_return_CFE_MSG_GetSize    = 0;
-
-    memset(&utbuf, 0, sizeof(utbuf));
-
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
-                     sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &forced_return_CFE_MSG_GetSize, sizeof(forced_return_CFE_MSG_GetSize),
-                     false);
-
-    /* Act */
-    CF_ProcessGroundCommand(&utbuf);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_STUB_COUNT(CFE_MSG_GetSize, 1);
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-    /* Assert for incremented counter */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, 0);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 0);
+    UtAssert_STUB_COUNT(CF_CFDP_CycleEngine, 1);
 }
 
 /*******************************************************************************
@@ -4237,22 +4134,14 @@ void add_CF_CmdDisableEngine_tests(void)
                cf_cmd_tests_Teardown, "Test_CF_CmdDisableEngine_WhenEngineDisabledAndIncrementErrCounterThenFail");
 }
 
-void add_CF_ProcessGroundCommand_tests(void)
+void add_CF_SendHkCmd_tests(void)
 {
-    UtTest_Add(Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent");
-    UtTest_Add(Test_CF_ProcessGroundCommand_When_cmd_GreaterThan_CF_NUM_COMMANDS_FailAndSendEvent, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown,
-               "Test_CF_ProcessGroundCommand_When_cmd_GreaterThan_CF_NUM_COMMANDS_FailAndSendEvent");
-    UtTest_Add(
-        Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForThatCommandSendEventAndFailure,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-        "Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForThatCommandSendEventAndFailure");
-    UtTest_Add(Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_msg, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_CmdNoop_With_msg");
-    UtTest_Add(Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_12_Is_NULL, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown,
-               "Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_12_Is_NULL");
+    UtTest_Add(Test_CF_SendHkCmd, cf_cmd_tests_Setup, cf_cmd_tests_Teardown, "Test_CF_SendHkCmd");
+}
+
+void add_CF_WakeupCmd_tests(void)
+{
+    UtTest_Add(Test_CF_WakeupCmd, cf_cmd_tests_Setup, cf_cmd_tests_Teardown, "Test_CF_WakeupCmd");
 }
 
 /*******************************************************************************
@@ -4337,5 +4226,7 @@ void UtTest_Setup(void)
 
     add_CF_CmdDisableEngine_tests();
 
-    add_CF_ProcessGroundCommand_tests();
+    add_CF_SendHkCmd_tests();
+
+    add_CF_WakeupCmd_tests();
 }

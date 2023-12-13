@@ -400,9 +400,9 @@ typedef enum
      *  \par Criticality
      *       None
      *
-     *  \sa #CF_GET_MIB_PARAM_CC
+     *  \sa #CF_GET_PARAM_CC
      */
-    CF_SET_MIB_PARAM_CC = 10,
+    CF_SET_PARAM_CC = 10,
 
     /**
      * \brief Get parameter
@@ -431,9 +431,9 @@ typedef enum
      *  \par Criticality
      *       None
      *
-     *  \sa #CF_SET_MIB_PARAM_CC
+     *  \sa #CF_SET_PARAM_CC
      */
-    CF_GET_MIB_PARAM_CC = 11,
+    CF_GET_PARAM_CC = 11,
 
     /**
      * \brief Write queue

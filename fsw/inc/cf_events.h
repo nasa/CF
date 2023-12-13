@@ -132,7 +132,7 @@
  *
  *  Invalid message ID received on the software bus pipe
  */
-#define CF_EID_ERR_INIT_CMD_LENGTH (28)
+#define CF_EID_ERR_INVALID_MID (28)
 
 /**
  * \brief CF SB Receive Buffer Failed Event ID
@@ -372,7 +372,7 @@
  *
  *  Can be induced via various off-nominal conditions - such as sending a META-data PDU
  *  with an invalid file destination.
- *  
+ *
  */
 #define CF_EID_DBG_RESET_FREED_XACT (59)
 
