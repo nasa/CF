@@ -46,8 +46,8 @@ CF_AppData_t CF_AppData;
  *-----------------------------------------------------------------*/
 void CF_HkCmd(void)
 {
-    CFE_MSG_SetMsgTime(&CF_AppData.hk.TelemetryHeader.Msg, CFE_TIME_GetTime());
-    /* return value ignored */ CFE_SB_TransmitMsg(&CF_AppData.hk.TelemetryHeader.Msg, true);
+    CFE_MSG_SetMsgTime(CFE_MSG_PTR(CF_AppData.hk.TelemetryHeader), CFE_TIME_GetTime());
+    /* return value ignored */ CFE_SB_TransmitMsg(CFE_MSG_PTR(CF_AppData.hk.TelemetryHeader), true);
 }
 
 /*----------------------------------------------------------------
@@ -205,7 +205,7 @@ CFE_Status_t CF_Init(void)
 
     CF_AppData.run_status = CFE_ES_RunStatus_APP_RUN;
 
-    CFE_MSG_Init(&CF_AppData.hk.TelemetryHeader.Msg, CFE_SB_ValueToMsgId(CF_HK_TLM_MID), sizeof(CF_AppData.hk));
+    CFE_MSG_Init(CFE_MSG_PTR(CF_AppData.hk.TelemetryHeader), CFE_SB_ValueToMsgId(CF_HK_TLM_MID), sizeof(CF_AppData.hk));
 
     status = CFE_EVS_Register(NULL, 0, CFE_EVS_EventFilter_BINARY);
     if (status != CFE_SUCCESS)
