@@ -23,6 +23,7 @@ set(CF_MISSION_CONFIG_FILE_LIST
   cf_tbldefs.h
   cf_tbl.h
   cf_tblstruct.h
+  cf_topicids.h
 )
 
 if (CFE_EDS_ENABLED_BUILD)
