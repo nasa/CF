@@ -27,10 +27,10 @@
 **
 *******************************************************************************/
 
-int UT_CListFn(CF_CListNode_t *node, void *context)
+CF_CListTraverse_Status_t UT_CListFn(CF_CListNode_t *node, void *context)
 {
-    int  status = CF_CLIST_CONT;
-    int *param  = context;
+    CF_CListTraverse_Status_t status = CF_CLIST_CONT;
+    int *                     param  = context;
 
     /* Passing in a negative value will exit when zero is hit */
     (*param)++;
@@ -42,7 +42,7 @@ int UT_CListFn(CF_CListNode_t *node, void *context)
     return status;
 }
 
-int UT_CListFn_Rm(CF_CListNode_t *node, void *context)
+CF_CListTraverse_Status_t UT_CListFn_Rm(CF_CListNode_t *node, void *context)
 {
     (*((int *)context))--;
     node->next = node;

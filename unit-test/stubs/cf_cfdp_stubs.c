@@ -74,16 +74,16 @@ void CF_CFDP_CancelTransaction(CF_Transaction_t *txn)
  * Generated stub function for CF_CFDP_CloseFiles()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_CFDP_CloseFiles(CF_CListNode_t *node, void *context)
+CF_CListTraverse_Status_t CF_CFDP_CloseFiles(CF_CListNode_t *node, void *context)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_CloseFiles, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_CloseFiles, CF_CListTraverse_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_CloseFiles, CF_CListNode_t *, node);
     UT_GenStub_AddParam(CF_CFDP_CloseFiles, void *, context);
 
     UT_GenStub_Execute(CF_CFDP_CloseFiles, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_CloseFiles, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_CFDP_CloseFiles, CF_CListTraverse_Status_t);
 }
 
 /*
@@ -156,16 +156,16 @@ void CF_CFDP_CycleTx(CF_Channel_t *chan)
  * Generated stub function for CF_CFDP_CycleTxFirstActive()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context)
+CF_CListTraverse_Status_t CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_CycleTxFirstActive, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_CycleTxFirstActive, CF_CListTraverse_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_CycleTxFirstActive, CF_CListNode_t *, node);
     UT_GenStub_AddParam(CF_CFDP_CycleTxFirstActive, void *, context);
 
     UT_GenStub_Execute(CF_CFDP_CycleTxFirstActive, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_CycleTxFirstActive, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_CFDP_CycleTxFirstActive, CF_CListTraverse_Status_t);
 }
 
 /*
@@ -214,16 +214,16 @@ void CF_CFDP_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
  * Generated stub function for CF_CFDP_DoTick()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context)
+CF_CListTraverse_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_DoTick, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_DoTick, CF_CListTraverse_Status_t);
 
     UT_GenStub_AddParam(CF_CFDP_DoTick, CF_CListNode_t *, node);
     UT_GenStub_AddParam(CF_CFDP_DoTick, void *, context);
 
     UT_GenStub_Execute(CF_CFDP_DoTick, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_DoTick, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_CFDP_DoTick, CF_CListTraverse_Status_t);
 }
 
 /*

@@ -844,9 +844,9 @@ void Test_CF_TraverseAllTransactions_Impl_GetContainer_t_Call_args_fn_AndAdd_1_T
     CF_CListNode_t *      arg_n = &txn.cl_node;
     CF_TraverseAll_Arg_t  args;
     CF_TraverseAll_Arg_t *arg_args;
-    int                   context_val;
+    int32                 context_val;
     void *                context              = &context_val;
-    int                   initial_args_counter = Any_int();
+    int32                 initial_args_counter = 57;
     CF_Transaction_t *    expected_t;
     void *                expected_context;
     int32                 result;
@@ -872,9 +872,7 @@ void Test_CF_TraverseAllTransactions_Impl_GetContainer_t_Call_args_fn_AndAdd_1_T
     /* Assert */
     UtAssert_ADDRESS_EQ(func_ptr_context.txn, expected_t);
     UtAssert_ADDRESS_EQ(func_ptr_context.context, expected_context);
-    UtAssert_True(arg_args->counter == initial_args_counter + 1,
-                  "CF_TraverseAllTransactions_Impl set args->counter to %d which is 1 more than initial value %d",
-                  arg_args->counter, initial_args_counter);
+    UtAssert_UINT32_EQ(arg_args->counter, initial_args_counter + 1);
     UtAssert_INT32_EQ(result, CF_CLIST_CONT);
 }
 

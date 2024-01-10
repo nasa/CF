@@ -1057,13 +1057,13 @@ void Test_CF_CFDP_CycleTxFirstActive(void)
     /* suspended, should return 0 */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
     txn->flags.com.suspended = 1;
-    UtAssert_INT32_EQ(CF_CFDP_CycleTxFirstActive(&txn->cl_node, &args), 0);
+    UtAssert_INT32_EQ(CF_CFDP_CycleTxFirstActive(&txn->cl_node, &args), CF_CListTraverse_Status_CONTINUE);
 
     /* nominal, with chan->cur set non-null, should skip loop and return 1 */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &args.chan, NULL, &txn, NULL);
     txn->flags.com.q_index = CF_QueueIdx_TXA; /* must be this */
     args.chan->cur         = txn;
-    UtAssert_INT32_EQ(CF_CFDP_CycleTxFirstActive(&txn->cl_node, &args), 1);
+    UtAssert_INT32_EQ(CF_CFDP_CycleTxFirstActive(&txn->cl_node, &args), CF_CListTraverse_Status_EXIT);
     UtAssert_BOOL_TRUE(args.ran_one);
 
     /* nominal, with chan->cur set null, should do loop and return 1 */
@@ -1074,7 +1074,7 @@ void Test_CF_CFDP_CycleTxFirstActive(void)
     txn->flags.com.q_index = CF_QueueIdx_TXA; /* must be this */
     args.chan->cur         = NULL;
     UT_SetHookFunction(UT_KEY(CF_CFDP_TxStateDispatch), Ut_Hook_StateHandler_SetQIndex, NULL);
-    UtAssert_INT32_EQ(CF_CFDP_CycleTxFirstActive(&txn->cl_node, &args), 1);
+    UtAssert_INT32_EQ(CF_CFDP_CycleTxFirstActive(&txn->cl_node, &args), CF_CListTraverse_Status_EXIT);
 }
 
 static void DoTickFnClearCont(CF_Transaction_t *txn, int *cont)

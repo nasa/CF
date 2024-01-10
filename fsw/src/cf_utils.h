@@ -96,7 +96,7 @@ typedef struct CF_TraverseAll_Arg
 {
     CF_TraverseAllTransactions_fn_t fn;      /**< \brief internal callback to use for each CList_Traverse */
     void *                          context; /**< \brief opaque object to pass to internal callback */
-    int                             counter; /**< \brief Running tally of all nodes traversed from all lists */
+    int32                           counter; /**< \brief Running tally of all nodes traversed from all lists */
 } CF_TraverseAll_Arg_t;
 
 /**
@@ -312,7 +312,7 @@ void CF_InsertSortPrio(CF_Transaction_t *txn, CF_QueueIdx_t queue);
  *
  * @returns Number of transactions traversed
  */
-CFE_Status_t CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransactions_fn_t fn, void *context);
+int32 CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransactions_fn_t fn, void *context);
 
 /************************************************************************/
 /** @brief Traverses all transactions on all channels and performs an operation on them.
@@ -325,7 +325,7 @@ CFE_Status_t CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransa
  *
  * @returns Number of transactions traversed
  */
-CFE_Status_t CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context);
+int32 CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context);
 
 /************************************************************************/
 /** @brief List traversal function performs operation on every active transaction.
@@ -337,12 +337,12 @@ CFE_Status_t CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_
  * @par Assumptions, External Events, and Notes:
  *       node must not be NULL. args must not be NULL.
  *
- * @param node    Node being currently traversed
- * @param args Intermediate context object from initial call
+ * @param node  Node being currently traversed
+ * @param arg   Intermediate context object from initial call
  *
  * @retval 0 for do not exit early (always continue)
  */
-CFE_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *node, CF_TraverseAll_Arg_t *args);
+CF_CListTraverse_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *node, void *arg);
 
 /************************************************************************/
 /** @brief Writes a human readable representation of a history queue entry to a file
@@ -362,7 +362,7 @@ CFE_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *node, CF_TraverseAl
  * @retval CF_CLIST_CONT if everything is going well
  * @retval CF_CLIST_EXIT if a write error occurred, which means traversal should stop
  */
-CFE_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *node, void *arg);
+CF_CListTraverse_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *node, void *arg);
 
 /************************************************************************/
 /** @brief Writes a human readable representation of a transaction history entry to a file
@@ -379,7 +379,7 @@ CFE_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *node, void
  * @retval CF_CLIST_CONT if everything is going well
  * @retval CF_CLIST_EXIT if a write error occurred, which means traversal should stop
  */
-CFE_Status_t CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *node, void *arg);
+CF_CListTraverse_Status_t CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *node, void *arg);
 
 /************************************************************************/
 /** @brief Searches for the first transaction with a lower priority than given.
@@ -394,7 +394,7 @@ CFE_Status_t CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *node, void *ar
  * @retval CF_CLIST_CONT when it isn't found, which causes list traversal to continue
  *
  */
-CFE_Status_t CF_PrioSearch(CF_CListNode_t *node, void *context);
+CF_CListTraverse_Status_t CF_PrioSearch(CF_CListNode_t *node, void *context);
 
 /************************************************************************/
 /** @brief Wrap the filesystem open call with a perf counter.

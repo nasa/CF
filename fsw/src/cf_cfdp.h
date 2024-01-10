@@ -602,7 +602,7 @@ void CF_CFDP_RecvIdle(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
  * @returns integer traversal code
  * @retval Always CF_LIST_CONT indicate list traversal should not exit early.
  */
-CFE_Status_t CF_CFDP_CloseFiles(CF_CListNode_t *node, void *context);
+CF_CListTraverse_Status_t CF_CFDP_CloseFiles(CF_CListNode_t *node, void *context);
 
 /************************************************************************/
 /** @brief Cycle the current active tx or make a new one active.
@@ -640,7 +640,7 @@ void CF_CFDP_CycleTx(CF_Channel_t *chan);
  * @retval CF_CLIST_EXIT when it's found, which terminates list traversal
  * @retval CF_CLIST_CONT when it's isn't found, which causes list traversal to continue
  */
-CFE_Status_t CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context);
+CF_CListTraverse_Status_t CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context);
 
 /************************************************************************/
 /** @brief Call R and then S tick functions for all active transactions.
@@ -701,6 +701,6 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *chan);
  * @retval CF_CLIST_EXIT when it's found, which terminates list traversal
  * @retval CF_CLIST_CONT when it's isn't found, which causes list traversal to continue
  */
-CFE_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context);
+CF_CListTraverse_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context);
 
 #endif /* !CF_CFDP_H */

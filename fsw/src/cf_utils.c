@@ -216,7 +216,7 @@ CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *histor
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *node, void *arg)
+CF_CListTraverse_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *node, void *arg)
 {
     CF_Traverse_WriteHistoryFileArg_t *context = arg;
     CF_History_t *                     history = container_of(node, CF_History_t, cl_node);
@@ -243,7 +243,7 @@ CFE_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *node, void
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *node, void *arg)
+CF_CListTraverse_Status_t CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *node, void *arg)
 {
     CF_Traverse_WriteTxnFileArg_t *context = arg;
     CF_Transaction_t *             txn     = container_of(node, CF_Transaction_t, cl_node);
@@ -302,7 +302,7 @@ CFE_Status_t CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *chan, CF
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_PrioSearch(CF_CListNode_t *node, void *context)
+CF_CListTraverse_Status_t CF_PrioSearch(CF_CListNode_t *node, void *context)
 {
     CF_Transaction_t *         txn = container_of(node, CF_Transaction_t, cl_node);
     CF_Traverse_PriorityArg_t *arg = (CF_Traverse_PriorityArg_t *)context;
@@ -369,11 +369,12 @@ void CF_InsertSortPrio(CF_Transaction_t *txn, CF_QueueIdx_t queue)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *node, CF_TraverseAll_Arg_t *args)
+CF_CListTraverse_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *node, void *arg)
 {
-    CF_Transaction_t *txn = container_of(node, CF_Transaction_t, cl_node);
-    args->fn(txn, args->context);
-    ++args->counter;
+    CF_TraverseAll_Arg_t *traverse_all = arg;
+    CF_Transaction_t *    txn          = container_of(node, CF_Transaction_t, cl_node);
+    traverse_all->fn(txn, traverse_all->context);
+    ++traverse_all->counter;
     return CF_CLIST_CONT;
 }
 
@@ -383,12 +384,12 @@ CFE_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *node, CF_TraverseAl
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransactions_fn_t fn, void *context)
+int32 CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransactions_fn_t fn, void *context)
 {
     CF_TraverseAll_Arg_t args = {fn, context, 0};
     CF_QueueIdx_t        queueidx;
     for (queueidx = CF_QueueIdx_PEND; queueidx <= CF_QueueIdx_RX; ++queueidx)
-        CF_CList_Traverse(chan->qs[queueidx], (CF_CListFn_t)CF_TraverseAllTransactions_Impl, &args);
+        CF_CList_Traverse(chan->qs[queueidx], CF_TraverseAllTransactions_Impl, &args);
 
     return args.counter;
 }
@@ -399,10 +400,10 @@ CFE_Status_t CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransa
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context)
+int32 CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context)
 {
-    int          i;
-    CFE_Status_t ret = 0;
+    int   i;
+    int32 ret = 0;
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
         ret += CF_TraverseAllTransactions(CF_AppData.engine.channels + i, fn, context);
     return ret;

@@ -27,9 +27,24 @@
 #define CF_CLIST_H
 
 #include <stddef.h>
+#include <stdbool.h>
 
-#define CF_CLIST_CONT (0) /**< \brief Constant indicating to continue traversal */
-#define CF_CLIST_EXIT (1) /**< \brief Constant indicating to stop traversal */
+typedef enum
+{
+    CF_CListTraverse_Status_CONTINUE = 0,
+    CF_CListTraverse_Status_EXIT     = 1
+} CF_CListTraverse_Status_t;
+
+#define CF_CLIST_CONT CF_CListTraverse_Status_CONTINUE /**< \brief Constant indicating to continue traversal */
+#define CF_CLIST_EXIT CF_CListTraverse_Status_EXIT     /**< \brief Constant indicating to stop traversal */
+
+/**
+ * Checks if the list traversal should continue
+ */
+static inline bool CF_CListTraverse_Status_IS_CONTINUE(CF_CListTraverse_Status_t stat)
+{
+    return (stat == CF_CListTraverse_Status_CONTINUE);
+}
 
 /**
  * @brief Node link structure
@@ -63,7 +78,7 @@ typedef struct CF_CListNode CF_CListNode_t;
  * @retval  #CF_CLIST_CONT Indicates to continue traversing the list
  * @retval  #CF_CLIST_EXIT Indicates to stop traversing the list
  */
-typedef int (*CF_CListFn_t)(CF_CListNode_t *node, void *context);
+typedef CF_CListTraverse_Status_t (*CF_CListFn_t)(CF_CListNode_t *node, void *context);
 
 /************************************************************************/
 /** @brief Initialize a clist node.
