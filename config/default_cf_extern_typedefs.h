@@ -26,7 +26,8 @@
 #ifndef CF_EXTERN_TYPEDEFS_H
 #define CF_EXTERN_TYPEDEFS_H
 
-#include "cf_platform_cfg.h"
+/* constants such as CF_FILENAME_MAX_LEN are in mission_cfg.h */
+#include "cf_mission_cfg.h"
 
 /**
  * @brief Values for CFDP file transfer class
@@ -69,5 +70,47 @@ typedef struct CF_TxnFilenames
     char src_filename[CF_FILENAME_MAX_LEN];
     char dst_filename[CF_FILENAME_MAX_LEN];
 } CF_TxnFilenames_t;
+
+/**
+ * @brief Entity id size
+ *
+ * @par Description:
+ *      The maximum size of the entity id as expected for all CFDP packets.
+ *      CF supports the spec's variable size of EID, where the actual size is
+ *      selected at runtime, and therefore the size in CFDP PDUs may be smaller
+ *      than the size specified here.  This type only establishes the maximum
+ *      size (and therefore maximum value) that an EID may be.
+ *
+ * @note This type is used in several CF commands, and so changing the size
+ *       of this type will affect the following structs:
+ *        CF_ConfigTable_t, configuration table - will change size of file
+ *        CF_ConfigPacket_t, set config params command
+ *        CF_TxFileCmd_t, transmit file command
+ *        CF_PlaybackDirCmd_t, equivalent to above
+ *        CF_Transaction_Payload_t, any command that selects a transaction based on EID
+ *
+ * @par Limits
+ *         Must be one of uint8, uint16, uint32, uint64.
+ */
+typedef uint32 CF_EntityId_t;
+
+/**
+ * @brief transaction sequence number size
+ *
+ * @par Description:
+ *      The max size of the transaction sequence number as expected for all CFDP packets.
+ *      CF supports the spec's variable size of TSN, where the actual size is
+ *      selected at runtime, and therefore the size in CFDP PDUs may be smaller
+ *      than the size specified here.  This type only establishes the maximum
+ *      size (and therefore maximum value) that a TSN may be.
+ *
+ * @note This type is used in several CF commands, and so changing the size
+ *       of this type will affect the following structure:
+ *        CF_Transaction_Payload_t, any command that selects a transaction based on TSN
+ *
+ * @par Limits
+ *         Must be one of uint8, uint16, uint32, uint64.
+ */
+typedef uint32 CF_TransactionSeq_t;
 
 #endif /* CF_EXTERN_TYPEDEFS_H */

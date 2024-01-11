@@ -39,4 +39,34 @@
 #include "cf_mission_cfg.h"
 #include "cf_internal_cfg.h"
 
+/**
+ *  @brief Total number of chunks (tx, rx, all channels)
+ *
+ *  @par Description:
+ *       Must be equal to the sum of all values input in CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION
+ *       and CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION.
+ *
+ *  @par Limits:
+ *
+ */
+/* CF_TOTAL_CHUNKS must be equal to the total number of chunks per rx/tx transactions per channel */
+/* (in other words, the summation of all elements in CF_CHANNEL_NUM_R/TX_CHUNKS_PER_TRANSACTION */
+#define CF_TOTAL_CHUNKS (CF_NAK_MAX_SEGMENTS * 4)
+
+/**
+ * \brief Mission specific version number
+ *
+ *  \par Description:
+ *       An application version number consists of four parts:
+ *       major version number, minor version number, revision
+ *       number and mission specific revision number. The mission
+ *       specific revision number is defined here such
+ *       that missions can manage as a configuration definition
+ *
+ *  \par Limits:
+ *       Must be defined as a numeric value that is greater than
+ *       or equal to zero.
+ */
+#define CF_MISSION_REV 0
+
 #endif

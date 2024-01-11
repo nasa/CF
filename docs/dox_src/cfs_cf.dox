@@ -960,7 +960,7 @@ CF_UnionArgs_Payload_t;
   <H2> Set MIB Parameter Command </H2>
 
   The CF Set MIB Parameter command is sent to CF using message ID #CF_CMD_MID
-  with command code #CF_SET_MIB_PARAM_CC. This command is used to change the
+  with command code #CF_SET_PARAM_CC. This command is used to change the
   flight engine Message Information Base (MIB). The MIB is a term used in the
   CCSDS blue book that can be interpreted as the engine configuration
   parameters. The command has two command parameters, Param indicates which
@@ -1001,7 +1001,7 @@ CF_UnionArgs_Payload_t;
   <H2> Get MIB Parameter Command </H2>
 
   The CF Set MIB Parameter command is sent to CF using message ID #CF_CMD_MID
-  with command code #CF_GET_MIB_PARAM_CC. This command is used to view a single
+  with command code #CF_GET_PARAM_CC. This command is used to view a single
   Message Information Base (MIB) parameter. The MIB is a term used in the CCSDS
   blue book that can be interpreted as the engine configuration parameters.
 

@@ -56,6 +56,7 @@ add_cfe_coverage_stubs(cf_internal
   stubs/cf_codec_handlers.c
   stubs/cf_codec_stubs.c
   stubs/cf_crc_stubs.c
+  stubs/cf_dispatch_stubs.c
   stubs/cf_timer_stubs.c
   stubs/cf_utils_handlers.c
   stubs/cf_utils_stubs.c

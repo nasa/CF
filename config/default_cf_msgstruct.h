@@ -187,7 +187,7 @@ typedef struct CF_PurgeQueueCmd
 /**
  * \brief Get parameter command structure
  *
- * For command details see #CF_GET_MIB_PARAM_CC
+ * For command details see #CF_GET_PARAM_CC
  */
 typedef struct CF_GetParamCmd
 {
@@ -198,7 +198,7 @@ typedef struct CF_GetParamCmd
 /**
  * \brief Set parameter command structure
  *
- * For command details see #CF_SET_MIB_PARAM_CC
+ * For command details see #CF_SET_PARAM_CC
  */
 typedef struct CF_SetParamCmd
 {
@@ -282,6 +282,26 @@ typedef struct CF_AbandonCmd
     CFE_MSG_CommandHeader_t  CommandHeader; /**< \brief Command header */
     CF_Transaction_Payload_t Payload;
 } CF_AbandonCmd_t;
+
+/**
+ * \brief Send Housekeeping Command
+ *
+ * Internal notification from SCH with no payload
+ */
+typedef struct CF_SendHkCmd
+{
+    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
+} CF_SendHkCmd_t;
+
+/**
+ * \brief Wake Up Command
+ *
+ * Internal notification from SCH with no payload
+ */
+typedef struct CF_WakeupCmd
+{
+    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
+} CF_WakeupCmd_t;
 
 /**\}*/
 

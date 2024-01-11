@@ -32,23 +32,12 @@
 #include "cf_perfids.h"
 #include "cf_cfdp.h"
 #include "cf_version.h"
-#include "cf_cmd.h"
+#include "cf_dispatch.h"
+#include "cf_tbl.h"
 
 #include <string.h>
 
 CF_AppData_t CF_AppData;
-
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_app.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-void CF_HkCmd(void)
-{
-    CFE_MSG_SetMsgTime(CFE_MSG_PTR(CF_AppData.hk.TelemetryHeader), CFE_TIME_GetTime());
-    /* return value ignored */ CFE_SB_TransmitMsg(CFE_MSG_PTR(CF_AppData.hk.TelemetryHeader), true);
-}
 
 /*----------------------------------------------------------------
  *
@@ -199,9 +188,9 @@ CFE_Status_t CF_TableInit(void)
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_Init(void)
 {
-    CFE_Status_t                     status;
-    static const CFE_SB_MsgId_Atom_t MID_VALUES[] = {CF_CMD_MID, CF_SEND_HK_MID, CF_WAKE_UP_MID};
-    uint32                           i;
+    CFE_Status_t              status;
+    const CFE_SB_MsgId_Atom_t MID_VALUES[] = {CF_CMD_MID, CF_SEND_HK_MID, CF_WAKE_UP_MID};
+    uint32                    i;
 
     CF_AppData.run_status = CFE_ES_RunStatus_APP_RUN;
 
@@ -262,54 +251,6 @@ CFE_Status_t CF_Init(void)
 
 /*----------------------------------------------------------------
  *
- * Application-scope internal function
- * See description in cf_app.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-void CF_WakeUp(void)
-{
-    CFE_ES_PerfLogEntry(CF_PERF_ID_CYCLE_ENG);
-    CF_CFDP_CycleEngine();
-    CFE_ES_PerfLogExit(CF_PERF_ID_CYCLE_ENG);
-}
-
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_app.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-void CF_ProcessMsg(CFE_SB_Buffer_t *msg)
-{
-    CFE_SB_MsgId_t msg_id = CFE_SB_INVALID_MSG_ID;
-
-    CFE_MSG_GetMsgId(&msg->Msg, &msg_id);
-
-    switch (CFE_SB_MsgIdToValue(msg_id))
-    {
-        case CF_CMD_MID:
-            CF_ProcessGroundCommand(msg);
-            break;
-
-        case CF_WAKE_UP_MID:
-            CF_WakeUp();
-            break;
-
-        case CF_SEND_HK_MID:
-            CF_HkCmd();
-            CF_CheckTables();
-            break;
-
-        default:
-            ++CF_AppData.hk.Payload.counters.err;
-            CFE_EVS_SendEvent(CF_EID_ERR_INIT_CMD_LENGTH, CFE_EVS_EventType_ERROR,
-                              "CF: invalid command packet id=0x%lx", (unsigned long)CFE_SB_MsgIdToValue(msg_id));
-            break;
-    }
-}
-
-/*----------------------------------------------------------------
- *
  * Entry point function
  * See description in cf_app.h for argument/return detail
  *
@@ -342,7 +283,7 @@ void CF_AppMain(void)
          */
         if (status == CFE_SUCCESS && msg != NULL)
         {
-            CF_ProcessMsg(msg);
+            CF_AppPipe(msg);
         }
         else if (status != CFE_SB_TIME_OUT && status != CFE_SB_NO_MESSAGE)
         {

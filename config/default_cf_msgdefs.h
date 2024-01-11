@@ -212,7 +212,7 @@ typedef enum
 /**
  * \brief Get parameter command structure
  *
- * For command details see #CF_GET_MIB_PARAM_CC
+ * For command details see #CF_GET_PARAM_CC
  */
 typedef struct CF_GetParam_Payload
 {
@@ -223,7 +223,7 @@ typedef struct CF_GetParam_Payload
 /**
  * \brief Set parameter command structure
  *
- * For command details see #CF_SET_MIB_PARAM_CC
+ * For command details see #CF_SET_PARAM_CC
  */
 typedef struct CF_SetParam_Payload
 {

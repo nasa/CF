@@ -14,6 +14,7 @@ set(APP_SRC_FILES
   fsw/src/cf_codec.c
   fsw/src/cf_cmd.c
   fsw/src/cf_crc.c
+  fsw/src/cf_dispatch.c
   fsw/src/cf_timer.c
   fsw/src/cf_utils.c
 )

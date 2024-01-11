@@ -20,26 +20,32 @@
 /**
  * @file
  *
- * CFS CFDP (CF) Application Mission Configuration Header File
- *
- * This is a compatibility header for the "mission_cfg.h" file that has
- * traditionally provided public config definitions for each CFS app.
- *
- * @note This file may be overridden/superceded by mission-provided defintions
- * either by overriding this header or by generating definitions from a command/data
- * dictionary tool.
+ * Auto-Generated stub implementations for functions defined in cf_dispatch header
  */
-#ifndef CF_MISSION_CFG_H
-#define CF_MISSION_CFG_H
 
-#include "cf_interface_cfg.h"
+#include "cf_dispatch.h"
+#include "utgenstub.h"
 
-/**
- *  @brief Maximum file path (not including file name)
- *
- *  @par Limits:
- *
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_AppPipe()
+ * ----------------------------------------------------
  */
-#define CF_FILENAME_MAX_PATH (CFE_MISSION_MAX_PATH_LEN - CFE_MISSION_MAX_FILE_LEN)
+void CF_AppPipe(const CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_AppPipe, const CFE_SB_Buffer_t *, msg);
 
-#endif
+    UT_GenStub_Execute(CF_AppPipe, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_ProcessGroundCommand()
+ * ----------------------------------------------------
+ */
+void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *msg)
+{
+    UT_GenStub_AddParam(CF_ProcessGroundCommand, const CFE_SB_Buffer_t *, msg);
+
+    UT_GenStub_Execute(CF_ProcessGroundCommand, Basic, NULL);
+}
