@@ -83,16 +83,16 @@ void CF_CmdCancel_Txn(CF_Transaction_t *txn, void *ignored)
  * Generated stub function for CF_CmdValidateChunkSize()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_CmdValidateChunkSize(uint32 val, uint8 chan_num)
+CF_ChanAction_Status_t CF_CmdValidateChunkSize(uint32 val, uint8 chan_num)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CmdValidateChunkSize, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_CmdValidateChunkSize, CF_ChanAction_Status_t);
 
     UT_GenStub_AddParam(CF_CmdValidateChunkSize, uint32, val);
     UT_GenStub_AddParam(CF_CmdValidateChunkSize, uint8, chan_num);
 
     UT_GenStub_Execute(CF_CmdValidateChunkSize, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CmdValidateChunkSize, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_CmdValidateChunkSize, CF_ChanAction_Status_t);
 }
 
 /*
@@ -100,16 +100,16 @@ CFE_Status_t CF_CmdValidateChunkSize(uint32 val, uint8 chan_num)
  * Generated stub function for CF_CmdValidateMaxOutgoing()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
+CF_ChanAction_Status_t CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CmdValidateMaxOutgoing, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_CmdValidateMaxOutgoing, CF_ChanAction_Status_t);
 
     UT_GenStub_AddParam(CF_CmdValidateMaxOutgoing, uint32, val);
     UT_GenStub_AddParam(CF_CmdValidateMaxOutgoing, uint8, chan_num);
 
     UT_GenStub_Execute(CF_CmdValidateMaxOutgoing, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CmdValidateMaxOutgoing, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_CmdValidateMaxOutgoing, CF_ChanAction_Status_t);
 }
 
 /*
@@ -153,10 +153,10 @@ void CF_DisablePolldirCmd(const CF_DisableDirPollingCmd_t *msg)
  * Generated stub function for CF_DoChanAction()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const char *errstr, CF_ChanActionFn_t fn,
-                             void *context)
+CF_ChanAction_Status_t CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const char *errstr, CF_ChanActionFn_t fn,
+                                       void *context)
 {
-    UT_GenStub_SetupReturnBuffer(CF_DoChanAction, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_DoChanAction, CF_ChanAction_Status_t);
 
     UT_GenStub_AddParam(CF_DoChanAction, const CF_UnionArgs_Payload_t *, data);
     UT_GenStub_AddParam(CF_DoChanAction, const char *, errstr);
@@ -165,7 +165,7 @@ CFE_Status_t CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const char *err
 
     UT_GenStub_Execute(CF_DoChanAction, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_DoChanAction, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_DoChanAction, CF_ChanAction_Status_t);
 }
 
 /*
@@ -173,16 +173,16 @@ CFE_Status_t CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const char *err
  * Generated stub function for CF_DoEnableDisableDequeue()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_DoEnableDisableDequeue(uint8 chan_num, const CF_ChanAction_BoolArg_t *context)
+CF_ChanAction_Status_t CF_DoEnableDisableDequeue(uint8 chan_num, void *arg)
 {
-    UT_GenStub_SetupReturnBuffer(CF_DoEnableDisableDequeue, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_DoEnableDisableDequeue, CF_ChanAction_Status_t);
 
     UT_GenStub_AddParam(CF_DoEnableDisableDequeue, uint8, chan_num);
-    UT_GenStub_AddParam(CF_DoEnableDisableDequeue, const CF_ChanAction_BoolArg_t *, context);
+    UT_GenStub_AddParam(CF_DoEnableDisableDequeue, void *, arg);
 
     UT_GenStub_Execute(CF_DoEnableDisableDequeue, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_DoEnableDisableDequeue, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_DoEnableDisableDequeue, CF_ChanAction_Status_t);
 }
 
 /*
@@ -190,16 +190,16 @@ CFE_Status_t CF_DoEnableDisableDequeue(uint8 chan_num, const CF_ChanAction_BoolA
  * Generated stub function for CF_DoEnableDisablePolldir()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolMsgArg_t *context)
+CF_ChanAction_Status_t CF_DoEnableDisablePolldir(uint8 chan_num, void *arg)
 {
-    UT_GenStub_SetupReturnBuffer(CF_DoEnableDisablePolldir, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_DoEnableDisablePolldir, CF_ChanAction_Status_t);
 
     UT_GenStub_AddParam(CF_DoEnableDisablePolldir, uint8, chan_num);
-    UT_GenStub_AddParam(CF_DoEnableDisablePolldir, const CF_ChanAction_BoolMsgArg_t *, context);
+    UT_GenStub_AddParam(CF_DoEnableDisablePolldir, void *, arg);
 
     UT_GenStub_Execute(CF_DoEnableDisablePolldir, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_DoEnableDisablePolldir, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_DoEnableDisablePolldir, CF_ChanAction_Status_t);
 }
 
 /*
@@ -207,16 +207,16 @@ CFE_Status_t CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolM
  * Generated stub function for CF_DoFreezeThaw()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_DoFreezeThaw(uint8 chan_num, const CF_ChanAction_BoolArg_t *context)
+CF_ChanAction_Status_t CF_DoFreezeThaw(uint8 chan_num, void *arg)
 {
-    UT_GenStub_SetupReturnBuffer(CF_DoFreezeThaw, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_DoFreezeThaw, CF_ChanAction_Status_t);
 
     UT_GenStub_AddParam(CF_DoFreezeThaw, uint8, chan_num);
-    UT_GenStub_AddParam(CF_DoFreezeThaw, const CF_ChanAction_BoolArg_t *, context);
+    UT_GenStub_AddParam(CF_DoFreezeThaw, void *, arg);
 
     UT_GenStub_Execute(CF_DoFreezeThaw, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_DoFreezeThaw, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_DoFreezeThaw, CF_ChanAction_Status_t);
 }
 
 /*
@@ -224,16 +224,16 @@ CFE_Status_t CF_DoFreezeThaw(uint8 chan_num, const CF_ChanAction_BoolArg_t *cont
  * Generated stub function for CF_DoPurgeQueue()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_DoPurgeQueue(uint8 chan_num, void *arg)
+CF_ChanAction_Status_t CF_DoPurgeQueue(uint8 chan_num, void *arg)
 {
-    UT_GenStub_SetupReturnBuffer(CF_DoPurgeQueue, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_DoPurgeQueue, CF_ChanAction_Status_t);
 
     UT_GenStub_AddParam(CF_DoPurgeQueue, uint8, chan_num);
     UT_GenStub_AddParam(CF_DoPurgeQueue, void *, arg);
 
     UT_GenStub_Execute(CF_DoPurgeQueue, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_DoPurgeQueue, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_DoPurgeQueue, CF_ChanAction_Status_t);
 }
 
 /*
@@ -395,16 +395,16 @@ void CF_ProcessGroundCommand(CFE_SB_Buffer_t *msg)
  * Generated stub function for CF_PurgeHistory()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_PurgeHistory(CF_CListNode_t *node, CF_Channel_t *chan)
+CF_CListTraverse_Status_t CF_PurgeHistory(CF_CListNode_t *node, void *arg)
 {
-    UT_GenStub_SetupReturnBuffer(CF_PurgeHistory, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_PurgeHistory, CF_CListTraverse_Status_t);
 
     UT_GenStub_AddParam(CF_PurgeHistory, CF_CListNode_t *, node);
-    UT_GenStub_AddParam(CF_PurgeHistory, CF_Channel_t *, chan);
+    UT_GenStub_AddParam(CF_PurgeHistory, void *, arg);
 
     UT_GenStub_Execute(CF_PurgeHistory, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_PurgeHistory, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_PurgeHistory, CF_CListTraverse_Status_t);
 }
 
 /*
@@ -424,16 +424,16 @@ void CF_PurgeQueueCmd(const CF_PurgeQueueCmd_t *msg)
  * Generated stub function for CF_PurgeTransaction()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignored)
+CF_CListTraverse_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignored)
 {
-    UT_GenStub_SetupReturnBuffer(CF_PurgeTransaction, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_PurgeTransaction, CF_CListTraverse_Status_t);
 
     UT_GenStub_AddParam(CF_PurgeTransaction, CF_CListNode_t *, node);
     UT_GenStub_AddParam(CF_PurgeTransaction, void *, ignored);
 
     UT_GenStub_Execute(CF_PurgeTransaction, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_PurgeTransaction, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_PurgeTransaction, CF_CListTraverse_Status_t);
 }
 
 /*
@@ -501,19 +501,19 @@ void CF_ThawCmd(const CF_ThawCmd_t *msg)
  * Generated stub function for CF_TsnChanAction()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_TsnChanAction(const CF_Transaction_Payload_t *payload, const char *cmdstr, CF_TsnChanAction_fn_t fn,
-                              void *context)
+int32 CF_TsnChanAction(const CF_Transaction_Payload_t *data, const char *cmdstr, CF_TsnChanAction_fn_t fn,
+                       void *context)
 {
-    UT_GenStub_SetupReturnBuffer(CF_TsnChanAction, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_TsnChanAction, int32);
 
-    UT_GenStub_AddParam(CF_TsnChanAction, const CF_Transaction_Payload_t *, payload);
+    UT_GenStub_AddParam(CF_TsnChanAction, const CF_Transaction_Payload_t *, data);
     UT_GenStub_AddParam(CF_TsnChanAction, const char *, cmdstr);
     UT_GenStub_AddParam(CF_TsnChanAction, CF_TsnChanAction_fn_t, fn);
     UT_GenStub_AddParam(CF_TsnChanAction, void *, context);
 
     UT_GenStub_Execute(CF_TsnChanAction, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_TsnChanAction, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_TsnChanAction, int32);
 }
 
 /*

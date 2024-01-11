@@ -1054,15 +1054,15 @@ CFE_Status_t CF_CFDP_InitEngine(void)
  * See description in cf_cfdp.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context)
+CF_CListTraverse_Status_t CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context)
 {
-    CF_CFDP_CycleTx_args_t *args = (CF_CFDP_CycleTx_args_t *)context;
-    CF_Transaction_t *      txn  = container_of(node, CF_Transaction_t, cl_node);
-    CFE_Status_t            ret  = 1; /* default option is exit traversal */
+    CF_CFDP_CycleTx_args_t *  args = (CF_CFDP_CycleTx_args_t *)context;
+    CF_Transaction_t *        txn  = container_of(node, CF_Transaction_t, cl_node);
+    CF_CListTraverse_Status_t ret  = CF_CLIST_EXIT; /* default option is exit traversal */
 
     if (txn->flags.com.suspended)
     {
-        ret = 0; /* suspended, so move on to next */
+        ret = CF_CLIST_CONT; /* suspended, so move on to next */
     }
     else
     {
@@ -1133,11 +1133,11 @@ void CF_CFDP_CycleTx(CF_Channel_t *chan)
  * See description in cf_cfdp.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context)
+CF_CListTraverse_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context)
 {
-    CFE_Status_t         ret  = CF_CLIST_CONT; /* CF_CLIST_CONT means don't tick one, keep looking for cur */
-    CF_CFDP_Tick_args_t *args = (CF_CFDP_Tick_args_t *)context;
-    CF_Transaction_t *   txn  = container_of(node, CF_Transaction_t, cl_node);
+    CF_CListTraverse_Status_t ret  = CF_CLIST_CONT; /* CF_CLIST_CONT means don't tick one, keep looking for cur */
+    CF_CFDP_Tick_args_t *     args = (CF_CFDP_Tick_args_t *)context;
+    CF_Transaction_t *        txn  = container_of(node, CF_Transaction_t, cl_node);
     if (!args->chan->cur || (args->chan->cur == txn))
     {
         /* found where we left off, so clear that and move on */
@@ -1787,7 +1787,7 @@ void CF_CFDP_CancelTransaction(CF_Transaction_t *txn)
  * See description in cf_cfdp.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_CFDP_CloseFiles(CF_CListNode_t *node, void *context)
+CF_CListTraverse_Status_t CF_CFDP_CloseFiles(CF_CListNode_t *node, void *context)
 {
     CF_Transaction_t *txn = container_of(node, CF_Transaction_t, cl_node);
     if (OS_ObjectIdDefined(txn->fd))

@@ -119,16 +119,16 @@ void CF_InsertSortPrio(CF_Transaction_t *txn, CF_QueueIdx_t queue)
  * Generated stub function for CF_PrioSearch()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_PrioSearch(CF_CListNode_t *node, void *context)
+CF_CListTraverse_Status_t CF_PrioSearch(CF_CListNode_t *node, void *context)
 {
-    UT_GenStub_SetupReturnBuffer(CF_PrioSearch, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_PrioSearch, CF_CListTraverse_Status_t);
 
     UT_GenStub_AddParam(CF_PrioSearch, CF_CListNode_t *, node);
     UT_GenStub_AddParam(CF_PrioSearch, void *, context);
 
     UT_GenStub_Execute(CF_PrioSearch, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_PrioSearch, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_PrioSearch, CF_CListTraverse_Status_t);
 }
 
 /*
@@ -149,9 +149,9 @@ void CF_ResetHistory(CF_Channel_t *chan, CF_History_t *history)
  * Generated stub function for CF_TraverseAllTransactions()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransactions_fn_t fn, void *context)
+int32 CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransactions_fn_t fn, void *context)
 {
-    UT_GenStub_SetupReturnBuffer(CF_TraverseAllTransactions, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_TraverseAllTransactions, int32);
 
     UT_GenStub_AddParam(CF_TraverseAllTransactions, CF_Channel_t *, chan);
     UT_GenStub_AddParam(CF_TraverseAllTransactions, CF_TraverseAllTransactions_fn_t, fn);
@@ -159,7 +159,7 @@ CFE_Status_t CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransa
 
     UT_GenStub_Execute(CF_TraverseAllTransactions, Basic, UT_DefaultHandler_CF_TraverseAllTransactions);
 
-    return UT_GenStub_GetReturnValue(CF_TraverseAllTransactions, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_TraverseAllTransactions, int32);
 }
 
 /*
@@ -167,9 +167,9 @@ CFE_Status_t CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransa
  * Generated stub function for CF_TraverseAllTransactions_All_Channels()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context)
+int32 CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context)
 {
-    UT_GenStub_SetupReturnBuffer(CF_TraverseAllTransactions_All_Channels, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_TraverseAllTransactions_All_Channels, int32);
 
     UT_GenStub_AddParam(CF_TraverseAllTransactions_All_Channels, CF_TraverseAllTransactions_fn_t, fn);
     UT_GenStub_AddParam(CF_TraverseAllTransactions_All_Channels, void *, context);
@@ -177,7 +177,7 @@ CFE_Status_t CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_
     UT_GenStub_Execute(CF_TraverseAllTransactions_All_Channels, Basic,
                        UT_DefaultHandler_CF_TraverseAllTransactions_All_Channels);
 
-    return UT_GenStub_GetReturnValue(CF_TraverseAllTransactions_All_Channels, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_TraverseAllTransactions_All_Channels, int32);
 }
 
 /*
@@ -185,16 +185,16 @@ CFE_Status_t CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_
  * Generated stub function for CF_TraverseAllTransactions_Impl()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *node, CF_TraverseAll_Arg_t *args)
+CF_CListTraverse_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *node, void *arg)
 {
-    UT_GenStub_SetupReturnBuffer(CF_TraverseAllTransactions_Impl, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_TraverseAllTransactions_Impl, CF_CListTraverse_Status_t);
 
     UT_GenStub_AddParam(CF_TraverseAllTransactions_Impl, CF_CListNode_t *, node);
-    UT_GenStub_AddParam(CF_TraverseAllTransactions_Impl, CF_TraverseAll_Arg_t *, args);
+    UT_GenStub_AddParam(CF_TraverseAllTransactions_Impl, void *, arg);
 
     UT_GenStub_Execute(CF_TraverseAllTransactions_Impl, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_TraverseAllTransactions_Impl, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_TraverseAllTransactions_Impl, CF_CListTraverse_Status_t);
 }
 
 /*
@@ -202,16 +202,16 @@ CFE_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *node, CF_TraverseAl
  * Generated stub function for CF_Traverse_WriteHistoryQueueEntryToFile()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *node, void *arg)
+CF_CListTraverse_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *node, void *arg)
 {
-    UT_GenStub_SetupReturnBuffer(CF_Traverse_WriteHistoryQueueEntryToFile, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_Traverse_WriteHistoryQueueEntryToFile, CF_CListTraverse_Status_t);
 
     UT_GenStub_AddParam(CF_Traverse_WriteHistoryQueueEntryToFile, CF_CListNode_t *, node);
     UT_GenStub_AddParam(CF_Traverse_WriteHistoryQueueEntryToFile, void *, arg);
 
     UT_GenStub_Execute(CF_Traverse_WriteHistoryQueueEntryToFile, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_Traverse_WriteHistoryQueueEntryToFile, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_Traverse_WriteHistoryQueueEntryToFile, CF_CListTraverse_Status_t);
 }
 
 /*
@@ -219,16 +219,16 @@ CFE_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *node, void
  * Generated stub function for CF_Traverse_WriteTxnQueueEntryToFile()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *node, void *arg)
+CF_CListTraverse_Status_t CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *node, void *arg)
 {
-    UT_GenStub_SetupReturnBuffer(CF_Traverse_WriteTxnQueueEntryToFile, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_Traverse_WriteTxnQueueEntryToFile, CF_CListTraverse_Status_t);
 
     UT_GenStub_AddParam(CF_Traverse_WriteTxnQueueEntryToFile, CF_CListNode_t *, node);
     UT_GenStub_AddParam(CF_Traverse_WriteTxnQueueEntryToFile, void *, arg);
 
     UT_GenStub_Execute(CF_Traverse_WriteTxnQueueEntryToFile, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_Traverse_WriteTxnQueueEntryToFile, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_Traverse_WriteTxnQueueEntryToFile, CF_CListTraverse_Status_t);
 }
 
 /*

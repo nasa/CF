@@ -30,13 +30,27 @@
 #include "cf_app.h"
 #include "cf_utils.h"
 
+typedef enum
+{
+    CF_ChanAction_Status_SUCCESS = 0,
+    CF_ChanAction_Status_ERROR   = -1
+} CF_ChanAction_Status_t;
+
+/**
+ * Checks if the channel action was successful
+ */
+static inline bool CF_ChanAction_Status_IS_SUCCESS(CF_ChanAction_Status_t stat)
+{
+    return (stat == CF_ChanAction_Status_SUCCESS);
+}
+
 /**
  * @brief A callback function for use with CF_DoChanAction()
  *
  * @param chan_num The CF channel number, for statistics purposes
  * @param context  Opaque object passed through from initial call
  */
-typedef int (*CF_ChanActionFn_t)(uint8 chan_num, void *context);
+typedef CF_ChanAction_Status_t (*CF_ChanActionFn_t)(uint8 chan_num, void *context);
 
 /**
  * @brief An object to use with channel-scope actions requiring only a boolean argument
@@ -165,10 +179,10 @@ void CF_PlaybackDirCmd(const CF_PlaybackDirCmd_t *msg);
  * @param context   Opaque pointer to pass through to callback (not used in this function)
  *
  * @returns The return value from the given action function.
- * @retval CF_ERROR on error
+ * @retval CF_ChanAction_Status_ERROR on error
  */
-CFE_Status_t CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const char *errstr, CF_ChanActionFn_t fn,
-                             void *context);
+CF_ChanAction_Status_t CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const char *errstr, CF_ChanActionFn_t fn,
+                                       void *context);
 
 /************************************************************************/
 /** @brief Channel action to set the frozen bit for a channel.
@@ -177,11 +191,11 @@ CFE_Status_t CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const char *err
  *       context must not be NULL.
  *
  * @param chan_num  channel number
- * @param context   Pointer to object passed through from initial call
+ * @param arg       context pointer to object, must be CF_ChanAction_BoolArg_t*
  *
- * @returns Always succeeds, so returns CFE_SUCCESS.
+ * @returns Always succeeds, so returns CF_ChanAction_Status_SUCCESS.
  */
-CFE_Status_t CF_DoFreezeThaw(uint8 chan_num, const CF_ChanAction_BoolArg_t *context);
+CF_ChanAction_Status_t CF_DoFreezeThaw(uint8 chan_num, void *arg);
 
 /************************************************************************/
 /** @brief Freeze a channel.
@@ -237,8 +251,8 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSe
  * @returns returns the number of transactions acted upon
  *
  */
-CFE_Status_t CF_TsnChanAction(const CF_Transaction_Payload_t *data, const char *cmdstr, CF_TsnChanAction_fn_t fn,
-                              void *context);
+int32 CF_TsnChanAction(const CF_Transaction_Payload_t *data, const char *cmdstr, CF_TsnChanAction_fn_t fn,
+                       void *context);
 
 /************************************************************************/
 /** @brief Set the suspended bit in a transaction.
@@ -339,12 +353,12 @@ void CF_AbandonCmd(const CF_AbandonCmd_t *msg);
  *       context must not be NULL.
  *
  * @param chan_num  channel number
- * @param context   Pointer to object passed through from initial call
+ * @param arg       context pointer to object, must be CF_ChanAction_BoolArg_t*
  *
- * @returns Always succeeds, so returns CFE_SUCCESS.
+ * @returns Always succeeds, so returns CF_ChanAction_Status_SUCCESS.
  *
  */
-CFE_Status_t CF_DoEnableDisableDequeue(uint8 chan_num, const CF_ChanAction_BoolArg_t *context);
+CF_ChanAction_Status_t CF_DoEnableDisableDequeue(uint8 chan_num, void *arg);
 
 /************************************************************************/
 /** @brief Handle an enable dequeue ground command.
@@ -373,13 +387,13 @@ void CF_DisableDequeueCmd(const CF_DisableDequeueCmd_t *msg);
  *       context must not be NULL.
  *
  * @param chan_num  channel number
- * @param context   Pointer to object passed through from initial call
+ * @param arg       context pointer to object, must be CF_ChanAction_BoolMsgArg_t*
  *
  * @returns success/fail status code
- * @retval  CFE_SUCCESS if successful
- * @retval  CF_ERROR if failed
+ * @retval  CF_ChanAction_Status_SUCCESS if successful
+ * @retval  CF_ChanAction_Status_ERROR if failed
  */
-CFE_Status_t CF_DoEnableDisablePolldir(uint8 chan_num, const CF_ChanAction_BoolMsgArg_t *context);
+CF_ChanAction_Status_t CF_DoEnableDisablePolldir(uint8 chan_num, void *arg);
 
 /************************************************************************/
 /** @brief Enable a polling dir ground command.
@@ -410,11 +424,11 @@ void CF_DisablePolldirCmd(const CF_DisableDirPollingCmd_t *msg);
  *       node must not be NULL. chan must not be NULL.
  *
  * @param node  Current list node being traversed
- * @param chan  Channel pointer passed through as opaque object
+ * @param arg   Channel pointer passed through as opaque object, must be CF_Channel_t*
  *
  * @returns Always #CF_CLIST_CONT to process all entries
  */
-CFE_Status_t CF_PurgeHistory(CF_CListNode_t *node, CF_Channel_t *chan);
+CF_CListTraverse_Status_t CF_PurgeHistory(CF_CListNode_t *node, void *arg);
 
 /************************************************************************/
 /** @brief Purge the pending transaction queue.
@@ -429,7 +443,7 @@ CFE_Status_t CF_PurgeHistory(CF_CListNode_t *node, CF_Channel_t *chan);
  *
  * @returns Always #CF_CLIST_CONT to process all entries
  */
-CFE_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignored);
+CF_CListTraverse_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignored);
 
 /************************************************************************/
 /** @brief Channel action command to perform purge queue operations.
@@ -445,10 +459,10 @@ CFE_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignored);
  * @param arg       Pointer to purge queue command
  *
  * @returns integer status code indicating success or failure
- * @retval  CFE_SUCCESS if successful
- * @retval  CF_ERROR on error
+ * @retval  CF_ChanAction_Status_SUCCESS if successful
+ * @retval  CF_ChanAction_Status_ERROR on error
  */
-CFE_Status_t CF_DoPurgeQueue(uint8 chan_num, void *arg);
+CF_ChanAction_Status_t CF_DoPurgeQueue(uint8 chan_num, void *arg);
 
 /************************************************************************/
 /** @brief Ground command to purge either the history or pending queues.
@@ -480,11 +494,11 @@ void CF_WriteQueueCmd(const CF_WriteQueueCmd_t *msg);
  * @param chan_num  Ignored by this implementation
  *
  * @returns status code indicating if check passed
- * @retval CFE_SUCCESS if successful (val is less than or equal to max PDU)
- * @retval CF_ERROR if failed (val is greater than max PDU)
+ * @retval CF_ChanAction_Status_SUCCESS if successful (val is less than or equal to max PDU)
+ * @retval CF_ChanAction_Status_ERROR if failed (val is greater than max PDU)
  *
  */
-CFE_Status_t CF_CmdValidateChunkSize(uint32 val, uint8 chan_num);
+CF_ChanAction_Status_t CF_CmdValidateChunkSize(uint32 val, uint8 chan_num);
 
 /************************************************************************/
 /** @brief Checks if the value is within allowable range as outgoing packets per wakeup
@@ -496,11 +510,11 @@ CFE_Status_t CF_CmdValidateChunkSize(uint32 val, uint8 chan_num);
  * @param chan_num  CF channel number
  *
  * @returns status code indicating if check passed
- * @retval CFE_SUCCESS if successful (val is allowable as max packets per wakeup)
- * @retval CF_ERROR if failed (val is not allowed)
+ * @retval CF_ChanAction_Status_SUCCESS if successful (val is allowable as max packets per wakeup)
+ * @retval CF_ChanAction_Status_ERROR if failed (val is not allowed)
  *
  */
-CFE_Status_t CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num);
+CF_ChanAction_Status_t CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num);
 
 /************************************************************************/
 /** @brief Perform a configuration get/set operation.
