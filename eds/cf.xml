@@ -1,0 +1,1266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    GSC-18128-1, "Core Flight Executive Version 6.7"
+    LEW-19710-1, "CCSDS electronic data sheet implementation"
+
+    Copyright (c) 2006-2019 United States Government as represented by
+    the Administrator of the National Aeronautics and Space Administration.
+    All Rights Reserved.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+    This document adheres to the Electronic Data Sheet (EDS) XML schema
+    as prescribed in CCSDS book 876.0.
+
+    Purpose:
+      This describes all interface objects for the Executive Services (CFE_ES)
+      core application
+
+-->
+<PackageFile xmlns="http://www.ccsds.org/schema/sois/seds">
+  <Package name="CF" shortDescription="CFDP">
+
+    <DataTypeSet>
+
+     <IntegerDataType name="EntityId" shortDescription="CFDP Entity ID logical value">
+       <IntegerDataEncoding sizeInBits="32" encoding="unsigned" />
+     </IntegerDataType>
+
+     <IntegerDataType name="TransactionSeq" shortDescription="transaction sequence number size">
+          <LongDescription>
+ @par Description
+      The max size of the transaction sequence number as expected for all CFDP packets.
+      CF supports the spec's variable size of TSN, where the actual size is
+      selected at runtime, and therefore the size in CFDP PDUs may be smaller
+      than the size specified here.  This type only establishes the maximum
+      size (and therefore maximum value) that a TSN may be.
+
+ @note This type is used in several CF commands, and so changing the size
+       of this type will affect the following structure:
+        CF_Transaction_Payload_t, any command that selects a transaction based on TSN
+
+ @par Limits
+         Must be one of uint8, uint16, uint32, uint64.
+          </LongDescription>
+       <IntegerDataEncoding sizeInBits="32" encoding="unsigned" />
+     </IntegerDataType>
+
+     <BooleanDataType name="EnableFlag" shortDescription="Enable/Disable logical value">
+       <BooleanDataEncoding sizeInBits="8" />
+     </BooleanDataType>
+
+<!--
+     <AliasDataType name="PathName" type="BASE_TYPES/PathName" />
+     <AliasDataType name="FileName" type="BASE_TYPES/FileName" />
+-->
+
+     <EnumeratedDataType name="CFDP">
+          <EnumerationList>
+            <Enumeration label="CLASS_1" value="0" shortDescription="CFDP class 1 - Unreliable transfer" />
+            <Enumeration label="CLASS_2" value="1" shortDescription="CFDP class 2 - Reliable transfer" />
+          </EnumerationList>
+       <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+     </EnumeratedDataType>
+
+     <EnumeratedDataType name="GetSet_ValueID" shortDescription="Parameter IDs for use with Get/Set parameter messages" >
+          <LongDescription>
+               Specifically these are used for the "key" field within CF_GetParamCmd_t and
+               CF_SetParamCmd_t message structures.
+          </LongDescription>
+          <EnumerationList>
+               <Enumeration label="ticks_per_second"                      shortDescription="Ticks per second key" />
+               <Enumeration label="rx_crc_calc_bytes_per_wakeup"          shortDescription="Receive CRC calculated bytes per wake-up key" />
+               <Enumeration label="ack_timer_s"                           shortDescription="ACK timer in seconds key" />
+               <Enumeration label="nak_timer_s"                           shortDescription="NAK timer in seconds key" />
+               <Enumeration label="inactivity_timer_s"                    shortDescription="Inactivity timer in seconds key" />
+               <Enumeration label="outgoing_file_chunk_size"              shortDescription="Outgoing file chunk size key" />
+               <Enumeration label="ack_limit"                             shortDescription="ACK retry limit key" />
+               <Enumeration label="nak_limit"                             shortDescription="NAK retry limit key" />
+               <Enumeration label="local_eid"                             shortDescription="Local entity id key" />
+               <Enumeration label="chan_max_outgoing_messages_per_wakeup" shortDescription="Max outgoing messages per wake-up key" />
+          </EnumerationList>
+       <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+     </EnumeratedDataType>
+
+     <EnumeratedDataType name="Reset" shortDescription="IDs for use for Reset cmd" >
+          <EnumerationList>
+               <Enumeration label="all" value="0" shortDescription="Reset all" />
+               <Enumeration label="command" value="1" shortDescription="Reset command" />
+               <Enumeration label="fault" value="2" shortDescription="Reset fault" />
+               <Enumeration label="up" value="3" shortDescription="Reset up" />
+               <Enumeration label="down" value="4" shortDescription="Reset down" />
+          </EnumerationList>
+       <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+     </EnumeratedDataType>
+
+
+     <ContainerDataType name="PollDir" shortDescription="Polled Directory Configuration Entry">
+       <EntryList>
+         <Entry type="BASE_TYPES/uint32" name="interval_sec" shortDescription="number of seconds to wait before trying a new directory" />
+         <Entry type="BASE_TYPES/uint8" name="priority" shortDescription="priority to use when placing transactions on the pending queue" />
+         <Entry type="CFDP" name="cfdp_class" shortDescription="the CFDP class to send" />
+         <Entry type="EntityId" name="dest_eid" shortDescription="destination entity id" />
+         <Entry type="BASE_TYPES/PathName" name="src_dir" shortDescription="path to source dir" />
+         <Entry type="BASE_TYPES/PathName" name="dst_dir" shortDescription="path to destination dir" />
+         <Entry type="EnableFlag" name="enabled" shortDescription="Enabled flag" />
+       </EntryList>
+     </ContainerDataType>
+
+     <ArrayDataType name="PollDirTable" dataTypeRef="PollDir" shortDescription="Polled Directory Table">
+       <DimensionList>
+          <Dimension size="${CF/MAX_POLLING_DIR_PER_CHAN}" />
+       </DimensionList>
+     </ArrayDataType>
+
+     <ContainerDataType name="ChannelConfig" shortDescription="Channel Configuration">
+       <EntryList>
+         <Entry type="BASE_TYPES/uint32" name="max_outgoing_messages_per_wakeup" shortDescription="max number of messages to send per wakeup (0 - unlimited)" />
+         <Entry type="BASE_TYPES/uint32" name="rx_max_messages_per_wakeup" shortDescription="max number of rx messages to process per wakeup" />
+         <Entry type="BASE_TYPES/uint32" name="ack_timer_s" shortDescription="Acknowledge timer in seconds" />
+         <Entry type="BASE_TYPES/uint32" name="nak_timer_s" shortDescription="Non-acknowledge timer in seconds" />
+         <Entry type="BASE_TYPES/uint32" name="inactivity_timer_s" shortDescription="Inactivity timer in seconds" />
+
+         <Entry type="BASE_TYPES/uint8" name="ack_limit" shortDescription="number of times to retry ACK (for ex, send FIN and wait for fin-ack)" />
+         <Entry type="BASE_TYPES/uint8" name="nak_limit" shortDescription="number of times to retry NAK before giving up (resets on a single response" />
+
+         <Entry type="CFE_SB/MsgIdValue" name="mid_input" shortDescription="msgid integer value for incoming messages" />
+         <Entry type="CFE_SB/MsgIdValue" name="mid_output" shortDescription="msgid integer value for outgoing messages" />
+
+         <Entry type="BASE_TYPES/uint16" name="pipe_depth_input" shortDescription="depth of pipe to receive incoming PDU" />
+
+         <Entry type="PollDirTable" name="polldir" shortDescription="Configuration for polled directories" />
+
+         <Entry type="BASE_TYPES/ApiName" name="sem_name" shortDescription="name of throttling semaphore in TO" />
+         <Entry type="EnableFlag" name="dequeue_enabled" shortDescription="if 1, then the channel will make pending transactions active" />
+         <Entry type="BASE_TYPES/PathName"  name="move_dir" shortDescription="Move directory if not empty" />
+       </EntryList>
+     </ContainerDataType>
+
+     <ArrayDataType name="ChannelConfigTable" dataTypeRef="ChannelConfig" shortDescription="Channel Config Table">
+       <DimensionList>
+          <Dimension size="${CF/NUM_CHANNELS}" />
+       </DimensionList>
+     </ArrayDataType>
+
+     <ContainerDataType name="ConfigTable" shortDescription="Main Configuration Table">
+       <EntryList>
+         <Entry type="BASE_TYPES/uint32" name="ticks_per_second" shortDescription="expected ticks per second to CFDP app" />
+         <Entry type="BASE_TYPES/uint32" name="rx_crc_calc_bytes_per_wakeup" shortDescription="max number of bytes per wakeup to calculate CRC for recvd file (must be 1024-byte aligned)" />
+         <Entry type="EntityId" name="local_eid" shortDescription="the local entity ID of the CF app" />
+
+         <Entry type="ChannelConfigTable" name="chan" shortDescription="Channel configuration" />
+         <Entry type="BASE_TYPES/uint16" name="outgoing_file_chunk_size" shortDescription="maximum size of outgoing file data PDUs - must be smaller than file data character array" />
+         <Entry type="BASE_TYPES/PathName" name="tmp_dir" shortDescription="directory to put temp files" />
+
+       </EntryList>
+     </ContainerDataType>
+
+
+
+      <ContainerDataType name="SendHkCmd" baseType="CFE_HDR/CommandHeader" shortDescription="Send Housekeeping command" />
+
+      <ContainerDataType name="WakeupCmd" baseType="CFE_HDR/CommandHeader" shortDescription="Send Wake Up command" />
+
+      <ContainerDataType name="HKCommandCounters" shortDescription="Housekeeping command counters">
+        <EntryList>
+          <Entry name="cmd" type="BASE_TYPES/uint16" shortDescription="Command success counter" />
+          <Entry name="err" type="BASE_TYPES/uint16"  shortDescription="Command error counter" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="HkSent" shortDescription="Housekeeping sent counters">
+        <EntryList>
+          <Entry name="file_data_bytes" type="BASE_TYPES/uint64" shortDescription="Sent file data bytes" />
+          <Entry name="pdu" type="BASE_TYPES/uint32"  shortDescription="Sent PDUs counter" />
+          <Entry name="nak_segment_requests" type="BASE_TYPES/uint32"  shortDescription="Sent NAK segment requests counter" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="HkRecv" shortDescription="Housekeeping received counters">
+        <EntryList>
+          <Entry name="file_data_bytes" type="BASE_TYPES/uint64" shortDescription="Sent file data bytes" />
+          <Entry name="pdu" type="BASE_TYPES/uint32"  shortDescription="Sent PDUs with valid header counter" />
+          <Entry name="error" type="BASE_TYPES/uint32"  shortDescription="Sent PDUs with error counter" />
+          <Entry name="spurious" type="BASE_TYPES/uint16"  shortDescription="Received PDUs with invalid directive code for current context or
+                                                           file directive FIN without matching active transaction counter" />
+          <Entry name="dropped" type="BASE_TYPES/uint16"  shortDescription="Received PDUs dropped due to a transaction error" />
+          <Entry name="nak_segment_requests" type="BASE_TYPES/uint32"  shortDescription="Received NAK segment requests counter" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="HkFault" shortDescription="Housekeeping fault counters">
+        <EntryList>
+          <Entry name="file_open" type="BASE_TYPES/uint16" shortDescription="File open fault counter" />
+          <Entry name="file_read" type="BASE_TYPES/uint16"  shortDescription="File read fault counter" />
+          <Entry name="file_seek" type="BASE_TYPES/uint16"  shortDescription="File seek fault counter" />
+          <Entry name="file_write" type="BASE_TYPES/uint16"  shortDescription="File write fault counter" />
+          <Entry name="file_rename" type="BASE_TYPES/uint16"  shortDescription="File rename fault counter" />
+          <Entry name="directory_read" type="BASE_TYPES/uint16"  shortDescription="Directory read fault counter" />
+          <Entry name="crc_mismatch" type="BASE_TYPES/uint16"  shortDescription="CRC mismatch fault counter" />
+          <Entry name="file_size_mismatch" type="BASE_TYPES/uint16"  shortDescription="File size mismatch fault counter" />
+          <Entry name="nak_limit" type="BASE_TYPES/uint16"  shortDescription="NAK limit exceeded fault counter" />
+          <Entry name="ack_limit" type="BASE_TYPES/uint16"  shortDescription="ACK limit exceeded fault counter" />
+          <Entry name="inactivity_timer" type="BASE_TYPES/uint16"  shortDescription="Inactivity timer exceeded counter" />
+          <PaddingEntry sizeInBits="16" shortDescription="Spare bytes for alignment"/>
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="HkCounters" shortDescription="Housekeeping counters">
+        <EntryList>
+          <Entry name="sent" type="HkSent" shortDescription="Sent counters" />
+          <Entry name="recv" type="HkRecv" shortDescription="Received counters" />
+          <Entry name="fault" type="HkFault" shortDescription="Fault counters" />
+        </EntryList>
+      </ContainerDataType>
+
+     <EnumeratedDataType name="QueueIdx" ShortDescription="Identifies the entry type in a filesystem monitor report">
+          <EnumerationList>
+            <Enumeration label="PEND" value="0" shortDescription="first one on this list is active" />
+            <Enumeration label="TXA" value="1" />
+            <Enumeration label="TXW" value="2" />
+            <Enumeration label="RX" value="3" />
+            <Enumeration label="HIST" value="4" />
+            <Enumeration label="HIST_FREE" value="5" />
+            <Enumeration label="FREE" value="6" />
+          </EnumerationList>
+       <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+     </EnumeratedDataType>
+
+
+      <ArrayDataType name="QSize" dataTypeRef="BASE_TYPES/uint16">
+          <DimensionList>
+            <Dimension indexTypeRef="QueueIdx" />
+          </DimensionList>
+      </ArrayDataType>
+
+
+      <ContainerDataType name="HkChannel_Data" shortDescription="Housekeeping channel data">
+        <EntryList>
+          <Entry name="counters" type="HkCounters" shortDescription="Counters" />
+          <Entry name="q_size" type="QSize" shortDescription="Queue sizes" />
+          <Entry name="poll_counter" type="BASE_TYPES/uint8" shortDescription="Number of active polling directories" />
+          <Entry name="playback_counter" type="BASE_TYPES/uint8" shortDescription="Number of active playback directories" />
+          <Entry name="frozen" type="BASE_TYPES/uint8" shortDescription="Frozen state" />
+          <PaddingEntry sizeInBits="56" shortDescription="Spare bytes for alignment"/>
+        </EntryList>
+      </ContainerDataType>
+
+      <ArrayDataType name="Channel_Hk" dataTypeRef="HkChannel_Data">
+        <DimensionList>
+           <Dimension size="${CF/NUM_CHANNELS}"/>
+        </DimensionList>
+      </ArrayDataType>
+
+      <ContainerDataType name="HkPacket_Payload">
+        <EntryList>
+          <Entry name="counters" type="HKCommandCounters" />
+          <PaddingEntry sizeInBits="32" shortDescription="Spare bytes for alignment"/>
+          <Entry name="channel_hk" type="Channel_Hk" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="HkPacket" baseType="CFE_HDR/TelemetryHeader">
+        <EntryList>
+          <Entry name="Payload" type="HkPacket_Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="TxnFilenames" shortDescription="Cache of source and destination filename">
+        <EntryList>
+          <Entry name="src_filename" type="BASE_TYPES/PathName" shortDescription="Source filename" />
+          <Entry name="dst_filename" type="BASE_TYPES/PathName" shortDescription="Destination filename" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="EotPacket_Payload">
+        <EntryList>
+          <Entry name="seq_num" type="BASE_TYPES/uint32" shortDescription="Transaction identifier" />
+          <Entry name="channel" type="BASE_TYPES/uint32" shortDescription="Channel number" />
+          <Entry name="direction" type="BASE_TYPES/uint32" shortDescription="Direction of this transaction" />
+          <Entry name="state" type="BASE_TYPES/uint32" shortDescription="Transaction state" />
+          <Entry name="txn_stat" type="BASE_TYPES/uint32" shortDescription="Final status code of transaction" />
+          <Entry name="src_eid" type="BASE_TYPES/uint32" shortDescription="Source eid of the transaction" />
+          <Entry name="peer_eid" type="BASE_TYPES/uint32" shortDescription="peer_eid is always the 'other guy', same src_eid for RX" />
+          <Entry name="fsize" type="BASE_TYPES/uint32" shortDescription="File size" />
+          <Entry name="crc_result" type="BASE_TYPES/uint32" shortDescription="CRC result" />
+          <Entry name="fnames" type="TxnFilenames" shortDescription="File names associated with this transaction" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="EotPacket" baseType="CFE_HDR/TelemetryHeader">
+        <EntryList>
+          <Entry name="Payload" type="EotPacket_Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <!-- change descriptions starts here -->
+
+      <ArrayDataType name="Hword" dataTypeRef="BASE_TYPES/uint16">
+        <DimensionList>
+           <Dimension size="2"/>
+        </DimensionList>
+      </ArrayDataType>
+
+      <ArrayDataType name="Byte" dataTypeRef="BASE_TYPES/uint8">
+        <DimensionList>
+           <Dimension size="4"/>
+        </DimensionList>
+      </ArrayDataType>
+
+      <ContainerDataType name="UnionArgs_Payload" shortDescription="Wrapper around 4 bytes">
+        <EntryList>
+          <Entry name="byte" type="Byte" shortDescription="Generic uint8 array of arguments" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="GetParam_Payload" shortDescription="Get parameter command structure">
+        <EntryList>
+          <Entry name="key" type="GetSet_ValueID" shortDescription="Parameter key, see #CF_GetSet_ValueID_t" />
+          <Entry name="chan_num" type="BASE_TYPES/uint8" shortDescription="Channel number" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="SetParam_Payload" shortDescription="Set parameter command structure">
+        <EntryList>
+          <Entry name="value" type="BASE_TYPES/uint32" shortDescription="Parameter value to set" />
+          <Entry name="key" type="GetSet_ValueID" shortDescription="Parameter key, see #CF_GetSet_ValueID_t" />
+          <Entry name="chan_num" type="BASE_TYPES/uint8" shortDescription="Channel number" />
+          <PaddingEntry sizeInBits="16" shortDescription="Alignment spare, uint32 multiple"/>
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="TxFile_Payload" shortDescription="Transmit file command structure">
+        <EntryList>
+          <Entry name="cfdp_class" type="BASE_TYPES/uint8" shortDescription="CFDP class: 0=class 1, 1=class 2" />
+          <Entry name="keep" type="BASE_TYPES/uint8" shortDescription="Keep file flag: 1=keep, else delete" />
+          <Entry name="chan_num" type="BASE_TYPES/uint8" shortDescription="Channel number" />
+          <Entry name="priority" type="BASE_TYPES/uint32" shortDescription="Priority: 0=highest priority" />
+          <Entry name="dest_id" type="BASE_TYPES/uint32" shortDescription="Destination entity id" />
+          <Entry name="src_filename" type="BASE_TYPES/PathName" shortDescription="Source filename" />
+          <Entry name="dst_filename" type="BASE_TYPES/PathName" shortDescription="Destination filename" />
+        </EntryList>
+      </ContainerDataType>
+
+     <EnumeratedDataType name="Type" ShortDescription="Type IDs for use for Write Queue cmd">
+          <EnumerationList>
+               <Enumeration label="all" value="0" />
+               <Enumeration label="up" value="1" />
+               <Enumeration label="down" value="2" />
+          </EnumerationList>
+       <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+     </EnumeratedDataType>
+
+     <EnumeratedDataType name="Queue" ShortDescription="Queue IDs for use for Write Queue cmd">
+          <EnumerationList>
+               <Enumeration label="pend" value="0" />
+               <Enumeration label="active" value="1" />
+               <Enumeration label="history" value="2" />
+               <Enumeration label="all" value="3" />
+          </EnumerationList>
+       <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+     </EnumeratedDataType>
+
+
+     <ContainerDataType name="WriteQueue_Payload" shortDescription="Write Queue command structure">
+        <EntryList>
+          <Entry name="type" type="Type" shortDescription="Transaction direction: all=0, up=1, down=2" />
+          <Entry name="chan" type="BASE_TYPES/uint8" shortDescription="Channel number" />
+          <Entry name="queue" type="Queue" shortDescription="Queue type: 0=pending, 1=active, 2=history, 3=all" />
+          <PaddingEntry sizeInBits="8" shortDescription="Alignment spare, puts filename on 32-bit boundary"/>
+          <Entry name="filename" type="BASE_TYPES/PathName" shortDescription="Filename written to" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="Transaction_Payload" shortDescription="Transaction command structure">
+        <EntryList>
+          <Entry name="ts" type="BASE_TYPES/uint32" shortDescription="Transaction sequence number" />
+          <Entry name="eid" type="BASE_TYPES/uint32" shortDescription="Entity id" />
+          <Entry name="chan" type="BASE_TYPES/uint8" shortDescription="Channel number: 254=use ts, 255=all channels, else channel" />
+          <PaddingEntry sizeInBits="24" shortDescription="Alignment spare for 32-bit multiple"/>
+        </EntryList>
+      </ContainerDataType>
+
+      <!-- change descriptions ends here -->
+
+      <ContainerDataType name="CMD" baseType="CFE_HDR/CommandHeader">
+      </ContainerDataType>
+
+      <ContainerDataType name="NoopCmd" baseType="CMD">
+        <LongDescription>
+         \cfcmd No Operation
+
+       \par Description
+            No-operation command for aliveness verification and version reporting
+
+       \par Command Structure
+            #CF_NoArgsCmd_t
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_NOOP
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+            </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="0" />
+        </ConstraintSet>
+      </ContainerDataType>
+
+      <ContainerDataType name="ResetCmd" baseType="CMD">
+        <LongDescription>
+              \cfcmd Reset counters
+
+       \par Description
+            Resets the requested housekeeping counters
+
+       \par Command Structure
+            #CF_UnionArgsCmd_t where byte[0] specifies the counters type, byte[1-3] don't care:
+            - 0 = all counters
+            - 1 = command counters
+            - 2 = fault counters
+            - 3 = up counters
+            - 4 = down counters
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_RESET
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Invalid counter type, #CF_EID_ERR_CMD_RESET_INVALID
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="1" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="UnionArgs_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="TxFileCmd" baseType="CMD">
+        <LongDescription>
+              \cfcmd Transmit file
+
+       \par Description
+            Requests transmission of a file
+
+       \par Command Structure
+            #CF_TxFileCmd_t
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_TX_FILE
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Invalid parameter, #CF_EID_ERR_CMD_BAD_PARAM
+            - Transaction initialization failure, #CF_EID_ERR_CMD_TX_FILE
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_PLAYBACK_DIR_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="2" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="TxFile_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="PlaybackDirCmd" baseType="CMD">
+        <LongDescription>
+              \cfcmd Playback a directory
+
+       \par Description
+            Transmits all the files in a directory
+
+       \par Command Structure
+            #CF_PlaybackDirCmd_t - note it's currently a typedef of CF_TxFileCmd_t, where
+            the source filename and destination filename are directories
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_PLAYBACK_DIR
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Invalid parameter, #CF_EID_ERR_CMD_BAD_PARAM
+            - Playback initialization failure, #CF_EID_ERR_CMD_PLAYBACK_DIR
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_TX_FILE_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="3" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="TxFile_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="FreezeCmd" baseType="CMD">
+        <LongDescription>
+           \cfcmd Freeze a channel
+
+       \par Description
+            Disables the transmission of all PDUs and disables tick processing (timeouts, ACK/NAK, etc)
+            for the specified channel, will still consume all received messages.  Note
+            this could cause failures for class 2 transactions in progress.
+
+       \par Command Structure
+            #CF_UnionArgsCmd_t where byte[0] specifies the channel number or all channels
+            - 255 = all channels
+            - else = single channel
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_FREEZE
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
+            - Command processing failure, #CF_EID_ERR_CMD_FREEZE
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_THAW_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="4" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="UnionArgs_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="ThawCmd" baseType="CMD">
+        <LongDescription>
+            \cfcmd Thaw a channel
+
+       \par Description
+            Enables the transmission of all PDUs and resumes tick processing (timeouts, ACK/NAK, etc)
+            for the specified channel, note received messages are consumed either way.
+
+       \par Command Structure
+            #CF_UnionArgsCmd_t where byte[0] specifies the channel number or all channels
+            - 255 = all channels
+            - else = single channel
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_THAW
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
+            - Command processing failure, #CF_EID_ERR_CMD_THAW
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_FREEZE_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="5" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="UnionArgs_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="SuspendCmd" baseType="CMD">
+        <LongDescription>
+           \cfcmd Suspend a transaction
+
+       \par Description
+            Disables the transmission of all PDUs and disables tick processing (timeouts, ACK/NAK, etc) on a single
+            transaction, all channels and transactions, or all transactions on a specific channel.
+            Will still consume all received messages. Note suspension is tracked per transaction,
+            whereas freeze/thaw are tracked per channel.
+
+       \par Command Structure
+            #CF_TransactionCmd_t
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_SUSPRES
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Transaction not found using compound key, #CF_EID_ERR_CMD_TRANS_NOT_FOUND
+            - Invalid channel number, #CF_EID_ERR_CMD_TSN_CHAN_INVALID
+            - Already in requested state, #CF_EID_ERR_CMD_SUSPRES_SAME
+            - No matching transaction, #CF_EID_ERR_CMD_SUSPRES_CHAN
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_RESUME_CC, #CF_CANCEL_CC, #CF_ABANDON_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="6" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="Transaction_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="ResumeCmd" baseType="CMD">
+        <LongDescription>
+           \cfcmd Resume a transaction
+
+       \par Description
+            Enables the transmission of all PDUs and resumes tick processing (timeouts, ACK/NAK, etc) on a single
+            transaction, all channels and transactions, or all transactions on a specific channel.
+            Note a suspended transaction still consume all received messages. Note suspension is tracked per
+            transaction, whereas freeze/thaw are tracked per channel.
+
+       \par Command Structure
+            #CF_TransactionCmd_t
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_SUSPRES
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Transaction not found using compound key, #CF_EID_ERR_CMD_TRANS_NOT_FOUND
+            - Invalid channel number, #CF_EID_ERR_CMD_TSN_CHAN_INVALID
+            - Already in requested state, #CF_EID_ERR_CMD_SUSPRES_SAME
+            - No matching transaction, #CF_EID_ERR_CMD_SUSPRES_CHAN
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_SUSPEND_CC, #CF_CANCEL_CC, #CF_ABANDON_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="7" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="Transaction_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="CancelCmd" baseType="CMD">
+        <LongDescription>
+            \cfcmd Cancel a transaction
+
+       \par Description
+            Cancel transaction processing by taking steps to close out cleanly (based on transaction
+            type and direction) for a single transaction, all channels and transactions,
+            or all transactions on a specific channel.
+
+       \par Command Structure
+            #CF_TransactionCmd_t
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_CANCEL
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Transaction not found using compound key, #CF_EID_ERR_CMD_TRANS_NOT_FOUND
+            - Invalid channel number, #CF_EID_ERR_CMD_TSN_CHAN_INVALID
+            - No matching transaction, #CF_EID_ERR_CMD_CANCEL_CHAN
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_SUSPEND_CC, #CF_RESUME_CC, #CF_ABANDON_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="8" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="Transaction_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="AbandonCmd" baseType="CMD">
+        <LongDescription>
+           \cfcmd Abandon a transaction
+
+       \par Description
+            Abandon transaction processing with an immediate reset (no close out attempted)
+            for a single transaction, all channels and transactions,
+            or all transactions on a specific channel.
+
+       \par Command Structure
+            #CF_TransactionCmd_t
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_ABANDON
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Transaction not found using compound key, #CF_EID_ERR_CMD_TRANS_NOT_FOUND
+            - Invalid channel number, #CF_EID_ERR_CMD_TSN_CHAN_INVALID
+            - No matching transaction, #CF_EID_ERR_CMD_ABANDON_CHAN
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_SUSPEND_CC, #CF_RESUME_CC, #CF_CANCEL_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="9" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="Transaction_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="SetParamCmd" baseType="CMD">
+        <LongDescription>
+           \cfcmd Set parameter
+
+       \par Description
+            Sets a configuration parameter
+
+       \par Command Structure
+            #CF_SetParamCmd_t
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_GETSET1
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Invalid configuration parameter key, #CF_EID_ERR_CMD_GETSET_PARAM
+            - Invalid channel number, #CF_EID_ERR_CMD_GETSET_CHAN
+            - Parameter value failed validation, #CF_EID_ERR_CMD_GETSET_VALIDATE
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_GET_PARAM_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="10" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="SetParam_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="GetParamCmd" baseType="CMD">
+        <LongDescription>
+             \cfcmd Get parameter
+
+       \par Description
+            Gets a configuration parameter
+
+       \par Command Structure
+            #CF_GetParamCmd_t
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_GETSET2
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Invalid configuration parameter key, #CF_EID_ERR_CMD_GETSET_PARAM
+            - Invalid channel number, #CF_EID_ERR_CMD_GETSET_CHAN
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_SET_PARAM_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="11" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="GetParam_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="WriteQueueCmd" baseType="CMD">
+        <LongDescription>
+             \cfcmd Write queue
+
+       \par Description
+            Writes requested queue(s) to a file
+
+       \par Command Structure
+            #CF_WriteQueueCmd_t
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_WQ
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Invalid parameter combination, #CF_EID_ERR_CMD_WQ_ARGS
+            - Invalid channel number, #CF_EID_ERR_CMD_WQ_CHAN
+            - Open file to write failed, #CF_EID_ERR_CMD_WQ_OPEN
+            - Write RX data failed, #CF_EID_ERR_CMD_WQ_WRITEQ_RX
+            - Write RX history data failed, #CF_EID_ERR_CMD_WQ_WRITEHIST_RX
+            - Write TX data failed, #CF_EID_ERR_CMD_WQ_WRITEQ_TX
+            - Write TX history data failed, #CF_EID_ERR_CMD_WQ_WRITEHIST_TX
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_PURGE_QUEUE_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="15" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="WriteQueue_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="EnableDequeueCmd" baseType="CMD">
+        <LongDescription>
+      \cfcmd Enable dequeue
+
+       \par Description
+            Enables the sending of file data PDUs.
+
+       \par Command Structure
+            #CF_UnionArgsCmd_t where byte[0] specifies the channel number or all channels
+            - 255 = all channels
+            - else = single channel
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_ENABLE_DEQUEUE
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
+            - Enable dequeue failed, #CF_EID_ERR_CMD_ENABLE_DEQUEUE
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_DISABLE_DEQUEUE_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="16" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="UnionArgs_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="DisableDequeueCmd" baseType="CMD">
+        <LongDescription>
+             \cfcmd Disable dequeue
+
+       \par Description
+            Disables the sending of file data PDUs.
+
+       \par Command Structure
+            #CF_UnionArgsCmd_t where byte[0] specifies the channel number or all channels
+            - 255 = all channels
+            - else = single channel
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_DISABLE_DEQUEUE
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
+            - Disable dequeue failed, #CF_EID_INF_CMD_DISABLE_DEQUEUE
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_ENABLE_DEQUEUE_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="17" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="UnionArgs_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="EnableDirPollingCmd" baseType="CMD">
+        <LongDescription>
+              \cfcmd Enable directory polling
+
+       \par Description
+            Enables the processing of polling directories
+
+       \par Command Structure
+            #CF_UnionArgsCmd_t
+
+            byte[0] specifies the channel number or all channels
+            - 255 = all channels
+            - else = single channel
+
+            byte[1] specifies the polling directory index
+            - 255 = all polling directories
+            - else = single polling directory index
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_ENABLE_POLLDIR
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
+            - Invalid polling directory index, #CF_EID_ERR_CMD_POLLDIR_INVALID
+            - Enable directory polling failed, #CF_EID_ERR_CMD_ENABLE_POLLDIR
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_DISABLE_DIR_POLLING_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="18" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="UnionArgs_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="DisableDirPollingCmd" baseType="CMD">
+        <LongDescription>
+              \cfcmd Disable directory polling
+
+       \par Description
+            Disable the processing of polling directories
+
+       \par Command Structure
+            #CF_UnionArgsCmd_t
+
+            byte[0] specifies the channel number or all channels
+            - 255 = all channels
+            - else = single channel
+
+            byte[1] specifies the polling directory index
+            - 255 = all polling directories
+            - else = single polling directory index
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_DISABLE_POLLDIR
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
+            - Invalid polling directory index, #CF_EID_ERR_CMD_POLLDIR_INVALID
+            - Disable directory polling failed, #CF_EID_ERR_CMD_DISABLE_POLLDIR
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_ENABLE_DIR_POLLING_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="19" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="UnionArgs_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="PurgeQueueCmd" baseType="CMD">
+        <LongDescription>
+              \cfcmd Purge queue
+
+       \par Description
+            Purge the requested queue
+
+       \par Command Structure
+            #CF_UnionArgsCmd_t
+
+            byte[0] specifies the channel number or all channels
+            - 255 = all channels
+            - else = single channel
+
+            byte[1] specifies the queue
+            - 0 = Pending queue
+            - 1 = History queue
+            - 2 = Both pending and history queue
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_PURGE_QUEUE
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
+            - Invalid purge queue argument, #CF_EID_ERR_CMD_PURGE_ARG
+            - Purge queue failed, #CF_EID_ERR_CMD_PURGE_QUEUE
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_WRITE_QUEUE_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="21" />
+        </ConstraintSet>
+        <EntryList>
+          <Entry type="UnionArgs_Payload" name="Payload" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="EnableEngineCmd" baseType="CMD" shortDescription="Enable Engine" >
+        <LongDescription>
+       \cfcmd Enable engine
+
+       \par Description
+            Reinitialize engine and enable processing.  Note configuration table updates
+            are not processed while the engine is enabled.
+
+       \par Command Structure
+            #CF_NoArgsCmd_t
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_ENABLE_ENGINE
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Engine initialization failed, #CF_EID_ERR_CMD_ENABLE_ENGINE
+            - Engine already enabled, #CF_EID_ERR_CMD_ENG_ALREADY_ENA
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_ENABLE_ENGINE_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="22" />
+        </ConstraintSet>
+      </ContainerDataType>
+
+      <ContainerDataType name="DisableEngineCmd" baseType="CMD" shortDescription="Disable Engine" >
+        <LongDescription>
+       \cfcmd Disable engine
+
+       \par Description
+            Disable engine processing.  Note configuration table updates
+            can be performed while the engine is disabled, and when the engine is
+            re-enabled the new configuration will take affect.
+
+       \par Command Structure
+            #CF_NoArgsCmd_t
+
+       \par Command Verification
+            Successful execution of this command may be verified with
+            the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.cmd will increment
+            - #CF_EID_INF_CMD_DISABLE_ENGINE
+
+       \par Error Conditions
+            This command may fail for the following reason(s):
+            - Command packet length not as expected, #CF_EID_ERR_CMD_GCMD_LEN
+            - Engine already disabled, #CF_EID_ERR_CMD_ENG_ALREADY_DIS
+
+       \par Evidence of failure may be found in the following telemetry:
+            - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
+
+       \par Criticality
+            None
+
+       \sa #CF_DISABLE_ENGINE_CC
+        </LongDescription>
+        <ConstraintSet>
+          <ValueConstraint entry="Sec.FunctionCode" value="23" />
+        </ConstraintSet>
+      </ContainerDataType>
+
+
+    </DataTypeSet>
+
+    <ComponentSet>
+      <Component name="Application">
+        <RequiredInterfaceSet>
+          <Interface name="CMD" shortDescription="Software bus telecommand interface" type="CFE_SB/Telecommand">
+            <GenericTypeMapSet>
+              <GenericTypeMap name="TelecommandDataType" type="CMD" />
+            </GenericTypeMapSet>
+          </Interface>
+          <Interface name="SEND_HK" shortDescription="Send telemetry command interface" type="CFE_SB/Telecommand">
+            <!-- This uses a bare spacepacket with no payload -->
+            <GenericTypeMapSet>
+              <GenericTypeMap name="TelecommandDataType" type="SendHkCmd" />
+            </GenericTypeMapSet>
+          </Interface>
+          <Interface name="WAKE_UP" shortDescription="Send telemetry command interface" type="CFE_SB/Telecommand">
+            <GenericTypeMapSet>
+              <GenericTypeMap name="TelecommandDataType" type="WakeupCmd" />
+            </GenericTypeMapSet>
+          </Interface>
+          <Interface name="HK_TLM" shortDescription="Software bus housekeeping telemetry interface" type="CFE_SB/Telemetry">
+            <GenericTypeMapSet>
+              <GenericTypeMap name="TelemetryDataType" type="HkPacket" />
+            </GenericTypeMapSet>
+          </Interface>
+          <Interface name="EOT_TLM" shortDescription="Software bus housekeeping telemetry interface" type="CFE_SB/Telemetry">
+            <GenericTypeMapSet>
+              <GenericTypeMap name="TelemetryDataType" type="EotPacket" />
+            </GenericTypeMapSet>
+          </Interface>
+        </RequiredInterfaceSet>
+        <Implementation>
+          <VariableSet>
+            <Variable type="BASE_TYPES/uint16" readOnly="true" name="CmdTopicId" initialValue="${CFE_MISSION/CF_CMD_TOPICID}" />
+            <Variable type="BASE_TYPES/uint16" readOnly="true" name="SendHkTopicId" initialValue="${CFE_MISSION/CF_SEND_HK_TOPICID}" />
+            <Variable type="BASE_TYPES/uint16" readOnly="true" name="WakeUpTopicId" initialValue="${CFE_MISSION/CF_WAKE_UP_TOPICID}" />
+            <Variable type="BASE_TYPES/uint16" readOnly="true" name="HkTlmTopicId" initialValue="${CFE_MISSION/CF_HK_TLM_TOPICID}" />
+            <Variable type="BASE_TYPES/uint16" readOnly="true" name="EotTlmTopicId" initialValue="${CFE_MISSION/CF_EOT_TLM_TOPICID)}" />
+          </VariableSet>
+          <!-- Assign fixed numbers to the "TopicId" parameter of each interface -->
+          <ParameterMapSet>
+            <ParameterMap interface="CMD" parameter="TopicId" variableRef="CmdTopicId" />
+            <ParameterMap interface="SEND_HK" parameter="TopicId" variableRef="SendHkTopicId" />
+            <ParameterMap interface="WAKE_UP" parameter="TopicId" variableRef="WakeUpTopicId" />
+            <ParameterMap interface="HK_TLM" parameter="TopicId" variableRef="HkTlmTopicId" />
+            <ParameterMap interface="EOT_TLM" parameter="TopicId" variableRef="EotTlmTopicId" />
+          </ParameterMapSet>
+        </Implementation>
+      </Component>
+    </ComponentSet>
+
+  </Package>
+</PackageFile>

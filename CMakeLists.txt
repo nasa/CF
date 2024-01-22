@@ -14,10 +14,15 @@ set(APP_SRC_FILES
   fsw/src/cf_codec.c
   fsw/src/cf_cmd.c
   fsw/src/cf_crc.c
-  fsw/src/cf_dispatch.c
   fsw/src/cf_timer.c
   fsw/src/cf_utils.c
 )
+
+if (CFE_EDS_ENABLED_BUILD)
+  list(APPEND APP_SRC_FILES fsw/src/cf_eds_dispatch.c)
+else()
+  list(APPEND APP_SRC_FILES fsw/src/cf_dispatch.c)
+endif()
 
 # Create the app module
 add_cfe_app(cf ${APP_SRC_FILES})
