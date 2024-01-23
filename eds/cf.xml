@@ -60,6 +60,13 @@
        <BooleanDataEncoding sizeInBits="8" />
      </BooleanDataType>
 
+     <IntegerDataType name="ChannelId" shortDescription="Channel Identifier Value">
+       <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+       <Range>
+          <MinMaxRange rangeType="inclusiveMinExclusiveMax" min="0" max="${CF/NUM_CHANNELS}"/>
+       </Range>
+     </IntegerDataType>
+
 <!--
      <AliasDataType name="PathName" type="BASE_TYPES/PathName" />
      <AliasDataType name="FileName" type="BASE_TYPES/FileName" />
@@ -149,7 +156,7 @@
 
      <ArrayDataType name="ChannelConfigTable" dataTypeRef="ChannelConfig" shortDescription="Channel Config Table">
        <DimensionList>
-          <Dimension size="${CF/NUM_CHANNELS}" />
+          <Dimension indexTypeRef="ChannelId" />
        </DimensionList>
      </ArrayDataType>
 
@@ -258,7 +265,7 @@
 
       <ArrayDataType name="Channel_Hk" dataTypeRef="HkChannel_Data">
         <DimensionList>
-           <Dimension size="${CF/NUM_CHANNELS}"/>
+          <Dimension indexTypeRef="ChannelId" />
         </DimensionList>
       </ArrayDataType>
 
@@ -327,7 +334,7 @@
       <ContainerDataType name="GetParam_Payload" shortDescription="Get parameter command structure">
         <EntryList>
           <Entry name="key" type="GetSet_ValueID" shortDescription="Parameter key, see #CF_GetSet_ValueID_t" />
-          <Entry name="chan_num" type="BASE_TYPES/uint8" shortDescription="Channel number" />
+          <Entry name="chan_num" type="ChannelId" shortDescription="Channel number" />
         </EntryList>
       </ContainerDataType>
 
@@ -335,17 +342,17 @@
         <EntryList>
           <Entry name="value" type="BASE_TYPES/uint32" shortDescription="Parameter value to set" />
           <Entry name="key" type="GetSet_ValueID" shortDescription="Parameter key, see #CF_GetSet_ValueID_t" />
-          <Entry name="chan_num" type="BASE_TYPES/uint8" shortDescription="Channel number" />
+          <Entry name="chan_num" type="ChannelId" shortDescription="Channel number" />
           <PaddingEntry sizeInBits="16" shortDescription="Alignment spare, uint32 multiple"/>
         </EntryList>
       </ContainerDataType>
 
       <ContainerDataType name="TxFile_Payload" shortDescription="Transmit file command structure">
         <EntryList>
-          <Entry name="cfdp_class" type="BASE_TYPES/uint8" shortDescription="CFDP class: 0=class 1, 1=class 2" />
-          <Entry name="keep" type="BASE_TYPES/uint8" shortDescription="Keep file flag: 1=keep, else delete" />
-          <Entry name="chan_num" type="BASE_TYPES/uint8" shortDescription="Channel number" />
-          <Entry name="priority" type="BASE_TYPES/uint32" shortDescription="Priority: 0=highest priority" />
+          <Entry name="cfdp_class" type="CFDP" shortDescription="CFDP class: 0=class 1, 1=class 2" />
+          <Entry name="keep" type="EnableFlag" shortDescription="Keep file flag: 1=keep, else delete" />
+          <Entry name="chan_num" type="ChannelId" shortDescription="Channel number" />
+          <Entry name="priority" type="BASE_TYPES/uint8" shortDescription="Priority: 0=highest priority" />
           <Entry name="dest_id" type="BASE_TYPES/uint32" shortDescription="Destination entity id" />
           <Entry name="src_filename" type="BASE_TYPES/PathName" shortDescription="Source filename" />
           <Entry name="dst_filename" type="BASE_TYPES/PathName" shortDescription="Destination filename" />
@@ -375,7 +382,7 @@
      <ContainerDataType name="WriteQueue_Payload" shortDescription="Write Queue command structure">
         <EntryList>
           <Entry name="type" type="Type" shortDescription="Transaction direction: all=0, up=1, down=2" />
-          <Entry name="chan" type="BASE_TYPES/uint8" shortDescription="Channel number" />
+          <Entry name="chan" type="ChannelId" shortDescription="Channel number" />
           <Entry name="queue" type="Queue" shortDescription="Queue type: 0=pending, 1=active, 2=history, 3=all" />
           <PaddingEntry sizeInBits="8" shortDescription="Alignment spare, puts filename on 32-bit boundary"/>
           <Entry name="filename" type="BASE_TYPES/PathName" shortDescription="Filename written to" />
@@ -396,7 +403,7 @@
       <ContainerDataType name="CMD" baseType="CFE_HDR/CommandHeader">
       </ContainerDataType>
 
-      <ContainerDataType name="NoopCmd" baseType="CMD">
+      <ContainerDataType name="NoopCmd" baseType="CMD" shortDescription="Generate an info event message with app version">
         <LongDescription>
          \cfcmd No Operation
 
@@ -427,7 +434,7 @@
         </ConstraintSet>
       </ContainerDataType>
 
-      <ContainerDataType name="ResetCmd" baseType="CMD">
+      <ContainerDataType name="ResetCmd" baseType="CMD" shortDescription="Resets HK TLM parent and child task counters">
         <LongDescription>
               \cfcmd Reset counters
 
@@ -467,7 +474,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="TxFileCmd" baseType="CMD">
+      <ContainerDataType name="TxFileCmd" baseType="CMD" shortDescription="Send file from Spacecraft to Ground">
         <LongDescription>
               \cfcmd Transmit file
 
@@ -505,7 +512,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="PlaybackDirCmd" baseType="CMD">
+      <ContainerDataType name="PlaybackDirCmd" baseType="CMD" shortDescription="Playback a directory">
         <LongDescription>
               \cfcmd Playback a directory
 
@@ -544,7 +551,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="FreezeCmd" baseType="CMD">
+      <ContainerDataType name="FreezeCmd" baseType="CMD" shortDescription="Freeze a channel">
         <LongDescription>
            \cfcmd Freeze a channel
 
@@ -586,7 +593,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="ThawCmd" baseType="CMD">
+      <ContainerDataType name="ThawCmd" baseType="CMD" shortDescription="Thaw a channel">
         <LongDescription>
             \cfcmd Thaw a channel
 
@@ -627,7 +634,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="SuspendCmd" baseType="CMD">
+      <ContainerDataType name="SuspendCmd" baseType="CMD" shortDescription="Suspend a transaction">
         <LongDescription>
            \cfcmd Suspend a transaction
 
@@ -670,7 +677,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="ResumeCmd" baseType="CMD">
+      <ContainerDataType name="ResumeCmd" baseType="CMD" shortDescription="Resume a transaction">
         <LongDescription>
            \cfcmd Resume a transaction
 
@@ -713,7 +720,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="CancelCmd" baseType="CMD">
+      <ContainerDataType name="CancelCmd" baseType="CMD" shortDescription="Cancel a transaction">
         <LongDescription>
             \cfcmd Cancel a transaction
 
@@ -754,7 +761,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="AbandonCmd" baseType="CMD">
+      <ContainerDataType name="AbandonCmd" baseType="CMD" shortDescription="Abandon a transaction">
         <LongDescription>
            \cfcmd Abandon a transaction
 
@@ -795,7 +802,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="SetParamCmd" baseType="CMD">
+      <ContainerDataType name="SetParamCmd" baseType="CMD" shortDescription="Set a local parameter">
         <LongDescription>
            \cfcmd Set parameter
 
@@ -834,7 +841,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="GetParamCmd" baseType="CMD">
+      <ContainerDataType name="GetParamCmd" baseType="CMD" shortDescription="Get a local parameter">
         <LongDescription>
              \cfcmd Get parameter
 
@@ -872,7 +879,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="WriteQueueCmd" baseType="CMD">
+      <ContainerDataType name="WriteQueueCmd" baseType="CMD" shortDescription="Write a queue to file">
         <LongDescription>
              \cfcmd Write queue
 
@@ -915,7 +922,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="EnableDequeueCmd" baseType="CMD">
+      <ContainerDataType name="EnableDequeueCmd" baseType="CMD" shortDescription="Enable dequeue (tx file) for a channel">
         <LongDescription>
       \cfcmd Enable dequeue
 
@@ -955,7 +962,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="DisableDequeueCmd" baseType="CMD">
+      <ContainerDataType name="DisableDequeueCmd" baseType="CMD" shortDescription="Disable dequeue (tx file) for a channel">
         <LongDescription>
              \cfcmd Disable dequeue
 
@@ -995,7 +1002,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="EnableDirPollingCmd" baseType="CMD">
+      <ContainerDataType name="EnableDirPollingCmd" baseType="CMD" shortDescription="Enable polling directory">
         <LongDescription>
               \cfcmd Enable directory polling
 
@@ -1042,7 +1049,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="DisableDirPollingCmd" baseType="CMD">
+      <ContainerDataType name="DisableDirPollingCmd" baseType="CMD" shortDescription="Disable polling directory">
         <LongDescription>
               \cfcmd Disable directory polling
 
@@ -1089,7 +1096,7 @@
         </EntryList>
       </ContainerDataType>
 
-      <ContainerDataType name="PurgeQueueCmd" baseType="CMD">
+      <ContainerDataType name="PurgeQueueCmd" baseType="CMD" shortDescription="Purge queue">
         <LongDescription>
               \cfcmd Purge queue
 
