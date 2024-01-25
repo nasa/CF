@@ -141,7 +141,7 @@ CFE_Status_t CF_TxFileCmd(const CF_TxFileCmd_t *msg)
      * For priority and dest_id params, anything is acceptable.
      */
     if ((tx->cfdp_class != CF_CFDP_CLASS_1 && tx->cfdp_class != CF_CFDP_CLASS_2) || tx->chan_num >= CF_NUM_CHANNELS ||
-        tx->keep > 1)
+        (int)tx->keep > 1)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_BAD_PARAM, CFE_EVS_EventType_ERROR,
                           "CF: bad parameter in CF_TxFileCmd(): chan=%u, class=%u keep=%u", (unsigned int)tx->chan_num,
@@ -190,7 +190,7 @@ CFE_Status_t CF_PlaybackDirCmd(const CF_PlaybackDirCmd_t *msg)
      * For priority and dest_id params, anything is acceptable.
      */
     if ((tx->cfdp_class != CF_CFDP_CLASS_1 && tx->cfdp_class != CF_CFDP_CLASS_2) || tx->chan_num >= CF_NUM_CHANNELS ||
-        tx->keep > 1)
+        (int)tx->keep > 1)
     {
         CFE_EVS_SendEvent(CF_EID_ERR_CMD_BAD_PARAM, CFE_EVS_EventType_ERROR,
                           "CF: bad parameter in CF_PlaybackDirCmd(): chan=%u, class=%u keep=%u",
