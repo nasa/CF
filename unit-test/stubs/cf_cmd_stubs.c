@@ -89,11 +89,11 @@ void CF_CmdCancel_Txn(CF_Transaction_t *txn, void *ignored)
  * Generated stub function for CF_CmdValidateChunkSize()
  * ----------------------------------------------------
  */
-CF_ChanAction_Status_t CF_CmdValidateChunkSize(uint32 val, uint8 chan_num)
+CF_ChanAction_Status_t CF_CmdValidateChunkSize(CF_ChunkSize_t val, uint8 chan_num)
 {
     UT_GenStub_SetupReturnBuffer(CF_CmdValidateChunkSize, CF_ChanAction_Status_t);
 
-    UT_GenStub_AddParam(CF_CmdValidateChunkSize, uint32, val);
+    UT_GenStub_AddParam(CF_CmdValidateChunkSize, CF_ChunkSize_t, val);
     UT_GenStub_AddParam(CF_CmdValidateChunkSize, uint8, chan_num);
 
     UT_GenStub_Execute(CF_CmdValidateChunkSize, Basic, NULL);

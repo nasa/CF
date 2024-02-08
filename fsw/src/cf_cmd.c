@@ -946,7 +946,7 @@ CFE_Status_t CF_WriteQueueCmd(const CF_WriteQueueCmd_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CF_ChanAction_Status_t CF_CmdValidateChunkSize(uint32 val, uint8 chan_num /* ignored */)
+CF_ChanAction_Status_t CF_CmdValidateChunkSize(CF_ChunkSize_t val, uint8 chan_num /* ignored */)
 {
     CF_ChanAction_Status_t ret = CF_ChanAction_Status_SUCCESS;
     if (val > sizeof(CF_CFDP_PduFileDataContent_t))
@@ -989,7 +989,7 @@ void CF_GetSetParamCmd(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
     struct
     {
         void * ptr;
-        uint32 size;
+        size_t size;
         CF_ChanAction_Status_t (*fn)(uint32, uint8 chan_num);
     } item;
 

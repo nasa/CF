@@ -175,7 +175,7 @@ CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *histor
 
     int          i;
     CFE_Status_t ret;
-    int32        len;
+    size_t       len;
     char         linebuf[(CF_FILENAME_MAX_LEN * 2) + 128]; /* buffer for line data */
 
     for (i = 0; i < 3; ++i)

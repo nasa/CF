@@ -63,7 +63,7 @@ void CF_CRC_Start(CF_Crc_t *crc);
  * @param len  Length of data to digest
  *
  */
-void CF_CRC_Digest(CF_Crc_t *crc, const uint8 *data, int len);
+void CF_CRC_Digest(CF_Crc_t *crc, const uint8 *data, size_t len);
 
 /************************************************************************/
 /** @brief Finalize a CRC calculation.
