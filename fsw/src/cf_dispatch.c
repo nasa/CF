@@ -151,7 +151,7 @@ void CF_AppPipe(const CFE_SB_Buffer_t *msg)
 
         default:
             ++CF_AppData.hk.Payload.counters.err;
-            CFE_EVS_SendEvent(CF_EID_ERR_INVALID_MID, CFE_EVS_EventType_ERROR, "CF: invalid command packet id=0x%lx",
+            CFE_EVS_SendEvent(CF_MID_ERR_EID, CFE_EVS_EventType_ERROR, "CF: invalid command packet id=0x%lx",
                               (unsigned long)CFE_SB_MsgIdToValue(msg_id));
             break;
     }

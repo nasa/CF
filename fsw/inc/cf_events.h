@@ -132,7 +132,7 @@
  *
  *  Invalid message ID received on the software bus pipe
  */
-#define CF_EID_ERR_INVALID_MID (28)
+#define CF_MID_ERR_EID (28)
 
 /**
  * \brief CF SB Receive Buffer Failed Event ID
