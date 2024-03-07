@@ -34,8 +34,8 @@
 #include "cf_eds_typedefs.h"
 
 typedef CF_QueueIdx_Enum_t CF_QueueIdx_t;
-#define CF_QueueIdx_NUM       (1 + CF_QueueIdx_Enum_t_MAX)
-#define CF_GetSet_ValueID_MAX (1 + CF_GetSet_ValueID_Enum_t_MAX)
+#define CF_QueueIdx_NUM       (1 + EdsDataType_CF_QueueIdx_t_MAX)
+#define CF_GetSet_ValueID_MAX (1 + EdsDataType_CF_GetSet_ValueID_t_MAX)
 
 typedef CF_EntityId_Atom_t       CF_EntityId_t;
 typedef CF_TransactionSeq_Atom_t CF_TransactionSeq_t;
@@ -43,8 +43,8 @@ typedef CF_TransactionSeq_Atom_t CF_TransactionSeq_t;
 typedef CF_CFDP_Enum_t           CF_CFDP_Class_t;
 typedef CF_GetSet_ValueID_Enum_t CF_GetSet_ValueID_t;
 
-typedef BASE_TYPES_PathName_String_t CF_PathName_t;
-typedef BASE_TYPES_FileName_String_t CF_FileName_t;
+typedef EdsDataType_BASE_TYPES_PathName_t CF_PathName_t;
+typedef EdsDataType_BASE_TYPES_FileName_t CF_FileName_t;
 
 #define CF_FILENAME_MAX_NAME ((int)sizeof(CF_FileName_t))
 #define CF_FILENAME_MAX_LEN  ((int)sizeof(CF_PathName_t))

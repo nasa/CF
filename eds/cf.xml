@@ -56,9 +56,14 @@
        <IntegerDataEncoding sizeInBits="32" encoding="unsigned" />
      </IntegerDataType>
 
-     <BooleanDataType name="EnableFlag" shortDescription="Enable/Disable logical value">
-       <BooleanDataEncoding sizeInBits="8" />
-     </BooleanDataType>
+     <EnumeratedDataType name="EnableFlag" shortDescription="Enable/Disable logical value">
+        <EnumerationList>
+          <Enumeration label="NO"  value="0" shortDescription="Option Disabled" />
+          <Enumeration label="YES" value="1" shortDescription="Option Enabled" />
+        </EnumerationList>
+
+       <IntegerDataEncoding sizeInBits="8" />
+     </EnumeratedDataType>
 
      <IntegerDataType name="ChannelId" shortDescription="Channel Identifier Value">
        <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
