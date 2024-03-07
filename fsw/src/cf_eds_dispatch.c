@@ -8,7 +8,7 @@
 
 #include "cfe_msg.h"
 
-static const CF_Application_Component_Telecommand_DispatchTable_t CF_TC_DISPATCH_TABLE = {
+static const EdsDispatchTable_CF_Application_CFE_SB_Telecommand_t CF_TC_DISPATCH_TABLE = {
     .CMD =
         {
 
@@ -48,8 +48,7 @@ void CF_AppPipe(const CFE_SB_Buffer_t *msg)
     CFE_MSG_Size_t    MsgSize;
     CFE_MSG_FcnCode_t MsgFc;
 
-    status = CF_Application_Component_Telecommand_Dispatch(CFE_SB_Telecommand_indication_Command_ID, msg,
-                                                           &CF_TC_DISPATCH_TABLE);
+    status = EdsDispatch_CF_Application_Telecommand(msg, &CF_TC_DISPATCH_TABLE);
 
     if (status != CFE_SUCCESS)
     {
@@ -58,9 +57,8 @@ void CF_AppPipe(const CFE_SB_Buffer_t *msg)
 
         if (status == CFE_STATUS_UNKNOWN_MSG_ID)
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_INVALID_MID, CFE_EVS_EventType_ERROR,
-                              "L%d TO: Invalid Msg ID Rcvd 0x%x status=0x%08x", __LINE__,
-                              (unsigned int)CFE_SB_MsgIdToValue(MsgId), (unsigned int)status);
+            CFE_EVS_SendEvent(CF_MID_ERR_EID, CFE_EVS_EventType_ERROR, "L%d TO: Invalid Msg ID Rcvd 0x%x status=0x%08x",
+                              __LINE__, (unsigned int)CFE_SB_MsgIdToValue(MsgId), (unsigned int)status);
         }
         else if (status == CFE_STATUS_WRONG_MSG_LENGTH)
         {
