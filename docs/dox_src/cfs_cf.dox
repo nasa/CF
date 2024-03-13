@@ -452,21 +452,18 @@
   configuration table. When the queue entry is 'pushed-off' the history queue,
   the memory for the queue will be available.
 
-  For incoming file transactions, CF uses a statically allocated buffer for the
-  incoming PDU. The size of this buffer is defined by the platform configuration
-  parameter, CF_MAX_PDU_SIZE. The incoming PDU's are copied from the Software Bus
-  into this buffer and then passed to the engine.
+  For incoming file transactions, CF writes file data from the incoming packet
+  directly to the file without the use of an internal buffer.  Incoming transaction
+  size is limited by the underlying transport layer.
 
-  For outgoing file transactions, the engine uses a statically allocated buffer for
-  PDUs. The size of this buffer is defined by platform configuration parameter,
-  CF_MAX_PDU_SIZE. The engine informs the CF app when it has a PDU
-  ready to go out. In response to this, the CF app checks with the downlink app
-  (e.g. TO) to see if it is ready to receive a PDU. This is done by the CF app
-  trying to 'take' the throttling semaphore defined in the CF configuration
-  table. If the CF app successfully 'takes' the semaphore, it gives a green
-  light to the engine and the PDU is then released by the engine and sent to the
-  software bus via the zero-copy delivery mode. There is a green light counter
-  and a red light counter for each output channel in telemetry.
+  For outgoing file transactions CF requests a buffer from SB sized for
+  CF_MAX_PDU_SIZE, the CCSDS header size, and CF_PDU_ENCAPSULATION_EXTRA_TRAILING_BYTES.
+  Outgoing packets are then filed up to this maximum value for transmission.  Note
+  the maximum outgoing size can also be limited by the table or set parameter command
+  for outgoing_file_chunk_size.
+
+  Generation of packets can be flow controlled via a throttling semaphore
+  defined in the CF configuration table.
 
   Prev: \ref cfscfovrdsn <BR>
   Next: \ref cfscfdg

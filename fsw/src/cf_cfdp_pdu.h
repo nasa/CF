@@ -369,11 +369,13 @@ typedef struct CF_CFDP_PduFileDataHeader
 } CF_CFDP_PduFileDataHeader_t;
 
 /**
- * @brief PDU file data content
+ * @brief
+ * PDU file data content typedef for limit checking outgoing_file_chunk_size
+ * table value and set parameter command.
  *
- * To serve as a sanity check, this should accommodate the largest data block possible.
- * In that light, it should be sized based on the minimum encoded header size, rather than
- * the maximum, as that case leaves the most space for data.
+ * This definition allows for the largest data block possible, as CF_MAX_PDU_SIZE -
+ * the minimum possible header size.  In practice the outgoing file chunk size is limited by
+ * whichever is smaller; the remaining data, remaining space in the packet, and outgoing_file_chunk_size.
  */
 typedef struct CF_CFDP_PduFileDataContent
 {

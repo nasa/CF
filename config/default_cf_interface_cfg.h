@@ -82,16 +82,21 @@
  *  @brief Max PDU size.
  *
  *  @par Description:
- *       The max PDU size across all channels in the system. Keep in mind that
- *       the max filedata PDU will be smaller than this. This size includes
- *       the PDU headers and everything. While this is the max value for all
- *       channels, the outgoing_file_chunk_size in the configuration table
- *       is different for each channel so a smaller size can be used.
+ *       Limits the maximum possible Tx PDU size. Note the resulting CCSDS packet
+ *       also includes a CCSDS header and CF_PDU_ENCAPSULATION_EXTRA_TRAILING_BYTES.
+ *       The outgoing file data chunk size is also limited from the table configuration
+ *       or by set parameter command, which is checked against this value
+ *       (+ smallest possible PDU header).
+ *
+ *  @par Note:
+ *       This does NOT limit Rx PDUs, since the file data is written from
+ *       the transport packet to the file.
  *
  *  @par Limits:
+ *       Since PDUs are wrapped in CCSDS packets, need to respect any
+ *       CCSDS packet size limits on the system.
  *
  */
-/* CF_MAX_PDU_SIZE must be the max possible PDU for any channel. Channels can be configured with a smaller max. */
 #define CF_MAX_PDU_SIZE (512)
 
 /**
@@ -113,8 +118,8 @@
 /**
  * @brief Number of trailing bytes to add to CFDP PDU
  *
- * @par Description
- *      Additional padding bytes to be appended to the tail of CFDP PDUs
+ * @par Description
+ *      Additional padding bytes to be appended to the tail of CFDP PDUs
  *      This reserves extra space to the software bus encapsulation buffer for every
  *      CFDP PDU such that platform-specific trailer information may be added.  This
  *      includes, but is not limited to a separate CRC or error control field in addition
@@ -126,7 +131,7 @@
  *      Set to 0 to disable this feature, such that the software bus buffer
  *      encapsulates only the CFDP PDU and no extra bytes are added.
  *
- *  @par Limits:
+ * @par Limits:
  *       Maximum value is the difference between the maximum size of a CFDP PDU and the
  *       maximum size of an SB message.
  */
