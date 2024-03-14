@@ -410,10 +410,6 @@ typedef struct CF_Channel
     uint8 tick_type;
 } CF_Channel_t;
 
-/* NOTE: the use of CF_CFDP_PduHeader_t below is correct, but the CF_PduRecvMsg_t and CF_PduSendMsg_t
- * structures are both longer than these definitions. They are always backed by a buffer
- * of size CF_MAX_PDU_SIZE */
-
 /**
  * @brief CF engine output state
  *
@@ -421,13 +417,9 @@ typedef struct CF_Channel
  */
 typedef struct CF_Output
 {
-    CFE_SB_Buffer_t * msg;    /**< \brief Binary message to be sent to underlying transport */
-    CF_EncoderState_t encode; /**< \brief Encoding state (while building message) */
-
-    /**
-     * \brief Temporary R/W buffer for holding output PDUs while working with them
-     */
-    CF_Logical_PduBuffer_t tx_pdudata;
+    CFE_SB_Buffer_t       *msg;        /**< \brief Binary message to be sent to underlying transport */
+    CF_EncoderState_t      encode;     /**< \brief Encoding state (while building message) */
+    CF_Logical_PduBuffer_t tx_pdudata; /**< \brief Tx PDU logical values */
 } CF_Output_t;
 
 /**
@@ -437,13 +429,9 @@ typedef struct CF_Output
  */
 typedef struct CF_Input
 {
-    CFE_SB_Buffer_t * msg;    /**< \brief Binary message received from underlying transport */
-    CF_DecoderState_t decode; /**< \brief Decoding state (while interpreting message) */
-
-    /**
-     * \brief Temporary R/W buffer for holding input PDUs while working with them
-     */
-    CF_Logical_PduBuffer_t rx_pdudata;
+    CFE_SB_Buffer_t       *msg;        /**< \brief Binary message received from underlying transport */
+    CF_DecoderState_t      decode;     /**< \brief Decoding state (while interpreting message) */
+    CF_Logical_PduBuffer_t rx_pdudata; /**< \brief Rx PDU logical values */
 } CF_Input_t;
 
 /**
