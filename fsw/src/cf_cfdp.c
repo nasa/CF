@@ -1604,9 +1604,7 @@ void CF_CFDP_CycleEngine(void)
  *-----------------------------------------------------------------*/
 void CF_CFDP_ResetTransaction(CF_Transaction_t *txn, int keep_history)
 {
-    char *        filename;
-    char          destination[OS_MAX_PATH_LEN];
-    osal_status_t status = OS_ERROR;
+
     CF_Channel_t *chan   = &CF_AppData.engine.channels[txn->chan_num];
     CF_Assert(txn->chan_num < CF_NUM_CHANNELS);
 
@@ -1624,31 +1622,10 @@ void CF_CFDP_ResetTransaction(CF_Transaction_t *txn, int keep_history)
     if (OS_ObjectIdDefined(txn->fd))
     {
         CF_WrappedClose(txn->fd);
+
         if (!txn->keep)
         {
-            if (CF_CFDP_IsSender(txn))
-            {
-                /* If move directory is defined attempt move */
-                if (CF_AppData.config_table->chan[txn->chan_num].move_dir[0] != 0)
-                {
-                    filename = strrchr(txn->history->fnames.src_filename, '/');
-                    if (filename != NULL)
-                    {
-                        snprintf(destination, sizeof(destination), "%s%s",
-                                 CF_AppData.config_table->chan[txn->chan_num].move_dir, filename);
-                        status = OS_mv(txn->history->fnames.src_filename, destination);
-                    }
-                }
-
-                if (status != OS_SUCCESS)
-                {
-                    OS_remove(txn->history->fnames.src_filename);
-                }
-            }
-            else
-            {
-                OS_remove(txn->history->fnames.dst_filename);
-            }
+            CF_CFDP_HandleNotKeepFile(txn);
         }
     }
 
@@ -1843,5 +1820,102 @@ void CF_CFDP_DisableEngine(void)
         memset(&CF_AppData.hk.Payload.channel_hk[i].q_size, 0, sizeof(CF_AppData.hk.Payload.channel_hk[i].q_size));
 
         CFE_SB_DeletePipe(chan->pipe);
+    }
+}
+
+/*----------------------------------------------------------------
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
+bool CF_CFDP_IsPollingDir(const char * src_file, uint8 chan_num)
+{
+    bool return_code = false;
+    char src_dir[CF_FILENAME_MAX_LEN] = "\0";
+    CF_ChannelConfig_t *cc;
+    CF_PollDir_t *      pd;
+    int                 i;
+
+    char * last_slash = strrchr(src_file, '/');
+    if(last_slash != NULL)
+    {
+        strncpy(src_dir, src_file, last_slash - src_file);
+    }
+
+    cc = &CF_AppData.config_table->chan[chan_num];
+    for (i = 0; i < CF_MAX_POLLING_DIR_PER_CHAN; ++i)
+    {
+        pd = &cc->polldir[i];
+        if(strcmp(src_dir, pd->src_dir) == 0)
+        {
+            return_code = true;
+            break;
+        }
+    }
+
+    return return_code;
+}
+
+/*----------------------------------------------------------------
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
+void CF_CFDP_HandleNotKeepFile(CF_Transaction_t *txn)
+{
+    /* Sender */
+    if (CF_CFDP_IsSender(txn))
+    {
+        if(!CF_TxnStatus_IsError(txn->history->txn_stat))
+        {
+            /* If move directory is defined attempt move */
+            CF_CFDP_MoveFile(txn->history->fnames.src_filename, CF_AppData.config_table->chan[txn->chan_num].move_dir);
+        }
+        else
+        {
+            /* file inside an polling directory */
+            if(CF_CFDP_IsPollingDir(txn->history->fnames.src_filename, txn->chan_num))
+            {
+                /* If fail directory is defined attempt move */
+                CF_CFDP_MoveFile(txn->history->fnames.src_filename, CF_AppData.config_table->fail_dir);
+            }
+        }
+    }
+    /* Not Sender */
+    else
+    {
+        OS_remove(txn->history->fnames.dst_filename);
+    }
+}
+
+
+/*----------------------------------------------------------------
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
+void CF_CFDP_MoveFile(const char *src, const char *dest_dir)
+{
+    osal_status_t status = OS_ERROR;
+    char *        filename;
+    char          destination[OS_MAX_PATH_LEN];
+
+    if(dest_dir[0] != 0)
+    {
+        filename = strrchr(src, '/');
+        if (filename != NULL)
+        {
+            snprintf(destination, sizeof(destination), "%s%s",
+                    dest_dir, filename);
+            status = OS_mv(src, destination);
+        }  
+    }
+
+    if (status != OS_SUCCESS)
+    {
+        OS_remove(src);
     }
 }
