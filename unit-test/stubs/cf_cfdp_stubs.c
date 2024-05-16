@@ -245,6 +245,18 @@ void CF_CFDP_EncodeStart(CF_EncoderState_t *penc, void *msgbuf, CF_Logical_PduBu
 
 /*
  * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_HandleNotKeepFile()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_HandleNotKeepFile(CF_Transaction_t *txn)
+{
+    UT_GenStub_AddParam(CF_CFDP_HandleNotKeepFile, CF_Transaction_t *, txn);
+
+    UT_GenStub_Execute(CF_CFDP_HandleNotKeepFile, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
  * Generated stub function for CF_CFDP_InitEngine()
  * ----------------------------------------------------
  */
@@ -271,6 +283,36 @@ void CF_CFDP_InitTxnTxFile(CF_Transaction_t *txn, CF_CFDP_Class_t cfdp_class, ui
     UT_GenStub_AddParam(CF_CFDP_InitTxnTxFile, uint8, priority);
 
     UT_GenStub_Execute(CF_CFDP_InitTxnTxFile, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_IsPollingDir()
+ * ----------------------------------------------------
+ */
+bool CF_CFDP_IsPollingDir(const char *src_file, uint8 chan_num)
+{
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_IsPollingDir, bool);
+
+    UT_GenStub_AddParam(CF_CFDP_IsPollingDir, const char *, src_file);
+    UT_GenStub_AddParam(CF_CFDP_IsPollingDir, uint8, chan_num);
+
+    UT_GenStub_Execute(CF_CFDP_IsPollingDir, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_CFDP_IsPollingDir, bool);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_MoveFile()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_MoveFile(const char *src, const char *dest_dir)
+{
+    UT_GenStub_AddParam(CF_CFDP_MoveFile, const char *, src);
+    UT_GenStub_AddParam(CF_CFDP_MoveFile, const char *, dest_dir);
+
+    UT_GenStub_Execute(CF_CFDP_MoveFile, Basic, NULL);
 }
 
 /*

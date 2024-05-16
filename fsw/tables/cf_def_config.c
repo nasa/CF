@@ -80,5 +80,6 @@ CF_ConfigTable_t CF_config_table = {
       .move_dir = ""}},
     480,       /* outgoing_file_chunk_size */
     "/cf/tmp", /* temporary file directory */
+    "/cf/fail", /* Stores failed tx file for "polling directory" */
 };
 CFE_TBL_FILEDEF(CF_config_table, CF.config_table, CF config table, cf_def_config.tbl)

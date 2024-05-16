@@ -703,4 +703,34 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *chan);
  */
 CF_CListTraverse_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context);
 
+/************************************************************************/
+/** @brief Check if source file came from polling directory
+ *
+ *
+ * @par Assumptions, External Events, and Notes:
+ *
+ * @retval true/false
+ */
+bool CF_CFDP_IsPollingDir(const char * src_file, uint8 chan_num);
+
+/************************************************************************/
+/** @brief Remove/Move file after transaction
+ * 
+ * This helper is used to handle "not keep" file option after a transaction.  
+ *
+ * @par Assumptions, External Events, and Notes:
+ *
+ */
+void CF_CFDP_HandleNotKeepFile(CF_Transaction_t *txn);
+
+/************************************************************************/
+/** @brief Move File 
+ * 
+ * This helper is used to move a file.  
+ *
+ * @par Assumptions, External Events, and Notes:
+ *
+ */
+void CF_CFDP_MoveFile(const char *src, const char *dest_dir);
+
 #endif /* !CF_CFDP_H */
