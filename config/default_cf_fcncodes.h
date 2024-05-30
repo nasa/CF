@@ -249,13 +249,13 @@ typedef enum
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
      *       - #CF_CMD_SUSPRES_INF_EID
+     *       - #CF_CMD_SUSPRES_SAME_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Transaction not found using compound key, #CF_CMD_TRANS_NOT_FOUND_ERR_EID
      *       - Invalid channel number, #CF_CMD_TSN_CHAN_INVALID_ERR_EID
-     *       - Already in requested state, #CF_CMD_SUSPRES_SAME_ERR_EID
      *       - No matching transaction, #CF_CMD_SUSPRES_CHAN_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
@@ -285,13 +285,13 @@ typedef enum
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
      *       - #CF_CMD_SUSPRES_INF_EID
+     *       - #CF_CMD_SUSPRES_SAME_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Transaction not found using compound key, #CF_CMD_TRANS_NOT_FOUND_ERR_EID
      *       - Invalid channel number, #CF_CMD_TSN_CHAN_INVALID_ERR_EID
-     *       - Already in requested state, #CF_CMD_SUSPRES_SAME_ERR_EID
      *       - No matching transaction, #CF_CMD_SUSPRES_CHAN_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
@@ -673,12 +673,12 @@ typedef enum
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
      *       - #CF_CMD_ENABLE_ENGINE_INF_EID
+     *       - #CF_CMD_ENG_ALREADY_ENA_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
      *       - Engine initialization failed, #CF_CMD_ENABLE_ENGINE_ERR_EID
-     *       - Engine already enabled, #CF_CMD_ENG_ALREADY_ENA_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -706,11 +706,11 @@ typedef enum
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
      *       - #CF_CMD_DISABLE_ENGINE_INF_EID
+   *         - #CF_CMD_ENG_ALREADY_DIS_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Engine already disabled, #CF_CMD_ENG_ALREADY_DIS_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment

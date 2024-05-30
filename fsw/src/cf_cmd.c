@@ -439,9 +439,9 @@ void CF_DoSuspRes(const CF_Transaction_Payload_t *payload, uint8 action)
     if (ret == 1 && args.same)
     {
         /* A single transaction was mached, and it was already set the same way */
-        CFE_EVS_SendEvent(CF_CMD_SUSPRES_SAME_ERR_EID, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_CMD_SUSPRES_SAME_INF_EID, CFE_EVS_EventType_INFORMATION,
                           "CF: %s cmd: setting suspend flag to current value of %d", msgstr[action], action);
-        ++CF_AppData.hk.Payload.counters.err;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
     else if (ret <= 0)
     {
@@ -1184,9 +1184,9 @@ CFE_Status_t CF_EnableEngineCmd(const CF_EnableEngineCmd_t *msg)
     }
     else
     {
-        CFE_EVS_SendEvent(CF_CMD_ENG_ALREADY_ENA_ERR_EID, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_CMD_ENG_ALREADY_ENA_INF_EID, CFE_EVS_EventType_INFORMATION,
                           "CF: received enable engine command while engine already enabled");
-        ++CF_AppData.hk.Payload.counters.err;
+        ++CF_AppData.hk.Payload.counters.cmd;
     }
 
     return CFE_SUCCESS;
@@ -1204,14 +1204,14 @@ CFE_Status_t CF_DisableEngineCmd(const CF_DisableEngineCmd_t *msg)
     {
         CF_CFDP_DisableEngine();
         CFE_EVS_SendEvent(CF_CMD_DISABLE_ENGINE_INF_EID, CFE_EVS_EventType_INFORMATION, "CF: disabled CFDP engine");
-        ++CF_AppData.hk.Payload.counters.cmd;
     }
     else
     {
-        CFE_EVS_SendEvent(CF_CMD_ENG_ALREADY_DIS_ERR_EID, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_CMD_ENG_ALREADY_DIS_INF_EID, CFE_EVS_EventType_INFORMATION,
                           "CF: received disable engine command while engine already disabled");
-        ++CF_AppData.hk.Payload.counters.err;
     }
+
+    ++CF_AppData.hk.Payload.counters.cmd;
 
     return CFE_SUCCESS;
 }

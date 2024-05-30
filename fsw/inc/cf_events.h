@@ -1157,13 +1157,13 @@
 /**
  * \brief CF Suspend/Resume Command For Single Transaction State Unchanged Event ID
  *
- *  \par Type: ERROR
+ *  \par Type: INFORMATION
  *
  *  \par Cause:
  *
  *  Suspend/resume command received affecting single transaction already set to that state
  */
-#define CF_CMD_SUSPRES_SAME_ERR_EID (133)
+#define CF_CMD_SUSPRES_SAME_INF_EID (133)
 
 /**
  * \brief CF Suspend/Resume Command No Matching Transaction Event ID
@@ -1333,24 +1333,24 @@
 /**
  * \brief CF Enable Engine Command Engine Already Enabled Event ID
  *
- *  \par Type: ERROR
+ *  \par Type: INFORMATION
  *
  *  \par Cause:
  *
  *  Enable engine command received while engine is already enabled
  */
-#define CF_CMD_ENG_ALREADY_ENA_ERR_EID (149)
+#define CF_CMD_ENG_ALREADY_ENA_INF_EID (149)
 
 /**
  * \brief CF Disable Engine Command Engine Already Disabled Event ID
  *
- *  \par Type: ERROR
+ *  \par Type: INFORMATION
  *
  *  \par Cause:
  *
  *  Disable engine command received while engine is already disabled
  */
-#define CF_CMD_ENG_ALREADY_DIS_ERR_EID (150)
+#define CF_CMD_ENG_ALREADY_DIS_INF_EID (150)
 
 /**
  * \brief CF Command Length Verification Failed Event ID

@@ -1295,8 +1295,8 @@ void Test_CF_DoSuspRes(void)
     UT_SetHandlerFunction(UT_KEY(CF_TraverseAllTransactions), UT_AltHandler_CF_TraverseAllTransactions_SetSuspResArg,
                           &utargs);
     UtAssert_VOIDCALL(CF_DoSuspRes(cmd, 0));
-    UT_CF_AssertEventID(CF_CMD_SUSPRES_SAME_ERR_EID);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 2);
+    UT_CF_AssertEventID(CF_CMD_SUSPRES_SAME_INF_EID);
+    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, 2);
 
     /* Output the CF_ChanAction_SuspResArg_t back to the caller, to set the "same" flag to 1 */
     /* however this time CF_TraverseAllTransactions reports it matched multiple transactions, so it should NOT reject it
@@ -1306,7 +1306,7 @@ void Test_CF_DoSuspRes(void)
     UtAssert_VOIDCALL(CF_DoSuspRes(cmd, 1));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_CMD_SUSPRES_INF_EID);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, 2);
+    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, 3);
 }
 
 /*******************************************************************************
@@ -3609,17 +3609,17 @@ void Test_CF_CmdEnableEngine_WithEngineNotEnableFailsInitSendEventAndIncrementEr
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
 }
 
-void Test_CF_CmdEnableEngine_WithEngineEnableFailsSendEventAndIncrementErrCounter(void)
+void Test_CF_CmdEnableEngine_WithEngineEnableFailsSendEventAndIncrementCmdCounter(void)
 {
     /* Arrange */
     CF_EnableEngineCmd_t utbuf;
-    uint16               initial_hk_err_counter = Any_uint16();
+    uint16               initial_hk_cmd_counter = Any_uint16();
 
     memset(&utbuf, 0, sizeof(utbuf));
 
     CF_AppData.engine.enabled = 1; /* 1 is enabled */
 
-    CF_AppData.hk.Payload.counters.err = initial_hk_err_counter;
+    CF_AppData.hk.Payload.counters.cmd = initial_hk_cmd_counter;
 
     /* Act */
     CF_EnableEngineCmd(&utbuf);
@@ -3629,9 +3629,9 @@ void Test_CF_CmdEnableEngine_WithEngineEnableFailsSendEventAndIncrementErrCounte
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_InitEngine, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_CMD_ENG_ALREADY_ENA_ERR_EID);
+    UT_CF_AssertEventID(CF_CMD_ENG_ALREADY_ENA_INF_EID);
     /* Assert for incremented counter */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
+    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
 }
 
 /*******************************************************************************
@@ -3664,17 +3664,17 @@ void Test_CF_CmdDisableEngine_SuccessWhenEngineEnabledAndIncrementCmdCounter(voi
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
 }
 
-void Test_CF_CmdDisableEngine_WhenEngineDisabledAndIncrementErrCounterThenFail(void)
+void Test_CF_CmdDisableEngine_WhenEngineDisabledAndIncrementCmdCounter(void)
 {
     /* Arrange */
     CF_DisableEngineCmd_t utbuf;
-    uint16                initial_hk_err_counter = Any_uint16();
+    uint16                initial_hk_counter = Any_uint16();
 
     memset(&utbuf, 0, sizeof(utbuf));
 
     CF_AppData.engine.enabled = 0; /* 0 is not enabled */
 
-    CF_AppData.hk.Payload.counters.err = initial_hk_err_counter;
+    CF_AppData.hk.Payload.counters.cmd = initial_hk_counter;
 
     /* Act */
     CF_DisableEngineCmd(&utbuf);
@@ -3682,12 +3682,9 @@ void Test_CF_CmdDisableEngine_WhenEngineDisabledAndIncrementErrCounterThenFail(v
     /* Assert */
     UtAssert_STUB_COUNT(CF_CFDP_DisableEngine, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_CMD_ENG_ALREADY_DIS_ERR_EID);
+    UT_CF_AssertEventID(CF_CMD_ENG_ALREADY_DIS_INF_EID);
     /* Assert for incremented counter */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
-    UtAssert_True(CF_AppData.hk.Payload.counters.err == (uint16)(initial_hk_err_counter + 1),
-                  "CF_AppData.hk.Payload.counters.err is %d and should be 1 more than %d",
-                  CF_AppData.hk.Payload.counters.err, initial_hk_err_counter);
+    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, (initial_hk_counter + 1) & 0xFFFF);
 }
 
 /*******************************************************************************
@@ -4103,16 +4100,16 @@ void add_CF_CmdEnableEngine_tests(void)
     UtTest_Add(Test_CF_CmdEnableEngine_WithEngineNotEnableFailsInitSendEventAndIncrementErrCounter, cf_cmd_tests_Setup,
                cf_cmd_tests_Teardown,
                "Test_CF_CmdEnableEngine_WithEngineNotEnableFailsInitSendEventAndIncrementErrCounter");
-    UtTest_Add(Test_CF_CmdEnableEngine_WithEngineEnableFailsSendEventAndIncrementErrCounter, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_CmdEnableEngine_WithEngineEnableFailsSendEventAndIncrementErrCounter");
+    UtTest_Add(Test_CF_CmdEnableEngine_WithEngineEnableFailsSendEventAndIncrementCmdCounter, cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown, "Test_CF_CmdEnableEngine_WithEngineEnableFailsSendEventAndIncrementCmdCounter");
 }
 
 void add_CF_CmdDisableEngine_tests(void)
 {
     UtTest_Add(Test_CF_CmdDisableEngine_SuccessWhenEngineEnabledAndIncrementCmdCounter, cf_cmd_tests_Setup,
                cf_cmd_tests_Teardown, "Test_CF_CmdDisableEngine_SuccessWhenEngineEnabledAndIncrementCmdCounter");
-    UtTest_Add(Test_CF_CmdDisableEngine_WhenEngineDisabledAndIncrementErrCounterThenFail, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_CmdDisableEngine_WhenEngineDisabledAndIncrementErrCounterThenFail");
+    UtTest_Add(Test_CF_CmdDisableEngine_WhenEngineDisabledAndIncrementCmdCounter, cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown, "Test_CF_CmdDisableEngine_WhenEngineDisabledAndIncrementCmdCounter");
 }
 
 void add_CF_SendHkCmd_tests(void)
