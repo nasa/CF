@@ -170,6 +170,12 @@ typedef struct
 typedef struct
 {
     CF_CListNode_t **head;
+    CF_CListNode_t * node;
+} CF_CList_InsertFront_context_t;
+
+typedef struct
+{
+    CF_CListNode_t **head;
     CF_CListNode_t * start;
     CF_CListNode_t * after;
 } CF_CList_InsertAfter_context_t;

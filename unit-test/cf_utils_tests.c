@@ -679,39 +679,39 @@ void Test_CF_PrioSearch_When_t_PrioIsLessThanContextPrio_Set_context_t_To_t_AndR
 **
 *******************************************************************************/
 
-void Test_CF_InsertSortPrio_Call_CF_CList_InsertBack_Ex_ListIsEmpty_AndSet_q_index_To_q(void)
+void Test_CF_InsertSortPrio_Call_CF_CList_InsertFront_Ex_ListIsEmpty_AndSet_q_index_To_q(void)
 {
     /* Arrange */
     CF_Transaction_t  txn;
     CF_Transaction_t *arg_t = &txn;
     CF_QueueIdx_t     arg_q = Any_cf_queue_index_t();
     CF_Channel_t *    chan;
-    CF_CListNode_t ** expected_insert_back_head;
-    CF_CListNode_t *  expected_insert_back_node;
+    CF_CListNode_t ** expected_insert_front_head;
+    CF_CListNode_t *  expected_insert_front_node;
 
-    CF_CList_InsertBack_context_t context_clist_insert_back;
+    CF_CList_InsertFront_context_t context_clist_insert_front;
 
     /* txn settings to bypass CF_Assert */
     txn.chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
     txn.state    = Any_uint8_Except(CF_TxnState_IDLE);
 
-    UT_SetDataBuffer(UT_KEY(CF_CList_InsertBack), &context_clist_insert_back, sizeof(context_clist_insert_back), false);
+    UT_SetDataBuffer(UT_KEY(CF_CList_InsertFront), &context_clist_insert_front, sizeof(context_clist_insert_front), false);
 
     /* setting (&CF_AppData.engine.channels[arg_t->chan_num])->qs[arg_q] to NULL
      * makes the list empty */
     chan            = &CF_AppData.engine.channels[arg_t->chan_num];
     chan->qs[arg_q] = NULL;
 
-    expected_insert_back_head = &chan->qs[arg_q];
-    expected_insert_back_node = &arg_t->cl_node;
+    expected_insert_front_head = &chan->qs[arg_q];
+    expected_insert_front_node = &arg_t->cl_node;
 
     /* Act */
     CF_InsertSortPrio(arg_t, arg_q);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_CList_InsertBack, 1);
-    UtAssert_ADDRESS_EQ(context_clist_insert_back.head, expected_insert_back_head);
-    UtAssert_ADDRESS_EQ(context_clist_insert_back.node, expected_insert_back_node);
+    UtAssert_STUB_COUNT(CF_CList_InsertFront, 1);
+    UtAssert_ADDRESS_EQ(context_clist_insert_front.head, expected_insert_front_head);
+    UtAssert_ADDRESS_EQ(context_clist_insert_front.node, expected_insert_front_node);
     UtAssert_True(arg_t->flags.com.q_index == arg_q,
                   "arg_t->flags.com.q_index set to %d and should be %d (CF_QueueIdx_t queue)", arg_t->flags.com.q_index,
                   arg_q);
@@ -776,7 +776,7 @@ void Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q(voi
                   arg_t->flags.com.q_index, arg_q);
 }
 
-void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
+void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertFront_Ex(void)
 {
     /* Arrange */
     CF_Transaction_t  txn;
@@ -786,11 +786,11 @@ void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
     CF_Channel_t *    chan;
     CF_CListNode_t *  expected_end;
     CF_CListFn_t      expected_fn;
-    CF_CListNode_t ** expected_insert_back_head;
-    CF_CListNode_t *  expected_insert_back_node;
+    CF_CListNode_t ** expected_insert_front_head;
+    CF_CListNode_t *  expected_insert_front_node;
 
     CF_CList_Traverse_R_context_t context_cf_clist_traverse_r;
-    CF_CList_InsertBack_context_t context_clist_insert_back;
+    CF_CList_InsertFront_context_t context_clist_insert_front;
 
     UT_SetDataBuffer(UT_KEY(CF_CList_Traverse_R), &context_cf_clist_traverse_r, sizeof(context_cf_clist_traverse_r),
                      false);
@@ -810,11 +810,11 @@ void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
     /* set expected values */
     expected_end              = chan->qs[arg_q];
     expected_fn               = CF_PrioSearch;
-    expected_insert_back_head = &chan->qs[arg_q];
-    expected_insert_back_node = &arg_t->cl_node;
+    expected_insert_front_head = &chan->qs[arg_q];
+    expected_insert_front_node = &arg_t->cl_node;
 
-    /* Arrange for CF_CList_InsertBack_Ex */
-    UT_SetDataBuffer(UT_KEY(CF_CList_InsertBack), &context_clist_insert_back, sizeof(context_clist_insert_back), false);
+    /* Arrange for CF_CList_InsertFront_Ex */
+    UT_SetDataBuffer(UT_KEY(CF_CList_InsertFront), &context_clist_insert_front, sizeof(context_clist_insert_front), false);
 
     /* Act */
     CF_InsertSortPrio(arg_t, arg_q);
@@ -824,9 +824,9 @@ void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
     UtAssert_ADDRESS_EQ(context_cf_clist_traverse_r.end, expected_end);
     UtAssert_True(context_cf_clist_traverse_r.fn == expected_fn, "context_cf_clist_traverse_r.fn ==  expected_fn");
     UtAssert_STUB_COUNT(CF_CList_InsertAfter, 0);
-    UtAssert_STUB_COUNT(CF_CList_InsertBack, 1);
-    UtAssert_ADDRESS_EQ(context_clist_insert_back.head, expected_insert_back_head);
-    UtAssert_ADDRESS_EQ(context_clist_insert_back.node, expected_insert_back_node);
+    UtAssert_STUB_COUNT(CF_CList_InsertFront, 1);
+    UtAssert_ADDRESS_EQ(context_clist_insert_front.head, expected_insert_front_head);
+    UtAssert_ADDRESS_EQ(context_clist_insert_front.node, expected_insert_front_node);
     UtAssert_True(arg_t->flags.com.q_index == arg_q, "txn->flags.com.q_index is %u and should be %u (q)",
                   arg_t->flags.com.q_index, arg_q);
 }
@@ -1229,13 +1229,13 @@ void add_CF_PrioSearch_tests(void)
 
 void add_CF_InsertSortPrio_tests(void)
 {
-    UtTest_Add(Test_CF_InsertSortPrio_Call_CF_CList_InsertBack_Ex_ListIsEmpty_AndSet_q_index_To_q, cf_utils_tests_Setup,
+    UtTest_Add(Test_CF_InsertSortPrio_Call_CF_CList_InsertFront_Ex_ListIsEmpty_AndSet_q_index_To_q, cf_utils_tests_Setup,
                cf_utils_tests_Teardown,
-               "Test_CF_InsertSortPrio_Call_CF_CList_InsertBack_Ex_ListIsEmpty_AndSet_q_index_To_q");
+               "Test_CF_InsertSortPrio_Call_CF_CList_InsertFront_Ex_ListIsEmpty_AndSet_q_index_To_q");
     UtTest_Add(Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q, cf_utils_tests_Setup,
                cf_utils_tests_Teardown, "Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q");
-    UtTest_Add(Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex, cf_utils_tests_Setup,
-               cf_utils_tests_Teardown, "Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex");
+    UtTest_Add(Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertFront_Ex, cf_utils_tests_Setup,
+               cf_utils_tests_Teardown, "Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertFront_Ex");
 }
 
 void add_CF_TraverseAllTransactions_Impl_tests(void)
