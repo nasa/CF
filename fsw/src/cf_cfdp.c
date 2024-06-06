@@ -301,22 +301,6 @@ CF_Logical_PduBuffer_t *CF_CFDP_ConstructPduHeader(const CF_Transaction_t *txn, 
 
 /*----------------------------------------------------------------
  *
- * Internal helper routine only, not part of API.
- *
- *-----------------------------------------------------------------*/
-static inline size_t CF_strnlen(const char *str, size_t maxlen)
-{
-    const char *end = memchr(str, 0, maxlen);
-    if (end != NULL)
-    {
-        /* actual length of string is difference */
-        maxlen = end - str;
-    }
-    return maxlen;
-}
-
-/*----------------------------------------------------------------
- *
  * Application-scope internal function
  * See description in cf_cfdp.h for argument/return detail
  *
@@ -344,10 +328,10 @@ CFE_Status_t CF_CFDP_SendMd(CF_Transaction_t *txn)
         /* at this point, need to append filenames into md packet */
         /* this does not actually copy here - that is done during encode */
         md->source_filename.length =
-            CF_strnlen(txn->history->fnames.src_filename, sizeof(txn->history->fnames.src_filename));
+            OS_strnlen(txn->history->fnames.src_filename, sizeof(txn->history->fnames.src_filename));
         md->source_filename.data_ptr = txn->history->fnames.src_filename;
         md->dest_filename.length =
-            CF_strnlen(txn->history->fnames.dst_filename, sizeof(txn->history->fnames.dst_filename));
+            OS_strnlen(txn->history->fnames.dst_filename, sizeof(txn->history->fnames.dst_filename));
         md->dest_filename.data_ptr = txn->history->fnames.dst_filename;
 
         CF_CFDP_EncodeMd(ph->penc, md);
