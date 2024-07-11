@@ -331,7 +331,7 @@ CF_CListTraverse_Status_t CF_PrioSearch(CF_CListNode_t *node, void *context)
  *-----------------------------------------------------------------*/
 void CF_InsertSortPrio(CF_Transaction_t *txn, CF_QueueIdx_t queue)
 {
-    int           insert_back = 0;
+    bool           insert_back = false;
     CF_Channel_t *chan        = &CF_AppData.engine.channels[txn->chan_num];
 
     CF_Assert(txn->chan_num < CF_NUM_CHANNELS);
@@ -343,7 +343,7 @@ void CF_InsertSortPrio(CF_Transaction_t *txn, CF_QueueIdx_t queue)
     if (!chan->qs[queue])
     {
         /* list is empty, so just insert */
-        insert_back = 1;
+        insert_back = true;
     }
     else
     {
@@ -355,7 +355,7 @@ void CF_InsertSortPrio(CF_Transaction_t *txn, CF_QueueIdx_t queue)
         }
         else
         {
-            insert_back = 1;
+            insert_back = true;
         }
     }
 

@@ -1455,7 +1455,7 @@ void Test_CF_CmdAbandon_Txn_Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0(void
 
     /* Assert */
     UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetTransaction.txn, arg_t);
-    UtAssert_True(context_CF_CFDP_ResetTransaction.keep_history == 0,
+    UtAssert_True(context_CF_CFDP_ResetTransaction.keep_history == false,
                   "CF_CFDP_CancelTransaction was called with int %d and should be 0 (constant in call)",
                   context_CF_CFDP_ResetTransaction.keep_history);
 }
@@ -2022,7 +2022,7 @@ void Test_CF_PurgeTransaction_Call_CF_CFDP_ResetTransaction_AndReturn_CLIST_CONT
 
     /* Assert */
     UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetTransaction.txn, &txn);
-    UtAssert_True(context_CF_CFDP_ResetTransaction.keep_history == 0,
+    UtAssert_True(context_CF_CFDP_ResetTransaction.keep_history == false,
                   "CF_CFDP_ResetTransaction received keep_history %u and should be 0 (constant)",
                   context_CF_CFDP_ResetTransaction.keep_history);
     UtAssert_True(local_result == CF_CLIST_CONT, "CF_PurgeHistory returned %d and should be %d (CF_CLIST_CONT)",
@@ -3421,7 +3421,7 @@ void Test_CF_CmdValidateMaxOutgoing_WhenGiven_val_Is_0_And_sem_name_Is_NULL_Retu
 void Test_CF_CmdGetSetParam(void)
 {
     /* Test cases for:
-     * void CF_GetSetParamCmd(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num);
+     * void CF_GetSetParamCmd(bool is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num);
      */
 
     /* Arrange */
@@ -3438,7 +3438,7 @@ void Test_CF_CmdGetSetParam(void)
     for (param_id = 0; param_id < CF_GetSet_ValueID_MAX; ++param_id)
     {
         UT_CF_ResetEventCapture();
-        UtAssert_VOIDCALL(CF_GetSetParamCmd(1, param_id, 1 + param_id, UT_CFDP_CHANNEL));
+        UtAssert_VOIDCALL(CF_GetSetParamCmd(true, param_id, 1 + param_id, UT_CFDP_CHANNEL));
         UT_CF_AssertEventID(CF_EID_INF_CMD_GETSET1);
         UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, ++expected_count);
     }
@@ -3459,26 +3459,26 @@ void Test_CF_CmdGetSetParam(void)
     for (param_id = 0; param_id < CF_GetSet_ValueID_MAX; ++param_id)
     {
         UT_CF_ResetEventCapture();
-        UtAssert_VOIDCALL(CF_GetSetParamCmd(0, param_id, 1, UT_CFDP_CHANNEL));
+        UtAssert_VOIDCALL(CF_GetSetParamCmd(false, param_id, 1, UT_CFDP_CHANNEL));
         UT_CF_AssertEventID(CF_EID_INF_CMD_GETSET2);
         UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, ++expected_count);
     }
 
     /* Bad param ID */
     UT_CF_ResetEventCapture();
-    UtAssert_VOIDCALL(CF_GetSetParamCmd(0, CF_GetSet_ValueID_MAX, 0, UT_CFDP_CHANNEL));
+    UtAssert_VOIDCALL(CF_GetSetParamCmd(false, CF_GetSet_ValueID_MAX, 0, UT_CFDP_CHANNEL));
     UT_CF_AssertEventID(CF_EID_ERR_CMD_GETSET_PARAM);
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 1);
 
     /* Bad channel ID */
     UT_CF_ResetEventCapture();
-    UtAssert_VOIDCALL(CF_GetSetParamCmd(0, 0, 0, CF_NUM_CHANNELS + 1));
+    UtAssert_VOIDCALL(CF_GetSetParamCmd(false, 0, 0, CF_NUM_CHANNELS + 1));
     UT_CF_AssertEventID(CF_EID_ERR_CMD_GETSET_CHAN);
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 2);
 
     /* Validation fail */
     UT_CF_ResetEventCapture();
-    UtAssert_VOIDCALL(CF_GetSetParamCmd(1, CF_GetSet_ValueID_outgoing_file_chunk_size,
+    UtAssert_VOIDCALL(CF_GetSetParamCmd(true, CF_GetSet_ValueID_outgoing_file_chunk_size,
                                         100 + sizeof(CF_CFDP_PduFileDataContent_t), UT_CFDP_CHANNEL));
     UT_CF_AssertEventID(CF_EID_ERR_CMD_GETSET_VALIDATE);
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 3);
@@ -3562,7 +3562,7 @@ void Test_CF_CmdEnableEngine_WithEngineNotEnableInitSuccessAndIncrementCmdCounte
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    CF_AppData.engine.enabled = 0; /* 0 is not enabled */
+    CF_AppData.engine.enabled = false;
 
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_InitEngine), forced_return_CF_CFDP_InitEngine);
 
@@ -3590,7 +3590,7 @@ void Test_CF_CmdEnableEngine_WithEngineNotEnableFailsInitSendEventAndIncrementEr
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    CF_AppData.engine.enabled = 0; /* 0 is not enabled */
+    CF_AppData.engine.enabled = false;
 
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_InitEngine), forced_return_CF_CFDP_InitEngine);
 
@@ -3617,7 +3617,7 @@ void Test_CF_CmdEnableEngine_WithEngineEnableFailsSendEventAndIncrementErrCounte
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    CF_AppData.engine.enabled = 1; /* 1 is enabled */
+    CF_AppData.engine.enabled = true;
 
     CF_AppData.hk.Payload.counters.err = initial_hk_err_counter;
 
@@ -3648,7 +3648,7 @@ void Test_CF_CmdDisableEngine_SuccessWhenEngineEnabledAndIncrementCmdCounter(voi
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    CF_AppData.engine.enabled = 1; /* 1 is enabled */
+    CF_AppData.engine.enabled = true;
 
     CF_AppData.hk.Payload.counters.cmd = initial_hk_cmd_counter;
 
@@ -3672,7 +3672,7 @@ void Test_CF_CmdDisableEngine_WhenEngineDisabledAndIncrementErrCounterThenFail(v
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    CF_AppData.engine.enabled = 0; /* 0 is not enabled */
+    CF_AppData.engine.enabled = false;
 
     CF_AppData.hk.Payload.counters.err = initial_hk_err_counter;
 
