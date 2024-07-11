@@ -455,7 +455,7 @@ typedef struct CF_Engine
     CF_Chunk_t        chunk_mem[CF_NUM_CHUNKS_ALL_CHANNELS];
 
     uint32 outgoing_counter;
-    uint8  enabled;
+    bool  enabled;
 } CF_Engine_t;
 
 #endif

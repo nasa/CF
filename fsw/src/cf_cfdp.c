@@ -123,7 +123,7 @@ void CF_CFDP_DecodeStart(CF_DecoderState_t *pdec, const void *msgbuf, CF_Logical
 void CF_CFDP_ArmAckTimer(CF_Transaction_t *txn)
 {
     CF_Timer_InitRelSec(&txn->ack_timer, CF_AppData.config_table->chan[txn->chan_num].ack_timer_s);
-    txn->flags.com.ack_timer_armed = 1;
+    txn->flags.com.ack_timer_armed = true;
 }
 
 /*----------------------------------------------------------------
@@ -252,7 +252,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_ConstructPduHeader(const CF_Transaction_t *txn, 
 
         hdr->version   = 1;
         hdr->pdu_type  = (directive_code == 0); /* set to '1' for file data PDU, '0' for a directive PDU */
-        hdr->direction = (towards_sender != 0); /* set to '1' for toward sender, '0' for toward receiver */
+        hdr->direction = (towards_sender != false); /* set to '1' for toward sender, '0' for toward receiver */
         hdr->txm_mode  = (CF_CFDP_GetClass(txn) == CF_CFDP_CLASS_1); /* set to '1' for class 1 data, '0' for class 2 */
 
         /* choose the larger of the two EIDs to determine size */
@@ -896,7 +896,7 @@ void CF_CFDP_RecvIdle(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
                 {
                     /* NOTE: whether or not class 1 or 2, get a free chunks. It's cheap, and simplifies cleanup path */
                     txn->state            = ph->pdu_header.txm_mode ? CF_TxnState_R1 : CF_TxnState_R2;
-                    txn->flags.rx.md_recv = 1;
+                    txn->flags.rx.md_recv = true;
                     CF_CFDP_R_Init(txn); /* initialize R */
                 }
                 else
@@ -918,7 +918,7 @@ void CF_CFDP_RecvIdle(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
     if (txn->state == CF_TxnState_IDLE)
     {
         /* state was not changed, so free the transaction */
-        CF_CFDP_ResetTransaction(txn, 0);
+        CF_CFDP_ResetTransaction(txn, false);
     }
 }
 
@@ -1026,7 +1026,7 @@ CFE_Status_t CF_CFDP_InitEngine(void)
 
     if (ret == CFE_SUCCESS)
     {
-        CF_AppData.engine.enabled = 1;
+        CF_AppData.engine.enabled = true;
     }
 
     return ret;
@@ -1137,7 +1137,7 @@ CF_CListTraverse_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context)
         if (args->chan->cur)
         {
             ret              = CF_CLIST_EXIT;
-            args->early_exit = 1;
+            args->early_exit = true;
         }
     }
 
@@ -1289,7 +1289,7 @@ CFE_Status_t CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, 
         CF_CFDP_TxFile_Initiate(txn, cfdp_class, keep, chan_num, priority, dest_id);
 
         ++chan->num_cmd_tx;
-        txn->flags.tx.cmd_tx = 1;
+        txn->flags.tx.cmd_tx = true;
     }
 
     return ret;
@@ -1316,8 +1316,8 @@ static CFE_Status_t CF_CFDP_PlaybackDir_Initiate(CF_Playback_t *pb, const char *
     }
     else
     {
-        pb->diropen    = 1;
-        pb->busy       = 1;
+        pb->diropen    = true;
+        pb->busy       = true;
         pb->keep       = keep;
         pb->priority   = priority;
         pb->dest_id    = dest_id;
@@ -1417,7 +1417,7 @@ void CF_CFDP_ProcessPlaybackDirectory(CF_Channel_t *chan, CF_Playback_t *pb)
         {
             /* PFTO: can we figure out the difference between "end of dir" and an error? */
             OS_DirectoryClose(pb->dir_id);
-            pb->diropen = 0;
+            pb->diropen = false;
         }
     }
 
@@ -1425,7 +1425,7 @@ void CF_CFDP_ProcessPlaybackDirectory(CF_Channel_t *chan, CF_Playback_t *pb)
     {
         /* the directory has been exhausted, and there are no more active transactions
          * for this playback -- so mark it as not busy */
-        pb->busy = 0;
+        pb->busy = false;
     }
 }
 
@@ -1503,7 +1503,7 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *chan)
                 {
                     /* timer was not set, so set it now */
                     CF_Timer_InitRelSec(&poll->interval_timer, pd->interval_sec);
-                    poll->timer_set = 1;
+                    poll->timer_set = true;
                 }
                 else if (CF_Timer_Expired(&poll->interval_timer))
                 {
@@ -1512,7 +1512,7 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *chan)
                                                        chan_index, pd->priority, pd->dest_eid);
                     if (!ret)
                     {
-                        poll->timer_set = 0;
+                        poll->timer_set = false;
                     }
                     else
                     {
@@ -1586,7 +1586,7 @@ void CF_CFDP_CycleEngine(void)
  * See description in cf_cfdp.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_ResetTransaction(CF_Transaction_t *txn, int keep_history)
+void CF_CFDP_ResetTransaction(CF_Transaction_t *txn, bool keep_history)
 {
 
     CF_Channel_t *chan   = &CF_AppData.engine.channels[txn->chan_num];
@@ -1736,7 +1736,7 @@ void CF_CFDP_CancelTransaction(CF_Transaction_t *txn)
     void (*fns[2])(CF_Transaction_t * txn) = {CF_CFDP_R_Cancel, CF_CFDP_S_Cancel};
     if (!txn->flags.com.canceled)
     {
-        txn->flags.com.canceled = 1;
+        txn->flags.com.canceled = true;
         CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_CANCEL_REQUEST_RECEIVED);
         fns[!!CF_CFDP_IsSender(txn)](txn);
     }
@@ -1771,7 +1771,7 @@ void CF_CFDP_DisableEngine(void)
     static const CF_QueueIdx_t CLOSE_QUEUES[] = {CF_QueueIdx_RX, CF_QueueIdx_TXA, CF_QueueIdx_TXW};
     CF_Channel_t *             chan;
 
-    CF_AppData.engine.enabled = 0;
+    CF_AppData.engine.enabled = false;
 
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {

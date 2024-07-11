@@ -513,10 +513,10 @@ CFE_Status_t CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
  * Generated stub function for CF_CFDP_ResetTransaction()
  * ----------------------------------------------------
  */
-void CF_CFDP_ResetTransaction(CF_Transaction_t *txn, int keep_history)
+void CF_CFDP_ResetTransaction(CF_Transaction_t *txn, bool keep_history)
 {
     UT_GenStub_AddParam(CF_CFDP_ResetTransaction, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_CFDP_ResetTransaction, int, keep_history);
+    UT_GenStub_AddParam(CF_CFDP_ResetTransaction, bool, keep_history);
 
     UT_GenStub_Execute(CF_CFDP_ResetTransaction, Basic, UT_DefaultHandler_CF_CFDP_ResetTransaction);
 }
