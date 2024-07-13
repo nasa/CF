@@ -44,7 +44,7 @@ typedef struct CF_CFDP_Tick_args
 {
     CF_Channel_t *chan;                    /**< \brief channel structure */
     void (*fn)(CF_Transaction_t *, int *); /**< \brief function pointer */
-    int early_exit;                        /**< \brief early exit result */
+    bool early_exit;                        /**< \brief early exit result */
     int cont;                              /**< \brief if 1, then re-traverse the list */
 } CF_CFDP_Tick_args_t;
 
@@ -91,7 +91,7 @@ void CF_CFDP_DecodeStart(CF_DecoderState_t *pdec, const void *msgbuf, CF_Logical
  * @param txn  Pointer to the transaction object
  * @param keep_history Whether the transaction info should be preserved in history
  */
-void CF_CFDP_ResetTransaction(CF_Transaction_t *txn, int keep_history);
+void CF_CFDP_ResetTransaction(CF_Transaction_t *txn, bool keep_history);
 
 /************************************************************************/
 /** @brief Helper function to store transaction status code only

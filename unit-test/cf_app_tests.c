@@ -69,7 +69,7 @@ void UT_UpdatedDefaultHandler_CFE_SB_ReceiveBuffer(void *UserObj, UT_EntryKey_t 
 void Test_CF_CheckTables_DoNotReleaseAddressBecauseEngineIsEnabled(void)
 {
     /* Arrange */
-    CF_AppData.engine.enabled = 1;
+    CF_AppData.engine.enabled = true;
 
     /* Act */
     CF_CheckTables();

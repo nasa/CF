@@ -379,7 +379,7 @@ void Test_CF_CFDP_MsgOutGet(void)
 
     /* transaction is suspended */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
-    txn->flags.com.suspended = 1;
+    txn->flags.com.suspended = true;
     UtAssert_NULL(CF_CFDP_MsgOutGet(txn, false));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 

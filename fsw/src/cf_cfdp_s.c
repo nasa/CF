@@ -48,7 +48,7 @@
  *-----------------------------------------------------------------*/
 static inline void CF_CFDP_S_Reset(CF_Transaction_t *txn)
 {
-    CF_CFDP_ResetTransaction(txn, 1);
+    CF_CFDP_ResetTransaction(txn, true);
 }
 
 /*----------------------------------------------------------------
@@ -62,7 +62,7 @@ CFE_Status_t CF_CFDP_S_SendEof(CF_Transaction_t *txn)
     if (!txn->flags.com.crc_calc)
     {
         CF_CRC_Finalize(&txn->crc);
-        txn->flags.com.crc_calc = 1;
+        txn->flags.com.crc_calc = true;
     }
     return CF_CFDP_SendEof(txn);
 }
@@ -93,7 +93,7 @@ void CF_CFDP_S1_SubstateSendEof(CF_Transaction_t *txn)
 void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *txn)
 {
     txn->state_data.send.sub_state = CF_TxSubState_WAIT_FOR_EOF_ACK;
-    txn->flags.com.ack_timer_armed = 1; /* will cause tick to see ack_timer as expired, and act */
+    txn->flags.com.ack_timer_armed = true; /* will cause tick to see ack_timer as expired, and act */
 
     /* no longer need to send file data PDU except in the case of NAK response */
 
@@ -250,7 +250,7 @@ CFE_Status_t CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *txn)
 {
     const CF_Chunk_t *chunk;
     CFE_Status_t      sret;
-    CFE_Status_t      ret = 0;
+    CFE_Status_t      ret = CFE_SUCCESS;
 
     if (txn->flags.tx.md_need_send)
     {
@@ -263,7 +263,7 @@ CFE_Status_t CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *txn)
         {
             if (sret == CFE_SUCCESS)
             {
-                txn->flags.tx.md_need_send = 0;
+                txn->flags.tx.md_need_send = false;
             }
             /* unless CF_SEND_PDU_ERROR, return 1 to keep caller from sending file data */
             ret = 1; /* 1 means nak processed, so don't send filedata */
@@ -494,7 +494,7 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
             if (sr->offset_start == 0 && sr->offset_end == 0)
             {
                 /* need to re-send metadata PDU */
-                txn->flags.tx.md_need_send = 1;
+                txn->flags.tx.md_need_send = true;
             }
             else
             {
@@ -566,7 +566,7 @@ void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
         else
         {
             txn->state_data.send.sub_state = CF_TxSubState_WAIT_FOR_FIN;
-            txn->flags.com.ack_timer_armed = 0; /* just wait for FIN now, nothing to re-send */
+            txn->flags.com.ack_timer_armed = false; /* just wait for FIN now, nothing to re-send */
         }
     }
     else
