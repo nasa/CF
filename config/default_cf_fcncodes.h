@@ -90,7 +90,7 @@ typedef enum
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Invalid counter type, #CF_EID_ERR_CMD_RESET_INVALID
+     *       - Invalid counter type, #CF_CMD_RESET_INVALID_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -113,13 +113,13 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_TX_FILE
+     *       - #CF_CMD_TX_FILE_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Invalid parameter, #CF_EID_ERR_CMD_BAD_PARAM
-     *       - Transaction initialization failure, #CF_EID_ERR_CMD_TX_FILE
+     *       - Invalid parameter, #CF_CMD_BAD_PARAM_ERR_EID
+     *       - Transaction initialization failure, #CF_CMD_TX_FILE_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -145,13 +145,13 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_PLAYBACK_DIR
+     *       - #CF_CMD_PLAYBACK_DIR_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Invalid parameter, #CF_EID_ERR_CMD_BAD_PARAM
-     *       - Playback initialization failure, #CF_EID_ERR_CMD_PLAYBACK_DIR
+     *       - Invalid parameter, #CF_CMD_BAD_PARAM_ERR_EID
+     *       - Playback initialization failure, #CF_CMD_PLAYBACK_DIR_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -180,13 +180,13 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_FREEZE
+     *       - #CF_CMD_FREEZE_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
-     *       - Command processing failure, #CF_EID_ERR_CMD_FREEZE
+     *       - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
+     *       - Command processing failure, #CF_CMD_FREEZE_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -214,13 +214,13 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_THAW
+     *       - #CF_CMD_THAW_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
-     *       - Command processing failure, #CF_EID_ERR_CMD_THAW
+     *       - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
+     *       - Command processing failure, #CF_CMD_THAW_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -248,15 +248,15 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_SUSPRES
+     *       - #CF_CMD_SUSPRES_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Transaction not found using compound key, #CF_EID_ERR_CMD_TRANS_NOT_FOUND
-     *       - Invalid channel number, #CF_EID_ERR_CMD_TSN_CHAN_INVALID
-     *       - Already in requested state, #CF_EID_ERR_CMD_SUSPRES_SAME
-     *       - No matching transaction, #CF_EID_ERR_CMD_SUSPRES_CHAN
+     *       - Transaction not found using compound key, #CF_CMD_TRANS_NOT_FOUND_ERR_EID
+     *       - Invalid channel number, #CF_CMD_TSN_CHAN_INVALID_ERR_EID
+     *       - Already in requested state, #CF_CMD_SUSPRES_SAME_ERR_EID
+     *       - No matching transaction, #CF_CMD_SUSPRES_CHAN_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -284,15 +284,15 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_SUSPRES
+     *       - #CF_CMD_SUSPRES_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Transaction not found using compound key, #CF_EID_ERR_CMD_TRANS_NOT_FOUND
-     *       - Invalid channel number, #CF_EID_ERR_CMD_TSN_CHAN_INVALID
-     *       - Already in requested state, #CF_EID_ERR_CMD_SUSPRES_SAME
-     *       - No matching transaction, #CF_EID_ERR_CMD_SUSPRES_CHAN
+     *       - Transaction not found using compound key, #CF_CMD_TRANS_NOT_FOUND_ERR_EID
+     *       - Invalid channel number, #CF_CMD_TSN_CHAN_INVALID_ERR_EID
+     *       - Already in requested state, #CF_CMD_SUSPRES_SAME_ERR_EID
+     *       - No matching transaction, #CF_CMD_SUSPRES_CHAN_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -319,14 +319,14 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_CANCEL
+     *       - #CF_CMD_CANCEL_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Transaction not found using compound key, #CF_EID_ERR_CMD_TRANS_NOT_FOUND
-     *       - Invalid channel number, #CF_EID_ERR_CMD_TSN_CHAN_INVALID
-     *       - No matching transaction, #CF_EID_ERR_CMD_CANCEL_CHAN
+     *       - Transaction not found using compound key, #CF_CMD_TRANS_NOT_FOUND_ERR_EID
+     *       - Invalid channel number, #CF_CMD_TSN_CHAN_INVALID_ERR_EID
+     *       - No matching transaction, #CF_CMD_CANCEL_CHAN_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -353,14 +353,14 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_ABANDON
+     *       - #CF_CMD_ABANDON_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Transaction not found using compound key, #CF_EID_ERR_CMD_TRANS_NOT_FOUND
-     *       - Invalid channel number, #CF_EID_ERR_CMD_TSN_CHAN_INVALID
-     *       - No matching transaction, #CF_EID_ERR_CMD_ABANDON_CHAN
+     *       - Transaction not found using compound key, #CF_CMD_TRANS_NOT_FOUND_ERR_EID
+     *       - Invalid channel number, #CF_CMD_TSN_CHAN_INVALID_ERR_EID
+     *       - No matching transaction, #CF_CMD_ABANDON_CHAN_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -385,14 +385,14 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_GETSET1
+     *       - #CF_CMD_GETSET1_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Invalid configuration parameter key, #CF_EID_ERR_CMD_GETSET_PARAM
-     *       - Invalid channel number, #CF_EID_ERR_CMD_GETSET_CHAN
-     *       - Parameter value failed validation, #CF_EID_ERR_CMD_GETSET_VALIDATE
+     *       - Invalid configuration parameter key, #CF_CMD_GETSET_PARAM_ERR_EID
+     *       - Invalid channel number, #CF_CMD_GETSET_CHAN_ERR_EID
+     *       - Parameter value failed validation, #CF_CMD_GETSET_VALIDATE_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -417,13 +417,13 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_GETSET2
+     *       - #CF_CMD_GETSET2_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Invalid configuration parameter key, #CF_EID_ERR_CMD_GETSET_PARAM
-     *       - Invalid channel number, #CF_EID_ERR_CMD_GETSET_CHAN
+     *       - Invalid configuration parameter key, #CF_CMD_GETSET_PARAM_ERR_EID
+     *       - Invalid channel number, #CF_CMD_GETSET_CHAN_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -448,18 +448,18 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_WQ
+     *       - #CF_CMD_WQ_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Invalid parameter combination, #CF_EID_ERR_CMD_WQ_ARGS
-     *       - Invalid channel number, #CF_EID_ERR_CMD_WQ_CHAN
-     *       - Open file to write failed, #CF_EID_ERR_CMD_WQ_OPEN
-     *       - Write RX data failed, #CF_EID_ERR_CMD_WQ_WRITEQ_RX
-     *       - Write RX history data failed, #CF_EID_ERR_CMD_WQ_WRITEHIST_RX
-     *       - Write TX data failed, #CF_EID_ERR_CMD_WQ_WRITEQ_TX
-     *       - Write TX history data failed, #CF_EID_ERR_CMD_WQ_WRITEHIST_TX
+     *       - Invalid parameter combination, #CF_CMD_WQ_ARGS_ERR_EID
+     *       - Invalid channel number, #CF_CMD_WQ_CHAN_ERR_EID
+     *       - Open file to write failed, #CF_CMD_WQ_OPEN_ERR_EID
+     *       - Write RX data failed, #CF_CMD_WQ_WRITEQ_RX_ERR_EID
+     *       - Write RX history data failed, #CF_CMD_WQ_WRITEHIST_RX_ERR_EID
+     *       - Write TX data failed, #CF_CMD_WQ_WRITEQ_TX_ERR_EID
+     *       - Write TX history data failed, #CF_CMD_WQ_WRITEHIST_TX_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -486,13 +486,13 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_ENABLE_DEQUEUE
+     *       - #CF_CMD_ENABLE_DEQUEUE_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
-     *       - Enable dequeue failed, #CF_EID_ERR_CMD_ENABLE_DEQUEUE
+     *       - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
+     *       - Enable dequeue failed, #CF_CMD_ENABLE_DEQUEUE_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -519,13 +519,13 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_DISABLE_DEQUEUE
+     *       - #CF_CMD_DISABLE_DEQUEUE_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
-     *       - Disable dequeue failed, #CF_EID_INF_CMD_DISABLE_DEQUEUE
+     *       - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
+     *       - Disable dequeue failed, #CF_CMD_DISABLE_DEQUEUE_INF_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -558,14 +558,14 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_ENABLE_POLLDIR
+     *       - #CF_CMD_ENABLE_POLLDIR_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
-     *       - Invalid polling directory index, #CF_EID_ERR_CMD_POLLDIR_INVALID
-     *       - Enable directory polling failed, #CF_EID_ERR_CMD_ENABLE_POLLDIR
+     *       - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
+     *       - Invalid polling directory index, #CF_CMD_POLLDIR_INVALID_ERR_EID
+     *       - Enable directory polling failed, #CF_CMD_ENABLE_POLLDIR_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -598,14 +598,14 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_DISABLE_POLLDIR
+     *       - #CF_CMD_DISABLE_POLLDIR_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
-     *       - Invalid polling directory index, #CF_EID_ERR_CMD_POLLDIR_INVALID
-     *       - Disable directory polling failed, #CF_EID_ERR_CMD_DISABLE_POLLDIR
+     *       - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
+     *       - Invalid polling directory index, #CF_CMD_POLLDIR_INVALID_ERR_EID
+     *       - Disable directory polling failed, #CF_CMD_DISABLE_POLLDIR_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -639,14 +639,14 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_PURGE_QUEUE
+     *       - #CF_CMD_PURGE_QUEUE_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Invalid channel number, #CF_EID_ERR_CMD_CHAN_PARAM
-     *       - Invalid purge queue argument, #CF_EID_ERR_CMD_PURGE_ARG
-     *       - Purge queue failed, #CF_EID_ERR_CMD_PURGE_QUEUE
+     *       - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
+     *       - Invalid purge queue argument, #CF_CMD_PURGE_ARG_ERR_EID
+     *       - Purge queue failed, #CF_CMD_PURGE_QUEUE_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -672,13 +672,13 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_ENABLE_ENGINE
+     *       - #CF_CMD_ENABLE_ENGINE_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Engine initialization failed, #CF_EID_ERR_CMD_ENABLE_ENGINE
-     *       - Engine already enabled, #CF_EID_ERR_CMD_ENG_ALREADY_ENA
+     *       - Engine initialization failed, #CF_CMD_ENABLE_ENGINE_ERR_EID
+     *       - Engine already enabled, #CF_CMD_ENG_ALREADY_ENA_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -705,12 +705,12 @@ typedef enum
      *       Successful execution of this command may be verified with
      *       the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.cmd will increment
-     *       - #CF_EID_INF_CMD_DISABLE_ENGINE
+     *       - #CF_CMD_DISABLE_ENGINE_INF_EID
      *
      *  \par Error Conditions
      *       This command may fail for the following reason(s):
      *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
-     *       - Engine already disabled, #CF_EID_ERR_CMD_ENG_ALREADY_DIS
+     *       - Engine already disabled, #CF_CMD_ENG_ALREADY_DIS_ERR_EID
      *
      *  \par Evidence of failure may be found in the following telemetry:
      *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment

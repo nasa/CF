@@ -184,24 +184,27 @@ CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *histor
         {
             case 0:
                 CF_Assert(history->dir < CF_Direction_NUM);
+                /* SAD: No need to check snprintf return; buffer size is sufficient for the formatted output */
                 snprintf(linebuf, sizeof(linebuf), "SEQ (%lu, %lu)\tDIR: %s\tPEER %lu\tSTAT: %d\t",
                          (unsigned long)history->src_eid, (unsigned long)history->seq_num, CF_DSTR[history->dir],
                          (unsigned long)history->peer_eid, (int)history->txn_stat);
                 break;
             case 1:
+                /* SAD: No need to check snprintf return; buffer size is sufficient for the formatted output */
                 snprintf(linebuf, sizeof(linebuf), "SRC: %s\t", history->fnames.src_filename);
                 break;
             case 2:
             default:
+                /* SAD: No need to check snprintf return; buffer size is sufficient for the formatted output */
                 snprintf(linebuf, sizeof(linebuf), "DST: %s\n", history->fnames.dst_filename);
                 break;
         }
 
-        len = strlen(linebuf);
+        len = OS_strnlen(linebuf, (CF_FILENAME_MAX_LEN * 2) + 128);
         ret = CF_WrappedWrite(fd, linebuf, len);
         if (ret != len)
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_CMD_WHIST_WRITE, CFE_EVS_EventType_ERROR,
+            CFE_EVS_SendEvent(CF_CMD_WHIST_WRITE_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF: writing queue file failed, expected %ld got %ld", (long)len, (long)ret);
             return CF_ERROR;
         }
@@ -441,7 +444,7 @@ void CF_WrappedClose(osal_id_t fd)
 
     if (ret != OS_SUCCESS)
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_CLOSE_ERR, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_CFDP_CLOSE_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CF: failed to close file 0x%lx, OS_close returned %ld", OS_ObjectIdToInteger(fd), (long)ret);
     }
 }
