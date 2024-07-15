@@ -204,7 +204,7 @@ CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *histor
         ret = CF_WrappedWrite(fd, linebuf, len);
         if (ret != len)
         {
-            CFE_EVS_SendEvent(CF_EID_ERR_CMD_WHIST_WRITE, CFE_EVS_EventType_ERROR,
+            CFE_EVS_SendEvent(CF_CMD_WHIST_WRITE_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF: writing queue file failed, expected %ld got %ld", (long)len, (long)ret);
             return CF_ERROR;
         }
@@ -444,7 +444,7 @@ void CF_WrappedClose(osal_id_t fd)
 
     if (ret != OS_SUCCESS)
     {
-        CFE_EVS_SendEvent(CF_EID_ERR_CFDP_CLOSE_ERR, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_CFDP_CLOSE_ERR_EID, CFE_EVS_EventType_ERROR,
                           "CF: failed to close file 0x%lx, OS_close returned %ld", OS_ObjectIdToInteger(fd), (long)ret);
     }
 }
