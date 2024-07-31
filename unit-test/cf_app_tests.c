@@ -275,7 +275,7 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_Register_DidNotReturnSuccess(void)
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_REG);
+    UT_CF_AssertEventID(CF_INIT_TBL_REG_ERR_EID);
 }
 
 void Test_CF_TableInit_FailBecause_CFE_TBL_Load_DidNotReturnSuccess(void)
@@ -289,7 +289,7 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_Load_DidNotReturnSuccess(void)
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_LOAD);
+    UT_CF_AssertEventID(CF_INIT_TBL_LOAD_ERR_EID);
 }
 
 void Test_CF_TableInit_FailBecause_CFE_TBL_Manage_DidNotReturnSuccess(void)
@@ -304,7 +304,7 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_Manage_DidNotReturnSuccess(void)
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_MANAGE);
+    UT_CF_AssertEventID(CF_INIT_TBL_MANAGE_ERR_EID);
 }
 
 void Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess(void)
@@ -319,7 +319,7 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess(void)
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_EID_ERR_INIT_TBL_GETADDR);
+    UT_CF_AssertEventID(CF_INIT_TBL_GETADDR_ERR_EID);
 }
 
 void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_SUCCESS_SuccessAndDoNotSendEvent(void)
@@ -517,7 +517,7 @@ void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
     /* Event from CF_Init and CF_AppMain */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 2);
     UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_INIT_INF_EID);
-    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[1], CF_EID_ERR_INIT_MSG_RECV);
+    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[1], CF_INIT_MSG_RECV_ERR_EID);
 
     /* Reset, return CFE_SUCCESS from CFE_SB_ReceiveBuffer and buffer NULL */
     UT_CF_ResetEventCapture();
@@ -529,7 +529,7 @@ void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
     /* Event from CF_Init and CF_AppMain */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 2);
     UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_INIT_INF_EID);
-    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[1], CF_EID_ERR_INIT_MSG_RECV);
+    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[1], CF_INIT_MSG_RECV_ERR_EID);
 
     /* Reset, return non-error codes and non-NULL buffer */
     UT_CF_ResetEventCapture();
