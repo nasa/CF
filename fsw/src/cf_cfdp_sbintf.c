@@ -109,7 +109,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool sile
             chan->cur = txn; /* remember where we were for next time */
             if (!silent && (os_status == OS_SUCCESS))
             {
-                CFE_EVS_SendEvent(CF_CFDP_NO_MSG_ERR_EID, CFE_EVS_EventType_ERROR,
+                CFE_EVS_SendEvent(CF_EID_ERR_CFDP_NO_MSG, CFE_EVS_EventType_ERROR,
                                   "CF: no output message buffer available");
             }
             success = false;
@@ -268,7 +268,7 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *chan)
                     if (CF_AppData.hk.Payload.channel_hk[chan_num].q_size[CF_QueueIdx_RX] == CF_MAX_SIMULTANEOUS_RX)
                     {
                         CFE_EVS_SendEvent(
-                            CF_CFDP_RX_DROPPED_ERR_EID, CFE_EVS_EventType_ERROR,
+                            CF_EID_ERR_CFDP_RX_DROPPED, CFE_EVS_EventType_ERROR,
                             "CF: dropping packet from %lu transaction number 0x%08lx due max RX transactions reached",
                             (unsigned long)ph->pdu_header.source_eid, (unsigned long)ph->pdu_header.sequence_num);
 
@@ -292,7 +292,7 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *chan)
                 }
                 else
                 {
-                    CFE_EVS_SendEvent(CF_CFDP_INVALID_DST_ERR_EID, CFE_EVS_EventType_ERROR,
+                    CFE_EVS_SendEvent(CF_EID_ERR_CFDP_INVALID_DST_EID, CFE_EVS_EventType_ERROR,
                                       "CF: dropping packet for invalid destination eid 0x%lx",
                                       (unsigned long)ph->pdu_header.destination_eid);
                 }

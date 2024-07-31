@@ -270,19 +270,19 @@ void Test_CF_CFDP_RecvPh(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, NULL, NULL);
     CF_CODEC_SET_DONE(ph->pdec);
     UtAssert_INT32_EQ(CF_CFDP_RecvPh(UT_CFDP_CHANNEL, ph), CF_SHORT_PDU_ERROR);
-    UT_CF_AssertEventID(CF_PDU_SHORT_HEADER_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_PDU_SHORT_HEADER);
 
     /* decode error, large file bit set */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, NULL, NULL);
     ph->pdu_header.large_flag = true;
     UtAssert_INT32_EQ(CF_CFDP_RecvPh(UT_CFDP_CHANNEL, ph), CF_ERROR);
-    UT_CF_AssertEventID(CF_PDU_LARGE_FILE_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_PDU_LARGE_FILE);
 
     /* decode error, insufficient storage for EID or seq num */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, NULL, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_DecodeHeader), 1, CF_ERROR);
     UtAssert_INT32_EQ(CF_CFDP_RecvPh(UT_CFDP_CHANNEL, ph), CF_ERROR);
-    UT_CF_AssertEventID(CF_PDU_TRUNCATION_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_PDU_TRUNCATION);
 }
 
 void Test_CF_CFDP_RecvMd(void)
@@ -316,21 +316,21 @@ void Test_CF_CFDP_RecvMd(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     CF_CODEC_SET_DONE(ph->pdec);
     UtAssert_INT32_EQ(CF_CFDP_RecvMd(txn, ph), CF_PDU_METADATA_ERROR);
-    UT_CF_AssertEventID(CF_PDU_MD_SHORT_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_PDU_MD_SHORT);
 
     /* decode errors: LV dest filename too long */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     md                       = &ph->int_header.md;
     md->dest_filename.length = CF_FILENAME_MAX_LEN + 1;
     UtAssert_INT32_EQ(CF_CFDP_RecvMd(txn, ph), CF_PDU_METADATA_ERROR);
-    UT_CF_AssertEventID(CF_PDU_INVALID_DST_LEN_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_PDU_INVALID_DST_LEN);
 
     /* decode errors: LV source filename too long */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     md                         = &ph->int_header.md;
     md->source_filename.length = CF_FILENAME_MAX_LEN + 1;
     UtAssert_INT32_EQ(CF_CFDP_RecvMd(txn, ph), CF_PDU_METADATA_ERROR);
-    UT_CF_AssertEventID(CF_PDU_INVALID_SRC_LEN_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_PDU_INVALID_SRC_LEN);
 }
 
 void Test_CF_CFDP_RecvFd(void)
@@ -357,7 +357,7 @@ void Test_CF_CFDP_RecvFd(void)
     CF_CODEC_SET_DONE(ph->pdec);
     UtAssert_INT32_EQ(CF_CFDP_RecvFd(txn, ph), CF_SHORT_PDU_ERROR);
     UtAssert_INT32_EQ(txn->history->txn_stat, CF_TxnStatus_PROTOCOL_ERROR);
-    UT_CF_AssertEventID(CF_PDU_FD_SHORT_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_PDU_FD_SHORT);
 
     /* decode errors: CRC part */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
@@ -371,7 +371,7 @@ void Test_CF_CFDP_RecvFd(void)
     ph->pdu_header.segment_meta_flag = 1;
     UtAssert_INT32_EQ(CF_CFDP_RecvFd(txn, ph), CF_ERROR);
     UtAssert_INT32_EQ(txn->history->txn_stat, CF_TxnStatus_PROTOCOL_ERROR);
-    UT_CF_AssertEventID(CF_PDU_FD_UNSUPPORTED_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_PDU_FD_UNSUPPORTED);
 }
 
 void Test_CF_CFDP_RecvEof(void)
@@ -391,7 +391,7 @@ void Test_CF_CFDP_RecvEof(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     CF_CODEC_SET_DONE(ph->pdec);
     UtAssert_INT32_EQ(CF_CFDP_RecvEof(txn, ph), CF_SHORT_PDU_ERROR);
-    UT_CF_AssertEventID(CF_PDU_EOF_SHORT_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_PDU_EOF_SHORT);
 }
 
 void Test_CF_CFDP_RecvAck(void)
@@ -410,7 +410,7 @@ void Test_CF_CFDP_RecvAck(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     CF_CODEC_SET_DONE(ph->pdec);
     UtAssert_INT32_EQ(CF_CFDP_RecvAck(txn, ph), CF_SHORT_PDU_ERROR);
-    UT_CF_AssertEventID(CF_PDU_ACK_SHORT_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_PDU_ACK_SHORT);
 }
 
 void Test_CF_CFDP_RecvFin(void)
@@ -430,7 +430,7 @@ void Test_CF_CFDP_RecvFin(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     CF_CODEC_SET_DONE(ph->pdec);
     UtAssert_INT32_EQ(CF_CFDP_RecvFin(txn, ph), CF_SHORT_PDU_ERROR);
-    UT_CF_AssertEventID(CF_PDU_FIN_SHORT_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_PDU_FIN_SHORT);
 }
 
 void Test_CF_CFDP_RecvNak(void)
@@ -450,7 +450,7 @@ void Test_CF_CFDP_RecvNak(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     CF_CODEC_SET_DONE(ph->pdec);
     UtAssert_INT32_EQ(CF_CFDP_RecvNak(txn, ph), CF_SHORT_PDU_ERROR);
-    UT_CF_AssertEventID(CF_PDU_NAK_SHORT_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_PDU_NAK_SHORT);
 }
 
 void Test_CF_CFDP_RecvDrop(void)
@@ -517,13 +517,13 @@ void Test_CF_CFDP_RecvIdle(void)
     CF_CODEC_SET_DONE(ph->pdec);
     UtAssert_VOIDCALL(CF_CFDP_RecvIdle(txn, ph));
     UtAssert_INT32_EQ(txn->state, CF_TxnState_IDLE);
-    UT_CF_AssertEventID(CF_CFDP_IDLE_MD_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_CFDP_IDLE_MD);
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, &history, &txn, NULL);
     ph->fdirective.directive_code = CF_CFDP_FileDirective_INVALID_MIN;
     UtAssert_VOIDCALL(CF_CFDP_RecvIdle(txn, ph));
     UtAssert_INT32_EQ(txn->state, CF_TxnState_IDLE);
-    UT_CF_AssertEventID(CF_CFDP_FD_UNHANDLED_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_CFDP_FD_UNHANDLED);
 }
 
 void Test_CF_CFDP_CopyStringFromLV(void)
@@ -869,7 +869,7 @@ void Test_CF_CFDP_InitEngine(void)
     UT_SetDefaultReturnValue(UT_KEY(OS_CountSemGetIdByName), OS_ERROR);
     UtAssert_INT32_EQ(CF_CFDP_InitEngine(), OS_ERROR);
     UtAssert_BOOL_FALSE(CF_AppData.engine.enabled);
-    UT_CF_AssertEventID(CF_INIT_SEM_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_INIT_SEM);
 
     /* Max retries of OS_CountSemGetIdByName - sem was never created at all  */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, NULL, &config);
@@ -877,7 +877,7 @@ void Test_CF_CFDP_InitEngine(void)
     UT_SetDefaultReturnValue(UT_KEY(OS_CountSemGetIdByName), OS_ERR_NAME_NOT_FOUND);
     UtAssert_INT32_EQ(CF_CFDP_InitEngine(), OS_ERR_NAME_NOT_FOUND);
     UtAssert_BOOL_FALSE(CF_AppData.engine.enabled);
-    UT_CF_AssertEventID(CF_INIT_SEM_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_INIT_SEM);
 
     /* Retry of OS_CountSemGetIdByName, when sem was created late, and thus
      * got return OS_ERR_NAME_NOT_FOUND followed by OS_SUCCESS */
@@ -928,7 +928,7 @@ void Test_CF_CFDP_TxFile(void)
     UtAssert_STRINGBUF_EQ(dest, -1, history->fnames.dst_filename, sizeof(history->fnames.dst_filename));
     UtAssert_STRINGBUF_EQ(src, -1, history->fnames.src_filename, sizeof(history->fnames.src_filename));
     UtAssert_UINT32_EQ(chan->num_cmd_tx, 1);
-    UT_CF_AssertEventID(CF_CFDP_S_START_SEND_INF_EID);
+    UT_CF_AssertEventID(CF_EID_INF_CFDP_S_START_SEND);
 
     /* same but for class 2 (for branch coverage) */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, &history, &txn, NULL);
@@ -939,13 +939,13 @@ void Test_CF_CFDP_TxFile(void)
     UtAssert_STRINGBUF_EQ(dest, -1, history->fnames.dst_filename, sizeof(history->fnames.dst_filename));
     UtAssert_STRINGBUF_EQ(src, -1, history->fnames.src_filename, sizeof(history->fnames.src_filename));
     UtAssert_UINT32_EQ(chan->num_cmd_tx, 2);
-    UT_CF_AssertEventID(CF_CFDP_S_START_SEND_INF_EID);
+    UT_CF_AssertEventID(CF_EID_INF_CFDP_S_START_SEND);
 
     /* max TX */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, &history, &txn, NULL);
     chan->num_cmd_tx = CF_MAX_COMMANDED_PLAYBACK_FILES_PER_CHAN;
     UtAssert_INT32_EQ(CF_CFDP_TxFile(src, dest, CF_CFDP_CLASS_1, 1, UT_CFDP_CHANNEL, 0, 1), -1);
-    UT_CF_AssertEventID(CF_CFDP_MAX_CMD_TX_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_CFDP_MAX_CMD_TX);
 }
 
 void Test_CF_CFDP_PlaybackDir(void)
@@ -975,7 +975,7 @@ void Test_CF_CFDP_PlaybackDir(void)
     memset(pb, 0, sizeof(*pb));
     UT_SetDeferredRetcode(UT_KEY(OS_DirectoryOpen), 1, OS_ERROR);
     UtAssert_INT32_EQ(CF_CFDP_PlaybackDir(src, dest, CF_CFDP_CLASS_1, 1, UT_CFDP_CHANNEL, 0, 1), -1);
-    UT_CF_AssertEventID(CF_CFDP_OPENDIR_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_CFDP_OPENDIR);
 
     /* no non-busy entries */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, NULL, NULL);
@@ -985,7 +985,7 @@ void Test_CF_CFDP_PlaybackDir(void)
         pb->busy = 1;
     }
     UtAssert_INT32_EQ(CF_CFDP_PlaybackDir(src, dest, CF_CFDP_CLASS_1, 1, UT_CFDP_CHANNEL, 0, 1), -1);
-    UT_CF_AssertEventID(CF_CFDP_DIR_SLOT_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_CFDP_DIR_SLOT);
 }
 
 static int32 Ut_Hook_CycleTx_SetRanOne(void *UserObj, int32 StubRetcode, uint32 CallCount,
@@ -1175,7 +1175,7 @@ void Test_CF_CFDP_ProcessPollingDirectories(void)
     UT_SetDeferredRetcode(UT_KEY(OS_DirectoryOpen), 1, OS_ERROR);
     UtAssert_VOIDCALL(CF_CFDP_ProcessPollingDirectories(chan));
     UtAssert_BOOL_TRUE(poll->timer_set);
-    UT_CF_AssertEventID(CF_CFDP_OPENDIR_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_CFDP_OPENDIR);
 
     /* Test case where the impl calls through to CF_CFDP_ProcessPlaybackDirectory()
      *
@@ -1264,7 +1264,7 @@ void Test_CF_CFDP_ProcessPlaybackDirectory(void)
     UtAssert_BOOL_FALSE(pb.diropen);
     UtAssert_STRINGBUF_EQ(history->fnames.src_filename, sizeof(history->fnames.src_filename), "/ut", -1);
     UtAssert_STRINGBUF_EQ(history->fnames.dst_filename, sizeof(history->fnames.dst_filename), "/ut", -1);
-    UT_CF_AssertEventID(CF_CFDP_S_START_SEND_INF_EID);
+    UT_CF_AssertEventID(CF_EID_INF_CFDP_S_START_SEND);
 }
 
 static int32 Ut_Hook_TickTransactions_SetEarlyExit(void *UserObj, int32 StubRetcode, uint32 CallCount,

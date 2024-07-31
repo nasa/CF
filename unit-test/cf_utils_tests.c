@@ -549,7 +549,7 @@ void Test_CF_WriteHistoryEntryToFile(void)
     UT_CF_ResetEventCapture();
     UT_SetDeferredRetcode(UT_KEY(OS_write), 1, -1);
     UtAssert_INT32_EQ(CF_WriteHistoryEntryToFile(arg_fd, &history), -1);
-    UT_CF_AssertEventID(CF_CMD_WHIST_WRITE_ERR_EID);
+    UT_CF_AssertEventID(CF_EID_ERR_CMD_WHIST_WRITE);
 }
 
 /*******************************************************************************
