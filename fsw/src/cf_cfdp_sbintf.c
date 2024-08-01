@@ -247,8 +247,7 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *chan)
                                             ph->int_header.fin.cc, ph->pdu_header.destination_eid,
                                             ph->pdu_header.sequence_num) != CF_SEND_PDU_NO_BUF_AVAIL_ERROR)
                         {
-                            /* couldn't get output buffer -- don't care about a send error (oh well, can't send) but we
-                             * do care that there was no message because chan->cur will be set to this transaction */
+                            /* CF_CFDP_SendAck does not return CF_SEND_PDU_ERROR */
                             chan->cur = NULL; /* do not remember temp transaction for next time */
                         }
 
