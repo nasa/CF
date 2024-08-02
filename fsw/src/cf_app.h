@@ -81,9 +81,9 @@ typedef struct
 {
     CF_HkPacket_t hk;
 
-    uint32 run_status;
+    uint32 RunStatus;
 
-    CFE_SB_PipeId_t cmd_pipe;
+    CFE_SB_PipeId_t CmdPipe;
 
     CFE_TBL_Handle_t  config_handle;
     CF_ConfigTable_t *config_table;
@@ -163,7 +163,7 @@ CFE_Status_t CF_TableInit(void);
  * @retval Returns anything else on error.
  *
  */
-CFE_Status_t CF_Init(void);
+CFE_Status_t CF_AppInit(void);
 
 /************************************************************************/
 /** @brief CF app entry point

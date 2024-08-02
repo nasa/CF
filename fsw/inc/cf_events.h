@@ -166,7 +166,7 @@
  *
  *  Failure from create pipe call during engine channel initialization
  */
-#define CF_CR_PIPE_ERR_EID (31)
+#define CF_CR_CHANNEL_PIPE_ERR_EID (31)
 
 /**
  * \brief CF Channel Message Subscription Failed Event ID
@@ -211,6 +211,17 @@
  *  Configuration table outgoing chunk size larger than PDU data size
  */
 #define CF_INIT_OUTGOING_SIZE_ERR_EID (35)
+
+/**
+ * \brief CF Create SB Command Pipe at Initialization Failed Event ID
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  Failure from create command pipe call during application initialization
+ */
+#define CF_CR_PIPE_ERR_EID (36)
 
 /**************************************************************************
  * CF_PDU event IDs - Protocol data unit

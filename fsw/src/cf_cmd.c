@@ -61,7 +61,7 @@ CFE_Status_t CF_NoopCmd(const CF_NoopCmd_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_ResetCmd(const CF_ResetCmd_t *msg)
+CFE_Status_t CF_ResetCountersCmd(const CF_ResetCountersCmd_t *msg)
 {
     const CF_UnionArgs_Payload_t *data     = &msg->Payload;
     static const char *           names[5] = {"all", "cmd", "fault", "up", "down"};
@@ -488,7 +488,7 @@ CFE_Status_t CF_ResumeCmd(const CF_ResumeCmd_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdCancel_Txn(CF_Transaction_t *txn, void *ignored)
+void CF_Cancel_TxnCmd(CF_Transaction_t *txn, void *ignored)
 {
     CF_CFDP_CancelTransaction(txn);
 }
@@ -501,7 +501,7 @@ void CF_CmdCancel_Txn(CF_Transaction_t *txn, void *ignored)
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_CancelCmd(const CF_CancelCmd_t *msg)
 {
-    if (CF_TsnChanAction(&msg->Payload, "cancel", CF_CmdCancel_Txn, NULL) > 0)
+    if (CF_TsnChanAction(&msg->Payload, "cancel", CF_Cancel_TxnCmd, NULL) > 0)
     {
         CFE_EVS_SendEvent(CF_CMD_CANCEL_INF_EID, CFE_EVS_EventType_INFORMATION,
                           "CF: cancel transaction successfully initiated");
@@ -523,7 +523,7 @@ CFE_Status_t CF_CancelCmd(const CF_CancelCmd_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CmdAbandon_Txn(CF_Transaction_t *txn, void *ignored)
+void CF_Abandon_TxnCmd(CF_Transaction_t *txn, void *ignored)
 {
     CF_CFDP_ResetTransaction(txn, 0);
 }
@@ -536,7 +536,7 @@ void CF_CmdAbandon_Txn(CF_Transaction_t *txn, void *ignored)
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_AbandonCmd(const CF_AbandonCmd_t *msg)
 {
-    if (CF_TsnChanAction(&msg->Payload, "abandon", CF_CmdAbandon_Txn, NULL) > 0)
+    if (CF_TsnChanAction(&msg->Payload, "abandon", CF_Abandon_TxnCmd, NULL) > 0)
     {
         CFE_EVS_SendEvent(CF_CMD_ABANDON_INF_EID, CFE_EVS_EventType_INFORMATION, "CF: abandon successful");
         ++CF_AppData.hk.Payload.counters.cmd;
@@ -946,7 +946,7 @@ CFE_Status_t CF_WriteQueueCmd(const CF_WriteQueueCmd_t *msg)
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CF_ChanAction_Status_t CF_CmdValidateChunkSize(CF_ChunkSize_t val, uint8 chan_num /* ignored */)
+CF_ChanAction_Status_t CF_ValidateChunkSizeCmd(CF_ChunkSize_t val, uint8 chan_num /* ignored */)
 {
     CF_ChanAction_Status_t ret = CF_ChanAction_Status_SUCCESS;
     if (val > sizeof(CF_CFDP_PduFileDataContent_t))
@@ -962,7 +962,7 @@ CF_ChanAction_Status_t CF_CmdValidateChunkSize(CF_ChunkSize_t val, uint8 chan_nu
  * See description in cf_cmd.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CF_ChanAction_Status_t CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
+CF_ChanAction_Status_t CF_ValidateMaxOutgoingCmd(uint32 val, uint8 chan_num)
 {
     CF_ChanAction_Status_t ret = CF_ChanAction_Status_SUCCESS;
 
@@ -1022,7 +1022,7 @@ void CF_GetSetParamCmd(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
         case CF_GetSet_ValueID_outgoing_file_chunk_size:
             item.ptr  = &config->outgoing_file_chunk_size;
             item.size = sizeof(config->outgoing_file_chunk_size);
-            item.fn   = CF_CmdValidateChunkSize;
+            item.fn   = CF_ValidateChunkSizeCmd;
             break;
         case CF_GetSet_ValueID_ack_limit:
             item.ptr  = &config->chan[chan_num].ack_limit;
@@ -1039,7 +1039,7 @@ void CF_GetSetParamCmd(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value,
         case CF_GetSet_ValueID_chan_max_outgoing_messages_per_wakeup:
             item.ptr  = &config->chan[chan_num].max_outgoing_messages_per_wakeup;
             item.size = sizeof(config->chan[chan_num].max_outgoing_messages_per_wakeup);
-            item.fn   = CF_CmdValidateMaxOutgoing;
+            item.fn   = CF_ValidateMaxOutgoingCmd;
             break;
         default:
             break;
@@ -1224,7 +1224,7 @@ CFE_Status_t CF_DisableEngineCmd(const CF_DisableEngineCmd_t *msg)
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_SendHkCmd(const CF_SendHkCmd_t *msg)
 {
-    CFE_MSG_SetMsgTime(CFE_MSG_PTR(CF_AppData.hk.TelemetryHeader), CFE_TIME_GetTime());
+    CFE_SB_TimeStampMsg(CFE_MSG_PTR(CF_AppData.hk.TelemetryHeader));
     /* return value ignored */ CFE_SB_TransmitMsg(CFE_MSG_PTR(CF_AppData.hk.TelemetryHeader), true);
 
     /* This is also used to check tables */

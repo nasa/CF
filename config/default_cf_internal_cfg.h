@@ -103,7 +103,7 @@
  *  @par Limits:
  *		 The minimum size of this parameter is 1
  *       The maximum size dictated by cFE platform configuration
- *		 parameter is CFE_SB_MAX_PIPE_DEPTH
+ *		 parameter is OS_QUEUE_MAX_DEPTH
  */
 #define CF_PIPE_DEPTH (32)
 
