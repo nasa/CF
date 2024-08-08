@@ -1357,6 +1357,7 @@ void Test_CF_CFDP_ResetTransaction(void)
     CF_History_t *    history;
     CF_Channel_t *    chan;
     CF_Playback_t     pb;
+    CF_ConfigTable_t *config;
 
     memset(&pb, 0, sizeof(pb));
 
@@ -1443,6 +1444,91 @@ void Test_CF_CFDP_ResetTransaction(void)
     UtAssert_UINT32_EQ(pb.num_ts, 9);
     UtAssert_UINT32_EQ(chan->num_cmd_tx, 7);
     UtAssert_STUB_COUNT(CF_FreeTransaction, 1);
+
+    /*
+     * File is in Polling Directory, Not Keep, and is Error
+     * Move to fail directory successful 
+     */
+    UT_ResetState(UT_KEY(CF_FreeTransaction));
+    UT_ResetState(UT_KEY(OS_remove));
+    UT_ResetState(UT_KEY(OS_mv));
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, &history, &txn, &config);
+    UT_SetDefaultReturnValue(UT_KEY(CF_TxnStatus_IsError), true);\
+    UT_SetDefaultReturnValue(UT_KEY(OS_mv), OS_SUCCESS);
+    txn->fd    = OS_ObjectIdFromInteger(1);
+    txn->keep  = 0;
+    txn->state = CF_TxnState_S2; 
+    strcpy(history->fnames.src_filename, "/ram/poll1/test1");
+    strcpy(config->chan[0].polldir[0].src_dir, "/ram/poll1");
+    strcpy(config->fail_dir, "/ram/fail");
+
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));
+    UtAssert_STUB_COUNT(CF_FreeTransaction, 1);
+    UtAssert_STUB_COUNT(OS_mv, 1);
+    UtAssert_STUB_COUNT(OS_remove, 0);
+
+    /*
+     * File is in Polling Directory, Not Keep, and is Error
+     * Move to fail directory not successful 
+     */
+    UT_ResetState(UT_KEY(CF_FreeTransaction));
+    UT_ResetState(UT_KEY(OS_remove));
+    UT_ResetState(UT_KEY(OS_mv));
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, &history, &txn, &config);
+    UT_SetDefaultReturnValue(UT_KEY(CF_TxnStatus_IsError), true);
+    UT_SetDefaultReturnValue(UT_KEY(OS_mv), OS_ERROR);
+    txn->fd    = OS_ObjectIdFromInteger(1);
+    txn->keep  = 0;
+    txn->state = CF_TxnState_S2; 
+    strcpy(history->fnames.src_filename, "/ram/poll1/test1");
+    strcpy(config->chan[0].polldir[0].src_dir, "/ram/poll1");
+    strcpy(config->fail_dir, "/ram/fail");
+
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));
+    UtAssert_STUB_COUNT(CF_FreeTransaction, 1);
+    UtAssert_STUB_COUNT(OS_mv, 1);
+    UtAssert_STUB_COUNT(OS_remove, 1);
+
+    /*
+    * Source file outside polling directory, Not Keep, is Error
+    */
+    UT_ResetState(UT_KEY(CF_FreeTransaction));
+    UT_ResetState(UT_KEY(OS_remove));
+    UT_ResetState(UT_KEY(OS_mv));
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, &history, &txn, &config);
+    UT_SetDefaultReturnValue(UT_KEY(CF_TxnStatus_IsError), true);
+    txn->fd    = OS_ObjectIdFromInteger(1);
+    txn->keep  = 0;
+    txn->state = CF_TxnState_S2; 
+    strcpy(history->fnames.src_filename, "/ram/test.txt");
+    strcpy(config->chan[0].polldir[0].src_dir, "/ram/poll1");
+    strcpy(config->fail_dir, "/ram/fail");
+
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));
+    UtAssert_STUB_COUNT(CF_FreeTransaction, 1);
+    UtAssert_STUB_COUNT(OS_mv, 0);
+    UtAssert_STUB_COUNT(OS_remove, 0);
+
+    /* 
+     * Source File is empty string. Not Keep, is Error
+     */
+    UT_ResetState(UT_KEY(CF_FreeTransaction));
+    UT_ResetState(UT_KEY(OS_remove));
+    UT_ResetState(UT_KEY(OS_mv));
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, &history, &txn, &config);
+    UT_SetDefaultReturnValue(UT_KEY(CF_TxnStatus_IsError), true);
+    txn->fd    = OS_ObjectIdFromInteger(1);
+    txn->keep  = 0;
+    txn->state = CF_TxnState_S2; 
+    strcpy(history->fnames.src_filename, "");
+    strcpy(config->chan[0].polldir[0].src_dir, "/ram/poll1");
+    strcpy(config->fail_dir, "/ram/fail");
+
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));
+    UtAssert_STUB_COUNT(CF_FreeTransaction, 1);
+    UtAssert_STUB_COUNT(OS_mv, 0);
+    UtAssert_STUB_COUNT(OS_remove, 1);
+
 }
 
 void Test_CF_CFDP_SetTxnStatus(void)

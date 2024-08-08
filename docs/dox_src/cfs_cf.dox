@@ -398,16 +398,24 @@
   When files are found in a polling directory that is enabled, the files are
   automatically queued by CF for output. The polling rate is configurable and
   each channel has a configurable number of polling directories.  Each polling
-  directory has an enable, a class setting, a priority setting, a preserve
-  setting and a destination directory. When enabled, CF will periodically check
-  the polling directories for files. When a file is found, CF will place the
-  file information on the pending queue if it is closed and not already on the
-  queue and not currently active. All polling directories are checked at the
-  same frequency which is defined by the table parameter
-  NumWakeupsPerPollDirChk. Setting this parameter to one will cause CF to check
-  the polling directories at the fastest possible rate, every time it receives a
-  'wake-up' command. Checking polling directories is a processor-intensive
-  effort, it is best to keep the polling rate as low as possible.
+  directory has an enable, a class setting, a priority setting, a destination 
+  directory. When enabled, CF will periodically check the polling directories 
+  for files. When a file is found, CF will place the file information on the 
+  pending queue if it is closed and not already on the queue and not currently 
+  active. All polling directories are checked at the same frequency which is 
+  defined by the table parameter NumWakeupsPerPollDirChk. Setting this parameter 
+  to one will cause CF to check the polling directories at the fastest possible 
+  rate, every time it receives a 'wake-up' command. Checking polling directories 
+  is a processor-intensive effort, it is best to keep the polling rate as low as 
+  possible.
+
+  <H2> Failed Transmit and directory use </H2>
+   
+  Currently, the fail directory is used only to store class 2 TX files that failed 
+  during transmission from a polling directory. When a file fails during transmission 
+  from a polling directory, it is deleted from the polling directory to prevent an 
+  infinite loop and moved to the fail directory. However, if a file fails during a 
+  class 2 TX outside of a polling directory, the file will not be deleted.
 
   <H2> Efficiency </H2>
 
@@ -645,7 +653,8 @@ CF_UnionArgs_Payload_t;
   and an event will be generated.
 
   If the command is not successful, the command error counter will increment and
-  an error event will be generated indicating the reason for failure.
+  an error event will be generated indicating the reason for failure. File will 
+  not be deleted if the 'transmit' failed (unless in an polling directories). 
 
   \verbatim
   typedef struct CF_TxFileCmd
