@@ -174,7 +174,7 @@
          <Entry type="ChannelConfigTable" name="chan" shortDescription="Channel configuration" />
          <Entry type="BASE_TYPES/uint16" name="outgoing_file_chunk_size" shortDescription="maximum size of outgoing file data PDUs - must be smaller than file data character array" />
          <Entry type="BASE_TYPES/PathName" name="tmp_dir" shortDescription="directory to put temp files" />
-
+         <Entry type="BASE_TYPES/PathName" name="fail_dir" shortDescription="fail directory" />
        </EntryList>
      </ContainerDataType>
 
