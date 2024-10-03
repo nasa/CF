@@ -117,7 +117,7 @@ static const CF_Codec_BitField_t CF_CFDP_PduMd_CHECKSUM_TYPE     = CF_INIT_FIELD
 static const CF_Codec_BitField_t CF_CFDP_PduFileData_RECORD_CONTINUATION_STATE = CF_INIT_FIELD(2, 6);
 static const CF_Codec_BitField_t CF_CFDP_PduFileData_SEGMENT_METADATA_LENGTH   = CF_INIT_FIELD(6, 0);
 
-/* NOTE: get/set will handle endianess */
+/* NOTE: get/set will handle endianness */
 /*
  * ALSO NOTE: These store/set inline functions/macros are used with
  * literal integers as well as variables.  So they operate on value, where

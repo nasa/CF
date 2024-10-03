@@ -258,7 +258,7 @@ void Test_CF_CFDP_ReceiveMessage(void)
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvPh), 1, -1);
     UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
 
-    /* Test the path where the function recieves a telemetry packet on it's pipe */
+    /* Test the path where the function receives a telemetry packet on it's pipe */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, &chan, NULL, &txn, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvPh), 1, -1);
     /* Override message type to take the command branch of the if then/else clause */

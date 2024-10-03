@@ -156,7 +156,7 @@ CFE_Status_t CF_NoopCmd(const CF_NoopCmd_t *msg);
  *
  * @param msg   Pointer to command message
  */
-CFE_Status_t CF_ResetCmd(const CF_ResetCmd_t *msg);
+CFE_Status_t CF_ResetCountersCmd(const CF_ResetCountersCmd_t *msg);
 
 /************************************************************************/
 /** @brief Ground command to start a file transfer.
@@ -337,7 +337,7 @@ CFE_Status_t CF_ResumeCmd(const CF_ResumeCmd_t *msg);
  * @param txn        Pointer to transaction object
  * @param ignored  Not used by this function
  */
-void CF_CmdCancel_Txn(CF_Transaction_t *txn, void *ignored);
+void CF_Cancel_TxnCmd(CF_Transaction_t *txn, void *ignored);
 
 /************************************************************************/
 /** @brief Handle a cancel ground command.
@@ -355,12 +355,12 @@ CFE_Status_t CF_CancelCmd(const CF_CancelCmd_t *msg);
  * This helper function is used with CF_TsnChanAction() to abandon matched transactions
  *
  * @par Assumptions, External Events, and Notes:
- *       msg must not be NULL.
+ *       txn must not be NULL.
  *
  * @param txn        Pointer to transaction object
  * @param ignored  Not used by this function
  */
-void CF_CmdAbandon_Txn(CF_Transaction_t *txn, void *ignored);
+void CF_Abandon_TxnCmd(CF_Transaction_t *txn, void *ignored);
 
 /************************************************************************/
 /** @brief Handle an abandon ground command.
@@ -524,7 +524,7 @@ CFE_Status_t CF_WriteQueueCmd(const CF_WriteQueueCmd_t *msg);
  * @retval CF_ChanAction_Status_ERROR if failed (val is greater than max PDU)
  *
  */
-CF_ChanAction_Status_t CF_CmdValidateChunkSize(CF_ChunkSize_t val, uint8 chan_num);
+CF_ChanAction_Status_t CF_ValidateChunkSizeCmd(CF_ChunkSize_t val, uint8 chan_num);
 
 /************************************************************************/
 /** @brief Checks if the value is within allowable range as outgoing packets per wakeup
@@ -540,7 +540,7 @@ CF_ChanAction_Status_t CF_CmdValidateChunkSize(CF_ChunkSize_t val, uint8 chan_nu
  * @retval CF_ChanAction_Status_ERROR if failed (val is not allowed)
  *
  */
-CF_ChanAction_Status_t CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num);
+CF_ChanAction_Status_t CF_ValidateMaxOutgoingCmd(uint32 val, uint8 chan_num);
 
 /************************************************************************/
 /** @brief Perform a configuration get/set operation.

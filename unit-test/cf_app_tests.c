@@ -243,7 +243,7 @@ void Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArra
 
 void Test_CF_ValidateConfigTable_Success(void)
 {
-    /* Arange */
+    /* Arrange */
     CF_ConfigTable_t *arg_table = &table;
     int32             result;
 
@@ -345,18 +345,18 @@ void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED_Succ
 
 /*******************************************************************************
 **
-**  CF_Init tests - full coverage
+**  CF_AppInit tests - full coverage
 **
 *******************************************************************************/
 
-void Test_CF_Init_CallTo_CFE_EVS_Register_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus(void)
+void Test_CF_AppInit_CallTo_CFE_EVS_Register_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus(void)
 {
     int32 result = -1;
 
     UT_SetDefaultReturnValue(UT_KEY(CFE_EVS_Register), result);
 
     /* Act */
-    UtAssert_INT32_EQ(CF_Init(), result);
+    UtAssert_INT32_EQ(CF_AppInit(), result);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
@@ -364,7 +364,7 @@ void Test_CF_Init_CallTo_CFE_EVS_Register_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_Wri
     UtAssert_STUB_COUNT(CFE_ES_WriteToSysLog, 1);
 }
 
-void Test_CF_Init_CallTo_CFE_SB_CreatePipe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus(void)
+void Test_CF_AppInit_CallTo_CFE_SB_CreatePipe_ReturnsNot_CFE_SUCCESS_Return_Pipe_Creation_Error_EID(void)
 {
     /* Arrange */
     int32 result = -1;
@@ -372,16 +372,17 @@ void Test_CF_Init_CallTo_CFE_SB_CreatePipe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_Wr
     UT_SetDefaultReturnValue(UT_KEY(CFE_SB_CreatePipe), result);
 
     /* Act */
-    UtAssert_INT32_EQ(CF_Init(), result);
+    UtAssert_INT32_EQ(CF_AppInit(), result);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
     UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
     UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
-    UtAssert_STUB_COUNT(CFE_ES_WriteToSysLog, 1);
+    UT_CF_AssertEventID(CF_CR_PIPE_ERR_EID);
 }
 
-void Test_CF_Init_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus(void)
+void Test_CF_AppInit_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus(
+    void)
 {
     /* Arrange */
     int32 result = -1;
@@ -389,7 +390,7 @@ void Test_CF_Init_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_E
     UT_SetDefaultReturnValue(UT_KEY(CFE_SB_Subscribe), result);
 
     /* Act */
-    UtAssert_INT32_EQ(CF_Init(), result);
+    UtAssert_INT32_EQ(CF_AppInit(), result);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
@@ -401,7 +402,7 @@ void Test_CF_Init_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_E
 
 /* NOTE: multi call test for CFE_SB_Subscribe would be helpful but not necessary for coverage */
 
-void Test_CF_Init_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus(void)
+void Test_CF_AppInit_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus(void)
 {
     /* Arrange */
     int32 result = -1;
@@ -410,7 +411,7 @@ void Test_CF_Init_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus(v
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_Register), result);
 
     /* Act */
-    UtAssert_INT32_EQ(CF_Init(), result);
+    UtAssert_INT32_EQ(CF_AppInit(), result);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
@@ -420,7 +421,7 @@ void Test_CF_Init_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus(v
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
 }
 
-void Test_CF_Init_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus(void)
+void Test_CF_AppInit_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus(void)
 {
     /* Arrange */
     int32 result = -1;
@@ -428,7 +429,7 @@ void Test_CF_Init_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorSt
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_InitEngine), result);
 
     /* Act */
-    UtAssert_INT32_EQ(CF_Init(), result);
+    UtAssert_INT32_EQ(CF_AppInit(), result);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
@@ -438,29 +439,10 @@ void Test_CF_Init_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorSt
     UtAssert_STUB_COUNT(CF_CFDP_InitEngine, 1);
 }
 
-void Test_CF_Init_CallTo_CFE_EVS_SendEvent_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus(void)
-{
-    /* Arrange */
-    int32 result = -1;
-
-    UT_SetDefaultReturnValue(UT_KEY(CFE_EVS_SendEvent), result);
-
-    /* Act */
-    UtAssert_INT32_EQ(CF_Init(), result);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
-    UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
-    UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
-    UtAssert_STUB_COUNT(CFE_SB_Subscribe, 3);
-    UtAssert_STUB_COUNT(CF_CFDP_InitEngine, 1);
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-}
-
-void Test_CF_Init_Success(void)
+void Test_CF_AppInit_Success(void)
 {
     /* Act */
-    UtAssert_INT32_EQ(CF_Init(), CFE_SUCCESS);
+    UtAssert_INT32_EQ(CF_AppInit(), CFE_SUCCESS);
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
@@ -472,7 +454,7 @@ void Test_CF_Init_Success(void)
 **
 *******************************************************************************/
 
-void Test_CF_AppMain_CallTo_CF_Init_DoNotReturn_CFE_SUCCESS_Set_CF_AppData_run_status_To_CFE_ES_RunStatus_APP_ERROR(
+void Test_CF_AppMain_CallTo_CF_AppInit_DoNotReturn_CFE_SUCCESS_Set_CF_AppData_RunStatus_To_CFE_ES_RunStatus_APP_ERROR(
     void)
 {
     /* Arrange */
@@ -487,13 +469,13 @@ void Test_CF_AppMain_CallTo_CF_Init_DoNotReturn_CFE_SUCCESS_Set_CF_AppData_run_s
     UtAssert_STUB_COUNT(CFE_ES_PerfLogAdd, 2);
     UtAssert_STUB_COUNT(CFE_ES_RunLoop, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-    UtAssert_UINT32_EQ(CF_AppData.run_status, CFE_ES_RunStatus_APP_ERROR);
+    UtAssert_UINT32_EQ(CF_AppData.RunStatus, CFE_ES_RunStatus_APP_ERROR);
 }
 
 void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
 {
     CFE_SB_Buffer_t  sbbuf;
-    CFE_SB_Buffer_t *sbbufptr = NULL;
+    CFE_SB_Buffer_t *sbbufptr;
 
     memset(&sbbuf, 0, sizeof(sbbuf));
 
@@ -506,19 +488,6 @@ void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
 
     UT_SetDeferredRetcode(UT_KEY(CFE_SB_ReceiveBuffer), 1, -1);
 
-    /* Act */
-    UtAssert_VOIDCALL(CF_AppMain());
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CFE_ES_PerfLogAdd, 4);
-    UtAssert_STUB_COUNT(CFE_ES_RunLoop, 2);
-    UtAssert_STUB_COUNT(CFE_ES_ExitApp, 1);
-
-    /* Event from CF_Init and CF_AppMain */
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 2);
-    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_INIT_INF_EID);
-    UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[1], CF_INIT_MSG_RECV_ERR_EID);
-
     /* Reset, return CFE_SUCCESS from CFE_SB_ReceiveBuffer and buffer NULL */
     UT_CF_ResetEventCapture();
     UT_SetDataBuffer(UT_KEY(CFE_SB_ReceiveBuffer), &sbbufptr, sizeof(sbbufptr), false);
@@ -526,7 +495,7 @@ void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
 
     UtAssert_VOIDCALL(CF_AppMain());
 
-    /* Event from CF_Init and CF_AppMain */
+    /* Event from CF_AppInit and CF_AppMain */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 2);
     UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_INIT_INF_EID);
     UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[1], CF_INIT_MSG_RECV_ERR_EID);
@@ -543,7 +512,7 @@ void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
 
     UtAssert_VOIDCALL(CF_AppMain());
 
-    /* Event from CF_Init */
+    /* Event from CF_AppInit */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UtAssert_UINT32_EQ(UT_CF_CapturedEventIDs[0], CF_INIT_INF_EID);
     UtAssert_STUB_COUNT(CFE_ES_RunLoop, 3);
@@ -554,13 +523,13 @@ void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndV
     /* Arrange */
     CFE_SB_MsgId_t   forced_MsgID = CFE_SB_INVALID_MSG_ID;
     CFE_SB_Buffer_t  fake_msg;
-    CFE_SB_Buffer_t *msg = &fake_msg;
+    CFE_SB_Buffer_t *BufPtr = &fake_msg;
 
     UT_SetDeferredRetcode(UT_KEY(CFE_ES_RunLoop), 1, true);
     UT_SetDefaultReturnValue(UT_KEY(CFE_ES_RunLoop), false);
 
     /* Actual data not used, just address is needed */
-    UT_SetDataBuffer(UT_KEY(CFE_SB_ReceiveBuffer), &msg, sizeof(msg), false);
+    UT_SetDataBuffer(UT_KEY(CFE_SB_ReceiveBuffer), &BufPtr, sizeof(BufPtr), false);
 
     /* Arrange unstubbable: CF_AppPipe, invalid ID */
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &forced_MsgID, sizeof(forced_MsgID), false);
@@ -572,7 +541,7 @@ void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndV
     UtAssert_STUB_COUNT(CFE_ES_PerfLogAdd, 4);
     UtAssert_STUB_COUNT(CFE_ES_RunLoop, 2);
     UtAssert_STUB_COUNT(CFE_ES_ExitApp, 1);
-    /* Assert for CF_Init call */
+    /* Assert for CF_AppInit call */
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
 }
 
@@ -635,38 +604,34 @@ void add_CF_TableInit_tests(void)
                "Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED_SuccessAndDoNotSendEvent");
 }
 
-void add_CF_Init_tests(void)
+void add_CF_AppInit_tests(void)
 {
     UtTest_Add(
-        Test_CF_Init_CallTo_CFE_EVS_Register_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus,
+        Test_CF_AppInit_CallTo_CFE_EVS_Register_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus,
         cf_app_tests_Setup, CF_App_Tests_Teardown,
-        "Test_CF_Init_CallTo_CFE_EVS_Register_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus");
+        "Test_CF_AppInit_CallTo_CFE_EVS_Register_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus");
+    UtTest_Add(Test_CF_AppInit_CallTo_CFE_SB_CreatePipe_ReturnsNot_CFE_SUCCESS_Return_Pipe_Creation_Error_EID,
+               cf_app_tests_Setup, CF_App_Tests_Teardown,
+               "Test_CF_AppInit_CallTo_CFE_SB_CreatePipe_ReturnsNot_CFE_SUCCESS_Return_Pipe_Creation_Error_EID");
     UtTest_Add(
-        Test_CF_Init_CallTo_CFE_SB_CreatePipe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus,
+        Test_CF_AppInit_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus,
         cf_app_tests_Setup, CF_App_Tests_Teardown,
-        "Test_CF_Init_CallTo_CFE_SB_CreatePipe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus");
-    UtTest_Add(
-        Test_CF_Init_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus,
-        cf_app_tests_Setup, CF_App_Tests_Teardown,
-        "Test_CF_Init_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus");
-    UtTest_Add(Test_CF_Init_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus, cf_app_tests_Setup,
-               CF_App_Tests_Teardown, "Test_CF_Init_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus");
-    UtTest_Add(Test_CF_Init_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus, cf_app_tests_Setup,
+        "Test_CF_AppInit_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_"
+        "ReturnErrorStatus");
+    UtTest_Add(Test_CF_AppInit_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus, cf_app_tests_Setup,
+               CF_App_Tests_Teardown, "Test_CF_AppInit_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus");
+    UtTest_Add(Test_CF_AppInit_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus, cf_app_tests_Setup,
                CF_App_Tests_Teardown,
-               "Test_CF_Init_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus");
-    UtTest_Add(
-        Test_CF_Init_CallTo_CFE_EVS_SendEvent_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus,
-        cf_app_tests_Setup, CF_App_Tests_Teardown,
-        "Test_CF_Init_CallTo_CFE_EVS_SendEvent_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus");
-    UtTest_Add(Test_CF_Init_Success, cf_app_tests_Setup, CF_App_Tests_Teardown, "Test_CF_Init_Success");
+               "Test_CF_AppInit_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus");
+    UtTest_Add(Test_CF_AppInit_Success, cf_app_tests_Setup, CF_App_Tests_Teardown, "Test_CF_AppInit_Success");
 }
 
 void add_CF_AppMain_tests(void)
 {
     UtTest_Add(
-        Test_CF_AppMain_CallTo_CF_Init_DoNotReturn_CFE_SUCCESS_Set_CF_AppData_run_status_To_CFE_ES_RunStatus_APP_ERROR,
+        Test_CF_AppMain_CallTo_CF_AppInit_DoNotReturn_CFE_SUCCESS_Set_CF_AppData_RunStatus_To_CFE_ES_RunStatus_APP_ERROR,
         cf_app_tests_Setup, CF_App_Tests_Teardown,
-        "Test_CF_AppMain_CallTo_CF_Init_DoNotReturn_CFE_SUCCESS_Set_CF_AppData_run_status_To_CFE_ES_RunStatus_APP_"
+        "Test_CF_AppMain_CallTo_CF_AppInit_DoNotReturn_CFE_SUCCESS_Set_CF_AppData_RunStatus_To_CFE_ES_RunStatus_APP_"
         "ERROR");
     UtTest_Add(Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases, cf_app_tests_Setup, CF_App_Tests_Teardown,
                "Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases");
@@ -691,7 +656,7 @@ void UtTest_Setup(void)
 
     add_CF_TableInit_tests();
 
-    add_CF_Init_tests();
+    add_CF_AppInit_tests();
 
     add_CF_AppMain_tests();
 }

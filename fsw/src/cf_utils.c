@@ -507,8 +507,8 @@ CFE_Status_t CF_WrappedLseek(osal_id_t fd, off_t offset, int mode)
 bool CF_TxnStatus_IsError(CF_TxnStatus_t txn_stat)
 {
     /* The value of CF_TxnStatus_UNDEFINED (-1) indicates a transaction is in progress and no error
-     * has occurred yet.  This will be will be set to CF_TxnStatus_NO_ERROR (0) after successful
-     * completion of the transaction (FIN/EOF).  Anything else indicates a problem has occurred. */
+     * has occurred yet.  This will be set to CF_TxnStatus_NO_ERROR (0) after successful completion
+     * of the transaction (FIN/EOF).  Anything else indicates a problem has occurred. */
     return (txn_stat > CF_TxnStatus_NO_ERROR);
 }
 

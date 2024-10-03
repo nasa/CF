@@ -316,7 +316,7 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
     expected_insert_back_head = &CF_AppData.engine.channels[arg_t->chan_num].qs[arg_q];
     expected_insert_back_node = &arg_t->cl_node;
 
-    /* Queue size needes to be >= 1 */
+    /* Queue size needs to be >= 1 */
     CF_AppData.hk.Payload.channel_hk[arg_t->chan_num].q_size[arg_t->flags.com.q_index] = 1;
 
     /* Act */

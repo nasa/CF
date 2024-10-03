@@ -28,7 +28,6 @@
  *  This file is intended to be a generic class that can be used in other apps.
  */
 
-#include "cf_verify.h"
 #include "cf_clist.h"
 #include "cf_assert.h"
 

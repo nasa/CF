@@ -60,62 +60,62 @@ CFE_Status_t CF_CancelCmd(const CF_CancelCmd_t *msg)
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CmdAbandon_Txn()
+ * Generated stub function for CF_Abandon_TxnCmd()
  * ----------------------------------------------------
  */
-void CF_CmdAbandon_Txn(CF_Transaction_t *txn, void *ignored)
+void CF_Abandon_TxnCmd(CF_Transaction_t *txn, void *ignored)
 {
-    UT_GenStub_AddParam(CF_CmdAbandon_Txn, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_CmdAbandon_Txn, void *, ignored);
+    UT_GenStub_AddParam(CF_Abandon_TxnCmd, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_Abandon_TxnCmd, void *, ignored);
 
-    UT_GenStub_Execute(CF_CmdAbandon_Txn, Basic, NULL);
+    UT_GenStub_Execute(CF_Abandon_TxnCmd, Basic, NULL);
 }
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CmdCancel_Txn()
+ * Generated stub function for CF_Cancel_TxnCmd()
  * ----------------------------------------------------
  */
-void CF_CmdCancel_Txn(CF_Transaction_t *txn, void *ignored)
+void CF_Cancel_TxnCmd(CF_Transaction_t *txn, void *ignored)
 {
-    UT_GenStub_AddParam(CF_CmdCancel_Txn, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_CmdCancel_Txn, void *, ignored);
+    UT_GenStub_AddParam(CF_Cancel_TxnCmd, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_Cancel_TxnCmd, void *, ignored);
 
-    UT_GenStub_Execute(CF_CmdCancel_Txn, Basic, NULL);
+    UT_GenStub_Execute(CF_Cancel_TxnCmd, Basic, NULL);
 }
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CmdValidateChunkSize()
+ * Generated stub function for CF_ValidateChunkSizeCmd()
  * ----------------------------------------------------
  */
-CF_ChanAction_Status_t CF_CmdValidateChunkSize(CF_ChunkSize_t val, uint8 chan_num)
+CF_ChanAction_Status_t CF_ValidateChunkSizeCmd(CF_ChunkSize_t val, uint8 chan_num)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CmdValidateChunkSize, CF_ChanAction_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_ValidateChunkSizeCmd, CF_ChanAction_Status_t);
 
-    UT_GenStub_AddParam(CF_CmdValidateChunkSize, CF_ChunkSize_t, val);
-    UT_GenStub_AddParam(CF_CmdValidateChunkSize, uint8, chan_num);
+    UT_GenStub_AddParam(CF_ValidateChunkSizeCmd, CF_ChunkSize_t, val);
+    UT_GenStub_AddParam(CF_ValidateChunkSizeCmd, uint8, chan_num);
 
-    UT_GenStub_Execute(CF_CmdValidateChunkSize, Basic, NULL);
+    UT_GenStub_Execute(CF_ValidateChunkSizeCmd, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CmdValidateChunkSize, CF_ChanAction_Status_t);
+    return UT_GenStub_GetReturnValue(CF_ValidateChunkSizeCmd, CF_ChanAction_Status_t);
 }
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CmdValidateMaxOutgoing()
+ * Generated stub function for CF_ValidateMaxOutgoingCmd()
  * ----------------------------------------------------
  */
-CF_ChanAction_Status_t CF_CmdValidateMaxOutgoing(uint32 val, uint8 chan_num)
+CF_ChanAction_Status_t CF_ValidateMaxOutgoingCmd(uint32 val, uint8 chan_num)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CmdValidateMaxOutgoing, CF_ChanAction_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_ValidateMaxOutgoingCmd, CF_ChanAction_Status_t);
 
-    UT_GenStub_AddParam(CF_CmdValidateMaxOutgoing, uint32, val);
-    UT_GenStub_AddParam(CF_CmdValidateMaxOutgoing, uint8, chan_num);
+    UT_GenStub_AddParam(CF_ValidateMaxOutgoingCmd, uint32, val);
+    UT_GenStub_AddParam(CF_ValidateMaxOutgoingCmd, uint8, chan_num);
 
-    UT_GenStub_Execute(CF_CmdValidateMaxOutgoing, Basic, NULL);
+    UT_GenStub_Execute(CF_ValidateMaxOutgoingCmd, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CmdValidateMaxOutgoing, CF_ChanAction_Status_t);
+    return UT_GenStub_GetReturnValue(CF_ValidateMaxOutgoingCmd, CF_ChanAction_Status_t);
 }
 
 /*
@@ -476,18 +476,18 @@ CF_CListTraverse_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignore
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_ResetCmd()
+ * Generated stub function for CF_ResetCountersCmd()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_ResetCmd(const CF_ResetCmd_t *msg)
+CFE_Status_t CF_ResetCountersCmd(const CF_ResetCountersCmd_t *msg)
 {
-    UT_GenStub_SetupReturnBuffer(CF_ResetCmd, CFE_Status_t);
+    UT_GenStub_SetupReturnBuffer(CF_ResetCountersCmd, CFE_Status_t);
 
-    UT_GenStub_AddParam(CF_ResetCmd, const CF_ResetCmd_t *, msg);
+    UT_GenStub_AddParam(CF_ResetCountersCmd, const CF_ResetCountersCmd_t *, msg);
 
-    UT_GenStub_Execute(CF_ResetCmd, Basic, NULL);
+    UT_GenStub_Execute(CF_ResetCountersCmd, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_ResetCmd, CFE_Status_t);
+    return UT_GenStub_GetReturnValue(CF_ResetCountersCmd, CFE_Status_t);
 }
 
 /*

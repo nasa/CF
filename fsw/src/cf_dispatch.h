@@ -38,11 +38,11 @@
 /** @brief Process any ground command contained in the given message.
  *
  * @par Assumptions, External Events, and Notes:
- *       msg must not be NULL.
+ *       BufPtr must not be NULL.
  *
- * @param msg   Pointer to command message
+ * @param BufPtr   Pointer to command message
  */
-void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *msg);
+void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *BufPtr);
 
 /************************************************************************/
 /** @brief CF message processing function
@@ -51,11 +51,11 @@ void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *msg);
  *       Process message packets received via the Software Bus command pipe
  *
  * @par Assumptions, External Events, and Notes:
- *       msg must not be NULL.
+ *       BufPtr must not be NULL.
  *
- * @param[in] msg Software Bus message pointer
+ * @param[in] BufPtr Software Bus message pointer
  *
  */
-void CF_AppPipe(const CFE_SB_Buffer_t *msg);
+void CF_AppPipe(const CFE_SB_Buffer_t *BufPtr);
 
 #endif /* !CF_DISPATCH_H */
