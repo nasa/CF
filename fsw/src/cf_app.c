@@ -192,10 +192,10 @@ CFE_Status_t CF_AppInit(void)
     const CFE_SB_MsgId_Atom_t MID_VALUES[] = {CF_CMD_MID, CF_SEND_HK_MID, CF_WAKE_UP_MID};
     uint32                    i;
 
-    CF_AppData.RunStatus = CFE_ES_RunStatus_APP_RUN;
-
     /* Zero-out global data structure */
     memset(&CF_AppData, 0, sizeof(CF_AppData));
+
+    CF_AppData.RunStatus = CFE_ES_RunStatus_APP_RUN;
 
     CFE_MSG_Init(CFE_MSG_PTR(CF_AppData.hk.TelemetryHeader), CFE_SB_ValueToMsgId(CF_HK_TLM_MID), sizeof(CF_AppData.hk));
 
