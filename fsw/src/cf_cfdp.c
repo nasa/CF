@@ -1394,7 +1394,7 @@ void CF_CFDP_ProcessPlaybackDirectory(CF_Channel_t *chan, CF_Playback_t *pb)
             }
 
             txn = CF_FindUnusedTransaction(chan);
-            CF_Assert(pt); /* should be impossible not to have one because there are limits on the number of uses of
+            CF_Assert(txn); /* should be impossible not to have one because there are limits on the number of uses of
                                 them */
 
             /* the -1 below is to make room for the slash */
