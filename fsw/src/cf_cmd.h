@@ -554,13 +554,13 @@ CF_ChanAction_Status_t CF_ValidateMaxOutgoingCmd(uint32 val, uint8 chan_num);
  * @par Assumptions, External Events, and Notes:
  *       None
  *
- * @param is_set    Whether to get (0) or set (1)
+ * @param is_set    Whether to get (false) or set (true)
  * @param param_id  Parameter ID
  * @param value     Value to get/set
  * @param chan_num  Channel number to operate on
  *
  */
-void CF_GetSetParamCmd(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num);
+void CF_GetSetParamCmd(bool is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num);
 
 /************************************************************************/
 /** @brief Ground command to set a configuration parameter.

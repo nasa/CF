@@ -189,7 +189,7 @@ void CF_CList_Traverse(CF_CListNode_t *start, CF_CListFn_t fn, void *context)
 {
     CF_CListNode_t *node = start;
     CF_CListNode_t *node_next;
-    int             last = 0;
+    bool            last = false;
 
     if (node)
     {
@@ -199,7 +199,7 @@ void CF_CList_Traverse(CF_CListNode_t *start, CF_CListFn_t fn, void *context)
             node_next = node->next;
             if (node_next == start)
             {
-                last = 1;
+                last = true;
             }
             if (!CF_CListTraverse_Status_IS_CONTINUE(fn(node, context)))
             {
@@ -230,7 +230,7 @@ void CF_CList_Traverse_R(CF_CListNode_t *end, CF_CListFn_t fn, void *context)
     {
         CF_CListNode_t *node = end->prev;
         CF_CListNode_t *node_next;
-        int             last = 0;
+        bool             last = false;
 
         if (node)
         {
@@ -242,7 +242,7 @@ void CF_CList_Traverse_R(CF_CListNode_t *end, CF_CListFn_t fn, void *context)
                 node_next = node->prev;
                 if (node_next == end)
                 {
-                    last = 1;
+                    last = true;
                 }
 
                 if (!CF_CListTraverse_Status_IS_CONTINUE(fn(node, context)))

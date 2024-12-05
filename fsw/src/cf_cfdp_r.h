@@ -149,7 +149,7 @@ void CF_CFDP_R2_Reset(CF_Transaction_t *txn);
  *       txn must not be NULL.
  *
  *
- * @retval CFE_SUCCESS on CRC match, otherwise error.
+ * @retval CFE_SUCCESS on CRC match, otherwise CF_ERROR.
  *
  *
  * @param txn            Pointer to the transaction object

@@ -462,7 +462,7 @@ void Test_CF_CFDP_R_CheckCrc(void)
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
     txn->state      = CF_TxnState_R1;
     txn->crc.result = 0xdeadbeef;
-    UtAssert_INT32_EQ(CF_CFDP_R_CheckCrc(txn, 0x1badc0de), 1);
+    UtAssert_INT32_EQ(CF_CFDP_R_CheckCrc(txn, 0x1badc0de), CF_ERROR);
     UT_CF_AssertEventID(CF_CFDP_R_CRC_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.crc_mismatch, 1);
 
@@ -470,14 +470,14 @@ void Test_CF_CFDP_R_CheckCrc(void)
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
     txn->state      = CF_TxnState_R2;
     txn->crc.result = 0xdeadbeef;
-    UtAssert_INT32_EQ(CF_CFDP_R_CheckCrc(txn, 0x2badc0de), 1);
+    UtAssert_INT32_EQ(CF_CFDP_R_CheckCrc(txn, 0x2badc0de), CF_ERROR);
     UT_CF_AssertEventID(CF_CFDP_R_CRC_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.crc_mismatch, 2);
 
     /* CRC match */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
     txn->crc.result = 0xc0ffee;
-    UtAssert_INT32_EQ(CF_CFDP_R_CheckCrc(txn, 0xc0ffee), 0);
+    UtAssert_INT32_EQ(CF_CFDP_R_CheckCrc(txn, 0xc0ffee), CFE_SUCCESS);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 }
 

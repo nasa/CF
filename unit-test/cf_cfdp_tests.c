@@ -982,7 +982,7 @@ void Test_CF_CFDP_PlaybackDir(void)
     for (i = 0; i < CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN; ++i)
     {
         pb       = &chan->playback[i];
-        pb->busy = 1;
+        pb->busy = true;
     }
     UtAssert_INT32_EQ(CF_CFDP_PlaybackDir(src, dest, CF_CFDP_CLASS_1, 1, UT_CFDP_CHANNEL, 0, 1), -1);
     UT_CF_AssertEventID(CF_CFDP_DIR_SLOT_ERR_EID);
@@ -1016,7 +1016,7 @@ void Test_CF_CFDP_CycleTx(void)
     /* need to set dequeue_enabled so it enters the actual logic */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, &config);
     CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].q_size[0] = 10;
-    CF_AppData.engine.enabled                                   = 1;
+    CF_AppData.engine.enabled                                   = true;
     config->chan[UT_CFDP_CHANNEL].dequeue_enabled               = 1;
 
     /* nominal call, w/chan->cur non-null */
@@ -1056,7 +1056,7 @@ void Test_CF_CFDP_CycleTxFirstActive(void)
 
     /* suspended, should return 0 */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
-    txn->flags.com.suspended = 1;
+    txn->flags.com.suspended = true;
     UtAssert_INT32_EQ(CF_CFDP_CycleTxFirstActive(&txn->cl_node, &args), CF_CListTraverse_Status_CONTINUE);
 
     /* nominal, with chan->cur set non-null, should skip loop and return 1 */
@@ -1112,7 +1112,7 @@ void Test_CF_CFDP_DoTick(void)
     UtAssert_BOOL_FALSE(args.cont);
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &args.chan, NULL, &txn, NULL);
-    txn->flags.com.suspended = 1;
+    txn->flags.com.suspended = true;
     args.cont                = true;
     UtAssert_INT32_EQ(CF_CFDP_DoTick(&txn->cl_node, &args), CF_CLIST_CONT);
     UtAssert_BOOL_TRUE(args.cont);
@@ -1216,10 +1216,10 @@ void Test_CF_CFDP_ProcessPlaybackDirectory(void)
     memset(&pb, 0, sizeof(pb));
     memset(dirent, 0, sizeof(dirent));
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, &history, &txn, &config);
-    CF_AppData.engine.enabled = 1;
+    CF_AppData.engine.enabled = true;
 
     /* diropen is true but num_ts is high so operations are restricted */
-    pb.busy    = 1;
+    pb.busy    = true;
     pb.num_ts  = CF_NUM_TRANSACTIONS_PER_PLAYBACK + 1;
     pb.diropen = true;
     UtAssert_VOIDCALL(CF_CFDP_ProcessPlaybackDirectory(chan, &pb));
@@ -1230,7 +1230,7 @@ void Test_CF_CFDP_ProcessPlaybackDirectory(void)
      * enter the loop, but error calling OS_DirectoryRead().
      * This should end up calling OS_DirectoryClose().
      */
-    pb.busy    = 1;
+    pb.busy    = true;
     pb.diropen = true;
     pb.num_ts  = 0;
     OS_DirectoryOpen(&pb.dir_id, "ut");
@@ -1247,7 +1247,7 @@ void Test_CF_CFDP_ProcessPlaybackDirectory(void)
      *  - this calls CF_FindUnusedTransaction() so that must return non-NULL.
      *  - this also calls CF_CFDP_FindUnusedChunks() and that pops an entry
      */
-    pb.busy    = 1;
+    pb.busy    = true;
     pb.diropen = true;
     pb.num_ts  = 0;
     strcpy(dirent[0].FileName, ".");  /* ignored */
@@ -1275,7 +1275,7 @@ static int32 Ut_Hook_TickTransactions_SetEarlyExit(void *UserObj, int32 StubRetc
     /* set flag on the second call */
     if ((CallCount & 1) == 1)
     {
-        args->early_exit = 1;
+        args->early_exit = true;
     }
 
     return StubRetcode;
@@ -1339,7 +1339,7 @@ void Test_CF_CFDP_CycleEngine(void)
     UtAssert_VOIDCALL(CF_CFDP_CycleEngine());
 
     /* enabled but frozen */
-    CF_AppData.engine.enabled                                = 1;
+    CF_AppData.engine.enabled                                = true;
     CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].frozen = 1;
     UtAssert_VOIDCALL(CF_CFDP_CycleEngine());
 
@@ -1365,12 +1365,12 @@ void Test_CF_CFDP_ResetTransaction(void)
     UT_ResetState(UT_KEY(CF_FreeTransaction));
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
     txn->flags.com.q_index = CF_QueueIdx_FREE;
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, false));
 
     /* nominal call */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
     CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].q_size[txn->flags.com.q_index] = 10;
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 1));
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, true));
     UtAssert_STUB_COUNT(CF_FreeTransaction, 1);
 
     UT_ResetState(UT_KEY(CF_FreeTransaction));
@@ -1378,8 +1378,8 @@ void Test_CF_CFDP_ResetTransaction(void)
     txn->fd      = OS_ObjectIdFromInteger(1);
     history->dir = CF_Direction_TX;
     txn->state   = CF_TxnState_S1;
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 1));
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, true));
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, false));
     UtAssert_STUB_COUNT(CF_FreeTransaction, 2);
 
     /* Transmit with move_dir set, without '/' in filename */
@@ -1387,14 +1387,14 @@ void Test_CF_CFDP_ResetTransaction(void)
     snprintf(CF_AppData.config_table->chan[txn->chan_num].move_dir,
              sizeof(CF_AppData.config_table->chan[txn->chan_num].move_dir), "/test");
     memset(txn->history->fnames.src_filename, 0, sizeof(txn->history->fnames.src_filename));
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, false));
     UtAssert_STUB_COUNT(OS_mv, 0);
     UtAssert_STUB_COUNT(OS_remove, 1);
 
     /* Transmit with move_dir set with '/' in filename */
     UT_ResetState(UT_KEY(OS_remove));
     snprintf(txn->history->fnames.src_filename, sizeof(txn->history->fnames.src_filename), "/ram/test");
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, false));
     UtAssert_STUB_COUNT(OS_mv, 1);
     UtAssert_STUB_COUNT(OS_remove, 0);
 
@@ -1402,7 +1402,7 @@ void Test_CF_CFDP_ResetTransaction(void)
     UT_ResetState(UT_KEY(OS_remove));
     UT_ResetState(UT_KEY(OS_mv));
     UT_SetDefaultReturnValue(UT_KEY(OS_mv), -1);
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, false));
     UtAssert_STUB_COUNT(OS_mv, 1);
     UtAssert_STUB_COUNT(OS_remove, 1);
 
@@ -1411,8 +1411,8 @@ void Test_CF_CFDP_ResetTransaction(void)
     txn->fd      = OS_ObjectIdFromInteger(1);
     history->dir = CF_Direction_RX;
     txn->state   = CF_TxnState_R1;
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 1));
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, true));
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, false));
     UtAssert_STUB_COUNT(CF_FreeTransaction, 2);
 
     UT_ResetState(UT_KEY(CF_FreeTransaction));
@@ -1421,8 +1421,8 @@ void Test_CF_CFDP_ResetTransaction(void)
     history->dir = CF_Direction_TX;
     txn->keep    = 1;
     txn->state   = CF_TxnState_S1;
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 1));
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 0));
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, true));
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, false));
     UtAssert_STUB_COUNT(CF_FreeTransaction, 2);
 
     /* coverage completeness:
@@ -1439,7 +1439,7 @@ void Test_CF_CFDP_ResetTransaction(void)
     chan->num_cmd_tx     = 8;
     history->dir         = CF_Direction_TX;
     txn->state           = CF_TxnState_S1;
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, 1));
+    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, true));
     UtAssert_NULL(chan->cur);
     UtAssert_UINT32_EQ(pb.num_ts, 9);
     UtAssert_UINT32_EQ(chan->num_cmd_tx, 7);
@@ -1596,15 +1596,15 @@ void Test_CF_CFDP_DisableEngine(void)
      */
 
     /* nominal call */
-    CF_AppData.engine.enabled = 1;
+    CF_AppData.engine.enabled = true;
     UtAssert_VOIDCALL(CF_CFDP_DisableEngine());
     UtAssert_STUB_COUNT(CFE_SB_DeletePipe, CF_NUM_CHANNELS);
     UtAssert_BOOL_FALSE(CF_AppData.engine.enabled);
 
     /* nominal call with playbacks and polls active */
-    CF_AppData.engine.channels[UT_CFDP_CHANNEL].playback[0].busy = 1;
+    CF_AppData.engine.channels[UT_CFDP_CHANNEL].playback[0].busy = true;
     OS_DirectoryOpen(&CF_AppData.engine.channels[UT_CFDP_CHANNEL].playback[0].dir_id, "ut");
-    CF_AppData.engine.channels[UT_CFDP_CHANNEL].poll[0].pb.busy = 1;
+    CF_AppData.engine.channels[UT_CFDP_CHANNEL].poll[0].pb.busy = true;
     OS_DirectoryOpen(&CF_AppData.engine.channels[UT_CFDP_CHANNEL].poll[0].pb.dir_id, "ut");
     UtAssert_VOIDCALL(CF_CFDP_DisableEngine());
     UtAssert_STUB_COUNT(OS_DirectoryClose, 2);
@@ -1636,11 +1636,11 @@ void Test_CF_CFDP_CancelTransaction(void)
 
     /* nominal; cover both "flags.com.canceled" branches in here */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
-    txn->flags.com.canceled = 1;
+    txn->flags.com.canceled = true;
     UtAssert_VOIDCALL(CF_CFDP_CancelTransaction(txn));
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
-    txn->flags.com.canceled = 0;
+    txn->flags.com.canceled = false;
     UtAssert_VOIDCALL(CF_CFDP_CancelTransaction(txn));
 }
 

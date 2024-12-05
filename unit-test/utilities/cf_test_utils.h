@@ -103,7 +103,7 @@ typedef struct
 typedef struct
 {
     CF_Transaction_t *txn;
-    int               keep_history;
+    bool               keep_history;
 } CF_CFDP_ResetTransaction_context_t;
 
 typedef struct

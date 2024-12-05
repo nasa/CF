@@ -382,9 +382,9 @@ CFE_Status_t CF_GetParamCmd(const CF_GetParamCmd_t *msg)
  * Generated stub function for CF_GetSetParamCmd()
  * ----------------------------------------------------
  */
-void CF_GetSetParamCmd(uint8 is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num)
+void CF_GetSetParamCmd(bool is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num)
 {
-    UT_GenStub_AddParam(CF_GetSetParamCmd, uint8, is_set);
+    UT_GenStub_AddParam(CF_GetSetParamCmd, bool, is_set);
     UT_GenStub_AddParam(CF_GetSetParamCmd, CF_GetSet_ValueID_t, param_id);
     UT_GenStub_AddParam(CF_GetSetParamCmd, uint32, value);
     UT_GenStub_AddParam(CF_GetSetParamCmd, uint8, chan_num);
