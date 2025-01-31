@@ -439,7 +439,7 @@
         </ConstraintSet>
       </ContainerDataType>
 
-      <ContainerDataType name="ResetCmd" baseType="CMD" shortDescription="Resets HK TLM parent and child task counters">
+      <ContainerDataType name="ResetCountersCmd" baseType="CMD" shortDescription="Resets HK TLM parent and child task counters">
         <LongDescription>
               \cfcmd Reset counters
 
