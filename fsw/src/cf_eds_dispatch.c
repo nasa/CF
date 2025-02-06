@@ -25,7 +25,7 @@ static const EdsDispatchTable_CF_Application_CFE_SB_Telecommand_t CF_TC_DISPATCH
             .NoopCmd_indication              = CF_NoopCmd,
             .PlaybackDirCmd_indication       = CF_PlaybackDirCmd,
             .PurgeQueueCmd_indication        = CF_PurgeQueueCmd,
-            .ResetCmd_indication             = CF_ResetCmd,
+            .ResetCountersCmd_indication     = CF_ResetCountersCmd,
             .ResumeCmd_indication            = CF_ResumeCmd,
             .SetParamCmd_indication          = CF_SetParamCmd,
             .SuspendCmd_indication           = CF_SuspendCmd,
