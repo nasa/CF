@@ -573,10 +573,11 @@ void CF_CFDP_R_Init(CF_Transaction_t *txn)
         {
             /* we need to make a temp file and then do a NAK for md PDU */
             /* the transaction already has a history, and that has a buffer that we can use to
-             * hold the temp filename */
+             * hold the temp filename which is defined by the sequence number and the source entity ID */
             /* the -1 below is to make room for the slash */
-            snprintf(txn->history->fnames.dst_filename, sizeof(txn->history->fnames.dst_filename) - 1, "%.*s/%lu.tmp",
-                     CF_FILENAME_MAX_PATH - 1, CF_AppData.config_table->tmp_dir, (unsigned long)txn->history->seq_num);
+            snprintf(txn->history->fnames.dst_filename, sizeof(txn->history->fnames.dst_filename) - 1, "%.*s/%lu:%lu.tmp",
+                     CF_FILENAME_MAX_PATH - 1, CF_AppData.config_table->tmp_dir, 
+                     (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
             CFE_EVS_SendEvent(CF_CFDP_R_TEMP_FILE_INF_EID, CFE_EVS_EventType_INFORMATION,
                               "CF R%d(%lu:%lu): making temp file %s for transaction without MD",
                               (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
