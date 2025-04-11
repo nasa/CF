@@ -66,6 +66,11 @@
  */
 #define CF_CHANNEL_PIPE_PREFIX ("CF_CHAN_")
 
+/**
+ * @brief Marker used to flag filenames suspected of being truncated
+ */
+#define CF_FILENAME_TRUNCATED '$'
+
 /*************************************************************************
  **
  ** Type definitions

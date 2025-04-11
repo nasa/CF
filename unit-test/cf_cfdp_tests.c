@@ -1382,30 +1382,6 @@ void Test_CF_CFDP_ResetTransaction(void)
     UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, false));
     UtAssert_STUB_COUNT(CF_FreeTransaction, 2);
 
-    /* Transmit with move_dir set, without '/' in filename */
-    UT_ResetState(UT_KEY(OS_remove));
-    snprintf(CF_AppData.config_table->chan[txn->chan_num].move_dir,
-             sizeof(CF_AppData.config_table->chan[txn->chan_num].move_dir), "/test");
-    memset(txn->history->fnames.src_filename, 0, sizeof(txn->history->fnames.src_filename));
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, false));
-    UtAssert_STUB_COUNT(OS_mv, 0);
-    UtAssert_STUB_COUNT(OS_remove, 1);
-
-    /* Transmit with move_dir set with '/' in filename */
-    UT_ResetState(UT_KEY(OS_remove));
-    snprintf(txn->history->fnames.src_filename, sizeof(txn->history->fnames.src_filename), "/ram/test");
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, false));
-    UtAssert_STUB_COUNT(OS_mv, 1);
-    UtAssert_STUB_COUNT(OS_remove, 0);
-
-    /* Move failure */
-    UT_ResetState(UT_KEY(OS_remove));
-    UT_ResetState(UT_KEY(OS_mv));
-    UT_SetDefaultReturnValue(UT_KEY(OS_mv), -1);
-    UtAssert_VOIDCALL(CF_CFDP_ResetTransaction(txn, false));
-    UtAssert_STUB_COUNT(OS_mv, 1);
-    UtAssert_STUB_COUNT(OS_remove, 1);
-
     UT_ResetState(UT_KEY(CF_FreeTransaction));
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, &history, &txn, NULL);
     txn->fd      = OS_ObjectIdFromInteger(1);
@@ -1447,17 +1423,17 @@ void Test_CF_CFDP_ResetTransaction(void)
 
     /*
      * File is in Polling Directory, Not Keep, and is Error
-     * Move to fail directory successful 
+     * Move to fail directory successful
      */
     UT_ResetState(UT_KEY(CF_FreeTransaction));
     UT_ResetState(UT_KEY(OS_remove));
     UT_ResetState(UT_KEY(OS_mv));
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, &history, &txn, &config);
-    UT_SetDefaultReturnValue(UT_KEY(CF_TxnStatus_IsError), true);\
+    UT_SetDefaultReturnValue(UT_KEY(CF_TxnStatus_IsError), true);
     UT_SetDefaultReturnValue(UT_KEY(OS_mv), OS_SUCCESS);
     txn->fd    = OS_ObjectIdFromInteger(1);
     txn->keep  = 0;
-    txn->state = CF_TxnState_S2; 
+    txn->state = CF_TxnState_S2;
     strcpy(history->fnames.src_filename, "/ram/poll1/test1");
     strcpy(config->chan[0].polldir[0].src_dir, "/ram/poll1");
     strcpy(config->fail_dir, "/ram/fail");
@@ -1469,7 +1445,7 @@ void Test_CF_CFDP_ResetTransaction(void)
 
     /*
      * File is in Polling Directory, Not Keep, and is Error
-     * Move to fail directory not successful 
+     * Move to fail directory not successful
      */
     UT_ResetState(UT_KEY(CF_FreeTransaction));
     UT_ResetState(UT_KEY(OS_remove));
@@ -1479,7 +1455,7 @@ void Test_CF_CFDP_ResetTransaction(void)
     UT_SetDefaultReturnValue(UT_KEY(OS_mv), OS_ERROR);
     txn->fd    = OS_ObjectIdFromInteger(1);
     txn->keep  = 0;
-    txn->state = CF_TxnState_S2; 
+    txn->state = CF_TxnState_S2;
     strcpy(history->fnames.src_filename, "/ram/poll1/test1");
     strcpy(config->chan[0].polldir[0].src_dir, "/ram/poll1");
     strcpy(config->fail_dir, "/ram/fail");
@@ -1490,8 +1466,8 @@ void Test_CF_CFDP_ResetTransaction(void)
     UtAssert_STUB_COUNT(OS_remove, 1);
 
     /*
-    * Source file outside polling directory, Not Keep, is Error
-    */
+     * Source file outside polling directory, Not Keep, is Error
+     */
     UT_ResetState(UT_KEY(CF_FreeTransaction));
     UT_ResetState(UT_KEY(OS_remove));
     UT_ResetState(UT_KEY(OS_mv));
@@ -1499,7 +1475,7 @@ void Test_CF_CFDP_ResetTransaction(void)
     UT_SetDefaultReturnValue(UT_KEY(CF_TxnStatus_IsError), true);
     txn->fd    = OS_ObjectIdFromInteger(1);
     txn->keep  = 0;
-    txn->state = CF_TxnState_S2; 
+    txn->state = CF_TxnState_S2;
     strcpy(history->fnames.src_filename, "/ram/test.txt");
     strcpy(config->chan[0].polldir[0].src_dir, "/ram/poll1");
     strcpy(config->fail_dir, "/ram/fail");
@@ -1509,7 +1485,7 @@ void Test_CF_CFDP_ResetTransaction(void)
     UtAssert_STUB_COUNT(OS_mv, 0);
     UtAssert_STUB_COUNT(OS_remove, 0);
 
-    /* 
+    /*
      * Source File is empty string. Not Keep, is Error
      */
     UT_ResetState(UT_KEY(CF_FreeTransaction));
@@ -1519,7 +1495,7 @@ void Test_CF_CFDP_ResetTransaction(void)
     UT_SetDefaultReturnValue(UT_KEY(CF_TxnStatus_IsError), true);
     txn->fd    = OS_ObjectIdFromInteger(1);
     txn->keep  = 0;
-    txn->state = CF_TxnState_S2; 
+    txn->state = CF_TxnState_S2;
     strcpy(history->fnames.src_filename, "");
     strcpy(config->chan[0].polldir[0].src_dir, "/ram/poll1");
     strcpy(config->fail_dir, "/ram/fail");
@@ -1528,7 +1504,6 @@ void Test_CF_CFDP_ResetTransaction(void)
     UtAssert_STUB_COUNT(CF_FreeTransaction, 1);
     UtAssert_STUB_COUNT(OS_mv, 0);
     UtAssert_STUB_COUNT(OS_remove, 1);
-
 }
 
 void Test_CF_CFDP_SetTxnStatus(void)
@@ -1644,6 +1619,58 @@ void Test_CF_CFDP_CancelTransaction(void)
     UtAssert_VOIDCALL(CF_CFDP_CancelTransaction(txn));
 }
 
+void Test_CF_CFDP_MoveFile(void)
+{
+    /* Test case for:
+     * void CF_CFDP_MoveFile(const char *src, const char *dest_dir)
+     */
+    char test_filename[OS_MAX_PATH_LEN];
+    char test_dest_dir[OS_MAX_PATH_LEN];
+
+    memset(test_filename, 0, sizeof(test_filename));
+    memset(test_dest_dir, 0, sizeof(test_dest_dir));
+
+    /* nominal call, no OS_remove  */
+    UT_ResetState(UT_KEY(OS_remove));
+    UT_ResetState(UT_KEY(OS_mv));
+    UT_SetDefaultReturnValue(UT_KEY(OS_mv), OS_SUCCESS);
+    snprintf(test_filename, sizeof(test_filename), "/ram");
+    snprintf(test_dest_dir, sizeof(test_dest_dir), "/test");
+    UtAssert_VOIDCALL(CF_CFDP_MoveFile(test_filename, test_dest_dir));
+    UtAssert_STUB_COUNT(OS_remove, 0);
+    UtAssert_STUB_COUNT(OS_mv, 1);
+
+    /* no filename with '/' found */
+    UT_ResetState(UT_KEY(OS_mv));
+    snprintf(test_filename, sizeof(test_filename), "ram");
+    snprintf(test_dest_dir, sizeof(test_dest_dir), "/test");
+    UtAssert_VOIDCALL(CF_CFDP_MoveFile(test_filename, test_dest_dir));
+    UtAssert_STUB_COUNT(OS_remove, 1);
+    UtAssert_STUB_COUNT(OS_mv, 0);
+
+    /* no dest dir */
+    UT_ResetState(UT_KEY(OS_remove));
+    UT_ResetState(UT_KEY(OS_mv));
+    memset(test_dest_dir, 0, sizeof(test_dest_dir));
+    UtAssert_VOIDCALL(CF_CFDP_MoveFile(test_filename, test_dest_dir));
+    UtAssert_STUB_COUNT(OS_remove, 1);
+    UtAssert_STUB_COUNT(OS_mv, 0);
+
+    /* nominal call, potential truncation detected */
+    UT_ResetState(UT_KEY(OS_remove));
+    UT_ResetState(UT_KEY(OS_mv));
+    memset(test_filename, 'X', sizeof(test_filename) - 1);
+    test_filename[0]                         = '/';
+    test_filename[sizeof(test_filename) - 1] = '\0';
+    memset(test_dest_dir, 'Y', sizeof(test_dest_dir) - 1);
+    test_dest_dir[0]                         = '/';
+    test_dest_dir[sizeof(test_dest_dir) - 1] = '\0';
+    UtAssert_VOIDCALL(CF_CFDP_MoveFile(test_filename, test_dest_dir));
+    UT_CF_AssertEventID(CF_EID_INF_CFDP_BUF_EXCEED);
+    UtAssert_STUB_COUNT(OS_remove, 0);
+    UtAssert_STUB_COUNT(OS_mv, 1);
+}
+
 /*******************************************************************************
 **
 **  cf_cfdp_tests UtTest_Setup
@@ -1701,4 +1728,6 @@ void UtTest_Setup(void)
     UtTest_Add(Test_CF_CFDP_SendFin, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_SendFin");
     UtTest_Add(Test_CF_CFDP_SendNak, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_SendNak");
     UtTest_Add(Test_CF_CFDP_AppendTlv, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_AppendTlv");
+
+    UtTest_Add(Test_CF_CFDP_MoveFile, cf_cfdp_tests_Setup, cf_cfdp_tests_Teardown, "CF_CFDP_MoveFile");
 }

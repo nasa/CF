@@ -1874,7 +1874,6 @@ void CF_CFDP_HandleNotKeepFile(CF_Transaction_t *txn)
     }
 }
 
-
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
@@ -1886,16 +1885,25 @@ void CF_CFDP_MoveFile(const char *src, const char *dest_dir)
     osal_status_t status = OS_ERROR;
     char *        filename;
     char          destination[OS_MAX_PATH_LEN];
+    int           dest_path_len;
 
-    if(dest_dir[0] != 0)
+    if (dest_dir[0] != 0)
     {
         filename = strrchr(src, '/');
         if (filename != NULL)
         {
-            snprintf(destination, sizeof(destination), "%s%s",
-                    dest_dir, filename);
+            dest_path_len = snprintf(destination, sizeof(destination), "%s%s", dest_dir, filename);
+            if (dest_path_len >= (int)sizeof(destination))
+            {
+                /* Mark character before zero terminator to indicate truncation */
+                destination[sizeof(destination) - 2] = CF_FILENAME_TRUNCATED;
+
+                /* Send event describing that the path would be truncated */
+                CFE_EVS_SendEvent(CF_EID_INF_CFDP_BUF_EXCEED, CFE_EVS_EventType_INFORMATION,
+                                  "CF: destination has been truncated to %s", destination);
+            }
             status = OS_mv(src, destination);
-        }  
+        }
     }
 
     if (status != OS_SUCCESS)
