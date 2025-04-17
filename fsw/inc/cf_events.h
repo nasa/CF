@@ -1528,6 +1528,17 @@
  */
 #define CF_CMD_PURGE_QUEUE_ERR_EID (165)
 
+/**
+ * \brief CF Move Path Length Verification Too Long Event ID
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Combined move filename length exceeds buffer size
+ */
+#define CF_EID_INF_CFDP_BUF_EXCEED (166)
+
 /**\}*/
 
 #endif /* !CF_EVENTS_H */
