@@ -1,4 +1,4 @@
-name: Assign CFS Team Reviewers
+name: Assign CFS Team Reviewers 
 
 on:
   pull_request:
