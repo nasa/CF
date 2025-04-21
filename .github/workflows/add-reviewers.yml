@@ -1,0 +1,55 @@
+name: Assign CFS Team Reviewers
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, reopened]
+
+jobs:
+  assign-reviewers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Fetch NASA/cfs team members and assign as reviewers
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // This script fetches all members of the NASA/cfs team and assigns them individually as reviewers
+            
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = context.issue.number;
+            
+            try {
+              // Fetch team members from nasa/teams/cfs
+              // Note: This requires a token with appropriate permissions to read team membership
+              const teamResponse = await github.rest.teams.listMembersInOrg({
+                org: 'nasa',
+                team_slug: 'cfs',
+                per_page: 100
+              });
+              
+              const teamMembers = teamResponse.data.map(member => member.login);
+              console.log(`Found ${teamMembers.length} team members in nasa/cfs`);
+              
+              if (teamMembers.length === 0) {
+                console.log('No team members found. Check team name and permissions.');
+                return;
+              }
+              
+              // Add all team members as individual reviewers
+              // This ensures they remain assigned even after others complete reviews
+              await github.rest.pulls.requestReviewers({
+                owner,
+                repo,
+                pull_number: prNumber,
+                reviewers: teamMembers
+              });
+              
+              console.log(`Successfully assigned ${teamMembers.length} reviewers from nasa/cfs team`);
+            } catch (error) {
+              console.error('Error assigning reviewers:', error);
+              core.setFailed(`Failed to assign reviewers: ${error.message}`);
+            }
