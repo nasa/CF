@@ -28,7 +28,7 @@
 #include "cf_dispatch.h"
 #include "cf_app.h"
 #include "cf_events.h"
-#include "cf_cmd.h"
+#include "cf_cmds.h"
 
 #include "cfe.h"
 #include <string.h>
@@ -36,7 +36,7 @@
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *BufPtr)

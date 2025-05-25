@@ -1,7 +1,7 @@
 #include "cf_app.h"
 #include "cf_events.h"
 #include "cf_dispatch.h"
-#include "cf_cmd.h"
+#include "cf_cmds.h"
 
 #include "cf_eds_dictionary.h"
 #include "cf_eds_dispatcher.h"

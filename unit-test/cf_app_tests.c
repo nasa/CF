@@ -22,7 +22,7 @@
 #include "cf_events.h"
 #include "cf_dispatch.h"
 #include "cf_app.h"
-#include "cf_cmd.h"
+#include "cf_cmds.h"
 
 /*******************************************************************************
 **

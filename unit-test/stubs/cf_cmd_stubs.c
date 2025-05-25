@@ -23,7 +23,7 @@
  * Auto-Generated stub implementations for functions defined in cf_cmd header
  */
 
-#include "cf_cmd.h"
+#include "cf_cmds.h"
 #include "utgenstub.h"
 
 /*

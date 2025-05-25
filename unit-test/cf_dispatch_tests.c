@@ -20,7 +20,7 @@
 /* cf testing includes */
 #include "cf_test_utils.h"
 #include "cf_dispatch.h"
-#include "cf_cmd.h"
+#include "cf_cmds.h"
 #include "cf_msgids.h"
 #include "cf_events.h"
 

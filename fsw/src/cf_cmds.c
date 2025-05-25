@@ -35,14 +35,14 @@
 #include "cf_platform_cfg.h"
 
 #include "cf_cfdp.h"
-#include "cf_cmd.h"
+#include "cf_cmds.h"
 
 #include <string.h>
 
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_NoopCmd(const CF_NoopCmd_t *msg)
@@ -58,7 +58,7 @@ CFE_Status_t CF_NoopCmd(const CF_NoopCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_ResetCountersCmd(const CF_ResetCountersCmd_t *msg)
@@ -128,7 +128,7 @@ CFE_Status_t CF_ResetCountersCmd(const CF_ResetCountersCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_TxFileCmd(const CF_TxFileCmd_t *msg)
@@ -177,7 +177,7 @@ CFE_Status_t CF_TxFileCmd(const CF_TxFileCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_PlaybackDirCmd(const CF_PlaybackDirCmd_t *msg)
@@ -227,7 +227,7 @@ CFE_Status_t CF_PlaybackDirCmd(const CF_PlaybackDirCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CF_ChanAction_Status_t CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const char *errstr, CF_ChanActionFn_t fn,
@@ -263,7 +263,7 @@ CF_ChanAction_Status_t CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CF_ChanAction_Status_t CF_DoFreezeThaw(uint8 chan_num, void *arg)
@@ -277,7 +277,7 @@ CF_ChanAction_Status_t CF_DoFreezeThaw(uint8 chan_num, void *arg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_FreezeCmd(const CF_FreezeCmd_t *msg)
@@ -301,7 +301,7 @@ CFE_Status_t CF_FreezeCmd(const CF_FreezeCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_ThawCmd(const CF_ThawCmd_t *msg)
@@ -325,7 +325,7 @@ CFE_Status_t CF_ThawCmd(const CF_ThawCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSeq_t ts, CF_EntityId_t eid)
@@ -353,7 +353,7 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSe
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 int32 CF_TsnChanAction(const CF_Transaction_Payload_t *data, const char *cmdstr, CF_TsnChanAction_fn_t fn,
@@ -401,7 +401,7 @@ int32 CF_TsnChanAction(const CF_Transaction_Payload_t *data, const char *cmdstr,
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 void CF_DoSuspRes_Txn(CF_Transaction_t *txn, CF_ChanAction_SuspResArg_t *context)
@@ -420,7 +420,7 @@ void CF_DoSuspRes_Txn(CF_Transaction_t *txn, CF_ChanAction_SuspResArg_t *context
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 void CF_DoSuspRes(const CF_Transaction_Payload_t *payload, uint8 action)
@@ -461,7 +461,7 @@ void CF_DoSuspRes(const CF_Transaction_Payload_t *payload, uint8 action)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_SuspendCmd(const CF_SuspendCmd_t *msg)
@@ -473,7 +473,7 @@ CFE_Status_t CF_SuspendCmd(const CF_SuspendCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_ResumeCmd(const CF_ResumeCmd_t *msg)
@@ -485,7 +485,7 @@ CFE_Status_t CF_ResumeCmd(const CF_ResumeCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 void CF_Cancel_TxnCmd(CF_Transaction_t *txn, void *ignored)
@@ -496,7 +496,7 @@ void CF_Cancel_TxnCmd(CF_Transaction_t *txn, void *ignored)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_CancelCmd(const CF_CancelCmd_t *msg)
@@ -520,7 +520,7 @@ CFE_Status_t CF_CancelCmd(const CF_CancelCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 void CF_Abandon_TxnCmd(CF_Transaction_t *txn, void *ignored)
@@ -531,7 +531,7 @@ void CF_Abandon_TxnCmd(CF_Transaction_t *txn, void *ignored)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_AbandonCmd(const CF_AbandonCmd_t *msg)
@@ -555,7 +555,7 @@ CFE_Status_t CF_AbandonCmd(const CF_AbandonCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CF_ChanAction_Status_t CF_DoEnableDisableDequeue(uint8 chan_num, void *arg)
@@ -569,7 +569,7 @@ CF_ChanAction_Status_t CF_DoEnableDisableDequeue(uint8 chan_num, void *arg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_EnableDequeueCmd(const CF_EnableDequeueCmd_t *msg)
@@ -594,7 +594,7 @@ CFE_Status_t CF_EnableDequeueCmd(const CF_EnableDequeueCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_DisableDequeueCmd(const CF_DisableDequeueCmd_t *msg)
@@ -619,7 +619,7 @@ CFE_Status_t CF_DisableDequeueCmd(const CF_DisableDequeueCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CF_ChanAction_Status_t CF_DoEnableDisablePolldir(uint8 chan_num, void *arg)
@@ -652,7 +652,7 @@ CF_ChanAction_Status_t CF_DoEnableDisablePolldir(uint8 chan_num, void *arg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_EnableDirPollingCmd(const CF_EnableDirPollingCmd_t *msg)
@@ -679,7 +679,7 @@ CFE_Status_t CF_EnableDirPollingCmd(const CF_EnableDirPollingCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_DisableDirPollingCmd(const CF_DisableDirPollingCmd_t *msg)
@@ -706,7 +706,7 @@ CFE_Status_t CF_DisableDirPollingCmd(const CF_DisableDirPollingCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CF_CListTraverse_Status_t CF_PurgeHistory(CF_CListNode_t *node, void *arg)
@@ -720,7 +720,7 @@ CF_CListTraverse_Status_t CF_PurgeHistory(CF_CListNode_t *node, void *arg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CF_CListTraverse_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignored)
@@ -733,7 +733,7 @@ CF_CListTraverse_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignore
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CF_ChanAction_Status_t CF_DoPurgeQueue(uint8 chan_num, void *arg)
@@ -784,7 +784,7 @@ CF_ChanAction_Status_t CF_DoPurgeQueue(uint8 chan_num, void *arg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_PurgeQueueCmd(const CF_PurgeQueueCmd_t *msg)
@@ -807,7 +807,7 @@ CFE_Status_t CF_PurgeQueueCmd(const CF_PurgeQueueCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_WriteQueueCmd(const CF_WriteQueueCmd_t *msg)
@@ -943,7 +943,7 @@ CFE_Status_t CF_WriteQueueCmd(const CF_WriteQueueCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CF_ChanAction_Status_t CF_ValidateChunkSizeCmd(CF_ChunkSize_t val, uint8 chan_num /* ignored */)
@@ -959,7 +959,7 @@ CF_ChanAction_Status_t CF_ValidateChunkSizeCmd(CF_ChunkSize_t val, uint8 chan_nu
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CF_ChanAction_Status_t CF_ValidateMaxOutgoingCmd(uint32 val, uint8 chan_num)
@@ -978,7 +978,7 @@ CF_ChanAction_Status_t CF_ValidateMaxOutgoingCmd(uint32 val, uint8 chan_num)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 void CF_GetSetParamCmd(bool is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num)
@@ -1133,7 +1133,7 @@ void CF_GetSetParamCmd(bool is_set, CF_GetSet_ValueID_t param_id, uint32 value, 
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_SetParamCmd(const CF_SetParamCmd_t *msg)
@@ -1148,7 +1148,7 @@ CFE_Status_t CF_SetParamCmd(const CF_SetParamCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_GetParamCmd(const CF_GetParamCmd_t *msg)
@@ -1163,7 +1163,7 @@ CFE_Status_t CF_GetParamCmd(const CF_GetParamCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_EnableEngineCmd(const CF_EnableEngineCmd_t *msg)
@@ -1195,7 +1195,7 @@ CFE_Status_t CF_EnableEngineCmd(const CF_EnableEngineCmd_t *msg)
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
- * See description in cf_cmd.h for argument/return detail
+ * See description in cf_cmds.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_DisableEngineCmd(const CF_DisableEngineCmd_t *msg)
