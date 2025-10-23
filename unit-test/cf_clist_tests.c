@@ -76,6 +76,8 @@ void Test_CF_CList_InsertFront(void)
 
     /* Already tested, so OK to use to initialize */
     CF_CList_InitNode(&node[0]);
+    CF_CList_InitNode(&node[1]);
+    CF_CList_InitNode(&node[2]);
 
     /* Insert to empty list */
     UtAssert_VOIDCALL(CF_CList_InsertFront(&head, &node[0]));
@@ -109,6 +111,8 @@ void Test_CF_CList_InsertBack(void)
 
     /* Already tested, so OK to use to initialize */
     CF_CList_InitNode(&node[0]);
+    CF_CList_InitNode(&node[1]);
+    CF_CList_InitNode(&node[2]);
 
     /* Insert to empty list */
     UtAssert_VOIDCALL(CF_CList_InsertBack(&head, &node[0]));
@@ -142,6 +146,8 @@ void Test_CF_CList_Pop(void)
 
     /* Already tested, so OK to use to initialize */
     CF_CList_InitNode(&node[0]);
+    CF_CList_InitNode(&node[1]);
+    CF_CList_InitNode(&node[2]);
     CF_CList_InsertBack(&head, &node[0]);
     CF_CList_InsertBack(&head, &node[1]);
     CF_CList_InsertBack(&head, &node[2]);
@@ -177,6 +183,8 @@ void Test_CF_CList_Remove(void)
 
     /* Already tested, so OK to use to initialize */
     CF_CList_InitNode(&node[0]);
+    CF_CList_InitNode(&node[1]);
+    CF_CList_InitNode(&node[2]);
     CF_CList_InsertBack(&head, &node[0]);
     CF_CList_InsertBack(&head, &node[1]);
     CF_CList_InsertBack(&head, &node[2]);
@@ -207,6 +215,9 @@ void Test_CF_CList_InsertAfter(void)
 
     /* Already tested, so OK to use to initialize */
     CF_CList_InitNode(&node[0]);
+    CF_CList_InitNode(&node[1]);
+    CF_CList_InitNode(&node[2]);
+    CF_CList_InitNode(&node[3]);
 
     /* Insert to a single node list */
     UtAssert_VOIDCALL(CF_CList_InsertAfter(&head, &node[0], &node[1]));

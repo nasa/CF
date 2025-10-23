@@ -183,7 +183,6 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *chan)
     CFE_MSG_Type_t    msg_type = CFE_MSG_Type_Invalid;
 
     CF_Logical_PduBuffer_t *ph;
-    CF_Transaction_t        t_finack;
 
     for (; count < CF_AppData.config_table->chan[chan_num].rx_max_messages_per_wakeup; ++count)
     {
@@ -219,74 +218,21 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *chan)
         {
             /* got a valid PDU -- look it up by sequence number */
             txn = CF_FindTransactionBySequenceNumber(chan, ph->pdu_header.sequence_num, ph->pdu_header.source_eid);
-            if (txn)
+            if (txn == NULL)
             {
-                /* found one! Send it to the transaction state processor */
-                CF_Assert(txn->state > CF_TxnState_IDLE);
-                CF_CFDP_DispatchRecv(txn, ph);
-            }
-            else
-            {
-                /* didn't find a match, but there's a special case:
-                 *
-                 * If an R2 sent FIN-ACK, the transaction is freed and the history data
-                 * is placed in the history queue. It's possible that the peer missed the
-                 * FIN-ACK and is sending another FIN. Since we don't know about this
-                 * transaction, we don't want to leave R2 hanging. That wouldn't be elegant.
-                 * So, send a FIN-ACK by cobbling together a temporary transaction on the
-                 * stack and calling CF_CFDP_SendAck() */
-                if (ph->pdu_header.source_eid == CF_AppData.config_table->local_eid &&
-                    ph->fdirective.directive_code == CF_CFDP_FileDirective_FIN)
-                {
-                    if (!CF_CFDP_RecvFin(txn, ph))
-                    {
-                        memset(&t_finack, 0, sizeof(t_finack));
-                        CF_CFDP_InitTxnTxFile(&t_finack, CF_CFDP_CLASS_2, 1, chan_num,
-                                              0); /* populate transaction with needed fields for CF_CFDP_SendAck() */
-                        if (CF_CFDP_SendAck(&t_finack, CF_CFDP_AckTxnStatus_UNRECOGNIZED, CF_CFDP_FileDirective_FIN,
-                                            ph->int_header.fin.cc, ph->pdu_header.destination_eid,
-                                            ph->pdu_header.sequence_num) != CF_SEND_PDU_NO_BUF_AVAIL_ERROR)
-                        {
-                            /* CF_CFDP_SendAck does not return CF_SEND_PDU_ERROR */
-                            chan->cur = NULL; /* do not remember temp transaction for next time */
-                        }
-
-                        /* NOTE: recv and recv_spurious will both be incremented */
-                        ++CF_AppData.hk.Payload.channel_hk[chan_num].counters.recv.spurious;
-                    }
-
-                    CFE_ES_PerfLogExit(CF_PERF_ID_PDURCVD(chan_num));
-                    continue;
-                }
-
                 /* if no match found, then it must be the case that we would be the destination entity id, so verify it
                  */
                 if (ph->pdu_header.destination_eid == CF_AppData.config_table->local_eid)
                 {
                     /* we didn't find a match, so assign it to a transaction */
-                    if (CF_AppData.hk.Payload.channel_hk[chan_num].q_size[CF_QueueIdx_RX] == CF_MAX_SIMULTANEOUS_RX)
+                    /* assume this is initiating an RX transaction, as TX transactions are only commanded */
+                    txn = CF_CFDP_StartRxTransaction(chan_num);
+                    if (txn == NULL)
                     {
                         CFE_EVS_SendEvent(
                             CF_CFDP_RX_DROPPED_ERR_EID, CFE_EVS_EventType_ERROR,
                             "CF: dropping packet from %lu transaction number 0x%08lx due max RX transactions reached",
                             (unsigned long)ph->pdu_header.source_eid, (unsigned long)ph->pdu_header.sequence_num);
-
-                        /* NOTE: as there is no transaction (txn) associated with this, there is no known channel,
-                            and therefore no known counter to account it to (because dropped is per-chan) */
-                    }
-                    else
-                    {
-                        txn = CF_FindUnusedTransaction(chan);
-                        CF_Assert(txn);
-                        txn->history->dir = CF_Direction_RX;
-
-                        /* set default FIN status */
-                        txn->state_data.receive.r2.dc = CF_CFDP_FinDeliveryCode_INCOMPLETE;
-                        txn->state_data.receive.r2.fs = CF_CFDP_FinFileStatus_DISCARDED;
-
-                        txn->flags.com.q_index = CF_QueueIdx_RX;
-                        CF_CList_InsertBack_Ex(chan, txn->flags.com.q_index, &txn->cl_node);
-                        CF_CFDP_DispatchRecv(txn, ph); /* will enter idle state */
                     }
                 }
                 else
@@ -295,6 +241,13 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *chan)
                                       "CF: dropping packet for invalid destination eid 0x%lx",
                                       (unsigned long)ph->pdu_header.destination_eid);
                 }
+            }
+
+            if (txn != NULL)
+            {
+                /* found one! Send it to the transaction state processor */
+                CF_Assert(txn->state > CF_TxnState_UNDEF);
+                CF_CFDP_DispatchRecv(txn, ph);
             }
         }
 

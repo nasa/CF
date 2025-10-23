@@ -78,8 +78,8 @@ CF_ConfigTable_t CF_config_table = {
       "", /* throttle sem, empty string means no throttle */
       1,  /* dequeue enable flag (1 = enabled) */
       .move_dir = ""}},
-    480,       /* outgoing_file_chunk_size */
-    "/cf/tmp", /* temporary file directory */
+    480,        /* outgoing_file_chunk_size */
+    "/cf/tmp",  /* temporary file directory */
     "/cf/fail", /* Stores failed tx file for "polling directory" */
 };
 CFE_TBL_FILEDEF(CF_config_table, CF.config_table, CF config table, cf_def_config.tbl)

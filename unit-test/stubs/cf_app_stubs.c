@@ -28,6 +28,20 @@
 
 /*
  * ----------------------------------------------------
+ * Generated stub function for CF_AppInit()
+ * ----------------------------------------------------
+ */
+CFE_Status_t CF_AppInit(void)
+{
+    UT_GenStub_SetupReturnBuffer(CF_AppInit, CFE_Status_t);
+
+    UT_GenStub_Execute(CF_AppInit, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_AppInit, CFE_Status_t);
+}
+
+/*
+ * ----------------------------------------------------
  * Generated stub function for CF_AppMain()
  * ----------------------------------------------------
  */
@@ -46,20 +60,6 @@ void CF_CheckTables(void)
 {
 
     UT_GenStub_Execute(CF_CheckTables, Basic, NULL);
-}
-
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_AppInit()
- * ----------------------------------------------------
- */
-CFE_Status_t CF_AppInit(void)
-{
-    UT_GenStub_SetupReturnBuffer(CF_AppInit, CFE_Status_t);
-
-    UT_GenStub_Execute(CF_AppInit, Basic, NULL);
-
-    return UT_GenStub_GetReturnValue(CF_AppInit, CFE_Status_t);
 }
 
 /*

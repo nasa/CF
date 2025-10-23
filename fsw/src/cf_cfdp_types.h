@@ -70,13 +70,15 @@
  */
 typedef enum
 {
-    CF_TxnState_IDLE    = 0, /**< \brief State assigned to a newly allocated transaction object */
-    CF_TxnState_R1      = 1, /**< \brief Receive file as class 1 */
-    CF_TxnState_S1      = 2, /**< \brief Send file as class 1 */
-    CF_TxnState_R2      = 3, /**< \brief Receive file as class 2 */
-    CF_TxnState_S2      = 4, /**< \brief Send file as class 2 */
-    CF_TxnState_DROP    = 5, /**< \brief State where all PDUs are dropped */
-    CF_TxnState_INVALID = 6  /**< \brief Marker value for the highest possible state number */
+    CF_TxnState_UNDEF   = 0, /**< \brief State assigned to an unused object on the free list */
+    CF_TxnState_INIT    = 1, /**< \brief State assigned to a newly allocated transaction object */
+    CF_TxnState_R1      = 2, /**< \brief Receive file as class 1 */
+    CF_TxnState_S1      = 3, /**< \brief Send file as class 1 */
+    CF_TxnState_R2      = 4, /**< \brief Receive file as class 2 */
+    CF_TxnState_S2      = 5, /**< \brief Send file as class 2 */
+    CF_TxnState_DROP    = 6, /**< \brief State where all PDUs are dropped */
+    CF_TxnState_HOLD    = 7, /**< \brief State assigned to a transaction after freeing it */
+    CF_TxnState_INVALID = 8  /**< \brief Marker value for the highest possible state number */
 } CF_TxnState_t;
 
 /**
@@ -84,13 +86,11 @@ typedef enum
  */
 typedef enum
 {
-    CF_TxSubState_METADATA         = 0,
-    CF_TxSubState_FILEDATA         = 1,
-    CF_TxSubState_EOF              = 2,
-    CF_TxSubState_WAIT_FOR_EOF_ACK = 3,
-    CF_TxSubState_WAIT_FOR_FIN     = 4,
-    CF_TxSubState_SEND_FIN_ACK     = 5,
-    CF_TxSubState_NUM_STATES       = 6
+    CF_TxSubState_METADATA      = 0, /**< sending the initial MD directive */
+    CF_TxSubState_FILEDATA      = 1, /**< sending file data PDUs */
+    CF_TxSubState_EOF           = 2, /**< sending the EOF directive */
+    CF_TxSubState_CLOSEOUT_SYNC = 3, /**< pending final acks from remote */
+    CF_TxSubState_NUM_STATES    = 4
 } CF_TxSubState_t;
 
 /**
@@ -98,10 +98,10 @@ typedef enum
  */
 typedef enum
 {
-    CF_RxSubState_FILEDATA         = 0,
-    CF_RxSubState_EOF              = 1,
-    CF_RxSubState_WAIT_FOR_FIN_ACK = 2,
-    CF_RxSubState_NUM_STATES       = 3,
+    CF_RxSubState_FILEDATA      = 0, /**< receive file data PDUs */
+    CF_RxSubState_EOF           = 1, /**< got EOF directive */
+    CF_RxSubState_CLOSEOUT_SYNC = 2, /**< pending final acks from remote */
+    CF_RxSubState_NUM_STATES    = 3
 } CF_RxSubState_t;
 
 /**
@@ -205,6 +205,7 @@ typedef struct CF_Playback
     uint16            num_ts; /**< \brief number of transactions */
     uint8             priority;
     CF_EntityId_t     dest_id;
+    char              pending_file[OS_MAX_FILE_NAME];
 
     bool busy;
     bool diropen;
@@ -279,6 +280,8 @@ typedef struct CF_Flags_Common
     bool  suspended;
     bool  canceled;
     bool  crc_calc;
+    bool  inactivity_fired; /**< \brief set whenever the inactivity timeout expires */
+    bool  keep_history;     /**< \brief whether history should be preserved during recycle */
 } CF_Flags_Common_t;
 
 /**
@@ -292,10 +295,9 @@ typedef struct CF_Flags_Rx
     bool eof_recv;
     bool send_nak;
     bool send_fin;
-    bool send_ack;
-    bool inactivity_fired; /**< \brief used for r2 */
-    bool complete;         /**< \brief r2 */
-    bool fd_nak_sent;      /**< \brief latches that at least one NAK has been sent for file data */
+    bool send_eof_ack;
+    bool complete;    /**< \brief r2 */
+    bool fd_nak_sent; /**< \brief latches that at least one NAK has been sent for file data */
 } CF_Flags_Rx_t;
 
 /**
@@ -306,6 +308,10 @@ typedef struct CF_Flags_Tx
     CF_Flags_Common_t com;
 
     bool md_need_send;
+    bool send_eof;
+    bool eof_ack_recv;
+    bool fin_recv;
+    bool send_fin_ack;
     bool cmd_tx; /**< \brief indicates transaction is commanded (ground) tx */
 } CF_Flags_Tx_t;
 
@@ -417,7 +423,7 @@ typedef struct CF_Channel
  */
 typedef struct CF_Output
 {
-    CFE_SB_Buffer_t       *msg;        /**< \brief Binary message to be sent to underlying transport */
+    CFE_SB_Buffer_t *      msg;        /**< \brief Binary message to be sent to underlying transport */
     CF_EncoderState_t      encode;     /**< \brief Encoding state (while building message) */
     CF_Logical_PduBuffer_t tx_pdudata; /**< \brief Tx PDU logical values */
 } CF_Output_t;
@@ -429,7 +435,7 @@ typedef struct CF_Output
  */
 typedef struct CF_Input
 {
-    CFE_SB_Buffer_t       *msg;        /**< \brief Binary message received from underlying transport */
+    CFE_SB_Buffer_t *      msg;        /**< \brief Binary message received from underlying transport */
     CF_DecoderState_t      decode;     /**< \brief Decoding state (while interpreting message) */
     CF_Logical_PduBuffer_t rx_pdudata; /**< \brief Rx PDU logical values */
 } CF_Input_t;
@@ -455,7 +461,7 @@ typedef struct CF_Engine
     CF_Chunk_t        chunk_mem[CF_NUM_CHUNKS_ALL_CHANNELS];
 
     uint32 outgoing_counter;
-    bool  enabled;
+    bool   enabled;
 } CF_Engine_t;
 
 #endif

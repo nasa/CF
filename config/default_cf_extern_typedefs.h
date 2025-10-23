@@ -78,7 +78,7 @@ typedef enum
     CF_QueueIdx_HIST      = 4,
     CF_QueueIdx_HIST_FREE = 5,
     CF_QueueIdx_FREE      = 6,
-    CF_QueueIdx_NUM       = 7,
+    CF_QueueIdx_NUM       = 7
 } CF_QueueIdx_t;
 
 /**

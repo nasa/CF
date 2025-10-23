@@ -64,7 +64,7 @@ CFE_Status_t CF_NoopCmd(const CF_NoopCmd_t *msg)
 CFE_Status_t CF_ResetCountersCmd(const CF_ResetCountersCmd_t *msg)
 {
     const CF_UnionArgs_Payload_t *data     = &msg->Payload;
-    static const char            *names[5] = {"all", "cmd", "fault", "up", "down"};
+    static const char *           names[5] = {"all", "cmd", "fault", "up", "down"};
     /* 0=all, 1=cmd, 2=fault 3=up 4=down */
     uint8 param = data->byte[0];
     int   i;
@@ -152,12 +152,6 @@ CFE_Status_t CF_TxFileCmd(const CF_TxFileCmd_t *msg)
         return CFE_SUCCESS;
     }
 
-#ifdef jphfix
-    /* make sure that the src and dst filenames are null terminated */
-    tx->src_filename[sizeof(tx->src_filename) - 1] = 0;
-    tx->dst_filename[sizeof(tx->dst_filename) - 1] = 0;
-#endif
-
     if (CF_CFDP_TxFile(tx->src_filename, tx->dst_filename, tx->cfdp_class, tx->keep, tx->chan_num, tx->priority,
                        tx->dest_id) == CFE_SUCCESS)
     {
@@ -200,12 +194,6 @@ CFE_Status_t CF_PlaybackDirCmd(const CF_PlaybackDirCmd_t *msg)
         /* This must return CFE_SUCCESS because the command is done (error counter was incremented, no more events) */
         return CFE_SUCCESS;
     }
-
-#ifdef jphfix
-    /* make sure that the src and dst filenames are null terminated */
-    tx->src_filename[sizeof(tx->src_filename) - 1] = 0;
-    tx->dst_filename[sizeof(tx->dst_filename) - 1] = 0;
-#endif
 
     if (CF_CFDP_PlaybackDir(tx->src_filename, tx->dst_filename, tx->cfdp_class, tx->keep, tx->chan_num, tx->priority,
                             tx->dest_id) == CFE_SUCCESS)
@@ -426,7 +414,7 @@ void CF_DoSuspRes_Txn(CF_Transaction_t *txn, CF_ChanAction_SuspResArg_t *context
 void CF_DoSuspRes(const CF_Transaction_Payload_t *payload, uint8 action)
 {
     /* ok to not bounds check action, because the caller is using it in two places with constant values 0 or 1 */
-    static const char         *msgstr[] = {"resume", "suspend"};
+    static const char *        msgstr[] = {"resume", "suspend"};
     CF_ChanAction_SuspResArg_t args     = {0, action};
     int ret = CF_TsnChanAction(payload, msgstr[action], (CF_TsnChanAction_fn_t)CF_DoSuspRes_Txn, &args);
 
@@ -525,7 +513,7 @@ CFE_Status_t CF_CancelCmd(const CF_CancelCmd_t *msg)
  *-----------------------------------------------------------------*/
 void CF_Abandon_TxnCmd(CF_Transaction_t *txn, void *ignored)
 {
-    CF_CFDP_ResetTransaction(txn, false);
+    CF_CFDP_FinishTransaction(txn, false);
 }
 
 /*----------------------------------------------------------------
@@ -726,7 +714,7 @@ CF_CListTraverse_Status_t CF_PurgeHistory(CF_CListNode_t *node, void *arg)
 CF_CListTraverse_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignored)
 {
     CF_Transaction_t *txn = container_of(node, CF_Transaction_t, cl_node);
-    CF_CFDP_ResetTransaction(txn, false);
+    CF_CFDP_FinishTransaction(txn, false);
     return CF_CLIST_CONT;
 }
 
@@ -740,7 +728,7 @@ CF_ChanAction_Status_t CF_DoPurgeQueue(uint8 chan_num, void *arg)
 {
     CF_ChanAction_Status_t ret = CF_ChanAction_Status_SUCCESS;
     /* no need to bounds check chan_num, done in caller */
-    CF_Channel_t                 *chan = &CF_AppData.engine.channels[chan_num];
+    CF_Channel_t *                chan = &CF_AppData.engine.channels[chan_num];
     const CF_UnionArgs_Payload_t *data = ((CF_ChanAction_MsgArg_t *)arg)->data;
 
     bool pend = false;
@@ -988,7 +976,7 @@ void CF_GetSetParamCmd(bool is_set, CF_GetSet_ValueID_t param_id, uint32 value, 
     bool              valid_set;
     struct
     {
-        void  *ptr;
+        void * ptr;
         size_t size;
         CF_ChanAction_Status_t (*fn)(uint32, uint8 chan_num);
     } item;
