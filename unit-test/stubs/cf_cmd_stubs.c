@@ -44,6 +44,19 @@ CFE_Status_t CF_AbandonCmd(const CF_AbandonCmd_t *msg)
 
 /*
  * ----------------------------------------------------
+ * Generated stub function for CF_Abandon_TxnCmd()
+ * ----------------------------------------------------
+ */
+void CF_Abandon_TxnCmd(CF_Transaction_t *txn, void *ignored)
+{
+    UT_GenStub_AddParam(CF_Abandon_TxnCmd, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_Abandon_TxnCmd, void *, ignored);
+
+    UT_GenStub_Execute(CF_Abandon_TxnCmd, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
  * Generated stub function for CF_CancelCmd()
  * ----------------------------------------------------
  */
@@ -60,19 +73,6 @@ CFE_Status_t CF_CancelCmd(const CF_CancelCmd_t *msg)
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_Abandon_TxnCmd()
- * ----------------------------------------------------
- */
-void CF_Abandon_TxnCmd(CF_Transaction_t *txn, void *ignored)
-{
-    UT_GenStub_AddParam(CF_Abandon_TxnCmd, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_Abandon_TxnCmd, void *, ignored);
-
-    UT_GenStub_Execute(CF_Abandon_TxnCmd, Basic, NULL);
-}
-
-/*
- * ----------------------------------------------------
  * Generated stub function for CF_Cancel_TxnCmd()
  * ----------------------------------------------------
  */
@@ -82,40 +82,6 @@ void CF_Cancel_TxnCmd(CF_Transaction_t *txn, void *ignored)
     UT_GenStub_AddParam(CF_Cancel_TxnCmd, void *, ignored);
 
     UT_GenStub_Execute(CF_Cancel_TxnCmd, Basic, NULL);
-}
-
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_ValidateChunkSizeCmd()
- * ----------------------------------------------------
- */
-CF_ChanAction_Status_t CF_ValidateChunkSizeCmd(CF_ChunkSize_t val, uint8 chan_num)
-{
-    UT_GenStub_SetupReturnBuffer(CF_ValidateChunkSizeCmd, CF_ChanAction_Status_t);
-
-    UT_GenStub_AddParam(CF_ValidateChunkSizeCmd, CF_ChunkSize_t, val);
-    UT_GenStub_AddParam(CF_ValidateChunkSizeCmd, uint8, chan_num);
-
-    UT_GenStub_Execute(CF_ValidateChunkSizeCmd, Basic, NULL);
-
-    return UT_GenStub_GetReturnValue(CF_ValidateChunkSizeCmd, CF_ChanAction_Status_t);
-}
-
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_ValidateMaxOutgoingCmd()
- * ----------------------------------------------------
- */
-CF_ChanAction_Status_t CF_ValidateMaxOutgoingCmd(uint32 val, uint8 chan_num)
-{
-    UT_GenStub_SetupReturnBuffer(CF_ValidateMaxOutgoingCmd, CF_ChanAction_Status_t);
-
-    UT_GenStub_AddParam(CF_ValidateMaxOutgoingCmd, uint32, val);
-    UT_GenStub_AddParam(CF_ValidateMaxOutgoingCmd, uint8, chan_num);
-
-    UT_GenStub_Execute(CF_ValidateMaxOutgoingCmd, Basic, NULL);
-
-    return UT_GenStub_GetReturnValue(CF_ValidateMaxOutgoingCmd, CF_ChanAction_Status_t);
 }
 
 /*
@@ -604,6 +570,40 @@ CFE_Status_t CF_TxFileCmd(const CF_TxFileCmd_t *msg)
     UT_GenStub_Execute(CF_TxFileCmd, Basic, NULL);
 
     return UT_GenStub_GetReturnValue(CF_TxFileCmd, CFE_Status_t);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_ValidateChunkSizeCmd()
+ * ----------------------------------------------------
+ */
+CF_ChanAction_Status_t CF_ValidateChunkSizeCmd(CF_ChunkSize_t val, uint8 chan_num)
+{
+    UT_GenStub_SetupReturnBuffer(CF_ValidateChunkSizeCmd, CF_ChanAction_Status_t);
+
+    UT_GenStub_AddParam(CF_ValidateChunkSizeCmd, CF_ChunkSize_t, val);
+    UT_GenStub_AddParam(CF_ValidateChunkSizeCmd, uint8, chan_num);
+
+    UT_GenStub_Execute(CF_ValidateChunkSizeCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_ValidateChunkSizeCmd, CF_ChanAction_Status_t);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_ValidateMaxOutgoingCmd()
+ * ----------------------------------------------------
+ */
+CF_ChanAction_Status_t CF_ValidateMaxOutgoingCmd(uint32 val, uint8 chan_num)
+{
+    UT_GenStub_SetupReturnBuffer(CF_ValidateMaxOutgoingCmd, CF_ChanAction_Status_t);
+
+    UT_GenStub_AddParam(CF_ValidateMaxOutgoingCmd, uint32, val);
+    UT_GenStub_AddParam(CF_ValidateMaxOutgoingCmd, uint8, chan_num);
+
+    UT_GenStub_Execute(CF_ValidateMaxOutgoingCmd, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_ValidateMaxOutgoingCmd, CF_ChanAction_Status_t);
 }
 
 /*

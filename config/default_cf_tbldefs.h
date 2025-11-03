@@ -78,7 +78,6 @@ typedef struct CF_ChannelConfig
     char  move_dir[OS_MAX_PATH_LEN]; /**< \brief Move directory if not empty */
 } CF_ChannelConfig_t;
 
-
 /*
  * Previously, the entire definition of the CF table was in this file, now it is split.
  * For backward compatibility with existing CF table definitions, include the other part here.

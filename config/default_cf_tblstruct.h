@@ -48,9 +48,9 @@ typedef struct CF_ConfigTable
 
     CF_ChannelConfig_t chan[CF_NUM_CHANNELS]; /**< \brief Channel configuration */
 
-    uint16 outgoing_file_chunk_size;    /**< \brief maximum size of outgoing file data chunk in a PDU.
-                                         *   Limited by CF_MAX_PDU_SIZE minus the PDU header(s) */
-    char tmp_dir[CF_FILENAME_MAX_PATH]; /**< \brief directory to put temp files */
+    uint16 outgoing_file_chunk_size;     /**< \brief maximum size of outgoing file data chunk in a PDU.
+                                          *   Limited by CF_MAX_PDU_SIZE minus the PDU header(s) */
+    char tmp_dir[CF_FILENAME_MAX_PATH];  /**< \brief directory to put temp files */
     char fail_dir[CF_FILENAME_MAX_PATH]; /**< \brief fail directory */
 } CF_ConfigTable_t;
 

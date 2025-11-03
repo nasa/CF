@@ -40,7 +40,91 @@
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *chan)
+CF_Channel_t *CF_GetChannelFromTxn(CF_Transaction_t *txn)
+{
+    CF_Channel_t *chan;
+
+    if (txn->chan_num < CF_NUM_CHANNELS)
+    {
+        chan = &CF_AppData.engine.channels[txn->chan_num];
+    }
+    else
+    {
+        chan = NULL;
+    }
+
+    return chan;
+}
+
+/*----------------------------------------------------------------
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
+CF_CListNode_t **CF_GetChunkListHead(CF_Channel_t *chan, uint8 direction)
+{
+    CF_CListNode_t **result;
+
+    if (chan != NULL && direction < CF_Direction_NUM)
+    {
+        result = &chan->cs[direction];
+    }
+    else
+    {
+        result = NULL;
+    }
+
+    return result;
+}
+
+/*----------------------------------------------------------------
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
+CF_CFDP_AckTxnStatus_t CF_CFDP_GetTxnStatus(CF_Transaction_t *txn)
+{
+    CF_CFDP_AckTxnStatus_t LocalStatus;
+
+    /* check if this is still an active Tx (not in holdover or drop etc) */
+    /* in theory this should never be called on S1 because there is no fin-ack to send,
+     * but including it for completeness (because it is an active txn) */
+    if (txn == NULL)
+    {
+        LocalStatus = CF_CFDP_AckTxnStatus_UNRECOGNIZED;
+    }
+    else
+        switch (txn->state)
+        {
+            case CF_TxnState_S1:
+            case CF_TxnState_R1:
+            case CF_TxnState_S2:
+            case CF_TxnState_R2:
+                LocalStatus = CF_CFDP_AckTxnStatus_ACTIVE;
+                break;
+
+            case CF_TxnState_DROP:
+            case CF_TxnState_HOLD:
+                LocalStatus = CF_CFDP_AckTxnStatus_TERMINATED;
+                break;
+
+            default:
+                LocalStatus = CF_CFDP_AckTxnStatus_INVALID;
+                break;
+        }
+
+    return LocalStatus;
+}
+
+/*----------------------------------------------------------------
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
+CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *chan, CF_Direction_t direction)
 {
     CF_CListNode_t *  node;
     CF_Transaction_t *txn;
@@ -67,17 +151,21 @@ CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *chan)
             q_index = CF_QueueIdx_HIST;
         }
 
-        txn->history      = container_of(chan->qs[q_index], CF_History_t, cl_node);
-        txn->history->dir = CF_Direction_NUM; /* start with no direction */
+        txn->history = container_of(chan->qs[q_index], CF_History_t, cl_node);
 
         CF_CList_Remove_Ex(chan, q_index, &txn->history->cl_node);
 
-        return txn;
+        /* Indicate that this was freshly pulled from the free list */
+        /* notably this state is distinguishable from items still on the free list */
+        txn->state        = CF_TxnState_INIT;
+        txn->history->dir = direction;
     }
     else
     {
-        return NULL;
+        txn = NULL;
     }
+
+    return txn;
 }
 
 /*----------------------------------------------------------------
@@ -98,14 +186,10 @@ void CF_ResetHistory(CF_Channel_t *chan, CF_History_t *history)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_FreeTransaction(CF_Transaction_t *txn)
+void CF_FreeTransaction(CF_Transaction_t *txn, uint8 chan)
 {
-    uint8 chan = txn->chan_num;
     memset(txn, 0, sizeof(*txn));
-    txn->flags.com.q_index = CF_QueueIdx_FREE;
-    txn->fd                = OS_OBJECT_ID_UNDEFINED;
-    txn->chan_num          = chan;
-    txn->state             = CF_TxnState_IDLE; /* NOTE: this is redundant as long as CF_TxnState_IDLE == 0 */
+    txn->chan_num = chan;
     CF_CList_InitNode(&txn->cl_node);
     CF_CList_InsertBack_Ex(&CF_AppData.engine.channels[chan], CF_QueueIdx_FREE, &txn->cl_node);
 }
@@ -331,11 +415,10 @@ CF_CListTraverse_Status_t CF_PrioSearch(CF_CListNode_t *node, void *context)
  *-----------------------------------------------------------------*/
 void CF_InsertSortPrio(CF_Transaction_t *txn, CF_QueueIdx_t queue)
 {
-    bool           insert_back = false;
+    bool          insert_back = false;
     CF_Channel_t *chan        = &CF_AppData.engine.channels[txn->chan_num];
 
     CF_Assert(txn->chan_num < CF_NUM_CHANNELS);
-    CF_Assert(txn->state != CF_TxnState_IDLE);
 
     /* look for proper position on PEND queue for this transaction.
      * This is a simple priority sort. */

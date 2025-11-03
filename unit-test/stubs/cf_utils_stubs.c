@@ -38,6 +38,22 @@ void UT_DefaultHandler_CF_WriteTxnQueueDataToFile(void *, UT_EntryKey_t, const U
 
 /*
  * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_GetTxnStatus()
+ * ----------------------------------------------------
+ */
+CF_CFDP_AckTxnStatus_t CF_CFDP_GetTxnStatus(CF_Transaction_t *txn)
+{
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_GetTxnStatus, CF_CFDP_AckTxnStatus_t);
+
+    UT_GenStub_AddParam(CF_CFDP_GetTxnStatus, CF_Transaction_t *, txn);
+
+    UT_GenStub_Execute(CF_CFDP_GetTxnStatus, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_CFDP_GetTxnStatus, CF_CFDP_AckTxnStatus_t);
+}
+
+/*
+ * ----------------------------------------------------
  * Generated stub function for CF_FindTransactionBySequenceNumber()
  * ----------------------------------------------------
  */
@@ -78,11 +94,12 @@ CFE_Status_t CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *node, CF_Tr
  * Generated stub function for CF_FindUnusedTransaction()
  * ----------------------------------------------------
  */
-CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *chan)
+CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *chan, CF_Direction_t direction)
 {
     UT_GenStub_SetupReturnBuffer(CF_FindUnusedTransaction, CF_Transaction_t *);
 
     UT_GenStub_AddParam(CF_FindUnusedTransaction, CF_Channel_t *, chan);
+    UT_GenStub_AddParam(CF_FindUnusedTransaction, CF_Direction_t, direction);
 
     UT_GenStub_Execute(CF_FindUnusedTransaction, Basic, UT_DefaultHandler_CF_FindUnusedTransaction);
 
@@ -94,11 +111,45 @@ CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *chan)
  * Generated stub function for CF_FreeTransaction()
  * ----------------------------------------------------
  */
-void CF_FreeTransaction(CF_Transaction_t *txn)
+void CF_FreeTransaction(CF_Transaction_t *txn, uint8 chan)
 {
     UT_GenStub_AddParam(CF_FreeTransaction, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_FreeTransaction, uint8, chan);
 
     UT_GenStub_Execute(CF_FreeTransaction, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_GetChannelFromTxn()
+ * ----------------------------------------------------
+ */
+CF_Channel_t *CF_GetChannelFromTxn(CF_Transaction_t *txn)
+{
+    UT_GenStub_SetupReturnBuffer(CF_GetChannelFromTxn, CF_Channel_t *);
+
+    UT_GenStub_AddParam(CF_GetChannelFromTxn, CF_Transaction_t *, txn);
+
+    UT_GenStub_Execute(CF_GetChannelFromTxn, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_GetChannelFromTxn, CF_Channel_t *);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_GetChunkListHead()
+ * ----------------------------------------------------
+ */
+CF_CListNode_t **CF_GetChunkListHead(CF_Channel_t *chan, uint8 direction)
+{
+    UT_GenStub_SetupReturnBuffer(CF_GetChunkListHead, CF_CListNode_t **);
+
+    UT_GenStub_AddParam(CF_GetChunkListHead, CF_Channel_t *, chan);
+    UT_GenStub_AddParam(CF_GetChunkListHead, uint8, direction);
+
+    UT_GenStub_Execute(CF_GetChunkListHead, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_GetChunkListHead, CF_CListNode_t **);
 }
 
 /*

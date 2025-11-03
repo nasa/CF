@@ -29,7 +29,6 @@
 void UT_DefaultHandler_CF_CFDP_CancelTransaction(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_CFDP_ConstructPduHeader(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_CFDP_PlaybackDir(void *, UT_EntryKey_t, const UT_StubContext_t *);
-void UT_DefaultHandler_CF_CFDP_ResetTransaction(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_CFDP_TxFile(void *, UT_EntryKey_t, const UT_StubContext_t *);
 
 /*
@@ -245,6 +244,19 @@ void CF_CFDP_EncodeStart(CF_EncoderState_t *penc, void *msgbuf, CF_Logical_PduBu
 
 /*
  * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_FinishTransaction()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_FinishTransaction(CF_Transaction_t *txn, bool keep_history)
+{
+    UT_GenStub_AddParam(CF_CFDP_FinishTransaction, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_CFDP_FinishTransaction, bool, keep_history);
+
+    UT_GenStub_Execute(CF_CFDP_FinishTransaction, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
  * Generated stub function for CF_CFDP_HandleNotKeepFile()
  * ----------------------------------------------------
  */
@@ -446,15 +458,28 @@ CFE_Status_t CF_CFDP_RecvFin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_RecvIdle()
+ * Generated stub function for CF_CFDP_RecvHold()
  * ----------------------------------------------------
  */
-void CF_CFDP_RecvIdle(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
+void CF_CFDP_RecvHold(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_AddParam(CF_CFDP_RecvIdle, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_CFDP_RecvIdle, CF_Logical_PduBuffer_t *, ph);
+    UT_GenStub_AddParam(CF_CFDP_RecvHold, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_CFDP_RecvHold, CF_Logical_PduBuffer_t *, ph);
 
-    UT_GenStub_Execute(CF_CFDP_RecvIdle, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_RecvHold, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_RecvInit()
+ * ----------------------------------------------------
+ */
+void CF_CFDP_RecvInit(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
+{
+    UT_GenStub_AddParam(CF_CFDP_RecvInit, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_CFDP_RecvInit, CF_Logical_PduBuffer_t *, ph);
+
+    UT_GenStub_Execute(CF_CFDP_RecvInit, Basic, NULL);
 }
 
 /*
@@ -510,15 +535,14 @@ CFE_Status_t CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_ResetTransaction()
+ * Generated stub function for CF_CFDP_RecycleTransaction()
  * ----------------------------------------------------
  */
-void CF_CFDP_ResetTransaction(CF_Transaction_t *txn, bool keep_history)
+void CF_CFDP_RecycleTransaction(CF_Transaction_t *txn)
 {
-    UT_GenStub_AddParam(CF_CFDP_ResetTransaction, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_CFDP_ResetTransaction, bool, keep_history);
+    UT_GenStub_AddParam(CF_CFDP_RecycleTransaction, CF_Transaction_t *, txn);
 
-    UT_GenStub_Execute(CF_CFDP_ResetTransaction, Basic, UT_DefaultHandler_CF_CFDP_ResetTransaction);
+    UT_GenStub_Execute(CF_CFDP_RecycleTransaction, Basic, NULL);
 }
 
 /*
@@ -652,6 +676,22 @@ void CF_CFDP_SetTxnStatus(CF_Transaction_t *txn, CF_TxnStatus_t txn_stat)
     UT_GenStub_AddParam(CF_CFDP_SetTxnStatus, CF_TxnStatus_t, txn_stat);
 
     UT_GenStub_Execute(CF_CFDP_SetTxnStatus, Basic, NULL);
+}
+
+/*
+ * ----------------------------------------------------
+ * Generated stub function for CF_CFDP_StartRxTransaction()
+ * ----------------------------------------------------
+ */
+CF_Transaction_t *CF_CFDP_StartRxTransaction(uint8 chan_num)
+{
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_StartRxTransaction, CF_Transaction_t *);
+
+    UT_GenStub_AddParam(CF_CFDP_StartRxTransaction, uint8, chan_num);
+
+    UT_GenStub_Execute(CF_CFDP_StartRxTransaction, Basic, NULL);
+
+    return UT_GenStub_GetReturnValue(CF_CFDP_StartRxTransaction, CF_Transaction_t *);
 }
 
 /*

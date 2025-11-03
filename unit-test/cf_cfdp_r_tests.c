@@ -171,13 +171,87 @@ void Test_CF_CFDP_R2_Recv(void)
     UtAssert_VOIDCALL(CF_CFDP_R2_Recv(txn, ph));
 }
 
+void Test_CF_CFDP_R_AckTimerTick(void)
+{
+    /* Test case for:
+     * void CF_CFDP_R_AckTimerTick(CF_Transaction_t *txn);
+     */
+    CF_Transaction_t *txn;
+    CF_ConfigTable_t *config;
+
+    /* no-op if not in R2 */
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
+    txn->state                     = CF_TxnState_R1;
+    txn->flags.com.ack_timer_armed = true;
+    UtAssert_VOIDCALL(CF_CFDP_R_AckTimerTick(txn));
+    UtAssert_STUB_COUNT(CF_Timer_Tick, 0);
+
+    /* no-op if not armed */
+    txn->state                     = CF_TxnState_R2;
+    txn->flags.com.ack_timer_armed = false;
+    UtAssert_VOIDCALL(CF_CFDP_R_AckTimerTick(txn));
+    UtAssert_STUB_COUNT(CF_Timer_Tick, 0);
+
+    /* in R2 state, ack_timer_armed set but not expired */
+    txn->state                     = CF_TxnState_R2;
+    txn->flags.com.ack_timer_armed = true;
+    UtAssert_VOIDCALL(CF_CFDP_R_AckTimerTick(txn));
+    UtAssert_STUB_COUNT(CF_Timer_Tick, 1);
+
+    /* in R2 state, ack_timer_armed set, timer expires */
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
+    txn->state                     = CF_TxnState_R2;
+    txn->flags.com.ack_timer_armed = true;
+    UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, 1);
+    UtAssert_VOIDCALL(CF_CFDP_R_AckTimerTick(txn));
+    UtAssert_STUB_COUNT(CF_CFDP_ArmAckTimer, 1);
+    UtAssert_BOOL_TRUE(txn->flags.rx.complete);
+
+    /* in R2 state, ack_timer_armed set, timer expires, finack substate */
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
+    config->chan[txn->chan_num].ack_limit = 10;
+    txn->state                            = CF_TxnState_R2;
+    txn->flags.com.ack_timer_armed        = true;
+    txn->flags.rx.complete                = true;
+    txn->state_data.receive.sub_state     = CF_RxSubState_CLOSEOUT_SYNC;
+    UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, 1);
+    UtAssert_VOIDCALL(CF_CFDP_R_AckTimerTick(txn));
+    UtAssert_STUB_COUNT(CF_CFDP_ArmAckTimer, 2);
+    UtAssert_BOOL_TRUE(txn->flags.rx.send_fin);
+
+    /* same as above, but acknak limit reached */
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
+    config->chan[txn->chan_num].ack_limit   = 10;
+    txn->state                              = CF_TxnState_R2;
+    txn->flags.com.ack_timer_armed          = true;
+    txn->flags.rx.complete                  = true;
+    txn->state_data.receive.sub_state       = CF_RxSubState_CLOSEOUT_SYNC;
+    txn->state_data.receive.r2.acknak_count = 9;
+    UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, 1);
+    UtAssert_VOIDCALL(CF_CFDP_R_AckTimerTick(txn));
+    UtAssert_STUB_COUNT(CF_CFDP_ArmAckTimer, 2);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1);
+    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.ack_limit, 1);
+
+    /* in R2 state, ack_timer_armed set, timer expires, not in finack substate */
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
+    config->chan[txn->chan_num].ack_limit = 10;
+    txn->state                            = CF_TxnState_R2;
+    txn->flags.com.ack_timer_armed        = true;
+    txn->flags.rx.complete                = true;
+    txn->state_data.receive.sub_state     = CF_RxSubState_EOF;
+    UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, 1);
+    UtAssert_VOIDCALL(CF_CFDP_R_AckTimerTick(txn));
+    UtAssert_STUB_COUNT(CF_CFDP_ArmAckTimer, 3);
+    UtAssert_BOOL_FALSE(txn->flags.rx.send_fin);
+}
+
 void Test_CF_CFDP_R_Tick(void)
 {
     /* Test case for:
      * void CF_CFDP_R_Tick(CF_Transaction_t *txn, int *cont);
      */
     CF_Transaction_t *txn;
-    CF_ConfigTable_t *config;
     int               cont;
 
     /* nominal, not in R2 state - just ticks */
@@ -189,11 +263,18 @@ void Test_CF_CFDP_R_Tick(void)
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, 1);
     UtAssert_VOIDCALL(CF_CFDP_R_Tick(txn, &cont));
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1);
+    UtAssert_STUB_COUNT(CF_CFDP_RecycleTransaction, 1);
 
     /* nominal, in R2 state */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
     txn->state = CF_TxnState_R2;
+    UtAssert_VOIDCALL(CF_CFDP_R_Tick(txn, &cont));
+    UtAssert_STUB_COUNT(CF_Timer_Tick, 2);
+
+    /* in HOLD state, timer expired */
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
+    UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, 1);
+    txn->state = CF_TxnState_HOLD;
     UtAssert_VOIDCALL(CF_CFDP_R_Tick(txn, &cont));
     UtAssert_STUB_COUNT(CF_Timer_Tick, 2);
 
@@ -202,118 +283,60 @@ void Test_CF_CFDP_R_Tick(void)
     txn->state = CF_TxnState_R2;
     UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, 1);
     UtAssert_VOIDCALL(CF_CFDP_R_Tick(txn, &cont));
-    UtAssert_BOOL_TRUE(txn->flags.rx.inactivity_fired);
+    UtAssert_BOOL_TRUE(txn->flags.com.inactivity_fired);
     UtAssert_INT32_EQ(txn->history->txn_stat, CF_TxnStatus_INACTIVITY_DETECTED);
 
     /* in R2 state, send_ack set */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
-    txn->state                     = CF_TxnState_R2;
-    txn->flags.rx.send_ack         = true;
-    txn->flags.rx.inactivity_fired = true;
+    txn->state                      = CF_TxnState_R2;
+    txn->flags.rx.send_eof_ack      = true;
+    txn->flags.com.inactivity_fired = true;
     UtAssert_VOIDCALL(CF_CFDP_R_Tick(txn, &cont));
     UtAssert_STUB_COUNT(CF_CFDP_SendAck, 1);
-    UtAssert_BOOL_FALSE(txn->flags.rx.send_ack);
+    UtAssert_BOOL_FALSE(txn->flags.rx.send_eof_ack);
 
     /* same as above, but SendAck fails */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendAck), 1, CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
-    txn->state                     = CF_TxnState_R2;
-    txn->flags.rx.send_ack         = true;
-    txn->flags.rx.inactivity_fired = true;
+    txn->state                      = CF_TxnState_R2;
+    txn->flags.rx.send_eof_ack      = true;
+    txn->flags.com.inactivity_fired = true;
     UtAssert_VOIDCALL(CF_CFDP_R_Tick(txn, &cont));
-    UtAssert_BOOL_TRUE(txn->flags.rx.send_ack);
+    UtAssert_BOOL_TRUE(txn->flags.rx.send_eof_ack);
 
     /* in R2 state, send_nak set */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
-    txn->state                     = CF_TxnState_R2;
-    txn->flags.rx.send_nak         = true;
-    txn->flags.rx.inactivity_fired = true;
+    txn->state                      = CF_TxnState_R2;
+    txn->flags.rx.send_nak          = true;
+    txn->flags.com.inactivity_fired = true;
     UtAssert_VOIDCALL(CF_CFDP_R_Tick(txn, &cont));
     UtAssert_BOOL_FALSE(txn->flags.rx.send_nak);
 
     /* same as above, but CF_CFDP_R_SubstateSendNak fails */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendNak), 1, CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
-    txn->state                     = CF_TxnState_R2;
-    txn->flags.rx.send_nak         = true;
-    txn->flags.rx.inactivity_fired = true;
+    txn->state                      = CF_TxnState_R2;
+    txn->flags.rx.send_nak          = true;
+    txn->flags.com.inactivity_fired = true;
     UtAssert_VOIDCALL(CF_CFDP_R_Tick(txn, &cont));
     UtAssert_BOOL_TRUE(txn->flags.rx.send_nak);
 
     /* in R2 state, send_fin set */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
-    txn->state                     = CF_TxnState_R2;
-    txn->flags.rx.send_fin         = true;
-    txn->flags.rx.inactivity_fired = true;
+    txn->state                      = CF_TxnState_R2;
+    txn->flags.rx.send_fin          = true;
+    txn->flags.com.inactivity_fired = true;
     UtAssert_VOIDCALL(CF_CFDP_R_Tick(txn, &cont));
     UtAssert_BOOL_FALSE(txn->flags.rx.send_fin);
 
     /* same as above, but CF_CFDP_R2_SubstateSendFin fails */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendFin), 1, CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
-    txn->state                     = CF_TxnState_R2;
-    txn->flags.rx.send_fin         = true;
-    txn->flags.rx.inactivity_fired = true;
+    txn->state                      = CF_TxnState_R2;
+    txn->flags.rx.send_fin          = true;
+    txn->flags.com.inactivity_fired = true;
     UtAssert_VOIDCALL(CF_CFDP_R_Tick(txn, &cont));
     UtAssert_BOOL_TRUE(txn->flags.rx.send_fin);
-
-    /* in R2 state, ack_timer_armed set */
-    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
-    txn->state                     = CF_TxnState_R2;
-    txn->flags.com.ack_timer_armed = true;
-    txn->flags.rx.inactivity_fired = true;
-    UtAssert_VOIDCALL(CF_CFDP_R_Tick(txn, &cont));
-    UtAssert_STUB_COUNT(CF_Timer_Tick, 3);
-
-    /* in R2 state, ack_timer_armed set, timer expires */
-    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
-    txn->state                     = CF_TxnState_R2;
-    txn->flags.com.ack_timer_armed = true;
-    txn->flags.rx.inactivity_fired = true;
-    UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, 1);
-    UtAssert_VOIDCALL(CF_CFDP_R_Tick(txn, &cont));
-    UtAssert_STUB_COUNT(CF_CFDP_ArmAckTimer, 1);
-    UtAssert_BOOL_TRUE(txn->flags.rx.complete);
-
-    /* in R2 state, ack_timer_armed set, timer expires, finack substate */
-    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
-    config->chan[txn->chan_num].ack_limit = 10;
-    txn->state                            = CF_TxnState_R2;
-    txn->flags.com.ack_timer_armed        = true;
-    txn->flags.rx.inactivity_fired        = true;
-    txn->flags.rx.complete                = true;
-    txn->state_data.receive.sub_state     = CF_RxSubState_WAIT_FOR_FIN_ACK;
-    UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, 1);
-    UtAssert_VOIDCALL(CF_CFDP_R_Tick(txn, &cont));
-    UtAssert_STUB_COUNT(CF_CFDP_ArmAckTimer, 2);
-    UtAssert_BOOL_TRUE(txn->flags.rx.send_fin);
-
-    /* same as above, but acknak limit reached */
-    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
-    config->chan[txn->chan_num].ack_limit   = 10;
-    txn->state                              = CF_TxnState_R2;
-    txn->flags.com.ack_timer_armed          = true;
-    txn->flags.rx.inactivity_fired          = true;
-    txn->flags.rx.complete                  = true;
-    txn->state_data.receive.sub_state       = CF_RxSubState_WAIT_FOR_FIN_ACK;
-    txn->state_data.receive.r2.acknak_count = 9;
-    UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, 1);
-    UtAssert_VOIDCALL(CF_CFDP_R_Tick(txn, &cont));
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 2);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.ack_limit, 1);
-
-    /* in R2 state, ack_timer_armed set, timer expires, not in finack substate */
-    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
-    config->chan[txn->chan_num].ack_limit = 10;
-    txn->state                            = CF_TxnState_R2;
-    txn->flags.com.ack_timer_armed        = true;
-    txn->flags.rx.inactivity_fired        = true;
-    txn->flags.rx.complete                = true;
-    txn->state_data.receive.sub_state     = CF_RxSubState_EOF;
-    UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, 1);
-    UtAssert_VOIDCALL(CF_CFDP_R_Tick(txn, &cont));
-    UtAssert_STUB_COUNT(CF_CFDP_ArmAckTimer, 3);
-    UtAssert_BOOL_FALSE(txn->flags.rx.send_fin);
 }
 
 void Test_CF_CFDP_R_Cancel(void)
@@ -326,7 +349,7 @@ void Test_CF_CFDP_R_Cancel(void)
     /* nominal, calls reset */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
     UtAssert_VOIDCALL(CF_CFDP_R_Cancel(txn));
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1);
 
     /* trigger send_fin on R2 */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
@@ -337,9 +360,9 @@ void Test_CF_CFDP_R_Cancel(void)
     /* for coverage, this should also go to reset */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
     txn->state                        = CF_TxnState_R2;
-    txn->state_data.receive.sub_state = CF_RxSubState_WAIT_FOR_FIN_ACK;
+    txn->state_data.receive.sub_state = CF_RxSubState_CLOSEOUT_SYNC;
     UtAssert_VOIDCALL(CF_CFDP_R_Cancel(txn));
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 2);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 2);
 }
 
 void Test_CF_CFDP_R_Init(void)
@@ -377,7 +400,7 @@ void Test_CF_CFDP_R_Init(void)
     UtAssert_VOIDCALL(CF_CFDP_R_Init(txn));
     UT_CF_AssertEventID(CF_CFDP_R_CREAT_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_open, 1);
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1);
 
     /* failure of file open, class 2 */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
@@ -413,7 +436,7 @@ void Test_CF_CFDP_R1_Reset(void)
     /* nominal, this just resets */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
     UtAssert_VOIDCALL(CF_CFDP_R1_Reset(txn));
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1);
 }
 
 void Test_CF_CFDP_R2_Reset(void)
@@ -427,28 +450,28 @@ void Test_CF_CFDP_R2_Reset(void)
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
     UtAssert_VOIDCALL(CF_CFDP_R2_Reset(txn));
     UtAssert_BOOL_TRUE(txn->flags.rx.send_fin);
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 0);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 0);
 
     /* test the various conditions that do cause reset */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
-    txn->state_data.receive.sub_state = CF_RxSubState_WAIT_FOR_FIN_ACK;
+    txn->state_data.receive.sub_state = CF_RxSubState_CLOSEOUT_SYNC;
     UtAssert_VOIDCALL(CF_CFDP_R2_Reset(txn));
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1);
 
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
     txn->state_data.receive.r2.eof_cc = CF_CFDP_ConditionCode_INVALID_TRANSMISSION_MODE; /* not NO_ERROR */
     UtAssert_VOIDCALL(CF_CFDP_R2_Reset(txn));
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 2);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 2);
 
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_TxnStatus_IsError), 1, true);
     UtAssert_VOIDCALL(CF_CFDP_R2_Reset(txn));
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 3);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 3);
 
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, NULL, NULL, NULL, &txn, NULL);
     txn->flags.com.canceled = true;
     UtAssert_VOIDCALL(CF_CFDP_R2_Reset(txn));
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 4);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 4);
 }
 
 void Test_CF_CFDP_R_CheckCrc(void)
@@ -657,7 +680,7 @@ void Test_CF_CFDP_R1_SubstateRecvEof(void)
     txn->fsize      = eof->size;
     UtAssert_VOIDCALL(CF_CFDP_R1_SubstateRecvEof(txn, ph));
     UtAssert_BOOL_TRUE(txn->keep);
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1);
 
     /* failure in CF_CFDP_R_SubstateRecvEof - not a stub, but calls CF_CFDP_RecvEof, which is. */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
@@ -692,7 +715,7 @@ void Test_CF_CFDP_R2_SubstateRecvEof(void)
     txn->fsize      = 0xbbb;
     UtAssert_VOIDCALL(CF_CFDP_R2_SubstateRecvEof(txn, ph));
     UtAssert_BOOL_TRUE(txn->flags.rx.eof_recv);
-    UtAssert_BOOL_TRUE(txn->flags.rx.send_ack);
+    UtAssert_BOOL_TRUE(txn->flags.rx.send_eof_ack);
     UtAssert_UINT32_EQ(txn->state_data.receive.r2.eof_crc, eof->crc);
     UtAssert_UINT32_EQ(txn->state_data.receive.r2.eof_size, eof->size);
     UtAssert_UINT32_EQ(txn->state_data.receive.r2.eof_cc, eof->cc);
@@ -702,15 +725,15 @@ void Test_CF_CFDP_R2_SubstateRecvEof(void)
     eof     = &ph->int_header.eof;
     eof->cc = CF_CFDP_ConditionCode_CANCEL_REQUEST_RECEIVED;
     UtAssert_VOIDCALL(CF_CFDP_R2_SubstateRecvEof(txn, ph));
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1);
 
     /* eof already recvd - noop */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     txn->flags.rx.eof_recv = true;
     UtAssert_VOIDCALL(CF_CFDP_R2_SubstateRecvEof(txn, ph));
-    UtAssert_BOOL_TRUE(txn->flags.rx.eof_recv);       /* unchanged */
-    UtAssert_BOOL_FALSE(txn->flags.rx.send_ack);      /* unchanged */
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1); /* unchanged */
+    UtAssert_BOOL_TRUE(txn->flags.rx.eof_recv);        /* unchanged */
+    UtAssert_BOOL_FALSE(txn->flags.rx.send_eof_ack);   /* unchanged */
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1); /* unchanged */
 
     /* failure in CF_CFDP_R_SubstateRecvEof - not a stub, but calls CF_CFDP_RecvEof, which is. */
     /* This will follow the CF_REC_PDU_BAD_EOF_ERROR processing path, which just sets state to FILEDATA */
@@ -746,13 +769,13 @@ void Test_CF_CFDP_R1_SubstateRecvFileData(void)
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvFd), 1, -1);
     UtAssert_VOIDCALL(CF_CFDP_R1_SubstateRecvFileData(txn, ph));
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1);
 
     /* failure in CF_CFDP_R_ProcessFd (via failure of CF_WrappedWrite) */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedWrite), 1, -1);
     UtAssert_VOIDCALL(CF_CFDP_R1_SubstateRecvFileData(txn, ph));
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 2);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 2);
 }
 
 void Test_CF_CFDP_R2_SubstateRecvFileData(void)
@@ -798,7 +821,7 @@ void Test_CF_CFDP_R2_SubstateRecvFileData(void)
     UT_SetDeferredRetcode(UT_KEY(CF_TxnStatus_IsError), 1, true);
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedWrite), 1, -1);
     UtAssert_VOIDCALL(CF_CFDP_R2_SubstateRecvFileData(txn, ph));
-    UtAssert_STUB_COUNT(CF_CFDP_ResetTransaction, 1); /* this resets the transaction */
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1); /* this resets the transaction */
 }
 
 void Test_CF_CFDP_R2_GapCompute(void)
@@ -1118,6 +1141,8 @@ void UtTest_Setup(void)
 {
     UtTest_Add(Test_CF_CFDP_R1_Recv, cf_cfdp_r_tests_Setup, cf_cfdp_r_tests_Teardown, "CF_CFDP_R1_Recv");
     UtTest_Add(Test_CF_CFDP_R2_Recv, cf_cfdp_r_tests_Setup, cf_cfdp_r_tests_Teardown, "CF_CFDP_R2_Recv");
+    UtTest_Add(Test_CF_CFDP_R_AckTimerTick, cf_cfdp_r_tests_Setup, cf_cfdp_r_tests_Teardown,
+               "Test_CF_CFDP_R_AckTimerTick");
     UtTest_Add(Test_CF_CFDP_R_Tick, cf_cfdp_r_tests_Setup, cf_cfdp_r_tests_Teardown, "CF_CFDP_R_Tick");
     UtTest_Add(Test_CF_CFDP_R_Cancel, cf_cfdp_r_tests_Setup, cf_cfdp_r_tests_Teardown, "CF_CFDP_R_Cancel");
     UtTest_Add(Test_CF_CFDP_R_Init, cf_cfdp_r_tests_Setup, cf_cfdp_r_tests_Teardown, "CF_CFDP_R_Init");

@@ -65,6 +65,21 @@ void CF_CFDP_R1_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 void CF_CFDP_R2_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
+/** @brief Perform acknowledgement timer tick (time-based) processing for R transactions.
+ *
+ * @par Description
+ *       This is invoked as part of overall timer tick processing if the transaction
+ *       has some sort of acknowledgement pending from the remote.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *       txn must not be NULL
+ *
+ * @param txn  Pointer to the transaction object
+ *
+ */
+void CF_CFDP_R_AckTimerTick(CF_Transaction_t *txn);
+
+/************************************************************************/
 /** @brief Perform tick (time-based) processing for R transactions.
  *
  * @par Description

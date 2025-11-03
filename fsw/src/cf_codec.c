@@ -78,7 +78,9 @@ static const CF_Codec_BitField_t CF_CFDP_PduHeader_FLAGS_LARGEFILE = CF_INIT_FIE
 /*
  * Fields within the "eid_tsn_lengths" byte of the PDU header
  */
+static const CF_Codec_BitField_t CF_CFDP_PduHeader_SEGMENTATION_CONTROL         = CF_INIT_FIELD(1, 7);
 static const CF_Codec_BitField_t CF_CFDP_PduHeader_LENGTHS_ENTITY               = CF_INIT_FIELD(3, 4);
+static const CF_Codec_BitField_t CF_CFDP_PduHeader_SEGMENT_METADATA             = CF_INIT_FIELD(1, 3);
 static const CF_Codec_BitField_t CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE = CF_INIT_FIELD(3, 0);
 
 /*
@@ -383,7 +385,9 @@ void CF_CFDP_EncodeHeaderWithoutSize(CF_EncoderState_t *state, CF_Logical_PduHea
 
         /* The eid+tsn lengths are encoded as -1 */
         CF_Codec_Store_uint8(&(peh->eid_tsn_lengths), 0);
+        FSV(peh->eid_tsn_lengths, CF_CFDP_PduHeader_SEGMENTATION_CONTROL, plh->segmentation_control);
         FSV(peh->eid_tsn_lengths, CF_CFDP_PduHeader_LENGTHS_ENTITY, plh->eid_length - 1);
+        FSV(peh->eid_tsn_lengths, CF_CFDP_PduHeader_SEGMENT_METADATA, plh->segment_meta_flag);
         FSV(peh->eid_tsn_lengths, CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE, plh->txn_seq_length - 1);
 
         /* NOTE: peh->length is NOT set here, as it depends on future encoding */
@@ -780,8 +784,10 @@ CFE_Status_t CF_CFDP_DecodeHeader(CF_DecoderState_t *state, CF_Logical_PduHeader
         plh->large_flag = FGV(peh->flags, CF_CFDP_PduHeader_FLAGS_LARGEFILE);
 
         /* The eid+tsn lengths are encoded as -1 */
-        plh->eid_length     = FGV(peh->eid_tsn_lengths, CF_CFDP_PduHeader_LENGTHS_ENTITY) + 1;
-        plh->txn_seq_length = FGV(peh->eid_tsn_lengths, CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE) + 1;
+        plh->segmentation_control = FGV(peh->eid_tsn_lengths, CF_CFDP_PduHeader_SEGMENTATION_CONTROL);
+        plh->eid_length           = FGV(peh->eid_tsn_lengths, CF_CFDP_PduHeader_LENGTHS_ENTITY) + 1;
+        plh->segment_meta_flag    = FGV(peh->eid_tsn_lengths, CF_CFDP_PduHeader_SEGMENT_METADATA);
+        plh->txn_seq_length       = FGV(peh->eid_tsn_lengths, CF_CFDP_PduHeader_LENGTHS_TRANSACTION_SEQUENCE) + 1;
 
         /* Length is a simple 16-bit quantity and refers to the content after this header */
         CF_Codec_Load_uint16(&(plh->data_encoded_length), &(peh->length));

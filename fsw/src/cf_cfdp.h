@@ -44,8 +44,8 @@ typedef struct CF_CFDP_Tick_args
 {
     CF_Channel_t *chan;                    /**< \brief channel structure */
     void (*fn)(CF_Transaction_t *, int *); /**< \brief function pointer */
-    bool early_exit;                        /**< \brief early exit result */
-    int cont;                              /**< \brief if 1, then re-traverse the list */
+    bool early_exit;                       /**< \brief early exit result */
+    int  cont;                             /**< \brief if 1, then re-traverse the list */
 } CF_CFDP_Tick_args_t;
 
 /********************************************************************************/
@@ -83,7 +83,17 @@ void CF_CFDP_DecodeStart(CF_DecoderState_t *pdec, const void *msgbuf, CF_Logical
 /* engine execution functions */
 
 /************************************************************************/
-/** @brief Reset a transaction and all its internals to an unused state.
+/** @brief Finish a transaction
+ *
+ * This marks the transaction as completed and puts it into a holdover state.
+ * After the inactivity timer expires, the resources will be recycled and
+ * become available for re-use.
+ *
+ * Holdover is necessary because even though locally we consider the transaction
+ * to be complete, there may be undelivered PDUs still in network queues that
+ * get delivered to us late.  By holding this transaction for a bit longer,
+ * we can still associate those PDUs with this transaction/seq_num and
+ * appropriately handle them as dupes/spurious deliveries.
  *
  * @par Assumptions, External Events, and Notes:
  *       txn must not be NULL.
@@ -91,7 +101,25 @@ void CF_CFDP_DecodeStart(CF_DecoderState_t *pdec, const void *msgbuf, CF_Logical
  * @param txn  Pointer to the transaction object
  * @param keep_history Whether the transaction info should be preserved in history
  */
-void CF_CFDP_ResetTransaction(CF_Transaction_t *txn, bool keep_history);
+void CF_CFDP_FinishTransaction(CF_Transaction_t *txn, bool keep_history);
+
+/************************************************************************/
+/** @brief Recover resources associated with a transaction
+ *
+ * Wipes all data in the transaction struct and returns everything to its
+ * relevant FREE list so it can be used again.
+ *
+ * Notably, should any PDUs arrive after this that is related to this
+ * transaction, these PDUs will not be identifiable, and no longer associable
+ * to this transaction.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *     It is imperative that nothing uses the txn struct after this call,
+ *     as it will now be invalid.  This is effectively like free().
+ *
+ * @param txn  Pointer to the transaction object
+ */
+void CF_CFDP_RecycleTransaction(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief Helper function to store transaction status code only
@@ -516,6 +544,22 @@ void CF_CFDP_CancelTransaction(CF_Transaction_t *txn);
  */
 void CF_CFDP_InitTxnTxFile(CF_Transaction_t *txn, CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority);
 
+/************************************************************************/
+/** @brief Helper function to start a new RX transaction
+ *
+ * This sets various fields inside a newly-allocated transaction
+ * structure appropriately for receiving a file.  Note that in the
+ * receive direction, most fields are unknown until the MD is received,
+ * and thus are left in their initial state here (generally 0).
+ *
+ * If there is no capacity for another RX transaction, this returns NULL.
+ *
+ * @param chan_num       CF channel number
+ * @returns Pointer to new transaction
+ *
+ */
+CF_Transaction_t *CF_CFDP_StartRxTransaction(uint8 chan_num);
+
 /* functions to handle LVs (length-value, CFDP spec) */
 /* returns number of bytes copied, or -1 on error */
 
@@ -571,6 +615,24 @@ void CF_CFDP_ArmAckTimer(CF_Transaction_t *txn);
 void CF_CFDP_RecvDrop(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
+/** @brief Receive state function during holdover period.
+ *
+ * @par Description
+ *       This function signature must match all receive state functions.
+ *       Handles any possible spurious PDUs that might come in after the
+ *       transaction is considered done.  This can happen if ACKs were
+ *       lost in transmission causing the sender to retransmit PDUs even
+ *       though we already completed the transaction.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *       txn must not be NULL.
+ *
+ * @param txn    Pointer to the transaction state
+ * @param ph   The logical PDU buffer being received
+ */
+void CF_CFDP_RecvHold(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
+
+/************************************************************************/
 /** @brief Receive state function to process new rx transaction.
  *
  * @par Description
@@ -586,7 +648,7 @@ void CF_CFDP_RecvDrop(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
  * @param txn    Pointer to the transaction state
  * @param ph   The logical PDU buffer being received
  */
-void CF_CFDP_RecvIdle(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
+void CF_CFDP_RecvInit(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief List traversal function to close all files in all active transactions.
@@ -711,12 +773,12 @@ CF_CListTraverse_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context);
  *
  * @retval true/false
  */
-bool CF_CFDP_IsPollingDir(const char * src_file, uint8 chan_num);
+bool CF_CFDP_IsPollingDir(const char *src_file, uint8 chan_num);
 
 /************************************************************************/
 /** @brief Remove/Move file after transaction
- * 
- * This helper is used to handle "not keep" file option after a transaction.  
+ *
+ * This helper is used to handle "not keep" file option after a transaction.
  *
  * @par Assumptions, External Events, and Notes:
  *
@@ -724,9 +786,9 @@ bool CF_CFDP_IsPollingDir(const char * src_file, uint8 chan_num);
 void CF_CFDP_HandleNotKeepFile(CF_Transaction_t *txn);
 
 /************************************************************************/
-/** @brief Move File 
- * 
- * This helper is used to move a file.  
+/** @brief Move File
+ *
+ * This helper is used to move a file.
  *
  * @par Assumptions, External Events, and Notes:
  *

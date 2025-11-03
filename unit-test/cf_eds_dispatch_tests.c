@@ -25,7 +25,6 @@
 #include "cf_msgids.h"
 #include "cf_events.h"
 
-
 /* UT includes */
 #include "uttest.h"
 #include "utassert.h"

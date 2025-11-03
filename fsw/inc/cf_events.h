@@ -490,6 +490,19 @@
  */
 #define CF_CFDP_CLOSE_ERR_EID (68)
 
+/**
+ * \brief CF No chunklist available
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  Engine has aborted a transaction due to lack of an
+ *  available resource to track the chunks associated
+ *  with the file.
+ */
+#define CF_CFDP_NO_CHUNKLIST_AVAIL_EID 88
+
 /**************************************************************************
  * CF_CFDP_R event IDs - Engine receive
  */
@@ -709,6 +722,19 @@
  *  Expiration of the RX inactivity timer
  */
 #define CF_CFDP_R_INACT_TIMER_ERR_EID (88)
+
+/**
+ * \brief CF No chunklist available
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  Engine has aborted a transaction due to lack of an
+ *  available resource to track the chunks associated
+ *  with the file.
+ */
+#define CF_CFDP_NO_CHUNKLIST_AVAIL_EID 88
 
 /**************************************************************************
  * CF_CFDP_S event IDs - Engine send

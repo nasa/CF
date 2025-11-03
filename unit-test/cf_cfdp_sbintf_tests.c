@@ -176,6 +176,9 @@ static void UT_CFDP_SetupBasicTestState(UT_CF_Setup_t setup, CF_Logical_PduBuffe
         ut_config_table.chan[UT_CFDP_CHANNEL].rx_max_messages_per_wakeup = 1;
     }
 
+    UT_SetDefaultReturnValue(UT_KEY(CF_GetChannelFromTxn),
+                             (UT_IntReturn_t)&CF_AppData.engine.channels[UT_CFDP_CHANNEL]);
+
     /* reset the event ID capture between each sub-case */
     UT_CF_ResetEventCapture();
 }
@@ -243,10 +246,13 @@ void Test_CF_CFDP_ReceiveMessage(void)
     /*
      *  - CF_CFDP_RecvPh() succeeds
      *  - CF_FindTransactionBySequenceNumber() returns NULL
-     *  - CF_CFDP_FindUnusedTransaction() needs to return non-NULL
+     *  - CF_CFDP_StartRxTransaction() needs to return non-NULL
      */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, NULL, &chan, NULL, &txn, &config);
-    UT_SetHandlerFunction(UT_KEY(CF_FindUnusedTransaction), UT_AltHandler_GenericPointerReturn, txn);
+    txn->state                    = CF_TxnState_INIT;
+    txn->state_data.receive.r2.dc = CF_CFDP_FinDeliveryCode_INCOMPLETE;
+    txn->state_data.receive.r2.fs = CF_CFDP_FinFileStatus_DISCARDED;
+    UT_SetHandlerFunction(UT_KEY(CF_CFDP_StartRxTransaction), UT_AltHandler_GenericPointerReturn, txn);
     UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
     UtAssert_STUB_COUNT(CF_CFDP_DispatchRecv, 1); /* should be dispatched */
     UtAssert_UINT32_EQ(txn->history->dir, CF_Direction_RX);
@@ -277,40 +283,6 @@ void Test_CF_CFDP_ReceiveMessage(void)
     UtAssert_STUB_COUNT(CF_CFDP_DispatchRecv, 2);              /* should be dispatched */
     UT_ResetState(UT_KEY(CF_FindTransactionBySequenceNumber)); /* clears it */
 
-    /* FIN handling special case */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, &config);
-    config->local_eid             = 123;
-    ph->pdu_header.source_eid     = config->local_eid;
-    ph->fdirective.directive_code = CF_CFDP_FileDirective_FIN;
-    chan->cur                     = txn;
-    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.spurious, 1);
-    UtAssert_STUB_COUNT(CF_CFDP_SendAck, 1);
-    UtAssert_NULL(chan->cur); /* cleared */
-
-    /* FIN handling special case, but failure of CF_CFDP_RecvFin */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, &config);
-    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvFin), 1, -1);
-    config->local_eid             = 123;
-    ph->pdu_header.source_eid     = config->local_eid;
-    ph->fdirective.directive_code = CF_CFDP_FileDirective_FIN;
-    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.spurious, 1); /* no increment */
-    UtAssert_STUB_COUNT(CF_CFDP_SendAck, 1);                                                       /* no increment */
-    UtAssert_NULL(chan->cur);                                                                      /* cleared */
-
-    /* FIN handling special case, but failure of CF_CFDP_SendAck */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, &config);
-    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_SendAck), 1, CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
-    config->local_eid             = 123;
-    ph->pdu_header.source_eid     = config->local_eid;
-    ph->fdirective.directive_code = CF_CFDP_FileDirective_FIN;
-    chan->cur                     = txn;
-    UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.spurious,
-                       2);               /* this does get increment */
-    UtAssert_ADDRESS_EQ(chan->cur, txn); /* not changed */
-
     /* recv but not the correct destination_eid */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, &config);
     config->local_eid              = 123;
@@ -319,10 +291,11 @@ void Test_CF_CFDP_ReceiveMessage(void)
     UT_CF_AssertEventID(CF_CFDP_INVALID_DST_ERR_EID);
 
     /* recv correct destination_eid but CF_MAX_SIMULTANEOUS_RX hit */
+    UT_ResetState(UT_KEY(CF_CFDP_StartRxTransaction));
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, &config);
-    CF_AppData.hk.Payload.channel_hk[txn->chan_num].q_size[CF_QueueIdx_RX] = CF_MAX_SIMULTANEOUS_RX;
-    config->local_eid                                                      = 123;
-    ph->pdu_header.destination_eid                                         = config->local_eid;
+    txn->state                     = CF_TxnState_R1;
+    config->local_eid              = 123;
+    ph->pdu_header.destination_eid = config->local_eid;
     UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
     UT_CF_AssertEventID(CF_CFDP_RX_DROPPED_ERR_EID);
 }

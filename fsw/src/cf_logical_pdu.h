@@ -107,9 +107,10 @@ typedef struct CF_Logical_PduHeader
     uint8 crc_flag;   /**< \brief CRC not present (0) or CRC present (1) */
     uint8 large_flag; /**< \brief Small/32-bit size (0) or Large/64-bit size (1) */
 
-    uint8 segment_meta_flag; /**< \brief Segment Metatdata not present (0) or Present (1) */
-    uint8 eid_length;        /**< \brief Length of encoded entity IDs, in octets (NOT size of logical value) */
-    uint8 txn_seq_length;    /**< \brief Length of encoded sequence number, in octets (NOT size of logical value) */
+    uint8 segmentation_control; /**< \brief Record boundaries not preserved (0) or preserved (1) */
+    uint8 eid_length;           /**< \brief Length of encoded entity IDs, in octets (NOT size of logical value) */
+    uint8 segment_meta_flag;    /**< \brief Segment Metatdata not present (0) or Present (1) */
+    uint8 txn_seq_length;       /**< \brief Length of encoded sequence number, in octets (NOT size of logical value) */
 
     uint16 header_encoded_length; /**< \brief Length of the encoded PDU header, in octets (NOT sizeof struct) */
     uint16 data_encoded_length;   /**< \brief Length of the encoded PDU data, in octets */

@@ -1442,22 +1442,15 @@ void Test_CF_CancelCmd_Failure(void)
 void Test_CF_Abandon_TxnCmd_Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0(void)
 {
     /* Arrange */
-    CF_Transaction_t                   txn;
-    CF_Transaction_t *                 arg_t       = &txn;
-    void *                             arg_ignored = NULL;
-    CF_CFDP_ResetTransaction_context_t context_CF_CFDP_ResetTransaction;
-
-    UT_SetDataBuffer(UT_KEY(CF_CFDP_ResetTransaction), &context_CF_CFDP_ResetTransaction,
-                     sizeof(context_CF_CFDP_ResetTransaction), false);
+    CF_Transaction_t  txn;
+    CF_Transaction_t *arg_t       = &txn;
+    void *            arg_ignored = NULL;
 
     /* Act */
     CF_Abandon_TxnCmd(arg_t, arg_ignored);
 
     /* Assert */
-    UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetTransaction.txn, arg_t);
-    UtAssert_True(context_CF_CFDP_ResetTransaction.keep_history == false,
-                  "CF_CFDP_CancelTransaction was called with int %d and should be 0 (constant in call)",
-                  context_CF_CFDP_ResetTransaction.keep_history);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1);
 }
 
 /*******************************************************************************
@@ -2007,26 +2000,16 @@ void Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT(void)
 void Test_CF_PurgeTransaction_Call_CF_CFDP_ResetTransaction_AndReturn_CLIST_CONT(void)
 {
     /* Arrange */
-    CF_Transaction_t                   txn;
-    CF_CListNode_t *                   arg_n = &txn.cl_node;
-    int                                ignored;
-    void *                             arg_ignored = &ignored;
-    CF_CListTraverse_Status_t          local_result;
-    CF_CFDP_ResetTransaction_context_t context_CF_CFDP_ResetTransaction;
-
-    UT_SetDataBuffer(UT_KEY(CF_CFDP_ResetTransaction), &context_CF_CFDP_ResetTransaction,
-                     sizeof(context_CF_CFDP_ResetTransaction), false);
+    CF_Transaction_t txn;
+    CF_CListNode_t * arg_n = &txn.cl_node;
+    int              ignored;
+    void *           arg_ignored = &ignored;
 
     /* Act */
-    local_result = CF_PurgeTransaction(arg_n, arg_ignored);
+    UtAssert_INT32_EQ(CF_PurgeTransaction(arg_n, arg_ignored), CF_CLIST_CONT);
 
     /* Assert */
-    UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetTransaction.txn, &txn);
-    UtAssert_True(context_CF_CFDP_ResetTransaction.keep_history == false,
-                  "CF_CFDP_ResetTransaction received keep_history %u and should be 0 (constant)",
-                  context_CF_CFDP_ResetTransaction.keep_history);
-    UtAssert_True(local_result == CF_CLIST_CONT, "CF_PurgeHistory returned %d and should be %d (CF_CLIST_CONT)",
-                  local_result, CF_CLIST_CONT);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1);
 }
 
 /*******************************************************************************
@@ -3438,8 +3421,7 @@ void Test_CF_GetSetParamCmd(void)
     for (param_id = 0; param_id < CF_GetSet_ValueID_MAX; ++param_id)
     {
         UT_CF_ResetEventCapture();
-        UtAssert_VOIDCALL(
-            CF_GetSetParamCmd(true, param_id, 1 + param_id, UT_CFDP_CHANNEL));
+        UtAssert_VOIDCALL(CF_GetSetParamCmd(true, param_id, 1 + param_id, UT_CFDP_CHANNEL));
         UT_CF_AssertEventID(CF_CMD_GETSET1_INF_EID);
         UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, ++expected_count);
     }
@@ -3460,16 +3442,14 @@ void Test_CF_GetSetParamCmd(void)
     for (param_id = 0; param_id < CF_GetSet_ValueID_MAX; ++param_id)
     {
         UT_CF_ResetEventCapture();
-        UtAssert_VOIDCALL(
-            CF_GetSetParamCmd(false, param_id, 1, UT_CFDP_CHANNEL));
+        UtAssert_VOIDCALL(CF_GetSetParamCmd(false, param_id, 1, UT_CFDP_CHANNEL));
         UT_CF_AssertEventID(CF_CMD_GETSET2_INF_EID);
         UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, ++expected_count);
     }
 
     /* Bad param ID */
     UT_CF_ResetEventCapture();
-    UtAssert_VOIDCALL(
-        CF_GetSetParamCmd(false, CF_GetSet_ValueID_MAX, 0, UT_CFDP_CHANNEL));
+    UtAssert_VOIDCALL(CF_GetSetParamCmd(false, CF_GetSet_ValueID_MAX, 0, UT_CFDP_CHANNEL));
     UT_CF_AssertEventID(CF_CMD_GETSET_PARAM_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 1);
 
@@ -3865,8 +3845,8 @@ void add_CF_ResumeCmd_tests(void)
 
 void add_CF_Cancel_TxnCmd_tests(void)
 {
-    UtTest_Add(Test_CF_Cancel_TxnCmd_Call_CF_CFDP_CancelTransaction_WithGiven_t, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-               "Test_CF_Cancel_TxnCmd_Call_CF_CFDP_CancelTransaction_WithGiven_t");
+    UtTest_Add(Test_CF_Cancel_TxnCmd_Call_CF_CFDP_CancelTransaction_WithGiven_t, cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown, "Test_CF_Cancel_TxnCmd_Call_CF_CFDP_CancelTransaction_WithGiven_t");
 }
 
 void add_CF_CancelCmd_tests(void)

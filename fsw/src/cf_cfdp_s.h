@@ -74,6 +74,21 @@ void CF_CFDP_S1_Tx(CF_Transaction_t *txn);
 void CF_CFDP_S2_Tx(CF_Transaction_t *txn);
 
 /************************************************************************/
+/** @brief Perform acknowledgement timer tick (time-based) processing for S transactions.
+ *
+ * @par Description
+ *       This is invoked as part of overall timer tick processing if the transaction
+ *       has some sort of acknowledgement pending from the remote.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *       txn must not be NULL
+ *
+ * @param txn  Pointer to the transaction object
+ *
+ */
+void CF_CFDP_S_AckTimerTick(CF_Transaction_t *txn);
+
+/************************************************************************/
 /** @brief Perform tick (time-based) processing for S transactions.
  *
  * @par Description
@@ -249,7 +264,7 @@ void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *txn);
  *
  * @param txn     Pointer to the transaction object
  */
-void CF_CFDP_S_SubstateSendFinAck(CF_Transaction_t *txn);
+CFE_Status_t CF_CFDP_S_SendFinAck(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief A FIN was received before file complete, so abandon the transaction.
@@ -301,11 +316,10 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
-/** @brief S2 received ACK PDU in wait for EOF-ACK state.
+/** @brief S2 received ACK PDU.
  *
  * @par Description
- *       This function will trigger a state transition to CF_TxSubState_WAIT_FOR_FIN,
- *       which waits for a FIN PDU.
+ *       Handles reception of an ACK PDU
  *
  * @par Assumptions, External Events, and Notes:
  *       txn must not be NULL. ph must not be NULL.
@@ -313,6 +327,6 @@ void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
  * @param txn  Pointer to the transaction object
  * @param ph Pointer to the PDU information
  */
-void CF_CFDP_S2_WaitForEofAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
+void CF_CFDP_S2_EofAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 
 #endif /* !CF_CFDP_S_H */
