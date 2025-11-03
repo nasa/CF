@@ -84,7 +84,7 @@ void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *BufPtr)
         [CF_DISABLE_DEQUEUE_CC]     = sizeof(CF_DisableDequeueCmd_t),
         [CF_ENABLE_DIR_POLLING_CC]  = sizeof(CF_EnableDirPollingCmd_t),
         [CF_DISABLE_DIR_POLLING_CC] = sizeof(CF_DisableDirPollingCmd_t),
-        [CF_PURGE_QUEUE_CC]         = sizeof(CF_UnionArgs_Payload_t),
+        [CF_PURGE_QUEUE_CC]         = sizeof(CF_PurgeQueueCmd_t),
         [CF_ENABLE_ENGINE_CC]       = sizeof(CF_EnableEngineCmd_t),
         [CF_DISABLE_ENGINE_CC]      = sizeof(CF_DisableEngineCmd_t),
     };
