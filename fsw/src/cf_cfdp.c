@@ -1611,21 +1611,19 @@ static void CF_CFDP_ProcessPlaybackDirectories(CF_Channel_t *chan)
  *-----------------------------------------------------------------*/
 void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *chan)
 {
-    CF_Poll_t *         poll;
+    CF_Poll_t          *poll;
     CF_ChannelConfig_t *cc;
-    CF_PollDir_t *      pd;
+    CF_PollDir_t       *pd;
     int                 i;
     int                 chan_index;
-    int                 count_check;
-    int                 ret;
+
+    chan_index = (chan - CF_AppData.engine.channels);
+    cc         = &CF_AppData.config_table->chan[chan_index];
 
     for (i = 0; i < CF_MAX_POLLING_DIR_PER_CHAN; ++i)
     {
-        poll        = &chan->poll[i];
-        chan_index  = (chan - CF_AppData.engine.channels);
-        cc          = &CF_AppData.config_table->chan[chan_index];
-        pd          = &cc->polldir[i];
-        count_check = 0;
+        poll = &chan->poll[i];
+        pd   = &cc->polldir[i];
 
         if (pd->enabled)
         {
@@ -1640,9 +1638,8 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *chan)
                 else if (CF_Timer_Expired(&poll->interval_timer))
                 {
                     /* the timer has expired */
-                    ret = CF_CFDP_PlaybackDir_Initiate(&poll->pb, pd->src_dir, pd->dst_dir, pd->cfdp_class, 0,
-                                                       chan_index, pd->priority, pd->dest_eid);
-                    if (!ret)
+                    if (!CF_CFDP_PlaybackDir_Initiate(&poll->pb, pd->src_dir, pd->dst_dir, pd->cfdp_class, 0,
+                                                      chan_index, pd->priority, pd->dest_eid))
                     {
                         poll->timer_set = false;
                     }
@@ -1664,11 +1661,9 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *chan)
                 /* playback is active, so step it */
                 CF_CFDP_ProcessPlaybackDirectory(chan, &poll->pb);
             }
-
-            count_check = 1;
         }
 
-        CF_CFDP_UpdatePollPbCounted(&poll->pb, count_check, &CF_AppData.hk.Payload.channel_hk[chan_index].poll_counter);
+        CF_CFDP_UpdatePollPbCounted(&poll->pb, pd->enabled, &CF_AppData.hk.Payload.channel_hk[chan_index].poll_counter);
     }
 }
 
