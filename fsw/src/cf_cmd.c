@@ -873,20 +873,14 @@ CFE_Status_t CF_WriteQueueCmd(const CF_WriteQueueCmd_t *msg)
         /* process downlink queue data */
         if ((wq->queue == CF_Queue_all) || (wq->queue == CF_Queue_active))
         {
-            int              i;
-            static const int qs[2] = {CF_QueueIdx_TXA, CF_QueueIdx_TXW};
-            for (i = 0; i < 2; ++i)
+            ret = CF_WriteTxnQueueDataToFile(fd, chan, CF_QueueIdx_TX);
+            if (ret)
             {
-                ret = CF_WriteTxnQueueDataToFile(fd, chan, qs[i]);
-                if (ret)
-                {
-                    CFE_EVS_SendEvent(CF_CMD_WQ_WRITEQ_TX_ERR_EID, CFE_EVS_EventType_ERROR,
-                                      "CF: write queue failed to write q index %d", qs[i]);
-                    CF_WrappedClose(fd);
-                    ++CF_AppData.hk.Payload.counters.err;
-                    success = false;
-                    break;
-                }
+                CFE_EVS_SendEvent(CF_CMD_WQ_WRITEQ_TX_ERR_EID, CFE_EVS_EventType_ERROR,
+                                  "CF: write queue failed to write CF_QueueIdx_TX data");
+                CF_WrappedClose(fd);
+                ++CF_AppData.hk.Payload.counters.err;
+                success = false;
             }
         }
 

@@ -54,6 +54,11 @@
  * \brief Debug build assert
  */
 #define CF_Assert(x) (assert(x))
+#define CF_TRACE(...)           \
+    do                          \
+    {                           \
+        OS_printf(__VA_ARGS__); \
+    } while (0)
 
 #else                /* CF_DEBUG_BUILD */
 
@@ -61,6 +66,7 @@
  * \brief Normal build assert
  */
 #define CF_Assert(x) /* no-op */
+#define CF_TRACE(...)
 
 #endif /* CF_DEBUG_BUILD */
 

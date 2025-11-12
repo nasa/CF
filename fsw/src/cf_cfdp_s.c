@@ -46,70 +46,11 @@
  * See description in cf_cfdp_s.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_CFDP_S_SendEof(CF_Transaction_t *txn)
-{
-    /* note the crc is "finalized" regardless of success or failure of the txn */
-    /* this is OK as we still need to put some value into the EOF */
-    if (!txn->flags.com.crc_calc)
-    {
-        CF_CRC_Finalize(&txn->crc);
-        txn->flags.com.crc_calc = true;
-    }
-    return CF_CFDP_SendEof(txn);
-}
-
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_cfdp_s.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-void CF_CFDP_S1_SubstateSendEof(CF_Transaction_t *txn)
-{
-    /* set the flag, the EOF is sent by the tick handler */
-    txn->flags.tx.send_eof = true;
-
-    /* In class 1 this is the end of normal operation */
-    /* NOTE: this is not always true, as class 1 can request an EOF ack.
-     * In this case we could change state to CLOSEOUT_SYNC instead and wait,
-     * but right now we do not request an EOF ack in S1 */
-    CF_CFDP_FinishTransaction(txn, true);
-}
-
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_cfdp_s.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *txn)
-{
-    /* set the flag, the EOF is sent by the tick handler */
-    txn->flags.tx.send_eof = true;
-
-    /* wait for remaining responses to close out the state machine */
-    txn->state_data.send.sub_state = CF_TxSubState_CLOSEOUT_SYNC;
-
-    /* always move the transaction onto the wait queue now */
-    CF_DequeueTransaction(txn);
-    CF_InsertSortPrio(txn, CF_QueueIdx_TXW);
-
-    /* the ack timer is armed in class 2 only */
-    CF_CFDP_ArmAckTimer(txn);
-}
-
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_cfdp_s.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
 CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc)
 {
-    bool                            success = true;
-    int                             status  = 0;
-    CFE_Status_t                    ret     = CF_ERROR;
-    CF_Logical_PduBuffer_t *        ph      = CF_CFDP_ConstructPduHeader(txn, 0, CF_AppData.config_table->local_eid,
+    int32                           status = 0;
+    CFE_Status_t                    ret;
+    CF_Logical_PduBuffer_t *        ph = CF_CFDP_ConstructPduHeader(txn, 0, CF_AppData.config_table->local_eid,
                                                             txn->history->peer_eid, 0, txn->history->seq_num, 1);
     CF_Logical_PduFileDataHeader_t *fd;
     size_t                          actual_bytes;
@@ -117,11 +58,12 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 
 
     if (!ph)
     {
-        ret     = CFE_SUCCESS; /* couldn't get message, so no bytes sent. Will try again next time */
-        success = false;
+        ret = CF_SEND_PDU_NO_BUF_AVAIL_ERROR; /* couldn't get message, so no bytes sent. Will try again next time */
     }
     else
     {
+        ret = CFE_SUCCESS;
+
         fd = &ph->int_header.fd;
 
         /* need to encode data header up to this point to figure out where data needs to get copied to */
@@ -158,46 +100,53 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 
         fd->data_len = actual_bytes;
         fd->data_ptr = data_ptr;
 
-        if (txn->state_data.send.cached_pos != foffs)
+        if (txn->state_data.cached_pos != foffs)
         {
             status = CF_WrappedLseek(txn->fd, foffs, OS_SEEK_SET);
             if (status != foffs)
             {
                 CFE_EVS_SendEvent(CF_CFDP_S_SEEK_FD_ERR_EID, CFE_EVS_EventType_ERROR,
-                                  "CF S%d(%lu:%lu): error seeking to offset %ld, got %ld",
-                                  (txn->state == CF_TxnState_S2), (unsigned long)txn->history->src_eid,
-                                  (unsigned long)txn->history->seq_num, (long)foffs, (long)status);
+                                  "CF S%d(%lu:%lu): error seeking to offset %ld, got %ld", CF_CFDP_GetPrintClass(txn),
+                                  (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
+                                  (long)foffs, (long)status);
                 ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek;
-                success = false;
+                ret = CF_ERROR;
+            }
+            else
+            {
+                txn->state_data.cached_pos = foffs;
             }
         }
 
-        if (success)
+        if (ret == CFE_SUCCESS)
         {
             status = CF_WrappedRead(txn->fd, data_ptr, actual_bytes);
             if (status != actual_bytes)
             {
                 CFE_EVS_SendEvent(CF_CFDP_S_READ_ERR_EID, CFE_EVS_EventType_ERROR,
                                   "CF S%d(%lu:%lu): error reading bytes: expected %ld, got %ld",
-                                  (txn->state == CF_TxnState_S2), (unsigned long)txn->history->src_eid,
+                                  CF_CFDP_GetPrintClass(txn), (unsigned long)txn->history->src_eid,
                                   (unsigned long)txn->history->seq_num, (long)actual_bytes, (long)status);
                 ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_read;
-                success = false;
+                ret = CF_ERROR;
+            }
+            else
+            {
+                txn->state_data.cached_pos += actual_bytes;
             }
         }
 
-        if (success)
+        if (ret == CFE_SUCCESS)
         {
-            txn->state_data.send.cached_pos += status;
             CF_CFDP_SendFd(txn, ph); /* CF_CFDP_SendFd only returns CFE_SUCCESS */
 
             CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.sent.file_data_bytes += actual_bytes;
-            CF_Assert((foffs + actual_bytes) <= txn->fsize); /* sanity check */
             if (calc_crc)
             {
                 CF_CRC_Digest(&txn->crc, fd->data_ptr, fd->data_len);
             }
 
+            /* The return code needs to pass back the actual chunk size that was sent */
             ret = actual_bytes;
         }
     }
@@ -213,26 +162,22 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 
  *-----------------------------------------------------------------*/
 void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *txn)
 {
-    int32 bytes_processed = CF_CFDP_S_SendFileData(txn, txn->foffs, (txn->fsize - txn->foffs), 1);
+    int32 sret;
 
-    if (bytes_processed > 0)
+    if (txn->foffs < txn->fsize)
     {
-        txn->foffs += bytes_processed;
-        if (txn->foffs == txn->fsize)
+        /* this returns the actual size of the chunk that was sent, or an error code */
+        /* no buffer available is benign; just do nothing and come back next tick */
+        sret = CF_CFDP_S_SendFileData(txn, txn->foffs, txn->fsize - txn->foffs, 1);
+        if (sret > 0)
         {
-            /* file is done */
-            txn->state_data.send.sub_state = CF_TxSubState_EOF;
+            txn->foffs += sret;
         }
-    }
-    else if (bytes_processed < 0)
-    {
-        /* IO error -- change state and send EOF */
-        CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
-        txn->state_data.send.sub_state = CF_TxSubState_EOF;
-    }
-    else
-    {
-        /* don't care about other cases */
+        else if (sret != CF_SEND_PDU_NO_BUF_AVAIL_ERROR)
+        {
+            /* anything other than lack of buffers is an error that will stop the txn */
+            CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_READ_FAILURE);
+        }
     }
 }
 
@@ -242,213 +187,19 @@ void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *txn)
  * See description in cf_cfdp_s.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CFE_Status_t CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *txn)
-{
-    const CF_Chunk_t *chunk;
-    CFE_Status_t      sret;
-    CFE_Status_t      ret = CFE_SUCCESS;
-
-    if (txn->flags.tx.md_need_send)
-    {
-        sret = CF_CFDP_SendMd(txn);
-        if (sret == CF_SEND_PDU_ERROR)
-        {
-            ret = CF_ERROR; /* error occurred */
-        }
-        else
-        {
-            if (sret == CFE_SUCCESS)
-            {
-                txn->flags.tx.md_need_send = false;
-            }
-            /* unless CF_SEND_PDU_ERROR, return 1 to keep caller from sending file data */
-            ret = 1; /* 1 means nak processed, so don't send filedata */
-        }
-    }
-    else
-    {
-        /* Get first chunk and process if available */
-        chunk = CF_ChunkList_GetFirstChunk(&txn->chunks->chunks);
-        if (chunk != NULL)
-        {
-            ret = CF_CFDP_S_SendFileData(txn, chunk->offset, chunk->size, 0);
-            if (ret > 0)
-            {
-                CF_ChunkList_RemoveFromFirst(&txn->chunks->chunks, ret);
-                ret = 1; /* processed nak, so caller doesn't send file data */
-            }
-            else if (ret < 0)
-            {
-                ret = CF_ERROR; /* error occurred */
-            }
-            else
-            {
-                /* nothing to do if ret==0, since nothing was sent */
-            }
-        }
-    }
-
-    return ret;
-}
-
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_cfdp_s.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-void CF_CFDP_S2_SubstateSendFileData(CF_Transaction_t *txn)
-{
-    int ret = CF_CFDP_S_CheckAndRespondNak(txn);
-
-    if (!ret)
-    {
-        CF_CFDP_S_SubstateSendFileData(txn);
-    }
-    else if (ret < 0)
-    {
-        CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_NAK_RESPONSE_ERROR);
-        txn->flags.tx.send_eof = true; /* do not leave the remote hanging */
-        CF_CFDP_FinishTransaction(txn, true);
-    }
-    else
-    {
-        /* don't care about other cases */
-    }
-}
-
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_cfdp_s.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *txn)
-{
-    CFE_Status_t sret;
-    int32        ret;
-    int          status  = 0;
-    bool         success = true;
-
-    if (!OS_ObjectIdDefined(txn->fd))
-    {
-        if (OS_FileOpenCheck(txn->history->fnames.src_filename) == OS_SUCCESS)
-        {
-            CFE_EVS_SendEvent(CF_CFDP_S_ALREADY_OPEN_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%lu:%lu): file %s already open", (txn->state == CF_TxnState_S2),
-                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
-                              txn->history->fnames.src_filename);
-            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_open;
-            success = false;
-        }
-
-        if (success)
-        {
-            ret = CF_WrappedOpenCreate(&txn->fd, txn->history->fnames.src_filename, OS_FILE_FLAG_NONE, OS_READ_ONLY);
-            if (ret < 0)
-            {
-                CFE_EVS_SendEvent(CF_CFDP_S_OPEN_ERR_EID, CFE_EVS_EventType_ERROR,
-                                  "CF S%d(%lu:%lu): failed to open file %s, error=%ld", (txn->state == CF_TxnState_S2),
-                                  (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
-                                  txn->history->fnames.src_filename, (long)ret);
-                ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_open;
-                txn->fd = OS_OBJECT_ID_UNDEFINED; /* just in case */
-                success = false;
-            }
-        }
-
-        if (success)
-        {
-            status = CF_WrappedLseek(txn->fd, 0, OS_SEEK_END);
-            if (status < 0)
-            {
-                CFE_EVS_SendEvent(CF_CFDP_S_SEEK_END_ERR_EID, CFE_EVS_EventType_ERROR,
-                                  "CF S%d(%lu:%lu): failed to seek end file %s, error=%ld",
-                                  (txn->state == CF_TxnState_S2), (unsigned long)txn->history->src_eid,
-                                  (unsigned long)txn->history->seq_num, txn->history->fnames.src_filename,
-                                  (long)status);
-                ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek;
-                success = false;
-            }
-        }
-
-        if (success)
-        {
-            txn->fsize = status;
-
-            status = CF_WrappedLseek(txn->fd, 0, OS_SEEK_SET);
-            if (status != 0)
-            {
-                CFE_EVS_SendEvent(CF_CFDP_S_SEEK_BEG_ERR_EID, CFE_EVS_EventType_ERROR,
-                                  "CF S%d(%lu:%lu): failed to seek begin file %s, got %ld",
-                                  (txn->state == CF_TxnState_S2), (unsigned long)txn->history->src_eid,
-                                  (unsigned long)txn->history->seq_num, txn->history->fnames.src_filename,
-                                  (long)status);
-                ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek;
-                success = false;
-            }
-        }
-    }
-
-    if (success)
-    {
-        sret = CF_CFDP_SendMd(txn);
-        if (sret == CF_SEND_PDU_ERROR)
-        {
-            /* failed to send md */
-            CFE_EVS_SendEvent(CF_CFDP_S_SEND_MD_ERR_EID, CFE_EVS_EventType_ERROR, "CF S%d(%lu:%lu): failed to send md",
-                              (txn->state == CF_TxnState_S2), (unsigned long)txn->history->src_eid,
-                              (unsigned long)txn->history->seq_num);
-            success = false;
-        }
-        else if (sret == CFE_SUCCESS)
-        {
-            /* once metadata is sent, switch to filedata mode */
-            txn->state_data.send.sub_state = CF_TxSubState_FILEDATA;
-        }
-        /* if sret==CF_SEND_PDU_NO_BUF_AVAIL_ERROR, then try to send md again next cycle */
-    }
-
-    if (!success)
-    {
-        CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
-        CF_CFDP_FinishTransaction(txn, true);
-    }
-
-    /* don't need CF_CRC_Start() since taken care of by reset_cfdp() */
-    /*CF_CRC_Start(&txn->crc);*/
-}
-
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_cfdp_s.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-CFE_Status_t CF_CFDP_S_SendFinAck(CF_Transaction_t *txn)
-{
-    return CF_CFDP_SendAck(txn, CF_CFDP_GetTxnStatus(txn), CF_CFDP_FileDirective_FIN, txn->state_data.send.s2.fin_cc,
-                           txn->history->peer_eid, txn->history->seq_num);
-}
-
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_cfdp_s.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-void CF_CFDP_S2_EarlyFin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
+void CF_CFDP_S_SubstateEarlyFin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
     /* received early fin, so just cancel */
     CFE_EVS_SendEvent(CF_CFDP_S_EARLY_FIN_ERR_EID, CFE_EVS_EventType_ERROR,
-                      "CF S%d(%lu:%lu): got early FIN -- cancelling", (txn->state == CF_TxnState_S2),
+                      "CF S%d(%lu:%lu): got early FIN -- cancelling", CF_CFDP_GetPrintClass(txn),
                       (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
+
+    /* Set our own status code to remember in history that this was canceled due to early FIN. */
+    /* Note this is not a CFDP defined CC.  It will translate to a CANCEL_REQUEST in an ack. */
     CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_EARLY_FIN);
 
-    txn->state_data.send.sub_state = CF_TxSubState_CLOSEOUT_SYNC;
-
     /* otherwise do normal fin processing */
-    CF_CFDP_S2_Fin(txn, ph);
+    CF_CFDP_S_SubstateRecvFin(txn, ph);
 }
 
 /*----------------------------------------------------------------
@@ -457,27 +208,32 @@ void CF_CFDP_S2_EarlyFin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
  * See description in cf_cfdp_s.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_S2_Fin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
+void CF_CFDP_S_SubstateRecvFin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
-    if (!CF_CFDP_RecvFin(txn, ph))
+    CF_Logical_PduFin_t *fin;
+
+    if (CF_CFDP_RecvFin(txn, ph) == CFE_SUCCESS)
     {
+        fin = &ph->int_header.fin;
+
         /* set the CC only on the first time we get the FIN.  If this is a dupe
-         * then re-ack but otherwise ignore it */
-        if (!txn->flags.tx.fin_recv)
+         * then count and re-ack but otherwise ignore it */
+        if (txn->flags.tx.fin_count == 0)
         {
-            txn->flags.tx.fin_recv               = true;
-            txn->state_data.send.s2.fin_cc       = ph->int_header.fin.cc;
-            txn->state_data.send.s2.acknak_count = 0; /* in case retransmits had occurred */
+            txn->state_data.peer_cc = fin->cc;
+            txn->state_data.fin_dc  = fin->delivery_code;
+            txn->state_data.fin_fs  = fin->file_status;
 
-            /* note this is a no-op unless the status was unset previously */
-            CF_CFDP_SetTxnStatus(txn, ph->int_header.fin.cc);
-
-            /* Generally FIN is the last exchange in an S2 transaction, the remote is not supposed
-             * to send it until after the EOF+ACK.  So at this point we stop trying to send anything
-             * to the peer, regardless of whether we got every ACK we expected. */
-            CF_CFDP_FinishTransaction(txn, true);
+            CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_From_ConditionCode(fin->cc));
         }
-        txn->flags.tx.send_fin_ack = true;
+
+        if (!CF_CFDP_CheckAckNakCount(txn, &txn->flags.tx.fin_count))
+        {
+            CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_POS_ACK_LIMIT_REACHED);
+        }
+
+        CF_TRACE("%s(): Recv FIN, cc=%d, dc=%d, st=%d\n", __func__, (int)fin->cc, (int)fin->delivery_code,
+                 (int)fin->file_status);
     }
 }
 
@@ -487,7 +243,7 @@ void CF_CFDP_S2_Fin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
  * See description in cf_cfdp_s.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_S2_Nak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
+void CF_CFDP_S2_SubstateNak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
     const CF_Logical_SegmentRequest_t *sr;
     const CF_Logical_PduNak_t *        nak;
@@ -497,10 +253,11 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
     bad_sr = 0;
 
     /* this function is only invoked for NAK PDU types */
-    nak = &ph->int_header.nak;
-
-    if (CF_CFDP_RecvNak(txn, ph) == CFE_SUCCESS && nak->segment_list.num_segments > 0)
+    if (CF_CFDP_RecvNak(txn, ph) == CFE_SUCCESS)
     {
+        nak = &ph->int_header.nak;
+        CF_TRACE("%s(): Recv NAK, segment_count=%d\n", __func__, (int)nak->segment_list.num_segments);
+
         for (counter = 0; counter < nak->segment_list.num_segments; ++counter)
         {
             sr = &nak->segment_list.segments[counter];
@@ -508,7 +265,8 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
             if (sr->offset_start == 0 && sr->offset_end == 0)
             {
                 /* need to re-send metadata PDU */
-                txn->flags.tx.md_need_send = true;
+                txn->flags.tx.send_md = true;
+                CF_TRACE("%s(): NAK for MD\n", __func__);
             }
             else
             {
@@ -527,6 +285,11 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 
                 /* insert gap data in chunks */
                 CF_ChunkListAdd(&txn->chunks->chunks, sr->offset_start, sr->offset_end - sr->offset_start);
+
+                /* note the fact that this has received a NAK of some nature */
+                txn->flags.tx.fd_nak_pending = true;
+                CF_TRACE("%s(): NAK for FD, offset=%lu->%lu\n", __func__, (unsigned long)sr->offset_start,
+                         (unsigned long)sr->offset_end);
             }
         }
 
@@ -535,15 +298,14 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
         if (bad_sr)
         {
             CFE_EVS_SendEvent(CF_CFDP_S_INVALID_SR_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%lu:%lu): received %d invalid NAK segment requests",
-                              (txn->state == CF_TxnState_S2), (unsigned long)txn->history->src_eid,
-                              (unsigned long)txn->history->seq_num, bad_sr);
+                              "CF S%d(%lu:%lu): received %d invalid NAK segment requests", CF_CFDP_GetPrintClass(txn),
+                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num, bad_sr);
         }
     }
     else
     {
         CFE_EVS_SendEvent(CF_CFDP_S_PDU_NAK_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "CF S%d(%lu:%lu): received invalid NAK PDU", (txn->state == CF_TxnState_S2),
+                          "CF S%d(%lu:%lu): received invalid NAK PDU", CF_CFDP_GetPrintClass(txn),
                           (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
         ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
     }
@@ -555,36 +317,29 @@ void CF_CFDP_S2_Nak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
  * See description in cf_cfdp_s.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
+void CF_CFDP_S2_SubstateEofAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
-    CF_CFDP_ArmAckTimer(txn);
-    CF_CFDP_S2_Nak(txn, ph);
-}
+    CFE_Status_t         ret;
+    CF_Logical_PduAck_t *ack;
 
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_cfdp_s.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-void CF_CFDP_S2_EofAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
-{
-    if (!CF_CFDP_RecvAck(txn, ph) && ph->int_header.ack.ack_directive_code == CF_CFDP_FileDirective_EOF)
+    ret = CF_CFDP_RecvAck(txn, ph);
+    if (ret == CFE_SUCCESS)
     {
-        txn->flags.tx.eof_ack_recv           = true;
-        txn->flags.com.ack_timer_armed       = false; /* just wait for FIN now, nothing to re-send */
-        txn->state_data.send.s2.acknak_count = 0;     /* in case EOF retransmits had occurred */
+        ack = &ph->int_header.ack;
 
-        /* if FIN was also received then we are done (these can come out of order) */
-        if (txn->flags.tx.fin_recv)
+        if (ack->ack_directive_code == CF_CFDP_FileDirective_EOF)
         {
-            CF_CFDP_FinishTransaction(txn, true);
+            txn->flags.tx.eof_ack_recv = true;
         }
+
+        CF_TRACE("%s(): Recv ACK, dir_code=%d, cc=%d, st=%d\n", __func__, (int)ack->ack_directive_code, (int)ack->cc,
+                 (int)ack->txn_status);
     }
-    else
+
+    if (ret != CFE_SUCCESS || !txn->flags.tx.eof_ack_recv)
     {
         CFE_EVS_SendEvent(CF_CFDP_S_PDU_EOF_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "CF S%d(%lu:%lu): received invalid EOF-ACK PDU", (txn->state == CF_TxnState_S2),
+                          "CF S%d(%lu:%lu): received invalid EOF-ACK PDU", CF_CFDP_GetPrintClass(txn),
                           (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
         ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
     }
@@ -598,8 +353,16 @@ void CF_CFDP_S2_EofAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
  *-----------------------------------------------------------------*/
 void CF_CFDP_S1_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
-    /* s1 doesn't need to receive anything */
-    static const CF_CFDP_S_SubstateRecvDispatchTable_t substate_fns = {{NULL}};
+    /* s1 generally doesn't receive except a possible FIN */
+    static const CF_CFDP_FileDirectiveDispatchTable_t s1_normal = {
+        .fdirective = {[CF_CFDP_FileDirective_FIN] = CF_CFDP_S_SubstateEarlyFin}};
+    static const CF_CFDP_FileDirectiveDispatchTable_t s1_eof = {
+        .fdirective = {[CF_CFDP_FileDirective_FIN] = CF_CFDP_S_SubstateRecvFin}};
+
+    /* In S1 there is no retransmit so only accept during the actual transaction */
+    static const CF_CFDP_S_SubstateRecvDispatchTable_t substate_fns = {
+        .substate = {[CF_TxSubState_DATA_NORMAL] = &s1_normal, [CF_TxSubState_DATA_EOF] = &s1_eof}};
+
     CF_CFDP_S_DispatchRecv(txn, ph, &substate_fns);
 }
 
@@ -611,22 +374,21 @@ void CF_CFDP_S1_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
  *-----------------------------------------------------------------*/
 void CF_CFDP_S2_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
-    static const CF_CFDP_FileDirectiveDispatchTable_t s2_meta      = {.fdirective = {
-                                                                     [CF_CFDP_FileDirective_FIN] = CF_CFDP_S2_EarlyFin,
-                                                                 }};
-    static const CF_CFDP_FileDirectiveDispatchTable_t s2_fd_or_eof = {
-        .fdirective = {
-            [CF_CFDP_FileDirective_FIN] = CF_CFDP_S2_EarlyFin, [CF_CFDP_FileDirective_NAK] = CF_CFDP_S2_Nak}};
-    static const CF_CFDP_FileDirectiveDispatchTable_t s2_wait_ack = {
-        .fdirective = {[CF_CFDP_FileDirective_FIN] = CF_CFDP_S2_Fin,
-                       [CF_CFDP_FileDirective_ACK] = CF_CFDP_S2_EofAck,
-                       [CF_CFDP_FileDirective_NAK] = CF_CFDP_S2_Nak_Arm}};
+    static const CF_CFDP_FileDirectiveDispatchTable_t s2_normal = {
+        .fdirective = {[CF_CFDP_FileDirective_FIN] = CF_CFDP_S_SubstateEarlyFin,
+                       [CF_CFDP_FileDirective_NAK] = CF_CFDP_S2_SubstateNak}};
+    static const CF_CFDP_FileDirectiveDispatchTable_t s2_eof = {
+        .fdirective = {[CF_CFDP_FileDirective_FIN] = CF_CFDP_S_SubstateRecvFin,
+                       [CF_CFDP_FileDirective_ACK] = CF_CFDP_S2_SubstateEofAck,
+                       [CF_CFDP_FileDirective_NAK] = CF_CFDP_S2_SubstateNak}};
 
+    /* In S2, we must continue allowing all directives until full completion,
+     * as the peer may be retransmitting something if it missed our ACK */
     static const CF_CFDP_S_SubstateRecvDispatchTable_t substate_fns = {
-        .substate = {[CF_TxSubState_METADATA]      = &s2_meta,
-                     [CF_TxSubState_FILEDATA]      = &s2_fd_or_eof,
-                     [CF_TxSubState_EOF]           = &s2_fd_or_eof,
-                     [CF_TxSubState_CLOSEOUT_SYNC] = &s2_wait_ack}};
+        .substate = {[CF_TxSubState_DATA_NORMAL] = &s2_normal,
+                     [CF_TxSubState_DATA_EOF]    = &s2_eof,
+                     [CF_TxSubState_FILESTORE]   = &s2_eof,
+                     [CF_TxSubState_COMPLETE]    = &s2_eof}};
 
     CF_CFDP_S_DispatchRecv(txn, ph, &substate_fns);
 }
@@ -637,48 +399,171 @@ void CF_CFDP_S2_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
  * See description in cf_cfdp_s.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_S1_Tx(CF_Transaction_t *txn)
+void CF_CFDP_S_Init(CF_Transaction_t *txn)
 {
-    static const CF_CFDP_S_SubstateSendDispatchTable_t substate_fns = {
-        .substate = {
-            [CF_TxSubState_METADATA] = CF_CFDP_S_SubstateSendMetadata,
-            [CF_TxSubState_FILEDATA] = CF_CFDP_S_SubstateSendFileData,
-            [CF_TxSubState_EOF]      = CF_CFDP_S1_SubstateSendEof,
-        }};
+    int32     OsStatus;
+    osal_id_t PendingFd;
 
-    CF_CFDP_S_DispatchTransmit(txn, &substate_fns);
-}
+    PendingFd = OS_OBJECT_ID_UNDEFINED;
 
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_cfdp_s.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-void CF_CFDP_S2_Tx(CF_Transaction_t *txn)
-{
-    static const CF_CFDP_S_SubstateSendDispatchTable_t substate_fns = {
-        .substate = {
-            [CF_TxSubState_METADATA] = CF_CFDP_S_SubstateSendMetadata,
-            [CF_TxSubState_FILEDATA] = CF_CFDP_S2_SubstateSendFileData,
-            [CF_TxSubState_EOF]      = CF_CFDP_S2_SubstateSendEof,
-        }};
-
-    CF_CFDP_S_DispatchTransmit(txn, &substate_fns);
-}
-
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_cfdp_s.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-void CF_CFDP_S_Cancel(CF_Transaction_t *txn)
-{
-    if (txn->state_data.send.sub_state < CF_TxSubState_EOF)
+    /* This is a race condition (toctou), but only intended to catch operational mistakes
+     * because CFDP does not work well with files that are potentially changing. */
+    if (CF_CFDP_TxnIsOK(txn))
     {
-        /* if state has not reached CF_TxSubState_EOF, then set it to CF_TxSubState_EOF now. */
-        txn->state_data.send.sub_state = CF_TxSubState_EOF;
+        OsStatus = OS_FileOpenCheck(txn->history->fnames.src_filename);
+        if (OsStatus == OS_SUCCESS)
+        {
+            CFE_EVS_SendEvent(CF_CFDP_S_ALREADY_OPEN_ERR_EID, CFE_EVS_EventType_ERROR,
+                              "CF S%d(%lu:%lu): file %s already open", CF_CFDP_GetPrintClass(txn),
+                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
+                              txn->history->fnames.src_filename);
+            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_open;
+            CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
+        }
+    }
+
+    if (CF_CFDP_TxnIsOK(txn))
+    {
+        OsStatus = CF_WrappedOpenCreate(&PendingFd, txn->history->fnames.src_filename, OS_FILE_FLAG_NONE, OS_READ_ONLY);
+        if (OsStatus < 0)
+        {
+            CFE_EVS_SendEvent(CF_CFDP_S_OPEN_ERR_EID, CFE_EVS_EventType_ERROR,
+                              "CF S%d(%lu:%lu): failed to open file %s, error=%ld", CF_CFDP_GetPrintClass(txn),
+                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
+                              txn->history->fnames.src_filename, (long)OsStatus);
+            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_open;
+            PendingFd = OS_OBJECT_ID_UNDEFINED; /* just in case */
+            CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
+        }
+    }
+
+    if (CF_CFDP_TxnIsOK(txn))
+    {
+        OsStatus = CF_WrappedLseek(PendingFd, 0, OS_SEEK_END);
+        if (OsStatus < 0)
+        {
+            CFE_EVS_SendEvent(CF_CFDP_S_SEEK_END_ERR_EID, CFE_EVS_EventType_ERROR,
+                              "CF S%d(%lu:%lu): failed to seek end file %s, error=%ld", CF_CFDP_GetPrintClass(txn),
+                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
+                              txn->history->fnames.src_filename, (long)OsStatus);
+            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek;
+            CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
+        }
+        else
+        {
+            txn->fsize = OsStatus;
+        }
+    }
+
+    if (CF_CFDP_TxnIsOK(txn))
+    {
+        OsStatus = CF_WrappedLseek(PendingFd, 0, OS_SEEK_SET);
+        if (OsStatus < 0)
+        {
+            CFE_EVS_SendEvent(CF_CFDP_S_SEEK_BEG_ERR_EID, CFE_EVS_EventType_ERROR,
+                              "CF S%d(%lu:%lu): failed to seek begin file %s, got %ld", CF_CFDP_GetPrintClass(txn),
+                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
+                              txn->history->fnames.src_filename, (long)OsStatus);
+            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek;
+            CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
+        }
+    }
+
+    if (CF_CFDP_TxnIsOK(txn))
+    {
+        /* allow the state machine to use the file */
+        txn->fd = PendingFd;
+
+        CF_CRC_Start(&txn->crc);
+
+        /* initial MD needs to be sent */
+        txn->flags.tx.send_md = true;
+    }
+    else if (OS_ObjectIdDefined(PendingFd))
+    {
+        /* Clean up, if an error occurred in here then close the file */
+        CF_WrappedClose(PendingFd);
+    }
+}
+
+/*----------------------------------------------------------------
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
+void CF_CFDP_S_HandleFileRetention(CF_Transaction_t *txn)
+{
+    /*
+     * For a sender:
+     *   - If the transfer is successful and the "keep" flag is false, then it applies
+     *     the local file deletion policy, either delete directly or move to recycle dir
+     *   - If the transfer is not successful or the "keep" flag is true, then do nothing
+     */
+    char                      TempName[CFE_MISSION_MAX_PATH_LEN];
+    const char *              SubjectFile;
+    const char *              MoveDest;
+    const CF_ChannelConfig_t *config;
+    int32                     OsStatus;
+    bool                      AllowLocalRemove;
+
+    config           = &CF_AppData.config_table->chan[txn->chan_num];
+    SubjectFile      = txn->history->fnames.src_filename;
+    MoveDest         = NULL;
+    AllowLocalRemove = false;
+
+    if (!CF_CFDP_TxnIsOK(txn) || !txn->flags.com.is_complete)
+    {
+        /* Nominally do nothing, we generally should not remove files that did not transfer, UNLESS this
+         * was an automatically triggered transfer (i.e. not invoked by command).  In that case doing nothing
+         * would cause the file to be transferred again in a loop and the problem may repeat itself in a loop.
+         * The "fail dir" is intended to address this loop risk. Moving the file there retains it locally
+         * while making it so the automatic transfer will not re-trigger on the same file. */
+        if (!txn->flags.tx.cmd_tx)
+        {
+            MoveDest =
+                CF_CFDP_GetMoveTarget(CF_AppData.config_table->fail_dir, SubjectFile, TempName, sizeof(TempName));
+        }
+    }
+    else if (!txn->keep)
+    {
+        /* It is a candidate for removal if the remote said it retained it */
+        if (!txn->reliable_mode)
+        {
+            /* In class 1, there is no FIN so the status will be UNREPORTED.  This is risky,
+             * but if the user said keep=0 with a class 1, then it is assumed they know the risk. */
+            AllowLocalRemove = true;
+        }
+        else
+        {
+            /* In class 2, check that the peer FIN said it had a completed and retained file */
+            AllowLocalRemove = (txn->state_data.fin_fs == CF_CFDP_FinFileStatus_RETAINED &&
+                                txn->state_data.fin_dc == CF_CFDP_FinDeliveryCode_COMPLETE);
+        }
+
+        if (AllowLocalRemove)
+        {
+            /* Everything checked out, If move directory is defined attempt move */
+            MoveDest = CF_CFDP_GetMoveTarget(config->move_dir, SubjectFile, TempName, sizeof(TempName));
+        }
+    }
+
+    if (MoveDest != NULL)
+    {
+        OsStatus = OS_mv(SubjectFile, MoveDest);
+        CFE_EVS_SendEvent(CF_CFDP_S_FILE_MOVED_EID, CFE_EVS_EventType_INFORMATION,
+                          "CF R%d(%lu:%lu): moved %s -> %s, status=%d", CF_CFDP_GetPrintClass(txn),
+                          (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num, SubjectFile,
+                          MoveDest, (int)OsStatus);
+    }
+    else if (AllowLocalRemove)
+    {
+        /* no move dir configured, so remove it (because keep == 0 and txn was success) */
+        OsStatus = OS_remove(SubjectFile);
+        CFE_EVS_SendEvent(CF_CFDP_S_FILE_REMOVED_EID, CFE_EVS_EventType_INFORMATION,
+                          "CF R%d(%lu:%lu): removed source file %s, status=%d", CF_CFDP_GetPrintClass(txn),
+                          (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num, SubjectFile,
+                          (int)OsStatus);
     }
 }
 
@@ -691,7 +576,7 @@ void CF_CFDP_S_Cancel(CF_Transaction_t *txn)
 void CF_CFDP_S_AckTimerTick(CF_Transaction_t *txn)
 {
     /* note: the ack timer is only ever relevant on class 2 */
-    if (txn->state != CF_TxnState_S2 || !txn->flags.com.ack_timer_armed)
+    if (!txn->reliable_mode || !txn->flags.com.ack_timer_armed)
     {
         /* nothing to do */
         return;
@@ -701,50 +586,232 @@ void CF_CFDP_S_AckTimerTick(CF_Transaction_t *txn)
     {
         CF_Timer_Tick(&txn->ack_timer);
     }
-    else if (txn->state_data.send.sub_state == CF_TxSubState_CLOSEOUT_SYNC)
+    else
     {
-        /* Check limit and handle if needed */
-        if (txn->state_data.send.s2.acknak_count >= CF_AppData.config_table->chan[txn->chan_num].ack_limit)
-        {
-            CFE_EVS_SendEvent(CF_CFDP_S_ACK_LIMIT_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF S2(%lu:%lu), ack limit reached, no eof-ack", (unsigned long)txn->history->src_eid,
-                              (unsigned long)txn->history->seq_num);
-            CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_ACK_LIMIT_NO_EOF);
-            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.ack_limit;
+        /* disarm the timer */
+        txn->flags.com.ack_timer_armed = false;
+    }
+}
 
-            /* give up on this */
-            CF_CFDP_FinishTransaction(txn, true);
-            txn->flags.com.ack_timer_armed = false;
+/*----------------------------------------------------------------
+ *
+ * Local Helper function for S state machine
+ *
+ *-----------------------------------------------------------------*/
+CF_TxSubState_t CF_CFDP_S_CheckState_DATA_NORMAL(CF_Transaction_t *txn)
+{
+    CF_TxSubState_t next_state = txn->state_data.sub_state;
+
+    /* The "normal" data state just pumps out PDUs, which is done by a separate sub-tick
+     * after all control messages are done.  At this stage we just check if its done sending PDUs. */
+    if (txn->foffs >= txn->fsize)
+    {
+        /* we reached EOF, do maintenance tasks */
+        next_state = CF_TxSubState_DATA_EOF;
+    }
+    else if (!CF_CFDP_TxnIsOK(txn) || txn->flags.tx.fin_count != 0)
+    {
+        /* do file storage tasks */
+        next_state = CF_TxSubState_FILESTORE;
+    }
+
+    return next_state;
+}
+
+/*----------------------------------------------------------------
+ *
+ * Local Helper function for S1 state machine
+ *
+ *-----------------------------------------------------------------*/
+CF_TxSubState_t CF_CFDP_S1_CheckState_DATA_EOF(CF_Transaction_t *txn)
+{
+    CF_TxSubState_t next_state = txn->state_data.sub_state;
+
+    if (!txn->flags.com.close_req)
+    {
+        /* In S1 when close is not requested, the only thing we need
+         * to do is send the EOF, so this means we are done.  There is
+         * no fin, no ack, no timer. */
+        txn->state_data.fin_dc     = CF_CFDP_FinFileStatus_UNREPORTED;
+        txn->flags.com.is_complete = true;
+        next_state                 = CF_TxSubState_FILESTORE;
+    }
+    else if (txn->flags.tx.fin_count != 0)
+    {
+        /* In S1 when close is requested, got the fin.
+         * This should use the DC from the fin (i.e. its not unreported in this case) */
+        txn->flags.com.is_complete = true;
+        next_state                 = CF_TxSubState_FILESTORE;
+    }
+
+    return next_state;
+}
+
+/*----------------------------------------------------------------
+ *
+ * Local Helper function for S state machine
+ *
+ *-----------------------------------------------------------------*/
+CF_TxSubState_t CF_CFDP_S2_CheckState_DATA_EOF(CF_Transaction_t *txn)
+{
+    CF_TxSubState_t next_state = txn->state_data.sub_state;
+
+    if (txn->flags.tx.fin_count != txn->flags.tx.fin_ack_count)
+    {
+        /* This means we need to send a FIN-ACK PDU but have not yet sent it (S2 only) */
+        /* Do nothing here, let it be sent, come back next time. */
+    }
+    else if (txn->flags.tx.eof_ack_recv)
+    {
+        if (txn->flags.tx.fin_count != 0)
+        {
+            /* Receipt of these means we are done (normal S2 completion) */
+            txn->flags.com.is_complete = true;
+            next_state                 = CF_TxSubState_FILESTORE;
+        }
+    }
+    else if (!txn->flags.com.ack_timer_armed)
+    {
+        if (txn->flags.tx.fin_count != 0)
+        {
+            /* this would mean we are S2 and got the FIN but not the EOF-ACK */
+            /* There could be many reasons:
+             *  - the peer is sending an "Early" FIN to stop the ttxn->flags.tx.eof_ack_recvransaction
+             *    (even though we sent EOF, peer might not be there yet)
+             *  - The EOF-ACK was lost in transit and we only got the FIN
+             *
+             * Receiving a FIN (whether early or at the expected time) always
+             * means to stop the transaction, so handle it the same.  The only
+             * difference is that we do not set the is_complete flag, because
+             * it means that not all protocol requirements were met. */
+            next_state = CF_TxSubState_FILESTORE;
+        }
+        else if (CF_CFDP_CheckAckNakCount(txn, &txn->state_data.acknak_count))
+        {
+            /* ok to send EOF again, expecting EOF-ACK */
+            txn->flags.tx.send_eof = true;
         }
         else
         {
-            /* Increment acknak counter */
-            ++txn->state_data.send.s2.acknak_count;
-
-            /* If the peer sent FIN that is an implicit EOF ack, it is not supposed
-             * to send it before EOF unless an error occurs, and either way we do not
-             * re-transmit anything after FIN unless we get another FIN */
-            if (!txn->flags.tx.eof_ack_recv && !txn->flags.tx.fin_recv)
-            {
-                txn->flags.tx.send_eof = true;
-            }
-            else
-            {
-                /* no response is pending */
-                txn->flags.com.ack_timer_armed = false;
-            }
+            /* hit limit */
+            CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_NAK_LIMIT_REACHED);
+            next_state = CF_TxSubState_FILESTORE;
         }
+    }
 
-        /* reset the ack timer if still waiting on something */
-        if (txn->flags.com.ack_timer_armed)
-        {
-            CF_CFDP_ArmAckTimer(txn);
-        }
+    return next_state;
+}
+
+/*----------------------------------------------------------------
+ *
+ * Local Helper function for S state machine
+ *
+ *-----------------------------------------------------------------*/
+CF_TxSubState_t CF_CFDP_S_CheckState_DATA_EOF(CF_Transaction_t *txn)
+{
+    CF_TxSubState_t next_state = txn->state_data.sub_state;
+
+    /* The "eof" data state just responds to receipt of control PDUs from the peer.  This may
+     * include data NAKs, which are also responded to in a separate sub-tick.  This just needs
+     * to check for completeness criteria */
+    if (!CF_CFDP_TxnIsOK(txn))
+    {
+        /* These conditions means we are done (abnormal) */
+        next_state = CF_TxSubState_FILESTORE;
+    }
+    else if (txn->flags.tx.send_eof)
+    {
+        /* This means we need to send an EOF PDU but have not yet sent it */
+        /* Do nothing here, let it be sent, come back next time. */
+    }
+    else if (!txn->reliable_mode)
+    {
+        next_state = CF_CFDP_S1_CheckState_DATA_EOF(txn);
     }
     else
     {
-        /* if we are not waiting for anything, why is the ack timer armed? */
+        next_state = CF_CFDP_S2_CheckState_DATA_EOF(txn);
+    }
+
+    return next_state;
+}
+
+/*----------------------------------------------------------------
+ *
+ * Local Helper function for S state machine
+ *
+ *-----------------------------------------------------------------*/
+CF_TxSubState_t CF_CFDP_S_CheckState_FILESTORE(CF_Transaction_t *txn)
+{
+    CF_TxSubState_t next_state = txn->state_data.sub_state;
+
+    /* This applies the retention policy based on whether the transaction was successful */
+    /* It uses data received in the FIN */
+    CF_CFDP_S_HandleFileRetention(txn);
+    next_state = CF_TxSubState_COMPLETE;
+
+    return next_state;
+}
+
+/*----------------------------------------------------------------
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
+void CF_CFDP_S_CheckState(CF_Transaction_t *txn)
+{
+    CF_TxSubState_t next_state = txn->state_data.sub_state;
+
+    /* State transitions are done here */
+    switch (txn->state_data.sub_state)
+    {
+        /* The "normal" data state just pumps out PDUs, which is done by a separate sub-tick
+         * after all control messages are done.  At this stage we just check if its done sending PDUs. */
+        case CF_TxSubState_DATA_NORMAL:
+            next_state = CF_CFDP_S_CheckState_DATA_NORMAL(txn);
+            break;
+
+        /* The "eof" data state just responds to receipt of control PDUs from the peer.  This may
+         * include data NAKs, which are also responded to in a separate sub-tick.  This just needs
+         * to check for completeness criteria */
+        case CF_TxSubState_DATA_EOF:
+            next_state = CF_CFDP_S_CheckState_DATA_EOF(txn);
+            break;
+
+        case CF_TxSubState_FILESTORE:
+            next_state = CF_CFDP_S_CheckState_FILESTORE(txn);
+            break;
+
+        default:
+            next_state = CF_TxSubState_COMPLETE;
+            break;
+    }
+
+    /* did we enter a new state? Do one-time entry things */
+    if (next_state != txn->state_data.sub_state)
+    {
+        CF_TRACE("%s(): State %d -> %d\n", __func__, txn->state_data.sub_state, next_state);
+
+        txn->state_data.sub_state      = next_state;
         txn->flags.com.ack_timer_armed = false;
+
+        switch (next_state)
+        {
+            case CF_TxSubState_DATA_EOF:
+                txn->state_data.acknak_count = 0;
+                CF_CRC_Finalize(&txn->crc);
+                txn->flags.com.crc_complete = true;
+                /* send the initial EOF */
+                txn->flags.tx.send_eof = true;
+                break;
+            case CF_TxSubState_COMPLETE:
+                /* This changes the txn state such that this function is no longer called. */
+                CF_CFDP_FinishTransaction(txn, true);
+                break;
+            default:
+                break;
+        }
     }
 }
 
@@ -754,15 +821,16 @@ void CF_CFDP_S_AckTimerTick(CF_Transaction_t *txn)
  * See description in cf_cfdp_s.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_S_Tick(CF_Transaction_t *txn, int *cont /* unused */)
+void CF_CFDP_S_Tick(CF_Transaction_t *txn)
 {
-    bool pending_send;
+    CF_CFDP_AckTxnStatus_t CurrStatus;
 
-    pending_send = true; /* maybe; tbd, will be reset if not */
+    CurrStatus = CF_CFDP_GetAckTxnStatus(txn);
 
     /* at each tick, various timers used by S are checked */
     /* first, check inactivity timer */
-    if (!txn->flags.com.inactivity_fired)
+    /* Note that the CFDP protocol does not expect any response from the peer until after EOF */
+    if (!txn->flags.com.inactivity_fired && txn->state_data.sub_state != CF_TxSubState_DATA_NORMAL)
     {
         if (!CF_Timer_Expired(&txn->inactivity_timer))
         {
@@ -773,44 +841,30 @@ void CF_CFDP_S_Tick(CF_Transaction_t *txn, int *cont /* unused */)
             txn->flags.com.inactivity_fired = true;
 
             /* HOLD state is the normal path to recycle transaction objects, not an error */
-            /* inactivity is abnormal in any other state */
-            if (txn->state != CF_TxnState_HOLD && txn->state == CF_TxnState_S2)
+            /* inactivity is abnormal in any active state */
+            if (CurrStatus == CF_CFDP_AckTxnStatus_ACTIVE)
             {
                 CFE_EVS_SendEvent(CF_CFDP_S_INACT_TIMER_ERR_EID, CFE_EVS_EventType_ERROR,
-                                  "CF S2(%lu:%lu): inactivity timer expired", (unsigned long)txn->history->src_eid,
+                                  "CF S(%lu:%lu): inactivity timer expired", (unsigned long)txn->history->src_eid,
                                   (unsigned long)txn->history->seq_num);
-                CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_INACTIVITY_DETECTED);
-
                 ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.inactivity_timer;
+
+                CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_INACTIVITY_DETECTED);
             }
         }
     }
 
-    /* tx maintenance: possibly process send_eof, or send_fin_ack */
-    if (txn->flags.tx.send_eof)
+    if (CurrStatus == CF_CFDP_AckTxnStatus_ACTIVE)
     {
-        if (CF_CFDP_S_SendEof(txn) == CFE_SUCCESS)
-        {
-            txn->flags.tx.send_eof = false;
-        }
-    }
-    else if (txn->flags.tx.send_fin_ack)
-    {
-        if (CF_CFDP_S_SendFinAck(txn) == CFE_SUCCESS)
-        {
-            txn->flags.tx.send_fin_ack = false;
-        }
-    }
-    else
-    {
-        pending_send = false;
+        CF_CFDP_S_AckTimerTick(txn);
+        CF_CFDP_S_CheckState(txn);
     }
 
+    CF_CFDP_S_Tick_Maintenance(txn);
+
     /* if the inactivity timer ran out, then there is no sense
-     * pending for responses for anything.  Send out anything
-     * that we need to send (i.e. the EOF) just in case the sender
-     * is still listening to us but do not expect any future ACKs */
-    if (txn->flags.com.inactivity_fired && !pending_send)
+     * pending for responses for anything. */
+    if (txn->flags.com.inactivity_fired && txn->state == CF_TxnState_HOLD)
     {
         /* the transaction is now recycleable - this means we will
          * no longer have a record of this transaction seq.  If the sender
@@ -823,8 +877,7 @@ void CF_CFDP_S_Tick(CF_Transaction_t *txn, int *cont /* unused */)
     }
     else
     {
-        /* transaction still valid so process the ACK timer, if relevant */
-        CF_CFDP_S_AckTimerTick(txn);
+        CF_CFDP_CompleteTick(txn);
     }
 }
 
@@ -834,10 +887,78 @@ void CF_CFDP_S_Tick(CF_Transaction_t *txn, int *cont /* unused */)
  * See description in cf_cfdp_s.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_S_Tick_Nak(CF_Transaction_t *txn, int *cont)
+void CF_CFDP_S_Tick_Maintenance(CF_Transaction_t *txn)
 {
-    int ret = CF_CFDP_S_CheckAndRespondNak(txn);
+    CFE_Status_t sret;
 
-    if (ret == 1)
-        *cont = 1; /* cause dispatcher to re-enter this wakeup */
+    /* tx maintenance: possibly process send_md, send_eof, or send_fin_ack */
+    if (txn->flags.tx.send_md)
+    {
+        /* this will clear the flag when the MD is sent */
+        sret = CF_CFDP_SendMd(txn);
+        if (sret == CFE_SUCCESS)
+        {
+            /* track that MD was sent.  */
+            /* Note that MD is not ack'ed in the CFDP protocol, so
+             * no timer set here.  If lost, it is only NAK'ed after we
+             * send data, otherwise we assume it got there. */
+            txn->flags.tx.send_md = false;
+        }
+    }
+    else if (txn->flags.tx.send_eof)
+    {
+        /* this will clear the flag when the EOF is sent */
+        sret = CF_CFDP_SendEof(txn);
+        if (sret == CFE_SUCCESS)
+        {
+            txn->flags.tx.send_eof = false;
+
+            /* In S2, the EOF needs an EOF-ACK response, so arm the timer. */
+            if (txn->reliable_mode)
+            {
+                CF_CFDP_ArmAckTimer(txn);
+            }
+        }
+    }
+    else if (txn->reliable_mode && txn->flags.tx.fin_ack_count != txn->flags.tx.fin_count)
+    {
+        /* this will clear the flag when the FINACK is sent */
+        sret = CF_CFDP_SendAck(txn, CF_CFDP_FileDirective_FIN);
+        if (sret == CFE_SUCCESS)
+        {
+            txn->flags.tx.fin_ack_count = txn->flags.tx.fin_count;
+        }
+    }
+}
+
+/*----------------------------------------------------------------
+ *
+ * Application-scope internal function
+ * See description in cf_cfdp_s.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
+void CF_CFDP_S_Tick_Nak(CF_Transaction_t *txn)
+{
+    const CF_Chunk_t *chunk;
+    CFE_Status_t      sret;
+
+    if (txn->flags.tx.fd_nak_pending)
+    {
+        /* Get first chunk and process if available */
+        chunk = CF_ChunkList_GetFirstChunk(&txn->chunks->chunks);
+        if (chunk == NULL)
+        {
+            /* no more chunks, clear the flag */
+            txn->flags.tx.fd_nak_pending = false;
+        }
+        else
+        {
+            sret = CF_CFDP_S_SendFileData(txn, chunk->offset, chunk->size, 0);
+            if (sret > 0)
+            {
+                /* Something was sent, so take the chunk out of the list */
+                CF_ChunkList_RemoveFromFirst(&txn->chunks->chunks, sret);
+            }
+        }
+    }
 }

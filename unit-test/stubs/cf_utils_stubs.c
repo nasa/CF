@@ -38,18 +38,18 @@ void UT_DefaultHandler_CF_WriteTxnQueueDataToFile(void *, UT_EntryKey_t, const U
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_GetTxnStatus()
+ * Generated stub function for CF_CFDP_GetAckTxnStatus()
  * ----------------------------------------------------
  */
-CF_CFDP_AckTxnStatus_t CF_CFDP_GetTxnStatus(CF_Transaction_t *txn)
+CF_CFDP_AckTxnStatus_t CF_CFDP_GetAckTxnStatus(CF_Transaction_t *txn)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_GetTxnStatus, CF_CFDP_AckTxnStatus_t);
+    UT_GenStub_SetupReturnBuffer(CF_CFDP_GetAckTxnStatus, CF_CFDP_AckTxnStatus_t);
 
-    UT_GenStub_AddParam(CF_CFDP_GetTxnStatus, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_CFDP_GetAckTxnStatus, CF_Transaction_t *, txn);
 
-    UT_GenStub_Execute(CF_CFDP_GetTxnStatus, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_GetAckTxnStatus, Basic, NULL);
 
-    return UT_GenStub_GetReturnValue(CF_CFDP_GetTxnStatus, CF_CFDP_AckTxnStatus_t);
+    return UT_GenStub_GetReturnValue(CF_CFDP_GetAckTxnStatus, CF_CFDP_AckTxnStatus_t);
 }
 
 /*
@@ -296,22 +296,6 @@ CF_TxnStatus_t CF_TxnStatus_From_ConditionCode(CF_CFDP_ConditionCode_t cc)
     UT_GenStub_Execute(CF_TxnStatus_From_ConditionCode, Basic, NULL);
 
     return UT_GenStub_GetReturnValue(CF_TxnStatus_From_ConditionCode, CF_TxnStatus_t);
-}
-
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_TxnStatus_IsError()
- * ----------------------------------------------------
- */
-bool CF_TxnStatus_IsError(CF_TxnStatus_t txn_stat)
-{
-    UT_GenStub_SetupReturnBuffer(CF_TxnStatus_IsError, bool);
-
-    UT_GenStub_AddParam(CF_TxnStatus_IsError, CF_TxnStatus_t, txn_stat);
-
-    UT_GenStub_Execute(CF_TxnStatus_IsError, Basic, UT_DefaultHandler_CF_TxnStatus_IsError);
-
-    return UT_GenStub_GetReturnValue(CF_TxnStatus_IsError, bool);
 }
 
 /*

@@ -368,12 +368,16 @@ uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_
     CF_ChunkOffset_t gap_start;
     CF_Chunk_t       chunk;
 
-    CF_Assert(total); /* does it make sense to have a 0 byte file? */
-    CF_Assert(start < total);
+    CF_Assert(start <= total);
 
-    /* simple case: there is no chunk data, which means there is a single gap of the entire size */
-    if (!chunks->count)
+    if (start == total)
     {
+        /* simple case: there cannot be a gap (this includes e.g. 0 byte file) */
+        ret = 0;
+    }
+    else if (!chunks->count)
+    {
+        /* simple case: there is no chunk data, which means there is a single gap of the entire size */
         chunk.offset = 0;
         chunk.size   = total;
         if (compute_gap_fn)

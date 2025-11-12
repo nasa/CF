@@ -84,7 +84,7 @@ CF_CListNode_t **CF_GetChunkListHead(CF_Channel_t *chan, uint8 direction)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CF_CFDP_AckTxnStatus_t CF_CFDP_GetTxnStatus(CF_Transaction_t *txn)
+CF_CFDP_AckTxnStatus_t CF_CFDP_GetAckTxnStatus(CF_Transaction_t *txn)
 {
     CF_CFDP_AckTxnStatus_t LocalStatus;
 
@@ -229,8 +229,7 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *      chan,
      *
      * Let's put CF_QueueIdx_RX up front, because most RX packets will be file data PDUs */
     CF_Traverse_TransSeqArg_t ctx    = {transaction_sequence_number, src_eid, NULL};
-    CF_CListNode_t *          ptrs[] = {chan->qs[CF_QueueIdx_RX], chan->qs[CF_QueueIdx_PEND], chan->qs[CF_QueueIdx_TXA],
-                              chan->qs[CF_QueueIdx_TXW]};
+    CF_CListNode_t *          ptrs[] = {chan->qs[CF_QueueIdx_RX], chan->qs[CF_QueueIdx_PEND], chan->qs[CF_QueueIdx_TX]};
     int                       i;
     CF_Transaction_t *        ret = NULL;
 
@@ -577,22 +576,6 @@ CFE_Status_t CF_WrappedLseek(osal_id_t fd, off_t offset, int mode)
     ret = OS_lseek(fd, offset, mode);
     CFE_ES_PerfLogExit(CF_PERF_ID_FSEEK);
     return ret;
-}
-
-/*----------------------------------------------------------------
- *
- * Function: CF_TxnStatus_IsError
- *
- * Application-scope internal function
- * See description in cf_utils.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-bool CF_TxnStatus_IsError(CF_TxnStatus_t txn_stat)
-{
-    /* The value of CF_TxnStatus_UNDEFINED (-1) indicates a transaction is in progress and no error
-     * has occurred yet.  This will be set to CF_TxnStatus_NO_ERROR (0) after successful completion
-     * of the transaction (FIN/EOF).  Anything else indicates a problem has occurred. */
-    return (txn_stat > CF_TxnStatus_NO_ERROR);
 }
 
 /*----------------------------------------------------------------

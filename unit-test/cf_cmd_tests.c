@@ -2662,7 +2662,7 @@ void Test_CF_WriteQueueCmd_When_CF_WriteHistoryDataToFile_FailsOnSecondCallAnd_w
     CF_WriteQueueCmd(&utbuf);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 2);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_CMD_WQ_WRITEQ_TX_ERR_EID);
     UtAssert_STUB_COUNT(CF_WrappedClose, 1);
@@ -2812,7 +2812,7 @@ void Test_CF_WriteQueueCmd_Success_type_AllAnd_q_All(void)
     CF_WriteQueueCmd(&utbuf);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 4);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 3);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 2);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_CMD_WQ_INF_EID);
@@ -2902,7 +2902,7 @@ void Test_CF_WriteQueueCmd_Success_type_AllAnd_q_Active(void)
     CF_WriteQueueCmd(&utbuf);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 3);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 2);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_CMD_WQ_INF_EID);
@@ -3133,7 +3133,7 @@ void Test_CF_WriteQueueCmd_Success_type_DownAnd_q_All(void)
     CF_WriteQueueCmd(&utbuf);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 3);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 2);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_CMD_WQ_INF_EID);
@@ -3223,7 +3223,7 @@ void Test_CF_WriteQueueCmd_Success_type_DownAnd_q_Active(void)
     CF_WriteQueueCmd(&utbuf);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 2);
+    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
     UtAssert_STUB_COUNT(CF_WriteHistoryQueueDataToFile, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_CMD_WQ_INF_EID);
@@ -3993,11 +3993,6 @@ void add_CF_WriteQueueCmd_tests(void)
         Test_CF_WriteQueueCmd_When_CF_WriteHistoryDataToFile_FailsOnFirstCallAnd_wq_IsDownAnd_queue_IsActive_fd_IsPositive_Call_CF_WrappedClose_SendEventCloseAndRejectCommand,
         cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
         "Test_CF_WriteQueueCmd_When_CF_WriteHistoryDataToFile_FailsOnFirstCallAnd_wq_IsDownAnd_queue_IsActive_fd_"
-        "IsPositive_Call_CF_WrappedClose_SendEventCloseAndRejectCommand");
-    UtTest_Add(
-        Test_CF_WriteQueueCmd_When_CF_WriteHistoryDataToFile_FailsOnSecondCallAnd_wq_IsDownAnd_queue_IsActive_fd_IsPositive_Call_CF_WrappedClose_SendEventCloseAndRejectCommand,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
-        "Test_CF_WriteQueueCmd_When_CF_WriteHistoryDataToFile_FailsOnSecondCallAnd_wq_IsDownAnd_queue_IsActive_fd_"
         "IsPositive_Call_CF_WrappedClose_SendEventCloseAndRejectCommand");
     UtTest_Add(
         Test_CF_WriteQueueCmd_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDownAnd_queue_IsPend_fd_IsPositive_Call_CF_WrappedClose_SendEventCloseAndRejectCommand,

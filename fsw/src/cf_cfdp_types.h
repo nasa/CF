@@ -86,11 +86,11 @@ typedef enum
  */
 typedef enum
 {
-    CF_TxSubState_METADATA      = 0, /**< sending the initial MD directive */
-    CF_TxSubState_FILEDATA      = 1, /**< sending file data PDUs */
-    CF_TxSubState_EOF           = 2, /**< sending the EOF directive */
-    CF_TxSubState_CLOSEOUT_SYNC = 3, /**< pending final acks from remote */
-    CF_TxSubState_NUM_STATES    = 4
+    CF_TxSubState_DATA_NORMAL = 0, /**< sending the initial MD directive and file data */
+    CF_TxSubState_DATA_EOF    = 1, /**< Sent an EOF, waiting on EOF-ACK and FIN (or NAK) */
+    CF_TxSubState_FILESTORE   = 2, /**< Performing file store ops */
+    CF_TxSubState_COMPLETE    = 3, /**< Transaction is done */
+    CF_TxSubState_NUM_STATES  = 4
 } CF_TxSubState_t;
 
 /**
@@ -98,10 +98,13 @@ typedef enum
  */
 typedef enum
 {
-    CF_RxSubState_FILEDATA      = 0, /**< receive file data PDUs */
-    CF_RxSubState_EOF           = 1, /**< got EOF directive */
-    CF_RxSubState_CLOSEOUT_SYNC = 2, /**< pending final acks from remote */
-    CF_RxSubState_NUM_STATES    = 3
+    CF_RxSubState_DATA_NORMAL = 0, /**< waiting for more PDUs, no EOF received yet (normal recv) */
+    CF_RxSubState_DATA_EOF    = 1, /**< Got an EOF, filling in remaining gaps (NAKs may be sent) */
+    CF_RxSubState_VALIDATE    = 2, /**< Checking the CRC on the complete file */
+    CF_RxSubState_FILESTORE   = 3, /**< Performing file store ops */
+    CF_RxSubState_FINACK      = 4, /**< pending final fin/fin-ack exchange */
+    CF_RxSubState_COMPLETE    = 5, /**< Transaction is done */
+    CF_RxSubState_NUM_STATES  = 6
 } CF_RxSubState_t;
 
 /**
@@ -160,9 +163,11 @@ typedef enum
     CF_TxnStatus_NAK_RESPONSE_ERROR = 19,
     CF_TxnStatus_SEND_EOF_FAILURE   = 20,
     CF_TxnStatus_EARLY_FIN          = 21,
+    CF_TxnStatus_READ_FAILURE       = 22, /* reading local file encountered an error */
+    CF_TxnStatus_NO_RESOURCE        = 23, /* lack of internal resources */
 
     /* keep last */
-    CF_TxnStatus_MAX = 22
+    CF_TxnStatus_MAX = 24
 } CF_TxnStatus_t;
 
 /**
@@ -226,62 +231,20 @@ typedef struct CF_Poll
 } CF_Poll_t;
 
 /**
- * @brief Data specific to a class 2 send file transaction
- */
-typedef struct CF_TxS2_Data
-{
-    uint8 fin_cc; /**< \brief remember the cc in the received FIN PDU to echo in eof-fin */
-    uint8 acknak_count;
-} CF_TxS2_Data_t;
-
-/**
- * @brief Data specific to a send file transaction
- */
-typedef struct CF_TxState_Data
-{
-    CF_TxSubState_t sub_state;
-    uint32          cached_pos;
-
-    CF_TxS2_Data_t s2;
-} CF_TxState_Data_t;
-
-/**
- * @brief Data specific to a class 2 receive file transaction
- */
-typedef struct CF_RxS2_Data
-{
-    uint32                    eof_crc;
-    uint32                    eof_size;
-    uint32                    rx_crc_calc_bytes;
-    CF_CFDP_FinDeliveryCode_t dc;
-    CF_CFDP_FinFileStatus_t   fs;
-    uint8                     eof_cc; /**< \brief remember the cc in the received EOF PDU to echo in eof-ack */
-    uint8                     acknak_count;
-} CF_RxS2_Data_t;
-
-/**
- * @brief Data specific to a receive file transaction
- */
-typedef struct CF_RxState_Data
-{
-    CF_RxSubState_t sub_state;
-    uint32          cached_pos;
-
-    CF_RxS2_Data_t r2;
-} CF_RxState_Data_t;
-
-/**
  * @brief Data that applies to all types of transactions
  */
 typedef struct CF_Flags_Common
 {
     uint8 q_index; /**< \brief Q index this is in */
-    bool  ack_timer_armed;
-    bool  suspended;
-    bool  canceled;
-    bool  crc_calc;
-    bool  inactivity_fired; /**< \brief set whenever the inactivity timeout expires */
-    bool  keep_history;     /**< \brief whether history should be preserved during recycle */
+
+    bool close_req; /**< Indicates if a FIN should be used in class 1 (optional) */
+    bool ack_timer_armed;
+    bool suspended;
+    bool canceled;
+    bool is_complete;      /**< Latches that all expected PDUs (MD + all FD + EOF) are processed */
+    bool crc_complete;     /**< Latches that the CRC computation is completed */
+    bool inactivity_fired; /**< \brief set whenever the inactivity timeout expires */
+    bool keep_history;     /**< \brief whether history should be preserved during recycle */
 } CF_Flags_Common_t;
 
 /**
@@ -291,13 +254,15 @@ typedef struct CF_Flags_Rx
 {
     CF_Flags_Common_t com;
 
-    bool md_recv; /**< \brief md received for r state */
-    bool eof_recv;
-    bool send_nak;
-    bool send_fin;
-    bool send_eof_ack;
-    bool complete;    /**< \brief r2 */
-    bool fd_nak_sent; /**< \brief latches that at least one NAK has been sent for file data */
+    bool tempfile_created; /**< Latches that the tempfile was created at txn start */
+
+    bool  md_recv;       /**< Latches that the MD PDU is received */
+    uint8 eof_count;     /**< Count of EOF PDUs received  */
+    uint8 eof_ack_count; /**< Count of EOF-ACKs sent to peer */
+    bool  finack_recv;   /**< Latches that the fin-ack PDU is received */
+
+    bool send_nak; /**< Indicates need to send NAK to peer */
+    bool send_fin; /**< Indicates need to send FIN to peer */
 } CF_Flags_Rx_t;
 
 /**
@@ -307,12 +272,16 @@ typedef struct CF_Flags_Tx
 {
     CF_Flags_Common_t com;
 
-    bool md_need_send;
-    bool send_eof;
-    bool eof_ack_recv;
-    bool fin_recv;
-    bool send_fin_ack;
     bool cmd_tx; /**< \brief indicates transaction is commanded (ground) tx */
+
+    bool  fd_nak_pending; /**< Peer sent a NAK on file data */
+    bool  eof_ack_recv;   /**< Latches that the EOF-ACK was received */
+    uint8 fin_count;      /**< Count of FIN PDUs received  */
+    uint8 fin_ack_count;  /**< Count of FIN-ACKs sent to peer */
+
+    bool send_md;  /**< Indicates need to send MD to peer */
+    bool send_eof; /**< Indicates need to send EOF to peer */
+
 } CF_Flags_Tx_t;
 
 /**
@@ -328,10 +297,19 @@ typedef union CF_StateFlags
 /**
  * @brief Summary of all possible transaction state information (tx and rx)
  */
-typedef union CF_StateData
+typedef struct CF_StateData
 {
-    CF_TxState_Data_t send;    /**< \brief applies to only send file transactions */
-    CF_RxState_Data_t receive; /**< \brief applies to only receive file transactions */
+    uint8 sub_state;
+    uint8 acknak_count; /**< Number of times the ack_timer expired and reset */
+
+    uint8 peer_cc; /**< \brief the peer cc from the received FIN or EOF PDU */
+    uint8 fin_dc;  /**< \brief the dc in FIN PDU */
+    uint8 fin_fs;  /**< \brief the fs in FIN PDU */
+
+    CF_FileSize_t cached_pos;
+    uint32        eof_crc;  /**< \brief remember the crc in the received EOF PDU  */
+    CF_FileSize_t eof_size; /**< \brief remember the size in the received EOF PDU  */
+
 } CF_StateData_t;
 
 /**
@@ -348,12 +326,13 @@ typedef struct CF_Transaction
     CF_Timer_t         inactivity_timer; /**< \brief set to the overall inactivity timer of a remote */
     CF_Timer_t         ack_timer;        /**< \brief called ack_timer, but is also nak_timer */
 
-    uint32    fsize; /**< \brief lseek() should be 64-bit on 64-bit system, but osal limits to 32-bit */
-    uint32    foffs; /**< \brief offset into file for next read */
-    osal_id_t fd;
+    CF_FileSize_t fsize; /**< \brief lseek() should be 64-bit on 64-bit system, but osal limits to 32-bit */
+    CF_FileSize_t foffs; /**< \brief offset into file for next read */
+    osal_id_t     fd;
 
     CF_Crc_t crc;
 
+    bool  reliable_mode; /**< Set true if class 2, false in class 1 */
     uint8 keep;
     uint8 chan_num; /**< \brief if ever more than one engine, this may need to change to pointer */
     uint8 priority;
@@ -380,11 +359,15 @@ typedef struct CF_Transaction
  */
 typedef enum
 {
-    CF_TickType_RX,
-    CF_TickType_TXW_NORM,
-    CF_TickType_TXW_NAK,
-    CF_TickType_NUM_TYPES
-} CF_TickType_t;
+    CF_TickState_INIT,
+    CF_TickState_RX_STATE,
+    CF_TickState_TX_STATE,
+    CF_TickState_TX_NAK,
+    CF_TickState_TX_FILEDATA,
+    CF_TickState_TX_PEND,
+    CF_TickState_COMPLETE,
+    CF_TickState_NUM_TYPES
+} CF_TickState_t;
 
 /**
  * @brief Channel state object
@@ -411,9 +394,17 @@ typedef struct CF_Channel
 
     osal_id_t sem_id; /**< \brief semaphore id for output pipe */
 
-    const CF_Transaction_t *cur; /**< \brief current transaction during channel cycle */
+    uint32 outgoing_counter;
 
-    uint8 tick_type;
+    /* If tick processing gets blocked due to TX limits (i.e. tx_blocked gets set during
+     * tick processing) then this captures where the tick processing left off.
+     * This is because it is important to tick every txn and not let traffic from the
+     * first item(s) in the queue to consume all the bandwidth and never let the later
+     * items get ticked. */
+    const CF_Transaction_t *tick_resume;
+
+    bool tx_blocked; /**< Set true if PDU transmission was blocked due to limits */
+
 } CF_Channel_t;
 
 /**
@@ -460,8 +451,7 @@ typedef struct CF_Engine
     CF_ChunkWrapper_t chunks[CF_NUM_TRANSACTIONS * CF_Direction_NUM];
     CF_Chunk_t        chunk_mem[CF_NUM_CHUNKS_ALL_CHANNELS];
 
-    uint32 outgoing_counter;
-    bool   enabled;
+    bool enabled;
 } CF_Engine_t;
 
 #endif

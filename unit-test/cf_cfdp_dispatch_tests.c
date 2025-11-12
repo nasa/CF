@@ -136,9 +136,11 @@ void Test_CF_CFDP_R_DispatchRecv(void)
     memset(&dispatch, 0, sizeof(dispatch));
     memset(&fddt, 0, sizeof(fddt));
 
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_TxnIsOK), true);
+
     /* just using CF_CFDP_R[12]_Recv here because they are stubs in this context */
     fddt.fdirective[CF_CFDP_FileDirective_METADATA] = CF_CFDP_R1_Recv;
-    dispatch.state[CF_RxSubState_EOF]               = &fddt;
+    dispatch.state[CF_RxSubState_DATA_EOF]          = &fddt;
 
     /* nominal (file directive) */
     UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
@@ -160,21 +162,21 @@ void Test_CF_CFDP_R_DispatchRecv(void)
     /* file data with error */
     UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     ph->pdu_header.pdu_type = 1;
-    UT_SetDeferredRetcode(UT_KEY(CF_TxnStatus_IsError), 1, true);
+    UT_SetDeferredRetcode(UT_KEY(CF_CFDP_TxnIsOK), 1, false);
     UtAssert_VOIDCALL(CF_CFDP_R_DispatchRecv(txn, ph, &dispatch, NULL));
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.dropped, 1);
 
     /* test actual dispatch */
     UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
-    ph->fdirective.directive_code     = CF_CFDP_FileDirective_METADATA;
-    txn->state_data.receive.sub_state = CF_RxSubState_EOF;
+    ph->fdirective.directive_code = CF_CFDP_FileDirective_METADATA;
+    txn->state_data.sub_state     = CF_RxSubState_DATA_EOF;
     UtAssert_VOIDCALL(CF_CFDP_R_DispatchRecv(txn, ph, &dispatch, CF_CFDP_R2_Recv));
     UtAssert_STUB_COUNT(CF_CFDP_R1_Recv, 1);
     UtAssert_STUB_COUNT(CF_CFDP_R2_Recv, 0);
 
     UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
-    ph->pdu_header.pdu_type           = 1;
-    txn->state_data.receive.sub_state = CF_RxSubState_EOF;
+    ph->pdu_header.pdu_type   = 1;
+    txn->state_data.sub_state = CF_RxSubState_DATA_EOF;
     UtAssert_VOIDCALL(CF_CFDP_R_DispatchRecv(txn, ph, &dispatch, CF_CFDP_R2_Recv));
     UtAssert_STUB_COUNT(CF_CFDP_R1_Recv, 1);
     UtAssert_STUB_COUNT(CF_CFDP_R2_Recv, 1);
@@ -196,7 +198,7 @@ void Test_CF_CFDP_S_DispatchRecv(void)
 
     /* just using CF_CFDP_S[12]_Recv here because they are stubs in this context */
     fddt.fdirective[CF_CFDP_FileDirective_METADATA] = CF_CFDP_S1_Recv;
-    dispatch.substate[CF_TxSubState_EOF]            = &fddt;
+    dispatch.substate[CF_TxSubState_DATA_EOF]       = &fddt;
 
     /* nominal, no handler */
     UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
@@ -216,56 +218,10 @@ void Test_CF_CFDP_S_DispatchRecv(void)
 
     /* test actual dispatch */
     UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
-    ph->fdirective.directive_code  = CF_CFDP_FileDirective_METADATA;
-    txn->state_data.send.sub_state = CF_TxSubState_EOF;
+    ph->fdirective.directive_code = CF_CFDP_FileDirective_METADATA;
+    txn->state_data.sub_state     = CF_TxSubState_DATA_EOF;
     UtAssert_VOIDCALL(CF_CFDP_S_DispatchRecv(txn, ph, &dispatch));
     UtAssert_STUB_COUNT(CF_CFDP_S1_Recv, 1);
-}
-
-void Test_CF_CFDP_S_DispatchTransmit(void)
-{
-    /* Test case for:
-     * void CF_CFDP_S_DispatchTransmit(CF_Transaction_t *txn, const CF_CFDP_S_SubstateSendDispatchTable_t *dispatch);
-     */
-    CF_Transaction_t *                    txn;
-    CF_CFDP_S_SubstateSendDispatchTable_t dispatch;
-
-    /* The CF_CFDP_S2_Tx is just used as a convenient stub to target */
-    memset(&dispatch, 0, sizeof(dispatch));
-    dispatch.substate[CF_TxSubState_EOF] = CF_CFDP_S2_Tx;
-
-    /* nominal, no handler */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
-    UtAssert_VOIDCALL(CF_CFDP_S_DispatchTransmit(txn, &dispatch));
-
-    /* test actual dispatch */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
-    txn->state_data.send.sub_state = CF_TxSubState_EOF;
-    UtAssert_VOIDCALL(CF_CFDP_S_DispatchTransmit(txn, &dispatch));
-    UtAssert_STUB_COUNT(CF_CFDP_S2_Tx, 1);
-}
-
-void Test_CF_CFDP_TxStateDispatch(void)
-{
-    /* Test case for:
-     * void CF_CFDP_TxStateDispatch(CF_Transaction_t *txn, const CF_CFDP_TxnSendDispatchTable_t *dispatch);
-     */
-    CF_Transaction_t *             txn;
-    CF_CFDP_TxnSendDispatchTable_t dispatch;
-
-    memset(&dispatch, 0, sizeof(dispatch));
-
-    dispatch.tx[CF_TxnState_S1] = CF_CFDP_S1_Tx;
-
-    /* nominal, no handler */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
-    UtAssert_VOIDCALL(CF_CFDP_TxStateDispatch(txn, &dispatch));
-
-    /* nominal, with handler */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
-    txn->state = CF_TxnState_S1;
-    UtAssert_VOIDCALL(CF_CFDP_TxStateDispatch(txn, &dispatch));
-    UtAssert_STUB_COUNT(CF_CFDP_S1_Tx, 1);
 }
 
 void Test_CF_CFDP_RxStateDispatch(void)
@@ -280,17 +236,37 @@ void Test_CF_CFDP_RxStateDispatch(void)
 
     memset(&dispatch, 0, sizeof(dispatch));
 
-    dispatch.rx[CF_TxnState_R1] = CF_CFDP_R1_Recv;
+    dispatch.rx[CF_TxnState_R1]   = CF_CFDP_R1_Recv;
+    dispatch.rx[CF_TxnState_DROP] = CF_CFDP_RecvDrop;
 
     /* nominal, no handler */
     UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    ph->pdu_header.txm_mode = 1;
+    txn->state              = CF_TxnState_INIT;
+    txn->reliable_mode      = false;
     UtAssert_VOIDCALL(CF_CFDP_RxStateDispatch(txn, ph, &dispatch));
 
     /* nominal, with handler */
     UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
-    txn->state = CF_TxnState_R1;
+    ph->pdu_header.txm_mode = 1;
+    txn->state              = CF_TxnState_R1;
+    txn->reliable_mode      = false;
     UtAssert_VOIDCALL(CF_CFDP_RxStateDispatch(txn, ph, &dispatch));
     UtAssert_STUB_COUNT(CF_CFDP_R1_Recv, 1);
+
+    /* Got txm_mode = 0 in an R1 */
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    ph->pdu_header.txm_mode = 0;
+    txn->reliable_mode      = false;
+    UtAssert_VOIDCALL(CF_CFDP_RxStateDispatch(txn, ph, &dispatch));
+    UtAssert_STUB_COUNT(CF_CFDP_RecvDrop, 1);
+
+    /* Got txm_mode = 1 in an R2 */
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    ph->pdu_header.txm_mode = 1;
+    txn->reliable_mode      = true;
+    UtAssert_VOIDCALL(CF_CFDP_RxStateDispatch(txn, ph, &dispatch));
+    UtAssert_STUB_COUNT(CF_CFDP_RecvDrop, 2);
 }
 
 /*******************************************************************************
@@ -303,14 +279,8 @@ void UtTest_Setup(void)
 {
     UtTest_Add(Test_CF_CFDP_R_DispatchRecv, cf_cfdp_dispatch_tests_Setup, cf_cfdp_dispatch_tests_Teardown,
                "CF_CFDP_R_DispatchRecv");
-
     UtTest_Add(Test_CF_CFDP_S_DispatchRecv, cf_cfdp_dispatch_tests_Setup, cf_cfdp_dispatch_tests_Teardown,
                "CF_CFDP_S_DispatchRecv");
-    UtTest_Add(Test_CF_CFDP_S_DispatchTransmit, cf_cfdp_dispatch_tests_Setup, cf_cfdp_dispatch_tests_Teardown,
-               "CF_CFDP_S_DispatchTransmit");
-
-    UtTest_Add(Test_CF_CFDP_TxStateDispatch, cf_cfdp_dispatch_tests_Setup, cf_cfdp_dispatch_tests_Teardown,
-               "CF_CFDP_TxStateDispatch");
     UtTest_Add(Test_CF_CFDP_RxStateDispatch, cf_cfdp_dispatch_tests_Setup, cf_cfdp_dispatch_tests_Teardown,
                "CF_CFDP_RxStateDispatch");
 }

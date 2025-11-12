@@ -297,6 +297,9 @@ void Test_CF_Chunk_ComputeGaps(void)
     /* Initialize list (note already tested) */
     CF_ChunkListInit(&clist, sizeof(chunks) / sizeof(chunks[0]), chunks);
 
+    /* Zero byte file */
+    UtAssert_UINT32_EQ(CF_ChunkList_ComputeGaps(&clist, TEST_CF_MAX_GAPS, 0, 0, NULL, NULL), 0);
+
     /* Empty list with function callback */
     total = 10;
     memset(&Test_CF_compute_gap_context, 0, sizeof(Test_CF_compute_gap_context));

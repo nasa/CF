@@ -29,24 +29,29 @@
 #include "cf_cfdp_types.h"
 
 /**
- * @brief Structure for use with the CF_CFDP_CycleTx() function
- */
-typedef struct CF_CFDP_CycleTx_args
-{
-    CF_Channel_t *chan;    /**< \brief channel structure */
-    int           ran_one; /**< \brief should be set to 1 if a transaction was cycled */
-} CF_CFDP_CycleTx_args_t;
-
-/**
- * @brief Structure for use with the CF_CFDP_DoTick() function
+ * @brief Structure for use with the CF_CFDP_DoTick() functions
  */
 typedef struct CF_CFDP_Tick_args
 {
-    CF_Channel_t *chan;                    /**< \brief channel structure */
-    void (*fn)(CF_Transaction_t *, int *); /**< \brief function pointer */
-    bool early_exit;                       /**< \brief early exit result */
-    int  cont;                             /**< \brief if 1, then re-traverse the list */
+    CF_Channel_t *          chan;         /**< \brief channel structure */
+    const CF_Transaction_t *resume_point; /**< \brief skip to this txn (if not null) */
+    void (*fn)(CF_Transaction_t *);       /**< \brief function pointer */
 } CF_CFDP_Tick_args_t;
+
+/********************************************************************************/
+/**
+ * @brief Get printable CFDP class number
+ *
+ * This is intended for use in log messages where a printf style spec string
+ * is used with a %d modifier.
+ *
+ * @returns integer 1 for class 1
+ * @returns integer 2 for class 2
+ */
+static inline int CF_CFDP_GetPrintClass(const CF_Transaction_t *txn)
+{
+    return ((int)txn->reliable_mode + 1);
+}
 
 /********************************************************************************/
 /**
@@ -136,6 +141,34 @@ void CF_CFDP_RecycleTransaction(CF_Transaction_t *txn);
 void CF_CFDP_SetTxnStatus(CF_Transaction_t *txn, CF_TxnStatus_t txn_stat);
 
 /************************************************************************/
+/** @brief Helper function to retrieve transaction status code only
+ *
+ * This retrieves the status from the history block.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *       txn must not be NULL.
+ *
+ * @param txn  Pointer to the transaction object
+ * @returns Status Code value set within transaction
+ */
+CF_TxnStatus_t CF_CFDP_GetTxnStatus(const CF_Transaction_t *txn);
+
+/************************************************************************/
+/** @brief Helper function to check if a transaction is errored
+ *
+ * Simplifies conditionals where state machines need to check
+ * if a transaction is OK to continue operating normally
+ *
+ * @par Assumptions, External Events, and Notes:
+ *       txn must not be NULL.
+ *
+ * @param txn  Pointer to the transaction object
+ * @retval true if transaction is in a good state, no errors
+ * @retval false if transaction has an error
+ */
+CF_TxnStatus_t CF_CFDP_TxnIsOK(const CF_Transaction_t *txn);
+
+/************************************************************************/
 /** @brief Send an end of transaction packet.
  *
  * @par Assumptions, External Events, and Notes:
@@ -144,6 +177,38 @@ void CF_CFDP_SetTxnStatus(CF_Transaction_t *txn, CF_TxnStatus_t txn_stat);
  * @param txn  Pointer to the transaction object
  */
 void CF_CFDP_SendEotPkt(CF_Transaction_t *txn);
+
+/************************************************************************/
+/** @brief Increment ack/nak counter and check limit
+ *
+ * @par Description
+ *       Checks the counter against the configured limit.
+ *       If still under limit, increment counter and return true
+ *       If reached limit, generate event and return false
+ *
+ * @par Assumptions, External Events, and Notes:
+ *
+ * @param txn the transaction object
+ * @param counter pointer to the respective ack/nak counter
+ *
+ * @retval true  Within limit, another ACK/NAK is allowed
+ * @retval false Reached limit, another ACK/NAK is not allowed
+ */
+bool CF_CFDP_CheckAckNakCount(CF_Transaction_t *txn, uint8 *counter);
+
+/************************************************************************/
+/** @brief Complete tick processing on a transaction
+ *
+ * @par Description
+ *       Checks if transmit operations have been blocked due to TX limits
+ *       If so, snapshot this TXN as a resume point for next cycle.
+ *       If not, does nothing.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *
+ * @param txn the transaction object
+ */
+void CF_CFDP_CompleteTick(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief Initialization function for the CFDP engine
@@ -305,18 +370,13 @@ CFE_Status_t CF_CFDP_SendEof(CF_Transaction_t *txn);
  * long term maintenance to not build an incomplete CF_History_t for it.
  *
  * @param txn        Pointer to the transaction object
- * @param ts       Transaction ACK status
  * @param dir_code File directive code being ACK'ed
- * @param cc       Condition code of transaction
- * @param peer_eid Remote entity ID
- * @param tsn      Transaction sequence number
  *
  * @returns CFE_Status_t status code
  * @retval CFE_SUCCESS on success.
  * @retval CF_SEND_PDU_NO_BUF_AVAIL_ERROR if message buffer cannot be obtained.
  */
-CFE_Status_t CF_CFDP_SendAck(CF_Transaction_t *txn, CF_CFDP_AckTxnStatus_t ts, CF_CFDP_FileDirective_t dir_code,
-                             CF_CFDP_ConditionCode_t cc, CF_EntityId_t peer_eid, CF_TransactionSeq_t tsn);
+CFE_Status_t CF_CFDP_SendAck(CF_Transaction_t *txn, CF_CFDP_FileDirective_t dir_code);
 
 /************************************************************************/
 /** @brief Build a FIN PDU for transmit.
@@ -325,16 +385,12 @@ CFE_Status_t CF_CFDP_SendAck(CF_Transaction_t *txn, CF_CFDP_AckTxnStatus_t ts, C
  *       txn must not be NULL.
  *
  * @param txn     Pointer to the transaction object
- * @param dc    Final delivery status code (complete or incomplete)
- * @param fs    Final file status (retained or rejected, etc)
- * @param cc    Final CFDP condition code
  *
  * @returns CFE_Status_t status code
  * @retval CFE_SUCCESS on success.
  * @retval CF_SEND_PDU_NO_BUF_AVAIL_ERROR if message buffer cannot be obtained.
  */
-CFE_Status_t CF_CFDP_SendFin(CF_Transaction_t *txn, CF_CFDP_FinDeliveryCode_t dc, CF_CFDP_FinFileStatus_t fs,
-                             CF_CFDP_ConditionCode_t cc);
+CFE_Status_t CF_CFDP_SendFin(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief Send a previously-assembled NAK PDU for transmit.
@@ -349,12 +405,8 @@ CFE_Status_t CF_CFDP_SendFin(CF_Transaction_t *txn, CF_CFDP_FinDeliveryCode_t dc
  * filled by the caller prior to invoking this routine.  This routine only
  * encodes and sends the previously-assembled PDU buffer.  As such, the
  * typical failure possibilities do not apply to this call.
- *
- * @returns CFE_Status_t status code
- * @retval CFE_SUCCESS on success.
- * @retval CF_SEND_PDU_NO_BUF_AVAIL_ERROR if message buffer cannot be obtained.
  */
-CFE_Status_t CF_CFDP_SendNak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
+void CF_CFDP_SendNak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief Appends a single TLV value to the logical PDU data
@@ -667,42 +719,27 @@ void CF_CFDP_RecvInit(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 CF_CListTraverse_Status_t CF_CFDP_CloseFiles(CF_CListNode_t *node, void *context);
 
 /************************************************************************/
-/** @brief Cycle the current active tx or make a new one active.
+/** @brief Tick processor to send new file data
+ *
+ * This helper is used in conjunction with CF_CList_Traverse() as part
+ * of Tick Processing.
  *
  * @par Description
- *       First traverses all tx transactions on the active queue. If at
- *       least one is found, then it stops. Otherwise it moves a
- *       transaction on the pending queue to the active queue and
- *       tries again to find an active one.
+ *
+ *      This sends new file data, which constitutes chunks of the file
+ *      that have never been transmitted before.
+ *
+ *      This attempts to fill the output pipe as much as possible - it will
+ *      create new PDUs until a transmission limit is reached.  As such,
+ *      it should run only after control traffic is handled.  This will consume
+ *      any unused bandwidth at the end of each wakeup.
  *
  * @par Assumptions, External Events, and Notes:
- *       None
+ *       txn must not be NULL.
  *
- * @param chan Channel to cycle
+ * @param txn     Txn
  */
-void CF_CFDP_CycleTx(CF_Channel_t *chan);
-
-/************************************************************************/
-/** @brief List traversal function that cycles the first active tx.
- *
- * This helper is used in conjunction with CF_CList_Traverse().
- *
- * @par Description
- *       There can only be one active tx transaction per engine cycle.
- *       This function finds the first active, and then sends file
- *       data PDUs until there are no outgoing message buffers.
- *
- * @par Assumptions, External Events, and Notes:
- *       node must not be NULL. Context must not be NULL.
- *
- * @param node    Pointer to list node
- * @param context Pointer to CF_CFDP_CycleTx_args_t object (passed through)
- *
- * @returns integer traversal code
- * @retval CF_CLIST_EXIT when it's found, which terminates list traversal
- * @retval CF_CLIST_CONT when it's isn't found, which causes list traversal to continue
- */
-CF_CListTraverse_Status_t CF_CFDP_CycleTxFirstActive(CF_CListNode_t *node, void *context);
+void CF_CFDP_S_Tick_NewData(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief Call R and then S tick functions for all active transactions.
@@ -766,33 +803,124 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *chan);
 CF_CListTraverse_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context);
 
 /************************************************************************/
-/** @brief Check if source file came from polling directory
+/** @brief Get move target
  *
+ * Gets the full path of the destination file after move to dest_dir
  *
  * @par Assumptions, External Events, and Notes:
+ *      None
  *
- * @retval true/false
+ * @param dest_dir     Directory to move file into
+ * @param subject_file Full path of file to move
+ * @param dest_buf     Buffer to store result
+ * @param dest_size    Size of result buffer
+ *
+ * @retval NULL if the result is not valid (i.e. dest_dir not set)
+ * @retval dest_buf if result is valid
  */
-bool CF_CFDP_IsPollingDir(const char *src_file, uint8 chan_num);
+const char *CF_CFDP_GetMoveTarget(const char *dest_dir, const char *subject_file, char *dest_buf, size_t dest_size);
 
 /************************************************************************/
-/** @brief Remove/Move file after transaction
+/** @brief Get temporary file name
  *
- * This helper is used to handle "not keep" file option after a transaction.
+ * Gets the full path of the temporary file for a transaction
  *
  * @par Assumptions, External Events, and Notes:
+ *      None
  *
+ * @param hist            History pointer
+ * @param FileNameBuf     Buffer to store result
+ * @param FileNameSize    Size of result buffer
  */
-void CF_CFDP_HandleNotKeepFile(CF_Transaction_t *txn);
+void CF_CFDP_GetTempName(const CF_History_t *hist, char *FileNameBuf, size_t FileNameSize);
 
 /************************************************************************/
-/** @brief Move File
+/** @brief Receive PDU processing entry point
  *
- * This helper is used to move a file.
+ * Invoked from the transport interface (e.g. software bus or equivalent) after
+ * reception of a PDU from the network.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *      None
+ *
+ * @param chan            Channel pointer
+ * @param ph              Received PDU buffer
+ */
+void CF_CFDP_ReceivePdu(CF_Channel_t *chan, CF_Logical_PduBuffer_t *ph);
+
+/************************************************************************/
+/** @brief Sets up a new RX transaction based on PDU
+ *
+ * Sets up a new RX transaction.
+ *
+ * All RX transactions are initiated based on the reception of a PDU
+ * with this node as the dest entity and a sequence number that does not
+ * match any existing transaction.
+ *
+ * When the given PDU requires a new transaction to be created, this
+ * initializes the new transaction object.  It sets up the chunklist
+ * and all the other required supplemental data structs.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *      None
+ *
+ * @param txn             Transaction pointer
+ * @param ph              Received PDU buffer
+ */
+void CF_CFDP_SetupRxTransaction(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
+
+/************************************************************************/
+/** @brief Sets up a new TX transaction
+ *
+ * TX transactions are initiated based on commands or configured polling dirs
+ *
+ * It sets up the chunklist and all the other required supplemental data
+ * structs and puts the transaction onto the TX queue, so that it is now
+ * usable by the engine.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *      Transactions come from the PEND queue
+ *
+ * @param txn             Transaction pointer
+ */
+void CF_CFDP_SetupTxTransaction(CF_Transaction_t *txn);
+
+/************************************************************************/
+/** @brief Pulls next TX transaction from the PEND queue
+ *
+ * If the PEND queue is not empty, pulls the first transaction from it,
+ * and prepares for it to be activated.
  *
  * @par Assumptions, External Events, and Notes:
  *
+ * @param chan             Channel pointer
  */
-void CF_CFDP_MoveFile(const char *src, const char *dest_dir);
+bool CF_CFDP_StartFirstPending(CF_Channel_t *chan);
+
+/************************************************************************/
+/** @brief Allocates a chunk list for the transaction
+ *
+ * All transactions use a chunklist to track gaps in the file as it is
+ * sent or received.  This is used for NAK generation and processing in
+ * class 2 or just simply checking if the whole file is received in class 1.
+ *
+ * The chunk lists come from a pool and are re-used
+ *
+ * Only active transactions need a chunklist.  Pending TX transactions
+ * will not get one assigned until they become active.
+ *
+ * @param txn             Transaction pointer
+ */
+void CF_CFDP_AllocChunkList(CF_Transaction_t *txn);
+
+/************************************************************************/
+/** @brief Arms the inactivity timer
+ *
+ * This is invoked whenever activity occurs on a transaction.  The inactivity
+ * timer will be reset to the value in the configuration.
+ *
+ * @param txn             Transaction pointer
+ */
+void CF_CFDP_ArmInactTimer(CF_Transaction_t *txn);
 
 #endif /* !CF_CFDP_H */
