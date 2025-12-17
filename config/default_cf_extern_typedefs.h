@@ -71,14 +71,13 @@ typedef enum
  */
 typedef enum
 {
-    CF_QueueIdx_PEND      = 0, /**< \brief first one on this list is active */
-    CF_QueueIdx_TXA       = 1,
-    CF_QueueIdx_TXW       = 2,
-    CF_QueueIdx_RX        = 3,
-    CF_QueueIdx_HIST      = 4,
-    CF_QueueIdx_HIST_FREE = 5,
-    CF_QueueIdx_FREE      = 6,
-    CF_QueueIdx_NUM       = 7
+    CF_QueueIdx_PEND      = 0, /**< \brief tx transactions that have not started */
+    CF_QueueIdx_TX        = 1, /**< \brief tx transactions in progress */
+    CF_QueueIdx_RX        = 2, /**< \brief rx transactions in progress */
+    CF_QueueIdx_HIST      = 3, /**< \brief transaction history (completed) */
+    CF_QueueIdx_HIST_FREE = 4, /**< \brief unused transaction history structs */
+    CF_QueueIdx_FREE      = 5, /**< \brief unused transaction structs */
+    CF_QueueIdx_NUM       = 6
 } CF_QueueIdx_t;
 
 /**

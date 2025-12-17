@@ -71,29 +71,3 @@ void CF_CFDP_S_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
 
     UT_GenStub_Execute(CF_CFDP_S_DispatchRecv, Basic, NULL);
 }
-
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S_DispatchTransmit()
- * ----------------------------------------------------
- */
-void CF_CFDP_S_DispatchTransmit(CF_Transaction_t *txn, const CF_CFDP_S_SubstateSendDispatchTable_t *dispatch)
-{
-    UT_GenStub_AddParam(CF_CFDP_S_DispatchTransmit, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_CFDP_S_DispatchTransmit, const CF_CFDP_S_SubstateSendDispatchTable_t *, dispatch);
-
-    UT_GenStub_Execute(CF_CFDP_S_DispatchTransmit, Basic, NULL);
-}
-
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_CFDP_TxStateDispatch()
- * ----------------------------------------------------
- */
-void CF_CFDP_TxStateDispatch(CF_Transaction_t *txn, const CF_CFDP_TxnSendDispatchTable_t *dispatch)
-{
-    UT_GenStub_AddParam(CF_CFDP_TxStateDispatch, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_CFDP_TxStateDispatch, const CF_CFDP_TxnSendDispatchTable_t *, dispatch);
-
-    UT_GenStub_Execute(CF_CFDP_TxStateDispatch, Basic, NULL);
-}

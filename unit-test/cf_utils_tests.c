@@ -245,7 +245,7 @@ void Test_CF_FindTransactionBySequenceNumber(void)
     chan = &CF_AppData.engine.channels[UT_CFDP_CHANNEL];
 
     UtAssert_NULL(CF_FindTransactionBySequenceNumber(chan, 12, 34));
-    UtAssert_STUB_COUNT(CF_CList_Traverse, 4); /* this checks 4 different queues */
+    UtAssert_STUB_COUNT(CF_CList_Traverse, 3); /* this checks 3 different queues: RX, TX, PEND */
 
     txn = &CF_AppData.engine.transactions[UT_CFDP_CHANNEL];
     UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_SeqArg_SetTxn, txn);
@@ -283,30 +283,30 @@ void Test_CF_GetChunkListHead(void)
 void Test_CF_CFDP_GetTxnStatus(void)
 {
     /* Test case for:
-     * CF_CFDP_AckTxnStatus_t CF_CFDP_GetTxnStatus(CF_Transaction_t *txn)
+     * CF_CFDP_AckTxnStatus_t CF_CFDP_GetAckTxnStatus(CF_Transaction_t *txn)
      */
     CF_Transaction_t txn;
 
     memset(&txn, 0, sizeof(txn));
 
     /* invalid */
-    UtAssert_UINT32_EQ(CF_CFDP_GetTxnStatus(NULL), CF_CFDP_AckTxnStatus_UNRECOGNIZED);
+    UtAssert_UINT32_EQ(CF_CFDP_GetAckTxnStatus(NULL), CF_CFDP_AckTxnStatus_UNRECOGNIZED);
 
     /* all nominal cases */
     txn.state = CF_TxnState_INIT;
-    UtAssert_UINT32_EQ(CF_CFDP_GetTxnStatus(&txn), CF_CFDP_AckTxnStatus_INVALID);
+    UtAssert_UINT32_EQ(CF_CFDP_GetAckTxnStatus(&txn), CF_CFDP_AckTxnStatus_INVALID);
     txn.state = CF_TxnState_S1;
-    UtAssert_UINT32_EQ(CF_CFDP_GetTxnStatus(&txn), CF_CFDP_AckTxnStatus_ACTIVE);
+    UtAssert_UINT32_EQ(CF_CFDP_GetAckTxnStatus(&txn), CF_CFDP_AckTxnStatus_ACTIVE);
     txn.state = CF_TxnState_R1;
-    UtAssert_UINT32_EQ(CF_CFDP_GetTxnStatus(&txn), CF_CFDP_AckTxnStatus_ACTIVE);
+    UtAssert_UINT32_EQ(CF_CFDP_GetAckTxnStatus(&txn), CF_CFDP_AckTxnStatus_ACTIVE);
     txn.state = CF_TxnState_S2;
-    UtAssert_UINT32_EQ(CF_CFDP_GetTxnStatus(&txn), CF_CFDP_AckTxnStatus_ACTIVE);
+    UtAssert_UINT32_EQ(CF_CFDP_GetAckTxnStatus(&txn), CF_CFDP_AckTxnStatus_ACTIVE);
     txn.state = CF_TxnState_R2;
-    UtAssert_UINT32_EQ(CF_CFDP_GetTxnStatus(&txn), CF_CFDP_AckTxnStatus_ACTIVE);
+    UtAssert_UINT32_EQ(CF_CFDP_GetAckTxnStatus(&txn), CF_CFDP_AckTxnStatus_ACTIVE);
     txn.state = CF_TxnState_DROP;
-    UtAssert_UINT32_EQ(CF_CFDP_GetTxnStatus(&txn), CF_CFDP_AckTxnStatus_TERMINATED);
+    UtAssert_UINT32_EQ(CF_CFDP_GetAckTxnStatus(&txn), CF_CFDP_AckTxnStatus_TERMINATED);
     txn.state = CF_TxnState_HOLD;
-    UtAssert_UINT32_EQ(CF_CFDP_GetTxnStatus(&txn), CF_CFDP_AckTxnStatus_TERMINATED);
+    UtAssert_UINT32_EQ(CF_CFDP_GetAckTxnStatus(&txn), CF_CFDP_AckTxnStatus_TERMINATED);
 }
 
 /* CF_DequeueTransaction tests */
@@ -626,11 +626,11 @@ void Test_CF_WriteTxnQueueDataToFile(void)
 
     memset(&node, 0, sizeof(node));
     memset(&ch, 0, sizeof(ch));
-    ch.qs[CF_QueueIdx_TXA] = &node;
+    ch.qs[CF_QueueIdx_TX] = &node;
 
     /* Act */
     /* with no configuration, this should return no error (0) */
-    UtAssert_INT32_EQ(CF_WriteTxnQueueDataToFile(arg_fd, &ch, CF_QueueIdx_TXA), 0);
+    UtAssert_INT32_EQ(CF_WriteTxnQueueDataToFile(arg_fd, &ch, CF_QueueIdx_TX), 0);
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CList_Traverse, 1);
@@ -1219,7 +1219,7 @@ void add_cf_utils_h_tests(void)
                "CF_FindTransactionBySequenceNumber");
     UtTest_Add(Test_CF_GetChannelFromTxn, cf_utils_tests_Setup, cf_utils_tests_Teardown, "CF_GetChannelFromTxn");
     UtTest_Add(Test_CF_GetChunkListHead, cf_utils_tests_Setup, cf_utils_tests_Teardown, "CF_GetChunkListHead");
-    UtTest_Add(Test_CF_CFDP_GetTxnStatus, cf_utils_tests_Setup, cf_utils_tests_Teardown, "CF_CFDP_GetTxnStatus");
+    UtTest_Add(Test_CF_CFDP_GetTxnStatus, cf_utils_tests_Setup, cf_utils_tests_Teardown, "CF_CFDP_GetAckTxnStatus");
 
     /* CF_DequeueTransaction tests */
     UtTest_Add(Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size, cf_utils_tests_Setup,

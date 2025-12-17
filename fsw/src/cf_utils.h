@@ -518,7 +518,13 @@ CF_TxnStatus_t CF_TxnStatus_From_ConditionCode(CF_CFDP_ConditionCode_t cc);
  * @retval true if an error has occurred during the transaction
  * @retval false if no error has occurred during the transaction yet
  */
-bool CF_TxnStatus_IsError(CF_TxnStatus_t txn_stat);
+static inline bool CF_TxnStatus_IsError(CF_TxnStatus_t txn_stat)
+{
+    /* The value of CF_TxnStatus_UNDEFINED (-1) indicates a transaction is in progress and no error
+     * has occurred yet.  This will be set to CF_TxnStatus_NO_ERROR (0) after successful completion
+     * of the transaction (FIN/EOF).  Anything else indicates a problem has occurred. */
+    return (txn_stat > CF_TxnStatus_NO_ERROR);
+}
 
 /************************************************************************/
 /** @brief Gets the associated channel struct from a transaction
@@ -557,6 +563,6 @@ CF_CListNode_t **CF_GetChunkListHead(CF_Channel_t *chan, uint8 direction);
  * @param txn   Transaction
  * @returns CF_CFDP_AckTxnStatus_t value corresponding to transaction
  */
-CF_CFDP_AckTxnStatus_t CF_CFDP_GetTxnStatus(CF_Transaction_t *txn);
+CF_CFDP_AckTxnStatus_t CF_CFDP_GetAckTxnStatus(CF_Transaction_t *txn);
 
 #endif /* !CF_UTILS_H */

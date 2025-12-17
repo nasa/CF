@@ -501,7 +501,7 @@
  *  available resource to track the chunks associated
  *  with the file.
  */
-#define CF_CFDP_NO_CHUNKLIST_AVAIL_EID 88
+#define CF_CFDP_NO_CHUNKLIST_AVAIL_EID 69
 
 /**************************************************************************
  * CF_CFDP_R event IDs - Engine receive
@@ -520,13 +520,13 @@
 #define CF_CFDP_R_REQUEST_MD_INF_EID (70)
 
 /**
- * \brief CF Creating Temp File For RX Transaction Without Metadata PDU
+ * \brief CF Creating Temp File For RX Transaction
  *
  *  \par Type: INFORMATION
  *
  *  \par Cause:
  *
- *  RX transaction missing metadata causing creation of a temporary
+ *  RX transaction creation of a temporary
  *  filename to store the data
  */
 #define CF_CFDP_R_TEMP_FILE_INF_EID (71)
@@ -661,33 +661,33 @@
  *
  *  \par Cause:
  *
- *  Failure from file rename call after reception of an out-of-order RX
- *  Class 2 Metadata PDU
+ *  Failure from file rename call after end of transaction
  */
 #define CF_CFDP_R_RENAME_ERR_EID (83)
 
 /**
- * \brief CF RX Class 2 Metadata PDU File Open Failed Event ID
+ * \brief CF File retained
  *
- *  \par Type: ERROR
+ *  \par Type: INFORMATION
  *
  *  \par Cause:
  *
- *  Failure from file open call after reception of an out-of-order RX
- *  Class 2 Metadata PDU
+ * Engine has fully retained the file after a successful transaction
  */
-#define CF_CFDP_R_OPEN_ERR_EID (84)
+#define CF_CFDP_R_FILE_RETAINED_EID (84)
 
 /**
- * \brief CF Invalid Out-of-order Metadata PDU Received Event ID
+ * \brief CF RX File not retained
  *
- *  \par Type: ERROR
+ *  \par Type: INFORMATION
  *
  *  \par Cause:
  *
- *  Failure to decode out-of-order metadata PDU
+ * Temporary file associated with a receive transaction was discarded
+ * without being retained.  This may be due to an error in the
+ * transaction, failure to validate, or cancellation.
  */
-#define CF_CFDP_R_PDU_MD_ERR_EID (85)
+#define CF_CFDP_R_NOT_RETAINED_EID (85)
 
 /**
  * \brief CF Class 2 CRC Read From File Failed Event ID
@@ -722,19 +722,6 @@
  *  Expiration of the RX inactivity timer
  */
 #define CF_CFDP_R_INACT_TIMER_ERR_EID (88)
-
-/**
- * \brief CF No chunklist available
- *
- *  \par Type: ERROR
- *
- *  \par Cause:
- *
- *  Engine has aborted a transaction due to lack of an
- *  available resource to track the chunks associated
- *  with the file.
- */
-#define CF_CFDP_NO_CHUNKLIST_AVAIL_EID 88
 
 /**************************************************************************
  * CF_CFDP_S event IDs - Engine send
@@ -933,6 +920,31 @@
  *  Send transaction activity timeout expired
  */
 #define CF_CFDP_S_INACT_TIMER_ERR_EID (107)
+
+/**
+ * \brief CF TX File Moved
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Source File has been moved after a TX transaction
+ *  This occurs when the move directory is configured.
+ */
+#define CF_CFDP_S_FILE_MOVED_EID (108)
+
+/**
+ * \brief CF TX File Removed
+ *
+ *  \par Type: INFORMATION
+ *
+ *  \par Cause:
+ *
+ *  Source File has been removed after a successful TX transaction
+ *  where the "keep" flag was false and there is no move directory
+ *  configured.
+ */
+#define CF_CFDP_S_FILE_REMOVED_EID (109)
 
 /**************************************************************************
  * CF_CMD event IDs - Command processing

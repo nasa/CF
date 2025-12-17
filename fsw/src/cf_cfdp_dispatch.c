@@ -40,7 +40,6 @@
 void CF_CFDP_R_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
                             const CF_CFDP_R_SubstateDispatchTable_t *dispatch, CF_CFDP_StateRecvFunc_t fd_fn)
 {
-    CF_Assert(txn->state_data.receive.sub_state < CF_RxSubState_NUM_STATES);
     CF_CFDP_StateRecvFunc_t              selected_handler;
     CF_Logical_PduFileDirectiveHeader_t *fdh;
 
@@ -52,9 +51,9 @@ void CF_CFDP_R_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
         fdh = &ph->fdirective;
         if (fdh->directive_code < CF_CFDP_FileDirective_INVALID_MAX)
         {
-            if (dispatch->state[txn->state_data.receive.sub_state] != NULL)
+            if (dispatch->state[txn->state_data.sub_state] != NULL)
             {
-                selected_handler = dispatch->state[txn->state_data.receive.sub_state]->fdirective[fdh->directive_code];
+                selected_handler = dispatch->state[txn->state_data.sub_state]->fdirective[fdh->directive_code];
             }
         }
         else
@@ -62,14 +61,13 @@ void CF_CFDP_R_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
             ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.spurious;
             CFE_EVS_SendEvent(CF_CFDP_R_DC_INV_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF R%d(%lu:%lu): received PDU with invalid directive code %d for sub-state %d",
-                              (txn->state == CF_TxnState_R2), (unsigned long)txn->history->src_eid,
-                              (unsigned long)txn->history->seq_num, fdh->directive_code,
-                              txn->state_data.receive.sub_state);
+                              CF_CFDP_GetPrintClass(txn), (unsigned long)txn->history->src_eid,
+                              (unsigned long)txn->history->seq_num, fdh->directive_code, txn->state_data.sub_state);
         }
     }
     else
     {
-        if (!CF_TxnStatus_IsError(txn->history->txn_stat))
+        if (CF_CFDP_TxnIsOK(txn))
         {
             selected_handler = fd_fn;
         }
@@ -98,7 +96,6 @@ void CF_CFDP_R_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
 void CF_CFDP_S_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
                             const CF_CFDP_S_SubstateRecvDispatchTable_t *dispatch)
 {
-    CF_Assert(txn->state_data.send.sub_state < CF_TxSubState_NUM_STATES);
     const CF_CFDP_FileDirectiveDispatchTable_t *substate_tbl;
     CF_CFDP_StateRecvFunc_t                     selected_handler;
     CF_Logical_PduFileDirectiveHeader_t *       fdh;
@@ -111,7 +108,7 @@ void CF_CFDP_S_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
         if (fdh->directive_code < CF_CFDP_FileDirective_INVALID_MAX)
         {
             /* This should be silent (no event) if no handler is defined in the table */
-            substate_tbl = dispatch->substate[txn->state_data.send.sub_state];
+            substate_tbl = dispatch->substate[txn->state_data.sub_state];
             if (substate_tbl != NULL)
             {
                 selected_handler = substate_tbl->fdirective[fdh->directive_code];
@@ -122,15 +119,14 @@ void CF_CFDP_S_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
             ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.spurious;
             CFE_EVS_SendEvent(CF_CFDP_S_DC_INV_ERR_EID, CFE_EVS_EventType_ERROR,
                               "CF S%d(%lu:%lu): received PDU with invalid directive code %d for sub-state %d",
-                              (txn->state == CF_TxnState_S2), (unsigned long)txn->history->src_eid,
-                              (unsigned long)txn->history->seq_num, fdh->directive_code,
-                              txn->state_data.send.sub_state);
+                              CF_CFDP_GetPrintClass(txn), (unsigned long)txn->history->src_eid,
+                              (unsigned long)txn->history->seq_num, fdh->directive_code, txn->state_data.sub_state);
         }
     }
     else
     {
         CFE_EVS_SendEvent(CF_CFDP_S_NON_FD_PDU_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "CF S%d(%lu:%lu): received non-file directive PDU", (txn->state == CF_TxnState_S2),
+                          "CF S%d(%lu:%lu): received non-file directive PDU", CF_CFDP_GetPrintClass(txn),
                           (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
     }
 
@@ -152,48 +148,25 @@ void CF_CFDP_S_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
  * See description in cf_cfdp_dispatch.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_S_DispatchTransmit(CF_Transaction_t *txn, const CF_CFDP_S_SubstateSendDispatchTable_t *dispatch)
-{
-    CF_CFDP_StateSendFunc_t selected_handler;
-
-    selected_handler = dispatch->substate[txn->state_data.send.sub_state];
-    if (selected_handler != NULL)
-    {
-        selected_handler(txn);
-    }
-}
-
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_cfdp_dispatch.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-void CF_CFDP_TxStateDispatch(CF_Transaction_t *txn, const CF_CFDP_TxnSendDispatchTable_t *dispatch)
-{
-    CF_CFDP_StateSendFunc_t selected_handler;
-
-    CF_Assert(txn->state < CF_TxnState_INVALID);
-    selected_handler = dispatch->tx[txn->state];
-    if (selected_handler != NULL)
-    {
-        selected_handler(txn);
-    }
-}
-
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_cfdp_dispatch.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
 void CF_CFDP_RxStateDispatch(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
                              const CF_CFDP_TxnRecvDispatchTable_t *dispatch)
 {
     CF_CFDP_StateRecvFunc_t selected_handler;
+    CF_TxnState_t           state;
 
-    CF_Assert(txn->state < CF_TxnState_INVALID);
-    selected_handler = dispatch->rx[txn->state];
+    /* The mode must match the txn, transactions cannot change modes mid-stream */
+    if ((!ph->pdu_header.txm_mode) != txn->reliable_mode)
+    {
+        state = CF_TxnState_DROP;
+    }
+    else
+    {
+        state = txn->state;
+    }
+
+    CF_Assert(state < CF_TxnState_INVALID);
+
+    selected_handler = dispatch->rx[state];
     if (selected_handler != NULL)
     {
         selected_handler(txn, ph);

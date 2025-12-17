@@ -77,12 +77,10 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool sile
     }
 
     if (CF_AppData.config_table->chan[txn->chan_num].max_outgoing_messages_per_wakeup &&
-        (CF_AppData.engine.outgoing_counter ==
-         CF_AppData.config_table->chan[txn->chan_num].max_outgoing_messages_per_wakeup))
+        (chan->outgoing_counter >= CF_AppData.config_table->chan[txn->chan_num].max_outgoing_messages_per_wakeup))
     {
         /* no more messages this wakeup allowed */
-        chan->cur = txn; /* remember where we were for next time */
-        success   = false;
+        success = false;
     }
 
     if (success && !CF_AppData.hk.Payload.channel_hk[txn->chan_num].frozen && !txn->flags.com.suspended)
@@ -106,7 +104,6 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool sile
 
         if (!CF_AppData.engine.out.msg)
         {
-            chan->cur = txn; /* remember where we were for next time */
             if (!silent && (os_status == OS_SUCCESS))
             {
                 CFE_EVS_SendEvent(CF_CFDP_NO_MSG_ERR_EID, CFE_EVS_EventType_ERROR,
@@ -120,7 +117,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool sile
             CFE_MSG_Init(&CF_AppData.engine.out.msg->Msg,
                          CFE_SB_ValueToMsgId(CF_AppData.config_table->chan[txn->chan_num].mid_output),
                          offsetof(CF_PduTlmMsg_t, ph));
-            ++CF_AppData.engine.outgoing_counter; /* even if max_outgoing_messages_per_wakeup is 0 (unlimited), it's ok
+            ++chan->outgoing_counter; /* even if max_outgoing_messages_per_wakeup is 0 (unlimited), it's ok
                                                     to inc this */
 
             /* prepare for encoding - the "tx_pdudata" is what serves as the temporary holding area for content */
@@ -128,9 +125,16 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool sile
         }
     }
 
-    /* if returning a buffer, then reset the encoder state to point to the beginning of the encapsulation msg */
-    if (success && ret != NULL)
+    /* If returning NULL, this only happens when we hit some traffic limit for this channel,
+     * either the limit of tx per wakeup, the sync sem is unavailable, or the SB pool is empty. */
+    if (ret == NULL)
     {
+        /* stop trying to send anything until next wake up */
+        chan->tx_blocked = true;
+    }
+    else
+    {
+        /* if returning a buffer, then reset the encoder state to point to the beginning of the encapsulation msg */
         CF_CFDP_EncodeStart(&CF_AppData.engine.out.encode, CF_AppData.engine.out.msg, ret, offsetof(CF_PduTlmMsg_t, ph),
                             offsetof(CF_PduTlmMsg_t, ph) + CF_MAX_PDU_SIZE);
     }
@@ -174,13 +178,12 @@ void CF_CFDP_Send(uint8 chan_num, const CF_Logical_PduBuffer_t *ph)
  *-----------------------------------------------------------------*/
 void CF_CFDP_ReceiveMessage(CF_Channel_t *chan)
 {
-    CF_Transaction_t *txn; /* initialized below */
-    uint32            count = 0;
-    int32             status;
-    const int         chan_num = (chan - CF_AppData.engine.channels);
-    CFE_SB_Buffer_t * bufptr;
-    CFE_MSG_Size_t    msg_size;
-    CFE_MSG_Type_t    msg_type = CFE_MSG_Type_Invalid;
+    uint32           count = 0;
+    int32            status;
+    const int        chan_num = (chan - CF_AppData.engine.channels);
+    CFE_SB_Buffer_t *bufptr;
+    CFE_MSG_Size_t   msg_size;
+    CFE_MSG_Type_t   msg_type = CFE_MSG_Type_Invalid;
 
     CF_Logical_PduBuffer_t *ph;
 
@@ -214,42 +217,9 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *chan)
         {
             CF_CFDP_DecodeStart(&CF_AppData.engine.in.decode, bufptr, ph, offsetof(CF_PduCmdMsg_t, ph), msg_size);
         }
-        if (!CF_CFDP_RecvPh(chan_num, ph))
-        {
-            /* got a valid PDU -- look it up by sequence number */
-            txn = CF_FindTransactionBySequenceNumber(chan, ph->pdu_header.sequence_num, ph->pdu_header.source_eid);
-            if (txn == NULL)
-            {
-                /* if no match found, then it must be the case that we would be the destination entity id, so verify it
-                 */
-                if (ph->pdu_header.destination_eid == CF_AppData.config_table->local_eid)
-                {
-                    /* we didn't find a match, so assign it to a transaction */
-                    /* assume this is initiating an RX transaction, as TX transactions are only commanded */
-                    txn = CF_CFDP_StartRxTransaction(chan_num);
-                    if (txn == NULL)
-                    {
-                        CFE_EVS_SendEvent(
-                            CF_CFDP_RX_DROPPED_ERR_EID, CFE_EVS_EventType_ERROR,
-                            "CF: dropping packet from %lu transaction number 0x%08lx due max RX transactions reached",
-                            (unsigned long)ph->pdu_header.source_eid, (unsigned long)ph->pdu_header.sequence_num);
-                    }
-                }
-                else
-                {
-                    CFE_EVS_SendEvent(CF_CFDP_INVALID_DST_ERR_EID, CFE_EVS_EventType_ERROR,
-                                      "CF: dropping packet for invalid destination eid 0x%lx",
-                                      (unsigned long)ph->pdu_header.destination_eid);
-                }
-            }
 
-            if (txn != NULL)
-            {
-                /* found one! Send it to the transaction state processor */
-                CF_Assert(txn->state > CF_TxnState_UNDEF);
-                CF_CFDP_DispatchRecv(txn, ph);
-            }
-        }
+        /* Identify and dispatch this PDU */
+        CF_CFDP_ReceivePdu(chan, ph);
 
         CFE_ES_PerfLogExit(CF_PERF_ID_PDURCVD(chan_num));
     }

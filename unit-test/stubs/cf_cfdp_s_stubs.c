@@ -41,91 +41,28 @@ void CF_CFDP_S1_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S1_SubstateSendEof()
+ * Generated stub function for CF_CFDP_S2_SubstateEofAck()
  * ----------------------------------------------------
  */
-void CF_CFDP_S1_SubstateSendEof(CF_Transaction_t *txn)
+void CF_CFDP_S2_SubstateEofAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_AddParam(CF_CFDP_S1_SubstateSendEof, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_CFDP_S2_SubstateEofAck, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_CFDP_S2_SubstateEofAck, CF_Logical_PduBuffer_t *, ph);
 
-    UT_GenStub_Execute(CF_CFDP_S1_SubstateSendEof, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_S2_SubstateEofAck, Basic, NULL);
 }
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S1_Tx()
+ * Generated stub function for CF_CFDP_S2_SubstateNak()
  * ----------------------------------------------------
  */
-void CF_CFDP_S1_Tx(CF_Transaction_t *txn)
+void CF_CFDP_S2_SubstateNak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_AddParam(CF_CFDP_S1_Tx, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_CFDP_S2_SubstateNak, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_CFDP_S2_SubstateNak, CF_Logical_PduBuffer_t *, ph);
 
-    UT_GenStub_Execute(CF_CFDP_S1_Tx, Basic, NULL);
-}
-
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S2_EarlyFin()
- * ----------------------------------------------------
- */
-void CF_CFDP_S2_EarlyFin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
-{
-    UT_GenStub_AddParam(CF_CFDP_S2_EarlyFin, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_CFDP_S2_EarlyFin, CF_Logical_PduBuffer_t *, ph);
-
-    UT_GenStub_Execute(CF_CFDP_S2_EarlyFin, Basic, NULL);
-}
-
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S2_EofAck()
- * ----------------------------------------------------
- */
-void CF_CFDP_S2_EofAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
-{
-    UT_GenStub_AddParam(CF_CFDP_S2_EofAck, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_CFDP_S2_EofAck, CF_Logical_PduBuffer_t *, ph);
-
-    UT_GenStub_Execute(CF_CFDP_S2_EofAck, Basic, NULL);
-}
-
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S2_Fin()
- * ----------------------------------------------------
- */
-void CF_CFDP_S2_Fin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
-{
-    UT_GenStub_AddParam(CF_CFDP_S2_Fin, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_CFDP_S2_Fin, CF_Logical_PduBuffer_t *, ph);
-
-    UT_GenStub_Execute(CF_CFDP_S2_Fin, Basic, NULL);
-}
-
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S2_Nak()
- * ----------------------------------------------------
- */
-void CF_CFDP_S2_Nak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
-{
-    UT_GenStub_AddParam(CF_CFDP_S2_Nak, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_CFDP_S2_Nak, CF_Logical_PduBuffer_t *, ph);
-
-    UT_GenStub_Execute(CF_CFDP_S2_Nak, Basic, NULL);
-}
-
-/*
- * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S2_Nak_Arm()
- * ----------------------------------------------------
- */
-void CF_CFDP_S2_Nak_Arm(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
-{
-    UT_GenStub_AddParam(CF_CFDP_S2_Nak_Arm, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_CFDP_S2_Nak_Arm, CF_Logical_PduBuffer_t *, ph);
-
-    UT_GenStub_Execute(CF_CFDP_S2_Nak_Arm, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_S2_SubstateNak, Basic, NULL);
 }
 
 /*
@@ -143,82 +80,76 @@ void CF_CFDP_S2_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S2_SubstateSendEof()
+ * Generated stub function for CF_CFDP_S_AckTimerTick()
  * ----------------------------------------------------
  */
-void CF_CFDP_S2_SubstateSendEof(CF_Transaction_t *txn)
+void CF_CFDP_S_AckTimerTick(CF_Transaction_t *txn)
 {
-    UT_GenStub_AddParam(CF_CFDP_S2_SubstateSendEof, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_CFDP_S_AckTimerTick, CF_Transaction_t *, txn);
 
-    UT_GenStub_Execute(CF_CFDP_S2_SubstateSendEof, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_S_AckTimerTick, Basic, NULL);
 }
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S2_SubstateSendFileData()
+ * Generated stub function for CF_CFDP_S_CheckState()
  * ----------------------------------------------------
  */
-void CF_CFDP_S2_SubstateSendFileData(CF_Transaction_t *txn)
+void CF_CFDP_S_CheckState(CF_Transaction_t *txn)
 {
-    UT_GenStub_AddParam(CF_CFDP_S2_SubstateSendFileData, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_CFDP_S_CheckState, CF_Transaction_t *, txn);
 
-    UT_GenStub_Execute(CF_CFDP_S2_SubstateSendFileData, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_S_CheckState, Basic, NULL);
 }
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S2_Tx()
+ * Generated stub function for CF_CFDP_S_SubstateEarlyFin()
  * ----------------------------------------------------
  */
-void CF_CFDP_S2_Tx(CF_Transaction_t *txn)
+void CF_CFDP_S_SubstateEarlyFin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_AddParam(CF_CFDP_S2_Tx, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_CFDP_S_SubstateEarlyFin, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_CFDP_S_SubstateEarlyFin, CF_Logical_PduBuffer_t *, ph);
 
-    UT_GenStub_Execute(CF_CFDP_S2_Tx, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_S_SubstateEarlyFin, Basic, NULL);
 }
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S_Cancel()
+ * Generated stub function for CF_CFDP_S_SubstateRecvFin()
  * ----------------------------------------------------
  */
-void CF_CFDP_S_Cancel(CF_Transaction_t *txn)
+void CF_CFDP_S_SubstateRecvFin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_AddParam(CF_CFDP_S_Cancel, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_CFDP_S_SubstateRecvFin, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_CFDP_S_SubstateRecvFin, CF_Logical_PduBuffer_t *, ph);
 
-    UT_GenStub_Execute(CF_CFDP_S_Cancel, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_S_SubstateRecvFin, Basic, NULL);
 }
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S_CheckAndRespondNak()
+ * Generated stub function for CF_CFDP_S_HandleFileRetention()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_CFDP_S_CheckAndRespondNak(CF_Transaction_t *txn)
+void CF_CFDP_S_HandleFileRetention(CF_Transaction_t *txn)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_S_CheckAndRespondNak, CFE_Status_t);
+    UT_GenStub_AddParam(CF_CFDP_S_HandleFileRetention, CF_Transaction_t *, txn);
 
-    UT_GenStub_AddParam(CF_CFDP_S_CheckAndRespondNak, CF_Transaction_t *, txn);
-
-    UT_GenStub_Execute(CF_CFDP_S_CheckAndRespondNak, Basic, NULL);
-
-    return UT_GenStub_GetReturnValue(CF_CFDP_S_CheckAndRespondNak, CFE_Status_t);
+    UT_GenStub_Execute(CF_CFDP_S_HandleFileRetention, Basic, NULL);
 }
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S_SendEof()
+ * Generated stub function for CF_CFDP_S_Init()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_CFDP_S_SendEof(CF_Transaction_t *txn)
+void CF_CFDP_S_Init(CF_Transaction_t *txn)
 {
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_S_SendEof, CFE_Status_t);
+    UT_GenStub_AddParam(CF_CFDP_S_Init, CF_Transaction_t *, txn);
 
-    UT_GenStub_AddParam(CF_CFDP_S_SendEof, CF_Transaction_t *, txn);
-
-    UT_GenStub_Execute(CF_CFDP_S_SendEof, Basic, NULL);
-
-    return UT_GenStub_GetReturnValue(CF_CFDP_S_SendEof, CFE_Status_t);
+    UT_GenStub_Execute(CF_CFDP_S_Init, Basic, NULL);
 }
 
 /*
@@ -242,22 +173,6 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S_SendFinAck()
- * ----------------------------------------------------
- */
-CFE_Status_t CF_CFDP_S_SendFinAck(CF_Transaction_t *txn)
-{
-    UT_GenStub_SetupReturnBuffer(CF_CFDP_S_SendFinAck, CFE_Status_t);
-
-    UT_GenStub_AddParam(CF_CFDP_S_SendFinAck, CF_Transaction_t *, txn);
-
-    UT_GenStub_Execute(CF_CFDP_S_SendFinAck, Basic, NULL);
-
-    return UT_GenStub_GetReturnValue(CF_CFDP_S_SendFinAck, CFE_Status_t);
-}
-
-/*
- * ----------------------------------------------------
  * Generated stub function for CF_CFDP_S_SubstateSendFileData()
  * ----------------------------------------------------
  */
@@ -270,27 +185,26 @@ void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *txn)
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S_SubstateSendMetadata()
+ * Generated stub function for CF_CFDP_S_Tick()
  * ----------------------------------------------------
  */
-void CF_CFDP_S_SubstateSendMetadata(CF_Transaction_t *txn)
+void CF_CFDP_S_Tick(CF_Transaction_t *txn)
 {
-    UT_GenStub_AddParam(CF_CFDP_S_SubstateSendMetadata, CF_Transaction_t *, txn);
+    UT_GenStub_AddParam(CF_CFDP_S_Tick, CF_Transaction_t *, txn);
 
-    UT_GenStub_Execute(CF_CFDP_S_SubstateSendMetadata, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_S_Tick, Basic, NULL);
 }
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_CFDP_S_Tick()
+ * Generated stub function for CF_CFDP_S_Tick_Maintenance()
  * ----------------------------------------------------
  */
-void CF_CFDP_S_Tick(CF_Transaction_t *txn, int *cont)
+void CF_CFDP_S_Tick_Maintenance(CF_Transaction_t *txn)
 {
-    UT_GenStub_AddParam(CF_CFDP_S_Tick, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_CFDP_S_Tick, int *, cont);
+    UT_GenStub_AddParam(CF_CFDP_S_Tick_Maintenance, CF_Transaction_t *, txn);
 
-    UT_GenStub_Execute(CF_CFDP_S_Tick, Basic, NULL);
+    UT_GenStub_Execute(CF_CFDP_S_Tick_Maintenance, Basic, NULL);
 }
 
 /*
@@ -298,10 +212,9 @@ void CF_CFDP_S_Tick(CF_Transaction_t *txn, int *cont)
  * Generated stub function for CF_CFDP_S_Tick_Nak()
  * ----------------------------------------------------
  */
-void CF_CFDP_S_Tick_Nak(CF_Transaction_t *txn, int *cont)
+void CF_CFDP_S_Tick_Nak(CF_Transaction_t *txn)
 {
     UT_GenStub_AddParam(CF_CFDP_S_Tick_Nak, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_CFDP_S_Tick_Nak, int *, cont);
 
     UT_GenStub_Execute(CF_CFDP_S_Tick_Nak, Basic, NULL);
 }
