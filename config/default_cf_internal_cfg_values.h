@@ -19,17 +19,21 @@
 
 /**
  * @file
- *   Specification for the CFS CFDP (CF) table structures
+ *   CFS CFDP (CF) Application Private Config Definitions
  *
- * @note
- *   Constants and enumerated types related to these table structures
- *   are defined in cf_tbldefs.h.
+ * This provides default values for configurable items that are internal
+ * to this module and do NOT affect the interface(s) of this module.  Changes
+ * to items in this file only affect the local module and will be transparent
+ * to external entities that are using the public interface(s).
+ *
+ * @note This file may be overridden/superceded by mission-provided defintions
+ * either by overriding this header or by generating definitions from a command/data
+ * dictionary tool.
  */
-#ifndef DEFAULT_CF_TBL_H
-#define DEFAULT_CF_TBL_H
+#ifndef DEFAULT_CF_INTERNAL_CFG_H
+#define DEFAULT_CF_INTERNAL_CFG_H
 
-#include "cf_mission_cfg.h"
-#include "cf_tbldefs.h"
-#include "cf_tblstruct.h"
+/* Use the default configuration value for all */
+#define CF_INTERNAL_CFGVAL(x) DEFAULT_CF_##x
 
 #endif

@@ -20,7 +20,7 @@
 /* cf testing includes */
 #include "cf_test_utils.h"
 #include "cf_cmd.h"
-#include "cf_events.h"
+#include "cf_eventids.h"
 #include "cf_test_alt_handler.h"
 
 /*******************************************************************************

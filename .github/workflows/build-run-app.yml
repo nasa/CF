@@ -2,7 +2,15 @@ name: Build and Run
 
 on:
   push:
+    branches:
+      - dev
+      - main
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  workflow_dispatch:
 
 jobs:
   build-run:

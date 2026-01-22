@@ -21,11 +21,11 @@
  * @file
  *   CFS CFDP (CF) Application Message IDs
  */
-#ifndef CF_MSGIDS_H
-#define CF_MSGIDS_H
+#ifndef DEFAULT_CF_MSGIDS_H
+#define DEFAULT_CF_MSGIDS_H
 
 #include "cfe_core_api_base_msgids.h"
-#include "cf_topicids.h"
+#include "cf_msgid_values.h"
 
 /**
  * \defgroup cfscfcmdmid CFS CFDP Command Message IDs
@@ -33,13 +33,13 @@
  */
 
 /** \brief Message ID for commands */
-#define CF_CMD_MID CFE_PLATFORM_CMD_TOPICID_TO_MIDV(CFE_MISSION_CF_CMD_TOPICID)
+#define CF_CMD_MID CFE_PLATFORM_CF_CMD_MIDVAL(CMD)
 
 /** \brief Message ID to request housekeeping telemetry */
-#define CF_SEND_HK_MID CFE_PLATFORM_CMD_TOPICID_TO_MIDV(CFE_MISSION_CF_SEND_HK_TOPICID)
+#define CF_SEND_HK_MID CFE_PLATFORM_CF_CMD_MIDVAL(SEND_HK)
 
 /** \brief Message ID for waking up the processing cycle */
-#define CF_WAKE_UP_MID CFE_PLATFORM_CMD_TOPICID_TO_MIDV(CFE_MISSION_CF_WAKE_UP_TOPICID)
+#define CF_WAKE_UP_MID CFE_PLATFORM_CF_CMD_MIDVAL(WAKE_UP)
 
 /**\}*/
 
@@ -49,10 +49,10 @@
  */
 
 /** \brief Message ID for housekeeping telemetry */
-#define CF_HK_TLM_MID  CFE_PLATFORM_TLM_TOPICID_TO_MIDV(CFE_MISSION_CF_HK_TLM_TOPICID)
+#define CF_HK_TLM_MID  CFE_PLATFORM_CF_TLM_MIDVAL(HK_TLM)
 
 /** \brief Message ID for end of transaction telemetry */
-#define CF_EOT_TLM_MID CFE_PLATFORM_TLM_TOPICID_TO_MIDV(CFE_MISSION_CF_EOT_TLM_TOPICID)
+#define CF_EOT_TLM_MID CFE_PLATFORM_CF_TLM_MIDVAL(EOT_TLM)
 
 /**\}*/
 
@@ -61,10 +61,10 @@
  * \{
  */
 
-#define CF_CH0_TX_MID CFE_PLATFORM_TLM_TOPICID_TO_MIDV(CFE_MISSION_CF_CH0_TX_TOPICID)
-#define CF_CH1_TX_MID CFE_PLATFORM_TLM_TOPICID_TO_MIDV(CFE_MISSION_CF_CH1_TX_TOPICID)
-#define CF_CH0_RX_MID CFE_PLATFORM_CMD_TOPICID_TO_MIDV(CFE_MISSION_CF_CH0_RX_TOPICID)
-#define CF_CH1_RX_MID CFE_PLATFORM_CMD_TOPICID_TO_MIDV(CFE_MISSION_CF_CH1_RX_TOPICID)
+#define CF_CH0_TX_MID CFE_PLATFORM_CF_CMD_MIDVAL(CH0_TX)
+#define CF_CH1_TX_MID CFE_PLATFORM_CF_CMD_MIDVAL(CH1_TX)
+#define CF_CH0_RX_MID CFE_PLATFORM_CF_TLM_MIDVAL(CH0_RX)
+#define CF_CH1_RX_MID CFE_PLATFORM_CF_TLM_MIDVAL(CH1_RX)
 
 /**\}*/
 

@@ -17,19 +17,34 @@
  * limitations under the License.
  ************************************************************************/
 
-/**
+ /**
  * @file
- *   Specification for the CFS CFDP (CF) table structures
  *
- * @note
- *   Constants and enumerated types related to these table structures
- *   are defined in cf_tbldefs.h.
+ * Declarations and prototypes for cf_extern_typedefs module
  */
-#ifndef DEFAULT_CF_TBL_H
-#define DEFAULT_CF_TBL_H
 
-#include "cf_mission_cfg.h"
-#include "cf_tbldefs.h"
-#include "cf_tblstruct.h"
+#ifndef EDS_CF_EXTERN_TYPEDEFS_H
+#define EDS_CF_EXTERN_TYPEDEFS_H
+
+#include "common_types.h"
+#include "cfe_resourceid_typedef.h"
+
+/* Source the definitions from EDS */
+#include "cf_eds_typedefs.h"
+
+/* Define type mappings for CF-specific types */
+typedef CF_QueueIdx_Enum_t CF_QueueIdx_t;
+
+#define CF_QueueIdx_NUM       (1 + EdsDataType_EdsEnum_CF_QueueIdx_t_MAX) 
+#define CF_GetSet_ValueID_MAX (1 + EdsDataType_EdsEnum_CF_GetSet_ValueID_t_MAX)
+
+typedef CF_EntityId_Atom_t       CF_EntityId_t;
+typedef CF_TransactionSeq_Atom_t CF_TransactionSeq_t;
+
+typedef CF_CFDP_Enum_t           CF_CFDP_Class_t;
+typedef CF_GetSet_ValueID_Enum_t CF_GetSet_ValueID_t;
+
+typedef EdsDataType_BASE_TYPES_PathName_t CF_PathName_t;
+typedef EdsDataType_BASE_TYPES_FileName_t CF_FileName_t;
 
 #endif

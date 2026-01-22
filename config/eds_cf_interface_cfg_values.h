@@ -19,17 +19,23 @@
 
 /**
  * @file
- *   Specification for the CFS CFDP (CF) table structures
+ *   CFS CFDP (CF) Application Public Definitions
  *
- * @note
- *   Constants and enumerated types related to these table structures
- *   are defined in cf_tbldefs.h.
+ * This provides default values for configurable items that affect
+ * the interface(s) of this module.  This includes the CMD/TLM message
+ * interface, tables definitions, and any other data products that
+ * serve to exchange information with other entities.
+ *
+ * @note This file may be overridden/superceded by mission-provided defintions
+ * either by overriding this header or by generating definitions from a command/data
+ * dictionary tool.
  */
-#ifndef DEFAULT_CF_TBL_H
-#define DEFAULT_CF_TBL_H
 
-#include "cf_mission_cfg.h"
-#include "cf_tbldefs.h"
-#include "cf_tblstruct.h"
+#ifndef EDS_CF_INTERFACE_CFG_VALUES_H
+#define EDS_CF_INTERFACE_CFG_VALUES_H
+
+#include "cf_eds_designparameters.h"
+
+#define CF_INTERFACE_CFGVAL(x) EdsParam_CF_##x
 
 #endif

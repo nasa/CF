@@ -28,8 +28,8 @@
  *   STRUCTURE DEFINITIONS IN THIS FILE!
  *   ADD THEM TO cf_tbl.h IF NEEDED!
  */
-#ifndef CF_TBLDEFS_H
-#define CF_TBLDEFS_H
+#ifndef DEFAULT_CF_TBLDEFS_H
+#define DEFAULT_CF_TBLDEFS_H
 
 #include "cf_mission_cfg.h"
 #include "cf_extern_typedefs.h"

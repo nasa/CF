@@ -19,17 +19,13 @@
 
 /**
  * @file
- *   Specification for the CFS CFDP (CF) table structures
- *
- * @note
- *   Constants and enumerated types related to these table structures
- *   are defined in cf_tbldefs.h.
+ *   CFDP (CF) Application Topic IDs
  */
-#ifndef DEFAULT_CF_TBL_H
-#define DEFAULT_CF_TBL_H
+#ifndef EDS_CF_TOPICID_VALUES_H
+#define EDS_CF_TOPICID_VALUES_H
 
-#include "cf_mission_cfg.h"
-#include "cf_tbldefs.h"
-#include "cf_tblstruct.h"
+#include "cfe_mission_eds_designparameters.h"
+
+#define CFE_MISSION_CF_TIDVAL(x) EdsParam_CFE_MISSION_CF_##x##_TOPICID
 
 #endif

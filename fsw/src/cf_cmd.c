@@ -28,7 +28,7 @@
 
 #include "cf_app.h"
 #include "cf_verify.h"
-#include "cf_events.h"
+#include "cf_eventids.h"
 #include "cf_perfids.h"
 #include "cf_utils.h"
 #include "cf_version.h"

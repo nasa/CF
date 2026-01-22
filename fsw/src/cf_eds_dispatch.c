@@ -1,5 +1,5 @@
 #include "cf_app.h"
-#include "cf_events.h"
+#include "cf_eventids.h"
 #include "cf_dispatch.h"
 #include "cf_cmd.h"
 
@@ -8,7 +8,7 @@
 
 #include "cfe_msg.h"
 
-static const EdsDispatchTable_CF_Application_CFE_SB_Telecommand_t CF_TC_DISPATCH_TABLE = {
+static const EdsDispatchTable_EdsComponent_CF_Application_CFE_SB_Telecommand_t CF_TC_DISPATCH_TABLE = {
     .CMD =
         {
 
@@ -48,7 +48,7 @@ void CF_AppPipe(const CFE_SB_Buffer_t *BufPtr)
     CFE_MSG_Size_t    MsgSize;
     CFE_MSG_FcnCode_t MsgFc;
 
-    status = EdsDispatch_CF_Application_Telecommand(BufPtr, &CF_TC_DISPATCH_TABLE);
+    status = EdsDispatch_EdsComponent_CF_Application_Telecommand(BufPtr, &CF_TC_DISPATCH_TABLE);
 
     if (status != CFE_SUCCESS)
     {

@@ -23,7 +23,7 @@
 #include "cf_eds_dispatcher.h"
 #include "cf_cmd.h"
 #include "cf_msgids.h"
-#include "cf_events.h"
+#include "cf_eventids.h"
 
 /* UT includes */
 #include "uttest.h"
@@ -54,7 +54,7 @@ void Test_CF_AppPipe(void)
      */
     CFE_SB_Buffer_t UtBuf;
 
-    UT_SetDeferredRetcode(UT_KEY(CFE_MSG_EdsDispatch), 1, CFE_SUCCESS);
+    UT_SetDeferredRetcode(UT_KEY(CFE_EDSMSG_Dispatch), 1, CFE_SUCCESS);
 
     memset(&UtBuf, 0, sizeof(UtBuf));
     UtAssert_VOIDCALL(CF_AppPipe(&UtBuf));

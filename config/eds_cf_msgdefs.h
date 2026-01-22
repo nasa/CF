@@ -19,17 +19,13 @@
 
 /**
  * @file
- *   Specification for the CFS CFDP (CF) table structures
- *
- * @note
- *   Constants and enumerated types related to these table structures
- *   are defined in cf_tbldefs.h.
+ *   Specification for the CFS CFDP (CF) command and telemetry
+ *   message constant definitions.
  */
-#ifndef DEFAULT_CF_TBL_H
-#define DEFAULT_CF_TBL_H
+#ifndef EDS_CF_MSGDEFS_H
+#define EDS_CF_MSGDEFS_H
 
-#include "cf_mission_cfg.h"
-#include "cf_tbldefs.h"
-#include "cf_tblstruct.h"
+#include "cf_eds_typedefs.h"
+#include "cf_fcncodes.h"
 
 #endif

@@ -26,8 +26,8 @@
  *   Constants and enumerated types related to these message structures
  *   are defined in cf_msgdefs.h.
  */
-#ifndef CF_MSGSTRUCT_H
-#define CF_MSGSTRUCT_H
+#ifndef DEFAULT_CF_MSGSTRUCT_H
+#define DEFAULT_CF_MSGSTRUCT_H
 
 /************************************************************************
  * Includes

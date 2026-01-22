@@ -22,7 +22,7 @@
 #include "cf_test_alt_handler.h"
 #include "cf_cfdp.h"
 #include "cf_app.h"
-#include "cf_events.h"
+#include "cf_eventids.h"
 
 #include "cf_cfdp_r.h"
 #include "cf_cfdp_s.h"
