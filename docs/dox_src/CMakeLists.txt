@@ -10,7 +10,6 @@
 # case of a self-contained/standalone build) or by a separate script
 # (useful if integrating into a larger project with a separate doc build)
 
-cmake_minimum_required(VERSION 3.5)
 project(CF_DOCS NONE)
 
 # generate the configuration files

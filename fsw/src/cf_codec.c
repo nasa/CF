@@ -26,7 +26,7 @@
 #include "cf_app.h"
 #include "cf_cfdp_pdu.h"
 #include "cf_codec.h"
-#include "cf_events.h"
+#include "cf_eventids.h"
 
 #include <stdint.h>
 

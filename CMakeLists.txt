@@ -18,7 +18,7 @@ set(APP_SRC_FILES
   fsw/src/cf_utils.c
 )
 
-if (CFE_EDS_ENABLED_BUILD)
+if (CFE_EDS_ENABLED)
   list(APPEND APP_SRC_FILES fsw/src/cf_eds_dispatch.c)
 else()
   list(APPEND APP_SRC_FILES fsw/src/cf_dispatch.c)

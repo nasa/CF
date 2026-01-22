@@ -29,8 +29,8 @@
  * either by overriding this header or by generating definitions from a command/data
  * dictionary tool.
  */
-#ifndef CF_MISSION_CFG_H
-#define CF_MISSION_CFG_H
+#ifndef DEFAULT_CF_MISSION_CFG_H
+#define DEFAULT_CF_MISSION_CFG_H
 
 #include "cf_interface_cfg.h"
 

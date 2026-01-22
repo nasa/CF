@@ -19,17 +19,18 @@
 
 /**
  * @file
- *   Specification for the CFS CFDP (CF) table structures
+ *   Specification for the CFS CFDP (CF) Command and Telemetry packet definition file.
  *
  * @note
- *   Constants and enumerated types related to these table structures
- *   are defined in cf_tbldefs.h.
+ *   Constants and enumerated types related to these message structures
+ *   are defined in cf_msgdefs.h.
  */
-#ifndef DEFAULT_CF_TBL_H
-#define DEFAULT_CF_TBL_H
+#ifndef EDS_CF_MSGSTRUCT_H
+#define EDS_CF_MSGSTRUCT_H
 
-#include "cf_mission_cfg.h"
-#include "cf_tbldefs.h"
-#include "cf_tblstruct.h"
+/************************************************************************
+ * Includes
+ ************************************************************************/
+#include "cf_eds_typedefs.h"
 
 #endif

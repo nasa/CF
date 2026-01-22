@@ -19,17 +19,22 @@
 
 /**
  * @file
- *   Specification for the CFS CFDP (CF) table structures
+ *   Specification for the CFS CFDP (CF) command function codes
  *
  * @note
- *   Constants and enumerated types related to these table structures
- *   are defined in cf_tbldefs.h.
+ *   This file should be strictly limited to the command/function code (CC)
+ *   macro definitions.  Other definitions such as enums, typedefs, or other
+ *   macros should be placed in the msgdefs.h or msg.h files.
  */
-#ifndef DEFAULT_CF_TBL_H
-#define DEFAULT_CF_TBL_H
+#ifndef EDS_CF_FCNCODES_H
+#define EDS_CF_FCNCODES_H
 
-#include "cf_mission_cfg.h"
-#include "cf_tbldefs.h"
-#include "cf_tblstruct.h"
+#include "cf_eds_cc.h"
+
+/************************************************************************
+ * Macro Definitions
+ ************************************************************************/
+
+#define CF_CCVAL(x) EDS_CONTAINER_CF_##x##_CC
 
 #endif

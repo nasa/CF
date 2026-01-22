@@ -22,7 +22,7 @@
 #include "cf_dispatch.h"
 #include "cf_cmd.h"
 #include "cf_msgids.h"
-#include "cf_events.h"
+#include "cf_eventids.h"
 
 /* UT includes */
 #include "uttest.h"

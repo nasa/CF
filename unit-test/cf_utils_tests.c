@@ -21,7 +21,7 @@
 #include "cf_test_utils.h"
 #include "cf_test_alt_handler.h"
 #include "cf_utils.h"
-#include "cf_events.h"
+#include "cf_eventids.h"
 
 /* A value that may be passed to stubs accepting osal_id_t values */
 #define UT_CF_OS_OBJID OS_ObjectIdFromInteger(1)

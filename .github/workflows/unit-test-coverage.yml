@@ -2,7 +2,15 @@ name: Unit Test and Coverage
 
 on:
   push:
+    branches:
+      - dev
+      - main
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  workflow_dispatch:
 
 jobs:
   unit-test-coverage:

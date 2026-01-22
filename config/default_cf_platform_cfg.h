@@ -33,11 +33,49 @@
  * either by overriding this header or by generating definitions from a command/data
  * dictionary tool.
  */
-#ifndef CF_PLATFORM_CFG_H
-#define CF_PLATFORM_CFG_H
+#ifndef DEFAULT_CF_PLATFORM_CFG_H
+#define DEFAULT_CF_PLATFORM_CFG_H
 
 #include "cf_mission_cfg.h"
 #include "cf_internal_cfg.h"
+
+/**
+ *  @brief RX chunks per transaction (per channel)
+ *
+ *  @par Description:
+ *       Number of chunks per transaction per channel (RX).
+ *
+ * CHUNKS -
+ * A chunk is a representation of a range (offset, size) of data received by a receiver.
+ *
+ * Class 2 CFDP deals with NAK, so received data must be tracked for receivers in order to generate
+ * the NAK. The sender must also keep track of NAK requests and send new file data PDUs as a result.
+ * (array size must be CF_NUM_CHANNELS)
+ * CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION is an array for each channel indicating the number of chunks per transaction
+ * CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION is an array for each channel indicating the number of chunks to keep track
+ * of NAK requests from the receiver per transaction
+ *
+ *  @par Limits:
+ *
+ */
+#define CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION \
+    {                                            \
+        CF_NAK_MAX_SEGMENTS, CF_NAK_MAX_SEGMENTS \
+    }
+
+/**
+ *  @brief TX chunks per transaction (per channel)
+ *
+ *  @par Description:
+ *       Number of chunks per transaction per channel (TX).
+ *
+ *  @par Limits:
+ *
+ */
+#define CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION \
+    {                                            \
+        CF_NAK_MAX_SEGMENTS, CF_NAK_MAX_SEGMENTS \
+    }
 
 /**
  *  @brief Total number of chunks (tx, rx, all channels)

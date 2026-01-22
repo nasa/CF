@@ -33,7 +33,7 @@
 #include "cfe.h"
 #include "cf_verify.h"
 #include "cf_app.h"
-#include "cf_events.h"
+#include "cf_eventids.h"
 #include "cf_perfids.h"
 #include "cf_cfdp.h"
 #include "cf_utils.h"
@@ -1433,7 +1433,7 @@ void CF_CFDP_TickTransactions(CF_Channel_t *chan)
             default:
                 /* Do nothing */
                 targs.fn = NULL;
-                q_id     = -1;
+                q_id     = 0;
                 break;
         }
 

@@ -19,12 +19,7 @@
 
 /**
  * @file
- *   CFS CFDP (CF) Application Public Definitions
- *
- * This provides default values for configurable items that affect
- * the interface(s) of this module.  This includes the CMD/TLM message
- * interface, tables definitions, and any other data products that
- * serve to exchange information with other entities.
+ *   CFS CFDP (CF) Application Mission Configuration Header File
  *
  * @note This file may be overridden/superceded by mission-provided defintions
  * either by overriding this header or by generating definitions from a command/data
@@ -35,6 +30,7 @@
 
 #include "common_types.h"
 #include "cfe_mission_cfg.h"
+#include "cf_interface_cfg_values.h"
 
 /**
  * \defgroup cfscfplatformcfg CFS CFDP Platform Configuration
@@ -51,7 +47,8 @@
  *  @par Limits:
  *       Must be less <= 200. Obviously it will be smaller than that.
  */
-#define CF_NUM_CHANNELS (2)
+#define CF_NUM_CHANNELS         CF_INTERFACE_CFGVAL(NUM_CHANNELS)
+#define DEFAULT_CF_NUM_CHANNELS 2
 
 /**
  *  @brief Max NAK segments supported in a NAK PDU
@@ -64,7 +61,8 @@
  *  @par Limits:
  *
  */
-#define CF_NAK_MAX_SEGMENTS (58)
+#define CF_NAK_MAX_SEGMENTS         CF_INTERFACE_CFGVAL(NAK_MAX_SEGMENTS)
+#define DEFAULT_CF_NAK_MAX_SEGMENTS 58
 
 /**
  *  @brief Max number of polling directories per channel.
@@ -76,7 +74,8 @@
  *  @par Limits:
  *
  */
-#define CF_MAX_POLLING_DIR_PER_CHAN (5)
+#define CF_MAX_POLLING_DIR_PER_CHAN         CF_INTERFACE_CFGVAL(MAX_POLLING_DIR_PER_CHAN)
+#define DEFAULT_CF_MAX_POLLING_DIR_PER_CHAN 5
 
 /**
  *  @brief Max PDU size.
@@ -97,7 +96,8 @@
  *       CCSDS packet size limits on the system.
  *
  */
-#define CF_MAX_PDU_SIZE (512)
+#define CF_MAX_PDU_SIZE         CF_INTERFACE_CFGVAL(MAX_PDU_SIZE)
+#define DEFAULT_CF_MAX_PDU_SIZE 512
 
 /**
  *  @brief Maximum file name length.
@@ -105,15 +105,17 @@
  *  @par Limits:
  *
  */
-#define CF_FILENAME_MAX_NAME CFE_MISSION_MAX_FILE_LEN
+#define CF_FILENAME_MAX_NAME         CF_INTERFACE_CFGVAL(FILENAME_MAX_NAME)
+#define DEFAULT_CF_FILENAME_MAX_NAME CFE_MISSION_MAX_FILE_LEN
 
 /**
  *  @brief Max filename and path length.
  *
- *  @par Limits:
+ *  @par Limits:    
  *
  */
-#define CF_FILENAME_MAX_LEN CFE_MISSION_MAX_PATH_LEN
+#define CF_FILENAME_MAX_LEN         CF_INTERFACE_CFGVAL(FILENAME_MAX_LEN)
+#define DEFAULT_CF_FILENAME_MAX_LEN CFE_MISSION_MAX_PATH_LEN
 
 /**
  * @brief Number of trailing bytes to add to CFDP PDU
@@ -135,7 +137,8 @@
  *       Maximum value is the difference between the maximum size of a CFDP PDU and the
  *       maximum size of an SB message.
  */
-#define CF_PDU_ENCAPSULATION_EXTRA_TRAILING_BYTES 0
+#define CF_PDU_ENCAPSULATION_EXTRA_TRAILING_BYTES         CF_INTERFACE_CFGVAL(PDU_ENCAPSULATION_EXTRA_TRAILING_BYTES)
+#define DEFAULT_CF_PDU_ENCAPSULATION_EXTRA_TRAILING_BYTES 0
 
 /**\}*/
 

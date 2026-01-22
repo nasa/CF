@@ -29,10 +29,10 @@
  * either by overriding this header or by generating definitions from a command/data
  * dictionary tool.
  */
-#ifndef CF_MSG_H
-#define CF_MSG_H
+#ifndef DEFAULT_CF_MSG_H
+#define DEFAULT_CF_MSG_H
 
-#include "cf_interface_cfg.h"
+#include "cf_mission_cfg.h"
 #include "cf_fcncodes.h"
 #include "cf_msgdefs.h"
 #include "cf_msgstruct.h"

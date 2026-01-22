@@ -238,13 +238,12 @@
 
      <EnumeratedDataType name="QueueIdx" ShortDescription="Identifies the entry type in a filesystem monitor report">
           <EnumerationList>
-            <Enumeration label="PEND" value="0" shortDescription="first one on this list is active" />
-            <Enumeration label="TXA" value="1" />
-            <Enumeration label="TXW" value="2" />
-            <Enumeration label="RX" value="3" />
-            <Enumeration label="HIST" value="4" />
-            <Enumeration label="HIST_FREE" value="5" />
-            <Enumeration label="FREE" value="6" />
+            <Enumeration label="PEND" value="0" />
+            <Enumeration label="TX" value="1" />
+            <Enumeration label="RX" value="2" />
+            <Enumeration label="HIST" value="3" />
+            <Enumeration label="HIST_FREE" value="4" />
+            <Enumeration label="FREE" value="5" />
           </EnumerationList>
        <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
      </EnumeratedDataType>
@@ -1227,6 +1226,11 @@
     <ComponentSet>
       <Component name="Application">
         <RequiredInterfaceSet>
+          <Interface name="config_table" shortDescription="configuration table" type="CFE_TBL/Table">
+            <GenericTypeMapSet>
+              <GenericTypeMap name="TableDataType" type="ConfigTable" />
+            </GenericTypeMapSet>
+          </Interface>
           <Interface name="CMD" shortDescription="Software bus telecommand interface" type="CFE_SB/Telecommand">
             <GenericTypeMapSet>
               <GenericTypeMap name="TelecommandDataType" type="CMD" />

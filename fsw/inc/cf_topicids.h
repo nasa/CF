@@ -24,17 +24,27 @@
 #ifndef CF_TOPICIDS_H
 #define CF_TOPICIDS_H
 
+#include "cf_topicid_values.h"
 
 /*
  * The following topic IDs are for the software bus control interface
  * These are for the normal CF app commands and telemtry
  */
 
-#define CFE_MISSION_CF_CMD_TOPICID     0xB3 /**< \brief Message ID for commands */
-#define CFE_MISSION_CF_SEND_HK_TOPICID 0xB4 /**< \brief Message ID to request housekeeping telemetry */
-#define CFE_MISSION_CF_WAKE_UP_TOPICID 0xB5 /**< \brief Message ID for waking up the processing cycle */
-#define CFE_MISSION_CF_HK_TLM_TOPICID  0xB0 /**< \brief Message ID for housekeeping telemetry */
-#define CFE_MISSION_CF_EOT_TLM_TOPICID 0xB3 /**< \brief Message ID for end of transaction telemetry */
+#define CFE_MISSION_CF_CMD_TOPICID             CFE_MISSION_CF_TIDVAL(CMD)
+#define DEFAULT_CFE_MISSION_CF_CMD_TOPICID     0xB3 /**< \brief Message ID for commands */
+
+#define CFE_MISSION_CF_SEND_HK_TOPICID         CFE_MISSION_CF_TIDVAL(SEND_HK)
+#define DEFAULT_CFE_MISSION_CF_SEND_HK_TOPICID 0xB4 /**< \brief Message ID to request housekeeping telemetry */
+
+#define CFE_MISSION_CF_WAKE_UP_TOPICID         CFE_MISSION_CF_TIDVAL(WAKE_UP)
+#define DEFAULT_CFE_MISSION_CF_WAKE_UP_TOPICID 0xB5 /**< \brief Message ID for waking up the processing cycle */
+
+#define CFE_MISSION_CF_HK_TLM_TOPICID          CFE_MISSION_CF_TIDVAL(HK_TLM)
+#define DEFAULT_CFE_MISSION_CF_HK_TLM_TOPICID  0xB0 /**< \brief Message ID for housekeeping telemetry */
+
+#define CFE_MISSION_CF_EOT_TLM_TOPICID         CFE_MISSION_CF_TIDVAL(EOT_TLM)
+#define DEFAULT_CFE_MISSION_CF_EOT_TLM_TOPICID 0xB3 /**< \brief Message ID for end of transaction telemetry */
 
 /*
  * The following topic IDs are for the data interface (PDUs)
@@ -45,9 +55,16 @@
  * just plain data in both directions, but they are encapsulated into a
  * CMD or TLM message to be sent across the software bus.
  */
-#define CFE_MISSION_CF_CH0_TX_TOPICID 0xB4
-#define CFE_MISSION_CF_CH1_TX_TOPICID 0xB5
-#define CFE_MISSION_CF_CH0_RX_TOPICID 0xB6
-#define CFE_MISSION_CF_CH1_RX_TOPICID 0xB7
+#define CFE_MISSION_CF_CH0_TX_TOPICID         CFE_MISSION_CF_TIDVAL(CH0_TX)
+#define DEFAULT_CFE_MISSION_CF_CH0_TX_TOPICID 0xB4
+
+#define CFE_MISSION_CF_CH1_TX_TOPICID         CFE_MISSION_CF_TIDVAL(CH1_TX)
+#define DEFAULT_CFE_MISSION_CF_CH1_TX_TOPICID 0xB5
+
+#define CFE_MISSION_CF_CH0_RX_TOPICID         CFE_MISSION_CF_TIDVAL(CH0_RX)
+#define DEFAULT_CFE_MISSION_CF_CH0_RX_TOPICID 0xB6
+
+#define CFE_MISSION_CF_CH1_RX_TOPICID         CFE_MISSION_CF_TIDVAL(CH1_RX)
+#define DEFAULT_CFE_MISSION_CF_CH1_RX_TOPICID 0xB7
 
 #endif

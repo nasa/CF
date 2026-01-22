@@ -20,10 +20,10 @@
 /**
  * @file
  *   Specification for the CFS CFDP (CF) command and telemetry
- *   message payload content definitions.
+ *   message payload and constant definitions.
  */
-#ifndef CF_MSGDEFS_H
-#define CF_MSGDEFS_H
+#ifndef DEFAULT_CF_MSGDEFS_H
+#define DEFAULT_CF_MSGDEFS_H
 
 #include "common_types.h"
 #include "cf_extern_typedefs.h"

@@ -19,7 +19,7 @@
 
 /* cf testing includes */
 #include "cf_test_utils.h"
-#include "cf_events.h"
+#include "cf_eventids.h"
 #include "cf_dispatch.h"
 #include "cf_app.h"
 #include "cf_cmd.h"
@@ -80,6 +80,9 @@ void Test_CF_CheckTables_DoNotReleaseAddressBecauseEngineIsEnabled(void)
 
 void Test_CF_CheckTables_CallTo_CFE_TBL_ReleaseAddress_ReturnsNot_CFE_SUCCESS_SendEvent(void)
 {
+    void *TablePtr = NULL;
+
+    UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_ReleaseAddress), CFE_STATUS_EXTERNAL_RESOURCE_FAIL);
 
     /* Act */
@@ -92,6 +95,9 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_ReleaseAddress_ReturnsNot_CFE_SUCCESS_Se
 
 void Test_CF_CheckTables_CallTo_CFE_TBL_Manage_ReturnsNot_CFE_SUCCESS_SendEvent(void)
 {
+    void *TablePtr = NULL;
+
+    UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_Manage), CFE_STATUS_EXTERNAL_RESOURCE_FAIL);
 
     /* Act */
@@ -119,6 +125,10 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_ReturnsNot_CFE_SUCCESS_Or_CFE
 
 void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS(void)
 {
+    void *TablePtr = NULL;
+
+    UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
+
     /* Act */
     CF_CheckTables();
 
@@ -131,6 +141,9 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS(void)
 
 void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED(void)
 {
+    void *TablePtr = NULL;
+
+    UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_GetAddress), CFE_TBL_INFO_UPDATED);
 
     /* Act */
@@ -324,6 +337,10 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess(void)
 
 void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_SUCCESS_SuccessAndDoNotSendEvent(void)
 {
+    void *TablePtr = NULL;
+
+    UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
+
     /* Act */
     UtAssert_INT32_EQ(CF_TableInit(), CFE_SUCCESS);
 
@@ -333,6 +350,9 @@ void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_SUCCESS_SuccessAndDoN
 
 void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED_SuccessAndDoNotSendEvent(void)
 {
+    void *TablePtr = NULL;
+
+    UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
     /* Arrange */
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_GetAddress), CFE_TBL_INFO_UPDATED);
 
@@ -424,8 +444,10 @@ void Test_CF_AppInit_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatu
 void Test_CF_AppInit_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus(void)
 {
     /* Arrange */
-    int32 result = -1;
+    int32 result   = -1;
+    void *TablePtr = NULL;
 
+    UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_InitEngine), result);
 
     /* Act */
@@ -441,6 +463,10 @@ void Test_CF_AppInit_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErro
 
 void Test_CF_AppInit_Success(void)
 {
+    void *TablePtr = NULL;
+
+    UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
+
     /* Act */
     UtAssert_INT32_EQ(CF_AppInit(), CFE_SUCCESS);
 
@@ -476,6 +502,7 @@ void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
 {
     CFE_SB_Buffer_t  sbbuf;
     CFE_SB_Buffer_t *sbbufptr;
+    void *           TablePtr = NULL;
 
     memset(&sbbuf, 0, sizeof(sbbuf));
 
@@ -492,6 +519,7 @@ void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
     UT_CF_ResetEventCapture();
     UT_SetDataBuffer(UT_KEY(CFE_SB_ReceiveBuffer), &sbbufptr, sizeof(sbbufptr), false);
     UT_SetDeferredRetcode(UT_KEY(CFE_ES_RunLoop), 1, true);
+    UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
 
     UtAssert_VOIDCALL(CF_AppMain());
 
@@ -509,6 +537,7 @@ void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
     UT_SetDeferredRetcode(UT_KEY(CFE_ES_RunLoop), 1, true);
     UT_SetDeferredRetcode(UT_KEY(CFE_SB_ReceiveBuffer), 1, CFE_SB_TIME_OUT);
     UT_SetDeferredRetcode(UT_KEY(CFE_SB_ReceiveBuffer), 1, CFE_SB_NO_MESSAGE);
+    UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
 
     UtAssert_VOIDCALL(CF_AppMain());
 
@@ -523,7 +552,10 @@ void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndV
     /* Arrange */
     CFE_SB_MsgId_t   forced_MsgID = CFE_SB_INVALID_MSG_ID;
     CFE_SB_Buffer_t  fake_msg;
-    CFE_SB_Buffer_t *BufPtr = &fake_msg;
+    CFE_SB_Buffer_t *BufPtr   = &fake_msg;
+    void *           TablePtr = NULL;
+
+    UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
 
     UT_SetDeferredRetcode(UT_KEY(CFE_ES_RunLoop), 1, true);
     UT_SetDefaultReturnValue(UT_KEY(CFE_ES_RunLoop), false);
