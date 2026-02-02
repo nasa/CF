@@ -52,7 +52,8 @@ void CF_App_Tests_Teardown(void)
  * not provide this ability
  * see https://github.com/nasa/cFE/issues/1617 (closed as wontfix label)
  */
-void UT_UpdatedDefaultHandler_CFE_SB_ReceiveBuffer(void *UserObj, UT_EntryKey_t FuncKey,
+void UT_UpdatedDefaultHandler_CFE_SB_ReceiveBuffer(void                   *UserObj,
+                                                   UT_EntryKey_t           FuncKey,
                                                    const UT_StubContext_t *Context)
 {
     CFE_SB_Buffer_t **BufPtr = UT_Hook_GetArgValueByName(Context, "BufPtr", CFE_SB_Buffer_t **);
@@ -171,11 +172,11 @@ CF_ConfigTable_t table;
 void cf_config_table_tests_set_table_to_nominal(void)
 {
     /* all values for table.ticks_per_second nominal except 0 */
-    table.ticks_per_second = Any_uint32_Except(0);
+    table.ticks_per_second             = Any_uint32_Except(0);
     /* all values (except 0) & 3ff == 0 are nominal (1024 byte aligned) */
     table.rx_crc_calc_bytes_per_wakeup = Any_uint32_Except(0) << 10;
     /* all values less than sizeof(CF_CFDP_PduFileDataContent_t) are nominal */
-    table.outgoing_file_chunk_size = Any_uint16_LessThan(sizeof(CF_CFDP_PduFileDataContent_t));
+    table.outgoing_file_chunk_size     = Any_uint16_LessThan(sizeof(CF_CFDP_PduFileDataContent_t));
 }
 
 void Setup_cf_config_table_tests(void)
@@ -225,9 +226,9 @@ void Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIsNot1024ByteAlign
 
     arg_table->ticks_per_second = 1;
     arg_table->rx_crc_calc_bytes_per_wakeup =
-        (Any_uint32() << 10) +
-        (Any_uint32_LessThan_or_EqualTo(0x3FE) +
-         1); /* Any_uint32_LessThan_or_EqualTo(0x3FE) + 1 is 0x001 to 0x3FF, forcing no 1024 byte alignment */
+        (Any_uint32() << 10)
+        + (Any_uint32_LessThan_or_EqualTo(0x3FE)
+           + 1); /* Any_uint32_LessThan_or_EqualTo(0x3FE) + 1 is 0x001 to 0x3FF, forcing no 1024 byte alignment */
 
     /* Act */
     result = CF_ValidateConfigTable(arg_table);
@@ -502,7 +503,7 @@ void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
 {
     CFE_SB_Buffer_t  sbbuf;
     CFE_SB_Buffer_t *sbbufptr;
-    void *           TablePtr = NULL;
+    void            *TablePtr = NULL;
 
     memset(&sbbuf, 0, sizeof(sbbuf));
 
@@ -553,7 +554,7 @@ void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndV
     CFE_SB_MsgId_t   forced_MsgID = CFE_SB_INVALID_MSG_ID;
     CFE_SB_Buffer_t  fake_msg;
     CFE_SB_Buffer_t *BufPtr   = &fake_msg;
-    void *           TablePtr = NULL;
+    void            *TablePtr = NULL;
 
     UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
 
@@ -585,54 +586,82 @@ void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndV
 
 void add_CF_CheckTables_tests(void)
 {
-    UtTest_Add(Test_CF_CheckTables_DoNotReleaseAddressBecauseEngineIsEnabled, Setup_cf_config_table_tests,
-               CF_App_Tests_Teardown, "Test_CF_CheckTables_DoNotReleaseAddressBecauseEngineIsEnabled");
+    UtTest_Add(Test_CF_CheckTables_DoNotReleaseAddressBecauseEngineIsEnabled,
+               Setup_cf_config_table_tests,
+               CF_App_Tests_Teardown,
+               "Test_CF_CheckTables_DoNotReleaseAddressBecauseEngineIsEnabled");
     UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_ReleaseAddress_ReturnsNot_CFE_SUCCESS_SendEvent,
-               Setup_cf_config_table_tests, CF_App_Tests_Teardown,
+               Setup_cf_config_table_tests,
+               CF_App_Tests_Teardown,
                "Test_CF_CheckTables_CallTo_CFE_TBL_ReleaseAddress_ReturnsNot_CFE_SUCCESS_SendEvent");
-    UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_Manage_ReturnsNot_CFE_SUCCESS_SendEvent, Setup_cf_config_table_tests,
-               CF_App_Tests_Teardown, "Test_CF_CheckTables_CallTo_CFE_TBL_Manage_ReturnsNot_CFE_SUCCESS_SendEvent");
+    UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_Manage_ReturnsNot_CFE_SUCCESS_SendEvent,
+               Setup_cf_config_table_tests,
+               CF_App_Tests_Teardown,
+               "Test_CF_CheckTables_CallTo_CFE_TBL_Manage_ReturnsNot_CFE_SUCCESS_SendEvent");
     UtTest_Add(
         Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_ReturnsNot_CFE_SUCCESS_Or_CFE_TBL_INFO_UPDATED_SendEvent,
-        Setup_cf_config_table_tests, CF_App_Tests_Teardown,
+        Setup_cf_config_table_tests,
+        CF_App_Tests_Teardown,
         "Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_ReturnsNot_CFE_SUCCESS_Or_CFE_TBL_INFO_UPDATED_SendEvent");
-    UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS, Setup_cf_config_table_tests,
-               CF_App_Tests_Teardown, "Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS");
-    UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED, Setup_cf_config_table_tests,
-               CF_App_Tests_Teardown, "Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED");
+    UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS,
+               Setup_cf_config_table_tests,
+               CF_App_Tests_Teardown,
+               "Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS");
+    UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED,
+               Setup_cf_config_table_tests,
+               CF_App_Tests_Teardown,
+               "Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED");
 }
 
 void add_CF_ValidateConfigTable_tests(void)
 {
-    UtTest_Add(Test_CF_ValidateConfigTable_FailBecauseTableTicksPerSecondIs0, Setup_cf_config_table_tests,
-               CF_App_Tests_Teardown, "Test_CF_ValidateConfigTable_FailBecauseTableTicksPerSecondIs0");
-    UtTest_Add(Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0, Setup_cf_config_table_tests,
-               CF_App_Tests_Teardown, "Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0");
+    UtTest_Add(Test_CF_ValidateConfigTable_FailBecauseTableTicksPerSecondIs0,
+               Setup_cf_config_table_tests,
+               CF_App_Tests_Teardown,
+               "Test_CF_ValidateConfigTable_FailBecauseTableTicksPerSecondIs0");
+    UtTest_Add(Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0,
+               Setup_cf_config_table_tests,
+               CF_App_Tests_Teardown,
+               "Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIs0");
     UtTest_Add(Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIsNot1024ByteAligned,
-               Setup_cf_config_table_tests, CF_App_Tests_Teardown,
+               Setup_cf_config_table_tests,
+               CF_App_Tests_Teardown,
                "Test_CF_ValidateConfigTable_FailBecauseCalcBytesPerWakeupIsNot1024ByteAligned");
     UtTest_Add(Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArray,
-               Setup_cf_config_table_tests, CF_App_Tests_Teardown,
+               Setup_cf_config_table_tests,
+               CF_App_Tests_Teardown,
                "Test_CF_ValidateConfigTable_FailBecauseOutgoingFileChunkSmallerThanDataArray");
-    UtTest_Add(Test_CF_ValidateConfigTable_Success, Setup_cf_config_table_tests, CF_App_Tests_Teardown,
+    UtTest_Add(Test_CF_ValidateConfigTable_Success,
+               Setup_cf_config_table_tests,
+               CF_App_Tests_Teardown,
                "Test_CF_ValidateConfigTable_Success");
 }
 
 void add_CF_TableInit_tests(void)
 {
-    UtTest_Add(Test_CF_TableInit_FailBecause_CFE_TBL_Register_DidNotReturnSuccess, cf_app_tests_Setup,
-               CF_App_Tests_Teardown, "Test_CF_TableInit_FailBecause_CFE_TBL_Register_DidNotReturnSuccess");
-    UtTest_Add(Test_CF_TableInit_FailBecause_CFE_TBL_Load_DidNotReturnSuccess, cf_app_tests_Setup,
-               CF_App_Tests_Teardown, "Test_CF_TableInit_FailBecause_CFE_TBL_Load_DidNotReturnSuccess");
-    UtTest_Add(Test_CF_TableInit_FailBecause_CFE_TBL_Manage_DidNotReturnSuccess, cf_app_tests_Setup,
-               CF_App_Tests_Teardown, "Test_CF_TableInit_FailBecause_CFE_TBL_Manage_DidNotReturnSuccess");
-    UtTest_Add(Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess, cf_app_tests_Setup,
-               CF_App_Tests_Teardown, "Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess");
+    UtTest_Add(Test_CF_TableInit_FailBecause_CFE_TBL_Register_DidNotReturnSuccess,
+               cf_app_tests_Setup,
+               CF_App_Tests_Teardown,
+               "Test_CF_TableInit_FailBecause_CFE_TBL_Register_DidNotReturnSuccess");
+    UtTest_Add(Test_CF_TableInit_FailBecause_CFE_TBL_Load_DidNotReturnSuccess,
+               cf_app_tests_Setup,
+               CF_App_Tests_Teardown,
+               "Test_CF_TableInit_FailBecause_CFE_TBL_Load_DidNotReturnSuccess");
+    UtTest_Add(Test_CF_TableInit_FailBecause_CFE_TBL_Manage_DidNotReturnSuccess,
+               cf_app_tests_Setup,
+               CF_App_Tests_Teardown,
+               "Test_CF_TableInit_FailBecause_CFE_TBL_Manage_DidNotReturnSuccess");
+    UtTest_Add(Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess,
+               cf_app_tests_Setup,
+               CF_App_Tests_Teardown,
+               "Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess");
     UtTest_Add(Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_SUCCESS_SuccessAndDoNotSendEvent,
-               cf_app_tests_Setup, CF_App_Tests_Teardown,
+               cf_app_tests_Setup,
+               CF_App_Tests_Teardown,
                "Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_SUCCESS_SuccessAndDoNotSendEvent");
     UtTest_Add(Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED_SuccessAndDoNotSendEvent,
-               cf_app_tests_Setup, CF_App_Tests_Teardown,
+               cf_app_tests_Setup,
+               CF_App_Tests_Teardown,
                "Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED_SuccessAndDoNotSendEvent");
 }
 
@@ -640,19 +669,25 @@ void add_CF_AppInit_tests(void)
 {
     UtTest_Add(
         Test_CF_AppInit_CallTo_CFE_EVS_Register_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus,
-        cf_app_tests_Setup, CF_App_Tests_Teardown,
+        cf_app_tests_Setup,
+        CF_App_Tests_Teardown,
         "Test_CF_AppInit_CallTo_CFE_EVS_Register_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus");
     UtTest_Add(Test_CF_AppInit_CallTo_CFE_SB_CreatePipe_ReturnsNot_CFE_SUCCESS_Return_Pipe_Creation_Error_EID,
-               cf_app_tests_Setup, CF_App_Tests_Teardown,
+               cf_app_tests_Setup,
+               CF_App_Tests_Teardown,
                "Test_CF_AppInit_CallTo_CFE_SB_CreatePipe_ReturnsNot_CFE_SUCCESS_Return_Pipe_Creation_Error_EID");
     UtTest_Add(
         Test_CF_AppInit_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_ReturnErrorStatus,
-        cf_app_tests_Setup, CF_App_Tests_Teardown,
+        cf_app_tests_Setup,
+        CF_App_Tests_Teardown,
         "Test_CF_AppInit_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_WriteToSysLog_"
         "ReturnErrorStatus");
-    UtTest_Add(Test_CF_AppInit_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus, cf_app_tests_Setup,
-               CF_App_Tests_Teardown, "Test_CF_AppInit_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus");
-    UtTest_Add(Test_CF_AppInit_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus, cf_app_tests_Setup,
+    UtTest_Add(Test_CF_AppInit_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus,
+               cf_app_tests_Setup,
+               CF_App_Tests_Teardown,
+               "Test_CF_AppInit_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus");
+    UtTest_Add(Test_CF_AppInit_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus,
+               cf_app_tests_Setup,
                CF_App_Tests_Teardown,
                "Test_CF_AppInit_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus");
     UtTest_Add(Test_CF_AppInit_Success, cf_app_tests_Setup, CF_App_Tests_Teardown, "Test_CF_AppInit_Success");
@@ -662,13 +697,17 @@ void add_CF_AppMain_tests(void)
 {
     UtTest_Add(
         Test_CF_AppMain_CallTo_CF_AppInit_DoNotReturn_CFE_SUCCESS_Set_CF_AppData_RunStatus_To_CFE_ES_RunStatus_APP_ERROR,
-        cf_app_tests_Setup, CF_App_Tests_Teardown,
+        cf_app_tests_Setup,
+        CF_App_Tests_Teardown,
         "Test_CF_AppMain_CallTo_CF_AppInit_DoNotReturn_CFE_SUCCESS_Set_CF_AppData_RunStatus_To_CFE_ES_RunStatus_APP_"
         "ERROR");
-    UtTest_Add(Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases, cf_app_tests_Setup, CF_App_Tests_Teardown,
+    UtTest_Add(Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases,
+               cf_app_tests_Setup,
+               CF_App_Tests_Teardown,
                "Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases");
     UtTest_Add(Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndValid_msg_Call_CF_AppPipe,
-               cf_app_tests_Setup, CF_App_Tests_Teardown,
+               cf_app_tests_Setup,
+               CF_App_Tests_Teardown,
                "Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndValid_msg_Call_CF_AppPipe");
 }
 

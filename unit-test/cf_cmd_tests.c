@@ -93,7 +93,7 @@ CF_TransactionSeq_t Any_CF_TransactionSeq_t(void)
 typedef struct
 {
     CF_Transaction_t *txn;
-    void *            context;
+    void             *context;
 } CF_TsnChanAction_fn_t_context_t;
 
 CF_ChanAction_Status_t Chan_action_fn_t(uint8 chan_num, void *context)
@@ -265,9 +265,11 @@ void Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_fault_ResetAllHkFaultCount
         UtAssert_ZERO(CF_AppData.hk.Payload.channel_hk[i].counters.fault.nak_limit);
         UtAssert_ZERO(CF_AppData.hk.Payload.channel_hk[i].counters.fault.ack_limit);
         UtAssert_ZERO(CF_AppData.hk.Payload.channel_hk[i].counters.fault.inactivity_timer);
-        UtAssert_MemCmpValue(&CF_AppData.hk.Payload.channel_hk[i].counters.fault, 0,
+        UtAssert_MemCmpValue(&CF_AppData.hk.Payload.channel_hk[i].counters.fault,
+                             0,
                              sizeof(&CF_AppData.hk.Payload.channel_hk[i].counters.fault),
-                             "fault channel %d was completely cleared to 0", i);
+                             "fault channel %d was completely cleared to 0",
+                             i);
     }
     /* Assert to show counter incremented */
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -312,9 +314,11 @@ void Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_up_AndResetAllHkRecvCountS
         UtAssert_ZERO(CF_AppData.hk.Payload.channel_hk[i].counters.recv.spurious);
         UtAssert_ZERO(CF_AppData.hk.Payload.channel_hk[i].counters.recv.pdu);
         UtAssert_ZERO(CF_AppData.hk.Payload.channel_hk[i].counters.recv.nak_segment_requests);
-        UtAssert_MemCmpValue(&CF_AppData.hk.Payload.channel_hk[i].counters.recv, 0,
+        UtAssert_MemCmpValue(&CF_AppData.hk.Payload.channel_hk[i].counters.recv,
+                             0,
                              sizeof(&CF_AppData.hk.Payload.channel_hk[i].counters.recv),
-                             "recv channel %d was completely cleared to 0", i);
+                             "recv channel %d was completely cleared to 0",
+                             i);
     }
     /* Assert to show counter incremented */
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -353,9 +357,11 @@ void Test_CF_ResetCountersCmd_tests_SWhenCommandByteIs_down_AndResetAllHkSentCou
         UtAssert_ZERO(CF_AppData.hk.Payload.channel_hk[i].counters.sent.file_data_bytes);
         UtAssert_ZERO(CF_AppData.hk.Payload.channel_hk[i].counters.sent.nak_segment_requests);
         UtAssert_ZERO(CF_AppData.hk.Payload.channel_hk[i].counters.sent.pdu);
-        UtAssert_MemCmpValue(&CF_AppData.hk.Payload.channel_hk[i].counters.sent, 0,
+        UtAssert_MemCmpValue(&CF_AppData.hk.Payload.channel_hk[i].counters.sent,
+                             0,
                              sizeof(&CF_AppData.hk.Payload.channel_hk[i].counters.sent),
-                             "sent channel %d was completely cleared to 0", i);
+                             "sent channel %d was completely cleared to 0",
+                             i);
     }
     /* Assert to show counter incremented */
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -418,21 +424,27 @@ void Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_all_AndResetAllMemValuesSe
     UtAssert_ZERO(CF_AppData.hk.Payload.counters.err);
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
-        UtAssert_MemCmpValue(&CF_AppData.hk.Payload.channel_hk[i].counters.fault, 0,
+        UtAssert_MemCmpValue(&CF_AppData.hk.Payload.channel_hk[i].counters.fault,
+                             0,
                              sizeof(&CF_AppData.hk.Payload.channel_hk[i].counters.fault),
-                             "fault channel %d was completely cleared to 0", i);
+                             "fault channel %d was completely cleared to 0",
+                             i);
     }
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
-        UtAssert_MemCmpValue(&CF_AppData.hk.Payload.channel_hk[i].counters.recv, 0,
+        UtAssert_MemCmpValue(&CF_AppData.hk.Payload.channel_hk[i].counters.recv,
+                             0,
                              sizeof(&CF_AppData.hk.Payload.channel_hk[i].counters.recv),
-                             "recv channel %d was completely cleared to 0", i);
+                             "recv channel %d was completely cleared to 0",
+                             i);
     }
     for (i = 0; i < CF_NUM_CHANNELS; ++i)
     {
-        UtAssert_MemCmpValue(&CF_AppData.hk.Payload.channel_hk[i].counters.sent, 0,
+        UtAssert_MemCmpValue(&CF_AppData.hk.Payload.channel_hk[i].counters.sent,
+                             0,
                              sizeof(&CF_AppData.hk.Payload.channel_hk[i].counters.sent),
-                             "sent channel %d was completely cleared to 0", i);
+                             "sent channel %d was completely cleared to 0",
+                             i);
     }
 }
 
@@ -585,10 +597,10 @@ void Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1(void)
     /* Arrange */
     CF_UnionArgs_Payload_t  utbuf;
     CF_UnionArgs_Payload_t *data       = &utbuf;
-    const char *            arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    const char             *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
     CF_ChanActionFn_t       arg_fn     = &Chan_action_fn_t;
     int                     context;
-    void *                  arg_context    = &context;
+    void                   *arg_context    = &context;
     uint8                   random_fn_call = Any_uint8_LessThan(CF_NUM_CHANNELS) + 1;
     CF_ChanAction_Status_t  local_result;
 
@@ -615,10 +627,10 @@ void Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAll_fn_return_1_Return_1(void)
     /* Arrange */
     CF_UnionArgs_Payload_t  utbuf;
     CF_UnionArgs_Payload_t *data       = &utbuf;
-    const char *            arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    const char             *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
     CF_ChanActionFn_t       arg_fn     = &Chan_action_fn_t;
     int                     context;
-    void *                  arg_context = &context;
+    void                   *arg_context = &context;
     CF_ChanAction_Status_t  local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -644,10 +656,10 @@ void Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0(void)
     /* Arrange */
     CF_UnionArgs_Payload_t  utbuf;
     CF_UnionArgs_Payload_t *data       = &utbuf;
-    const char *            arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    const char             *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
     CF_ChanActionFn_t       arg_fn     = &Chan_action_fn_t;
     int                     context;
-    void *                  arg_context = &context;
+    void                   *arg_context = &context;
     CF_ChanAction_Status_t  local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -673,10 +685,10 @@ void Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_1_Return_1(void)
     /* Arrange */
     CF_UnionArgs_Payload_t  utbuf;
     CF_UnionArgs_Payload_t *data       = &utbuf;
-    const char *            arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    const char             *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
     CF_ChanActionFn_t       arg_fn     = &Chan_action_fn_t;
     int                     context;
-    void *                  arg_context = &context;
+    void                   *arg_context = &context;
     CF_ChanAction_Status_t  local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -702,10 +714,10 @@ void Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_0_Return_1(void)
     /* Arrange */
     CF_UnionArgs_Payload_t  utbuf;
     CF_UnionArgs_Payload_t *data       = &utbuf;
-    const char *            arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    const char             *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
     CF_ChanActionFn_t       arg_fn     = &Chan_action_fn_t;
     int                     context;
-    void *                  arg_context = &context;
+    void                   *arg_context = &context;
     CF_ChanAction_Status_t  local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -731,10 +743,10 @@ void Test_CF_DoChanAction_WhenChanNumberEq_CF_NUM_CHANNELS_Return_neg1_And_SendE
     /* Arrange */
     CF_UnionArgs_Payload_t  utbuf;
     CF_UnionArgs_Payload_t *data       = &utbuf;
-    const char *            arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    const char             *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
     CF_ChanActionFn_t       arg_fn     = &Chan_action_fn_t;
     int                     context;
-    void *                  arg_context = &context;
+    void                   *arg_context = &context;
     CF_ChanAction_Status_t  local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -760,10 +772,10 @@ void Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent(void)
     /* Arrange */
     CF_UnionArgs_Payload_t  utbuf;
     CF_UnionArgs_Payload_t *data       = &utbuf;
-    const char *            arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
+    const char             *arg_errstr = "CANNOT TEST SENT TO SEND EVENT";
     CF_ChanActionFn_t       arg_fn     = &Chan_action_fn_t;
     int                     context;
-    void *                  arg_context = &context;
+    void                   *arg_context = &context;
     CF_ChanAction_Status_t  local_result;
     int                     catastrophe_count = 0;
 
@@ -775,7 +787,9 @@ void Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent(void)
     {
         if (catastrophe_count == 10) /* 10 is arbitrary */
         {
-            UtAssert_Message(UTASSERT_CASETYPE_ABORT, __FILE__, __LINE__,
+            UtAssert_Message(UTASSERT_CASETYPE_ABORT,
+                             __FILE__,
+                             __LINE__,
                              "CANNOT make data->byte[0] != CF_ALL_CHANNELS in 10 tries");
         }
 
@@ -822,7 +836,8 @@ void Test_CF_DoFreezeThaw_Set_frozen_ToGiven_context_barg_AndReturn_0(void)
     /* Assert */
     UtAssert_True(CF_AppData.hk.Payload.channel_hk[arg_chan_num].frozen == context.barg,
                   "CF_DoFreezeThaw set frozen to %d and should be %d (context->barg))",
-                  CF_AppData.hk.Payload.channel_hk[arg_chan_num].frozen, context.barg);
+                  CF_AppData.hk.Payload.channel_hk[arg_chan_num].frozen,
+                  context.barg);
     UtAssert_INT32_EQ(local_result, CF_ChanAction_Status_SUCCESS);
 }
 
@@ -859,7 +874,8 @@ void Test_CF_FreezeCmd_Set_frozen_To_1_AndAcceptCommand(void)
                   CF_AppData.hk.Payload.channel_hk[chan_num].frozen);
     UtAssert_True(CF_AppData.hk.Payload.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
                   "CF_AppData.hk.Payload.counters.cmd is %d and should be 1 more than %d",
-                  CF_AppData.hk.Payload.counters.cmd, initial_hk_cmd_counter);
+                  CF_AppData.hk.Payload.counters.cmd,
+                  initial_hk_cmd_counter);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_CMD_FREEZE_INF_EID);
 }
@@ -920,7 +936,8 @@ void Test_CF_ThawCmd_Set_frozen_To_0_AndAcceptCommand(void)
                   CF_AppData.hk.Payload.channel_hk[chan_num].frozen);
     UtAssert_True(CF_AppData.hk.Payload.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
                   "CF_AppData.hk.Payload.counters.cmd is %d and should be 1 more than %d",
-                  CF_AppData.hk.Payload.counters.cmd, initial_hk_cmd_counter);
+                  CF_AppData.hk.Payload.counters.cmd,
+                  initial_hk_cmd_counter);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_CMD_THAW_INF_EID);
 }
@@ -959,14 +976,16 @@ void Test_CF_FindTransactionBySequenceNumberAllChannels_WhenNoTransactionFoundRe
     /* Arrange */
     CF_TransactionSeq_t arg_ts  = Any_CF_TransactionSeq_t();
     CF_EntityId_t       arg_eid = Any_CF_EntityId_t();
-    CF_Transaction_t *  local_result;
-    CF_Transaction_t *  expected_result = NULL;
+    CF_Transaction_t   *local_result;
+    CF_Transaction_t   *expected_result = NULL;
 
     CF_FindTransactionBySequenceNumber_context_t context_CF_CFDP_FTBSN;
 
     context_CF_CFDP_FTBSN.forced_return = NULL;
 
-    UT_SetDataBuffer(UT_KEY(CF_FindTransactionBySequenceNumber), &context_CF_CFDP_FTBSN, sizeof(context_CF_CFDP_FTBSN),
+    UT_SetDataBuffer(UT_KEY(CF_FindTransactionBySequenceNumber),
+                     &context_CF_CFDP_FTBSN,
+                     sizeof(context_CF_CFDP_FTBSN),
                      false);
 
     /* Act */
@@ -989,8 +1008,8 @@ void Test_CF_FindTransactionBySequenceNumberAllChannels_Return_TransactionFound(
     CF_EntityId_t       arg_eid                  = Any_CF_EntityId_t();
     uint8               number_transaction_match = Any_uint8_LessThan(CF_NUM_CHANNELS);
     CF_Transaction_t    return_value;
-    CF_Transaction_t *  local_result;
-    CF_Transaction_t *  expected_result = &return_value;
+    CF_Transaction_t   *local_result;
+    CF_Transaction_t   *expected_result = &return_value;
     int                 i               = 0;
 
     CF_FindTransactionBySequenceNumber_context_t contexts_CF_CFDP_FTBSN[CF_NUM_CHANNELS];
@@ -1003,8 +1022,10 @@ void Test_CF_FindTransactionBySequenceNumberAllChannels_Return_TransactionFound(
     /* set matching transaction */
     contexts_CF_CFDP_FTBSN[i].forced_return = &return_value;
 
-    UT_SetDataBuffer(UT_KEY(CF_FindTransactionBySequenceNumber), &contexts_CF_CFDP_FTBSN,
-                     sizeof(contexts_CF_CFDP_FTBSN), false);
+    UT_SetDataBuffer(UT_KEY(CF_FindTransactionBySequenceNumber),
+                     &contexts_CF_CFDP_FTBSN,
+                     sizeof(contexts_CF_CFDP_FTBSN),
+                     false);
 
     /* Act */
     local_result = CF_FindTransactionBySequenceNumberAllChannels(arg_ts, arg_eid);
@@ -1040,7 +1061,7 @@ void Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionNotF
     const char                arg_cmdstr[10]; /* 10 is arbitrary */
     CF_TsnChanAction_fn_t     arg_fn = &Dummy_CF_TsnChanAction_fn_t;
     int                       context;
-    void *                    arg_context = &context;
+    void                     *arg_context = &context;
     int                       i           = 0;
 
     CF_FindTransactionBySequenceNumber_context_t contexts_CF_CFDP_FTBSN[CF_NUM_CHANNELS];
@@ -1058,8 +1079,10 @@ void Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionNotF
         contexts_CF_CFDP_FTBSN[i].forced_return = NULL;
     }
 
-    UT_SetDataBuffer(UT_KEY(CF_FindTransactionBySequenceNumber), &contexts_CF_CFDP_FTBSN,
-                     sizeof(contexts_CF_CFDP_FTBSN), false);
+    UT_SetDataBuffer(UT_KEY(CF_FindTransactionBySequenceNumber),
+                     &contexts_CF_CFDP_FTBSN,
+                     sizeof(contexts_CF_CFDP_FTBSN),
+                     false);
 
     /* Act */
     UtAssert_INT32_EQ(CF_TsnChanAction(arg_cmd, arg_cmdstr, arg_fn, arg_context), -1);
@@ -1077,12 +1100,12 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionFoundRun_fn_An
 {
     /* Arrange */
     CF_Transaction_Payload_t        utbuf;
-    CF_Transaction_Payload_t *      arg_cmd = &utbuf;
+    CF_Transaction_Payload_t       *arg_cmd = &utbuf;
     char                            cmdstr[10];     /* 10 is arbitrary */
     const char                      arg_cmdstr[10]; /* 10 is arbitrary */
     CF_TsnChanAction_fn_t           arg_fn = &Dummy_CF_TsnChanAction_fn_t;
     int                             context;
-    void *                          arg_context = &context;
+    void                           *arg_context = &context;
     CF_Transaction_t                txn;
     CF_TsnChanAction_fn_t_context_t context_CF_TsnChanAction_fn_t;
 
@@ -1092,8 +1115,10 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionFoundRun_fn_An
 
     arg_cmd->chan = CF_COMPOUND_KEY;
 
-    UT_SetDataBuffer(UT_KEY(Dummy_CF_TsnChanAction_fn_t), &context_CF_TsnChanAction_fn_t,
-                     sizeof(context_CF_TsnChanAction_fn_t), false);
+    UT_SetDataBuffer(UT_KEY(Dummy_CF_TsnChanAction_fn_t),
+                     &context_CF_TsnChanAction_fn_t,
+                     sizeof(context_CF_TsnChanAction_fn_t),
+                     false);
 
     /* Arrange unstubbable: CF_FindTransactionBySequenceNumberAllChannels */
     CF_FindTransactionBySequenceNumber_context_t context_CF_CFDP_FTBSN;
@@ -1101,7 +1126,9 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionFoundRun_fn_An
     /* set matching transaction */
     context_CF_CFDP_FTBSN.forced_return = &txn;
 
-    UT_SetDataBuffer(UT_KEY(CF_FindTransactionBySequenceNumber), &context_CF_CFDP_FTBSN, sizeof(context_CF_CFDP_FTBSN),
+    UT_SetDataBuffer(UT_KEY(CF_FindTransactionBySequenceNumber),
+                     &context_CF_CFDP_FTBSN,
+                     sizeof(context_CF_CFDP_FTBSN),
                      false);
 
     /* Act */
@@ -1120,12 +1147,12 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_CF_ALL_CHANNELS_Return_CF_TraverseAllTran
 {
     /* Arrange */
     CF_Transaction_Payload_t                          utbuf;
-    CF_Transaction_Payload_t *                        arg_cmd = &utbuf;
+    CF_Transaction_Payload_t                         *arg_cmd = &utbuf;
     char                                              cmdstr[10];     /* 10 is arbitrary */
     const char                                        arg_cmdstr[10]; /* 10 is arbitrary */
     CF_TsnChanAction_fn_t                             arg_fn = &Dummy_CF_TsnChanAction_fn_t;
     int                                               context;
-    void *                                            arg_context     = &context;
+    void                                             *arg_context     = &context;
     int                                               expected_result = Any_int();
     CF_TraverseAllTransactions_All_Channels_context_t context_CF_TATAC;
 
@@ -1137,7 +1164,9 @@ void Test_CF_TsnChanAction_cmd_chan_Eq_CF_ALL_CHANNELS_Return_CF_TraverseAllTran
 
     arg_cmd->chan = CF_ALL_CHANNELS;
 
-    UT_SetDataBuffer(UT_KEY(CF_TraverseAllTransactions_All_Channels), &context_CF_TATAC, sizeof(context_CF_TATAC),
+    UT_SetDataBuffer(UT_KEY(CF_TraverseAllTransactions_All_Channels),
+                     &context_CF_TATAC,
+                     sizeof(context_CF_TATAC),
                      false);
 
     /* Act */
@@ -1173,7 +1202,7 @@ void Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid(void)
     const char                arg_cmdstr[1] = "";
     CF_TsnChanAction_fn_t     arg_fn        = &Dummy_CF_TsnChanAction_fn_t;
     int                       context;
-    void *                    arg_context = &context;
+    void                     *arg_context = &context;
 
     memset(&utbuf, 0, sizeof(utbuf));
     arg_cmd->chan = Any_uint8_BetweenExcludeMax(CF_NUM_CHANNELS, CF_COMPOUND_KEY);
@@ -1196,7 +1225,7 @@ void Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action(void)
 {
     /* Arrange */
     CF_Transaction_t            txn;
-    CF_Transaction_t *          arg_t = &txn;
+    CF_Transaction_t           *arg_t = &txn;
     CF_ChanAction_SuspResArg_t  context;
     CF_ChanAction_SuspResArg_t *arg_context = &context;
 
@@ -1211,7 +1240,8 @@ void Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action(void)
     CF_DoSuspRes_Txn(arg_t, arg_context);
 
     /* Assert */
-    UtAssert_True(arg_context->same == 1, "CF_DoSuspRes_Txn set context->same to %d and should be 1 (direct set)",
+    UtAssert_True(arg_context->same == 1,
+                  "CF_DoSuspRes_Txn set context->same to %d and should be 1 (direct set)",
                   arg_context->same);
 }
 
@@ -1219,7 +1249,7 @@ void Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action
 {
     /* Arrange */
     CF_Transaction_t            txn;
-    CF_Transaction_t *          arg_t = &txn;
+    CF_Transaction_t           *arg_t = &txn;
     CF_ChanAction_SuspResArg_t  context;
     CF_ChanAction_SuspResArg_t *arg_context = &context;
 
@@ -1236,7 +1266,8 @@ void Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action
     /* Assert */
     UtAssert_True(arg_t->flags.com.suspended == arg_context->action,
                   "CF_DoSuspRes_Txn set arg_t->flags.com.suspended to %d and should be %d (context->action)",
-                  arg_t->flags.com.suspended, arg_context->action);
+                  arg_t->flags.com.suspended,
+                  arg_context->action);
 }
 
 /*******************************************************************************
@@ -1245,7 +1276,8 @@ void Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action
 **
 *******************************************************************************/
 
-static void UT_AltHandler_CF_TraverseAllTransactions_SetSuspResArg(void *UserObj, UT_EntryKey_t FuncKey,
+static void UT_AltHandler_CF_TraverseAllTransactions_SetSuspResArg(void                   *UserObj,
+                                                                   UT_EntryKey_t           FuncKey,
                                                                    const UT_StubContext_t *Context)
 {
     CF_ChanAction_SuspResArg_t *context = UT_Hook_GetArgValueByName(Context, "context", CF_ChanAction_SuspResArg_t *);
@@ -1266,7 +1298,7 @@ void Test_CF_DoSuspRes(void)
      */
 
     CF_Transaction_Payload_t   utbuf;
-    CF_Transaction_Payload_t * cmd = &utbuf;
+    CF_Transaction_Payload_t  *cmd = &utbuf;
     CF_ChanAction_SuspResArg_t utargs;
 
     memset(&CF_AppData.hk.Payload.counters, 0, sizeof(CF_AppData.hk.Payload.counters));
@@ -1292,7 +1324,8 @@ void Test_CF_DoSuspRes(void)
     UT_CF_ResetEventCapture();
     UT_SetDeferredRetcode(UT_KEY(CF_TraverseAllTransactions), 1, 1);
     utargs.same = 1;
-    UT_SetHandlerFunction(UT_KEY(CF_TraverseAllTransactions), UT_AltHandler_CF_TraverseAllTransactions_SetSuspResArg,
+    UT_SetHandlerFunction(UT_KEY(CF_TraverseAllTransactions),
+                          UT_AltHandler_CF_TraverseAllTransactions_SetSuspResArg,
                           &utargs);
     UtAssert_VOIDCALL(CF_DoSuspRes(cmd, 0));
     UT_CF_AssertEventID(CF_CMD_SUSPRES_SAME_INF_EID);
@@ -1377,11 +1410,13 @@ void Test_CF_Cancel_TxnCmd_Call_CF_CFDP_CancelTransaction_WithGiven_t(void)
     /* Arrange */
     CF_Transaction_t  txn;
     CF_Transaction_t *arg_t       = &txn;
-    void *            arg_ignored = NULL;
+    void             *arg_ignored = NULL;
     CF_Transaction_t *context_CF_CFDP_CancelTransaction;
 
-    UT_SetDataBuffer(UT_KEY(CF_CFDP_CancelTransaction), &context_CF_CFDP_CancelTransaction,
-                     sizeof(context_CF_CFDP_CancelTransaction), false);
+    UT_SetDataBuffer(UT_KEY(CF_CFDP_CancelTransaction),
+                     &context_CF_CFDP_CancelTransaction,
+                     sizeof(context_CF_CFDP_CancelTransaction),
+                     false);
 
     /* Act */
     CF_Cancel_TxnCmd(arg_t, arg_ignored);
@@ -1444,7 +1479,7 @@ void Test_CF_Abandon_TxnCmd_Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0(void
     /* Arrange */
     CF_Transaction_t  txn;
     CF_Transaction_t *arg_t       = &txn;
-    void *            arg_ignored = NULL;
+    void             *arg_ignored = NULL;
 
     /* Act */
     CF_Abandon_TxnCmd(arg_t, arg_ignored);
@@ -1520,8 +1555,10 @@ void Test_CF_DoEnableDisableDequeue_Set_chan_num_EnabledFlagTo_context_barg(void
 
     /* Assert */
     UtAssert_True(CF_AppData.config_table->chan[arg_chan_num].dequeue_enabled == context.barg,
-                  "Channel %u dequeue_enabled is %u and should be %u (context->barg)", arg_chan_num,
-                  CF_AppData.config_table->chan[arg_chan_num].dequeue_enabled, context.barg);
+                  "Channel %u dequeue_enabled is %u and should be %u (context->barg)",
+                  arg_chan_num,
+                  CF_AppData.config_table->chan[arg_chan_num].dequeue_enabled,
+                  context.barg);
 }
 
 /*******************************************************************************
@@ -1565,7 +1602,8 @@ void Test_CF_EnableDequeueCmd_Success(void)
         CF_AppData.hk.Payload.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
         "CF_AppData.hk.Payload.counters.cmd is %d and should be 1 more than %d\nACCEPTANCE OF COMMAND (+1) SHOULD BE "
         "THE BEHAVIOR BUT IT IS NOT",
-        CF_AppData.hk.Payload.counters.cmd, initial_hk_cmd_counter);
+        CF_AppData.hk.Payload.counters.cmd,
+        initial_hk_cmd_counter);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_CMD_ENABLE_DEQUEUE_INF_EID);
 }
@@ -1637,7 +1675,8 @@ void Test_CF_DisableDequeueCmd_Success(void)
     /* Assert for incremented counter */
     UtAssert_True(CF_AppData.hk.Payload.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
                   "CF_AppData.hk.Payload.counters.cmd is %d and should be 1 more than %d",
-                  CF_AppData.hk.Payload.counters.cmd, initial_hk_cmd_counter);
+                  CF_AppData.hk.Payload.counters.cmd,
+                  initial_hk_cmd_counter);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_CMD_DISABLE_DEQUEUE_INF_EID);
 }
@@ -1681,7 +1720,7 @@ void Test_CF_DoEnableDisablePolldir_When_CF_ALL_CHANNELS_SetAllPolldirsInChannel
 {
     /* Arrange */
     CF_UnionArgs_Payload_t      utbuf;
-    CF_UnionArgs_Payload_t *    data = &utbuf;
+    CF_UnionArgs_Payload_t     *data = &utbuf;
     CF_ChanAction_BoolMsgArg_t  context;
     CF_ChanAction_BoolMsgArg_t *arg_context = &context;
     CF_ConfigTable_t            config_table;
@@ -1708,8 +1747,11 @@ void Test_CF_DoEnableDisablePolldir_When_CF_ALL_CHANNELS_SetAllPolldirsInChannel
     for (current_polldir = 0; current_polldir < CF_MAX_POLLING_DIR_PER_CHAN; ++current_polldir)
     {
         UtAssert_True(CF_AppData.config_table->chan[arg_chan_num].polldir[current_polldir].enabled == expected_enabled,
-                      "Channel %u Polldir %u set to %u and should be %u (context->barg)", arg_chan_num, current_polldir,
-                      CF_AppData.config_table->chan[arg_chan_num].polldir[current_polldir].enabled, expected_enabled);
+                      "Channel %u Polldir %u set to %u and should be %u (context->barg)",
+                      arg_chan_num,
+                      current_polldir,
+                      CF_AppData.config_table->chan[arg_chan_num].polldir[current_polldir].enabled,
+                      expected_enabled);
     }
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_INT32_EQ(local_result, CF_ChanAction_Status_SUCCESS);
@@ -1721,7 +1763,7 @@ void Test_CF_DoEnableDisablePolldir_WhenSetToSpecificPolldirSetPolldirFrom_conte
     uint8                       arg_chan_num = Any_cf_channel();
     uint8                       polldir      = Any_cf_polldir();
     CF_UnionArgs_Payload_t      utbuf;
-    CF_UnionArgs_Payload_t *    data = &utbuf;
+    CF_UnionArgs_Payload_t     *data = &utbuf;
     CF_ChanAction_BoolMsgArg_t  context;
     CF_ChanAction_BoolMsgArg_t *arg_context = &context;
     CF_ConfigTable_t            config_table;
@@ -1744,8 +1786,11 @@ void Test_CF_DoEnableDisablePolldir_WhenSetToSpecificPolldirSetPolldirFrom_conte
 
     /* Assert */
     UtAssert_True(CF_AppData.config_table->chan[arg_chan_num].polldir[polldir].enabled == expected_enabled,
-                  "Channel %u Polldir %u set to %u and should be %u (context->barg)", arg_chan_num, polldir,
-                  CF_AppData.config_table->chan[arg_chan_num].polldir[polldir].enabled, expected_enabled);
+                  "Channel %u Polldir %u set to %u and should be %u (context->barg)",
+                  arg_chan_num,
+                  polldir,
+                  CF_AppData.config_table->chan[arg_chan_num].polldir[polldir].enabled,
+                  expected_enabled);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     UtAssert_INT32_EQ(local_result, CF_ChanAction_Status_SUCCESS);
 }
@@ -1755,7 +1800,7 @@ void Test_CF_DoEnableDisablePolldir_FailPolldirEq_CF_MAX_POLLING_DIR_PER_CHAN_An
     /* Arrange */
     uint8                       arg_chan_num = Any_cf_channel();
     CF_UnionArgs_Payload_t      utbuf;
-    CF_UnionArgs_Payload_t *    data = &utbuf;
+    CF_UnionArgs_Payload_t     *data = &utbuf;
     CF_ChanAction_BoolMsgArg_t  context;
     CF_ChanAction_BoolMsgArg_t *arg_context = &context;
     CF_ConfigTable_t            config_table;
@@ -1784,7 +1829,7 @@ void Test_CF_DoEnableDisablePolldir_FailAnyBadPolldirSendEvent(void)
     /* Arrange */
     uint8                       arg_chan_num = Any_cf_channel();
     CF_UnionArgs_Payload_t      utbuf;
-    CF_UnionArgs_Payload_t *    data = &utbuf;
+    CF_UnionArgs_Payload_t     *data = &utbuf;
     CF_ChanAction_BoolMsgArg_t  context;
     CF_ChanAction_BoolMsgArg_t *arg_context = &context;
     CF_ConfigTable_t            config_table;
@@ -1845,12 +1890,15 @@ void Test_CF_EnablePolldirCmd_SuccessWhenActionSuccess(void)
     /* Assert */
     /* Assert for CF_DoEnableDisablePolldir */
     UtAssert_True(CF_AppData.config_table->chan[channel].polldir[polldir].enabled == 1,
-                  "Channel %u Polldir %u set to %u and should be 1 (context->barg)", channel, polldir,
+                  "Channel %u Polldir %u set to %u and should be 1 (context->barg)",
+                  channel,
+                  polldir,
                   CF_AppData.config_table->chan[channel].polldir[polldir].enabled);
     /* Assert for incremented counter */
     UtAssert_True(CF_AppData.hk.Payload.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
                   "CF_AppData.hk.Payload.counters.cmd is %d and should be 1 more than %d",
-                  CF_AppData.hk.Payload.counters.cmd, initial_hk_cmd_counter);
+                  CF_AppData.hk.Payload.counters.cmd,
+                  initial_hk_cmd_counter);
     UT_CF_AssertEventID(CF_CMD_ENABLE_POLLDIR_INF_EID);
 }
 
@@ -1861,7 +1909,7 @@ void Test_CF_EnablePolldirCmd_FailWhenActionFail(void)
     uint8 error_polldir = Any_uint8_BetweenInclusive(CF_MAX_POLLING_DIR_PER_CHAN, CF_ALL_CHANNELS - 1);
 
     CF_EnableDirPollingCmd_t utbuf;
-    CF_UnionArgs_Payload_t * data                   = &utbuf.Payload;
+    CF_UnionArgs_Payload_t  *data                   = &utbuf.Payload;
     uint16                   initial_hk_err_counter = Any_uint16();
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -1881,7 +1929,8 @@ void Test_CF_EnablePolldirCmd_FailWhenActionFail(void)
     /* Assert for incremented counter */
     UtAssert_True(CF_AppData.hk.Payload.counters.err == (uint16)(initial_hk_err_counter + 1),
                   "CF_AppData.hk.Payload.counters.err is %d and should be 1 more than %d",
-                  CF_AppData.hk.Payload.counters.err, initial_hk_err_counter);
+                  CF_AppData.hk.Payload.counters.err,
+                  initial_hk_err_counter);
     UT_CF_AssertEventID(CF_CMD_ENABLE_POLLDIR_ERR_EID);
 }
 
@@ -1899,7 +1948,7 @@ void Test_CF_DisablePolldirCmd_SuccessWhenActionSuccess(void)
     uint8            polldir = Any_cf_polldir();
 
     CF_DisableDirPollingCmd_t utbuf;
-    CF_UnionArgs_Payload_t *  data                   = &utbuf.Payload;
+    CF_UnionArgs_Payload_t   *data                   = &utbuf.Payload;
     uint16                    initial_hk_cmd_counter = Any_uint16();
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -1921,12 +1970,15 @@ void Test_CF_DisablePolldirCmd_SuccessWhenActionSuccess(void)
     /* Assert */
     /* Assert for CF_DoEnableDisablePolldir */
     UtAssert_True(CF_AppData.config_table->chan[channel].polldir[polldir].enabled == 0,
-                  "Channel %u Polldir %u set to %u and should be 0 (context->barg)", channel, polldir,
+                  "Channel %u Polldir %u set to %u and should be 0 (context->barg)",
+                  channel,
+                  polldir,
                   CF_AppData.config_table->chan[channel].polldir[polldir].enabled);
     /* Assert for incremented counter */
     UtAssert_True(CF_AppData.hk.Payload.counters.cmd == (uint16)(initial_hk_cmd_counter + 1),
                   "CF_AppData.hk.Payload.counters.cmd is %d and should be 1 more than %d",
-                  CF_AppData.hk.Payload.counters.cmd, initial_hk_cmd_counter);
+                  CF_AppData.hk.Payload.counters.cmd,
+                  initial_hk_cmd_counter);
     UT_CF_AssertEventID(CF_CMD_DISABLE_POLLDIR_INF_EID);
 }
 
@@ -1937,7 +1989,7 @@ void Test_CF_DisablePolldirCmd_FailWhenActionFail(void)
     uint8 error_polldir = Any_uint8_BetweenInclusive(CF_MAX_POLLING_DIR_PER_CHAN, CF_ALL_CHANNELS - 1);
 
     CF_DisableDirPollingCmd_t utbuf;
-    CF_UnionArgs_Payload_t *  data                   = &utbuf.Payload;
+    CF_UnionArgs_Payload_t   *data                   = &utbuf.Payload;
     uint16                    initial_hk_err_counter = Any_uint16();
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -1958,7 +2010,8 @@ void Test_CF_DisablePolldirCmd_FailWhenActionFail(void)
     /* Assert for incremented counter*/
     UtAssert_True(CF_AppData.hk.Payload.counters.err == (uint16)(initial_hk_err_counter + 1),
                   "CF_AppData.hk.Payload.counters.err is %d and should be 1 more than %d",
-                  CF_AppData.hk.Payload.counters.err, initial_hk_err_counter);
+                  CF_AppData.hk.Payload.counters.err,
+                  initial_hk_err_counter);
     UT_CF_AssertEventID(CF_CMD_DISABLE_POLLDIR_ERR_EID);
 }
 
@@ -1972,13 +2025,15 @@ void Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT(void)
 {
     /* Arrange */
     CF_History_t                   history;
-    CF_CListNode_t *               arg_n = &history.cl_node;
+    CF_CListNode_t                *arg_n = &history.cl_node;
     CF_Channel_t                   chan;
-    CF_Channel_t *                 arg_c = &chan;
+    CF_Channel_t                  *arg_c = &chan;
     CF_CListTraverse_Status_t      local_result;
     CF_CFDP_ResetHistory_context_t context_CF_CFDP_ResetHistory;
 
-    UT_SetDataBuffer(UT_KEY(CF_ResetHistory), &context_CF_CFDP_ResetHistory, sizeof(context_CF_CFDP_ResetHistory),
+    UT_SetDataBuffer(UT_KEY(CF_ResetHistory),
+                     &context_CF_CFDP_ResetHistory,
+                     sizeof(context_CF_CFDP_ResetHistory),
                      false);
 
     /* Act */
@@ -1987,8 +2042,10 @@ void Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT(void)
     /* Assert */
     UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetHistory.chan, arg_c);
     UtAssert_ADDRESS_EQ(context_CF_CFDP_ResetHistory.history, &history);
-    UtAssert_True(local_result == CF_CLIST_CONT, "CF_PurgeHistory returned %d and should be %d (CF_CLIST_CONT)",
-                  local_result, CF_CLIST_CONT);
+    UtAssert_True(local_result == CF_CLIST_CONT,
+                  "CF_PurgeHistory returned %d and should be %d (CF_CLIST_CONT)",
+                  local_result,
+                  CF_CLIST_CONT);
 }
 
 /*******************************************************************************
@@ -2001,9 +2058,9 @@ void Test_CF_PurgeTransaction_Call_CF_CFDP_ResetTransaction_AndReturn_CLIST_CONT
 {
     /* Arrange */
     CF_Transaction_t txn;
-    CF_CListNode_t * arg_n = &txn.cl_node;
+    CF_CListNode_t  *arg_n = &txn.cl_node;
     int              ignored;
-    void *           arg_ignored = &ignored;
+    void            *arg_ignored = &ignored;
 
     /* Act */
     UtAssert_INT32_EQ(CF_PurgeTransaction(arg_n, arg_ignored), CF_CLIST_CONT);
@@ -2023,18 +2080,19 @@ void Test_CF_DoPurgeQueue_PendOnly(void)
     /* Arrange */
     uint8                               arg_chan_num = Any_cf_channel();
     CF_UnionArgs_Payload_t              utbuf;
-    CF_UnionArgs_Payload_t *            data   = &utbuf;
-    CF_ChanAction_MsgArg_t              msgarg = {data};
-    CF_Channel_t *                      chan;
+    CF_UnionArgs_Payload_t             *data   = &utbuf;
+    CF_ChanAction_MsgArg_t              msgarg = { data };
+    CF_Channel_t                       *chan;
     CF_CListNode_t                      start;
-    CF_CListNode_t *                    expected_start = &start;
+    CF_CListNode_t                     *expected_start = &start;
     CF_ChanAction_Status_t              local_result;
     CF_CList_Traverse_POINTER_context_t context_CF_CList_Traverse;
 
     memset(&utbuf, 0, sizeof(utbuf));
 
     data->byte[1] = 0; /* pend */
-    UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_POINTER,
+    UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse),
+                          UT_AltHandler_CF_CList_Traverse_POINTER,
                           &context_CF_CList_Traverse);
 
     chan                       = &CF_AppData.engine.channels[arg_chan_num];
@@ -2059,11 +2117,11 @@ void Test_CF_DoPurgeQueue_HistoryOnly(void)
     /* Arrange */
     uint8                               arg_chan_num = Any_cf_channel();
     CF_UnionArgs_Payload_t              utbuf;
-    CF_UnionArgs_Payload_t *            data   = &utbuf;
-    CF_ChanAction_MsgArg_t              msgarg = {data};
-    CF_Channel_t *                      chan;
+    CF_UnionArgs_Payload_t             *data   = &utbuf;
+    CF_ChanAction_MsgArg_t              msgarg = { data };
+    CF_Channel_t                       *chan;
     CF_CListNode_t                      start;
-    CF_CListNode_t *                    expected_start = &start;
+    CF_CListNode_t                     *expected_start = &start;
     CF_ChanAction_Status_t              local_result;
     CF_CList_Traverse_POINTER_context_t context_CF_CList_Traverse;
 
@@ -2072,7 +2130,8 @@ void Test_CF_DoPurgeQueue_HistoryOnly(void)
     data->byte[1] = 1; /* history */
 
     /* set correct context type for CF_CList_Traverse stub */
-    UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_POINTER,
+    UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse),
+                          UT_AltHandler_CF_CList_Traverse_POINTER,
                           &context_CF_CList_Traverse);
 
     chan                       = &CF_AppData.engine.channels[arg_chan_num];
@@ -2097,13 +2156,13 @@ void Test_CF_DoPurgeQueue_Both(void)
     /* Arrange */
     uint8                               arg_chan_num = Any_cf_channel();
     CF_UnionArgs_Payload_t              utbuf;
-    CF_UnionArgs_Payload_t *            data   = &utbuf;
-    CF_ChanAction_MsgArg_t              msgarg = {data};
-    CF_Channel_t *                      chan;
+    CF_UnionArgs_Payload_t             *data   = &utbuf;
+    CF_ChanAction_MsgArg_t              msgarg = { data };
+    CF_Channel_t                       *chan;
     CF_CListNode_t                      pend_start;
-    CF_CListNode_t *                    expected_pend_start = &pend_start;
+    CF_CListNode_t                     *expected_pend_start = &pend_start;
     CF_CListNode_t                      history_start;
-    CF_CListNode_t *                    expected_history_start = &history_start;
+    CF_CListNode_t                     *expected_history_start = &history_start;
     CF_ChanAction_Status_t              local_result;
     CF_CList_Traverse_POINTER_context_t context_CF_CList_Traverse[2];
 
@@ -2144,7 +2203,7 @@ void Test_CF_DoPurgeQueue_GivenBad_data_byte_1_SendEventAndReturn_neg1(void)
     uint8                   arg_chan_num = Any_cf_channel();
     CF_UnionArgs_Payload_t  utbuf;
     CF_UnionArgs_Payload_t *data   = &utbuf;
-    CF_ChanAction_MsgArg_t  msgarg = {data};
+    CF_ChanAction_MsgArg_t  msgarg = { data };
     CF_ChanAction_Status_t  local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -2169,7 +2228,7 @@ void Test_CF_DoPurgeQueue_AnyGivenBad_data_byte_1_SendEventAndReturn_neg1(void)
     uint8                   arg_chan_num = Any_cf_channel();
     CF_UnionArgs_Payload_t  utbuf;
     CF_UnionArgs_Payload_t *data   = &utbuf;
-    CF_ChanAction_MsgArg_t  msgarg = {data};
+    CF_ChanAction_MsgArg_t  msgarg = { data };
     CF_ChanAction_Status_t  local_result;
 
     memset(&utbuf, 0, sizeof(utbuf));
@@ -2221,7 +2280,8 @@ void Test_CF_PurgeQueueCmd_FailWhenActionFail(void)
     /* Assert for incremented counter */
     UtAssert_True(CF_AppData.hk.Payload.counters.err == (uint16)(initial_hk_err_counter + 1),
                   "CF_AppData.hk.Payload.counters.err is %d and should be 1 more than %d",
-                  CF_AppData.hk.Payload.counters.err, initial_hk_err_counter);
+                  CF_AppData.hk.Payload.counters.err,
+                  initial_hk_err_counter);
     UT_CF_AssertEventID(CF_CMD_PURGE_QUEUE_ERR_EID);
 }
 
@@ -2339,7 +2399,7 @@ void Test_CF_WriteQueueCmd_When_CF_WrappedCreat_Fails_type_Is_type_up_And_queue_
 {
     /* Arrange */
     CF_WriteQueueCmd_t             utbuf;
-    CF_WriteQueue_Payload_t *      wq = &utbuf.Payload;
+    CF_WriteQueue_Payload_t       *wq = &utbuf.Payload;
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
     uint16                         initial_hk_err_counter = Any_uint16();
 
@@ -2357,7 +2417,9 @@ void Test_CF_WriteQueueCmd_When_CF_WrappedCreat_Fails_type_Is_type_up_And_queue_
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Negative();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     CF_AppData.hk.Payload.counters.err = initial_hk_err_counter;
@@ -2380,7 +2442,7 @@ void Test_CF_WriteQueueCmd_When_CF_WrappedCreat_Fails_type_IsNot_type_up_And_que
 {
     /* Arrange */
     CF_WriteQueueCmd_t             utbuf;
-    CF_WriteQueue_Payload_t *      wq = &utbuf.Payload;
+    CF_WriteQueue_Payload_t       *wq = &utbuf.Payload;
     CF_WrappedOpenCreate_context_t context_CF_WrappedOpenCreate;
     uint16                         initial_hk_err_counter = Any_uint16();
 
@@ -2398,7 +2460,9 @@ void Test_CF_WriteQueueCmd_When_CF_WrappedCreat_Fails_type_IsNot_type_up_And_que
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Negative();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     CF_AppData.hk.Payload.counters.err = initial_hk_err_counter;
@@ -2442,12 +2506,16 @@ void Test_CF_WriteQueueCmd_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedC
 
     context_CF_WrappedOpenCreate.forced_return = 0;
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* invalid result from CF_WriteTxnQueueDataToFile */
-    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile), &context_CF_WriteTxnQueueDataToFile,
-                     sizeof(context_CF_WriteTxnQueueDataToFile), false);
+    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile),
+                     &context_CF_WriteTxnQueueDataToFile,
+                     sizeof(context_CF_WriteTxnQueueDataToFile),
+                     false);
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     CF_AppData.hk.Payload.counters.err = initial_hk_err_counter;
@@ -2491,12 +2559,16 @@ void Test_CF_WriteQueueCmd_When_CF_WriteTxnQueueDataToFile_FailsAnd_wq_IsUpAnd_q
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* invalid result from CF_WriteTxnQueueDataToFile */
-    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile), &context_CF_WriteTxnQueueDataToFile,
-                     sizeof(context_CF_WriteTxnQueueDataToFile), false);
+    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile),
+                     &context_CF_WriteTxnQueueDataToFile,
+                     sizeof(context_CF_WriteTxnQueueDataToFile),
+                     false);
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     UT_SetDataBuffer(UT_KEY(CF_WrappedClose), &context_CF_WrappedClose_fd, sizeof(context_CF_WrappedClose_fd), false);
@@ -2542,12 +2614,16 @@ void Test_CF_WriteQueueCmd_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsUpA
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* invalid result from CF_WriteHistoryQueueDataToFile */
-    UT_SetDataBuffer(UT_KEY(CF_WriteHistoryQueueDataToFile), &context_CF_WriteHistoryQueueDataToFile,
-                     sizeof(context_CF_WriteHistoryQueueDataToFile), false);
+    UT_SetDataBuffer(UT_KEY(CF_WriteHistoryQueueDataToFile),
+                     &context_CF_WriteHistoryQueueDataToFile,
+                     sizeof(context_CF_WriteHistoryQueueDataToFile),
+                     false);
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteHistoryQueueDataToFile), forced_return_CF_WriteHistoryQueueDataToFile);
 
     UT_SetDataBuffer(UT_KEY(CF_WrappedClose), &context_CF_WrappedClose_fd, sizeof(context_CF_WrappedClose_fd), false);
@@ -2593,12 +2669,16 @@ void Test_CF_WriteQueueCmd_When_CF_WriteHistoryDataToFile_FailsOnFirstCallAnd_wq
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* invalid result from CF_WriteTxnQueueDataToFile */
-    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile), &context_CF_WriteTxnQueueDataToFile,
-                     sizeof(context_CF_WriteTxnQueueDataToFile), false);
+    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile),
+                     &context_CF_WriteTxnQueueDataToFile,
+                     sizeof(context_CF_WriteTxnQueueDataToFile),
+                     false);
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     UT_SetDataBuffer(UT_KEY(CF_WrappedClose), &context_CF_WrappedClose_fd, sizeof(context_CF_WrappedClose_fd), false);
@@ -2645,12 +2725,16 @@ void Test_CF_WriteQueueCmd_When_CF_WriteHistoryDataToFile_FailsOnSecondCallAnd_w
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* invalid result from CF_WriteTxnQueueDataToFile */
-    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile), &context_CF_WriteTxnQueueDataToFile,
-                     sizeof(context_CF_WriteTxnQueueDataToFile), false);
+    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile),
+                     &context_CF_WriteTxnQueueDataToFile,
+                     sizeof(context_CF_WriteTxnQueueDataToFile),
+                     false);
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile_1st_call);
     UT_SetDeferredRetcode(UT_KEY(CF_WriteTxnQueueDataToFile), 2, forced_return_CF_WriteTxnQueueDataToFile_2nd_call);
 
@@ -2697,12 +2781,16 @@ void Test_CF_WriteQueueCmd_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* invalid result from CF_WriteTxnQueueDataToFile */
-    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile), &context_CF_WriteTxnQueueDataToFile,
-                     sizeof(context_CF_WriteTxnQueueDataToFile), false);
+    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile),
+                     &context_CF_WriteTxnQueueDataToFile,
+                     sizeof(context_CF_WriteTxnQueueDataToFile),
+                     false);
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
 
     UT_SetDataBuffer(UT_KEY(CF_WrappedClose), &context_CF_WrappedClose_fd, sizeof(context_CF_WrappedClose_fd), false);
@@ -2748,12 +2836,16 @@ void Test_CF_WriteQueueCmd_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDow
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* invalid result from CF_WriteHistoryQueueDataToFile */
-    UT_SetDataBuffer(UT_KEY(CF_WriteHistoryQueueDataToFile), &context_CF_WriteHistoryQueueDataToFile,
-                     sizeof(context_CF_WriteHistoryQueueDataToFile), false);
+    UT_SetDataBuffer(UT_KEY(CF_WriteHistoryQueueDataToFile),
+                     &context_CF_WriteHistoryQueueDataToFile,
+                     sizeof(context_CF_WriteHistoryQueueDataToFile),
+                     false);
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteHistoryQueueDataToFile), forced_return_CF_WriteHistoryQueueDataToFile);
 
     UT_SetDataBuffer(UT_KEY(CF_WrappedClose), &context_CF_WrappedClose_fd, sizeof(context_CF_WrappedClose_fd), false);
@@ -2797,7 +2889,9 @@ void Test_CF_WriteQueueCmd_Success_type_AllAnd_q_All(void)
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* valid result from CF_WriteTxnQueueDataToFile */
@@ -2845,7 +2939,9 @@ void Test_CF_WriteQueueCmd_Success_type_AllAnd_q_History(void)
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* valid result from CF_WriteHistoryQueueDataToFile */
@@ -2890,7 +2986,9 @@ void Test_CF_WriteQueueCmd_Success_type_AllAnd_q_Active(void)
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* valid result from CF_WriteTxnQueueDataToFile */
@@ -2935,7 +3033,9 @@ void Test_CF_WriteQueueCmd_Success_type_AllAnd_q_Pend(void)
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* valid result from CF_WriteTxnQueueDataToFile */
@@ -2981,7 +3081,9 @@ void Test_CF_WriteQueueCmd_Success_type_UpAnd_q_All(void)
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* valid result from CF_WriteTxnQueueDataToFile */
@@ -3029,7 +3131,9 @@ void Test_CF_WriteQueueCmd_Success_type_UpAnd_q_History(void)
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* valid result from CF_WriteHistoryQueueDataToFile */
@@ -3074,7 +3178,9 @@ void Test_CF_WriteQueueCmd_Success_type_UpAnd_q_Active(void)
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* valid result from CF_WriteTxnQueueDataToFile */
@@ -3121,7 +3227,9 @@ void Test_CF_WriteQueueCmd_Success_type_DownAnd_q_All(void)
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* valid result from CF_WriteTxnQueueDataToFile */
@@ -3166,7 +3274,9 @@ void Test_CF_WriteQueueCmd_Success_type_DownAnd_q_History(void)
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* valid result from CF_WriteTxnQueueDataToFile */
@@ -3211,7 +3321,9 @@ void Test_CF_WriteQueueCmd_Success_type_DownAnd_q_Active(void)
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* valid result from CF_WriteTxnQueueDataToFile */
@@ -3256,7 +3368,9 @@ void Test_CF_WriteQueueCmd_Success_type_DownAnd_q_Pend(void)
 
     context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
 
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate), &context_CF_WrappedOpenCreate, sizeof(context_CF_WrappedOpenCreate),
+    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
+                     &context_CF_WrappedOpenCreate,
+                     sizeof(context_CF_WrappedOpenCreate),
                      false);
 
     /* valid result from CF_WriteTxnQueueDataToFile */
@@ -3461,8 +3575,10 @@ void Test_CF_GetSetParamCmd(void)
 
     /* Validation fail */
     UT_CF_ResetEventCapture();
-    UtAssert_VOIDCALL(CF_GetSetParamCmd(true, CF_GetSet_ValueID_outgoing_file_chunk_size,
-                                        100 + sizeof(CF_CFDP_PduFileDataContent_t), UT_CFDP_CHANNEL));
+    UtAssert_VOIDCALL(CF_GetSetParamCmd(true,
+                                        CF_GetSet_ValueID_outgoing_file_chunk_size,
+                                        100 + sizeof(CF_CFDP_PduFileDataContent_t),
+                                        UT_CFDP_CHANNEL));
     UT_CF_AssertEventID(CF_CMD_GETSET_VALIDATE_ERR_EID);
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 3);
 }
@@ -3712,31 +3828,40 @@ void Test_CF_WakeupCmd(void)
 
 void add_CF_NoopCmd_tests(void)
 {
-    UtTest_Add(Test_CF_NoopCmd_SendNoopEventAndAcceptCommand, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_NoopCmd_SendNoopEventAndAcceptCommand,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_NoopCmd_SendNoopEventAndAcceptCommand");
 }
 
 void add_CF_ResetCountersCmd_tests(void)
 {
-    UtTest_Add(Test_CF_ResetCountersCmd_tests_WhenCommandByteIsEqTo_5_SendEventAndRejectCommand, cf_cmd_tests_Setup,
+    UtTest_Add(Test_CF_ResetCountersCmd_tests_WhenCommandByteIsEqTo_5_SendEventAndRejectCommand,
+               cf_cmd_tests_Setup,
                cf_cmd_tests_Teardown,
                "Test_CF_ResetCountersCmd_tests_WhenCommandByteIsEqTo_5_SendEventAndRejectCommand");
     UtTest_Add(Test_CF_ResetCountersCmd_tests_WhenCommandByteIsGreaterThan_5_SendEventAndRejectCommand,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_ResetCountersCmd_tests_WhenCommandByteIsGreaterThan_5_SendEventAndRejectCommand");
     UtTest_Add(Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_command_AndResetHkCmdAndErrCountSendEvent,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_command_AndResetHkCmdAndErrCountSendEvent");
     UtTest_Add(Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_fault_ResetAllHkFaultCountSendEventAndAcceptCommand,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_fault_ResetAllHkFaultCountSendEventAndAcceptCommand");
     UtTest_Add(Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_up_AndResetAllHkRecvCountSendEventAndAcceptCommand,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_up_AndResetAllHkRecvCountSendEventAndAcceptCommand");
     UtTest_Add(Test_CF_ResetCountersCmd_tests_SWhenCommandByteIs_down_AndResetAllHkSentCountendEventAcceptCommand,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_ResetCountersCmd_tests_SWhenCommandByteIs_down_AndResetAllHkSentCountendEventAcceptCommand");
-    UtTest_Add(Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_all_AndResetAllMemValuesSendEvent, cf_cmd_tests_Setup,
+    UtTest_Add(Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_all_AndResetAllMemValuesSendEvent,
+               cf_cmd_tests_Setup,
                cf_cmd_tests_Teardown,
                "Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_all_AndResetAllMemValuesSendEvent");
 }
@@ -3753,77 +3878,114 @@ void add_CF_PlaybackDirCmd_tests(void)
 
 void add_CF_DoChanAction_tests(void)
 {
-    UtTest_Add(Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1");
-    UtTest_Add(Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAll_fn_return_1_Return_1, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAll_fn_return_1_Return_1");
-    UtTest_Add(Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0");
-    UtTest_Add(Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_1_Return_1, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAny_fn_returns_1_Return_1");
+    UtTest_Add(Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAll_fn_return_1_Return_1,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenAll_fn_return_1_Return_1");
+    UtTest_Add(Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_DoChanAction_CF_ALL_CHANNELS_WhenNo_fn_returns_0_Return_0");
+    UtTest_Add(Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_1_Return_1,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_1_Return_1");
-    UtTest_Add(Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_0_Return_1, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_0_Return_1,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_DoChanAction_WhenChannel_fn_ActionReturns_0_Return_1");
-    UtTest_Add(Test_CF_DoChanAction_WhenChanNumberEq_CF_NUM_CHANNELS_Return_neg1_And_SendEvent_, cf_cmd_tests_Setup,
+    UtTest_Add(Test_CF_DoChanAction_WhenChanNumberEq_CF_NUM_CHANNELS_Return_neg1_And_SendEvent_,
+               cf_cmd_tests_Setup,
                cf_cmd_tests_Teardown,
                "Test_CF_DoChanAction_WhenChanNumberEq_CF_NUM_CHANNELS_Return_neg1_And_SendEvent_");
-    UtTest_Add(Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent");
+    UtTest_Add(Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_DoChanAction_WhenBadChannelNumber_Return_neg1_And_SendEvent");
 }
 
 void add_CF_DoFreezeThaw_tests(void)
 {
-    UtTest_Add(Test_CF_DoFreezeThaw_Set_frozen_ToGiven_context_barg_AndReturn_0, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_DoFreezeThaw_Set_frozen_ToGiven_context_barg_AndReturn_0");
+    UtTest_Add(Test_CF_DoFreezeThaw_Set_frozen_ToGiven_context_barg_AndReturn_0,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_DoFreezeThaw_Set_frozen_ToGiven_context_barg_AndReturn_0");
 }
 
 void add_CF_FreezeCmd_tests(void)
 {
-    UtTest_Add(Test_CF_FreezeCmd_Set_frozen_To_1_AndAcceptCommand, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_FreezeCmd_Set_frozen_To_1_AndAcceptCommand,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_FreezeCmd_Set_frozen_To_1_AndAcceptCommand");
-    UtTest_Add(Test_CF_FreezeCmd_Set_frozen_To_1_AndRejectCommand, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_FreezeCmd_Set_frozen_To_1_AndRejectCommand,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_FreezeCmd_Set_frozen_To_1_AndRejectCommand");
 }
 
 void add_CF_ThawCmd_tests(void)
 {
-    UtTest_Add(Test_CF_ThawCmd_Set_frozen_To_0_AndAcceptCommand, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_ThawCmd_Set_frozen_To_0_AndAcceptCommand,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_ThawCmd_Set_frozen_To_0_AndAcceptCommand");
-    UtTest_Add(Test_CF_ThawCmd_Set_frozen_To_0_AndRejectCommand, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_ThawCmd_Set_frozen_To_0_AndRejectCommand,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_ThawCmd_Set_frozen_To_0_AndRejectCommand");
 }
 
 void add_CF_FindTransactionBySequenceNumberAllChannels_tests(void)
 {
-    UtTest_Add(Test_CF_FindTransactionBySequenceNumberAllChannels_WhenNoTransactionFoundReturn_NULL, cf_cmd_tests_Setup,
+    UtTest_Add(Test_CF_FindTransactionBySequenceNumberAllChannels_WhenNoTransactionFoundReturn_NULL,
+               cf_cmd_tests_Setup,
                cf_cmd_tests_Teardown,
                "Test_CF_FindTransactionBySequenceNumberAllChannels_WhenNoTransactionFoundReturn_NULL");
-    UtTest_Add(Test_CF_FindTransactionBySequenceNumberAllChannels_Return_TransactionFound, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_FindTransactionBySequenceNumberAllChannels_Return_TransactionFound");
+    UtTest_Add(Test_CF_FindTransactionBySequenceNumberAllChannels_Return_TransactionFound,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_FindTransactionBySequenceNumberAllChannels_Return_TransactionFound");
 }
 
 void add_CF_TsnChanAction_tests(void)
 {
     UtTest_Add(Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionNotFoundAndReturn_neg1_Fail,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_TsnChanAction_SendEvent_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionNotFoundAndReturn_neg1_Fail");
     UtTest_Add(Test_CF_TsnChanAction_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionFoundRun_fn_AndReturn_CFE_SUCCESS,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_TsnChanAction_cmd_chan_Eq_CF_COMPOUND_KEY_TransactionFoundRun_fn_AndReturn_CFE_SUCCESS");
     UtTest_Add(Test_CF_TsnChanAction_cmd_chan_Eq_CF_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_TsnChanAction_cmd_chan_Eq_CF_ALL_CHANNELS_Return_CF_TraverseAllTransactions_All_Channels");
-    UtTest_Add(Test_CF_TsnChanAction_cmd_chan_IsASingleChannel, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_TsnChanAction_cmd_chan_IsASingleChannel,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_TsnChanAction_cmd_chan_IsASingleChannel");
-    UtTest_Add(Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_TsnChanAction_cmd_FailBecause_cmd_chan_IsInvalid");
 }
 
 void add_CF_DoSuspRes_Txn_tests(void)
 {
-    UtTest_Add(Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action");
-    UtTest_Add(Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action");
+    UtTest_Add(Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_DoSuspRes_Txn_Set_context_same_To_1_suspended_Eq_action");
+    UtTest_Add(Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_DoSuspRes_Txn_When_suspended_NotEqTo_action_Set_suspended_To_action");
 }
 
 void add_CF_DoSuspRes_tests(void)
@@ -3833,20 +3995,26 @@ void add_CF_DoSuspRes_tests(void)
 
 void add_CF_SuspendCmd_tests(void)
 {
-    UtTest_Add(Test_CF_SuspendCmd_Call_CF_DoSuspRes_WithGiven_msg_And_action_1, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_SuspendCmd_Call_CF_DoSuspRes_WithGiven_msg_And_action_1");
+    UtTest_Add(Test_CF_SuspendCmd_Call_CF_DoSuspRes_WithGiven_msg_And_action_1,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_SuspendCmd_Call_CF_DoSuspRes_WithGiven_msg_And_action_1");
 }
 
 void add_CF_ResumeCmd_tests(void)
 {
-    UtTest_Add(Test_CF_ResumeCmd_Call_CF_DoSuspRes_WithGiven_msg_And_action_0, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_ResumeCmd_Call_CF_DoSuspRes_WithGiven_msg_And_action_0");
+    UtTest_Add(Test_CF_ResumeCmd_Call_CF_DoSuspRes_WithGiven_msg_And_action_0,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_ResumeCmd_Call_CF_DoSuspRes_WithGiven_msg_And_action_0");
 }
 
 void add_CF_Cancel_TxnCmd_tests(void)
 {
-    UtTest_Add(Test_CF_Cancel_TxnCmd_Call_CF_CFDP_CancelTransaction_WithGiven_t, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_Cancel_TxnCmd_Call_CF_CFDP_CancelTransaction_WithGiven_t");
+    UtTest_Add(Test_CF_Cancel_TxnCmd_Call_CF_CFDP_CancelTransaction_WithGiven_t,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_Cancel_TxnCmd_Call_CF_CFDP_CancelTransaction_WithGiven_t");
 }
 
 void add_CF_CancelCmd_tests(void)
@@ -3857,8 +4025,10 @@ void add_CF_CancelCmd_tests(void)
 
 void add_CF_Abandon_TxnCmd_tests(void)
 {
-    UtTest_Add(Test_CF_Abandon_TxnCmd_Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_Abandon_TxnCmd_Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0");
+    UtTest_Add(Test_CF_Abandon_TxnCmd_Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_Abandon_TxnCmd_Call_CF_CFDP_ResetTransaction_WithGiven_t_And_0");
 }
 
 void add_CF_AbandonCmd_tests(void)
@@ -3869,187 +4039,272 @@ void add_CF_AbandonCmd_tests(void)
 
 void add_CF_DoEnableDisableDequeue_tests(void)
 {
-    UtTest_Add(Test_CF_DoEnableDisableDequeue_Set_chan_num_EnabledFlagTo_context_barg, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_DoEnableDisableDequeue_Set_chan_num_EnabledFlagTo_context_barg");
+    UtTest_Add(Test_CF_DoEnableDisableDequeue_Set_chan_num_EnabledFlagTo_context_barg,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_DoEnableDisableDequeue_Set_chan_num_EnabledFlagTo_context_barg");
 }
 
 void add_CF_EnableDequeueCmd_tests(void)
 {
-    UtTest_Add(Test_CF_EnableDequeueCmd_Success, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_EnableDequeueCmd_Success,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_EnableDequeueCmd_Success");
-    UtTest_Add(Test_CF_EnableDequeueCmd_Failure, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_EnableDequeueCmd_Failure,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_EnableDequeueCmd_Failure");
 }
 
 void add_CF_DisableDequeueCmd_tests(void)
 {
-    UtTest_Add(Test_CF_DisableDequeueCmd_Success, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_DisableDequeueCmd_Success,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_DisableDequeueCmd_Success");
-    UtTest_Add(Test_CF_DisableDequeueCmd_Failure, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_DisableDequeueCmd_Failure,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_DisableDequeueCmd_Failure");
 }
 
 void add_CF_DoEnableDisablePolldir_tests(void)
 {
     UtTest_Add(Test_CF_DoEnableDisablePolldir_When_CF_ALL_CHANNELS_SetAllPolldirsInChannelEnabledTo_context_barg,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_DoEnableDisablePolldir_When_CF_ALL_CHANNELS_SetAllPolldirsInChannelEnabledTo_context_barg");
     UtTest_Add(
         Test_CF_DoEnableDisablePolldir_WhenSetToSpecificPolldirSetPolldirFrom_context_ChannelEnabledTo_context_barg,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+        cf_cmd_tests_Setup,
+        cf_cmd_tests_Teardown,
         "Test_CF_DoEnableDisablePolldir_WhenSetToSpecificPolldirSetPolldirFrom_context_ChannelEnabledTo_context_barg");
     UtTest_Add(Test_CF_DoEnableDisablePolldir_FailPolldirEq_CF_MAX_POLLING_DIR_PER_CHAN_AndSendEvent,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_DoEnableDisablePolldir_FailPolldirEq_CF_MAX_POLLING_DIR_PER_CHAN_AndSendEvent");
-    UtTest_Add(Test_CF_DoEnableDisablePolldir_FailAnyBadPolldirSendEvent, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_DoEnableDisablePolldir_FailAnyBadPolldirSendEvent,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_DoEnableDisablePolldir_FailAnyBadPolldirSendEvent");
 }
 
 void add_CF_EnablePolldirCmd_tests(void)
 {
-    UtTest_Add(Test_CF_EnablePolldirCmd_SuccessWhenActionSuccess, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_EnablePolldirCmd_SuccessWhenActionSuccess,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_EnablePolldirCmd_SuccessWhenActionSuccess");
-    UtTest_Add(Test_CF_EnablePolldirCmd_FailWhenActionFail, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_EnablePolldirCmd_FailWhenActionFail,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_EnablePolldirCmd_FailWhenActionFail");
 }
 
 void add_CF_DisablePolldirCmd_tests(void)
 {
-    UtTest_Add(Test_CF_DisablePolldirCmd_SuccessWhenActionSuccess, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_DisablePolldirCmd_SuccessWhenActionSuccess,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_DisablePolldirCmd_SuccessWhenActionSuccess");
-    UtTest_Add(Test_CF_DisablePolldirCmd_FailWhenActionFail, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_DisablePolldirCmd_FailWhenActionFail,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_DisablePolldirCmd_FailWhenActionFail");
 }
 
 void add_CF_PurgeHistory_tests(void)
 {
-    UtTest_Add(Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT");
+    UtTest_Add(Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_PurgeHistory_Call_CF_CFDP_ResetHistory_AndReturn_CLIST_CONT");
 }
 
 void add_CF_PurgeTransaction_tests(void)
 {
-    UtTest_Add(Test_CF_PurgeTransaction_Call_CF_CFDP_ResetTransaction_AndReturn_CLIST_CONT, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_PurgeTransaction_Call_CF_CFDP_ResetTransaction_AndReturn_CLIST_CONT");
+    UtTest_Add(Test_CF_PurgeTransaction_Call_CF_CFDP_ResetTransaction_AndReturn_CLIST_CONT,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_PurgeTransaction_Call_CF_CFDP_ResetTransaction_AndReturn_CLIST_CONT");
 }
 
 void add_CF_DoPurgeQueue_tests(void)
 {
-    UtTest_Add(Test_CF_DoPurgeQueue_PendOnly, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_DoPurgeQueue_PendOnly,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_DoPurgeQueue_PendOnly");
-    UtTest_Add(Test_CF_DoPurgeQueue_HistoryOnly, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_DoPurgeQueue_HistoryOnly,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_DoPurgeQueue_HistoryOnly");
     UtTest_Add(Test_CF_DoPurgeQueue_Both, cf_cmd_tests_Setup, cf_cmd_tests_Teardown, "Test_CF_DoPurgeQueue_Both");
-    UtTest_Add(Test_CF_DoPurgeQueue_GivenBad_data_byte_1_SendEventAndReturn_neg1, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_DoPurgeQueue_GivenBad_data_byte_1_SendEventAndReturn_neg1");
-    UtTest_Add(Test_CF_DoPurgeQueue_AnyGivenBad_data_byte_1_SendEventAndReturn_neg1, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_DoPurgeQueue_AnyGivenBad_data_byte_1_SendEventAndReturn_neg1");
+    UtTest_Add(Test_CF_DoPurgeQueue_GivenBad_data_byte_1_SendEventAndReturn_neg1,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_DoPurgeQueue_GivenBad_data_byte_1_SendEventAndReturn_neg1");
+    UtTest_Add(Test_CF_DoPurgeQueue_AnyGivenBad_data_byte_1_SendEventAndReturn_neg1,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_DoPurgeQueue_AnyGivenBad_data_byte_1_SendEventAndReturn_neg1");
 }
 
 void add_CF_PurgeQueueCmd_tests(void)
 {
-    UtTest_Add(Test_CF_PurgeQueueCmd_FailWhenActionFail, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_PurgeQueueCmd_FailWhenActionFail,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_PurgeQueueCmd_FailWhenActionFail");
-    UtTest_Add(Test_CF_PurgeQueueCmd_SuccessWhenActionSuccess, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_PurgeQueueCmd_SuccessWhenActionSuccess,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_PurgeQueueCmd_SuccessWhenActionSuccess");
 }
 
 void add_CF_WriteQueueCmd_tests(void)
 {
-    UtTest_Add(Test_CF_WriteQueueCmd_When_chan_Eq_CF_NUM_CAHNNELS_SendEventAndRejectCommand, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_WriteQueueCmd_When_chan_Eq_CF_NUM_CAHNNELS_SendEventAndRejectCommand");
+    UtTest_Add(Test_CF_WriteQueueCmd_When_chan_Eq_CF_NUM_CAHNNELS_SendEventAndRejectCommand,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_WriteQueueCmd_When_chan_Eq_CF_NUM_CAHNNELS_SendEventAndRejectCommand");
     UtTest_Add(Test_CF_WriteQueueCmd_When_chan_GreaterThan_CF_NUM_CAHNNELS_SendEventAndRejectCommand,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_WriteQueueCmd_When_chan_GreaterThan_CF_NUM_CAHNNELS_SendEventAndRejectCommand");
-    UtTest_Add(Test_CF_WriteQueueCmd_WhenUpAndPendingQueueSendEventAndRejectCommand, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_WriteQueueCmd_WhenUpAndPendingQueueSendEventAndRejectCommand");
+    UtTest_Add(Test_CF_WriteQueueCmd_WhenUpAndPendingQueueSendEventAndRejectCommand,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_WriteQueueCmd_WhenUpAndPendingQueueSendEventAndRejectCommand");
     UtTest_Add(
         Test_CF_WriteQueueCmd_When_CF_WrappedCreat_Fails_type_Is_type_up_And_queue_IsNot_q_pend_SendEventAndRejectCommand,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+        cf_cmd_tests_Setup,
+        cf_cmd_tests_Teardown,
         "Test_CF_WriteQueueCmd_When_CF_WrappedCreat_Fails_type_Is_type_up_And_queue_IsNot_q_pend_"
         "SendEventAndRejectCommand");
     UtTest_Add(
         Test_CF_WriteQueueCmd_When_CF_WrappedCreat_Fails_type_IsNot_type_up_And_queue_Is_q_pend_SendEventAndRejectCommand,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+        cf_cmd_tests_Setup,
+        cf_cmd_tests_Teardown,
         "Test_CF_WriteQueueCmd_When_CF_WrappedCreat_Fails_type_IsNot_type_up_And_queue_Is_q_pend_"
         "SendEventAndRejectCommand");
     UtTest_Add(
         Test_CF_WriteQueueCmd_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedClose_SendEventCloseAndRejectCommandWhen_CF_WriteTxnQueueDataToFile_Fails,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+        cf_cmd_tests_Setup,
+        cf_cmd_tests_Teardown,
         "Test_CF_WriteQueueCmd_When_wq_IsAllAnd_queue_IsAll_fd_Is_0_Call_CF_WrappedClose_"
         "SendEventCloseAndRejectCommandWhen_CF_WriteTxnQueueDataToFile_Fails");
     UtTest_Add(
         Test_CF_WriteQueueCmd_When_CF_WriteTxnQueueDataToFile_FailsAnd_wq_IsUpAnd_queue_IsActive_fd_IsPositive_Call_CF_WrappedClose_SendEventClosesAndRejectCommand,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+        cf_cmd_tests_Setup,
+        cf_cmd_tests_Teardown,
         "Test_CF_WriteQueueCmd_When_CF_WriteTxnQueueDataToFile_FailsAnd_wq_IsUpAnd_queue_IsActive_fd_IsPositive_Call_"
         "CF_"
         "WrappedClose_SendEventClosesAndRejectCommand");
     UtTest_Add(
         Test_CF_WriteQueueCmd_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsUpAnd_queue_IsHistory_fd_IsPositive_Call_CF_WrappedClose_SendEventCloseAndRejectCommand,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+        cf_cmd_tests_Setup,
+        cf_cmd_tests_Teardown,
         "Test_CF_WriteQueueCmd_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsUpAnd_queue_IsHistory_fd_IsPositive_"
         "Call_CF_WrappedClose_SendEventCloseAndRejectCommand");
     UtTest_Add(
         Test_CF_WriteQueueCmd_When_CF_WriteHistoryDataToFile_FailsOnFirstCallAnd_wq_IsDownAnd_queue_IsActive_fd_IsPositive_Call_CF_WrappedClose_SendEventCloseAndRejectCommand,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+        cf_cmd_tests_Setup,
+        cf_cmd_tests_Teardown,
         "Test_CF_WriteQueueCmd_When_CF_WriteHistoryDataToFile_FailsOnFirstCallAnd_wq_IsDownAnd_queue_IsActive_fd_"
         "IsPositive_Call_CF_WrappedClose_SendEventCloseAndRejectCommand");
     UtTest_Add(
         Test_CF_WriteQueueCmd_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDownAnd_queue_IsPend_fd_IsPositive_Call_CF_WrappedClose_SendEventCloseAndRejectCommand,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+        cf_cmd_tests_Setup,
+        cf_cmd_tests_Teardown,
         "Test_CF_WriteQueueCmd_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDownAnd_queue_IsPend_fd_IsPositive_"
         "Call_CF_WrappedClose_SendEventCloseAndRejectCommand");
     UtTest_Add(
         Test_CF_WriteQueueCmd_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDownAnd_queue_IsHistory_fd_IsPositive_Call_CF_WrappedClose_SendEventCloseAndRejectCommand,
-        cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+        cf_cmd_tests_Setup,
+        cf_cmd_tests_Teardown,
         "Test_CF_WriteQueueCmd_When_CF_WriteHistoryQueueDataToFile_FailsAnd_wq_IsDownAnd_queue_IsHistory_fd_IsPositive_"
         "Call_CF_WrappedClose_SendEventCloseAndRejectCommand");
-    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_AllAnd_q_All, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_AllAnd_q_All,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_WriteQueueCmd_Success_type_AllAnd_q_All");
-    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_AllAnd_q_History, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_AllAnd_q_History,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_WriteQueueCmd_Success_type_AllAnd_q_History");
-    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_AllAnd_q_Active, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_AllAnd_q_Active,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_WriteQueueCmd_Success_type_AllAnd_q_Active");
-    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_AllAnd_q_Pend, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_AllAnd_q_Pend,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_WriteQueueCmd_Success_type_AllAnd_q_Pend");
-    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_UpAnd_q_All, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_UpAnd_q_All,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_WriteQueueCmd_Success_type_UpAnd_q_All");
-    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_UpAnd_q_History, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_UpAnd_q_History,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_WriteQueueCmd_Success_type_UpAnd_q_History");
-    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_UpAnd_q_Active, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_UpAnd_q_Active,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_WriteQueueCmd_Success_type_UpAnd_q_Active");
     /* see Test_CF_WriteQueueCmd_WhenUpAndPendingQueueSendEventAndRejectCommand */
-    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_DownAnd_q_All, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_DownAnd_q_All,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_WriteQueueCmd_Success_type_DownAnd_q_All");
-    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_DownAnd_q_History, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_DownAnd_q_History,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_WriteQueueCmd_Success_type_DownAnd_q_History");
-    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_DownAnd_q_Active, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_DownAnd_q_Active,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_WriteQueueCmd_Success_type_DownAnd_q_Active");
-    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_DownAnd_q_Pend, cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+    UtTest_Add(Test_CF_WriteQueueCmd_Success_type_DownAnd_q_Pend,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_WriteQueueCmd_Success_type_DownAnd_q_Pend");
 }
 
 void add_CF_ValidateChunkSizeCmd_tests(void)
 {
-    UtTest_Add(Test_CF_ValidateChunkSizeCmd_val_GreaterThan_pdu_fd_data_t_FailAndReturn_1, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_ValidateChunkSizeCmd_val_GreaterThan_pdu_fd_data_t_FailAndReturn_1");
-    UtTest_Add(Test_CF_ValidateChunkSizeCmd_Any_val_GreaterThan_pdu_fd_data_t_FailAndReturn_1, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_ValidateChunkSizeCmd_Any_val_GreaterThan_pdu_fd_data_t_FailAndReturn_1");
-    UtTest_Add(Test_CF_ValidateChunkSizeCmd_val_SizeOf_pdu_fd_data_t_SuccessAndReturn_0, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_ValidateChunkSizeCmd_val_SizeOf_pdu_fd_data_t_SuccessAndReturn_0");
-    UtTest_Add(Test_CF_ValidateChunkSizeCmd_val_LessThanOrEqSizeOf_pdu_fd_data_t_SuccessAndReturn_0, cf_cmd_tests_Setup,
+    UtTest_Add(Test_CF_ValidateChunkSizeCmd_val_GreaterThan_pdu_fd_data_t_FailAndReturn_1,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_ValidateChunkSizeCmd_val_GreaterThan_pdu_fd_data_t_FailAndReturn_1");
+    UtTest_Add(Test_CF_ValidateChunkSizeCmd_Any_val_GreaterThan_pdu_fd_data_t_FailAndReturn_1,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_ValidateChunkSizeCmd_Any_val_GreaterThan_pdu_fd_data_t_FailAndReturn_1");
+    UtTest_Add(Test_CF_ValidateChunkSizeCmd_val_SizeOf_pdu_fd_data_t_SuccessAndReturn_0,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_ValidateChunkSizeCmd_val_SizeOf_pdu_fd_data_t_SuccessAndReturn_0");
+    UtTest_Add(Test_CF_ValidateChunkSizeCmd_val_LessThanOrEqSizeOf_pdu_fd_data_t_SuccessAndReturn_0,
+               cf_cmd_tests_Setup,
                cf_cmd_tests_Teardown,
                "Test_CF_ValidateChunkSizeCmd_val_LessThanOrEqSizeOf_pdu_fd_data_t_SuccessAndReturn_0");
 }
 
 void add_CF_ValidateMaxOutgoingCmd_tests(void)
 {
-    UtTest_Add(Test_CF_ValidateMaxOutgoingCmd_WhenGiven_val_IsNot_0_Return_0_Success, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_ValidateMaxOutgoingCmd_WhenGiven_val_IsNot_0_Return_0_Success");
+    UtTest_Add(Test_CF_ValidateMaxOutgoingCmd_WhenGiven_val_IsNot_0_Return_0_Success,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_ValidateMaxOutgoingCmd_WhenGiven_val_IsNot_0_Return_0_Success");
     UtTest_Add(Test_CF_ValidateMaxOutgoingCmd_WhenGiven_val_Is_0_But_sem_name_IsNot_NULL_Return_0_Success,
-               cf_cmd_tests_Setup, cf_cmd_tests_Teardown,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
                "Test_CF_ValidateMaxOutgoingCmd_WhenGiven_val_Is_0_But_sem_name_IsNot_NULL_Return_0_Success");
-    UtTest_Add(Test_CF_ValidateMaxOutgoingCmd_WhenGiven_val_Is_0_And_sem_name_Is_NULL_Return_1_Fail, cf_cmd_tests_Setup,
+    UtTest_Add(Test_CF_ValidateMaxOutgoingCmd_WhenGiven_val_Is_0_And_sem_name_Is_NULL_Return_1_Fail,
+               cf_cmd_tests_Setup,
                cf_cmd_tests_Teardown,
                "Test_CF_ValidateMaxOutgoingCmd_WhenGiven_val_Is_0_And_sem_name_Is_NULL_Return_1_Fail");
 }
@@ -4061,34 +4316,46 @@ void add_CF_GetSetParamCmd_tests(void)
 
 void add_CF_SetParamCmd_tests(void)
 {
-    UtTest_Add(Test_CF_SetParamCmd_Call_CF_GetSetParamCmd_With_cmd_key_And_cmd_value, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_SetParamCmd_Call_CF_GetSetParamCmd_With_cmd_key_And_cmd_value");
+    UtTest_Add(Test_CF_SetParamCmd_Call_CF_GetSetParamCmd_With_cmd_key_And_cmd_value,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_SetParamCmd_Call_CF_GetSetParamCmd_With_cmd_key_And_cmd_value");
 }
 
 void add_CF_GetParamCmd_tests(void)
 {
-    UtTest_Add(Test_CF_GetParamCmd_Call_CF_GetSetParamCmd_With_cmd_data_byte_0_AndConstantValue_0, cf_cmd_tests_Setup,
+    UtTest_Add(Test_CF_GetParamCmd_Call_CF_GetSetParamCmd_With_cmd_data_byte_0_AndConstantValue_0,
+               cf_cmd_tests_Setup,
                cf_cmd_tests_Teardown,
                "Test_CF_GetParamCmd_Call_CF_GetSetParamCmd_With_cmd_data_byte_0_AndConstantValue_0");
 }
 
 void add_CF_EnableEngineCmd_tests(void)
 {
-    UtTest_Add(Test_CF_EnableEngineCmd_WithEngineNotEnableInitSuccessAndIncrementCmdCounter, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_EnableEngineCmd_WithEngineNotEnableInitSuccessAndIncrementCmdCounter");
-    UtTest_Add(Test_CF_EnableEngineCmd_WithEngineNotEnableFailsInitSendEventAndIncrementErrCounter, cf_cmd_tests_Setup,
+    UtTest_Add(Test_CF_EnableEngineCmd_WithEngineNotEnableInitSuccessAndIncrementCmdCounter,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_EnableEngineCmd_WithEngineNotEnableInitSuccessAndIncrementCmdCounter");
+    UtTest_Add(Test_CF_EnableEngineCmd_WithEngineNotEnableFailsInitSendEventAndIncrementErrCounter,
+               cf_cmd_tests_Setup,
                cf_cmd_tests_Teardown,
                "Test_CF_EnableEngineCmd_WithEngineNotEnableFailsInitSendEventAndIncrementErrCounter");
-    UtTest_Add(Test_CF_EnableEngineCmd_WithEngineEnableFailsSendEventAndIncrementCmdCounter, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_EnableEngineCmd_WithEngineEnableFailsSendEventAndIncrementCmdCounter");
+    UtTest_Add(Test_CF_EnableEngineCmd_WithEngineEnableFailsSendEventAndIncrementCmdCounter,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_EnableEngineCmd_WithEngineEnableFailsSendEventAndIncrementCmdCounter");
 }
 
 void add_CF_DisableEngineCmd_tests(void)
 {
-    UtTest_Add(Test_CF_DisableEngineCmd_SuccessWhenEngineEnabledAndIncrementCmdCounter, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_CmdDisableEngine_SuccessWhenEngineEnabledAndIncrementCmdCounter");
-    UtTest_Add(Test_CF_DisableEngineCmd_WhenEngineDisabledAndIncrementCmdCounter, cf_cmd_tests_Setup,
-               cf_cmd_tests_Teardown, "Test_CF_DisableEngineCmd_WhenEngineDisabledAndIncrementCmdCounter");
+    UtTest_Add(Test_CF_DisableEngineCmd_SuccessWhenEngineEnabledAndIncrementCmdCounter,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_CmdDisableEngine_SuccessWhenEngineEnabledAndIncrementCmdCounter");
+    UtTest_Add(Test_CF_DisableEngineCmd_WhenEngineDisabledAndIncrementCmdCounter,
+               cf_cmd_tests_Setup,
+               cf_cmd_tests_Teardown,
+               "Test_CF_DisableEngineCmd_WhenEngineDisabledAndIncrementCmdCounter");
 }
 
 void add_CF_SendHkCmd_tests(void)

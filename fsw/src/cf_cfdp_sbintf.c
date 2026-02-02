@@ -61,7 +61,7 @@
 CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool silent)
 {
     /* if channel is frozen, do not take message */
-    CF_Channel_t *          chan    = CF_AppData.engine.channels + txn->chan_num;
+    CF_Channel_t           *chan    = CF_AppData.engine.channels + txn->chan_num;
     bool                    success = true;
     CF_Logical_PduBuffer_t *ret;
     int32                   os_status;
@@ -76,8 +76,8 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool sile
         CF_AppData.engine.out.msg = NULL;
     }
 
-    if (CF_AppData.config_table->chan[txn->chan_num].max_outgoing_messages_per_wakeup &&
-        (chan->outgoing_counter >= CF_AppData.config_table->chan[txn->chan_num].max_outgoing_messages_per_wakeup))
+    if (CF_AppData.config_table->chan[txn->chan_num].max_outgoing_messages_per_wakeup
+        && (chan->outgoing_counter >= CF_AppData.config_table->chan[txn->chan_num].max_outgoing_messages_per_wakeup))
     {
         /* no more messages this wakeup allowed */
         success = false;
@@ -98,15 +98,16 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool sile
         /* Allocate message buffer on success */
         if (os_status == OS_SUCCESS)
         {
-            CF_AppData.engine.out.msg = CFE_SB_AllocateMessageBuffer(offsetof(CF_PduTlmMsg_t, ph) + CF_MAX_PDU_SIZE +
-                                                                     CF_PDU_ENCAPSULATION_EXTRA_TRAILING_BYTES);
+            CF_AppData.engine.out.msg = CFE_SB_AllocateMessageBuffer(offsetof(CF_PduTlmMsg_t, ph) + CF_MAX_PDU_SIZE
+                                                                     + CF_PDU_ENCAPSULATION_EXTRA_TRAILING_BYTES);
         }
 
         if (!CF_AppData.engine.out.msg)
         {
             if (!silent && (os_status == OS_SUCCESS))
             {
-                CFE_EVS_SendEvent(CF_CFDP_NO_MSG_ERR_EID, CFE_EVS_EventType_ERROR,
+                CFE_EVS_SendEvent(CF_CFDP_NO_MSG_ERR_EID,
+                                  CFE_EVS_EventType_ERROR,
                                   "CF: no output message buffer available");
             }
             success = false;
@@ -135,7 +136,10 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool sile
     else
     {
         /* if returning a buffer, then reset the encoder state to point to the beginning of the encapsulation msg */
-        CF_CFDP_EncodeStart(&CF_AppData.engine.out.encode, CF_AppData.engine.out.msg, ret, offsetof(CF_PduTlmMsg_t, ph),
+        CF_CFDP_EncodeStart(&CF_AppData.engine.out.encode,
+                            CF_AppData.engine.out.msg,
+                            ret,
+                            offsetof(CF_PduTlmMsg_t, ph),
                             offsetof(CF_PduTlmMsg_t, ph) + CF_MAX_PDU_SIZE);
     }
 
@@ -156,7 +160,7 @@ void CF_CFDP_Send(uint8 chan_num, const CF_Logical_PduBuffer_t *ph)
 
     /* now handle the SB encapsulation - this should reflect the
      * length of the entire message, including encapsulation */
-    sb_msgsize = offsetof(CF_PduTlmMsg_t, ph);
+    sb_msgsize  = offsetof(CF_PduTlmMsg_t, ph);
     sb_msgsize += ph->pdu_header.header_encoded_length;
     sb_msgsize += ph->pdu_header.data_encoded_length;
     sb_msgsize += CF_PDU_ENCAPSULATION_EXTRA_TRAILING_BYTES;

@@ -134,8 +134,10 @@ typedef struct
  * @param dispatch  Dispatch table for file directive PDUs
  * @param fd_fn     Function to handle file data PDUs
  */
-void CF_CFDP_R_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
-                            const CF_CFDP_R_SubstateDispatchTable_t *dispatch, CF_CFDP_StateRecvFunc_t fd_fn);
+void CF_CFDP_R_DispatchRecv(CF_Transaction_t                        *txn,
+                            CF_Logical_PduBuffer_t                  *ph,
+                            const CF_CFDP_R_SubstateDispatchTable_t *dispatch,
+                            CF_CFDP_StateRecvFunc_t                  fd_fn);
 
 /************************************************************************/
 /**
@@ -148,7 +150,8 @@ void CF_CFDP_R_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
  * @param ph        PDU Buffer
  * @param dispatch  Dispatch table for file directive PDUs
  */
-void CF_CFDP_S_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
+void CF_CFDP_S_DispatchRecv(CF_Transaction_t                            *txn,
+                            CF_Logical_PduBuffer_t                      *ph,
                             const CF_CFDP_S_SubstateRecvDispatchTable_t *dispatch);
 
 /************************************************************************/
@@ -159,7 +162,8 @@ void CF_CFDP_S_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
  * @param ph          Received PDU Buffer
  * @param dispatch    Transaction State-based Dispatch table
  */
-void CF_CFDP_RxStateDispatch(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
+void CF_CFDP_RxStateDispatch(CF_Transaction_t                     *txn,
+                             CF_Logical_PduBuffer_t               *ph,
                              const CF_CFDP_TxnRecvDispatchTable_t *dispatch);
 
 #endif /* CF_CFDP_DISPATCH_H */

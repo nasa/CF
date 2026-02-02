@@ -57,14 +57,14 @@ void CF_CRC_Digest(CF_Crc_t *crc, const uint8 *data, size_t len)
     for (; i < len; ++i)
     {
         crc->working <<= 8;
-        crc->working |= data[i];
+        crc->working  |= data[i];
 
         ++crc->index;
 
         if (crc->index == 4)
         {
             crc->result += crc->working;
-            crc->index = 0;
+            crc->index   = 0;
         }
     }
 }

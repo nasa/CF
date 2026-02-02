@@ -47,8 +47,8 @@
  *       The maximum size dictated by cFE platform configuration
  *		 parameter is OS_QUEUE_MAX_DEPTH
  */
- #define CF_PIPE_DEPTH         CF_INTERNAL_CFGVAL(PIPE_DEPTH)
- #define DEFAULT_CF_PIPE_DEPTH 32
+#define CF_PIPE_DEPTH         CF_INTERNAL_CFGVAL(PIPE_DEPTH)
+#define DEFAULT_CF_PIPE_DEPTH 32
 
 /**
  *  @brief Number of max commanded playback files per chan.

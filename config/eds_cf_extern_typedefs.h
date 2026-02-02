@@ -17,7 +17,7 @@
  * limitations under the License.
  ************************************************************************/
 
- /**
+/**
  * @file
  *
  * Declarations and prototypes for cf_extern_typedefs module
@@ -35,7 +35,7 @@
 /* Define type mappings for CF-specific types */
 typedef CF_QueueIdx_Enum_t CF_QueueIdx_t;
 
-#define CF_QueueIdx_NUM       (1 + EdsDataType_EdsEnum_CF_QueueIdx_t_MAX) 
+#define CF_QueueIdx_NUM       (1 + EdsDataType_EdsEnum_CF_QueueIdx_t_MAX)
 #define CF_GetSet_ValueID_MAX (1 + EdsDataType_EdsEnum_CF_GetSet_ValueID_t_MAX)
 
 typedef CF_EntityId_Atom_t       CF_EntityId_t;

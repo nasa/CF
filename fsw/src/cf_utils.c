@@ -126,7 +126,7 @@ CF_CFDP_AckTxnStatus_t CF_CFDP_GetAckTxnStatus(CF_Transaction_t *txn)
  *-----------------------------------------------------------------*/
 CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *chan, CF_Direction_t direction)
 {
-    CF_CListNode_t *  node;
+    CF_CListNode_t   *node;
     CF_Transaction_t *txn;
     int               q_index; /* initialized below in if */
 
@@ -220,7 +220,7 @@ CFE_Status_t CF_FindTransactionBySequenceNumber_Impl(CF_CListNode_t *node, CF_Tr
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *      chan,
+CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t       *chan,
                                                      CF_TransactionSeq_t transaction_sequence_number,
                                                      CF_EntityId_t       src_eid)
 {
@@ -228,10 +228,10 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *      chan,
      * or on Q_TX or Q_RX. Once a transaction moves to history, then it's done.
      *
      * Let's put CF_QueueIdx_RX up front, because most RX packets will be file data PDUs */
-    CF_Traverse_TransSeqArg_t ctx    = {transaction_sequence_number, src_eid, NULL};
-    CF_CListNode_t *          ptrs[] = {chan->qs[CF_QueueIdx_RX], chan->qs[CF_QueueIdx_PEND], chan->qs[CF_QueueIdx_TX]};
-    int                       i;
-    CF_Transaction_t *        ret = NULL;
+    CF_Traverse_TransSeqArg_t ctx = { transaction_sequence_number, src_eid, NULL };
+    CF_CListNode_t   *ptrs[]      = { chan->qs[CF_QueueIdx_RX], chan->qs[CF_QueueIdx_PEND], chan->qs[CF_QueueIdx_TX] };
+    int               i;
+    CF_Transaction_t *ret = NULL;
 
     for (i = 0; i < (sizeof(ptrs) / sizeof(ptrs[0])); ++i)
     {
@@ -254,7 +254,7 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *      chan,
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *history)
 {
-    static const char *CF_DSTR[] = {"RX", "TX"}; /* conversion of CF_Direction_t to string */
+    static const char *CF_DSTR[] = { "RX", "TX" }; /* conversion of CF_Direction_t to string */
 
     int          i;
     CFE_Status_t ret;
@@ -268,9 +268,14 @@ CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *histor
             case 0:
                 CF_Assert(history->dir < CF_Direction_NUM);
                 /* SAD: No need to check snprintf return; buffer size is sufficient for the formatted output */
-                snprintf(linebuf, sizeof(linebuf), "SEQ (%lu, %lu)\tDIR: %s\tPEER %lu\tSTAT: %d\t",
-                         (unsigned long)history->src_eid, (unsigned long)history->seq_num, CF_DSTR[history->dir],
-                         (unsigned long)history->peer_eid, (int)history->txn_stat);
+                snprintf(linebuf,
+                         sizeof(linebuf),
+                         "SEQ (%lu, %lu)\tDIR: %s\tPEER %lu\tSTAT: %d\t",
+                         (unsigned long)history->src_eid,
+                         (unsigned long)history->seq_num,
+                         CF_DSTR[history->dir],
+                         (unsigned long)history->peer_eid,
+                         (int)history->txn_stat);
                 break;
             case 1:
                 /* SAD: No need to check snprintf return; buffer size is sufficient for the formatted output */
@@ -287,8 +292,11 @@ CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *histor
         ret = CF_WrappedWrite(fd, linebuf, len);
         if (ret != len)
         {
-            CFE_EVS_SendEvent(CF_CMD_WHIST_WRITE_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF: writing queue file failed, expected %ld got %ld", (long)len, (long)ret);
+            CFE_EVS_SendEvent(CF_CMD_WHIST_WRITE_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF: writing queue file failed, expected %ld got %ld",
+                              (long)len,
+                              (long)ret);
             return CF_ERROR;
         }
     }
@@ -305,7 +313,7 @@ CFE_Status_t CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *histor
 CF_CListTraverse_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_t *node, void *arg)
 {
     CF_Traverse_WriteHistoryFileArg_t *context = arg;
-    CF_History_t *                     history = container_of(node, CF_History_t, cl_node);
+    CF_History_t                      *history = container_of(node, CF_History_t, cl_node);
 
     /* if filter_dir is CF_Direction_NUM, this means both directions (all match) */
     if (context->filter_dir == CF_Direction_NUM || history->dir == context->filter_dir)
@@ -332,7 +340,7 @@ CF_CListTraverse_Status_t CF_Traverse_WriteHistoryQueueEntryToFile(CF_CListNode_
 CF_CListTraverse_Status_t CF_Traverse_WriteTxnQueueEntryToFile(CF_CListNode_t *node, void *arg)
 {
     CF_Traverse_WriteTxnFileArg_t *context = arg;
-    CF_Transaction_t *             txn     = container_of(node, CF_Transaction_t, cl_node);
+    CF_Transaction_t              *txn     = container_of(node, CF_Transaction_t, cl_node);
 
     if (CF_WriteHistoryEntryToFile(context->fd, txn->history) < 0)
     {
@@ -390,7 +398,7 @@ CFE_Status_t CF_WriteHistoryQueueDataToFile(osal_id_t fd, CF_Channel_t *chan, CF
  *-----------------------------------------------------------------*/
 CF_CListTraverse_Status_t CF_PrioSearch(CF_CListNode_t *node, void *context)
 {
-    CF_Transaction_t *         txn = container_of(node, CF_Transaction_t, cl_node);
+    CF_Transaction_t          *txn = container_of(node, CF_Transaction_t, cl_node);
     CF_Traverse_PriorityArg_t *arg = (CF_Traverse_PriorityArg_t *)context;
 
     if (txn->priority <= arg->priority)
@@ -429,7 +437,7 @@ void CF_InsertSortPrio(CF_Transaction_t *txn, CF_QueueIdx_t queue)
     }
     else
     {
-        CF_Traverse_PriorityArg_t arg = {NULL, txn->priority};
+        CF_Traverse_PriorityArg_t arg = { NULL, txn->priority };
         CF_CList_Traverse_R(chan->qs[queue], CF_PrioSearch, &arg);
         if (arg.txn)
         {
@@ -457,7 +465,7 @@ void CF_InsertSortPrio(CF_Transaction_t *txn, CF_QueueIdx_t queue)
 CF_CListTraverse_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *node, void *arg)
 {
     CF_TraverseAll_Arg_t *traverse_all = arg;
-    CF_Transaction_t *    txn          = container_of(node, CF_Transaction_t, cl_node);
+    CF_Transaction_t     *txn          = container_of(node, CF_Transaction_t, cl_node);
     traverse_all->fn(txn, traverse_all->context);
     ++traverse_all->counter;
     return CF_CLIST_CONT;
@@ -471,7 +479,7 @@ CF_CListTraverse_Status_t CF_TraverseAllTransactions_Impl(CF_CListNode_t *node, 
  *-----------------------------------------------------------------*/
 int32 CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransactions_fn_t fn, void *context)
 {
-    CF_TraverseAll_Arg_t args = {fn, context, 0};
+    CF_TraverseAll_Arg_t args = { fn, context, 0 };
     CF_QueueIdx_t        queueidx;
     for (queueidx = CF_QueueIdx_PEND; queueidx <= CF_QueueIdx_RX; ++queueidx)
         CF_CList_Traverse(chan->qs[queueidx], CF_TraverseAllTransactions_Impl, &args);
@@ -526,8 +534,11 @@ void CF_WrappedClose(osal_id_t fd)
 
     if (ret != OS_SUCCESS)
     {
-        CFE_EVS_SendEvent(CF_CFDP_CLOSE_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "CF: failed to close file 0x%lx, OS_close returned %ld", OS_ObjectIdToInteger(fd), (long)ret);
+        CFE_EVS_SendEvent(CF_CFDP_CLOSE_ERR_EID,
+                          CFE_EVS_EventType_ERROR,
+                          "CF: failed to close file 0x%lx, OS_close returned %ld",
+                          OS_ObjectIdToInteger(fd),
+                          (long)ret);
     }
 }
 

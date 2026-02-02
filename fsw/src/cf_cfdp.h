@@ -33,7 +33,7 @@
  */
 typedef struct CF_CFDP_Tick_args
 {
-    CF_Channel_t *          chan;         /**< \brief channel structure */
+    CF_Channel_t           *chan;         /**< \brief channel structure */
     const CF_Transaction_t *resume_point; /**< \brief skip to this txn (if not null) */
     void (*fn)(CF_Transaction_t *);       /**< \brief function pointer */
 } CF_CFDP_Tick_args_t;
@@ -66,8 +66,11 @@ static inline int CF_CFDP_GetPrintClass(const CF_Transaction_t *txn)
  * @param encap_hdr_size Offset of first CFDP PDU octet within buffer
  * @param total_size     Allocated size of msgbuf encapsulation structure (encoding cannot exceed this)
  */
-void CF_CFDP_EncodeStart(CF_EncoderState_t *penc, void *msgbuf, CF_Logical_PduBuffer_t *ph, size_t encap_hdr_size,
-                         size_t total_size);
+void CF_CFDP_EncodeStart(CF_EncoderState_t      *penc,
+                         void                   *msgbuf,
+                         CF_Logical_PduBuffer_t *ph,
+                         size_t                  encap_hdr_size,
+                         size_t                  total_size);
 
 /********************************************************************************/
 /**
@@ -82,8 +85,11 @@ void CF_CFDP_EncodeStart(CF_EncoderState_t *penc, void *msgbuf, CF_Logical_PduBu
  * @param encap_hdr_size Offset of first CFDP PDU octet within buffer
  * @param total_size     Total size of msgbuf encapsulation structure (decoding cannot exceed this)
  */
-void CF_CFDP_DecodeStart(CF_DecoderState_t *pdec, const void *msgbuf, CF_Logical_PduBuffer_t *ph, size_t encap_hdr_size,
-                         size_t total_size);
+void CF_CFDP_DecodeStart(CF_DecoderState_t      *pdec,
+                         const void             *msgbuf,
+                         CF_Logical_PduBuffer_t *ph,
+                         size_t                  encap_hdr_size,
+                         size_t                  total_size);
 
 /* engine execution functions */
 
@@ -264,8 +270,13 @@ void CF_CFDP_DisableEngine(void);
  * @retval #CFE_SUCCESS \copydoc CFE_SUCCESS
  * @returns CFE_SUCCESS on success. CF_ERROR on error.
  */
-CFE_Status_t CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, CF_CFDP_Class_t cfdp_class, uint8 keep,
-                            uint8 chan, uint8 priority, CF_EntityId_t dest_id);
+CFE_Status_t CF_CFDP_TxFile(const char     *src_filename,
+                            const char     *dst_filename,
+                            CF_CFDP_Class_t cfdp_class,
+                            uint8           keep,
+                            uint8           chan,
+                            uint8           priority,
+                            CF_EntityId_t   dest_id);
 
 /************************************************************************/
 /** @brief Begin transmit of a directory.
@@ -288,8 +299,13 @@ CFE_Status_t CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, 
  * @retval #CFE_SUCCESS \copydoc CFE_SUCCESS
  * @returns CFE_SUCCESS on success. CF_ERROR on error.
  */
-CFE_Status_t CF_CFDP_PlaybackDir(const char *src_filename, const char *dst_filename, CF_CFDP_Class_t cfdp_class,
-                                 uint8 keep, uint8 chan, uint8 priority, uint16 dest_id);
+CFE_Status_t CF_CFDP_PlaybackDir(const char     *src_filename,
+                                 const char     *dst_filename,
+                                 CF_CFDP_Class_t cfdp_class,
+                                 uint8           keep,
+                                 uint8           chan,
+                                 uint8           priority,
+                                 uint16          dest_id);
 
 /************************************************************************/
 /** @brief Build the PDU header in the output buffer to prepare to send a packet.
@@ -308,9 +324,13 @@ CFE_Status_t CF_CFDP_PlaybackDir(const char *src_filename, const char *dst_filen
  * @returns Pointer to PDU buffer which may be filled with additional data
  * @retval  NULL if no message buffer available
  */
-CF_Logical_PduBuffer_t *CF_CFDP_ConstructPduHeader(const CF_Transaction_t *txn, CF_CFDP_FileDirective_t directive_code,
-                                                   CF_EntityId_t src_eid, CF_EntityId_t dst_eid, bool towards_sender,
-                                                   CF_TransactionSeq_t tsn, bool silent);
+CF_Logical_PduBuffer_t *CF_CFDP_ConstructPduHeader(const CF_Transaction_t *txn,
+                                                   CF_CFDP_FileDirective_t directive_code,
+                                                   CF_EntityId_t           src_eid,
+                                                   CF_EntityId_t           dst_eid,
+                                                   bool                    towards_sender,
+                                                   CF_TransactionSeq_t     tsn,
+                                                   bool                    silent);
 
 /************************************************************************/
 /** @brief Build a metadata PDU for transmit.
