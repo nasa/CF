@@ -107,7 +107,7 @@ typedef struct CF_HkChannel_Data
     uint8           poll_counter;            /**< \brief Number of active polling directories */
     uint8           playback_counter;        /**< \brief Number of active playback directories */
     uint8           frozen;                  /**< \brief Frozen state: 0 == not frozen, else frozen */
-    uint8           spare[7];                /**< \brief Alignment spare (uint64 values in the counters) */
+    uint8           spare;                   /**< \brief Alignment spare (uint64 values in the counters) */
 } CF_HkChannel_Data_t;
 
 /**
@@ -116,7 +116,7 @@ typedef struct CF_HkChannel_Data
 typedef struct CF_HkPacket_Payload
 {
     CF_HkCmdCounters_t counters; /**< \brief Command counters */
-    uint8              spare[4]; /**< \brief Alignment spare (CF_HkCmdCounters_t is 4 bytes) */
+    uint8              Padding[4];
 
     CF_HkChannel_Data_t channel_hk[CF_NUM_CHANNELS]; /**< \brief Per channel housekeeping data */
 } CF_HkPacket_Payload_t;
