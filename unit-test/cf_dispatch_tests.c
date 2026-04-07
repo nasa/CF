@@ -59,8 +59,10 @@ void Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
-                     sizeof(forced_return_CFE_MSG_GetFcnCode), false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode),
+                     &forced_return_CFE_MSG_GetFcnCode,
+                     sizeof(forced_return_CFE_MSG_GetFcnCode),
+                     false);
     /* CFE_MSG_GetSize does not matter for Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent
      */
 
@@ -83,8 +85,10 @@ void Test_CF_ProcessGroundCommand_When_cmd_GreaterThan_CF_NUM_COMMANDS_FailAndSe
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
-                     sizeof(forced_return_CFE_MSG_GetFcnCode), false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode),
+                     &forced_return_CFE_MSG_GetFcnCode,
+                     sizeof(forced_return_CFE_MSG_GetFcnCode),
+                     false);
     /* CFE_MSG_GetSize does not matter for Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent
      */
 
@@ -108,9 +112,13 @@ void Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForT
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
-                     sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &forced_return_CFE_MSG_GetSize, sizeof(forced_return_CFE_MSG_GetSize),
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode),
+                     &forced_return_CFE_MSG_GetFcnCode,
+                     sizeof(forced_return_CFE_MSG_GetFcnCode),
+                     false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize),
+                     &forced_return_CFE_MSG_GetSize,
+                     sizeof(forced_return_CFE_MSG_GetSize),
                      false);
 
     /* Act */
@@ -134,9 +142,13 @@ void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_NoopCmd_With_m
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
-                     sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &forced_return_CFE_MSG_GetSize, sizeof(forced_return_CFE_MSG_GetSize),
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode),
+                     &forced_return_CFE_MSG_GetFcnCode,
+                     sizeof(forced_return_CFE_MSG_GetFcnCode),
+                     false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize),
+                     &forced_return_CFE_MSG_GetSize,
+                     sizeof(forced_return_CFE_MSG_GetSize),
                      false);
 
     /* Act */
@@ -157,9 +169,13 @@ void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_1
 
     memset(&utbuf, 0, sizeof(utbuf));
 
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
-                     sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &forced_return_CFE_MSG_GetSize, sizeof(forced_return_CFE_MSG_GetSize),
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode),
+                     &forced_return_CFE_MSG_GetFcnCode,
+                     sizeof(forced_return_CFE_MSG_GetFcnCode),
+                     false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize),
+                     &forced_return_CFE_MSG_GetSize,
+                     sizeof(forced_return_CFE_MSG_GetSize),
                      false);
 
     /* Act */
@@ -192,9 +208,13 @@ void Test_CF_AppPipe_ProcessGroundCommand(void)
 
     /* CFE_MSG_GetMsgId uses return by ref */
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetMsgId), &forced_MsgID, sizeof(forced_MsgID), false);
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode), &forced_return_CFE_MSG_GetFcnCode,
-                     sizeof(forced_return_CFE_MSG_GetFcnCode), false);
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &forced_return_CFE_MSG_GetSize, sizeof(forced_return_CFE_MSG_GetSize),
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetFcnCode),
+                     &forced_return_CFE_MSG_GetFcnCode,
+                     sizeof(forced_return_CFE_MSG_GetFcnCode),
+                     false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize),
+                     &forced_return_CFE_MSG_GetSize,
+                     sizeof(forced_return_CFE_MSG_GetSize),
                      false);
 
     /* Act */
@@ -267,31 +287,40 @@ void Test_CF_AppPipe_UnrecognizedCommandEnterDefaultPath(void)
 
 void add_CF_ProcessGroundCommand_tests(void)
 {
-    UtTest_Add(Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent, cf_dispatch_tests_Setup,
+    UtTest_Add(Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent,
+               cf_dispatch_tests_Setup,
                cf_dispatch_tests_Teardown,
                "Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent");
     UtTest_Add(Test_CF_ProcessGroundCommand_When_cmd_GreaterThan_CF_NUM_COMMANDS_FailAndSendEvent,
-               cf_dispatch_tests_Setup, cf_dispatch_tests_Teardown,
+               cf_dispatch_tests_Setup,
+               cf_dispatch_tests_Teardown,
                "Test_CF_ProcessGroundCommand_When_cmd_GreaterThan_CF_NUM_COMMANDS_FailAndSendEvent");
     UtTest_Add(
         Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForThatCommandSendEventAndFailure,
-        cf_dispatch_tests_Setup, cf_dispatch_tests_Teardown,
+        cf_dispatch_tests_Setup,
+        cf_dispatch_tests_Teardown,
         "Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForThatCommandSendEventAndFailure");
-    UtTest_Add(Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_NoopCmd_With_msg, cf_dispatch_tests_Setup,
+    UtTest_Add(Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_NoopCmd_With_msg,
+               cf_dispatch_tests_Setup,
                cf_dispatch_tests_Teardown,
                "Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_NoopCmd_With_msg");
     UtTest_Add(Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_12_Is_NULL,
-               cf_dispatch_tests_Setup, cf_dispatch_tests_Teardown,
+               cf_dispatch_tests_Setup,
+               cf_dispatch_tests_Teardown,
                "Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_12_Is_NULL");
 }
 
 void add_CF_AppPipe_tests(void)
 {
-    UtTest_Add(Test_CF_AppPipe_ProcessGroundCommand, cf_dispatch_tests_Setup, cf_dispatch_tests_Teardown,
+    UtTest_Add(Test_CF_AppPipe_ProcessGroundCommand,
+               cf_dispatch_tests_Setup,
+               cf_dispatch_tests_Teardown,
                "Test_CF_AppPipe_ProcessGroundCommand");
     UtTest_Add(Test_CF_AppPipe_WakeUp, cf_dispatch_tests_Setup, cf_dispatch_tests_Teardown, "Test_CF_AppPipe_WakeUp");
     UtTest_Add(Test_CF_AppPipe_SendHk, cf_dispatch_tests_Setup, cf_dispatch_tests_Teardown, "Test_CF_AppPipe_SendHk");
-    UtTest_Add(Test_CF_AppPipe_UnrecognizedCommandEnterDefaultPath, cf_dispatch_tests_Setup, cf_dispatch_tests_Teardown,
+    UtTest_Add(Test_CF_AppPipe_UnrecognizedCommandEnterDefaultPath,
+               cf_dispatch_tests_Setup,
+               cf_dispatch_tests_Teardown,
                "Test_CF_AppPipe_UnrecognizedCommandEnterDefaultPath");
 }
 

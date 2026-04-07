@@ -143,9 +143,13 @@ void CF_CFDP_CompleteTick(CF_Transaction_t *txn)
  * Generated stub function for CF_CFDP_ConstructPduHeader()
  * ----------------------------------------------------
  */
-CF_Logical_PduBuffer_t *CF_CFDP_ConstructPduHeader(const CF_Transaction_t *txn, CF_CFDP_FileDirective_t directive_code,
-                                                   CF_EntityId_t src_eid, CF_EntityId_t dst_eid, bool towards_sender,
-                                                   CF_TransactionSeq_t tsn, bool silent)
+CF_Logical_PduBuffer_t *CF_CFDP_ConstructPduHeader(const CF_Transaction_t *txn,
+                                                   CF_CFDP_FileDirective_t directive_code,
+                                                   CF_EntityId_t           src_eid,
+                                                   CF_EntityId_t           dst_eid,
+                                                   bool                    towards_sender,
+                                                   CF_TransactionSeq_t     tsn,
+                                                   bool                    silent)
 {
     UT_GenStub_SetupReturnBuffer(CF_CFDP_ConstructPduHeader, CF_Logical_PduBuffer_t *);
 
@@ -187,7 +191,6 @@ int CF_CFDP_CopyStringFromLV(char *buf, size_t buf_maxsz, const CF_Logical_Lv_t 
  */
 void CF_CFDP_CycleEngine(void)
 {
-
     UT_GenStub_Execute(CF_CFDP_CycleEngine, Basic, NULL);
 }
 
@@ -196,8 +199,11 @@ void CF_CFDP_CycleEngine(void)
  * Generated stub function for CF_CFDP_DecodeStart()
  * ----------------------------------------------------
  */
-void CF_CFDP_DecodeStart(CF_DecoderState_t *pdec, const void *msgbuf, CF_Logical_PduBuffer_t *ph, size_t encap_hdr_size,
-                         size_t total_size)
+void CF_CFDP_DecodeStart(CF_DecoderState_t      *pdec,
+                         const void             *msgbuf,
+                         CF_Logical_PduBuffer_t *ph,
+                         size_t                  encap_hdr_size,
+                         size_t                  total_size)
 {
     UT_GenStub_AddParam(CF_CFDP_DecodeStart, CF_DecoderState_t *, pdec);
     UT_GenStub_AddParam(CF_CFDP_DecodeStart, const void *, msgbuf);
@@ -215,7 +221,6 @@ void CF_CFDP_DecodeStart(CF_DecoderState_t *pdec, const void *msgbuf, CF_Logical
  */
 void CF_CFDP_DisableEngine(void)
 {
-
     UT_GenStub_Execute(CF_CFDP_DisableEngine, Basic, NULL);
 }
 
@@ -254,8 +259,11 @@ CF_CListTraverse_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context)
  * Generated stub function for CF_CFDP_EncodeStart()
  * ----------------------------------------------------
  */
-void CF_CFDP_EncodeStart(CF_EncoderState_t *penc, void *msgbuf, CF_Logical_PduBuffer_t *ph, size_t encap_hdr_size,
-                         size_t total_size)
+void CF_CFDP_EncodeStart(CF_EncoderState_t      *penc,
+                         void                   *msgbuf,
+                         CF_Logical_PduBuffer_t *ph,
+                         size_t                  encap_hdr_size,
+                         size_t                  total_size)
 {
     UT_GenStub_AddParam(CF_CFDP_EncodeStart, CF_EncoderState_t *, penc);
     UT_GenStub_AddParam(CF_CFDP_EncodeStart, void *, msgbuf);
@@ -363,8 +371,13 @@ void CF_CFDP_InitTxnTxFile(CF_Transaction_t *txn, CF_CFDP_Class_t cfdp_class, ui
  * Generated stub function for CF_CFDP_PlaybackDir()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_CFDP_PlaybackDir(const char *src_filename, const char *dst_filename, CF_CFDP_Class_t cfdp_class,
-                                 uint8 keep, uint8 chan, uint8 priority, uint16 dest_id)
+CFE_Status_t CF_CFDP_PlaybackDir(const char     *src_filename,
+                                 const char     *dst_filename,
+                                 CF_CFDP_Class_t cfdp_class,
+                                 uint8           keep,
+                                 uint8           chan,
+                                 uint8           priority,
+                                 uint16          dest_id)
 {
     UT_GenStub_SetupReturnBuffer(CF_CFDP_PlaybackDir, CFE_Status_t);
 
@@ -795,8 +808,13 @@ void CF_CFDP_TickTransactions(CF_Channel_t *chan)
  * Generated stub function for CF_CFDP_TxFile()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_CFDP_TxFile(const char *src_filename, const char *dst_filename, CF_CFDP_Class_t cfdp_class, uint8 keep,
-                            uint8 chan, uint8 priority, CF_EntityId_t dest_id)
+CFE_Status_t CF_CFDP_TxFile(const char     *src_filename,
+                            const char     *dst_filename,
+                            CF_CFDP_Class_t cfdp_class,
+                            uint8           keep,
+                            uint8           chan,
+                            uint8           priority,
+                            CF_EntityId_t   dest_id)
 {
     UT_GenStub_SetupReturnBuffer(CF_CFDP_TxFile, CFE_Status_t);
 

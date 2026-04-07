@@ -50,11 +50,16 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 
 {
     int32                           status = 0;
     CFE_Status_t                    ret;
-    CF_Logical_PduBuffer_t *        ph = CF_CFDP_ConstructPduHeader(txn, 0, CF_AppData.config_table->local_eid,
-                                                            txn->history->peer_eid, 0, txn->history->seq_num, 1);
+    CF_Logical_PduBuffer_t         *ph = CF_CFDP_ConstructPduHeader(txn,
+                                                            0,
+                                                            CF_AppData.config_table->local_eid,
+                                                            txn->history->peer_eid,
+                                                            0,
+                                                            txn->history->seq_num,
+                                                            1);
     CF_Logical_PduFileDataHeader_t *fd;
     size_t                          actual_bytes;
-    void *                          data_ptr;
+    void                           *data_ptr;
 
     if (!ph)
     {
@@ -105,10 +110,14 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 
             status = CF_WrappedLseek(txn->fd, foffs, OS_SEEK_SET);
             if (status != foffs)
             {
-                CFE_EVS_SendEvent(CF_CFDP_S_SEEK_FD_ERR_EID, CFE_EVS_EventType_ERROR,
-                                  "CF S%d(%lu:%lu): error seeking to offset %ld, got %ld", CF_CFDP_GetPrintClass(txn),
-                                  (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
-                                  (long)foffs, (long)status);
+                CFE_EVS_SendEvent(CF_CFDP_S_SEEK_FD_ERR_EID,
+                                  CFE_EVS_EventType_ERROR,
+                                  "CF S%d(%lu:%lu): error seeking to offset %ld, got %ld",
+                                  CF_CFDP_GetPrintClass(txn),
+                                  (unsigned long)txn->history->src_eid,
+                                  (unsigned long)txn->history->seq_num,
+                                  (long)foffs,
+                                  (long)status);
                 ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek;
                 ret = CF_ERROR;
             }
@@ -123,10 +132,14 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 
             status = CF_WrappedRead(txn->fd, data_ptr, actual_bytes);
             if (status != actual_bytes)
             {
-                CFE_EVS_SendEvent(CF_CFDP_S_READ_ERR_EID, CFE_EVS_EventType_ERROR,
+                CFE_EVS_SendEvent(CF_CFDP_S_READ_ERR_EID,
+                                  CFE_EVS_EventType_ERROR,
                                   "CF S%d(%lu:%lu): error reading bytes: expected %ld, got %ld",
-                                  CF_CFDP_GetPrintClass(txn), (unsigned long)txn->history->src_eid,
-                                  (unsigned long)txn->history->seq_num, (long)actual_bytes, (long)status);
+                                  CF_CFDP_GetPrintClass(txn),
+                                  (unsigned long)txn->history->src_eid,
+                                  (unsigned long)txn->history->seq_num,
+                                  (long)actual_bytes,
+                                  (long)status);
                 ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_read;
                 ret = CF_ERROR;
             }
@@ -190,9 +203,12 @@ void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *txn)
 void CF_CFDP_S_SubstateEarlyFin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
     /* received early fin, so just cancel */
-    CFE_EVS_SendEvent(CF_CFDP_S_EARLY_FIN_ERR_EID, CFE_EVS_EventType_ERROR,
-                      "CF S%d(%lu:%lu): got early FIN -- cancelling", CF_CFDP_GetPrintClass(txn),
-                      (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
+    CFE_EVS_SendEvent(CF_CFDP_S_EARLY_FIN_ERR_EID,
+                      CFE_EVS_EventType_ERROR,
+                      "CF S%d(%lu:%lu): got early FIN -- cancelling",
+                      CF_CFDP_GetPrintClass(txn),
+                      (unsigned long)txn->history->src_eid,
+                      (unsigned long)txn->history->seq_num);
 
     /* Set our own status code to remember in history that this was canceled due to early FIN. */
     /* Note this is not a CFDP defined CC.  It will translate to a CANCEL_REQUEST in an ack. */
@@ -232,7 +248,10 @@ void CF_CFDP_S_SubstateRecvFin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_POS_ACK_LIMIT_REACHED);
         }
 
-        CF_TRACE("%s(): Recv FIN, cc=%d, dc=%d, st=%d\n", __func__, (int)fin->cc, (int)fin->delivery_code,
+        CF_TRACE("%s(): Recv FIN, cc=%d, dc=%d, st=%d\n",
+                 __func__,
+                 (int)fin->cc,
+                 (int)fin->delivery_code,
                  (int)fin->file_status);
     }
 }
@@ -246,7 +265,7 @@ void CF_CFDP_S_SubstateRecvFin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph
 void CF_CFDP_S2_SubstateNak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
     const CF_Logical_SegmentRequest_t *sr;
-    const CF_Logical_PduNak_t *        nak;
+    const CF_Logical_PduNak_t         *nak;
     uint8                              counter;
     uint8                              bad_sr;
 
@@ -288,7 +307,9 @@ void CF_CFDP_S2_SubstateNak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 
                 /* note the fact that this has received a NAK of some nature */
                 txn->flags.tx.fd_nak_pending = true;
-                CF_TRACE("%s(): NAK for FD, offset=%lu->%lu\n", __func__, (unsigned long)sr->offset_start,
+                CF_TRACE("%s(): NAK for FD, offset=%lu->%lu\n",
+                         __func__,
+                         (unsigned long)sr->offset_start,
                          (unsigned long)sr->offset_end);
             }
         }
@@ -297,16 +318,23 @@ void CF_CFDP_S2_SubstateNak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
             nak->segment_list.num_segments;
         if (bad_sr)
         {
-            CFE_EVS_SendEvent(CF_CFDP_S_INVALID_SR_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%lu:%lu): received %d invalid NAK segment requests", CF_CFDP_GetPrintClass(txn),
-                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num, bad_sr);
+            CFE_EVS_SendEvent(CF_CFDP_S_INVALID_SR_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF S%d(%lu:%lu): received %d invalid NAK segment requests",
+                              CF_CFDP_GetPrintClass(txn),
+                              (unsigned long)txn->history->src_eid,
+                              (unsigned long)txn->history->seq_num,
+                              bad_sr);
         }
     }
     else
     {
-        CFE_EVS_SendEvent(CF_CFDP_S_PDU_NAK_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "CF S%d(%lu:%lu): received invalid NAK PDU", CF_CFDP_GetPrintClass(txn),
-                          (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
+        CFE_EVS_SendEvent(CF_CFDP_S_PDU_NAK_ERR_EID,
+                          CFE_EVS_EventType_ERROR,
+                          "CF S%d(%lu:%lu): received invalid NAK PDU",
+                          CF_CFDP_GetPrintClass(txn),
+                          (unsigned long)txn->history->src_eid,
+                          (unsigned long)txn->history->seq_num);
         ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
     }
 }
@@ -332,15 +360,21 @@ void CF_CFDP_S2_SubstateEofAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph
             txn->flags.tx.eof_ack_recv = true;
         }
 
-        CF_TRACE("%s(): Recv ACK, dir_code=%d, cc=%d, st=%d\n", __func__, (int)ack->ack_directive_code, (int)ack->cc,
+        CF_TRACE("%s(): Recv ACK, dir_code=%d, cc=%d, st=%d\n",
+                 __func__,
+                 (int)ack->ack_directive_code,
+                 (int)ack->cc,
                  (int)ack->txn_status);
     }
 
     if (ret != CFE_SUCCESS || !txn->flags.tx.eof_ack_recv)
     {
-        CFE_EVS_SendEvent(CF_CFDP_S_PDU_EOF_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "CF S%d(%lu:%lu): received invalid EOF-ACK PDU", CF_CFDP_GetPrintClass(txn),
-                          (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
+        CFE_EVS_SendEvent(CF_CFDP_S_PDU_EOF_ERR_EID,
+                          CFE_EVS_EventType_ERROR,
+                          "CF S%d(%lu:%lu): received invalid EOF-ACK PDU",
+                          CF_CFDP_GetPrintClass(txn),
+                          (unsigned long)txn->history->src_eid,
+                          (unsigned long)txn->history->seq_num);
         ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
     }
 }
@@ -354,14 +388,15 @@ void CF_CFDP_S2_SubstateEofAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph
 void CF_CFDP_S1_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
     /* s1 generally doesn't receive except a possible FIN */
-    static const CF_CFDP_FileDirectiveDispatchTable_t s1_normal = {
-        .fdirective = {[CF_CFDP_FileDirective_FIN] = CF_CFDP_S_SubstateEarlyFin}};
-    static const CF_CFDP_FileDirectiveDispatchTable_t s1_eof = {
-        .fdirective = {[CF_CFDP_FileDirective_FIN] = CF_CFDP_S_SubstateRecvFin}};
+    static const CF_CFDP_FileDirectiveDispatchTable_t s1_normal = { .fdirective = { [CF_CFDP_FileDirective_FIN] =
+                                                                                        CF_CFDP_S_SubstateEarlyFin } };
+    static const CF_CFDP_FileDirectiveDispatchTable_t s1_eof    = { .fdirective = { [CF_CFDP_FileDirective_FIN] =
+                                                                                        CF_CFDP_S_SubstateRecvFin } };
 
     /* In S1 there is no retransmit so only accept during the actual transaction */
     static const CF_CFDP_S_SubstateRecvDispatchTable_t substate_fns = {
-        .substate = {[CF_TxSubState_DATA_NORMAL] = &s1_normal, [CF_TxSubState_DATA_EOF] = &s1_eof}};
+        .substate = { [CF_TxSubState_DATA_NORMAL] = &s1_normal, [CF_TxSubState_DATA_EOF] = &s1_eof }
+    };
 
     CF_CFDP_S_DispatchRecv(txn, ph, &substate_fns);
 }
@@ -375,20 +410,23 @@ void CF_CFDP_S1_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 void CF_CFDP_S2_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
     static const CF_CFDP_FileDirectiveDispatchTable_t s2_normal = {
-        .fdirective = {[CF_CFDP_FileDirective_FIN] = CF_CFDP_S_SubstateEarlyFin,
-                       [CF_CFDP_FileDirective_NAK] = CF_CFDP_S2_SubstateNak}};
+        .fdirective = { [CF_CFDP_FileDirective_FIN] = CF_CFDP_S_SubstateEarlyFin,
+                       [CF_CFDP_FileDirective_NAK] = CF_CFDP_S2_SubstateNak }
+    };
     static const CF_CFDP_FileDirectiveDispatchTable_t s2_eof = {
-        .fdirective = {[CF_CFDP_FileDirective_FIN] = CF_CFDP_S_SubstateRecvFin,
+        .fdirective = { [CF_CFDP_FileDirective_FIN] = CF_CFDP_S_SubstateRecvFin,
                        [CF_CFDP_FileDirective_ACK] = CF_CFDP_S2_SubstateEofAck,
-                       [CF_CFDP_FileDirective_NAK] = CF_CFDP_S2_SubstateNak}};
+                       [CF_CFDP_FileDirective_NAK] = CF_CFDP_S2_SubstateNak }
+    };
 
     /* In S2, we must continue allowing all directives until full completion,
      * as the peer may be retransmitting something if it missed our ACK */
     static const CF_CFDP_S_SubstateRecvDispatchTable_t substate_fns = {
-        .substate = {[CF_TxSubState_DATA_NORMAL] = &s2_normal,
+        .substate = { [CF_TxSubState_DATA_NORMAL] = &s2_normal,
                      [CF_TxSubState_DATA_EOF]    = &s2_eof,
                      [CF_TxSubState_FILESTORE]   = &s2_eof,
-                     [CF_TxSubState_COMPLETE]    = &s2_eof}};
+                     [CF_TxSubState_COMPLETE]    = &s2_eof }
+    };
 
     CF_CFDP_S_DispatchRecv(txn, ph, &substate_fns);
 }
@@ -413,9 +451,12 @@ void CF_CFDP_S_Init(CF_Transaction_t *txn)
         OsStatus = OS_FileOpenCheck(txn->history->fnames.src_filename);
         if (OsStatus == OS_SUCCESS)
         {
-            CFE_EVS_SendEvent(CF_CFDP_S_ALREADY_OPEN_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%lu:%lu): file %s already open", CF_CFDP_GetPrintClass(txn),
-                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
+            CFE_EVS_SendEvent(CF_CFDP_S_ALREADY_OPEN_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF S%d(%lu:%lu): file %s already open",
+                              CF_CFDP_GetPrintClass(txn),
+                              (unsigned long)txn->history->src_eid,
+                              (unsigned long)txn->history->seq_num,
                               txn->history->fnames.src_filename);
             ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_open;
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
@@ -427,10 +468,14 @@ void CF_CFDP_S_Init(CF_Transaction_t *txn)
         OsStatus = CF_WrappedOpenCreate(&PendingFd, txn->history->fnames.src_filename, OS_FILE_FLAG_NONE, OS_READ_ONLY);
         if (OsStatus < 0)
         {
-            CFE_EVS_SendEvent(CF_CFDP_S_OPEN_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%lu:%lu): failed to open file %s, error=%ld", CF_CFDP_GetPrintClass(txn),
-                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
-                              txn->history->fnames.src_filename, (long)OsStatus);
+            CFE_EVS_SendEvent(CF_CFDP_S_OPEN_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF S%d(%lu:%lu): failed to open file %s, error=%ld",
+                              CF_CFDP_GetPrintClass(txn),
+                              (unsigned long)txn->history->src_eid,
+                              (unsigned long)txn->history->seq_num,
+                              txn->history->fnames.src_filename,
+                              (long)OsStatus);
             ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_open;
             PendingFd = OS_OBJECT_ID_UNDEFINED; /* just in case */
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
@@ -442,10 +487,14 @@ void CF_CFDP_S_Init(CF_Transaction_t *txn)
         OsStatus = CF_WrappedLseek(PendingFd, 0, OS_SEEK_END);
         if (OsStatus < 0)
         {
-            CFE_EVS_SendEvent(CF_CFDP_S_SEEK_END_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%lu:%lu): failed to seek end file %s, error=%ld", CF_CFDP_GetPrintClass(txn),
-                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
-                              txn->history->fnames.src_filename, (long)OsStatus);
+            CFE_EVS_SendEvent(CF_CFDP_S_SEEK_END_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF S%d(%lu:%lu): failed to seek end file %s, error=%ld",
+                              CF_CFDP_GetPrintClass(txn),
+                              (unsigned long)txn->history->src_eid,
+                              (unsigned long)txn->history->seq_num,
+                              txn->history->fnames.src_filename,
+                              (long)OsStatus);
             ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek;
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
         }
@@ -460,10 +509,14 @@ void CF_CFDP_S_Init(CF_Transaction_t *txn)
         OsStatus = CF_WrappedLseek(PendingFd, 0, OS_SEEK_SET);
         if (OsStatus < 0)
         {
-            CFE_EVS_SendEvent(CF_CFDP_S_SEEK_BEG_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF S%d(%lu:%lu): failed to seek begin file %s, got %ld", CF_CFDP_GetPrintClass(txn),
-                              (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num,
-                              txn->history->fnames.src_filename, (long)OsStatus);
+            CFE_EVS_SendEvent(CF_CFDP_S_SEEK_BEG_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF S%d(%lu:%lu): failed to seek begin file %s, got %ld",
+                              CF_CFDP_GetPrintClass(txn),
+                              (unsigned long)txn->history->src_eid,
+                              (unsigned long)txn->history->seq_num,
+                              txn->history->fnames.src_filename,
+                              (long)OsStatus);
             ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek;
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
         }
@@ -501,8 +554,8 @@ void CF_CFDP_S_HandleFileRetention(CF_Transaction_t *txn)
      *   - If the transfer is not successful or the "keep" flag is true, then do nothing
      */
     char                      TempName[CFE_MISSION_MAX_PATH_LEN];
-    const char *              SubjectFile;
-    const char *              MoveDest;
+    const char               *SubjectFile;
+    const char               *MoveDest;
     const CF_ChannelConfig_t *config;
     int32                     OsStatus;
     bool                      AllowLocalRemove;
@@ -537,8 +590,8 @@ void CF_CFDP_S_HandleFileRetention(CF_Transaction_t *txn)
         else
         {
             /* In class 2, check that the peer FIN said it had a completed and retained file */
-            AllowLocalRemove = (txn->state_data.fin_fs == CF_CFDP_FinFileStatus_RETAINED &&
-                                txn->state_data.fin_dc == CF_CFDP_FinDeliveryCode_COMPLETE);
+            AllowLocalRemove = (txn->state_data.fin_fs == CF_CFDP_FinFileStatus_RETAINED
+                                && txn->state_data.fin_dc == CF_CFDP_FinDeliveryCode_COMPLETE);
         }
 
         if (AllowLocalRemove)
@@ -551,18 +604,27 @@ void CF_CFDP_S_HandleFileRetention(CF_Transaction_t *txn)
     if (MoveDest != NULL)
     {
         OsStatus = OS_mv(SubjectFile, MoveDest);
-        CFE_EVS_SendEvent(CF_CFDP_S_FILE_MOVED_EID, CFE_EVS_EventType_INFORMATION,
-                          "CF R%d(%lu:%lu): moved %s -> %s, status=%d", CF_CFDP_GetPrintClass(txn),
-                          (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num, SubjectFile,
-                          MoveDest, (int)OsStatus);
+        CFE_EVS_SendEvent(CF_CFDP_S_FILE_MOVED_EID,
+                          CFE_EVS_EventType_INFORMATION,
+                          "CF R%d(%lu:%lu): moved %s -> %s, status=%d",
+                          CF_CFDP_GetPrintClass(txn),
+                          (unsigned long)txn->history->src_eid,
+                          (unsigned long)txn->history->seq_num,
+                          SubjectFile,
+                          MoveDest,
+                          (int)OsStatus);
     }
     else if (AllowLocalRemove)
     {
         /* no move dir configured, so remove it (because keep == 0 and txn was success) */
         OsStatus = OS_remove(SubjectFile);
-        CFE_EVS_SendEvent(CF_CFDP_S_FILE_REMOVED_EID, CFE_EVS_EventType_INFORMATION,
-                          "CF R%d(%lu:%lu): removed source file %s, status=%d", CF_CFDP_GetPrintClass(txn),
-                          (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num, SubjectFile,
+        CFE_EVS_SendEvent(CF_CFDP_S_FILE_REMOVED_EID,
+                          CFE_EVS_EventType_INFORMATION,
+                          "CF R%d(%lu:%lu): removed source file %s, status=%d",
+                          CF_CFDP_GetPrintClass(txn),
+                          (unsigned long)txn->history->src_eid,
+                          (unsigned long)txn->history->seq_num,
+                          SubjectFile,
                           (int)OsStatus);
     }
 }
@@ -803,7 +865,7 @@ void CF_CFDP_S_CheckState(CF_Transaction_t *txn)
                 CF_CRC_Finalize(&txn->crc);
                 txn->flags.com.crc_complete = true;
                 /* send the initial EOF */
-                txn->flags.tx.send_eof = true;
+                txn->flags.tx.send_eof      = true;
                 break;
             case CF_TxSubState_COMPLETE:
                 /* This changes the txn state such that this function is no longer called. */
@@ -844,8 +906,10 @@ void CF_CFDP_S_Tick(CF_Transaction_t *txn)
             /* inactivity is abnormal in any active state */
             if (CurrStatus == CF_CFDP_AckTxnStatus_ACTIVE)
             {
-                CFE_EVS_SendEvent(CF_CFDP_S_INACT_TIMER_ERR_EID, CFE_EVS_EventType_ERROR,
-                                  "CF S(%lu:%lu): inactivity timer expired", (unsigned long)txn->history->src_eid,
+                CFE_EVS_SendEvent(CF_CFDP_S_INACT_TIMER_ERR_EID,
+                                  CFE_EVS_EventType_ERROR,
+                                  "CF S(%lu:%lu): inactivity timer expired",
+                                  (unsigned long)txn->history->src_eid,
                                   (unsigned long)txn->history->seq_num);
                 ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.inactivity_timer;
 

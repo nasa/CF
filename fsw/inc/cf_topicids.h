@@ -31,8 +31,8 @@
  * These are for the normal CF app commands and telemtry
  */
 
-#define CFE_MISSION_CF_CMD_TOPICID             CFE_MISSION_CF_TIDVAL(CMD)
-#define DEFAULT_CFE_MISSION_CF_CMD_TOPICID     0xB3 /**< \brief Message ID for commands */
+#define CFE_MISSION_CF_CMD_TOPICID         CFE_MISSION_CF_TIDVAL(CMD)
+#define DEFAULT_CFE_MISSION_CF_CMD_TOPICID 0xB3 /**< \brief Message ID for commands */
 
 #define CFE_MISSION_CF_SEND_HK_TOPICID         CFE_MISSION_CF_TIDVAL(SEND_HK)
 #define DEFAULT_CFE_MISSION_CF_SEND_HK_TOPICID 0xB4 /**< \brief Message ID to request housekeeping telemetry */
@@ -40,8 +40,8 @@
 #define CFE_MISSION_CF_WAKE_UP_TOPICID         CFE_MISSION_CF_TIDVAL(WAKE_UP)
 #define DEFAULT_CFE_MISSION_CF_WAKE_UP_TOPICID 0xB5 /**< \brief Message ID for waking up the processing cycle */
 
-#define CFE_MISSION_CF_HK_TLM_TOPICID          CFE_MISSION_CF_TIDVAL(HK_TLM)
-#define DEFAULT_CFE_MISSION_CF_HK_TLM_TOPICID  0xB0 /**< \brief Message ID for housekeeping telemetry */
+#define CFE_MISSION_CF_HK_TLM_TOPICID         CFE_MISSION_CF_TIDVAL(HK_TLM)
+#define DEFAULT_CFE_MISSION_CF_HK_TLM_TOPICID 0xB0 /**< \brief Message ID for housekeeping telemetry */
 
 #define CFE_MISSION_CF_EOT_TLM_TOPICID         CFE_MISSION_CF_TIDVAL(EOT_TLM)
 #define DEFAULT_CFE_MISSION_CF_EOT_TLM_TOPICID 0xB3 /**< \brief Message ID for end of transaction telemetry */

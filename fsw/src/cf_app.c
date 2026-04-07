@@ -69,24 +69,30 @@ void CF_CheckTables(void)
         status = CFE_TBL_ReleaseAddress(CF_AppData.config_handle);
         if (status < CFE_SUCCESS)
         {
-            CFE_EVS_SendEvent(CF_INIT_TBL_CHECK_REL_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF: error in CFE_TBL_ReleaseAddress (check), returned 0x%08lx", (unsigned long)status);
+            CFE_EVS_SendEvent(CF_INIT_TBL_CHECK_REL_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF: error in CFE_TBL_ReleaseAddress (check), returned 0x%08lx",
+                              (unsigned long)status);
             CF_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
         }
 
         status = CFE_TBL_Manage(CF_AppData.config_handle);
         if (status < CFE_SUCCESS)
         {
-            CFE_EVS_SendEvent(CF_INIT_TBL_CHECK_MAN_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF: error in CFE_TBL_Manage (check), returned 0x%08lx", (unsigned long)status);
+            CFE_EVS_SendEvent(CF_INIT_TBL_CHECK_MAN_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF: error in CFE_TBL_Manage (check), returned 0x%08lx",
+                              (unsigned long)status);
             CF_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
         }
 
         status = CFE_TBL_GetAddress((void *)&CF_AppData.config_table, CF_AppData.config_handle);
         if (status < CFE_SUCCESS)
         {
-            CFE_EVS_SendEvent(CF_INIT_TBL_CHECK_GA_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF: failed to get table address (check), returned 0x%08lx", (unsigned long)status);
+            CFE_EVS_SendEvent(CF_INIT_TBL_CHECK_GA_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF: failed to get table address (check), returned 0x%08lx",
+                              (unsigned long)status);
             CF_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
         }
     }
@@ -109,12 +115,14 @@ CFE_Status_t CF_ValidateConfigTable(void *tbl_ptr)
     }
     else if (!tbl->rx_crc_calc_bytes_per_wakeup || (tbl->rx_crc_calc_bytes_per_wakeup & 0x3ff))
     {
-        CFE_EVS_SendEvent(CF_INIT_CRC_ALIGN_ERR_EID, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_INIT_CRC_ALIGN_ERR_EID,
+                          CFE_EVS_EventType_ERROR,
                           "CF: config table has rx CRC size not aligned with 1024");
     }
     else if (tbl->outgoing_file_chunk_size > sizeof(CF_CFDP_PduFileDataContent_t))
     {
-        CFE_EVS_SendEvent(CF_INIT_OUTGOING_SIZE_ERR_EID, CFE_EVS_EventType_ERROR,
+        CFE_EVS_SendEvent(CF_INIT_OUTGOING_SIZE_ERR_EID,
+                          CFE_EVS_EventType_ERROR,
                           "CF: config table has outgoing file chunk size too large");
     }
     else
@@ -135,20 +143,27 @@ CFE_Status_t CF_TableInit(void)
 {
     CFE_Status_t status;
 
-    status = CFE_TBL_Register(&CF_AppData.config_handle, CF_CONFIG_TABLE_NAME, sizeof(CF_ConfigTable_t),
-                              CFE_TBL_OPT_SNGL_BUFFER | CFE_TBL_OPT_LOAD_DUMP, CF_ValidateConfigTable);
+    status = CFE_TBL_Register(&CF_AppData.config_handle,
+                              CF_CONFIG_TABLE_NAME,
+                              sizeof(CF_ConfigTable_t),
+                              CFE_TBL_OPT_SNGL_BUFFER | CFE_TBL_OPT_LOAD_DUMP,
+                              CF_ValidateConfigTable);
     if (status != CFE_SUCCESS)
     {
-        CFE_EVS_SendEvent(CF_INIT_TBL_REG_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "CF: error registering table, returned 0x%08lx", (unsigned long)status);
+        CFE_EVS_SendEvent(CF_INIT_TBL_REG_ERR_EID,
+                          CFE_EVS_EventType_ERROR,
+                          "CF: error registering table, returned 0x%08lx",
+                          (unsigned long)status);
     }
     else
     {
         status = CFE_TBL_Load(CF_AppData.config_handle, CFE_TBL_SRC_FILE, CF_CONFIG_TABLE_FILENAME);
         if (status != CFE_SUCCESS)
         {
-            CFE_EVS_SendEvent(CF_INIT_TBL_LOAD_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF: error loading table, returned 0x%08lx", (unsigned long)status);
+            CFE_EVS_SendEvent(CF_INIT_TBL_LOAD_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF: error loading table, returned 0x%08lx",
+                              (unsigned long)status);
         }
     }
 
@@ -157,8 +172,10 @@ CFE_Status_t CF_TableInit(void)
         status = CFE_TBL_Manage(CF_AppData.config_handle);
         if (status != CFE_SUCCESS)
         {
-            CFE_EVS_SendEvent(CF_INIT_TBL_MANAGE_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF: error in CFE_TBL_Manage, returned 0x%08lx", (unsigned long)status);
+            CFE_EVS_SendEvent(CF_INIT_TBL_MANAGE_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF: error in CFE_TBL_Manage, returned 0x%08lx",
+                              (unsigned long)status);
         }
     }
 
@@ -168,8 +185,10 @@ CFE_Status_t CF_TableInit(void)
         /* status will be CFE_TBL_INFO_UPDATED because it was just loaded, but we can use CFE_SUCCESS too */
         if ((status != CFE_TBL_INFO_UPDATED) && (status != CFE_SUCCESS))
         {
-            CFE_EVS_SendEvent(CF_INIT_TBL_GETADDR_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF: error getting table address, returned 0x%08lx", (unsigned long)status);
+            CFE_EVS_SendEvent(CF_INIT_TBL_GETADDR_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF: error getting table address, returned 0x%08lx",
+                              (unsigned long)status);
         }
         else
         {
@@ -189,7 +208,7 @@ CFE_Status_t CF_TableInit(void)
 CFE_Status_t CF_AppInit(void)
 {
     CFE_Status_t              status;
-    const CFE_SB_MsgId_Atom_t MID_VALUES[] = {CF_CMD_MID, CF_SEND_HK_MID, CF_WAKE_UP_MID};
+    const CFE_SB_MsgId_Atom_t MID_VALUES[] = { CF_CMD_MID, CF_SEND_HK_MID, CF_WAKE_UP_MID };
     uint32                    i;
 
     /* Zero-out global data structure */
@@ -209,8 +228,11 @@ CFE_Status_t CF_AppInit(void)
         status = CFE_SB_CreatePipe(&CF_AppData.CmdPipe, CF_PIPE_DEPTH, CF_PIPE_NAME);
         if (status != CFE_SUCCESS)
         {
-            CFE_EVS_SendEvent(CF_CR_PIPE_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF app: error creating pipe %s, returned 0x%08lx", CF_PIPE_NAME, (unsigned long)status);
+            CFE_EVS_SendEvent(CF_CR_PIPE_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF app: error creating pipe %s, returned 0x%08lx",
+                              CF_PIPE_NAME,
+                              (unsigned long)status);
         }
     }
 
@@ -222,7 +244,8 @@ CFE_Status_t CF_AppInit(void)
             if (status != CFE_SUCCESS)
             {
                 CFE_ES_WriteToSysLog("CF app: failed to subscribe to MID 0x%04lx, returned 0x%08lx",
-                                     (unsigned long)MID_VALUES[i], (unsigned long)status);
+                                     (unsigned long)MID_VALUES[i],
+                                     (unsigned long)status);
                 break;
             }
         }
@@ -240,8 +263,13 @@ CFE_Status_t CF_AppInit(void)
 
     if (status == CFE_SUCCESS)
     {
-        CFE_EVS_SendEvent(CF_INIT_INF_EID, CFE_EVS_EventType_INFORMATION, "CF Initialized. Version %d.%d.%d.%d",
-                          CF_MAJOR_VERSION, CF_MINOR_VERSION, CF_REVISION, CF_MISSION_REV);
+        CFE_EVS_SendEvent(CF_INIT_INF_EID,
+                          CFE_EVS_EventType_INFORMATION,
+                          "CF Initialized. Version %d.%d.%d.%d",
+                          CF_MAJOR_VERSION,
+                          CF_MINOR_VERSION,
+                          CF_REVISION,
+                          CF_MISSION_REV);
     }
 
     return status;
@@ -279,8 +307,10 @@ void CF_AppMain(void)
         }
         else if (status != CFE_SB_TIME_OUT && status != CFE_SB_NO_MESSAGE)
         {
-            CFE_EVS_SendEvent(CF_INIT_MSG_RECV_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "CF: exiting due to CFE_SB_ReceiveBuffer error 0x%08lx", (unsigned long)status);
+            CFE_EVS_SendEvent(CF_INIT_MSG_RECV_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF: exiting due to CFE_SB_ReceiveBuffer error 0x%08lx",
+                              (unsigned long)status);
             CF_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
         }
         else

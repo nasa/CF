@@ -28,13 +28,15 @@
 
 /* Alternate handlers for CF_CList_Traverse -
  * these differ in the type of context they save */
-void UT_AltHandler_CF_CList_Traverse_TRAVERSE_ALL_ARGS_T(void *UserObj, UT_EntryKey_t FuncKey,
+void UT_AltHandler_CF_CList_Traverse_TRAVERSE_ALL_ARGS_T(void                   *UserObj,
+                                                         UT_EntryKey_t           FuncKey,
                                                          const UT_StubContext_t *Context);
 void UT_AltHandler_CF_CList_Traverse_POINTER(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context);
 
 void UT_AltHandler_CF_CList_Traverse_R_PRIO(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context);
 
-void UT_AltHandler_CF_TraverseAllTransactions_All_Channels_Set_Context(void *UserObj, UT_EntryKey_t FuncKey,
+void UT_AltHandler_CF_TraverseAllTransactions_All_Channels_Set_Context(void                   *UserObj,
+                                                                       UT_EntryKey_t           FuncKey,
                                                                        const UT_StubContext_t *Context);
 
 void UT_AltHandler_GenericPointerReturn(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context);

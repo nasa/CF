@@ -58,10 +58,7 @@
  *  @par Limits:
  *
  */
-#define CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION \
-    {                                            \
-        CF_NAK_MAX_SEGMENTS, CF_NAK_MAX_SEGMENTS \
-    }
+#define CF_CHANNEL_NUM_RX_CHUNKS_PER_TRANSACTION { CF_NAK_MAX_SEGMENTS, CF_NAK_MAX_SEGMENTS }
 
 /**
  *  @brief TX chunks per transaction (per channel)
@@ -72,10 +69,7 @@
  *  @par Limits:
  *
  */
-#define CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION \
-    {                                            \
-        CF_NAK_MAX_SEGMENTS, CF_NAK_MAX_SEGMENTS \
-    }
+#define CF_CHANNEL_NUM_TX_CHUNKS_PER_TRANSACTION { CF_NAK_MAX_SEGMENTS, CF_NAK_MAX_SEGMENTS }
 
 /**
  *  @brief Total number of chunks (tx, rx, all channels)

@@ -74,8 +74,8 @@ void Test_CF_EncodeIntegerInSize(void)
      */
     CF_EncoderState_t state;
     uint8             bytes[10];
-    const uint8       expected_2[] = {0x12, 0x34};
-    const uint8       expected_4[] = {0x00, 0x00, 0x12, 0x34};
+    const uint8       expected_2[] = { 0x12, 0x34 };
+    const uint8       expected_4[] = { 0x00, 0x00, 0x12, 0x34 };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(bytes, 0xEE, sizeof(bytes));
@@ -110,7 +110,7 @@ void Test_CF_CFDP_EncodeHeaderWithoutSize(void)
     CF_EncoderState_t      state;
     CF_Logical_PduHeader_t in;
     uint8                  bytes[10];
-    const uint8            expected[] = {0x3c, 0xEE, 0xEE, 0x00, 0x44, 0x55, 0x66};
+    const uint8            expected[] = { 0x3c, 0xEE, 0xEE, 0x00, 0x44, 0x55, 0x66 };
 
     memset(&in, 0, sizeof(in));
     in.version         = 1;
@@ -149,7 +149,7 @@ void Test_CF_CFDP_EncodeHeaderFinalSize(void)
     CF_EncoderState_t      state;
     CF_Logical_PduHeader_t in;
     uint8                  bytes[10];
-    const uint8            expected[] = {0xEE, 0x12, 0x34, 0xEE};
+    const uint8            expected[] = { 0xEE, 0x12, 0x34, 0xEE };
 
     memset(&in, 0, sizeof(in));
     in.data_encoded_length = 0x1234;
@@ -183,7 +183,7 @@ void Test_CF_CFDP_EncodeFileDirectiveHeader(void)
     CF_EncoderState_t                   state;
     CF_Logical_PduFileDirectiveHeader_t in;
     uint8                               bytes[10];
-    const uint8                         expected[] = {0x07};
+    const uint8                         expected[] = { 0x07 };
 
     memset(&in, 0, sizeof(in));
     in.directive_code = 7;
@@ -214,9 +214,9 @@ void Test_CF_CFDP_EncodeLV(void)
     CF_EncoderState_t state;
     CF_Logical_Lv_t   in;
     uint8             bytes[10];
-    const uint8       ref[]             = {0x45, 0x67, 0x89};
-    const uint8       expected[]        = {0x03, 0x45, 0x67, 0x89};
-    const uint8       expected_nodata[] = {0x00};
+    const uint8       ref[]             = { 0x45, 0x67, 0x89 };
+    const uint8       expected[]        = { 0x03, 0x45, 0x67, 0x89 };
+    const uint8       expected_nodata[] = { 0x00 };
 
     memset(&in, 0, sizeof(in));
     in.length   = sizeof(ref);
@@ -267,9 +267,9 @@ void Test_CF_CFDP_EncodeTLV(void)
     CF_EncoderState_t state;
     CF_Logical_Tlv_t  in;
     uint8             bytes[10];
-    const uint8       expected_tlv[]    = {0x06, 0x01, 0x77};
-    const uint8       expected_other[]  = {0x01, 0x03, 'a', 'b', 'c'};
-    const uint8       expected_nodata[] = {0x01, 0x00};
+    const uint8       expected_tlv[]    = { 0x06, 0x01, 0x77 };
+    const uint8       expected_other[]  = { 0x01, 0x03, 'a', 'b', 'c' };
+    const uint8       expected_nodata[] = { 0x01, 0x00 };
 
     memset(&in, 0, sizeof(in));
     in.type     = CF_CFDP_TLV_TYPE_ENTITY_ID;
@@ -291,7 +291,9 @@ void Test_CF_CFDP_EncodeTLV(void)
     UtAssert_BOOL_TRUE(CF_CODEC_IS_OK(&state));
     UtAssert_UINT32_EQ(CF_CODEC_GET_POSITION(&state), sizeof(expected_tlv));
     UtAssert_MemCmp(bytes, expected_tlv, sizeof(expected_tlv), "Encoded Bytes");
-    UtAssert_MemCmpValue(bytes + sizeof(expected_tlv), 0xEE, sizeof(bytes) - sizeof(expected_tlv),
+    UtAssert_MemCmpValue(bytes + sizeof(expected_tlv),
+                         0xEE,
+                         sizeof(bytes) - sizeof(expected_tlv),
                          "Remainder unchanged");
 
     /* setup non-EID */
@@ -332,7 +334,7 @@ void Test_CF_CFDP_EncodeSegmentRequest(void)
     CF_EncoderState_t           state;
     CF_Logical_SegmentRequest_t in;
     uint8                       bytes[10];
-    const uint8                 expected[] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88};
+    const uint8                 expected[] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88 };
 
     memset(&in, 0, sizeof(in));
     in.offset_start = 0x11223344;
@@ -364,7 +366,7 @@ void Test_CF_CFDP_EncodeAllTlv(void)
     CF_EncoderState_t    state;
     CF_Logical_TlvList_t in;
     uint8                bytes[10];
-    const uint8          expected[] = {0x06, 0x01, 0x88, 0x06, 0x01, 0x99};
+    const uint8          expected[] = { 0x06, 0x01, 0x88, 0x06, 0x01, 0x99 };
 
     memset(&in, 0, sizeof(in));
 
@@ -406,8 +408,8 @@ void Test_CF_CFDP_EncodeAllSegments(void)
     CF_EncoderState_t        state;
     CF_Logical_SegmentList_t in;
     uint8                    bytes[20];
-    const uint8              expected[] = {0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02,
-                              0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x04};
+    const uint8              expected[] = { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02,
+                                            0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x04 };
 
     memset(&in, 0, sizeof(in));
 
@@ -447,7 +449,7 @@ void Test_CF_CFDP_EncodeMd(void)
     CF_EncoderState_t  state;
     CF_Logical_PduMd_t in;
     uint8              bytes[20];
-    const uint8        expected[] = {0x00, 0x00, 0x00, 0x12, 0x34, 0x03, 's', 'r', 'c', 0x04, 'd', 'e', 's', 't'};
+    const uint8        expected[] = { 0x00, 0x00, 0x00, 0x12, 0x34, 0x03, 's', 'r', 'c', 0x04, 'd', 'e', 's', 't' };
 
     memset(&in, 0, sizeof(in));
     in.size                     = 0x1234;
@@ -483,8 +485,8 @@ void Test_CF_CFDP_EncodeFileDataHeader(void)
     CF_EncoderState_t              state;
     CF_Logical_PduFileDataHeader_t in;
     uint8                          bytes[20];
-    const uint8                    expected_basic[] = {0x00, 0x00, 0x00, 0x13};
-    const uint8 expected_meta[] = {0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x11, 0x00, 0x00, 0x00, 0x13};
+    const uint8                    expected_basic[] = { 0x00, 0x00, 0x00, 0x13 };
+    const uint8 expected_meta[] = { 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x11, 0x00, 0x00, 0x00, 0x13 };
 
     memset(&in, 0, sizeof(in));
     in.offset   = 0x13;
@@ -506,7 +508,9 @@ void Test_CF_CFDP_EncodeFileDataHeader(void)
     UtAssert_BOOL_TRUE(CF_CODEC_IS_OK(&state));
     UtAssert_UINT32_EQ(CF_CODEC_GET_POSITION(&state), sizeof(expected_basic));
     UtAssert_MemCmp(bytes, expected_basic, sizeof(expected_basic), "Encoded Bytes");
-    UtAssert_MemCmpValue(bytes + sizeof(expected_basic), 0xEE, sizeof(bytes) - sizeof(expected_basic),
+    UtAssert_MemCmpValue(bytes + sizeof(expected_basic),
+                         0xEE,
+                         sizeof(bytes) - sizeof(expected_basic),
                          "Remainder unchanged");
 
     /* setup nominal, with metadata */
@@ -529,7 +533,7 @@ void Test_CF_CFDP_EncodeEof(void)
     CF_EncoderState_t   state;
     CF_Logical_PduEof_t in;
     uint8               bytes[20];
-    const uint8         expected[] = {0x10, 0x12, 0x34, 0x56, 0x78, 0x00, 0x00, 0x45, 0x67, 0x06, 0x01, 0xaa};
+    const uint8         expected[] = { 0x10, 0x12, 0x34, 0x56, 0x78, 0x00, 0x00, 0x45, 0x67, 0x06, 0x01, 0xaa };
 
     memset(&in, 0, sizeof(in));
     in.crc                      = 0x12345678;
@@ -566,7 +570,7 @@ void Test_CF_CFDP_EncodeFin(void)
     CF_EncoderState_t   state;
     CF_Logical_PduFin_t in;
     uint8               bytes[10];
-    const uint8         expected[] = {0x16};
+    const uint8         expected[] = { 0x16 };
 
     memset(&in, 0, sizeof(in));
     in.cc            = 1;
@@ -599,7 +603,7 @@ void Test_CF_CFDP_EncodeAck(void)
     CF_EncoderState_t   state;
     CF_Logical_PduAck_t in;
     uint8               bytes[10];
-    const uint8         expected[] = {0x51, 0x23};
+    const uint8         expected[] = { 0x51, 0x23 };
 
     memset(&in, 0, sizeof(in));
     in.ack_directive_code = 5;
@@ -633,8 +637,8 @@ void Test_CF_CFDP_EncodeNak(void)
     CF_EncoderState_t   state;
     CF_Logical_PduNak_t in;
     uint8               bytes[30];
-    const uint8         expected[] = {0x00, 0x00, 0x01, 0x02, 0x00, 0x00, 0x03, 0x04, 0x00, 0x00, 0x00, 0x05,
-                              0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x08};
+    const uint8         expected[] = { 0x00, 0x00, 0x01, 0x02, 0x00, 0x00, 0x03, 0x04, 0x00, 0x00, 0x00, 0x05,
+                                       0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x08 };
 
     memset(&in, 0, sizeof(in));
     in.scope_start                           = 0x0102;
@@ -671,7 +675,7 @@ void Test_CF_CFDP_EncodeCrc(void)
     CF_EncoderState_t state;
     uint32            in;
     uint8             bytes[10];
-    const uint8       expected[] = {0xde, 0xad, 0xbe, 0xef};
+    const uint8       expected[] = { 0xde, 0xad, 0xbe, 0xef };
 
     memset(&in, 0, sizeof(in));
     in = 0xdeadbeef;
@@ -701,8 +705,8 @@ void Test_CF_DecodeIntegerInSize(void)
      */
     CF_DecoderState_t      state;
     CF_Logical_PduHeader_t out;
-    const uint8            bytes_2[] = {0x12, 0x34};
-    const uint8            bytes_4[] = {0x00, 0x56, 0x78, 0x9a};
+    const uint8            bytes_2[] = { 0x12, 0x34 };
+    const uint8            bytes_4[] = { 0x00, 0x56, 0x78, 0x9a };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
@@ -733,9 +737,9 @@ void Test_CF_CFDP_DecodeHeader(void)
      */
     CF_DecoderState_t      state;
     CF_Logical_PduHeader_t out;
-    const uint8            bytes[]   = {0x3c, 0x01, 0x02, 0x00, 0x44, 0x55, 0x66};
-    const uint8            bad_eid[] = {0x3c, 0x01, 0x02, 0x73, 0x44, 0x55, 0x66};
-    const uint8            bad_tsn[] = {0x3c, 0x01, 0x02, 0x37, 0x44, 0x55, 0x66};
+    const uint8            bytes[]   = { 0x3c, 0x01, 0x02, 0x00, 0x44, 0x55, 0x66 };
+    const uint8            bad_eid[] = { 0x3c, 0x01, 0x02, 0x73, 0x44, 0x55, 0x66 };
+    const uint8            bad_tsn[] = { 0x3c, 0x01, 0x02, 0x37, 0x44, 0x55, 0x66 };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
@@ -783,7 +787,7 @@ void Test_CF_CFDP_DecodeFileDirectiveHeader(void)
      */
     CF_DecoderState_t                   state;
     CF_Logical_PduFileDirectiveHeader_t out;
-    const uint8                         bytes[] = {0x08};
+    const uint8                         bytes[] = { 0x08 };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
@@ -809,8 +813,8 @@ void Test_CF_CFDP_DecodeLV(void)
      */
     CF_DecoderState_t state;
     CF_Logical_Lv_t   out;
-    const uint8       bytes[]     = {0x03, 0x45, 0x67, 0x89};
-    const uint8       bad_input[] = {0x32, 0x45, 0x67, 0x89, 0xaa};
+    const uint8       bytes[]     = { 0x03, 0x45, 0x67, 0x89 };
+    const uint8       bad_input[] = { 0x32, 0x45, 0x67, 0x89, 0xaa };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
@@ -842,9 +846,9 @@ void Test_CF_CFDP_DecodeTLV(void)
      */
     CF_DecoderState_t state;
     CF_Logical_Tlv_t  out;
-    const uint8       bytes_tlv[]   = {0x06, 0x01, 0x77};
-    const uint8       bytes_other[] = {0x01, 0x02, 0x88, 0x99};
-    const uint8       bad_input[]   = {0x06, 0x21, 0x88, 0x99};
+    const uint8       bytes_tlv[]   = { 0x06, 0x01, 0x77 };
+    const uint8       bytes_other[] = { 0x01, 0x02, 0x88, 0x99 };
+    const uint8       bad_input[]   = { 0x06, 0x21, 0x88, 0x99 };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
@@ -886,7 +890,7 @@ void Test_CF_CFDP_DecodeSegmentRequest(void)
      */
     CF_DecoderState_t           state;
     CF_Logical_SegmentRequest_t out;
-    const uint8                 bytes[] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88};
+    const uint8                 bytes[] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88 };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
@@ -913,9 +917,9 @@ void Test_CF_CFDP_DecodeAllTlv(void)
      */
     CF_DecoderState_t    state;
     CF_Logical_TlvList_t out;
-    const uint8          bytes[]                              = {0x06, 0x01, 0x88, 0x06, 0x01, 0x99};
-    const uint8          bad_input[]                          = {0x06, 0x07, 0x88, 0x06, 0x03, 0x99, 0xaa};
-    const uint8          long_input[2 * (CF_PDU_MAX_TLV + 1)] = {0};
+    const uint8          bytes[]                              = { 0x06, 0x01, 0x88, 0x06, 0x01, 0x99 };
+    const uint8          bad_input[]                          = { 0x06, 0x07, 0x88, 0x06, 0x03, 0x99, 0xaa };
+    const uint8          long_input[2 * (CF_PDU_MAX_TLV + 1)] = { 0 };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
@@ -968,9 +972,9 @@ void Test_CF_CFDP_DecodeAllSegments(void)
      */
     CF_DecoderState_t        state;
     CF_Logical_SegmentList_t out;
-    const uint8              bytes[] = {0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02,
-                           0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x04};
-    const uint8              long_input[8 * (CF_PDU_MAX_SEGMENTS + 1)] = {0};
+    const uint8              bytes[] = { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02,
+                                         0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x04 };
+    const uint8              long_input[8 * (CF_PDU_MAX_SEGMENTS + 1)] = { 0 };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
@@ -1015,8 +1019,8 @@ void Test_CF_CFDP_DecodeMd(void)
      */
     CF_DecoderState_t  state;
     CF_Logical_PduMd_t out;
-    const uint8        bytes[]     = {0x00, 0x00, 0x00, 0x12, 0x34, 0x03, 's', 'r', 'c', 0x04, 'd', 'e', 's', 't'};
-    const uint8        bad_input[] = {0x00, 0x00, 0x00, 0x12, 0x34, 0x56, 's', 'r', 'c', 0x04, 'd', 'e', 's', 't'};
+    const uint8        bytes[]     = { 0x00, 0x00, 0x00, 0x12, 0x34, 0x03, 's', 'r', 'c', 0x04, 'd', 'e', 's', 't' };
+    const uint8        bad_input[] = { 0x00, 0x00, 0x00, 0x12, 0x34, 0x56, 's', 'r', 'c', 0x04, 'd', 'e', 's', 't' };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
@@ -1052,10 +1056,10 @@ void Test_CF_CFDP_DecodeFileDataHeader(void)
      */
     CF_DecoderState_t              state;
     CF_Logical_PduFileDataHeader_t out;
-    const uint8                    bytes_basic[] = {0x00, 0x00, 0x00, 0x13, 0xdd};
-    const uint8 bytes_meta[]  = {0x41, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x00, 0x00, 0x00, 0x13, 0xcc};
-    const uint8 bad_input_1[] = {0xff, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x00, 0x00, 0x00, 0x13, 0xcc};
-    const uint8 bad_input_2[] = {0x41, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
+    const uint8                    bytes_basic[] = { 0x00, 0x00, 0x00, 0x13, 0xdd };
+    const uint8 bytes_meta[]  = { 0x41, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x00, 0x00, 0x00, 0x13, 0xcc };
+    const uint8 bad_input_1[] = { 0xff, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x00, 0x00, 0x00, 0x13, 0xcc };
+    const uint8 bad_input_2[] = { 0x41, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
@@ -1106,8 +1110,8 @@ void Test_CF_CFDP_DecodeEof(void)
      */
     CF_DecoderState_t   state;
     CF_Logical_PduEof_t out;
-    const uint8         bytes[]     = {0x10, 0x12, 0x34, 0x56, 0x78, 0x00, 0x00, 0x45, 0x67, 0x06, 0x01, 0xaa};
-    const uint8         bad_input[] = {0x10, 0x12, 0x34, 0x56, 0x78, 0x00, 0x00, 0x45, 0x67, 0x06, 0x06, 0xaa, 0xbb};
+    const uint8         bytes[]     = { 0x10, 0x12, 0x34, 0x56, 0x78, 0x00, 0x00, 0x45, 0x67, 0x06, 0x01, 0xaa };
+    const uint8         bad_input[] = { 0x10, 0x12, 0x34, 0x56, 0x78, 0x00, 0x00, 0x45, 0x67, 0x06, 0x06, 0xaa, 0xbb };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
@@ -1144,7 +1148,7 @@ void Test_CF_CFDP_DecodeFin(void)
      */
     CF_DecoderState_t   state;
     CF_Logical_PduFin_t out;
-    const uint8         bytes[] = {0x16};
+    const uint8         bytes[] = { 0x16 };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
@@ -1172,7 +1176,7 @@ void Test_CF_CFDP_DecodeAck(void)
      */
     CF_DecoderState_t   state;
     CF_Logical_PduAck_t out;
-    const uint8         bytes[] = {0x51, 0x23};
+    const uint8         bytes[] = { 0x51, 0x23 };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
@@ -1201,8 +1205,8 @@ void Test_CF_CFDP_DecodeNak(void)
      */
     CF_DecoderState_t   state;
     CF_Logical_PduNak_t out;
-    const uint8         bytes[] = {0x00, 0x00, 0x01, 0x02, 0x00, 0x00, 0x03, 0x04, 0x00, 0x00, 0x00, 0x05,
-                           0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x08};
+    const uint8         bytes[] = { 0x00, 0x00, 0x01, 0x02, 0x00, 0x00, 0x03, 0x04, 0x00, 0x00, 0x00, 0x05,
+                                    0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x08 };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));
@@ -1234,7 +1238,7 @@ void Test_CF_CFDP_DecodeCrc(void)
      */
     CF_DecoderState_t state;
     uint32            out;
-    const uint8       bytes[] = {0xde, 0xad, 0xbe, 0xef};
+    const uint8       bytes[] = { 0xde, 0xad, 0xbe, 0xef };
 
     /* fill with nonzero bytes so it is evident what was set */
     memset(&out, 0xEE, sizeof(out));

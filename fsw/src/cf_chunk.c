@@ -66,7 +66,8 @@ void CF_Chunks_EraseChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t erase_index)
     CF_Assert(erase_index < chunks->count);
 
     /* to erase, move memory over the old one */
-    memmove(&chunks->chunks[erase_index], &chunks->chunks[erase_index + 1],
+    memmove(&chunks->chunks[erase_index],
+            &chunks->chunks[erase_index + 1],
             sizeof(*chunks->chunks) * (chunks->count - 1 - erase_index));
     --chunks->count;
 }
@@ -84,7 +85,8 @@ void CF_Chunks_InsertChunk(CF_ChunkList_t *chunks, CF_ChunkIdx_t index_before, c
 
     if (chunks->count && (index_before != chunks->count))
     {
-        memmove(&chunks->chunks[index_before + 1], &chunks->chunks[index_before],
+        memmove(&chunks->chunks[index_before + 1],
+                &chunks->chunks[index_before],
                 sizeof(*chunk) * (chunks->count - index_before));
     }
     memcpy(&chunks->chunks[index_before], chunk, sizeof(*chunk));
@@ -107,12 +109,12 @@ CF_ChunkIdx_t CF_Chunks_FindInsertPosition(CF_ChunkList_t *chunks, const CF_Chun
 
     while (count > 0)
     {
-        i    = first;
-        step = count / 2;
-        i += step;
+        i     = first;
+        step  = count / 2;
+        i    += step;
         if (chunks->chunks[i].offset < chunk->offset)
         {
-            first = i + 1;
+            first  = i + 1;
             count -= step + 1;
         }
         else
@@ -132,7 +134,7 @@ CF_ChunkIdx_t CF_Chunks_FindInsertPosition(CF_ChunkList_t *chunks, const CF_Chun
  *-----------------------------------------------------------------*/
 int CF_Chunks_CombinePrevious(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
-    CF_Chunk_t *     prev;
+    CF_Chunk_t      *prev;
     CF_ChunkOffset_t prev_end;
     CF_ChunkOffset_t chunk_end;
     int              ret = 0;
@@ -236,7 +238,7 @@ CF_ChunkIdx_t CF_Chunks_FindSmallestSize(const CF_ChunkList_t *chunks)
 void CF_Chunks_Insert(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t *chunk)
 {
     CF_ChunkIdx_t smallest_i;
-    CF_Chunk_t *  smallest_c;
+    CF_Chunk_t   *smallest_c;
     int           n = CF_Chunks_CombineNext(chunks, i, chunk);
     int           combined;
 
@@ -279,7 +281,7 @@ void CF_Chunks_Insert(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t 
  *-----------------------------------------------------------------*/
 void CF_ChunkListAdd(CF_ChunkList_t *chunks, CF_ChunkOffset_t offset, CF_ChunkSize_t size)
 {
-    const CF_Chunk_t    chunk = {offset, size};
+    const CF_Chunk_t    chunk = { offset, size };
     const CF_ChunkIdx_t i     = CF_Chunks_FindInsertPosition(chunks, &chunk);
 
     /* PTFO: files won't be so big we need to gracefully handle overflow,
@@ -359,8 +361,12 @@ void CF_ChunkListReset(CF_ChunkList_t *chunks)
  * See description in cf_chunk.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_gaps, CF_ChunkSize_t total,
-                                CF_ChunkOffset_t start, CF_ChunkList_ComputeGapFn_t compute_gap_fn, void *opaque)
+uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t       *chunks,
+                                CF_ChunkIdx_t               max_gaps,
+                                CF_ChunkSize_t              total,
+                                CF_ChunkOffset_t            start,
+                                CF_ChunkList_ComputeGapFn_t compute_gap_fn,
+                                void                       *opaque)
 {
     uint32           ret = 0;
     CF_ChunkIdx_t    i   = 0;

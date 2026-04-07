@@ -207,8 +207,8 @@ CFE_Status_t CF_PlaybackDirCmd(const CF_PlaybackDirCmd_t *msg);
  * @returns The return value from the given action function.
  * @retval CF_ChanAction_Status_ERROR on error
  */
-CF_ChanAction_Status_t CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const char *errstr, CF_ChanActionFn_t fn,
-                                       void *context);
+CF_ChanAction_Status_t
+CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const char *errstr, CF_ChanActionFn_t fn, void *context);
 
 /************************************************************************/
 /** @brief Channel action to set the frozen bit for a channel.
@@ -277,8 +277,10 @@ CF_Transaction_t *CF_FindTransactionBySequenceNumberAllChannels(CF_TransactionSe
  * @returns returns the number of transactions acted upon
  *
  */
-int32 CF_TsnChanAction(const CF_Transaction_Payload_t *data, const char *cmdstr, CF_TsnChanAction_fn_t fn,
-                       void *context);
+int32 CF_TsnChanAction(const CF_Transaction_Payload_t *data,
+                       const char                     *cmdstr,
+                       CF_TsnChanAction_fn_t           fn,
+                       void                           *context);
 
 /************************************************************************/
 /** @brief Set the suspended bit in a transaction.

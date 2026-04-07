@@ -28,9 +28,12 @@
 #include "cf_cfdp_s.h"
 #include "cf_cfdp_dispatch.h"
 
-static void UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_t setup, CF_Logical_PduBuffer_t **pdu_buffer_p,
-                                                 CF_Channel_t **channel_p, CF_History_t **history_p,
-                                                 CF_Transaction_t **txn_p, CF_ConfigTable_t **config_table_p)
+static void UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_t            setup,
+                                                 CF_Logical_PduBuffer_t **pdu_buffer_p,
+                                                 CF_Channel_t           **channel_p,
+                                                 CF_History_t           **history_p,
+                                                 CF_Transaction_t       **txn_p,
+                                                 CF_ConfigTable_t       **config_table_p)
 {
     /*
      * fake objects used to pass into CF app during unit tests.
@@ -128,8 +131,8 @@ void Test_CF_CFDP_R_DispatchRecv(void)
      * void CF_CFDP_R_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph, const
      * CF_CFDP_R_SubstateDispatchTable_t *dispatch, CF_CFDP_StateRecvFunc_t fd_fn);
      */
-    CF_Transaction_t *                   txn;
-    CF_Logical_PduBuffer_t *             ph;
+    CF_Transaction_t                    *txn;
+    CF_Logical_PduBuffer_t              *ph;
     CF_CFDP_R_SubstateDispatchTable_t    dispatch;
     CF_CFDP_FileDirectiveDispatchTable_t fddt;
 
@@ -188,8 +191,8 @@ void Test_CF_CFDP_S_DispatchRecv(void)
      * void CF_CFDP_S_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
                                    const CF_CFDP_S_SubstateRecvDispatchTable_t *dispatch)
      */
-    CF_Transaction_t *                    txn;
-    CF_Logical_PduBuffer_t *              ph;
+    CF_Transaction_t                     *txn;
+    CF_Logical_PduBuffer_t               *ph;
     CF_CFDP_S_SubstateRecvDispatchTable_t dispatch;
     CF_CFDP_FileDirectiveDispatchTable_t  fddt;
 
@@ -230,8 +233,8 @@ void Test_CF_CFDP_RxStateDispatch(void)
      * void CF_CFDP_RxStateDispatch(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph, const
      * CF_CFDP_TxnRecvDispatchTable_t *dispatch);
      */
-    CF_Transaction_t *             txn;
-    CF_Logical_PduBuffer_t *       ph;
+    CF_Transaction_t              *txn;
+    CF_Logical_PduBuffer_t        *ph;
     CF_CFDP_TxnRecvDispatchTable_t dispatch;
 
     memset(&dispatch, 0, sizeof(dispatch));
@@ -277,10 +280,16 @@ void Test_CF_CFDP_RxStateDispatch(void)
 
 void UtTest_Setup(void)
 {
-    UtTest_Add(Test_CF_CFDP_R_DispatchRecv, cf_cfdp_dispatch_tests_Setup, cf_cfdp_dispatch_tests_Teardown,
+    UtTest_Add(Test_CF_CFDP_R_DispatchRecv,
+               cf_cfdp_dispatch_tests_Setup,
+               cf_cfdp_dispatch_tests_Teardown,
                "CF_CFDP_R_DispatchRecv");
-    UtTest_Add(Test_CF_CFDP_S_DispatchRecv, cf_cfdp_dispatch_tests_Setup, cf_cfdp_dispatch_tests_Teardown,
+    UtTest_Add(Test_CF_CFDP_S_DispatchRecv,
+               cf_cfdp_dispatch_tests_Setup,
+               cf_cfdp_dispatch_tests_Teardown,
                "CF_CFDP_S_DispatchRecv");
-    UtTest_Add(Test_CF_CFDP_RxStateDispatch, cf_cfdp_dispatch_tests_Setup, cf_cfdp_dispatch_tests_Teardown,
+    UtTest_Add(Test_CF_CFDP_RxStateDispatch,
+               cf_cfdp_dispatch_tests_Setup,
+               cf_cfdp_dispatch_tests_Teardown,
                "CF_CFDP_RxStateDispatch");
 }

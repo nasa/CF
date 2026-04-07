@@ -137,8 +137,8 @@ CFE_Status_t CF_DisableEngineCmd(const CF_DisableEngineCmd_t *msg)
  * Generated stub function for CF_DoChanAction()
  * ----------------------------------------------------
  */
-CF_ChanAction_Status_t CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const char *errstr, CF_ChanActionFn_t fn,
-                                       void *context)
+CF_ChanAction_Status_t
+CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const char *errstr, CF_ChanActionFn_t fn, void *context)
 {
     UT_GenStub_SetupReturnBuffer(CF_DoChanAction, CF_ChanAction_Status_t);
 
@@ -541,8 +541,10 @@ CFE_Status_t CF_ThawCmd(const CF_ThawCmd_t *msg)
  * Generated stub function for CF_TsnChanAction()
  * ----------------------------------------------------
  */
-int32 CF_TsnChanAction(const CF_Transaction_Payload_t *data, const char *cmdstr, CF_TsnChanAction_fn_t fn,
-                       void *context)
+int32 CF_TsnChanAction(const CF_Transaction_Payload_t *data,
+                       const char                     *cmdstr,
+                       CF_TsnChanAction_fn_t           fn,
+                       void                           *context)
 {
     UT_GenStub_SetupReturnBuffer(CF_TsnChanAction, int32);
 

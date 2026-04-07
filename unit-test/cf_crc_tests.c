@@ -39,7 +39,7 @@ void Test_CF_CRC_Start(void)
 void Test_CF_CRC_Digest(void)
 {
     CF_Crc_t crc;
-    uint8    data[] = {1, 2, 3, 4, 5};
+    uint8    data[] = { 1, 2, 3, 4, 5 };
 
     /* Already tested, so OK to use */
     CF_CRC_Start(&crc);
@@ -60,7 +60,7 @@ void Test_CF_CRC_Digest(void)
 void Test_CF_CRC_Finalize(void)
 {
     CF_Crc_t crc;
-    uint8    data[] = {1, 2, 3, 4, 5};
+    uint8    data[] = { 1, 2, 3, 4, 5 };
 
     /* Already tested, so OK to use */
     CF_CRC_Start(&crc);

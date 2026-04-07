@@ -31,8 +31,10 @@
  * Generated stub function for CF_CFDP_R_DispatchRecv()
  * ----------------------------------------------------
  */
-void CF_CFDP_R_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
-                            const CF_CFDP_R_SubstateDispatchTable_t *dispatch, CF_CFDP_StateRecvFunc_t fd_fn)
+void CF_CFDP_R_DispatchRecv(CF_Transaction_t                        *txn,
+                            CF_Logical_PduBuffer_t                  *ph,
+                            const CF_CFDP_R_SubstateDispatchTable_t *dispatch,
+                            CF_CFDP_StateRecvFunc_t                  fd_fn)
 {
     UT_GenStub_AddParam(CF_CFDP_R_DispatchRecv, CF_Transaction_t *, txn);
     UT_GenStub_AddParam(CF_CFDP_R_DispatchRecv, CF_Logical_PduBuffer_t *, ph);
@@ -47,7 +49,8 @@ void CF_CFDP_R_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
  * Generated stub function for CF_CFDP_RxStateDispatch()
  * ----------------------------------------------------
  */
-void CF_CFDP_RxStateDispatch(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
+void CF_CFDP_RxStateDispatch(CF_Transaction_t                     *txn,
+                             CF_Logical_PduBuffer_t               *ph,
                              const CF_CFDP_TxnRecvDispatchTable_t *dispatch)
 {
     UT_GenStub_AddParam(CF_CFDP_RxStateDispatch, CF_Transaction_t *, txn);
@@ -62,7 +65,8 @@ void CF_CFDP_RxStateDispatch(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
  * Generated stub function for CF_CFDP_S_DispatchRecv()
  * ----------------------------------------------------
  */
-void CF_CFDP_S_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
+void CF_CFDP_S_DispatchRecv(CF_Transaction_t                            *txn,
+                            CF_Logical_PduBuffer_t                      *ph,
                             const CF_CFDP_S_SubstateRecvDispatchTable_t *dispatch)
 {
     UT_GenStub_AddParam(CF_CFDP_S_DispatchRecv, CF_Transaction_t *, txn);

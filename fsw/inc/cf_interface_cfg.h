@@ -111,7 +111,7 @@
 /**
  *  @brief Max filename and path length.
  *
- *  @par Limits:    
+ *  @par Limits:
  *
  */
 #define CF_FILENAME_MAX_LEN         CF_INTERFACE_CFGVAL(FILENAME_MAX_LEN)

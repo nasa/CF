@@ -49,7 +49,7 @@
  */
 
 /** \brief Message ID for housekeeping telemetry */
-#define CF_HK_TLM_MID  CFE_PLATFORM_CF_TLM_MIDVAL(HK_TLM)
+#define CF_HK_TLM_MID CFE_PLATFORM_CF_TLM_MIDVAL(HK_TLM)
 
 /** \brief Message ID for end of transaction telemetry */
 #define CF_EOT_TLM_MID CFE_PLATFORM_CF_TLM_MIDVAL(EOT_TLM)

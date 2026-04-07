@@ -158,31 +158,43 @@ void Test_CF_Timer_Tick_When_t_tick_Is_non0_Decrement_t_tick(void)
 
 void add_CF_Timer_Sec2Ticks_tests(void)
 {
-    UtTest_Add(Test_CF_Timer_Sec2Ticks_ReturnExpectedValue, cf_timer_tests_Setup, cf_timer_tests_Teardown,
+    UtTest_Add(Test_CF_Timer_Sec2Ticks_ReturnExpectedValue,
+               cf_timer_tests_Setup,
+               cf_timer_tests_Teardown,
                "Test_CF_Timer_Sec2Ticks_ReturnExpectedValue");
 }
 
 void add_CF_Timer_InitRelSec_tests(void)
 {
-    UtTest_Add(Test_CF_Timer_InitRelSec_ReceiveExpectedValue, cf_timer_tests_Setup, cf_timer_tests_Teardown,
+    UtTest_Add(Test_CF_Timer_InitRelSec_ReceiveExpectedValue,
+               cf_timer_tests_Setup,
+               cf_timer_tests_Teardown,
                "Test_CF_Timer_InitRelSec_ReceiveExpectedValue");
 }
 
 void add_CF_Timer_Expired_tests(void)
 {
-    UtTest_Add(Test_CF_Timer_Expired_When_t_tick_Is_0_Return_1, cf_timer_tests_Setup, cf_timer_tests_Teardown,
+    UtTest_Add(Test_CF_Timer_Expired_When_t_tick_Is_0_Return_1,
+               cf_timer_tests_Setup,
+               cf_timer_tests_Teardown,
                "Test_CF_Timer_Expired_When_t_tick_Is_0_Return_1");
 
-    UtTest_Add(Test_CF_Timer_Expired_When_t_tick_Is_1_Return_0, cf_timer_tests_Setup, cf_timer_tests_Teardown,
+    UtTest_Add(Test_CF_Timer_Expired_When_t_tick_Is_1_Return_0,
+               cf_timer_tests_Setup,
+               cf_timer_tests_Teardown,
                "Test_CF_Timer_Expired_When_t_tick_Is_1_Return_0");
 
-    UtTest_Add(Test_CF_Timer_Expired_When_t_tick_IsAnyIntegerExcept_0_Return_0, cf_timer_tests_Setup,
-               cf_timer_tests_Teardown, "Test_CF_Timer_Expired_When_t_tick_IsAnyIntegerExcept_0_Return_0");
+    UtTest_Add(Test_CF_Timer_Expired_When_t_tick_IsAnyIntegerExcept_0_Return_0,
+               cf_timer_tests_Setup,
+               cf_timer_tests_Teardown,
+               "Test_CF_Timer_Expired_When_t_tick_IsAnyIntegerExcept_0_Return_0");
 }
 
 void add_CF_Timer_Tick_tests(void)
 {
-    UtTest_Add(Test_CF_Timer_Tick_When_t_tick_Is_non0_Decrement_t_tick, cf_timer_tests_Setup, cf_timer_tests_Teardown,
+    UtTest_Add(Test_CF_Timer_Tick_When_t_tick_Is_non0_Decrement_t_tick,
+               cf_timer_tests_Setup,
+               cf_timer_tests_Teardown,
                "Test_CF_Timer_Tick_When_t_tick_Is_non0_Decrement_t_tick");
 }
 

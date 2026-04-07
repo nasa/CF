@@ -79,14 +79,18 @@ void UT_CF_Chunk_Print(CF_ChunkList_t *CList)
     UtPrintf("Chunk list: index{offset, size}");
     for (cidx = 0; cidx < CList->count; cidx++)
     {
-        UtPrintf("%u{%u, %u}", (unsigned int)cidx, (unsigned int)CList->chunks[cidx].offset,
+        UtPrintf("%u{%u, %u}",
+                 (unsigned int)cidx,
+                 (unsigned int)CList->chunks[cidx].offset,
                  (unsigned int)CList->chunks[cidx].size);
     }
 
     UtPrintf("Chunk list: index{start-end}");
     for (cidx = 0; cidx < CList->count; cidx++)
     {
-        UtPrintf("%u{%u-%u}", (unsigned int)cidx, (unsigned int)CList->chunks[cidx].offset,
+        UtPrintf("%u{%u-%u}",
+                 (unsigned int)cidx,
+                 (unsigned int)CList->chunks[cidx].offset,
                  (unsigned int)(CList->chunks[cidx].offset + CList->chunks[cidx].size));
     }
 }
