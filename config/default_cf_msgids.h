@@ -61,7 +61,7 @@
  * \{
  */
 
-/** \brief Message IDs for File Transfers. 
+/** \brief Message IDs for File Transfers.
  * CMD/TLM Directions are from the perspective of the App
  */
 #define CF_CH0_RX_MID CFE_PLATFORM_CF_CMD_MIDVAL(CH0_RX)
