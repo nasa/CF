@@ -1,0 +1,20 @@
+name: MCDC Analysis
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  workflow_dispatch:
+
+jobs:
+  mcdc:
+    name: Run MCDC Analysis
+    uses: nasa/cFS/.github/workflows/mcdc-reusable.yml@dev
+    with:
+      app-name: 'cf'
