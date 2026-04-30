@@ -24,6 +24,7 @@
 #include "cfe.h"
 #include "cfe_tbl_filedef.h"
 #include "cf_tbldefs.h"
+#include "cf_msgids.h"
 
 CF_ConfigTable_t CF_config_table = {
     10, /* ticks_per_second */
@@ -32,17 +33,17 @@ CF_ConfigTable_t CF_config_table = {
     {      /* channel configuration for CF_NUM_CHANNELS */
       {
           /* channel 0 */
-          5,      /* max number of outgoing messages per wakeup */
-          5,      /* max number of rx messages per wakeup */
-          3,      /* ACK timer */
-          3,      /* NAK timer */
-          30,     /* inactivity timer */
-          4,      /* ACK limit */
-          4,      /* NAK limit */
-          0x18c8, /* input message id */
-          0x08c2, /* output message id */
-          16,     /* input pipe depth */
-          {       /* polling directory configuration for CF_MAX_POLLING_DIR_PER_CHAN */
+          5,             /* max number of outgoing messages per wakeup */
+          5,             /* max number of rx messages per wakeup */
+          3,             /* ACK timer */
+          3,             /* NAK timer */
+          30,            /* inactivity timer */
+          4,             /* ACK limit */
+          4,             /* NAK limit */
+          CF_CH0_RX_MID, /* input message id */
+          CF_CH0_TX_MID, /* output message id */
+          16,            /* input pipe depth */
+          {              /* polling directory configuration for CF_MAX_POLLING_DIR_PER_CHAN */
             {
                 /* polling directory 0 */
                 5,               /* interval seconds */
@@ -59,18 +60,18 @@ CF_ConfigTable_t CF_config_table = {
           "",            /* throttle sem, empty string means no throttle */
           1,             /* dequeue enable flag (1 = enabled) */
           .move_dir = "" /* If not empty, will attempt move instead of delete on TX file complete */
-      }, {         /* channel 1 */
-        5,      /* max number of outgoing messages per wakeup */
-        5,      /* max number of rx messages per wakeup */
-        3,      /* ack timer */
-        3,      /* nak timer */
-        30,     /* inactivity timer */
-        4,      /* ack limit */
-        4,      /* nak limit */
-        0x18c9, /* input message id */
-        0x08c3, /* output message id */
-        16,     /* input pipe depth */
-        {       /* polling directory configuration for CF_MAX_POOLING_DIR_PER_CHAN */
+      }, {                /* channel 1 */
+        5,             /* max number of outgoing messages per wakeup */
+        5,             /* max number of rx messages per wakeup */
+        3,             /* ack timer */
+        3,             /* nak timer */
+        30,            /* inactivity timer */
+        4,             /* ack limit */
+        4,             /* nak limit */
+        CF_CH1_RX_MID, /* input message id */
+        CF_CH1_TX_MID, /* output message id */
+        16,            /* input pipe depth */
+        {              /* polling directory configuration for CF_MAX_POOLING_DIR_PER_CHAN */
           {
               0 /* zero fill unused polling directory slots */
           } },
