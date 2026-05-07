@@ -15,11 +15,8 @@ on:
 jobs:
   codeql:
     name: Codeql Analysis
-    uses: nasa/cFS/.github/workflows/codeql-reusable.yml@main
+    uses: nasa/cFS/.github/workflows/codeql-reusable.yml@dev
     with:
       component-path: apps/cf
       prep: 'make prep; make -C build/tools/elf2cfetbl'
       make: 'make -C build/native/default_cpu1/apps/cf'
-      setup: |
-        cp ./cfe/cmake/Makefile.sample Makefile && cp -r ./cfe/cmake/sample_defs sample_defs
-        sed -i "/list(APPEND MISSION_GLOBAL_APPLIST/a list(APPEND MISSION_GLOBAL_APPLIST cf)" sample_defs/targets.cmake
