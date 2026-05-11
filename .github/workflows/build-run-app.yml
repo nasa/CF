@@ -11,8 +11,11 @@ on:
       - reopened
       - synchronize
   workflow_dispatch:
+  schedule:
+    # 9:35 PM UTC every Sunday
+    - cron:  '35 21 * * 0'
 
 jobs:
   build-run:
     name: Build and run with startup msg verification
-    uses: nasa/cFS/.github/workflows/build-run-app.yml@main
+    uses: nasa/cFS/.github/workflows/build-run-app-reusable.yml@dev

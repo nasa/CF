@@ -32,8 +32,8 @@
  * \{
  */
 
-#define CF_MAJOR_VERSION (7)  /**< \brief Major version number */
-#define CF_MINOR_VERSION (0)  /**< \brief Minor version number */
+#define CF_MAJOR_VERSION (7) /**< \brief Major version number */
+#define CF_MINOR_VERSION (0) /**< \brief Minor version number */
 #define CF_REVISION      (0) /**< \brief Revision number */
 
 /**\}*/

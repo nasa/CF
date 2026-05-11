@@ -11,8 +11,11 @@ on:
       - reopened
       - synchronize
   workflow_dispatch:
+  schedule:
+    # 9:25 PM UTC every Sunday
+    - cron:  '25 21 * * 0'
 
 jobs:
   unit-test-coverage:
     name: Run unit test and coverage
-    uses: nasa/cFS/.github/workflows/unit-test-coverage.yml@main
+    uses: nasa/cFS/.github/workflows/unit-test-coverage-reusable.yml@dev

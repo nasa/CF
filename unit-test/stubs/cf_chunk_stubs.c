@@ -73,8 +73,12 @@ void CF_ChunkListReset(CF_ChunkList_t *chunks)
  * Generated stub function for CF_ChunkList_ComputeGaps()
  * ----------------------------------------------------
  */
-uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_gaps, CF_ChunkSize_t total,
-                                CF_ChunkOffset_t start, CF_ChunkList_ComputeGapFn_t compute_gap_fn, void *opaque)
+uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t       *chunks,
+                                CF_ChunkIdx_t               max_gaps,
+                                CF_ChunkSize_t              total,
+                                CF_ChunkOffset_t            start,
+                                CF_ChunkList_ComputeGapFn_t compute_gap_fn,
+                                void                       *opaque)
 {
     UT_GenStub_SetupReturnBuffer(CF_ChunkList_ComputeGaps, uint32);
 

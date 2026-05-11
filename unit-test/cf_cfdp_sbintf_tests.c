@@ -48,7 +48,7 @@ static void UT_CFDP_SetupBasicRxState(CF_Logical_PduBuffer_t *pdu_buffer)
 {
     static CF_DecoderState_t ut_decoder;
     static uint8             bytes[CF_CFDP_MAX_HEADER_SIZE];
-    CFE_SB_Buffer_t *        bufptr;
+    CFE_SB_Buffer_t         *bufptr;
     CFE_MSG_Size_t           sz;
     CFE_MSG_Type_t           msg_type = CFE_MSG_Type_Cmd;
 
@@ -71,7 +71,7 @@ static void UT_CFDP_SetupBasicRxState(CF_Logical_PduBuffer_t *pdu_buffer)
     UT_SetDataBuffer(UT_KEY(CFE_MSG_GetSize), &sz, sizeof(sz), true);
 
     /* setup for a potential call to CFE_MSG_GetType() */
-    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetType), &msg_type, sizeof(msg_type), false);
+    UT_SetDataBuffer(UT_KEY(CFE_MSG_GetType), &msg_type, sizeof(msg_type), true);
 }
 
 static void UT_CFDP_SetupBasicTxState(CF_Logical_PduBuffer_t *pdu_buffer)
@@ -96,9 +96,12 @@ static void UT_CFDP_SetupBasicTxState(CF_Logical_PduBuffer_t *pdu_buffer)
     UT_SetDataBuffer(UT_KEY(CFE_SB_AllocateMessageBuffer), &bufptr, sizeof(bufptr), true);
 }
 
-static void UT_CFDP_SetupBasicTestState(UT_CF_Setup_t setup, CF_Logical_PduBuffer_t **pdu_buffer_p,
-                                        CF_Channel_t **channel_p, CF_History_t **history_p, CF_Transaction_t **txn_p,
-                                        CF_ConfigTable_t **config_table_p)
+static void UT_CFDP_SetupBasicTestState(UT_CF_Setup_t            setup,
+                                        CF_Logical_PduBuffer_t **pdu_buffer_p,
+                                        CF_Channel_t           **channel_p,
+                                        CF_History_t           **history_p,
+                                        CF_Transaction_t       **txn_p,
+                                        CF_ConfigTable_t       **config_table_p)
 {
     /*
      * fake objects used to pass into CF app during unit tests.
@@ -216,7 +219,7 @@ void Test_CF_CFDP_ReceiveMessage(void)
     /* Test case for:
      * void CF_CFDP_ReceiveMessage(CF_Channel_t *chan);
      */
-    CF_Channel_t *    chan;
+    CF_Channel_t     *chan;
     CF_ConfigTable_t *config;
     CF_Transaction_t *txn;
     CFE_MSG_Type_t    msg_type;
@@ -272,7 +275,7 @@ void Test_CF_CFDP_MsgOutGet(void)
      */
     CF_Transaction_t *txn;
     CF_ConfigTable_t *config;
-    CF_Channel_t *    chan;
+    CF_Channel_t     *chan;
 
     /* nominal */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);

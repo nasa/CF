@@ -47,7 +47,6 @@ CFE_Status_t CF_AppInit(void)
  */
 void CF_AppMain(void)
 {
-
     UT_GenStub_Execute(CF_AppMain, Basic, NULL);
 }
 
@@ -58,7 +57,6 @@ void CF_AppMain(void)
  */
 void CF_CheckTables(void)
 {
-
     UT_GenStub_Execute(CF_CheckTables, Basic, NULL);
 }
 

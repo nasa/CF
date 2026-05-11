@@ -86,7 +86,8 @@ void UT_DefaultHandler_CF_CFDP_DoDecodeChunk(void *UserObj, UT_EntryKey_t FuncKe
  * Translates return value into the correct size for returning
  *
  *-----------------------------------------------------------------*/
-void UT_DefaultHandler_CF_CFDP_GetValueEncodedSize(void *UserObj, UT_EntryKey_t FuncKey,
+void UT_DefaultHandler_CF_CFDP_GetValueEncodedSize(void                   *UserObj,
+                                                   UT_EntryKey_t           FuncKey,
                                                    const UT_StubContext_t *Context)
 {
     uint8 retval;

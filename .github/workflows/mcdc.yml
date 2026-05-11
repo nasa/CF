@@ -1,6 +1,5 @@
-name: Format Check
+name: MCDC Analysis
 
-# Run on all push and pull requests
 on:
   push:
     branches:
@@ -14,6 +13,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  format-check:
-    name: Run format check
-    uses: nasa/cFS/.github/workflows/format-check.yml@dev
+  mcdc:
+    name: Run MCDC Analysis
+    uses: nasa/cFS/.github/workflows/mcdc-reusable.yml@dev
+    with:
+      app-name: 'cf'

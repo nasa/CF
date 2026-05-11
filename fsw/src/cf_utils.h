@@ -40,7 +40,7 @@ typedef struct CF_Traverse_TransSeqArg
 {
     CF_TransactionSeq_t transaction_sequence_number;
     CF_EntityId_t       src_eid;
-    CF_Transaction_t *  txn; /**< \brief output transaction pointer */
+    CF_Transaction_t   *txn; /**< \brief output transaction pointer */
 } CF_Traverse_TransSeqArg_t;
 
 /**
@@ -95,7 +95,7 @@ typedef void (*CF_TraverseAllTransactions_fn_t)(CF_Transaction_t *txn, void *con
 typedef struct CF_TraverseAll_Arg
 {
     CF_TraverseAllTransactions_fn_t fn;      /**< \brief internal callback to use for each CList_Traverse */
-    void *                          context; /**< \brief opaque object to pass to internal callback */
+    void                           *context; /**< \brief opaque object to pass to internal callback */
     int32                           counter; /**< \brief Running tally of all nodes traversed from all lists */
 } CF_TraverseAll_Arg_t;
 
@@ -145,8 +145,8 @@ static inline void CF_CList_Remove_Ex(CF_Channel_t *chan, CF_QueueIdx_t queueidx
     --CF_AppData.hk.Payload.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx];
 }
 
-static inline void CF_CList_InsertAfter_Ex(CF_Channel_t *chan, CF_QueueIdx_t queueidx, CF_CListNode_t *start,
-                                           CF_CListNode_t *after)
+static inline void
+CF_CList_InsertAfter_Ex(CF_Channel_t *chan, CF_QueueIdx_t queueidx, CF_CListNode_t *start, CF_CListNode_t *after)
 {
     CF_CList_InsertAfter(&chan->qs[queueidx], start, after);
     ++CF_AppData.hk.Payload.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx];
@@ -215,7 +215,7 @@ void CF_FreeTransaction(CF_Transaction_t *txn, uint8 chan);
  * @returns Pointer to the given transaction if found
  * @retval  NULL if the transaction is not found
  */
-CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *      chan,
+CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t       *chan,
                                                      CF_TransactionSeq_t transaction_sequence_number,
                                                      CF_EntityId_t       src_eid);
 

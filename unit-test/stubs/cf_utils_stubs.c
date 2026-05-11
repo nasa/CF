@@ -57,7 +57,7 @@ CF_CFDP_AckTxnStatus_t CF_CFDP_GetAckTxnStatus(CF_Transaction_t *txn)
  * Generated stub function for CF_FindTransactionBySequenceNumber()
  * ----------------------------------------------------
  */
-CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t *      chan,
+CF_Transaction_t *CF_FindTransactionBySequenceNumber(CF_Channel_t       *chan,
                                                      CF_TransactionSeq_t transaction_sequence_number,
                                                      CF_EntityId_t       src_eid)
 {
@@ -225,7 +225,8 @@ int32 CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn
     UT_GenStub_AddParam(CF_TraverseAllTransactions_All_Channels, CF_TraverseAllTransactions_fn_t, fn);
     UT_GenStub_AddParam(CF_TraverseAllTransactions_All_Channels, void *, context);
 
-    UT_GenStub_Execute(CF_TraverseAllTransactions_All_Channels, Basic,
+    UT_GenStub_Execute(CF_TraverseAllTransactions_All_Channels,
+                       Basic,
                        UT_DefaultHandler_CF_TraverseAllTransactions_All_Channels);
 
     return UT_GenStub_GetReturnValue(CF_TraverseAllTransactions_All_Channels, int32);

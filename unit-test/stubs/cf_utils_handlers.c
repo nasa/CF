@@ -63,7 +63,8 @@ void UT_DefaultHandler_CF_ResetHistory(void *UserObj, UT_EntryKey_t FuncKey, con
  * arguments to a test-provided context capture buffer.
  *
  *-----------------------------------------------------------------*/
-void UT_DefaultHandler_CF_FindTransactionBySequenceNumber(void *UserObj, UT_EntryKey_t FuncKey,
+void UT_DefaultHandler_CF_FindTransactionBySequenceNumber(void                   *UserObj,
+                                                          UT_EntryKey_t           FuncKey,
                                                           const UT_StubContext_t *Context)
 {
     CF_FindTransactionBySequenceNumber_context_t *ctxt =
@@ -125,7 +126,8 @@ void UT_DefaultHandler_CF_WriteTxnQueueDataToFile(void *UserObj, UT_EntryKey_t F
  * arguments to a test-provided context capture buffer.
  *
  *-----------------------------------------------------------------*/
-void UT_DefaultHandler_CF_WriteHistoryQueueDataToFile(void *UserObj, UT_EntryKey_t FuncKey,
+void UT_DefaultHandler_CF_WriteHistoryQueueDataToFile(void                   *UserObj,
+                                                      UT_EntryKey_t           FuncKey,
                                                       const UT_StubContext_t *Context)
 {
     CF_WriteHistoryQueueDataToFile_context_t *ctxt =
@@ -163,7 +165,8 @@ void UT_DefaultHandler_CF_TraverseAllTransactions(void *UserObj, UT_EntryKey_t F
  * arguments to a test-provided context capture buffer.
  *
  *-----------------------------------------------------------------*/
-void UT_DefaultHandler_CF_TraverseAllTransactions_All_Channels(void *UserObj, UT_EntryKey_t FuncKey,
+void UT_DefaultHandler_CF_TraverseAllTransactions_All_Channels(void                   *UserObj,
+                                                               UT_EntryKey_t           FuncKey,
                                                                const UT_StubContext_t *Context)
 {
     CF_TraverseAllTransactions_All_Channels_context_t *ctxt =

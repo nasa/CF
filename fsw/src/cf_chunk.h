@@ -50,7 +50,7 @@ typedef struct CF_ChunkList
 {
     CF_ChunkIdx_t count;      /**< \brief number of chunks currently in the array */
     CF_ChunkIdx_t max_chunks; /**< \brief maximum number of chunks allowed in the list (allocation size) */
-    CF_Chunk_t *  chunks;     /**< \brief chunk list array */
+    CF_Chunk_t   *chunks;     /**< \brief chunk list array */
 } CF_ChunkList_t;
 
 /**
@@ -176,8 +176,12 @@ const CF_Chunk_t *CF_ChunkList_GetFirstChunk(const CF_ChunkList_t *chunks);
  *
  * @returns The number of computed gaps.
  */
-uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t *chunks, CF_ChunkIdx_t max_gaps, CF_ChunkSize_t total,
-                                CF_ChunkOffset_t start, CF_ChunkList_ComputeGapFn_t compute_gap_fn, void *opaque);
+uint32 CF_ChunkList_ComputeGaps(const CF_ChunkList_t       *chunks,
+                                CF_ChunkIdx_t               max_gaps,
+                                CF_ChunkSize_t              total,
+                                CF_ChunkOffset_t            start,
+                                CF_ChunkList_ComputeGapFn_t compute_gap_fn,
+                                void                       *opaque);
 
 /************************************************************************/
 /** @brief Erase a range of chunks.

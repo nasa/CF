@@ -37,8 +37,10 @@
  * See description in cf_cfdp_dispatch.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_R_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
-                            const CF_CFDP_R_SubstateDispatchTable_t *dispatch, CF_CFDP_StateRecvFunc_t fd_fn)
+void CF_CFDP_R_DispatchRecv(CF_Transaction_t                        *txn,
+                            CF_Logical_PduBuffer_t                  *ph,
+                            const CF_CFDP_R_SubstateDispatchTable_t *dispatch,
+                            CF_CFDP_StateRecvFunc_t                  fd_fn)
 {
     CF_CFDP_StateRecvFunc_t              selected_handler;
     CF_Logical_PduFileDirectiveHeader_t *fdh;
@@ -59,10 +61,14 @@ void CF_CFDP_R_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
         else
         {
             ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.spurious;
-            CFE_EVS_SendEvent(CF_CFDP_R_DC_INV_ERR_EID, CFE_EVS_EventType_ERROR,
+            CFE_EVS_SendEvent(CF_CFDP_R_DC_INV_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
                               "CF R%d(%lu:%lu): received PDU with invalid directive code %d for sub-state %d",
-                              CF_CFDP_GetPrintClass(txn), (unsigned long)txn->history->src_eid,
-                              (unsigned long)txn->history->seq_num, fdh->directive_code, txn->state_data.sub_state);
+                              CF_CFDP_GetPrintClass(txn),
+                              (unsigned long)txn->history->src_eid,
+                              (unsigned long)txn->history->seq_num,
+                              fdh->directive_code,
+                              txn->state_data.sub_state);
         }
     }
     else
@@ -93,12 +99,13 @@ void CF_CFDP_R_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
  * See description in cf_cfdp_dispatch.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_S_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
+void CF_CFDP_S_DispatchRecv(CF_Transaction_t                            *txn,
+                            CF_Logical_PduBuffer_t                      *ph,
                             const CF_CFDP_S_SubstateRecvDispatchTable_t *dispatch)
 {
     const CF_CFDP_FileDirectiveDispatchTable_t *substate_tbl;
     CF_CFDP_StateRecvFunc_t                     selected_handler;
-    CF_Logical_PduFileDirectiveHeader_t *       fdh;
+    CF_Logical_PduFileDirectiveHeader_t        *fdh;
 
     /* send state, so we only care about file directive PDU */
     selected_handler = NULL;
@@ -117,17 +124,24 @@ void CF_CFDP_S_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
         else
         {
             ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.spurious;
-            CFE_EVS_SendEvent(CF_CFDP_S_DC_INV_ERR_EID, CFE_EVS_EventType_ERROR,
+            CFE_EVS_SendEvent(CF_CFDP_S_DC_INV_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
                               "CF S%d(%lu:%lu): received PDU with invalid directive code %d for sub-state %d",
-                              CF_CFDP_GetPrintClass(txn), (unsigned long)txn->history->src_eid,
-                              (unsigned long)txn->history->seq_num, fdh->directive_code, txn->state_data.sub_state);
+                              CF_CFDP_GetPrintClass(txn),
+                              (unsigned long)txn->history->src_eid,
+                              (unsigned long)txn->history->seq_num,
+                              fdh->directive_code,
+                              txn->state_data.sub_state);
         }
     }
     else
     {
-        CFE_EVS_SendEvent(CF_CFDP_S_NON_FD_PDU_ERR_EID, CFE_EVS_EventType_ERROR,
-                          "CF S%d(%lu:%lu): received non-file directive PDU", CF_CFDP_GetPrintClass(txn),
-                          (unsigned long)txn->history->src_eid, (unsigned long)txn->history->seq_num);
+        CFE_EVS_SendEvent(CF_CFDP_S_NON_FD_PDU_ERR_EID,
+                          CFE_EVS_EventType_ERROR,
+                          "CF S%d(%lu:%lu): received non-file directive PDU",
+                          CF_CFDP_GetPrintClass(txn),
+                          (unsigned long)txn->history->src_eid,
+                          (unsigned long)txn->history->seq_num);
     }
 
     /* check that there's a valid function pointer. If there isn't,
@@ -148,7 +162,8 @@ void CF_CFDP_S_DispatchRecv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
  * See description in cf_cfdp_dispatch.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_CFDP_RxStateDispatch(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph,
+void CF_CFDP_RxStateDispatch(CF_Transaction_t                     *txn,
+                             CF_Logical_PduBuffer_t               *ph,
                              const CF_CFDP_TxnRecvDispatchTable_t *dispatch)
 {
     CF_CFDP_StateRecvFunc_t selected_handler;

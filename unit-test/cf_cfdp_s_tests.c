@@ -61,9 +61,12 @@ static void UT_CFDP_S_SetupBasicTxState(CF_Logical_PduBuffer_t *pdu_buffer)
     UT_SetHandlerFunction(UT_KEY(CF_CFDP_ConstructPduHeader), UT_AltHandler_GenericPointerReturn, pdu_buffer);
 }
 
-static void UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_t setup, CF_Logical_PduBuffer_t **pdu_buffer_p,
-                                          CF_Channel_t **channel_p, CF_History_t **history_p, CF_Transaction_t **txn_p,
-                                          CF_ConfigTable_t **config_table_p)
+static void UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_t            setup,
+                                          CF_Logical_PduBuffer_t **pdu_buffer_p,
+                                          CF_Channel_t           **channel_p,
+                                          CF_History_t           **history_p,
+                                          CF_Transaction_t       **txn_p,
+                                          CF_ConfigTable_t       **config_table_p)
 {
     /*
      * fake objects used to pass into CF app during unit tests.
@@ -173,7 +176,7 @@ void Test_CF_CFDP_S1_Recv(void)
     /* Test case for:
      * void CF_CFDP_S1_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t *      txn;
+    CF_Transaction_t       *txn;
     CF_Logical_PduBuffer_t *ph;
 
     /* class 1 recv is really a noop, it basically drops all packets.
@@ -187,7 +190,7 @@ void Test_CF_CFDP_S2_Recv(void)
     /* Test case for:
      * void CF_CFDP_S2_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t *      txn;
+    CF_Transaction_t       *txn;
     CF_Logical_PduBuffer_t *ph;
 
     /* class 2 recv just invokes a dispatcher to functions that should be
@@ -515,7 +518,7 @@ void Test_CF_CFDP_S_SubstateEarlyFin(void)
     /* Test case for:
      * void CF_CFDP_S_SubstateEarlyFin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t *      txn;
+    CF_Transaction_t       *txn;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal */
@@ -528,7 +531,7 @@ void Test_CF_CFDP_S_SubstateRecvFin(void)
     /* Test case for:
      * void CF_CFDP_S_SubstateRecvFin(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t *      txn;
+    CF_Transaction_t       *txn;
     CF_Logical_PduBuffer_t *ph;
 
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_CheckAckNakCount), true);
@@ -562,9 +565,9 @@ void Test_CF_CFDP_S2_SubstateNak(void)
     /* Test case for:
      * void CF_CFDP_S2_SubstateNak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t *      txn;
+    CF_Transaction_t       *txn;
     CF_Logical_PduBuffer_t *ph;
-    CF_Logical_PduNak_t *   nak;
+    CF_Logical_PduNak_t    *nak;
 
     /* no segments */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
@@ -577,7 +580,7 @@ void Test_CF_CFDP_S2_SubstateNak(void)
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     nak                            = &ph->int_header.nak;
     nak->segment_list.num_segments = 1;
-    nak->segment_list.segments[0]  = (CF_Logical_SegmentRequest_t) {0, 0};
+    nak->segment_list.segments[0]  = (CF_Logical_SegmentRequest_t) { 0, 0 };
     UtAssert_VOIDCALL(CF_CFDP_S2_SubstateNak(txn, ph));
     UtAssert_BOOL_TRUE(txn->flags.tx.send_md);
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.nak_segment_requests, 1);
@@ -586,8 +589,8 @@ void Test_CF_CFDP_S2_SubstateNak(void)
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     nak                            = &ph->int_header.nak;
     nak->segment_list.num_segments = 2;
-    nak->segment_list.segments[0]  = (CF_Logical_SegmentRequest_t) {0, 200};
-    nak->segment_list.segments[1]  = (CF_Logical_SegmentRequest_t) {200, 300};
+    nak->segment_list.segments[0]  = (CF_Logical_SegmentRequest_t) { 0, 200 };
+    nak->segment_list.segments[1]  = (CF_Logical_SegmentRequest_t) { 200, 300 };
     txn->fsize                     = 300;
     UtAssert_VOIDCALL(CF_CFDP_S2_SubstateNak(txn, ph));
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.nak_segment_requests, 3);
@@ -596,9 +599,9 @@ void Test_CF_CFDP_S2_SubstateNak(void)
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     nak                            = &ph->int_header.nak;
     nak->segment_list.num_segments = 3;
-    nak->segment_list.segments[0]  = (CF_Logical_SegmentRequest_t) {200, 100};
-    nak->segment_list.segments[1]  = (CF_Logical_SegmentRequest_t) {100, 400};
-    nak->segment_list.segments[2]  = (CF_Logical_SegmentRequest_t) {400, 0};
+    nak->segment_list.segments[0]  = (CF_Logical_SegmentRequest_t) { 200, 100 };
+    nak->segment_list.segments[1]  = (CF_Logical_SegmentRequest_t) { 100, 400 };
+    nak->segment_list.segments[2]  = (CF_Logical_SegmentRequest_t) { 400, 0 };
     txn->fsize                     = 300;
     UtAssert_VOIDCALL(CF_CFDP_S2_SubstateNak(txn, ph));
     UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.nak_segment_requests, 6);
@@ -619,7 +622,7 @@ void Test_CF_CFDP_S2_SubstateEofAck(void)
     /* Test case for:
      * void CF_CFDP_S2_SubstateEofAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
      */
-    CF_Transaction_t *      txn;
+    CF_Transaction_t       *txn;
     CF_Logical_PduBuffer_t *ph;
 
     /* nominal */
@@ -669,7 +672,8 @@ void Test_CF_CFDP_S_Init(void)
     CF_Transaction_t *txn;
 
     UT_SetDefaultReturnValue(UT_KEY(OS_FileOpenCheck), OS_ERROR); /* this is the "good" code */
-    UT_SetHandlerFunction(UT_KEY(CF_WrappedOpenCreate), UT_AltHandler_CF_WrappedOpenCreate,
+    UT_SetHandlerFunction(UT_KEY(CF_WrappedOpenCreate),
+                          UT_AltHandler_CF_WrappedOpenCreate,
                           NULL); /* set FD on output */
 
     /* Nominal case, everything success */
@@ -1156,21 +1160,33 @@ void UtTest_Setup(void)
     UtTest_Add(Test_CF_CFDP_S2_Recv, cf_cfdp_s_tests_Setup, cf_cfdp_s_tests_Teardown, "CF_CFDP_S2_Recv");
     UtTest_Add(Test_CF_CFDP_S_AckTimerTick, cf_cfdp_s_tests_Setup, cf_cfdp_s_tests_Teardown, "CF_CFDP_S_AckTimerTick");
     UtTest_Add(Test_CF_CFDP_S_Tick, cf_cfdp_s_tests_Setup, cf_cfdp_s_tests_Teardown, "CF_CFDP_S_Tick");
-    UtTest_Add(Test_CF_CFDP_S_Tick_Maintenance, cf_cfdp_s_tests_Setup, cf_cfdp_s_tests_Teardown,
+    UtTest_Add(Test_CF_CFDP_S_Tick_Maintenance,
+               cf_cfdp_s_tests_Setup,
+               cf_cfdp_s_tests_Teardown,
                "CF_CFDP_S_Tick_Maintenance");
     UtTest_Add(Test_CF_CFDP_S_SendFileData, cf_cfdp_s_tests_Setup, cf_cfdp_s_tests_Teardown, "CF_CFDP_S_SendFileData");
-    UtTest_Add(Test_CF_CFDP_S_SubstateSendFileData, cf_cfdp_s_tests_Setup, cf_cfdp_s_tests_Teardown,
+    UtTest_Add(Test_CF_CFDP_S_SubstateSendFileData,
+               cf_cfdp_s_tests_Setup,
+               cf_cfdp_s_tests_Teardown,
                "CF_CFDP_S_SubstateSendFileData");
-    UtTest_Add(Test_CF_CFDP_S_SubstateEarlyFin, cf_cfdp_s_tests_Setup, cf_cfdp_s_tests_Teardown,
+    UtTest_Add(Test_CF_CFDP_S_SubstateEarlyFin,
+               cf_cfdp_s_tests_Setup,
+               cf_cfdp_s_tests_Teardown,
                "CF_CFDP_S_SubstateEarlyFin");
-    UtTest_Add(Test_CF_CFDP_S_SubstateRecvFin, cf_cfdp_s_tests_Setup, cf_cfdp_s_tests_Teardown,
+    UtTest_Add(Test_CF_CFDP_S_SubstateRecvFin,
+               cf_cfdp_s_tests_Setup,
+               cf_cfdp_s_tests_Teardown,
                "CF_CFDP_S_SubstateRecvFin");
     UtTest_Add(Test_CF_CFDP_S2_SubstateNak, cf_cfdp_s_tests_Setup, cf_cfdp_s_tests_Teardown, "CF_CFDP_S2_SubstateNak");
-    UtTest_Add(Test_CF_CFDP_S2_SubstateEofAck, cf_cfdp_s_tests_Setup, cf_cfdp_s_tests_Teardown,
+    UtTest_Add(Test_CF_CFDP_S2_SubstateEofAck,
+               cf_cfdp_s_tests_Setup,
+               cf_cfdp_s_tests_Teardown,
                "CF_CFDP_S2_SubstateEofAck");
 
     UtTest_Add(Test_CF_CFDP_S_Init, cf_cfdp_s_tests_Setup, cf_cfdp_s_tests_Teardown, "CF_CFDP_S_Init");
-    UtTest_Add(Test_CF_CFDP_S_HandleFileRetention, cf_cfdp_s_tests_Setup, cf_cfdp_s_tests_Teardown,
+    UtTest_Add(Test_CF_CFDP_S_HandleFileRetention,
+               cf_cfdp_s_tests_Setup,
+               cf_cfdp_s_tests_Teardown,
                "CF_CFDP_S_HandleFileRetention");
     UtTest_Add(Test_CF_CFDP_S_CheckState, cf_cfdp_s_tests_Setup, cf_cfdp_s_tests_Teardown, "CF_CFDP_S_CheckState");
     UtTest_Add(Test_CF_CFDP_S_Tick_Nak, cf_cfdp_s_tests_Setup, cf_cfdp_s_tests_Teardown, "CF_CFDP_S_Tick_Nak");

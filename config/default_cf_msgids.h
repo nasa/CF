@@ -49,7 +49,7 @@
  */
 
 /** \brief Message ID for housekeeping telemetry */
-#define CF_HK_TLM_MID  CFE_PLATFORM_CF_TLM_MIDVAL(HK_TLM)
+#define CF_HK_TLM_MID CFE_PLATFORM_CF_TLM_MIDVAL(HK_TLM)
 
 /** \brief Message ID for end of transaction telemetry */
 #define CF_EOT_TLM_MID CFE_PLATFORM_CF_TLM_MIDVAL(EOT_TLM)
@@ -61,10 +61,13 @@
  * \{
  */
 
-#define CF_CH0_TX_MID CFE_PLATFORM_CF_CMD_MIDVAL(CH0_TX)
-#define CF_CH1_TX_MID CFE_PLATFORM_CF_CMD_MIDVAL(CH1_TX)
-#define CF_CH0_RX_MID CFE_PLATFORM_CF_TLM_MIDVAL(CH0_RX)
-#define CF_CH1_RX_MID CFE_PLATFORM_CF_TLM_MIDVAL(CH1_RX)
+/** \brief Message IDs for File Transfers.
+ * CMD/TLM Directions are from the perspective of the App
+ */
+#define CF_CH0_RX_MID CFE_PLATFORM_CF_CMD_MIDVAL(CH0_RX)
+#define CF_CH1_RX_MID CFE_PLATFORM_CF_CMD_MIDVAL(CH1_RX)
+#define CF_CH0_TX_MID CFE_PLATFORM_CF_TLM_MIDVAL(CH0_TX)
+#define CF_CH1_TX_MID CFE_PLATFORM_CF_TLM_MIDVAL(CH1_TX)
 
 /**\}*/
 

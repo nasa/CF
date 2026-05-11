@@ -263,7 +263,7 @@
           <Entry name="poll_counter" type="BASE_TYPES/uint8" shortDescription="Number of active polling directories" />
           <Entry name="playback_counter" type="BASE_TYPES/uint8" shortDescription="Number of active playback directories" />
           <Entry name="frozen" type="BASE_TYPES/uint8" shortDescription="Frozen state" />
-          <PaddingEntry sizeInBits="56" shortDescription="Spare bytes for alignment"/>
+          <PaddingEntry sizeInBits="8" shortDescription="Spare bytes for alignment"/>
         </EntryList>
       </ContainerDataType>
 
@@ -276,7 +276,7 @@
       <ContainerDataType name="HkPacket_Payload">
         <EntryList>
           <Entry name="counters" type="HKCommandCounters" />
-          <PaddingEntry sizeInBits="32" shortDescription="Spare bytes for alignment"/>
+          <PaddingEntry sizeInBits="32" shortDescription="Padding for 32-bit alignment"/>
           <Entry name="channel_hk" type="Channel_Hk" />
         </EntryList>
       </ContainerDataType>

@@ -35,7 +35,8 @@
  * including the opaque context pointer as a CF_TraverseAll_Arg_t object.
  *
  *-----------------------------------------------------------------*/
-void UT_AltHandler_CF_CList_Traverse_TRAVERSE_ALL_ARGS_T(void *UserObj, UT_EntryKey_t FuncKey,
+void UT_AltHandler_CF_CList_Traverse_TRAVERSE_ALL_ARGS_T(void                   *UserObj,
+                                                         UT_EntryKey_t           FuncKey,
                                                          const UT_StubContext_t *Context)
 {
     CF_CList_Traverse_TRAVERSE_ALL_ARGS_T_context_t *ctxt;
@@ -105,7 +106,7 @@ void UT_AltHandler_CF_CList_Traverse_POINTER(void *UserObj, UT_EntryKey_t FuncKe
 void UT_AltHandler_CF_CList_Traverse_R_PRIO(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
     CF_CList_Traverse_R_context_t *ctxt;
-    CF_Traverse_PriorityArg_t *    arg = UT_Hook_GetArgValueByName(Context, "context", CF_Traverse_PriorityArg_t *);
+    CF_Traverse_PriorityArg_t     *arg = UT_Hook_GetArgValueByName(Context, "context", CF_Traverse_PriorityArg_t *);
 
     if (UserObj)
     {
@@ -135,7 +136,8 @@ void UT_AltHandler_CF_CList_Traverse_R_PRIO(void *UserObj, UT_EntryKey_t FuncKey
  * pointer as an int* object.  The value is taken from the UserObj opaque pointer.
  *
  *-----------------------------------------------------------------*/
-void UT_AltHandler_CF_TraverseAllTransactions_All_Channels_Set_Context(void *UserObj, UT_EntryKey_t FuncKey,
+void UT_AltHandler_CF_TraverseAllTransactions_All_Channels_Set_Context(void                   *UserObj,
+                                                                       UT_EntryKey_t           FuncKey,
                                                                        const UT_StubContext_t *Context)
 {
     int *call_context = UT_Hook_GetArgValueByName(Context, "context", int *);
