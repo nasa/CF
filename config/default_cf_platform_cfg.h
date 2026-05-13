@@ -99,6 +99,6 @@
  *       Must be defined as a numeric value that is greater than
  *       or equal to zero.
  */
-#define CF_MISSION_REV 0
+#define CF_MISSION_REV 0xFF
 
 #endif
