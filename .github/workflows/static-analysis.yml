@@ -1,6 +1,5 @@
 name: Static Analysis
 
-# Run on all push and pull requests
 on:
   push:
     branches:
@@ -16,4 +15,6 @@ on:
 jobs:
   static-analysis:
     name: Static Analysis
-    uses: nasa/cFS/.github/workflows/app-static-analysis-reusable.yml@dev
+    uses: nasa/cFS/.github/workflows/static-analysis-reusable.yml@dev
+    with:
+      source-dir: 'source/fsw'
