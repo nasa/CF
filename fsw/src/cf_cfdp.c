@@ -2293,6 +2293,7 @@ void CF_CFDP_DisableEngine(void)
     int                        j;
     static const CF_QueueIdx_t CLOSE_QUEUES[] = { CF_QueueIdx_RX, CF_QueueIdx_TX };
     CF_Channel_t              *chan;
+    CFE_Status_t               delete_status;
 
     CF_AppData.engine.enabled = false;
 
@@ -2326,7 +2327,15 @@ void CF_CFDP_DisableEngine(void)
         /* finally all queue counters must be reset */
         memset(&CF_AppData.hk.Payload.channel_hk[i].q_size, 0, sizeof(CF_AppData.hk.Payload.channel_hk[i].q_size));
 
-        CFE_SB_DeletePipe(chan->pipe);
+        delete_status = CFE_SB_DeletePipe(chan->pipe);
+
+        if (delete_status < CFE_SUCCESS)
+        {
+            CFE_EVS_SendEvent(CF_CFDP_DELETE_PIPE_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF: failed to delete pipe for channel %d",
+                              i);
+        }
     }
 }
 

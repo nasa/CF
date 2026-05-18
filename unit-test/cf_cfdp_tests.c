@@ -1499,6 +1499,7 @@ void Test_CF_CFDP_SendEotPkt(void)
 
 void Test_CF_CFDP_DisableEngine(void)
 {
+    uint8 call_count_CFE_EVS_SendEvent;
     /* Test case for:
      * void CF_CFDP_DisableEngine(void)
      */
@@ -1508,6 +1509,13 @@ void Test_CF_CFDP_DisableEngine(void)
     UtAssert_VOIDCALL(CF_CFDP_DisableEngine());
     UtAssert_STUB_COUNT(CFE_SB_DeletePipe, CF_NUM_CHANNELS);
     UtAssert_BOOL_FALSE(CF_AppData.engine.enabled);
+
+    /* Call where CFE_SB_DeletePipe fails */
+    UT_SetDefaultReturnValue(UT_KEY(CFE_SB_DeletePipe), -1);
+    UtAssert_VOIDCALL(CF_CFDP_DisableEngine());
+    call_count_CFE_EVS_SendEvent = UT_GetStubCount(UT_KEY(CFE_EVS_SendEvent));
+    UtAssert_INT32_EQ(call_count_CFE_EVS_SendEvent, CF_NUM_CHANNELS);
+    UT_ClearDefaultReturnValue(UT_KEY(CFE_SB_DeletePipe));
 
     /* nominal call with playbacks and polls active */
     CF_AppData.engine.channels[UT_CFDP_CHANNEL].playback[0].busy = true;

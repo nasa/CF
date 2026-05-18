@@ -1577,6 +1577,17 @@
  */
 #define CF_EID_INF_CFDP_BUF_EXCEED 166
 
+/**
+ * \brief CF Disable Engine Pipe Delete Failed
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  Call to delete SB pipes when disabling CFDP engine fails
+ */
+#define CF_CFDP_DELETE_PIPE_ERR_EID 167
+
 /**\}*/
 
 #endif /* !CF_EVENTIDS_H */
