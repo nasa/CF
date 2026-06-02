@@ -2237,7 +2237,11 @@ void CF_CFDP_SendEotPkt(CF_Transaction_t *txn)
  *-----------------------------------------------------------------*/
 int CF_CFDP_CopyStringFromLV(char *buf, size_t buf_maxsz, const CF_Logical_Lv_t *src_lv)
 {
-    if (src_lv->length < buf_maxsz)
+    /* Guard against a NULL data_ptr, which CF_CFDP_DoDecodeChunk sets when the
+     * claimed LV length exceeds the remaining PDU bytes.  Without this check a
+     * crafted PDU can trigger memcpy(buf, NULL, n) — undefined behaviour that
+     * causes a NULL-pointer dereference on most platforms. */
+    if (src_lv->data_ptr != NULL && src_lv->length < buf_maxsz)
     {
         memcpy(buf, src_lv->data_ptr, src_lv->length);
         buf[src_lv->length] = 0;
@@ -2246,7 +2250,7 @@ int CF_CFDP_CopyStringFromLV(char *buf, size_t buf_maxsz, const CF_Logical_Lv_t 
 
     /* ensure output is empty */
     buf[0] = 0;
-    return CF_ERROR; /* invalid len in lv? */
+    return CF_ERROR;
 }
 
 /*----------------------------------------------------------------
