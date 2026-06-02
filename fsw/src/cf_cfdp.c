@@ -2326,7 +2326,9 @@ void CF_CFDP_DisableEngine(void)
         /* finally all queue counters must be reset */
         memset(&CF_AppData.hk.Payload.channel_hk[i].q_size, 0, sizeof(CF_AppData.hk.Payload.channel_hk[i].q_size));
 
-        CFE_SB_DeletePipe(chan->pipe);
+        /* SAD: Suppress Ignored Return Value warning from CodeSonar.  CFE_SB_DeletePipe() will send event message if
+         * there is any error */
+        (void)CFE_SB_DeletePipe(chan->pipe);
     }
 }
 
