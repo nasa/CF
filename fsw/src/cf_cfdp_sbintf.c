@@ -187,13 +187,16 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *chan)
     const int        chan_num = (chan - CF_AppData.engine.channels);
     CFE_SB_Buffer_t *bufptr;
     CFE_MSG_Size_t   msg_size;
-    CFE_MSG_Type_t   msg_type = CFE_MSG_Type_Invalid;
+    CFE_MSG_Type_t   msg_type;
 
     CF_Logical_PduBuffer_t *ph;
 
     for (; count < CF_AppData.config_table->chan[chan_num].rx_max_messages_per_wakeup; ++count)
     {
-        status = CFE_SB_ReceiveBuffer(&bufptr, chan->pipe, CFE_SB_POLL);
+        bufptr   = NULL;
+        msg_size = 0;
+        msg_type = CFE_MSG_Type_Invalid;
+        status   = CFE_SB_ReceiveBuffer(&bufptr, chan->pipe, CFE_SB_POLL);
         if (status != CFE_SUCCESS)
         {
             break; /* no more messages */
