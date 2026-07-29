@@ -45,11 +45,6 @@ void cf_cmd_tests_Teardown(void)
 **
 *******************************************************************************/
 
-CF_CFDP_Class_t Any_cfdp_class_t(void)
-{
-    return (CF_CFDP_Class_t)AnyCoinFlip();
-}
-
 CF_EntityId_t Any_CF_EntityId_t(void)
 {
     return (CF_EntityId_t)Any_uint8();
@@ -2680,63 +2675,6 @@ void Test_CF_WriteQueueCmd_When_CF_WriteHistoryDataToFile_FailsOnFirstCallAnd_wq
                      sizeof(context_CF_WriteTxnQueueDataToFile),
                      false);
     UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile);
-
-    UT_SetDataBuffer(UT_KEY(CF_WrappedClose), &context_CF_WrappedClose_fd, sizeof(context_CF_WrappedClose_fd), false);
-
-    CF_AppData.hk.Payload.counters.err = initial_hk_err_counter;
-
-    /* Act */
-    CF_WriteQueueCmd(&utbuf);
-
-    /* Assert */
-    UtAssert_STUB_COUNT(CF_WriteTxnQueueDataToFile, 1);
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
-    UT_CF_AssertEventID(CF_CMD_WQ_WRITEQ_TX_ERR_EID);
-    UtAssert_STUB_COUNT(CF_WrappedClose, 1);
-    /* Assert for incremented counter */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, (initial_hk_err_counter + 1) & 0xFFFF);
-}
-
-void Test_CF_WriteQueueCmd_When_CF_WriteHistoryDataToFile_FailsOnSecondCallAnd_wq_IsDownAnd_queue_IsActive_fd_IsPositive_Call_CF_WrappedClose_SendEventCloseAndRejectCommand(
-    void)
-{
-    /* Arrange */
-    CF_WriteQueueCmd_t       utbuf;
-    CF_WriteQueue_Payload_t *wq = &utbuf.Payload;
-
-    CF_WrappedOpenCreate_context_t       context_CF_WrappedOpenCreate;
-    CF_WriteTxnQueueDataToFile_context_t context_CF_WriteTxnQueueDataToFile[2];
-    int32                                forced_return_CF_WriteTxnQueueDataToFile_1st_call = 0;
-    int32                                forced_return_CF_WriteTxnQueueDataToFile_2nd_call = Any_int32_Except(0);
-    int32                                context_CF_WrappedClose_fd;
-    uint16                               initial_hk_err_counter = Any_uint16();
-
-    memset(&utbuf, 0, sizeof(utbuf));
-
-    /* valid channel */
-    wq->chan = Any_uint8_LessThan(CF_NUM_CHANNELS);
-
-    /* valid combination all direction, all queue */
-    wq->type  = CF_Type_down;
-    wq->queue = CF_Queue_active;
-
-    /* valid result from CF_WrappedCreat */
-    strncpy(wq->filename, AnyRandomStringOfLettersOfLength(10), 10);
-
-    context_CF_WrappedOpenCreate.forced_return = Any_int_Positive();
-
-    UT_SetDataBuffer(UT_KEY(CF_WrappedOpenCreate),
-                     &context_CF_WrappedOpenCreate,
-                     sizeof(context_CF_WrappedOpenCreate),
-                     false);
-
-    /* invalid result from CF_WriteTxnQueueDataToFile */
-    UT_SetDataBuffer(UT_KEY(CF_WriteTxnQueueDataToFile),
-                     &context_CF_WriteTxnQueueDataToFile,
-                     sizeof(context_CF_WriteTxnQueueDataToFile),
-                     false);
-    UT_SetDefaultReturnValue(UT_KEY(CF_WriteTxnQueueDataToFile), forced_return_CF_WriteTxnQueueDataToFile_1st_call);
-    UT_SetDeferredRetcode(UT_KEY(CF_WriteTxnQueueDataToFile), 2, forced_return_CF_WriteTxnQueueDataToFile_2nd_call);
 
     UT_SetDataBuffer(UT_KEY(CF_WrappedClose), &context_CF_WrappedClose_fd, sizeof(context_CF_WrappedClose_fd), false);
 

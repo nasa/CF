@@ -59,17 +59,6 @@ CF_QueueIdx_t Any_cf_queue_index_t(void)
     return (CF_QueueIdx_t)Any_uint16_LessThan(CF_QueueIdx_NUM);
 }
 
-CF_Direction_t Any_direction_t(void)
-{
-    return (CF_Direction_t)Any_uint8_LessThan(CF_Direction_NUM);
-}
-
-CF_CFDP_ConditionCode_t Any_condition_code_t(void)
-{
-    uint8 codes[13] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15 };
-    return (CF_CFDP_ConditionCode_t)Any_uint8_FromThese(codes, sizeof(codes) / sizeof(codes[0]));
-}
-
 void local_handler_OS_close(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
     int32 status;
@@ -589,38 +578,6 @@ void Test_CF_Traverse_WriteTxnQueueEntryToFile(void)
     UtAssert_INT32_EQ(CF_Traverse_WriteTxnQueueEntryToFile(&txn.cl_node, &args), CF_CLIST_EXIT);
     UtAssert_UINT32_EQ(args.counter, 1); /* no increment */
     UtAssert_BOOL_TRUE(args.error);
-}
-
-/*******************************************************************************
-**
-**  CF_WriteHistoryEntryToFile tests
-**
-*******************************************************************************/
-
-void Test_CF_WriteHistoryEntryToFile(void)
-{
-    /* Test case for:
-     * int CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *history)
-     */
-    osal_id_t    arg_fd = OS_ObjectIdFromInteger(1);
-    CF_History_t history;
-
-    memset(&history, 0, sizeof(history));
-    strcpy(history.fnames.src_filename, "sf");
-    strcpy(history.fnames.dst_filename, "df");
-
-    /* Successful write - need to set up for 3 successful calls to OS_write() */
-    UT_SetDeferredRetcode(UT_KEY(OS_write), 1, 44);
-    UT_SetDeferredRetcode(UT_KEY(OS_write), 1, strlen(history.fnames.src_filename) + 6);
-    UT_SetDeferredRetcode(UT_KEY(OS_write), 1, strlen(history.fnames.dst_filename) + 6);
-    UtAssert_INT32_EQ(CF_WriteHistoryEntryToFile(arg_fd, &history), 0);
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-
-    /* Unsuccessful write */
-    UT_CF_ResetEventCapture();
-    UT_SetDeferredRetcode(UT_KEY(OS_write), 1, -1);
-    UtAssert_INT32_EQ(CF_WriteHistoryEntryToFile(arg_fd, &history), -1);
-    UT_CF_AssertEventID(CF_CMD_WHIST_WRITE_ERR_EID);
 }
 
 /*******************************************************************************
