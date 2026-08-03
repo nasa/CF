@@ -216,6 +216,8 @@
           <Entry name="file_data_bytes" type="BASE_TYPES/uint64" shortDescription="Sent file data bytes" />
           <Entry name="pdu" type="BASE_TYPES/uint32"  shortDescription="Sent PDUs counter" />
           <Entry name="nak_segment_requests" type="BASE_TYPES/uint32"  shortDescription="Sent NAK segment requests counter" />
+          <Entry name="files_sent" type="BASE_TYPES/uint32"  shortDescription="Files successfully sent counter" />
+          <PaddingEntry sizeInBits="32" shortDescription="Spare bytes for alignment"/>
         </EntryList>
       </ContainerDataType>
 
@@ -228,6 +230,8 @@
                                                            file directive FIN without matching active transaction counter" />
           <Entry name="dropped" type="BASE_TYPES/uint16"  shortDescription="Received PDUs dropped due to a transaction error" />
           <Entry name="nak_segment_requests" type="BASE_TYPES/uint32"  shortDescription="Received NAK segment requests counter" />
+          <Entry name="files_recv" type="BASE_TYPES/uint32"  shortDescription="Files successfully received counter" />
+          <PaddingEntry sizeInBits="32" shortDescription="Spare bytes for alignment"/>
         </EntryList>
       </ContainerDataType>
 
