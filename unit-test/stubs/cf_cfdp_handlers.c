@@ -117,23 +117,6 @@ void UT_DefaultHandler_CF_CFDP_PlaybackDir(void *UserObj, UT_EntryKey_t FuncKey,
  * arguments to a test-provided context capture buffer.
  *
  *-----------------------------------------------------------------*/
-void UT_DefaultHandler_CF_CFDP_ResetTransaction(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
-{
-    CF_CFDP_ResetTransaction_context_t *ctxt = UT_CF_GetContextBuffer(FuncKey, CF_CFDP_ResetTransaction_context_t);
-
-    if (ctxt)
-    {
-        ctxt->txn          = UT_Hook_GetArgValueByName(Context, "txn", CF_Transaction_t *);
-        ctxt->keep_history = UT_Hook_GetArgValueByName(Context, "keep_history", bool);
-    }
-}
-
-/*----------------------------------------------------------------
- *
- * For compatibility with other tests, this has a mechanism to save its
- * arguments to a test-provided context capture buffer.
- *
- *-----------------------------------------------------------------*/
 void UT_DefaultHandler_CF_CFDP_CancelTransaction(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
     CF_Transaction_t **ctxt = UT_CF_GetContextBuffer(FuncKey, CF_Transaction_t *);

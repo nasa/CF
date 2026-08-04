@@ -132,26 +132,6 @@ void UT_AltHandler_CF_CList_Traverse_R_PRIO(void *UserObj, UT_EntryKey_t FuncKey
 
 /*----------------------------------------------------------------
  *
- * A handler for CF_TraverseAllTransactions which _sets_ the opaque context
- * pointer as an int* object.  The value is taken from the UserObj opaque pointer.
- *
- *-----------------------------------------------------------------*/
-void UT_AltHandler_CF_TraverseAllTransactions_All_Channels_Set_Context(void                   *UserObj,
-                                                                       UT_EntryKey_t           FuncKey,
-                                                                       const UT_StubContext_t *Context)
-{
-    int *call_context = UT_Hook_GetArgValueByName(Context, "context", int *);
-    int *req_context  = UserObj;
-    int  forced_return;
-
-    *call_context = *req_context;
-    forced_return = -1;
-
-    UT_Stub_SetReturnValue(FuncKey, forced_return);
-}
-
-/*----------------------------------------------------------------
- *
  * A simple handler that can be used for any stub that returns a pointer.
  * it just forces the return value to be the object passed in as UserObj.
  *

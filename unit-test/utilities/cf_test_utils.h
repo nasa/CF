@@ -225,37 +225,23 @@ void TestUtil_InitializeRandomSeed(void);
 
 unsigned int AnyCoinFlip(void);
 
-bool         Any_bool(void);
-void         AnyBufferOf_uint8_WithSize(uint8 *buffer, size_t size);
-char         Any_char(void);
-uint8        Any_0_or_1(void);
 uint8        Any_uint8(void);
 uint8        Any_uint8_BetweenExcludeMax(uint8 floor, uint8 ceiling);
 uint8        Any_uint8_BetweenInclusive(uint8 floor, uint8 ceiling);
-uint8        Any_uint8_ExceptSetBits(uint8 mask);
-uint8        Any_uint8_ExceptUnsetBits(uint8 mask);
-uint8        Any_uint8_FromThese(uint8 values[], uint8 num_values);
 uint8        Any_uint8_LessThan(uint8 ceiling);
 uint8        Any_uint8_GreaterThan(uint8 floor);
 uint8        Any_uint8_GreaterThan_or_EqualTo(uint8 floor);
 uint8        Any_uint8_Except(uint8 exception);
 uint16       Any_uint16(void);
-uint16       Any_uint16_BetweenExcludeMax(uint16 floor, uint16 ceiling);
 uint16       Any_uint16_Except(uint16 exception);
-uint16       Any_uint16_GreaterThan(uint16 floor);
 uint16       Any_uint16_LessThan(uint16 ceiling);
 uint32       Any_uint32(void);
-uint32       Any_uint32_BetweenInclusive(uint32 min, uint32 max);
-uint32       Any_uint32_BetweenExcludeMax(uint32 min, uint32 max);
 uint32       Any_uint32_Except(uint32 exception);
 uint32       Any_uint32_GreaterThan(uint32 floor);
 uint32       Any_uint32_LessThan(uint32 ceiling);
 uint32       Any_uint32_LessThan_or_EqualTo(uint32 max);
 int32        Any_int32(void);
 int32        Any_int32_Except(int32 exception);
-int32        Any_int32_LessThan(int32 ceiling);
-int32        Any_int32_Negative(void);
-int32        Any_int32_ZeroOrPositive(void);
 uint64       Any_uint64(void);
 uint64       Any_uint64_Except(uint64 exception);
 unsigned int Any_unsigned_int(void);
@@ -263,17 +249,9 @@ int          Any_int(void);
 int          Any_int_Except(int exception);
 int          Any_int_Negative(void);
 int          Any_int_Positive(void);
-int          Any_int_PositiveExcept(int exception);
-int          Any_int_ZeroOrPositiveLessThan(int ceiling);
-char        *AnyFilenameOfLength(size_t length);
-char        *AnyRandomStringOfTextOfLength(size_t stringLength);
 char        *AnyRandomStringOfLettersOfLength(size_t length);
 void         AnyRandomStringOfLettersOfLengthCopy(char *random_string, size_t length);
 
 uint8 Any_cf_chan_num(void);
-
-void         Any_CFE_TIME_SysTime_Set(CFE_TIME_SysTime_t *fake_time);
-CFE_Status_t Any_CFE_Status_t_Negative(void);
-CFE_Status_t Any_CFE_Status_t_Except(CFE_Status_t exception);
 
 #endif

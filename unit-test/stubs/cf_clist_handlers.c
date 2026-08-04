@@ -78,23 +78,6 @@ void UT_DefaultHandler_CF_CList_InsertBack(void *UserObj, UT_EntryKey_t FuncKey,
  * arguments to a test-provided context capture buffer.
  *
  *-----------------------------------------------------------------*/
-void UT_DefaultHandler_CF_CList_CF_CList_Pop(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
-{
-    CF_CList_Pop_context_t *ctxt = UT_CF_GetContextBuffer(FuncKey, CF_CList_Pop_context_t);
-
-    if (ctxt)
-    {
-        ctxt->head = UT_Hook_GetArgValueByName(Context, "head", CF_CListNode_t **);
-        UT_Stub_SetReturnValue(FuncKey, ctxt->forced_return);
-    }
-}
-
-/*----------------------------------------------------------------
- *
- * For compatibility with other tests, this has a mechanism to save its
- * arguments to a test-provided context capture buffer.
- *
- *-----------------------------------------------------------------*/
 void UT_DefaultHandler_CF_CList_Remove(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
     CF_CList_Remove_context_t *ctxt = UT_CF_GetContextBuffer(FuncKey, CF_CList_Remove_context_t);

@@ -138,26 +138,9 @@ void TestUtil_InitializeRandomSeed(void)
  * The 'Any' randomized values section
  ******************************************************************************/
 
-bool Any_bool(void)
-{
-    bool random_bool = false;
-
-    if (AnyCoinFlip())
-    {
-        random_bool = true;
-    }
-
-    return random_bool;
-}
-
 unsigned int AnyCoinFlip(void)
 {
     return rand() % 2;
-}
-
-char Any_char(void)
-{
-    return (char)Any_uint8();
 }
 
 unsigned int Any_unsigned_int(void)
@@ -167,85 +150,9 @@ unsigned int Any_unsigned_int(void)
     return random_val;
 }
 
-/*
- * AnyBufferOf_uint8_WithSize works, but name/design could use overhaul
- * should it return a pointer? or should it be named different because it alters
- * the buffer given?
- */
-void AnyBufferOf_uint8_WithSize(uint8 *buffer, size_t size)
-{
-    int i;
-
-    for (i = 0; i < size; ++i)
-    {
-        *(buffer + (sizeof(uint8) * i)) = Any_uint8();
-    }
-}
-
-uint8 Any_0_or_1(void)
-{
-    return Any_uint8_LessThan(2);
-}
-
 uint8 Any_uint8(void)
 {
     return (uint8)Any_unsigned_int();
-}
-
-uint8 Any_uint8_ExceptSetBits(uint8 bits)
-{
-    uint8 random_value = bits;
-    uint8 max_tries    = 10;
-    uint8 num_tries    = 0;
-
-    while ((random_value & bits) == bits)
-    {
-        if (num_tries == max_tries)
-        {
-            UtPrintf("Any_uint8_ExceptSetBits unable to get valid number in %u checks\n", num_tries);
-            UtAssert_Abort("Any_uint8_ExceptSetBits failed to get valid number");
-        }
-        else
-        {
-            ++num_tries;
-        }
-
-        random_value = Any_uint8();
-    }
-
-    return random_value;
-}
-
-uint8 Any_uint8_ExceptUnsetBits(uint8 bits)
-{
-    uint8 random_value = bits;
-    uint8 max_tries    = 10;
-    uint8 num_tries    = 0;
-
-    while ((random_value | bits) == bits)
-    {
-        if (num_tries == max_tries)
-        {
-            UtPrintf("Any_uint8_ExceptUnsetBits unable to get valid number in %u checks\n", num_tries);
-            UtAssert_Abort("Any_uint8_ExceptUnsetBits failed to get valid number");
-        }
-        else
-        {
-            ++num_tries;
-        }
-
-        random_value = Any_uint8();
-    }
-
-    return random_value;
-}
-
-uint8 Any_uint8_FromThese(uint8 values[], uint8 num_values)
-{
-    uint8 random_index = rand() % num_values;
-    uint8 random_value = values[random_index];
-
-    return random_value;
 }
 
 uint8 Any_uint8_BetweenExcludeMax(uint8 floor, uint8 ceiling)
@@ -312,13 +219,6 @@ uint16 Any_uint16(void)
     return (uint16)Any_unsigned_int();
 }
 
-uint16 Any_uint16_BetweenExcludeMax(uint16 floor, uint16 ceiling)
-{
-    uint16 difference = ceiling - floor;
-
-    return (uint16)((rand() % difference) + floor);
-}
-
 uint16 Any_uint16_Except(uint16 exception)
 {
     uint32 random_val = exception;
@@ -327,15 +227,6 @@ uint16 Any_uint16_Except(uint16 exception)
     {
         random_val = Any_uint16();
     }
-
-    return random_val;
-}
-
-uint16 Any_uint16_GreaterThan(uint16 floor)
-{
-    uint16 random_val;
-
-    random_val = 65535 - (rand() % (65536 - floor - 1)); /* -1 for non-inclusive */
 
     return random_val;
 }
@@ -350,26 +241,6 @@ uint32 Any_uint32(void)
     return Any_unsigned_int();
 }
 
-uint32 Any_uint32_BetweenInclusive(uint32 min, uint32 max)
-{
-    uint32 difference = max - min + 1; /* +1 for max inclusive */
-
-    return (uint32)((rand() % difference) + min);
-}
-
-uint32 Any_uint32_BetweenExcludeMax(uint32 min, uint32 max)
-{
-    uint32 difference = max - min;
-
-    /* check that rand % 0 does not happen */
-    if (difference == 0)
-    {
-        UtAssert_Abort(__func__);
-    }
-
-    return (uint32)((rand() % difference) + min);
-}
-
 uint32 Any_uint32_Except(uint32 exception)
 {
     uint32 random_val = exception;
@@ -377,24 +248,6 @@ uint32 Any_uint32_Except(uint32 exception)
     while (random_val == exception)
     {
         random_val = Any_unsigned_int();
-    }
-
-    return random_val;
-}
-
-int32 Any_int32_LessThan(int32 ceiling)
-{
-    int32 random_val;
-    int32 new_ceiling;
-
-    if (ceiling > 0)
-    {
-        random_val = (rand() % ceiling) - rand();
-    }
-    else
-    {
-        new_ceiling = abs(INT32_MIN - ceiling);
-        random_val  = ceiling - (rand() % new_ceiling);
     }
 
     return random_val;
@@ -458,23 +311,6 @@ int Any_int_Positive(void)
     return (rand() % (UINT16_MAX)) + 1; /* 0 to RAND_MAX - 1, then +1 for 1 to RAND_MAX */
 }
 
-int Any_int_PositiveExcept(int exception)
-{
-    int rand_val = exception;
-
-    while (rand_val == exception)
-    {
-        rand_val = rand();
-    }
-
-    return rand_val;
-}
-
-int Any_int_ZeroOrPositiveLessThan(int ceiling)
-{
-    return rand() % ceiling;
-}
-
 int32 Any_int32(void)
 {
     return (int32)Any_int();
@@ -483,18 +319,6 @@ int32 Any_int32(void)
 int32 Any_int32_Except(int32 exception)
 {
     return (int32)Any_int_Except(exception);
-}
-
-int32 Any_int32_Negative(void)
-{
-    return Any_int_Negative();
-}
-
-int32 Any_int32_ZeroOrPositive()
-{
-    int32 random_val = rand() % INT32_MAX;
-
-    return random_val;
 }
 
 uint64 Any_uint64()
@@ -523,26 +347,6 @@ uint64 Any_uint64_Except(uint64 exception)
 }
 
 char random_length_string[500];
-
-char *AnyFilenameOfLength(size_t length)
-{
-    return AnyRandomStringOfLettersOfLength(length);
-}
-
-char *AnyRandomStringOfTextOfLength(size_t length)
-{
-    size_t i;
-    int    value;
-
-    for (i = 0; i < length; ++i)
-    {
-        value                   = 32 + (rand() % 95); /* ASCII 32 to 126 */
-        random_length_string[i] = (char)value;
-    }
-    random_length_string[i] = '\0';
-
-    return random_length_string;
-}
 
 char *AnyRandomStringOfLettersOfLength(size_t length)
 {
@@ -582,31 +386,6 @@ void AnyRandomStringOfLettersOfLengthCopy(char *random_string, size_t length)
         random_string[i] = (char)value;
     }
     random_string[i] = '\0';
-}
-
-/* cfe specific */
-void Any_CFE_TIME_SysTime_Set(CFE_TIME_SysTime_t *fake_time)
-{
-    fake_time->Seconds    = Any_uint32();
-    fake_time->Subseconds = Any_uint32();
-}
-
-CFE_Status_t Any_CFE_Status_t_Negative()
-{
-    return Any_int32_Negative();
-}
-
-CFE_Status_t Any_CFE_Status_t_Except(CFE_Status_t exception)
-{
-    CFE_Status_t rand_val = exception;
-
-    /* technically could continue forever, but it won't */
-    while (rand_val == exception)
-    {
-        rand_val = Any_int32();
-    }
-
-    return rand_val;
 }
 
 /* cf specific */
