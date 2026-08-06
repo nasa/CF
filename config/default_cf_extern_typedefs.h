@@ -38,11 +38,19 @@
  *
  * Defined per section 7.1 of CCSDS 727.0-B-5
  */
-typedef enum
+enum CF_CFDP_Class
 {
-    CF_CFDP_CLASS_1 = 0, /**< \brief CFDP class 1 - Unreliable transfer */
-    CF_CFDP_CLASS_2 = 1, /**< \brief CFDP class 2 - Reliable transfer */
-} CF_CFDP_Class_t;
+    CF_CFDP_Class_1 = 0, /**< \brief CFDP class 1 - Unreliable transfer */
+    CF_CFDP_Class_2 = 1, /**< \brief CFDP class 2 - Reliable transfer */
+};
+
+/**
+ * @brief External type to use for CFDP class
+ *
+ * This uses the labels defined in enum CF_CFDP_Class
+ * but maps to a fixed-width type for use in CMD/TLM/Tables
+ */
+typedef uint8 CF_CFDP_Class_Enum_t;
 
 /**
  * @brief CF queue identifiers

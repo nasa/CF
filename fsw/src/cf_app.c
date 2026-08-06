@@ -33,11 +33,158 @@
 #include "cf_cfdp.h"
 #include "cf_version.h"
 #include "cf_dispatch.h"
+#include "cf_utils.h"
 #include "cf_tbl.h"
 
 #include <string.h>
 
 CF_AppData_t CF_AppData;
+
+/*----------------------------------------------------------------
+ *
+ * Local helper function
+ * Imports configuration from table for a single channel
+ * Compatible with CF_ForEachChannel()
+ *
+ *-----------------------------------------------------------------*/
+static int32 CF_DoChannelConfig(CF_Engine_t *engine_ptr, CF_Channel_t *chan, void *arg)
+{
+    const CF_ConfigTable_t   *config      = arg;
+    const int                 chan_num    = CF_ChannelSelect_AsInt(CF_GetChannelFromPtr(chan));
+    const CF_ChannelConfig_t *chan_config = &config->chan[chan_num];
+    const CF_PollDir_t       *tbl_pd_config;
+    CF_LocalPdConfig_t       *pd_config;
+    int                       pd;
+
+    chan->config.max_outgoing_messages_per_wakeup = chan_config->max_outgoing_messages_per_wakeup;
+    chan->config.rx_max_messages_per_wakeup       = chan_config->rx_max_messages_per_wakeup;
+    chan->config.ack_timer_s                      = chan_config->ack_timer_s;
+    chan->config.nak_timer_s                      = chan_config->nak_timer_s;
+    chan->config.inactivity_timer_s               = chan_config->inactivity_timer_s;
+    chan->config.ack_limit                        = chan_config->ack_limit;
+    chan->config.nak_limit                        = chan_config->nak_limit;
+    chan->config.mid_input                        = chan_config->mid_input;
+    chan->config.mid_output                       = chan_config->mid_output;
+    chan->config.pipe_depth_input                 = chan_config->pipe_depth_input;
+    chan->config.dequeue_enabled                  = chan_config->dequeue_enabled;
+
+    CFE_SB_MessageStringGet(chan->config.sem_name,
+                            chan_config->sem_name,
+                            "",
+                            sizeof(chan->config.sem_name),
+                            sizeof(chan_config->sem_name));
+    CFE_SB_MessageStringGet(chan->config.move_dir,
+                            chan_config->move_dir,
+                            "",
+                            sizeof(chan->config.move_dir),
+                            sizeof(chan_config->move_dir));
+
+    for (pd = 0; pd < CF_MAX_POLLING_DIR_PER_CHAN; ++pd)
+    {
+        tbl_pd_config = &chan_config->polldir[pd];
+        pd_config     = &chan->config.polldir[pd];
+
+        pd_config->enabled      = tbl_pd_config->enabled;
+        pd_config->priority     = tbl_pd_config->priority;
+        pd_config->interval_sec = tbl_pd_config->interval_sec;
+        pd_config->cfdp_class   = tbl_pd_config->cfdp_class;
+        pd_config->dest_eid     = tbl_pd_config->dest_eid;
+
+        CFE_SB_MessageStringGet(pd_config->src_dir,
+                                tbl_pd_config->src_dir,
+                                "",
+                                sizeof(pd_config->src_dir),
+                                sizeof(tbl_pd_config->src_dir));
+        CFE_SB_MessageStringGet(pd_config->dst_dir,
+                                tbl_pd_config->dst_dir,
+                                "",
+                                sizeof(pd_config->dst_dir),
+                                sizeof(tbl_pd_config->dst_dir));
+    }
+
+    return CFE_SUCCESS;
+}
+
+/*----------------------------------------------------------------
+ *
+ * Local helper function
+ * Checks for table updates
+ *
+ *-----------------------------------------------------------------*/
+static CFE_Status_t CF_ManageTables(CF_Engine_t *engine_ptr, bool always_import)
+{
+    CFE_Status_t            status;
+    void                   *table_addr;
+    const CF_ConfigTable_t *config;
+
+    /*
+     * NOTE: As of CFE 7.0 (Caelum), some the CFE TBL APIs return success codes
+     * other than CFE_SUCCESS, so it is not sufficient to check for only this
+     * result here.  For example they may return something like CFE_TBL_INFO_UPDATED.
+     * But from the standpoint of this routine, they are all success, because the
+     * function still did its expected job.
+     *
+     * For now, the safest way to check is to check for negative values,
+     * as the alt-success codes are in the positive range by design, and
+     * error codes are all in the negative range of CFE_Status_t.
+     *
+     * This should continue to work even if CFE TBL APIs change to
+     * remove the problematic alt-success codes at some point.
+     */
+    status = CFE_TBL_Manage(CF_AppData.config_handle);
+    if (status < CFE_SUCCESS)
+    {
+        CFE_EVS_SendEvent(CF_INIT_TBL_MANAGE_ERR_EID,
+                          CFE_EVS_EventType_ERROR,
+                          "CF: error in CFE_TBL_Manage, returned 0x%08lx",
+                          (unsigned long)status);
+    }
+    else if (always_import || status == CFE_TBL_INFO_UPDATED)
+    {
+        status = CFE_TBL_GetAddress(&table_addr, CF_AppData.config_handle);
+        if (status < CFE_SUCCESS)
+        {
+            CFE_EVS_SendEvent(CF_INIT_TBL_GETADDR_ERR_EID,
+                              CFE_EVS_EventType_ERROR,
+                              "CF: failed to get table address, returned 0x%08lx",
+                              (unsigned long)status);
+        }
+        else
+        {
+            config = table_addr;
+
+            engine_ptr->config.ticks_per_second             = config->ticks_per_second;
+            engine_ptr->config.rx_crc_calc_bytes_per_wakeup = config->rx_crc_calc_bytes_per_wakeup;
+            engine_ptr->config.local_eid                    = config->local_eid;
+            engine_ptr->config.outgoing_file_chunk_size     = config->outgoing_file_chunk_size;
+
+            CFE_SB_MessageStringGet(engine_ptr->config.tmp_dir,
+                                    config->tmp_dir,
+                                    "",
+                                    sizeof(engine_ptr->config.tmp_dir),
+                                    sizeof(config->tmp_dir));
+            CFE_SB_MessageStringGet(engine_ptr->config.fail_dir,
+                                    config->fail_dir,
+                                    "",
+                                    sizeof(engine_ptr->config.fail_dir),
+                                    sizeof(config->fail_dir));
+
+            CF_ForEachChannel(engine_ptr, CF_DoChannelConfig, table_addr);
+
+            /* Release the address, the config is now in the CF global data */
+            status = CFE_TBL_ReleaseAddress(CF_AppData.config_handle);
+            if (status < CFE_SUCCESS)
+            {
+                CFE_EVS_SendEvent(CF_INIT_TBL_CHECK_REL_ERR_EID,
+                                  CFE_EVS_EventType_ERROR,
+                                  "CF: error in CFE_TBL_ReleaseAddress, returned 0x%08lx",
+                                  (unsigned long)status);
+            }
+        }
+    }
+
+    return status;
+}
 
 /*----------------------------------------------------------------
  *
@@ -47,54 +194,15 @@ CF_AppData_t CF_AppData;
  *-----------------------------------------------------------------*/
 void CF_CheckTables(void)
 {
-    CFE_Status_t status;
+    CF_Engine_t *engine_ptr = CF_GetEngine();
 
     /* check the table for an update only if engine is disabled */
-    if (!CF_AppData.engine.enabled)
+    if (!engine_ptr->enabled)
     {
-        /*
-         * NOTE: As of CFE 7.0 (Caelum), some the CFE TBL APIs return success codes
-         * other than CFE_SUCCESS, so it is not sufficient to check for only this
-         * result here.  For example they may return something like CFE_TBL_INFO_UPDATED.
-         * But from the standpoint of this routine, they are all success, because the
-         * function still did its expected job.
-         *
-         * For now, the safest way to check is to check for negative values,
-         * as the alt-success codes are in the positive range by design, and
-         * error codes are all in the negative range of CFE_Status_t.
-         *
-         * This should continue to work even if CFE TBL APIs change to
-         * remove the problematic alt-success codes at some point.
-         */
-        status = CFE_TBL_ReleaseAddress(CF_AppData.config_handle);
-        if (status < CFE_SUCCESS)
-        {
-            CFE_EVS_SendEvent(CF_INIT_TBL_CHECK_REL_ERR_EID,
-                              CFE_EVS_EventType_ERROR,
-                              "CF: error in CFE_TBL_ReleaseAddress (check), returned 0x%08lx",
-                              (unsigned long)status);
-            CF_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
-        }
-
-        status = CFE_TBL_Manage(CF_AppData.config_handle);
-        if (status < CFE_SUCCESS)
-        {
-            CFE_EVS_SendEvent(CF_INIT_TBL_CHECK_MAN_ERR_EID,
-                              CFE_EVS_EventType_ERROR,
-                              "CF: error in CFE_TBL_Manage (check), returned 0x%08lx",
-                              (unsigned long)status);
-            CF_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
-        }
-
-        status = CFE_TBL_GetAddress((void *)&CF_AppData.config_table, CF_AppData.config_handle);
-        if (status < CFE_SUCCESS)
-        {
-            CFE_EVS_SendEvent(CF_INIT_TBL_CHECK_GA_ERR_EID,
-                              CFE_EVS_EventType_ERROR,
-                              "CF: failed to get table address (check), returned 0x%08lx",
-                              (unsigned long)status);
-            CF_AppData.RunStatus = CFE_ES_RunStatus_APP_ERROR;
-        }
+        /* NOTE: We do not need to abort the app if this fails, it can
+         * keep running with the existing config in RAM.  A failure here only
+         * means that the config is not applied */
+        CF_ManageTables(engine_ptr, false);
     }
 }
 
@@ -165,34 +273,9 @@ CFE_Status_t CF_TableInit(void)
                               "CF: error loading table, returned 0x%08lx",
                               (unsigned long)status);
         }
-    }
-
-    if (status == CFE_SUCCESS)
-    {
-        status = CFE_TBL_Manage(CF_AppData.config_handle);
-        if (status != CFE_SUCCESS)
-        {
-            CFE_EVS_SendEvent(CF_INIT_TBL_MANAGE_ERR_EID,
-                              CFE_EVS_EventType_ERROR,
-                              "CF: error in CFE_TBL_Manage, returned 0x%08lx",
-                              (unsigned long)status);
-        }
-    }
-
-    if (status == CFE_SUCCESS)
-    {
-        status = CFE_TBL_GetAddress((void **)&CF_AppData.config_table, CF_AppData.config_handle);
-        /* status will be CFE_TBL_INFO_UPDATED because it was just loaded, but we can use CFE_SUCCESS too */
-        if ((status != CFE_TBL_INFO_UPDATED) && (status != CFE_SUCCESS))
-        {
-            CFE_EVS_SendEvent(CF_INIT_TBL_GETADDR_ERR_EID,
-                              CFE_EVS_EventType_ERROR,
-                              "CF: error getting table address, returned 0x%08lx",
-                              (unsigned long)status);
-        }
         else
         {
-            status = CFE_SUCCESS;
+            status = CF_ManageTables(CF_GetEngine(), true);
         }
     }
 
@@ -215,8 +298,6 @@ CFE_Status_t CF_AppInit(void)
     memset(&CF_AppData, 0, sizeof(CF_AppData));
 
     CF_AppData.RunStatus = CFE_ES_RunStatus_APP_RUN;
-
-    CFE_MSG_Init(CFE_MSG_PTR(CF_AppData.hk.TelemetryHeader), CFE_SB_ValueToMsgId(CF_HK_TLM_MID), sizeof(CF_AppData.hk));
 
     status = CFE_EVS_Register(NULL, 0, CFE_EVS_EventFilter_BINARY);
     if (status != CFE_SUCCESS)
@@ -258,7 +339,7 @@ CFE_Status_t CF_AppInit(void)
 
     if (status == CFE_SUCCESS)
     {
-        status = CF_CFDP_InitEngine(); /* function sends event internally */
+        status = CF_CFDP_InitEngine(CF_GetEngine()); /* function sends event internally */
     }
 
     if (status == CFE_SUCCESS)

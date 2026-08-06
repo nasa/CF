@@ -74,7 +74,7 @@
  *       Resets the requested housekeeping counters
  *
  *  \par Command Structure
- *       #CF_UnionArgs_Payload_t where byte[0] specifies the counters type, byte[1-3] don't care:
+ *       Single byte enumeration
  *       - 0 = all counters
  *       - 1 = command counters
  *       - 2 = fault counters
@@ -172,7 +172,7 @@
  *       this could cause failures for class 2 transactions in progress.
  *
  *  \par Command Structure
- *       #CF_UnionArgs_Payload_t where byte[0] specifies the channel number or all channels
+ *       Single byte channel selector
  *       - 255 = all channels
  *       - else = single channel
  *
@@ -206,7 +206,7 @@
  *       for the specified channel, note received messages are consumed either way.
  *
  *  \par Command Structure
- *       #CF_UnionArgs_Payload_t where byte[0] specifies the channel number or all channels
+ *       Single byte channel selector
  *       - 255 = all channels
  *       - else = single channel
  *
@@ -478,7 +478,7 @@
  *       Enables the sending of file data PDUs.
  *
  *  \par Command Structure
- *       #CF_UnionArgs_Payload_t where byte[0] specifies the channel number or all channels
+ *       Single byte channel selector
  *       - 255 = all channels
  *       - else = single channel
  *
@@ -511,7 +511,7 @@
  *       Disables the sending of file data PDUs.
  *
  *  \par Command Structure
- *       #CF_UnionArgs_Payload_t where byte[0] specifies the channel number or all channels
+ *       Single byte channel selector
  *       - 255 = all channels
  *       - else = single channel
  *
@@ -544,13 +544,12 @@
  *       Enables the processing of polling directories
  *
  *  \par Command Structure
- *       #CF_UnionArgs_Payload_t
  *
- *       byte[0] specifies the channel number or all channels
+ *       Single byte channel selector
  *       - 255 = all channels
  *       - else = single channel
  *
- *       byte[1] specifies the polling directory index
+ *       Single byte polling directory index
  *       - 255 = all polling directories
  *       - else = single polling directory index
  *
@@ -584,13 +583,12 @@
  *       Disable the processing of polling directories
  *
  *  \par Command Structure
- *       #CF_UnionArgs_Payload_t
  *
- *       byte[0] specifies the channel number or all channels
+ *       Single byte channel selector
  *       - 255 = all channels
  *       - else = single channel
  *
- *       byte[1] specifies the polling directory index
+ *       Single byte polling directory index
  *       - 255 = all polling directories
  *       - else = single polling directory index
  *
@@ -624,13 +622,12 @@
  *       Purge the requested queue
  *
  *  \par Command Structure
- *       #CF_UnionArgs_Payload_t
  *
- *       byte[0] specifies the channel number or all channels
+ *       Single byte channel selector
  *       - 255 = all channels
  *       - else = single channel
  *
- *       byte[1] specifies the queue
+ *       Single byte queue selection enum
  *       - 0 = Pending queue
  *       - 1 = History queue
  *       - 2 = Both pending and history queue

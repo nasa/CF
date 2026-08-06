@@ -47,10 +47,10 @@ static inline bool CF_ChanAction_Status_IS_SUCCESS(CF_ChanAction_Status_t stat)
 /**
  * @brief A callback function for use with CF_DoChanAction()
  *
- * @param chan_num The CF channel number, for statistics purposes
+ * @param chan     The CF channel pointer
  * @param context  Opaque object passed through from initial call
  */
-typedef CF_ChanAction_Status_t (*CF_ChanActionFn_t)(uint8 chan_num, void *context);
+typedef CF_ChanAction_Status_t (*CF_ChanActionFn_t)(CF_Channel_t *chan, void *context);
 
 /**
  * @brief An object to use with channel-scope actions requiring only a boolean argument
@@ -86,8 +86,8 @@ typedef struct CF_ChanAction_SuspResArg
  */
 typedef struct CF_ChanAction_BoolMsgArg
 {
-    const CF_UnionArgs_Payload_t *data;
-    bool                          barg;
+    const void *opaque_data;
+    bool        barg;
 } CF_ChanAction_BoolMsgArg_t;
 
 /**
@@ -97,7 +97,7 @@ typedef struct CF_ChanAction_BoolMsgArg
  */
 typedef struct CF_ChanAction_MsgArg
 {
-    const CF_UnionArgs_Payload_t *data;
+    const void *opaque_data;
 } CF_ChanAction_MsgArg_t;
 
 /************************************************************************/
@@ -208,7 +208,7 @@ CFE_Status_t CF_PlaybackDirCmd(const CF_PlaybackDirCmd_t *msg);
  * @retval CF_ChanAction_Status_ERROR on error
  */
 CF_ChanAction_Status_t
-CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const char *errstr, CF_ChanActionFn_t fn, void *context);
+CF_DoChanAction(CF_ChannelSelect_t chan_select, const char *errstr, CF_ChanActionFn_t fn, void *context);
 
 /************************************************************************/
 /** @brief Channel action to set the frozen bit for a channel.
@@ -221,7 +221,7 @@ CF_DoChanAction(const CF_UnionArgs_Payload_t *data, const char *errstr, CF_ChanA
  *
  * @returns Always succeeds, so returns CF_ChanAction_Status_SUCCESS.
  */
-CF_ChanAction_Status_t CF_DoFreezeThaw(uint8 chan_num, void *arg);
+CF_ChanAction_Status_t CF_DoFreezeThaw(CF_Channel_t *chan, void *arg);
 
 /************************************************************************/
 /** @brief Freeze a channel.
@@ -386,7 +386,7 @@ CFE_Status_t CF_AbandonCmd(const CF_AbandonCmd_t *msg);
  * @returns Always succeeds, so returns CF_ChanAction_Status_SUCCESS.
  *
  */
-CF_ChanAction_Status_t CF_DoEnableDisableDequeue(uint8 chan_num, void *arg);
+CF_ChanAction_Status_t CF_DoEnableDisableDequeue(CF_Channel_t *chan, void *arg);
 
 /************************************************************************/
 /** @brief Handle an enable dequeue ground command.
@@ -421,7 +421,7 @@ CFE_Status_t CF_DisableDequeueCmd(const CF_DisableDequeueCmd_t *msg);
  * @retval  CF_ChanAction_Status_SUCCESS if successful
  * @retval  CF_ChanAction_Status_ERROR if failed
  */
-CF_ChanAction_Status_t CF_DoEnableDisablePolldir(uint8 chan_num, void *arg);
+CF_ChanAction_Status_t CF_DoEnableDisablePolldir(CF_Channel_t *chan, void *arg);
 
 /************************************************************************/
 /** @brief Enable a polling dir ground command.
@@ -490,7 +490,7 @@ CF_CListTraverse_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignore
  * @retval  CF_ChanAction_Status_SUCCESS if successful
  * @retval  CF_ChanAction_Status_ERROR on error
  */
-CF_ChanAction_Status_t CF_DoPurgeQueue(uint8 chan_num, void *arg);
+CF_ChanAction_Status_t CF_DoPurgeQueue(CF_Channel_t *chan, void *arg);
 
 /************************************************************************/
 /** @brief Ground command to purge either the history or pending queues.
@@ -526,7 +526,7 @@ CFE_Status_t CF_WriteQueueCmd(const CF_WriteQueueCmd_t *msg);
  * @retval CF_ChanAction_Status_ERROR if failed (val is greater than max PDU)
  *
  */
-CF_ChanAction_Status_t CF_ValidateChunkSizeCmd(CF_ChunkSize_t val, uint8 chan_num);
+CF_ChanAction_Status_t CF_ValidateChunkSizeCmd(CF_ChunkSize_t val, CF_Channel_t *chan);
 
 /************************************************************************/
 /** @brief Checks if the value is within allowable range as outgoing packets per wakeup
@@ -542,7 +542,7 @@ CF_ChanAction_Status_t CF_ValidateChunkSizeCmd(CF_ChunkSize_t val, uint8 chan_nu
  * @retval CF_ChanAction_Status_ERROR if failed (val is not allowed)
  *
  */
-CF_ChanAction_Status_t CF_ValidateMaxOutgoingCmd(uint32 val, uint8 chan_num);
+CF_ChanAction_Status_t CF_ValidateMaxOutgoingCmd(uint32 val, CF_Channel_t *chan);
 
 /************************************************************************/
 /** @brief Perform a configuration get/set operation.
@@ -562,7 +562,7 @@ CF_ChanAction_Status_t CF_ValidateMaxOutgoingCmd(uint32 val, uint8 chan_num);
  * @param chan_num  Channel number to operate on
  *
  */
-void CF_GetSetParamCmd(bool is_set, CF_GetSet_ValueID_t param_id, uint32 value, uint8 chan_num);
+void CF_GetSetParamCmd(bool is_set, CF_GetSet_ValueID_t param_id, uint32 value, CF_ChannelSelect_t chan_num);
 
 /************************************************************************/
 /** @brief Ground command to set a configuration parameter.

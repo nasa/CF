@@ -84,14 +84,11 @@
  */
 typedef struct
 {
-    CF_HkPacket_t hk;
-
     uint32 RunStatus;
 
-    CFE_SB_PipeId_t CmdPipe;
-
-    CFE_TBL_Handle_t  config_handle;
-    CF_ConfigTable_t *config_table;
+    CF_HkCmdCounters_t counters;
+    CFE_SB_PipeId_t    CmdPipe;
+    CFE_TBL_Handle_t   config_handle;
 
     CF_Engine_t engine;
 } CF_AppData_t;
@@ -112,6 +109,180 @@ extern CF_AppData_t CF_AppData;
  **  Function Prototypes
  **
  **************************************************************************/
+
+/************************************************************************/
+/**
+ * @brief Gets the CFDP engine struct
+ *
+ * @par Description
+ *      Obtains a pointer to the CFDP engine.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *      This is currently a singleon in the CF app, but the architecture
+ *      does permit there to be more than one.
+ *
+ *      This never returns NULL, in the current implementation there is
+ *      one (and only one) engine.
+ *
+ * @returns engine pointer
+ */
+static inline CF_Engine_t *CF_GetEngine(void)
+{
+    return &CF_AppData.engine;
+}
+
+/************************************************************************/
+/**
+ * @brief Checks if a class identifier is valid
+ *
+ * @par Description
+ *      checks if the given class number matches one of the defined enum values
+ *
+ * @par Assumptions, External Events, and Notes:
+ *      None
+ *
+ * @retval true if value is valid/acceptable
+ * @retval false if value is invalid
+ */
+static inline bool CF_IsValidClass(CF_CFDP_Class_Enum_t cv)
+{
+    return (cv == CF_CFDP_Class_1 || cv == CF_CFDP_Class_2);
+}
+
+/************************************************************************/
+/**
+ * @brief Checks if a channel identifier is valid
+ *
+ * @par Description
+ *      checks if the given channel number matches one of the defined values
+ *
+ * @par Assumptions, External Events, and Notes:
+ *      This only checks if it matches a single channel.  It does not test
+ *      for the special values that some commands might accept.
+ *
+ * @retval true if value is valid/acceptable
+ * @retval false if value is invalid
+ */
+static inline bool CF_IsValidChannel(CF_ChannelSelect_t cs)
+{
+    return (cs < CF_NUM_CHANNELS);
+}
+
+/************************************************************************/
+/**
+ * @brief Checks if a channel identifier represents "all channels"
+ *
+ * @par Description
+ *      checks if the given channel number matches the special all channels value
+ *
+ * @par Assumptions, External Events, and Notes:
+ *      This only checks if it matches all channels.
+ *
+ * @retval true if value is valid/acceptable
+ * @retval false if value is invalid
+ */
+static inline bool CF_IsAllChannels(CF_ChannelSelect_t cs)
+{
+    return (cs == CF_ALL_CHANNELS);
+}
+
+/************************************************************************/
+/**
+ * @brief Checks if a channel identifier represents "all channels"
+ *
+ * @par Description
+ *      checks if the given channel number matches the special all channels value
+ *
+ * @par Assumptions, External Events, and Notes:
+ *      This only checks if it matches all channels.
+ *
+ * @retval true if value is valid/acceptable
+ * @retval false if value is invalid
+ */
+static inline bool CF_IsCompoundKey(CF_ChannelSelect_t cs)
+{
+    return (cs == CF_COMPOUND_KEY);
+}
+
+/************************************************************************/
+/**
+ * @brief Gets the channel number as an integer
+ *
+ * @par Description
+ *      For consistent representation of channel numbers in logs messages
+ *      and other strings.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *      Format log messages with printf "%d" conversion
+ *
+ * @returns channel number represented as "int" type
+ */
+static inline int CF_ChannelSelect_AsInt(CF_ChannelSelect_t cs)
+{
+    return (cs);
+}
+
+/************************************************************************/
+/**
+ * @brief Gets the channel number from integer
+ *
+ * @par Description
+ *      For intentional conversion from an integer value to a channel number
+ *
+ * @par Assumptions, External Events, and Notes:
+ *      this exists for special/corner cases only, should really not be
+ *      needed in general.  Prefer to use the APIs that invoke a subroutine
+ *      using the standard selector logic.
+ *
+ * @returns channel number value
+ */
+static inline CF_ChannelSelect_t CF_ChannelSelect_FromInt(int c)
+{
+    return (c);
+}
+
+/************************************************************************/
+/**
+ * @brief Gets the channel pointer from a channel number
+ *
+ * @par Description
+ *      Obtains the channel pointer associated with the channel number
+ *
+ * @par Assumptions, External Events, and Notes:
+ *      This implements range-checking and may return NULL
+ *
+ * @returns channel pointer
+ * @retval NULL if channel number is invalid
+ */
+static inline CF_Channel_t *CF_GetChannelPtr(CF_ChannelSelect_t cs)
+{
+    if (CF_IsValidChannel(cs))
+    {
+        return &CF_GetEngine()->channels[cs];
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+/************************************************************************/
+/**
+ * @brief Gets the channel number from a channel pointer
+ *
+ * @par Description
+ *      Obtains the channel number associated with the channel pointer
+ *
+ * @par Assumptions, External Events, and Notes:
+ *      This is primarily for log messages.
+ *
+ * @returns channel number
+ */
+static inline CF_ChannelSelect_t CF_GetChannelFromPtr(const CF_Channel_t *ChanPtr)
+{
+    CF_Engine_t *engine_ptr = CF_GetEngine();
+    return (CF_ChannelSelect_t) { (ChanPtr - engine_ptr->channels) };
+}
 
 /************************************************************************/
 /** @brief Checks to see if a table update is pending, and perform it.

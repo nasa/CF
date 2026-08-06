@@ -50,9 +50,10 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 
 {
     int32                           status = 0;
     CFE_Status_t                    ret;
-    CF_Logical_PduBuffer_t         *ph = CF_CFDP_ConstructPduHeader(txn,
+    CF_Engine_t                    *engine_ptr = CF_GetEngine();
+    CF_Logical_PduBuffer_t         *ph         = CF_CFDP_ConstructPduHeader(txn,
                                                             0,
-                                                            CF_AppData.config_table->local_eid,
+                                                            engine_ptr->config.local_eid,
                                                             txn->history->peer_eid,
                                                             0,
                                                             txn->history->seq_num,
@@ -60,6 +61,7 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 
     CF_Logical_PduFileDataHeader_t *fd;
     size_t                          actual_bytes;
     void                           *data_ptr;
+    CF_Channel_t                   *chan = CF_GetChannelFromTxn(txn);
 
     if (!ph)
     {
@@ -86,9 +88,9 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 
         {
             actual_bytes = bytes_to_read;
         }
-        if (actual_bytes > CF_AppData.config_table->outgoing_file_chunk_size)
+        if (actual_bytes > engine_ptr->config.outgoing_file_chunk_size)
         {
-            actual_bytes = CF_AppData.config_table->outgoing_file_chunk_size;
+            actual_bytes = engine_ptr->config.outgoing_file_chunk_size;
         }
 
         /*
@@ -118,7 +120,7 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 
                                   (unsigned long)txn->history->seq_num,
                                   (long)foffs,
                                   (long)status);
-                ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek;
+                ++chan->stat.counters.fault.file_seek;
                 ret = CF_ERROR;
             }
             else
@@ -140,7 +142,7 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 
                                   (unsigned long)txn->history->seq_num,
                                   (long)actual_bytes,
                                   (long)status);
-                ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_read;
+                ++chan->stat.counters.fault.file_read;
                 ret = CF_ERROR;
             }
             else
@@ -153,7 +155,7 @@ CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 
         {
             CF_CFDP_SendFd(txn, ph); /* CF_CFDP_SendFd only returns CFE_SUCCESS */
 
-            CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.sent.file_data_bytes += actual_bytes;
+            chan->stat.counters.sent.file_data_bytes += actual_bytes;
             if (calc_crc)
             {
                 CF_CRC_Digest(&txn->crc, fd->data_ptr, fd->data_len);
@@ -268,6 +270,7 @@ void CF_CFDP_S2_SubstateNak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
     const CF_Logical_PduNak_t         *nak;
     uint8                              counter;
     uint8                              bad_sr;
+    CF_Channel_t                      *chan = CF_GetChannelFromTxn(txn);
 
     bad_sr = 0;
 
@@ -314,8 +317,7 @@ void CF_CFDP_S2_SubstateNak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
             }
         }
 
-        CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.nak_segment_requests +=
-            nak->segment_list.num_segments;
+        chan->stat.counters.recv.nak_segment_requests += nak->segment_list.num_segments;
         if (bad_sr)
         {
             CFE_EVS_SendEvent(CF_CFDP_S_INVALID_SR_ERR_EID,
@@ -335,7 +337,7 @@ void CF_CFDP_S2_SubstateNak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
                           CF_CFDP_GetPrintClass(txn),
                           (unsigned long)txn->history->src_eid,
                           (unsigned long)txn->history->seq_num);
-        ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
+        ++chan->stat.counters.recv.error;
     }
 }
 
@@ -349,6 +351,7 @@ void CF_CFDP_S2_SubstateEofAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph
 {
     CFE_Status_t         ret;
     CF_Logical_PduAck_t *ack;
+    CF_Channel_t        *chan = CF_GetChannelFromTxn(txn);
 
     ret = CF_CFDP_RecvAck(txn, ph);
     if (ret == CFE_SUCCESS)
@@ -375,7 +378,7 @@ void CF_CFDP_S2_SubstateEofAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph
                           CF_CFDP_GetPrintClass(txn),
                           (unsigned long)txn->history->src_eid,
                           (unsigned long)txn->history->seq_num);
-        ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
+        ++chan->stat.counters.recv.error;
     }
 }
 
@@ -439,8 +442,9 @@ void CF_CFDP_S2_Recv(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
  *-----------------------------------------------------------------*/
 void CF_CFDP_S_Init(CF_Transaction_t *txn)
 {
-    int32     OsStatus;
-    osal_id_t PendingFd;
+    int32         OsStatus;
+    osal_id_t     PendingFd;
+    CF_Channel_t *chan = CF_GetChannelFromTxn(txn);
 
     PendingFd = OS_OBJECT_ID_UNDEFINED;
 
@@ -458,7 +462,7 @@ void CF_CFDP_S_Init(CF_Transaction_t *txn)
                               (unsigned long)txn->history->src_eid,
                               (unsigned long)txn->history->seq_num,
                               txn->history->fnames.src_filename);
-            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_open;
+            ++chan->stat.counters.fault.file_open;
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
         }
     }
@@ -476,7 +480,7 @@ void CF_CFDP_S_Init(CF_Transaction_t *txn)
                               (unsigned long)txn->history->seq_num,
                               txn->history->fnames.src_filename,
                               (long)OsStatus);
-            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_open;
+            ++chan->stat.counters.fault.file_open;
             PendingFd = OS_OBJECT_ID_UNDEFINED; /* just in case */
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
         }
@@ -495,7 +499,7 @@ void CF_CFDP_S_Init(CF_Transaction_t *txn)
                               (unsigned long)txn->history->seq_num,
                               txn->history->fnames.src_filename,
                               (long)OsStatus);
-            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek;
+            ++chan->stat.counters.fault.file_seek;
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
         }
         else
@@ -517,7 +521,7 @@ void CF_CFDP_S_Init(CF_Transaction_t *txn)
                               (unsigned long)txn->history->seq_num,
                               txn->history->fnames.src_filename,
                               (long)OsStatus);
-            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek;
+            ++chan->stat.counters.fault.file_seek;
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
         }
     }
@@ -553,14 +557,14 @@ void CF_CFDP_S_HandleFileRetention(CF_Transaction_t *txn)
      *     the local file deletion policy, either delete directly or move to recycle dir
      *   - If the transfer is not successful or the "keep" flag is true, then do nothing
      */
-    char                      TempName[CFE_MISSION_MAX_PATH_LEN];
-    const char               *SubjectFile;
-    const char               *MoveDest;
-    const CF_ChannelConfig_t *config;
-    int32                     OsStatus;
-    bool                      AllowLocalRemove;
+    char          TempName[CFE_MISSION_MAX_PATH_LEN];
+    const char   *SubjectFile;
+    const char   *MoveDest;
+    int32         OsStatus;
+    bool          AllowLocalRemove;
+    CF_Engine_t  *engine_ptr = CF_GetEngine();
+    CF_Channel_t *chan       = CF_GetChannelFromTxn(txn);
 
-    config           = &CF_AppData.config_table->chan[txn->chan_num];
     SubjectFile      = txn->history->fnames.src_filename;
     MoveDest         = NULL;
     AllowLocalRemove = false;
@@ -574,8 +578,7 @@ void CF_CFDP_S_HandleFileRetention(CF_Transaction_t *txn)
          * while making it so the automatic transfer will not re-trigger on the same file. */
         if (!txn->flags.tx.cmd_tx)
         {
-            MoveDest =
-                CF_CFDP_GetMoveTarget(CF_AppData.config_table->fail_dir, SubjectFile, TempName, sizeof(TempName));
+            MoveDest = CF_CFDP_GetMoveTarget(engine_ptr->config.fail_dir, SubjectFile, TempName, sizeof(TempName));
         }
     }
     else if (!txn->keep)
@@ -597,7 +600,7 @@ void CF_CFDP_S_HandleFileRetention(CF_Transaction_t *txn)
         if (AllowLocalRemove)
         {
             /* Everything checked out, If move directory is defined attempt move */
-            MoveDest = CF_CFDP_GetMoveTarget(config->move_dir, SubjectFile, TempName, sizeof(TempName));
+            MoveDest = CF_CFDP_GetMoveTarget(chan->config.move_dir, SubjectFile, TempName, sizeof(TempName));
         }
     }
 
@@ -886,6 +889,7 @@ void CF_CFDP_S_CheckState(CF_Transaction_t *txn)
 void CF_CFDP_S_Tick(CF_Transaction_t *txn)
 {
     CF_CFDP_AckTxnStatus_t CurrStatus;
+    CF_Channel_t          *chan = CF_GetChannelFromTxn(txn);
 
     CurrStatus = CF_CFDP_GetAckTxnStatus(txn);
 
@@ -911,7 +915,7 @@ void CF_CFDP_S_Tick(CF_Transaction_t *txn)
                                   "CF S(%lu:%lu): inactivity timer expired",
                                   (unsigned long)txn->history->src_eid,
                                   (unsigned long)txn->history->seq_num);
-                ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.inactivity_timer;
+                ++chan->stat.counters.fault.inactivity_timer;
 
                 CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_INACTIVITY_DETECTED);
             }

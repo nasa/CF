@@ -201,3 +201,30 @@ void UT_DefaultHandler_CF_WrappedOpenCreate(void *UserObj, UT_EntryKey_t FuncKey
         UT_Stub_SetReturnValue(FuncKey, ctxt->forced_return);
     }
 }
+
+/*----------------------------------------------------------------
+ *
+ * Function: UT_DefaultHandler_CF_ForEachChannel
+ *
+ * Invokes the passed-in, as this is usually required for correct operation
+ *
+ *-----------------------------------------------------------------*/
+void UT_DefaultHandler_CF_ForEachChannel(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
+{
+    CF_Engine_t     *engine_ptr = UT_Hook_GetArgValueByName(Context, "engine_ptr", CF_Engine_t *);
+    CF_ChannelFunc_t fn         = UT_Hook_GetArgValueByName(Context, "fn", CF_ChannelFunc_t);
+    void            *arg        = UT_Hook_GetArgValueByName(Context, "arg", void *);
+    int32            ret;
+
+    if (fn)
+    {
+        ret = fn(engine_ptr, &engine_ptr->channels[UT_CFDP_CHANNEL_IDX], arg);
+    }
+    else
+    {
+        ret = CFE_SUCCESS;
+    }
+
+    UT_Stub_SetReturnValue(FuncKey, ret);
+}
+

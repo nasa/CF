@@ -29,6 +29,66 @@
 #include "cf_extern_typedefs.h"
 
 /**
+ * \defgroup cfscfmsgtypes Typedefs used in CFS CFDP Commands and Telemetry
+ * \{
+ */
+
+/**
+ * \brief Type IDs for use for Write Queue cmd
+ */
+typedef enum CF_Type
+{
+    CF_Type_all  = 0, /**< \brief Type all */
+    CF_Type_up   = 1, /**< \brief Type up */
+    CF_Type_down = 2  /**< \brief Type down */
+} CF_Type_t;
+
+/**
+ * @brief External type to use for CFDP queue type
+ *
+ * This uses the labels defined in enum CF_Type
+ * but maps to a fixed-width type for use in CMD/TLM/Tables
+ */
+typedef uint8 CF_Type_Enum_t;
+
+/**
+ * @brief Standardized type used for channel selection in commands
+ *
+ * 255 = all channels (if applicable; not all commands allow all channels)
+ * 0-X = single channel number
+ */
+typedef uint8 CF_ChannelSelect_t;
+
+/**
+ * Standardized type used for polling directory selection in commands
+ *
+ * 255 = all polling directory indices (if applicable)
+ * 0-X = single polling directory index number
+ */
+typedef uint8 CF_PollIdxSelect_t;
+
+/**
+ * \brief Enum labels for use for queue selection
+ */
+enum CF_QueueSelect
+{
+    CF_QueueSelect_Pending = 0, /**< \brief Pending Queue */
+    CF_QueueSelect_Active  = 1, /**< \brief Active Queue */
+    CF_QueueSelect_History = 2, /**< \brief History Queue */
+    CF_QueueSelect_All     = 3, /**< \brief All queues */
+};
+
+/**
+ * @brief External type to use for CFDP queue select
+ *
+ * This uses the labels defined in enum CF_QueueSelect
+ * but maps to a fixed-width type for use in CMD/TLM/Tables
+ */
+typedef uint8 CF_QueueSelect_Enum_t;
+
+/** \} */
+
+/**
  * \defgroup cfscftlm CFS CFDP Telemetry
  * \{
  */
@@ -146,47 +206,86 @@ typedef struct CF_EotPacket_Payload
  */
 
 /**
- * \brief Command payload argument union to support 4 uint8's, 2 uint16's or 1 uint32
+ * \brief Enum labels for use for Reset cmd
  */
-typedef union CF_UnionArgs_Payload
-{
-    uint32 dword;    /**< \brief Generic uint32 argument */
-    uint16 hword[2]; /**< \brief Generic uint16 array of arguments */
-    uint8  byte[4];  /**< \brief Generic uint8 array of arguments */
-} CF_UnionArgs_Payload_t;
-
-/**
- * \brief IDs for use for Reset cmd
- */
-typedef enum
+enum CF_Reset
 {
     CF_Reset_all     = 0, /**< \brief Reset all */
     CF_Reset_command = 1, /**< \brief Reset command */
     CF_Reset_fault   = 2, /**< \brief Reset fault */
     CF_Reset_up      = 3, /**< \brief Reset up */
     CF_Reset_down    = 4  /**< \brief Reset down */
-} CF_Reset_t;
+};
 
 /**
- * \brief Type IDs for use for Write Queue cmd
+ * @brief External type to use for Reset command
+ *
+ * This uses the labels defined in enum CF_Reset
+ * but maps to a fixed-width type for use in CMD/TLM/Tables
  */
-typedef enum
-{
-    CF_Type_all  = 0, /**< \brief Type all */
-    CF_Type_up   = 1, /**< \brief Type up */
-    CF_Type_down = 2  /**< \brief Type down */
-} CF_Type_t;
+typedef uint8 CF_Reset_Enum_t;
 
 /**
- * \brief Queue IDs for use for Write Queue cmd
+ * \brief Reset command payload
+ *
+ * For command details see #CF_RESET_CC
  */
-typedef enum
+typedef struct CF_ResetCountersCmd_Payload
 {
-    CF_Queue_pend    = 0, /**< \brief Queue pending */
-    CF_Queue_active  = 1, /**< \brief Queue active */
-    CF_Queue_history = 2, /**< \brief Queue history */
-    CF_Queue_all     = 3  /**< \brief Queue all */
-} CF_Queue_t;
+    CF_Reset_Enum_t ResetType;
+} CF_ResetCountersCmd_Payload_t;
+
+/**
+ * \brief Single byte channel selector payload
+ *
+ * Used in all commands needing only a channel selection
+ *       - 255 = all channels
+ *       - else = single channel
+ */
+typedef struct CF_ChannelSelect_Payload
+{
+    CF_ChannelSelect_t ChannelSelect;
+} CF_ChannelSelect_Payload_t;
+
+/**
+ * \brief Polling directory selector payload
+ *
+ * Used in all commands needing a polldir selection
+ *
+ * Single byte channel selector
+ *       - 255 = all channels
+ *       - else = single channel
+ *
+ * Single byte polling directory index
+ *       - 255 = all polling directories
+ *       - else = single polling directory index
+ */
+typedef struct CF_PollDirSelect_Payload
+{
+    CF_ChannelSelect_t ChannelSelect;
+    CF_PollIdxSelect_t PollDirIndx;
+} CF_PollDirSelect_Payload_t;
+
+/**
+ * \brief Queue selector payload
+ *
+ * Used in all commands needing a queue selection
+ *
+ *       Single byte channel selector
+ *       - 255 = all channels
+ *       - else = single channel
+ *
+ *       Single byte queue selection enum
+ *       Values indicated by #CF_QueueSelect enum
+ *       - 0 = Pending queue
+ *       - 1 = History queue
+ *       - 2 = Both pending and history queue
+ */
+typedef struct CF_QueueSelect_Payload
+{
+    CF_ChannelSelect_t    ChannelSelect;
+    CF_QueueSelect_Enum_t QueueSelect;
+} CF_QueueSelect_Payload_t;
 
 /**
  * \brief Parameter IDs for use with Get/Set parameter messages
@@ -194,7 +293,7 @@ typedef enum
  * Specifically these are used for the "key" field within CF_GetParamCmd_t and
  * CF_SetParamCmd_t message structures.
  */
-typedef enum
+enum CF_GetSet_ValueID
 {
     CF_GetSet_ValueID_ticks_per_second,                      /**< \brief Ticks per second key */
     CF_GetSet_ValueID_rx_crc_calc_bytes_per_wakeup,          /**< \brief Receive CRC calculated bytes per wake-up key */
@@ -207,7 +306,15 @@ typedef enum
     CF_GetSet_ValueID_local_eid,                             /**< \brief Local entity id key */
     CF_GetSet_ValueID_chan_max_outgoing_messages_per_wakeup, /**< \brief Max outgoing messages per wake-up key */
     CF_GetSet_ValueID_MAX                                    /**< \brief Key limit used for validity check */
-} CF_GetSet_ValueID_t;
+};
+
+/**
+ * @brief External type to use for CF_GetSet_ValueID
+ *
+ * This uses the labels defined in enum CF_GetSet_ValueID
+ * but maps to a fixed-width type for use in CMD/TLM/Tables
+ */
+typedef uint8 CF_GetSet_ValueID_Enum_t;
 
 /**
  * \brief Get parameter command structure
@@ -216,8 +323,8 @@ typedef enum
  */
 typedef struct CF_GetParam_Payload
 {
-    uint8 key;      /**< \brief Parameter key, see #CF_GetSet_ValueID_t */
-    uint8 chan_num; /**< \brief Channel number */
+    CF_GetSet_ValueID_Enum_t key;      /**< \brief Parameter key, see #CF_GetSet_ValueID_t */
+    CF_ChannelSelect_t       chan_num; /**< \brief Channel number */
 } CF_GetParam_Payload_t;
 
 /**
@@ -227,10 +334,10 @@ typedef struct CF_GetParam_Payload
  */
 typedef struct CF_SetParam_Payload
 {
-    uint32 value;    /**< \brief Parameter value to set */
-    uint8  key;      /**< \brief Parameter key, see #CF_GetSet_ValueID_t */
-    uint8  chan_num; /**< \brief Channel number */
-    uint8  spare[2]; /**< \brief Alignment spare, uint32 multiple */
+    uint32                   value;    /**< \brief Parameter value to set */
+    CF_GetSet_ValueID_Enum_t key;      /**< \brief Parameter key, see #CF_GetSet_ValueID_t */
+    CF_ChannelSelect_t       chan_num; /**< \brief Channel number */
+    uint8                    spare[2]; /**< \brief Alignment spare, uint32 multiple */
 } CF_SetParam_Payload_t;
 
 /**
@@ -240,13 +347,13 @@ typedef struct CF_SetParam_Payload
  */
 typedef struct CF_TxFile_Payload
 {
-    uint8         cfdp_class;                        /**< \brief CFDP class: 0=class 1, 1=class 2 */
-    uint8         keep;                              /**< \brief Keep file flag: 1=keep, else delete */
-    uint8         chan_num;                          /**< \brief Channel number */
-    uint8         priority;                          /**< \brief Priority: 0=highest priority */
-    CF_EntityId_t dest_id;                           /**< \brief Destination entity id */
-    char          src_filename[CF_FILENAME_MAX_LEN]; /**< \brief Source file/directory name */
-    char          dst_filename[CF_FILENAME_MAX_LEN]; /**< \brief Destination file/directory name */
+    CF_CFDP_Class_Enum_t cfdp_class;                        /**< \brief CFDP class: 0=class 1, 1=class 2 */
+    uint8                keep;                              /**< \brief Keep file flag: 1=keep, else delete */
+    CF_ChannelSelect_t   chan_num;                          /**< \brief Channel number */
+    uint8                priority;                          /**< \brief Priority: 0=highest priority */
+    CF_EntityId_t        dest_id;                           /**< \brief Destination entity id */
+    char                 src_filename[CF_FILENAME_MAX_LEN]; /**< \brief Source file/directory name */
+    char                 dst_filename[CF_FILENAME_MAX_LEN]; /**< \brief Destination file/directory name */
 } CF_TxFile_Payload_t;
 
 /**
@@ -256,10 +363,10 @@ typedef struct CF_TxFile_Payload
  */
 typedef struct CF_WriteQueue_Payload
 {
-    uint8 type;  /**< \brief Transaction direction: all=0, up=1, down=2 */
-    uint8 chan;  /**< \brief Channel number */
-    uint8 queue; /**< \brief Queue type: 0=pending, 1=active, 2=history, 3=all */
-    uint8 spare; /**< \brief Alignment spare, puts filename on 32-bit boundary */
+    CF_Type_Enum_t        type;  /**< \brief Transaction direction: all=0, up=1, down=2 */
+    CF_ChannelSelect_t    chan;  /**< \brief Channel number */
+    CF_QueueSelect_Enum_t queue; /**< \brief Queue type: 0=pending, 1=active, 2=history, 3=all */
+    uint8                 spare; /**< \brief Alignment spare, puts filename on 32-bit boundary */
 
     char filename[CF_FILENAME_MAX_LEN]; /**< \brief Filename written to */
 } CF_WriteQueue_Payload_t;
@@ -273,10 +380,32 @@ typedef struct CF_Transaction_Payload
 {
     CF_TransactionSeq_t ts;       /**< \brief Transaction sequence number */
     CF_EntityId_t       eid;      /**< \brief Entity id */
-    uint8               chan;     /**< \brief Channel number: 254=use ts, 255=all channels, else channel */
+    CF_ChannelSelect_t  chan_num; /**< \brief Channel number: 254=use ts, 255=all channels, else channel */
     uint8               spare[3]; /**< \brief Alignment spare for 32-bit multiple */
 } CF_Transaction_Payload_t;
 
 /**\}*/
+
+/**
+ * @brief Internal type (enum) for the CFDP class.
+ *
+ * This typedef should only be used internally but the same labels/values
+ * apply externally as well.  Notably this is a native-width type, and for
+ * external cmd/tlm use it needs to be a fixed-width type.
+ *
+ * @sa #CF_CFDP_Class_Enum_t
+ */
+typedef enum CF_CFDP_Class CF_CFDP_Class_t;
+
+/**
+ * @brief Internal type (enum) for the CFDP value identifier.
+ *
+ * This typedef should only be used internally but the same labels/values
+ * apply externally as well.  Notably this is a native-width type, and for
+ * external cmd/tlm use it needs to be a fixed-width type.
+ *
+ * @sa #CF_GetSet_ValueID_Enum_t
+ */
+typedef enum CF_GetSet_ValueID CF_GetSet_ValueID_t;
 
 #endif

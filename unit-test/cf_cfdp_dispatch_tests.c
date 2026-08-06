@@ -33,7 +33,7 @@ static void UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_t            setup,
                                                  CF_Channel_t           **channel_p,
                                                  CF_History_t           **history_p,
                                                  CF_Transaction_t       **txn_p,
-                                                 CF_ConfigTable_t       **config_table_p)
+                                                 CF_EngineConfig_t      **config_table_p)
 {
     /*
      * fake objects used to pass into CF app during unit tests.
@@ -42,7 +42,9 @@ static void UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_t            setup,
     static CF_Logical_PduBuffer_t ut_pdu_buffer;
     static CF_History_t           ut_history;
     static CF_Transaction_t       ut_transaction;
-    static CF_ConfigTable_t       ut_config_table;
+
+    CF_Engine_t  *engine_ptr      = CF_GetEngine();
+    CF_Channel_t *local_channel_p = &engine_ptr->channels[UT_CFDP_CHANNEL_IDX];
 
     /*
      * always clear all objects, regardless of what was asked for.
@@ -52,12 +54,11 @@ static void UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_t            setup,
     memset(&ut_pdu_buffer, 0, sizeof(ut_pdu_buffer));
     memset(&ut_history, 0, sizeof(ut_history));
     memset(&ut_transaction, 0, sizeof(ut_transaction));
-    memset(&ut_config_table, 0, sizeof(ut_config_table));
 
     /* certain pointers should be connected even if they were not asked for,
      * as internal code may assume these are set (test cases may un-set) */
     ut_transaction.history  = &ut_history;
-    CF_AppData.config_table = &ut_config_table;
+    ut_transaction.chan_ptr = local_channel_p;
 
     if (pdu_buffer_p)
     {
@@ -81,7 +82,7 @@ static void UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_t            setup,
          * a member of that array, so for now it must be so.
          * This always uses the same channel for now.
          */
-        *channel_p = &CF_AppData.engine.channels[UT_CFDP_CHANNEL];
+        *channel_p = local_channel_p;
     }
     if (history_p)
     {
@@ -93,7 +94,7 @@ static void UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_t            setup,
     }
     if (config_table_p)
     {
-        *config_table_p = &ut_config_table;
+        *config_table_p = &engine_ptr->config;
     }
 
     /* reset the event ID capture between each sub-case */
@@ -135,6 +136,7 @@ void Test_CF_CFDP_R_DispatchRecv(void)
     CF_Logical_PduBuffer_t              *ph;
     CF_CFDP_R_SubstateDispatchTable_t    dispatch;
     CF_CFDP_FileDirectiveDispatchTable_t fddt;
+    CF_Channel_t                        *chan;
 
     memset(&dispatch, 0, sizeof(dispatch));
     memset(&fddt, 0, sizeof(fddt));
@@ -146,38 +148,38 @@ void Test_CF_CFDP_R_DispatchRecv(void)
     dispatch.state[CF_RxSubState_DATA_EOF]          = &fddt;
 
     /* nominal (file directive) */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     ph->pdu_header.pdu_type = 0;
     UtAssert_VOIDCALL(CF_CFDP_R_DispatchRecv(txn, ph, &dispatch, NULL));
 
     /* nominal (file data) */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     ph->pdu_header.pdu_type = 1;
     UtAssert_VOIDCALL(CF_CFDP_R_DispatchRecv(txn, ph, &dispatch, NULL));
 
     /* directive code beyond range */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     ph->fdirective.directive_code = CF_CFDP_FileDirective_INVALID_MAX;
     UtAssert_VOIDCALL(CF_CFDP_R_DispatchRecv(txn, ph, &dispatch, NULL));
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.spurious, 1);
+    UtAssert_UINT32_EQ(chan->stat.counters.recv.spurious, 1);
     UT_CF_AssertEventID(CF_CFDP_R_DC_INV_ERR_EID);
 
     /* file data with error */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     ph->pdu_header.pdu_type = 1;
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_TxnIsOK), 1, false);
     UtAssert_VOIDCALL(CF_CFDP_R_DispatchRecv(txn, ph, &dispatch, NULL));
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.dropped, 1);
+    UtAssert_UINT32_EQ(chan->stat.counters.recv.dropped, 1);
 
     /* test actual dispatch */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     ph->fdirective.directive_code = CF_CFDP_FileDirective_METADATA;
     txn->state_data.sub_state     = CF_RxSubState_DATA_EOF;
     UtAssert_VOIDCALL(CF_CFDP_R_DispatchRecv(txn, ph, &dispatch, CF_CFDP_R2_Recv));
     UtAssert_STUB_COUNT(CF_CFDP_R1_Recv, 1);
     UtAssert_STUB_COUNT(CF_CFDP_R2_Recv, 0);
 
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     ph->pdu_header.pdu_type   = 1;
     txn->state_data.sub_state = CF_RxSubState_DATA_EOF;
     UtAssert_VOIDCALL(CF_CFDP_R_DispatchRecv(txn, ph, &dispatch, CF_CFDP_R2_Recv));
@@ -195,6 +197,7 @@ void Test_CF_CFDP_S_DispatchRecv(void)
     CF_Logical_PduBuffer_t               *ph;
     CF_CFDP_S_SubstateRecvDispatchTable_t dispatch;
     CF_CFDP_FileDirectiveDispatchTable_t  fddt;
+    CF_Channel_t                         *chan;
 
     memset(&dispatch, 0, sizeof(dispatch));
     memset(&fddt, 0, sizeof(fddt));
@@ -204,23 +207,23 @@ void Test_CF_CFDP_S_DispatchRecv(void)
     dispatch.substate[CF_TxSubState_DATA_EOF]       = &fddt;
 
     /* nominal, no handler */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     UtAssert_VOIDCALL(CF_CFDP_S_DispatchRecv(txn, ph, &dispatch));
 
     /* directive code beyond range */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     ph->fdirective.directive_code = CF_CFDP_FileDirective_INVALID_MAX;
     UtAssert_VOIDCALL(CF_CFDP_S_DispatchRecv(txn, ph, &dispatch));
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.spurious, 1);
+    UtAssert_UINT32_EQ(chan->stat.counters.recv.spurious, 1);
     UT_CF_AssertEventID(CF_CFDP_S_DC_INV_ERR_EID);
 
     /* file data PDU, not expected in this type of txn */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     ph->pdu_header.pdu_type = 1;
     UtAssert_VOIDCALL(CF_CFDP_S_DispatchRecv(txn, ph, &dispatch));
 
     /* test actual dispatch */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     ph->fdirective.directive_code = CF_CFDP_FileDirective_METADATA;
     txn->state_data.sub_state     = CF_TxSubState_DATA_EOF;
     UtAssert_VOIDCALL(CF_CFDP_S_DispatchRecv(txn, ph, &dispatch));
@@ -236,6 +239,7 @@ void Test_CF_CFDP_RxStateDispatch(void)
     CF_Transaction_t              *txn;
     CF_Logical_PduBuffer_t        *ph;
     CF_CFDP_TxnRecvDispatchTable_t dispatch;
+    CF_Channel_t                  *chan;
 
     memset(&dispatch, 0, sizeof(dispatch));
 
@@ -243,14 +247,14 @@ void Test_CF_CFDP_RxStateDispatch(void)
     dispatch.rx[CF_TxnState_DROP] = CF_CFDP_RecvDrop;
 
     /* nominal, no handler */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     ph->pdu_header.txm_mode = 1;
     txn->state              = CF_TxnState_INIT;
     txn->reliable_mode      = false;
     UtAssert_VOIDCALL(CF_CFDP_RxStateDispatch(txn, ph, &dispatch));
 
     /* nominal, with handler */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     ph->pdu_header.txm_mode = 1;
     txn->state              = CF_TxnState_R1;
     txn->reliable_mode      = false;
@@ -258,14 +262,14 @@ void Test_CF_CFDP_RxStateDispatch(void)
     UtAssert_STUB_COUNT(CF_CFDP_R1_Recv, 1);
 
     /* Got txm_mode = 0 in an R1 */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     ph->pdu_header.txm_mode = 0;
     txn->reliable_mode      = false;
     UtAssert_VOIDCALL(CF_CFDP_RxStateDispatch(txn, ph, &dispatch));
     UtAssert_STUB_COUNT(CF_CFDP_RecvDrop, 1);
 
     /* Got txm_mode = 1 in an R2 */
-    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     ph->pdu_header.txm_mode = 1;
     txn->reliable_mode      = true;
     UtAssert_VOIDCALL(CF_CFDP_RxStateDispatch(txn, ph, &dispatch));

@@ -58,28 +58,6 @@
 #define CF_INIT_TBL_CHECK_REL_ERR_EID 21
 
 /**
- * \brief CF Check Table Manage Failed Event ID
- *
- *  \par Type: ERROR
- *
- *  \par Cause:
- *
- *  Failure from manage table call during periodic table check
- */
-#define CF_INIT_TBL_CHECK_MAN_ERR_EID 22
-
-/**
- * \brief CF Check Table Get Address Failed Event ID
- *
- *  \par Type: ERROR
- *
- *  \par Cause:
- *
- *  Failure from get table call during periodic table check
- */
-#define CF_INIT_TBL_CHECK_GA_ERR_EID 23
-
-/**
  * \brief CF Table Registration At Initialization Failed Event ID
  *
  *  \par Type: ERROR

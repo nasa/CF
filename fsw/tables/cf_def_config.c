@@ -48,7 +48,7 @@ CF_ConfigTable_t CF_config_table = {
                 /* polling directory 0 */
                 5,               /* interval seconds */
                 25,              /* priority */
-                CF_CFDP_CLASS_2, /* class to send */
+                CF_CFDP_Class_2, /* class to send */
                 23,              /* destination entity id */
                 "/cf/poll_dir",  /* source directory */
                 "./poll_dir",    /* destination directory */

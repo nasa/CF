@@ -46,7 +46,8 @@
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_CFDP_R_CheckCrc(CF_Transaction_t *txn)
 {
-    CFE_Status_t ret;
+    CFE_Status_t  ret;
+    CF_Channel_t *chan = CF_GetChannelFromTxn(txn);
 
     if (txn->crc.result != txn->state_data.eof_crc)
     {
@@ -58,7 +59,7 @@ CFE_Status_t CF_CFDP_R_CheckCrc(CF_Transaction_t *txn)
                           (unsigned long)txn->history->seq_num,
                           (unsigned long)txn->crc.result,
                           (unsigned long)txn->state_data.eof_crc);
-        ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.crc_mismatch;
+        ++chan->stat.counters.fault.crc_mismatch;
         ret = CF_ERROR;
     }
     else
@@ -111,6 +112,7 @@ CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *
     const CF_Logical_PduFileDataHeader_t *fd;
     int32                                 fret;
     CFE_Status_t                          ret;
+    CF_Channel_t                         *chan = CF_GetChannelFromTxn(txn);
 
     /* this function is only entered for data PDUs */
     fd  = &ph->int_header.fd;
@@ -136,7 +138,7 @@ CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *
                               (long)fd->offset,
                               (long)fret);
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILE_SIZE_ERROR);
-            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek;
+            ++chan->stat.counters.fault.file_seek;
             ret = CF_ERROR; /* connection will reset in caller */
         }
         else
@@ -159,13 +161,13 @@ CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *
                               (long)fd->data_len,
                               (long)fret);
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
-            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_write;
+            ++chan->stat.counters.fault.file_write;
             ret = CF_ERROR; /* connection will reset in caller */
         }
         else
         {
-            txn->state_data.cached_pos                                                     = fd->data_len + fd->offset;
-            CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.file_data_bytes += fd->data_len;
+            txn->state_data.cached_pos                = fd->data_len + fd->offset;
+            chan->stat.counters.recv.file_data_bytes += fd->data_len;
 
             /* insert gap data in chunks */
             CF_ChunkListAdd(&txn->chunks->chunks, fd->offset, fd->data_len);
@@ -185,6 +187,7 @@ void CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph
 {
     CFE_Status_t               ret = CFE_SUCCESS;
     const CF_Logical_PduEof_t *eof;
+    CF_Channel_t              *chan = CF_GetChannelFromTxn(txn);
 
     /* this function is only entered for PDUs identified as EOF type */
     ret = CF_CFDP_RecvEof(txn, ph);
@@ -223,7 +226,7 @@ void CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph
                           CF_CFDP_GetPrintClass(txn),
                           (unsigned long)txn->history->src_eid,
                           (unsigned long)txn->history->seq_num);
-        ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
+        ++chan->stat.counters.recv.error;
     }
 }
 
@@ -296,16 +299,18 @@ void CF_CFDP_R2_GapCompute(const CF_ChunkList_t *chunks, const CF_Chunk_t *chunk
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_CFDP_R_SendNak(CF_Transaction_t *txn)
 {
-    CF_Logical_PduBuffer_t *ph = CF_CFDP_ConstructPduHeader(txn,
+    CF_Engine_t            *engine_ptr = CF_GetEngine();
+    CF_Logical_PduBuffer_t *ph         = CF_CFDP_ConstructPduHeader(txn,
                                                             CF_CFDP_FileDirective_NAK,
                                                             txn->history->peer_eid,
-                                                            CF_AppData.config_table->local_eid,
+                                                            engine_ptr->config.local_eid,
                                                             1,
                                                             txn->history->seq_num,
                                                             1);
     CF_Logical_PduNak_t    *nak;
     uint32                  cret;
     CFE_Status_t            ret;
+    CF_Channel_t           *chan = CF_GetChannelFromTxn(txn);
 
     if (ph == NULL)
     {
@@ -350,7 +355,7 @@ CFE_Status_t CF_CFDP_R_SendNak(CF_Transaction_t *txn)
             {
                 CF_CFDP_SendNak(txn, ph);
 
-                CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.sent.nak_segment_requests += cret;
+                chan->stat.counters.sent.nak_segment_requests += cret;
             }
         }
         else
@@ -386,8 +391,9 @@ CFE_Status_t CF_CFDP_R_SendNak(CF_Transaction_t *txn)
  *-----------------------------------------------------------------*/
 void CF_CFDP_R_Init(CF_Transaction_t *txn)
 {
-    int32 ret;
-    char  TempName[CFE_MISSION_MAX_FILE_LEN];
+    int32         ret;
+    char          TempName[CFE_MISSION_MAX_FILE_LEN];
+    CF_Channel_t *chan = CF_GetChannelFromTxn(txn);
 
     /* set default FIN status */
     txn->state_data.fin_dc = CF_CFDP_FinDeliveryCode_INVALID;
@@ -408,7 +414,7 @@ void CF_CFDP_R_Init(CF_Transaction_t *txn)
                           TempName,
                           (long)ret);
 
-        ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_open;
+        ++chan->stat.counters.fault.file_open;
         txn->fd = OS_OBJECT_ID_UNDEFINED; /* just in case */
 
         CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILESTORE_REJECTION);
@@ -435,7 +441,8 @@ void CF_CFDP_R_Init(CF_Transaction_t *txn)
  *-----------------------------------------------------------------*/
 void CF_CFDP_R_CalcCrcStart(CF_Transaction_t *txn)
 {
-    int32 OsStatus;
+    int32         OsStatus;
+    CF_Channel_t *chan = CF_GetChannelFromTxn(txn);
 
     if (txn->fsize != txn->state_data.eof_size)
     {
@@ -463,7 +470,7 @@ void CF_CFDP_R_CalcCrcStart(CF_Transaction_t *txn)
                               (unsigned long)txn->history->src_eid,
                               (unsigned long)txn->history->seq_num,
                               (long)OsStatus);
-            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek;
+            ++chan->stat.counters.fault.file_seek;
 
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILE_SIZE_ERROR);
             txn->flags.com.crc_complete = true;
@@ -484,19 +491,20 @@ void CF_CFDP_R_CalcCrcStart(CF_Transaction_t *txn)
  *-----------------------------------------------------------------*/
 void CF_CFDP_R_CalcCrcChunk(CF_Transaction_t *txn)
 {
-    uint8  buf[CF_R2_CRC_CHUNK_SIZE];
-    size_t count_bytes;
-    size_t want_offs_size;
-    size_t read_size;
-    int    fret;
-    bool   success = true;
+    uint8         buf[CF_R2_CRC_CHUNK_SIZE];
+    size_t        count_bytes;
+    size_t        want_offs_size;
+    size_t        read_size;
+    int           fret;
+    bool          success    = true;
+    CF_Engine_t  *engine_ptr = CF_GetEngine();
+    CF_Channel_t *chan       = CF_GetChannelFromTxn(txn);
 
     memset(buf, 0, sizeof(buf));
 
     count_bytes = 0;
 
-    while ((count_bytes < CF_AppData.config_table->rx_crc_calc_bytes_per_wakeup)
-           && (txn->state_data.cached_pos < txn->fsize))
+    while ((count_bytes < engine_ptr->config.rx_crc_calc_bytes_per_wakeup) && (txn->state_data.cached_pos < txn->fsize))
     {
         want_offs_size = txn->state_data.cached_pos + sizeof(buf);
 
@@ -521,7 +529,7 @@ void CF_CFDP_R_CalcCrcChunk(CF_Transaction_t *txn)
                               (unsigned long)read_size,
                               (long)fret);
             CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILE_SIZE_ERROR);
-            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_read;
+            ++chan->stat.counters.fault.file_read;
             success = false;
             break;
         }
@@ -558,6 +566,7 @@ void CF_CFDP_R2_SubstateRecvFinAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t
 {
     CFE_Status_t         status;
     CF_Logical_PduAck_t *ack;
+    CF_Channel_t        *chan = CF_GetChannelFromTxn(txn);
 
     /* receipt of fin-ack is only valid if we had previously sent
      * a fin and it decodes as expected */
@@ -591,7 +600,7 @@ void CF_CFDP_R2_SubstateRecvFinAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t
                           CF_CFDP_GetPrintClass(txn),
                           (unsigned long)txn->history->src_eid,
                           (unsigned long)txn->history->seq_num);
-        ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error;
+        ++chan->stat.counters.recv.error;
     }
 }
 
@@ -1129,6 +1138,7 @@ void CF_CFDP_R_Tick_Maintenance(CF_Transaction_t *txn)
 void CF_CFDP_R_Tick(CF_Transaction_t *txn)
 {
     CF_CFDP_AckTxnStatus_t CurrStatus;
+    CF_Channel_t          *chan = CF_GetChannelFromTxn(txn);
 
     CurrStatus = CF_CFDP_GetAckTxnStatus(txn);
 
@@ -1152,7 +1162,7 @@ void CF_CFDP_R_Tick(CF_Transaction_t *txn)
                                   CF_CFDP_GetPrintClass(txn),
                                   (unsigned long)txn->history->src_eid,
                                   (unsigned long)txn->history->seq_num);
-                ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.inactivity_timer;
+                ++chan->stat.counters.fault.inactivity_timer;
 
                 CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_INACTIVITY_DETECTED);
             }

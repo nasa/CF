@@ -34,27 +34,15 @@
 
 #include "cf_assert.h"
 
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_utils.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-CF_Channel_t *CF_GetChannelFromTxn(CF_Transaction_t *txn)
+/*
+ * Local type to support CF_DoTraverseAllTransactions
+ */
+typedef struct
 {
-    CF_Channel_t *chan;
-
-    if (txn->chan_num < CF_NUM_CHANNELS)
-    {
-        chan = &CF_AppData.engine.channels[txn->chan_num];
-    }
-    else
-    {
-        chan = NULL;
-    }
-
-    return chan;
-}
+    CF_TraverseAllTransactions_fn_t fn;
+    void                           *context;
+    int32                           ret;
+} CF_TraverseAllTransactions_State_t;
 
 /*----------------------------------------------------------------
  *
@@ -159,6 +147,7 @@ CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *chan, CF_Direction_t di
         /* notably this state is distinguishable from items still on the free list */
         txn->state        = CF_TxnState_INIT;
         txn->history->dir = direction;
+        txn->chan_ptr     = chan;
     }
     else
     {
@@ -186,12 +175,14 @@ void CF_ResetHistory(CF_Channel_t *chan, CF_History_t *history)
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
-void CF_FreeTransaction(CF_Transaction_t *txn, uint8 chan)
+void CF_FreeTransaction(CF_Transaction_t *txn)
 {
+    CF_Channel_t *chan = CF_GetChannelFromTxn(txn);
+
     memset(txn, 0, sizeof(*txn));
-    txn->chan_num = chan;
+    txn->chan_ptr = chan;
     CF_CList_InitNode(&txn->cl_node);
-    CF_CList_InsertBack_Ex(&CF_AppData.engine.channels[chan], CF_QueueIdx_FREE, &txn->cl_node);
+    CF_CList_InsertBack_Ex(chan, CF_QueueIdx_FREE, &txn->cl_node);
 }
 
 /*----------------------------------------------------------------
@@ -423,9 +414,9 @@ CF_CListTraverse_Status_t CF_PrioSearch(CF_CListNode_t *node, void *context)
 void CF_InsertSortPrio(CF_Transaction_t *txn, CF_QueueIdx_t queue)
 {
     bool          insert_back = false;
-    CF_Channel_t *chan        = &CF_AppData.engine.channels[txn->chan_num];
+    CF_Channel_t *chan        = CF_GetChannelFromTxn(txn);
 
-    CF_Assert(txn->chan_num < CF_NUM_CHANNELS);
+    CF_Assert(chan);
 
     /* look for proper position on PEND queue for this transaction.
      * This is a simple priority sort. */
@@ -489,17 +480,38 @@ int32 CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransactions_
 
 /*----------------------------------------------------------------
  *
+ * Local helper function
+ * Invokes CF_TraverseAllTransactions() for a single channel within the CFDP engine
+ * Compatible with CF_ForEachChannel()
+ *
+ *-----------------------------------------------------------------*/
+static int32 CF_DoTraverseAllTransactions(CF_Engine_t *engine_ptr, CF_Channel_t *chan, void *arg)
+{
+    CF_TraverseAllTransactions_State_t *state = arg;
+
+    state->ret += CF_TraverseAllTransactions(chan, state->fn, state->context);
+
+    return CFE_SUCCESS;
+}
+
+/*----------------------------------------------------------------
+ *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
  *
  *-----------------------------------------------------------------*/
 int32 CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context)
 {
-    int   i;
-    int32 ret = 0;
-    for (i = 0; i < CF_NUM_CHANNELS; ++i)
-        ret += CF_TraverseAllTransactions(CF_AppData.engine.channels + i, fn, context);
-    return ret;
+    CF_TraverseAllTransactions_State_t state;
+
+    memset(&state, 0, sizeof(state));
+
+    state.fn      = fn;
+    state.context = context;
+
+    CF_ForEachChannel(CF_GetEngine(), CF_DoTraverseAllTransactions, &state);
+
+    return state.ret;
 }
 
 /*----------------------------------------------------------------
@@ -667,4 +679,26 @@ CF_TxnStatus_t CF_TxnStatus_From_ConditionCode(CF_CFDP_ConditionCode_t cc)
 {
     /* All CFDP CC values directly correspond to a Transaction Status of the same numeric value */
     return (CF_TxnStatus_t)cc;
+}
+
+/*----------------------------------------------------------------
+ *
+ * Function: CF_ForEachChannel
+ *
+ * Application-scope internal function
+ * See description in cf_utils.h for argument/return detail
+ *
+ *-----------------------------------------------------------------*/
+int32 CF_ForEachChannel(CF_Engine_t *engine_ptr, CF_ChannelFunc_t fn, void *arg)
+{
+    int32 Result;
+    int32 i;
+
+    Result = CFE_SUCCESS;
+    for (i = 0; i < CF_NUM_CHANNELS && Result == CFE_SUCCESS; ++i)
+    {
+        Result = fn(engine_ptr, &engine_ptr->channels[i], arg);
+    }
+
+    return Result;
 }

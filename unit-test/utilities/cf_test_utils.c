@@ -389,7 +389,7 @@ void AnyRandomStringOfLettersOfLengthCopy(char *random_string, size_t length)
 }
 
 /* cf specific */
-uint8 Any_cf_chan_num(void)
+CF_ChannelSelect_t Any_cf_chan_num(void)
 {
-    return Any_uint8_LessThan(CF_NUM_CHANNELS);
+    return (Any_uint8_LessThan(CF_NUM_CHANNELS));
 }

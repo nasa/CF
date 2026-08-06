@@ -103,8 +103,8 @@ typedef struct CF_DisableEngineCmd
  */
 typedef struct CF_ResetCountersCmd
 {
-    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
-    CF_UnionArgs_Payload_t  Payload;       /**< \brief Generic command arguments */
+    CFE_MSG_CommandHeader_t       CommandHeader; /**< \brief Command header */
+    CF_ResetCountersCmd_Payload_t Payload;       /**< \brief Command arguments */
 } CF_ResetCountersCmd_t;
 
 /**
@@ -114,8 +114,8 @@ typedef struct CF_ResetCountersCmd
  */
 typedef struct CF_FreezeCmd
 {
-    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
-    CF_UnionArgs_Payload_t  Payload;       /**< \brief Generic command arguments */
+    CFE_MSG_CommandHeader_t    CommandHeader; /**< \brief Command header */
+    CF_ChannelSelect_Payload_t Payload;       /**< \brief Command arguments */
 } CF_FreezeCmd_t;
 
 /**
@@ -125,8 +125,8 @@ typedef struct CF_FreezeCmd
  */
 typedef struct CF_ThawCmd
 {
-    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
-    CF_UnionArgs_Payload_t  Payload;       /**< \brief Generic command arguments */
+    CFE_MSG_CommandHeader_t    CommandHeader; /**< \brief Command header */
+    CF_ChannelSelect_Payload_t Payload;       /**< \brief Command arguments */
 } CF_ThawCmd_t;
 
 /**
@@ -136,8 +136,8 @@ typedef struct CF_ThawCmd
  */
 typedef struct CF_EnableDequeueCmd
 {
-    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
-    CF_UnionArgs_Payload_t  Payload;       /**< \brief Generic command arguments */
+    CFE_MSG_CommandHeader_t    CommandHeader; /**< \brief Command header */
+    CF_ChannelSelect_Payload_t Payload;       /**< \brief Command arguments */
 } CF_EnableDequeueCmd_t;
 
 /**
@@ -147,8 +147,8 @@ typedef struct CF_EnableDequeueCmd
  */
 typedef struct CF_DisableDequeueCmd
 {
-    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
-    CF_UnionArgs_Payload_t  Payload;       /**< \brief Generic command arguments */
+    CFE_MSG_CommandHeader_t    CommandHeader; /**< \brief Command header */
+    CF_ChannelSelect_Payload_t Payload;       /**< \brief Command arguments */
 } CF_DisableDequeueCmd_t;
 
 /**
@@ -158,8 +158,8 @@ typedef struct CF_DisableDequeueCmd
  */
 typedef struct CF_EnableDirPollingCmd
 {
-    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
-    CF_UnionArgs_Payload_t  Payload;       /**< \brief Generic command arguments */
+    CFE_MSG_CommandHeader_t    CommandHeader; /**< \brief Command header */
+    CF_PollDirSelect_Payload_t Payload;       /**< \brief Command arguments */
 } CF_EnableDirPollingCmd_t;
 
 /**
@@ -169,8 +169,8 @@ typedef struct CF_EnableDirPollingCmd
  */
 typedef struct CF_DisableDirPollingCmd
 {
-    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
-    CF_UnionArgs_Payload_t  Payload;       /**< \brief Generic command arguments */
+    CFE_MSG_CommandHeader_t    CommandHeader; /**< \brief Command header */
+    CF_PollDirSelect_Payload_t Payload;       /**< \brief Command arguments */
 } CF_DisableDirPollingCmd_t;
 
 /**
@@ -180,8 +180,8 @@ typedef struct CF_DisableDirPollingCmd
  */
 typedef struct CF_PurgeQueueCmd
 {
-    CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
-    CF_UnionArgs_Payload_t  Payload;       /**< \brief Generic command arguments */
+    CFE_MSG_CommandHeader_t  CommandHeader; /**< \brief Command header */
+    CF_QueueSelect_Payload_t Payload;       /**< \brief Command arguments */
 } CF_PurgeQueueCmd_t;
 
 /**

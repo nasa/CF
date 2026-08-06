@@ -115,7 +115,7 @@ void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *BufPtr)
                               cmd,
                               expected_lengths[cmd],
                               len);
-            ++CF_AppData.hk.Payload.counters.err;
+            ++CF_AppData.counters.err;
         }
     }
     else
@@ -124,7 +124,7 @@ void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *BufPtr)
                           CFE_EVS_EventType_ERROR,
                           "CF: invalid ground command packet cmd_code=0x%02x",
                           cmd);
-        ++CF_AppData.hk.Payload.counters.err;
+        ++CF_AppData.counters.err;
     }
 }
 
@@ -170,7 +170,7 @@ void CF_AppPipe(const CFE_SB_Buffer_t *BufPtr)
     }
     else
     {
-        ++CF_AppData.hk.Payload.counters.err;
+        ++CF_AppData.counters.err;
         CFE_EVS_SendEvent(CF_MID_ERR_EID,
                           CFE_EVS_EventType_ERROR,
                           "CF: invalid command packet id=0x%lx",

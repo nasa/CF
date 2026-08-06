@@ -66,7 +66,7 @@ static void UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_t            setup,
                                           CF_Channel_t           **channel_p,
                                           CF_History_t           **history_p,
                                           CF_Transaction_t       **txn_p,
-                                          CF_ConfigTable_t       **config_table_p)
+                                          CF_EngineConfig_t      **config_table_p)
 {
     /*
      * fake objects used to pass into CF app during unit tests.
@@ -75,7 +75,9 @@ static void UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_t            setup,
     static CF_Logical_PduBuffer_t ut_pdu_buffer;
     static CF_History_t           ut_history;
     static CF_Transaction_t       ut_transaction;
-    static CF_ConfigTable_t       ut_config_table;
+
+    CF_Engine_t  *engine_ptr      = CF_GetEngine();
+    CF_Channel_t *local_channel_p = &engine_ptr->channels[UT_CFDP_CHANNEL_IDX];
 
     /*
      * always clear all objects, regardless of what was asked for.
@@ -85,13 +87,12 @@ static void UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_t            setup,
     memset(&ut_pdu_buffer, 0, sizeof(ut_pdu_buffer));
     memset(&ut_history, 0, sizeof(ut_history));
     memset(&ut_transaction, 0, sizeof(ut_transaction));
-    memset(&ut_config_table, 0, sizeof(ut_config_table));
 
     /* certain pointers should be connected even if they were not asked for,
      * as internal code may assume these are set (test cases may un-set) */
     ut_transaction.history  = &ut_history;
+    ut_transaction.chan_ptr = local_channel_p;
     ut_history.txn_stat     = CF_TxnStatus_UNDEFINED;
-    CF_AppData.config_table = &ut_config_table;
 
     if (pdu_buffer_p)
     {
@@ -115,7 +116,7 @@ static void UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_t            setup,
          * a member of that array, so for now it must be so.
          * This always uses the same channel for now.
          */
-        *channel_p = &CF_AppData.engine.channels[UT_CFDP_CHANNEL];
+        *channel_p = local_channel_p;
     }
     if (history_p)
     {
@@ -127,7 +128,7 @@ static void UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_t            setup,
     }
     if (config_table_p)
     {
-        *config_table_p = &ut_config_table;
+        *config_table_p = &engine_ptr->config;
     }
 
     if (setup == UT_CF_Setup_TX)
@@ -240,9 +241,10 @@ void Test_CF_CFDP_S_Tick(void)
      * void CF_CFDP_S_Tick(CF_Transaction_t *txn);
      */
     CF_Transaction_t *txn;
+    CF_Channel_t     *chan;
 
     /* nominal, not in CF_TxSubState_DATA_NORMAL */
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, NULL);
     txn->flags.com.inactivity_fired = false;
     txn->reliable_mode              = false;
     txn->state_data.sub_state       = CF_TxSubState_DATA_EOF;
@@ -252,7 +254,7 @@ void Test_CF_CFDP_S_Tick(void)
 
     /* nominal, with timer expiry */
     UT_ResetState(0);
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_GetAckTxnStatus), 1, CF_CFDP_AckTxnStatus_ACTIVE);
     txn->flags.com.inactivity_fired = false;
     txn->reliable_mode              = false;
@@ -262,11 +264,11 @@ void Test_CF_CFDP_S_Tick(void)
     UtAssert_BOOL_TRUE(txn->flags.com.inactivity_fired);
     UtAssert_STUB_COUNT(CF_CFDP_RecycleTransaction, 0);
     UtAssert_STUB_COUNT(CF_CFDP_CompleteTick, 1);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.inactivity_timer, 1);
+    UtAssert_UINT32_EQ(chan->stat.counters.fault.inactivity_timer, 1);
 
     /* nominal, in CF_TxnState_HOLD, with timer expiry */
     UT_ResetState(0);
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_GetAckTxnStatus), 1, CF_CFDP_AckTxnStatus_TERMINATED);
     txn->flags.com.inactivity_fired = false;
     txn->state                      = CF_TxnState_HOLD;
@@ -278,7 +280,7 @@ void Test_CF_CFDP_S_Tick(void)
 
     /* nominal, in CF_TxnState_S2, with timer expiry */
     UT_ResetState(0);
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_Timer_Expired), 1, 1);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_GetAckTxnStatus), 1, CF_CFDP_AckTxnStatus_ACTIVE);
     txn->flags.com.inactivity_fired = false;
@@ -287,13 +289,13 @@ void Test_CF_CFDP_S_Tick(void)
     UtAssert_VOIDCALL(CF_CFDP_S_Tick(txn));
     UtAssert_STUB_COUNT(CF_Timer_Tick, 0);
     UT_CF_AssertEventID(CF_CFDP_S_INACT_TIMER_ERR_EID);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.inactivity_timer, 2);
+    UtAssert_UINT32_EQ(chan->stat.counters.fault.inactivity_timer, 2);
     UtAssert_BOOL_TRUE(txn->flags.com.inactivity_fired);
     UtAssert_STUB_COUNT(CF_CFDP_RecycleTransaction, 0);
 
     /* nominal, active transaction */
     UT_ResetState(0);
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, &txn, NULL);
     txn->reliable_mode        = false;
     txn->state_data.sub_state = CF_TxSubState_DATA_NORMAL;
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_GetAckTxnStatus), 1, CF_CFDP_AckTxnStatus_ACTIVE);
@@ -303,7 +305,7 @@ void Test_CF_CFDP_S_Tick(void)
 
     /* inactive transaction */
     UT_ResetState(0);
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, &txn, NULL);
     txn->state                      = CF_TxnState_HOLD;
     txn->flags.com.inactivity_fired = true;
     UtAssert_VOIDCALL(CF_CFDP_S_Tick(txn));
@@ -382,81 +384,82 @@ void Test_CF_CFDP_S_SendFileData(void)
     /* Test case for:
      * int32 CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc);
      */
-    CF_Transaction_t *txn;
-    CF_ConfigTable_t *config;
-    uint32            cumulative_read;
-    uint32            read_size;
-    uint32            offset;
+    CF_Transaction_t  *txn;
+    CF_EngineConfig_t *config;
+    CF_Channel_t      *chan;
+    uint32             cumulative_read;
+    uint32             read_size;
+    uint32             offset;
 
     cumulative_read = 0;
     offset          = 0;
     read_size       = 100;
 
     /* failure of CF_CFDP_ConstructPduHeader */
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, &txn, NULL);
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(txn, offset, read_size, true), CF_SEND_PDU_NO_BUF_AVAIL_ERROR);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.sent.file_data_bytes, cumulative_read);
+    UtAssert_UINT32_EQ(chan->stat.counters.sent.file_data_bytes, cumulative_read);
 
     /* nominal, smaller than chunk, no CRC */
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, &config);
     config->outgoing_file_chunk_size = 150;
     txn->fsize                       = 300;
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, read_size);
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(txn, offset, read_size, false), read_size);
     cumulative_read += read_size;
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.sent.file_data_bytes, cumulative_read);
+    UtAssert_UINT32_EQ(chan->stat.counters.sent.file_data_bytes, cumulative_read);
 
     /* nominal, larger than PDU, no CRC */
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, &config);
     config->outgoing_file_chunk_size = CF_MAX_PDU_SIZE * 2;
     txn->fsize                       = CF_MAX_PDU_SIZE * 2;
     read_size                        = CF_MAX_PDU_SIZE;
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, read_size);
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(txn, offset, read_size * 2, false), read_size);
     cumulative_read += read_size;
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.sent.file_data_bytes, cumulative_read);
+    UtAssert_UINT32_EQ(chan->stat.counters.sent.file_data_bytes, cumulative_read);
     UtAssert_STUB_COUNT(CF_CRC_Digest, 0);
 
     /* nominal, larger than chunk, with CRC */
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, &config);
     config->outgoing_file_chunk_size = 50;
     read_size                        = 100;
     txn->fsize                       = 300;
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, config->outgoing_file_chunk_size);
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(txn, offset, read_size, true), config->outgoing_file_chunk_size);
     cumulative_read += config->outgoing_file_chunk_size;
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.sent.file_data_bytes, cumulative_read);
+    UtAssert_UINT32_EQ(chan->stat.counters.sent.file_data_bytes, cumulative_read);
     UtAssert_STUB_COUNT(CF_CRC_Digest, 1);
 
     /* read w/failure */
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, -1);
     config->outgoing_file_chunk_size = read_size;
     txn->fsize                       = 300;
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(txn, offset, read_size, true), -1);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.sent.file_data_bytes, cumulative_read);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_read, 1);
+    UtAssert_UINT32_EQ(chan->stat.counters.sent.file_data_bytes, cumulative_read);
+    UtAssert_UINT32_EQ(chan->stat.counters.fault.file_read, 1);
     UT_CF_AssertEventID(CF_CFDP_S_READ_ERR_EID);
 
     /* require lseek */
     offset = 25;
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedLseek), 1, offset);
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedRead), 1, read_size);
     config->outgoing_file_chunk_size = read_size;
     txn->fsize                       = 300;
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(txn, offset, read_size, true), read_size);
     cumulative_read += read_size;
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.sent.file_data_bytes, cumulative_read);
+    UtAssert_UINT32_EQ(chan->stat.counters.sent.file_data_bytes, cumulative_read);
 
     /* lseek w/failure */
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, &config);
     UT_SetDeferredRetcode(UT_KEY(CF_WrappedLseek), 1, -1);
     config->outgoing_file_chunk_size = read_size;
     txn->fsize                       = 300;
     UtAssert_INT32_EQ(CF_CFDP_S_SendFileData(txn, offset, read_size, true), -1);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.sent.file_data_bytes, cumulative_read);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.fault.file_seek, 1);
+    UtAssert_UINT32_EQ(chan->stat.counters.sent.file_data_bytes, cumulative_read);
+    UtAssert_UINT32_EQ(chan->stat.counters.fault.file_seek, 1);
     UT_CF_AssertEventID(CF_CFDP_S_SEEK_FD_ERR_EID);
 }
 
@@ -465,8 +468,8 @@ void Test_CF_CFDP_S_SubstateSendFileData(void)
     /* Test case for:
      * void CF_CFDP_S_SubstateSendFileData(CF_Transaction_t *txn);
      */
-    CF_Transaction_t *txn;
-    CF_ConfigTable_t *config;
+    CF_Transaction_t  *txn;
+    CF_EngineConfig_t *config;
 
     /* nominal, zero bytes processed */
     UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
@@ -568,35 +571,36 @@ void Test_CF_CFDP_S2_SubstateNak(void)
     CF_Transaction_t       *txn;
     CF_Logical_PduBuffer_t *ph;
     CF_Logical_PduNak_t    *nak;
+    CF_Channel_t           *chan;
 
     /* no segments */
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvNak), 1, CF_ERROR);
     UtAssert_VOIDCALL(CF_CFDP_S2_SubstateNak(txn, ph));
     UT_CF_AssertEventID(CF_CFDP_S_PDU_NAK_ERR_EID);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error, 1);
+    UtAssert_UINT32_EQ(chan->stat.counters.recv.error, 1);
 
     /* nominal, re-send md request (0,0) */
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     nak                            = &ph->int_header.nak;
     nak->segment_list.num_segments = 1;
     nak->segment_list.segments[0]  = (CF_Logical_SegmentRequest_t) { 0, 0 };
     UtAssert_VOIDCALL(CF_CFDP_S2_SubstateNak(txn, ph));
     UtAssert_BOOL_TRUE(txn->flags.tx.send_md);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.nak_segment_requests, 1);
+    UtAssert_UINT32_EQ(chan->stat.counters.recv.nak_segment_requests, 1);
 
     /* nominal, nonzero offsets */
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     nak                            = &ph->int_header.nak;
     nak->segment_list.num_segments = 2;
     nak->segment_list.segments[0]  = (CF_Logical_SegmentRequest_t) { 0, 200 };
     nak->segment_list.segments[1]  = (CF_Logical_SegmentRequest_t) { 200, 300 };
     txn->fsize                     = 300;
     UtAssert_VOIDCALL(CF_CFDP_S2_SubstateNak(txn, ph));
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.nak_segment_requests, 3);
+    UtAssert_UINT32_EQ(chan->stat.counters.recv.nak_segment_requests, 3);
 
     /* bad segments */
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     nak                            = &ph->int_header.nak;
     nak->segment_list.num_segments = 3;
     nak->segment_list.segments[0]  = (CF_Logical_SegmentRequest_t) { 200, 100 };
@@ -604,16 +608,16 @@ void Test_CF_CFDP_S2_SubstateNak(void)
     nak->segment_list.segments[2]  = (CF_Logical_SegmentRequest_t) { 400, 0 };
     txn->fsize                     = 300;
     UtAssert_VOIDCALL(CF_CFDP_S2_SubstateNak(txn, ph));
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.nak_segment_requests, 6);
+    UtAssert_UINT32_EQ(chan->stat.counters.recv.nak_segment_requests, 6);
     UT_CF_AssertEventID(CF_CFDP_S_INVALID_SR_ERR_EID);
 
     /* bad decode */
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvNak), 1, -1);
     nak                            = &ph->int_header.nak;
     nak->segment_list.num_segments = 1;
     UtAssert_VOIDCALL(CF_CFDP_S2_SubstateNak(txn, ph));
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error, 2);
+    UtAssert_UINT32_EQ(chan->stat.counters.recv.error, 2);
     UT_CF_AssertEventID(CF_CFDP_S_PDU_NAK_ERR_EID);
 }
 
@@ -624,9 +628,10 @@ void Test_CF_CFDP_S2_SubstateEofAck(void)
      */
     CF_Transaction_t       *txn;
     CF_Logical_PduBuffer_t *ph;
+    CF_Channel_t           *chan;
 
     /* nominal */
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     txn->flags.tx.eof_ack_recv            = false;
     ph->int_header.ack.ack_directive_code = CF_CFDP_FileDirective_EOF;
     UtAssert_VOIDCALL(CF_CFDP_S2_SubstateEofAck(txn, ph));
@@ -634,20 +639,20 @@ void Test_CF_CFDP_S2_SubstateEofAck(void)
     UtAssert_BOOL_FALSE(txn->flags.com.ack_timer_armed);
 
     /* failure of CF_CFDP_RecvAck */
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     ph->int_header.ack.ack_directive_code = CF_CFDP_FileDirective_EOF;
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvAck), 1, -1);
     UtAssert_VOIDCALL(CF_CFDP_S2_SubstateEofAck(txn, ph));
     UT_CF_AssertEventID(CF_CFDP_S_PDU_EOF_ERR_EID);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error, 1);
+    UtAssert_UINT32_EQ(chan->stat.counters.recv.error, 1);
 
     /* Ack not for EOF */
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
     ph->int_header.ack.ack_directive_code = CF_CFDP_FileDirective_FIN;
     txn->flags.tx.eof_ack_recv            = false;
     UtAssert_VOIDCALL(CF_CFDP_S2_SubstateEofAck(txn, ph));
     UT_CF_AssertEventID(CF_CFDP_S_PDU_EOF_ERR_EID);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.error, 2);
+    UtAssert_UINT32_EQ(chan->stat.counters.recv.error, 2);
 }
 
 /* Hook function to set FD output on opencreate call */
@@ -1109,9 +1114,9 @@ void Test_CF_CFDP_S_Tick_Nak(void)
     /* Test Case For:
      * void CF_CFDP_S_Tick_Nak(CF_Transaction_t *txn)
      */
-    CF_Transaction_t *txn;
-    CF_ConfigTable_t *config;
-    CF_Chunk_t        chunk;
+    CF_Transaction_t  *txn;
+    CF_EngineConfig_t *config;
+    CF_Chunk_t         chunk;
 
     memset(&chunk, 0, sizeof(chunk));
     chunk.size = 100;

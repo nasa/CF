@@ -28,6 +28,7 @@
 
 void UT_DefaultHandler_CF_FindTransactionBySequenceNumber(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_FindUnusedTransaction(void *, UT_EntryKey_t, const UT_StubContext_t *);
+void UT_DefaultHandler_CF_ForEachChannel(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_ResetHistory(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_TraverseAllTransactions(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_TraverseAllTransactions_All_Channels(void *, UT_EntryKey_t, const UT_StubContext_t *);
@@ -107,31 +108,32 @@ CF_Transaction_t *CF_FindUnusedTransaction(CF_Channel_t *chan, CF_Direction_t di
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_FreeTransaction()
+ * Generated stub function for CF_ForEachChannel()
  * ----------------------------------------------------
  */
-void CF_FreeTransaction(CF_Transaction_t *txn, uint8 chan)
+int32 CF_ForEachChannel(CF_Engine_t *engine_ptr, CF_ChannelFunc_t fn, void *arg)
 {
-    UT_GenStub_AddParam(CF_FreeTransaction, CF_Transaction_t *, txn);
-    UT_GenStub_AddParam(CF_FreeTransaction, uint8, chan);
+    UT_GenStub_SetupReturnBuffer(CF_ForEachChannel, int32);
 
-    UT_GenStub_Execute(CF_FreeTransaction, Basic, NULL);
+    UT_GenStub_AddParam(CF_ForEachChannel, CF_Engine_t *, engine_ptr);
+    UT_GenStub_AddParam(CF_ForEachChannel, CF_ChannelFunc_t, fn);
+    UT_GenStub_AddParam(CF_ForEachChannel, void *, arg);
+
+    UT_GenStub_Execute(CF_ForEachChannel, Basic, UT_DefaultHandler_CF_ForEachChannel);
+
+    return UT_GenStub_GetReturnValue(CF_ForEachChannel, int32);
 }
 
 /*
  * ----------------------------------------------------
- * Generated stub function for CF_GetChannelFromTxn()
+ * Generated stub function for CF_FreeTransaction()
  * ----------------------------------------------------
  */
-CF_Channel_t *CF_GetChannelFromTxn(CF_Transaction_t *txn)
+void CF_FreeTransaction(CF_Transaction_t *txn)
 {
-    UT_GenStub_SetupReturnBuffer(CF_GetChannelFromTxn, CF_Channel_t *);
+    UT_GenStub_AddParam(CF_FreeTransaction, CF_Transaction_t *, txn);
 
-    UT_GenStub_AddParam(CF_GetChannelFromTxn, CF_Transaction_t *, txn);
-
-    UT_GenStub_Execute(CF_GetChannelFromTxn, Basic, NULL);
-
-    return UT_GenStub_GetReturnValue(CF_GetChannelFromTxn, CF_Channel_t *);
+    UT_GenStub_Execute(CF_FreeTransaction, Basic, NULL);
 }
 
 /*

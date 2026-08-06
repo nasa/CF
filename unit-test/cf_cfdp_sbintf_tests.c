@@ -101,7 +101,7 @@ static void UT_CFDP_SetupBasicTestState(UT_CF_Setup_t            setup,
                                         CF_Channel_t           **channel_p,
                                         CF_History_t           **history_p,
                                         CF_Transaction_t       **txn_p,
-                                        CF_ConfigTable_t       **config_table_p)
+                                        CF_EngineConfig_t      **config_table_p)
 {
     /*
      * fake objects used to pass into CF app during unit tests.
@@ -109,7 +109,9 @@ static void UT_CFDP_SetupBasicTestState(UT_CF_Setup_t            setup,
      */
     static CF_History_t     ut_history;
     static CF_Transaction_t ut_transaction;
-    static CF_ConfigTable_t ut_config_table;
+
+    CF_Engine_t  *engine_ptr      = CF_GetEngine();
+    CF_Channel_t *local_channel_p = &engine_ptr->channels[UT_CFDP_CHANNEL_IDX];
 
     /*
      * always clear all objects, regardless of what was asked for.
@@ -118,22 +120,25 @@ static void UT_CFDP_SetupBasicTestState(UT_CF_Setup_t            setup,
      */
     memset(&ut_history, 0, sizeof(ut_history));
     memset(&ut_transaction, 0, sizeof(ut_transaction));
-    memset(&ut_config_table, 0, sizeof(ut_config_table));
 
     /* certain pointers should be connected even if they were not asked for,
      * as internal code may assume these are set (test cases may un-set) */
     ut_transaction.history  = &ut_history;
-    CF_AppData.config_table = &ut_config_table;
+    ut_transaction.chan_ptr = local_channel_p;
+
+    local_channel_p->outgoing_counter = 0;
+    local_channel_p->num_cmd_tx       = 0;
+    local_channel_p->tx_blocked       = 0;
 
     if (pdu_buffer_p)
     {
         if (setup == UT_CF_Setup_TX)
         {
-            *pdu_buffer_p = &CF_AppData.engine.out.tx_pdudata;
+            *pdu_buffer_p = &engine_ptr->out.tx_pdudata;
         }
         else if (setup == UT_CF_Setup_RX)
         {
-            *pdu_buffer_p = &CF_AppData.engine.in.rx_pdudata;
+            *pdu_buffer_p = &engine_ptr->in.rx_pdudata;
         }
         else
         {
@@ -151,7 +156,7 @@ static void UT_CFDP_SetupBasicTestState(UT_CF_Setup_t            setup,
          * a member of that array, so for now it must be so.
          * This always uses the same channel for now.
          */
-        *channel_p = &CF_AppData.engine.channels[UT_CFDP_CHANNEL];
+        *channel_p = local_channel_p;
     }
     if (history_p)
     {
@@ -163,24 +168,21 @@ static void UT_CFDP_SetupBasicTestState(UT_CF_Setup_t            setup,
     }
     if (config_table_p)
     {
-        *config_table_p = &ut_config_table;
+        *config_table_p = &engine_ptr->config;
     }
 
     if (setup == UT_CF_Setup_TX)
     {
         /* transmit is likely to invoke CF_CFDP_ConstructPduHeader()
             which in turn requires MsgOutGet to work */
-        UT_CFDP_SetupBasicTxState(&CF_AppData.engine.out.tx_pdudata);
+        UT_CFDP_SetupBasicTxState(&engine_ptr->out.tx_pdudata);
     }
     else if (setup == UT_CF_Setup_RX)
     {
         /* most calls on the RX side will do some sort of decode, so set up for that. */
-        UT_CFDP_SetupBasicRxState(&CF_AppData.engine.in.rx_pdudata);
-        ut_config_table.chan[UT_CFDP_CHANNEL].rx_max_messages_per_wakeup = 1;
+        UT_CFDP_SetupBasicRxState(&engine_ptr->in.rx_pdudata);
+        local_channel_p->config.rx_max_messages_per_wakeup = 1;
     }
-
-    UT_SetDefaultReturnValue(UT_KEY(CF_GetChannelFromTxn),
-                             (UT_IntReturn_t)&CF_AppData.engine.channels[UT_CFDP_CHANNEL]);
 
     /* reset the event ID capture between each sub-case */
     UT_CF_ResetEventCapture();
@@ -219,11 +221,11 @@ void Test_CF_CFDP_ReceiveMessage(void)
     /* Test case for:
      * void CF_CFDP_ReceiveMessage(CF_Channel_t *chan);
      */
-    CF_Channel_t     *chan;
-    CF_ConfigTable_t *config;
-    CF_Transaction_t *txn;
-    CFE_MSG_Type_t    msg_type;
-    CFE_MSG_Size_t    msg_size_buf;
+    CF_Channel_t      *chan;
+    CF_EngineConfig_t *config;
+    CF_Transaction_t  *txn;
+    CFE_MSG_Type_t     msg_type;
+    CFE_MSG_Size_t     msg_size_buf;
 
     /* no-config - the max per wakeup will be 0, and this is a noop */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, NULL, NULL);
@@ -231,7 +233,7 @@ void Test_CF_CFDP_ReceiveMessage(void)
 
     /* failure in CFE_SB_ReceiveBuffer */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, NULL, &config);
-    config->chan[UT_CFDP_CHANNEL].rx_max_messages_per_wakeup = 1;
+    chan->config.rx_max_messages_per_wakeup = 1;
     UT_SetDeferredRetcode(UT_KEY(CFE_SB_ReceiveBuffer), 1, CFE_SB_NO_MESSAGE);
     UtAssert_VOIDCALL(CF_CFDP_ReceiveMessage(chan));
 
@@ -256,14 +258,15 @@ void Test_CF_CFDP_ReceiveMessage(void)
 void Test_CF_CFDP_Send(void)
 {
     /* Test case for:
-     * void CF_CFDP_Send(uint8 chan_num, const CF_Logical_PduBuffer_t *ph)
+     * void CF_CFDP_Send(CF_Channel_t *chan_ptr, const CF_Logical_PduBuffer_t *ph)
      */
     CF_Logical_PduBuffer_t *ph;
+    CF_Channel_t           *chan;
 
     /* nominal */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, NULL, NULL, NULL, NULL);
-    UtAssert_VOIDCALL(CF_CFDP_Send(UT_CFDP_CHANNEL, ph));
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].counters.sent.pdu, 1);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, &ph, &chan, NULL, NULL, NULL);
+    UtAssert_VOIDCALL(CF_CFDP_Send(chan, ph));
+    UtAssert_UINT32_EQ(chan->stat.counters.sent.pdu, 1);
     UtAssert_STUB_COUNT(CFE_MSG_SetSize, 1);
     UtAssert_STUB_COUNT(CFE_SB_TransmitBuffer, 1);
 }
@@ -273,27 +276,30 @@ void Test_CF_CFDP_MsgOutGet(void)
     /* Test case for:
         CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool silent)
      */
-    CF_Transaction_t *txn;
-    CF_ConfigTable_t *config;
-    CF_Channel_t     *chan;
+    CF_Transaction_t  *txn;
+    CF_EngineConfig_t *config;
+    CF_Channel_t      *chan;
 
     /* nominal */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, NULL);
     UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(txn, false));
     UtAssert_STUB_COUNT(CFE_SB_ReleaseMessageBuffer, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* This should discard the old message, and get a new one */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, NULL);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, NULL);
     UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(txn, false));
     UtAssert_STUB_COUNT(CFE_SB_ReleaseMessageBuffer, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* test the various throttling mechanisms */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, NULL, NULL, &txn, &config);
-    config->chan[UT_CFDP_CHANNEL].max_outgoing_messages_per_wakeup = 3;
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, &config);
+    chan->config.max_outgoing_messages_per_wakeup = 3;
+    chan->outgoing_counter                        = 2;
     UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(txn, false));
+    UtAssert_BOOL_FALSE(chan->tx_blocked);
     UtAssert_NULL(CF_CFDP_MsgOutGet(txn, false));
+    UtAssert_BOOL_TRUE(chan->tx_blocked);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, NULL);
@@ -304,25 +310,25 @@ void Test_CF_CFDP_MsgOutGet(void)
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* transaction is suspended */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, &txn, NULL);
     txn->flags.com.suspended = true;
     UtAssert_NULL(CF_CFDP_MsgOutGet(txn, false));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* channel is frozen */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
-    CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].frozen = 1;
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, &txn, NULL);
+    chan->stat.frozen = 1;
     UtAssert_NULL(CF_CFDP_MsgOutGet(txn, false));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-    CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].frozen = 0;
+    chan->stat.frozen = 0;
 
     /* no msg available from SB */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, &txn, NULL);
     UtAssert_NULL(CF_CFDP_MsgOutGet(txn, false));
     UT_CF_AssertEventID(CF_CFDP_NO_MSG_ERR_EID);
 
     /* same, but the silent flag should suppress the event */
-    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
+    UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, &txn, NULL);
     UtAssert_NULL(CF_CFDP_MsgOutGet(txn, true));
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 }
