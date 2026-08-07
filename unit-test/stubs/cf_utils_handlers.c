@@ -227,4 +227,3 @@ void UT_DefaultHandler_CF_ForEachChannel(void *UserObj, UT_EntryKey_t FuncKey, c
 
     UT_Stub_SetReturnValue(FuncKey, ret);
 }
-

@@ -199,7 +199,7 @@ CFE_Status_t CF_PlaybackDirCmd(const CF_PlaybackDirCmd_t *msg);
  * @par Assumptions, External Events, and Notes:
  *       cmd must not be NULL, errstr must not be NULL, fn must be a valid function, context may be NULL.
  *
- * @param data      Pointer to payload being processed
+ * @param chan_select Channel selector value from command (validated within this function)
  * @param errstr    String to be included in the EVS event if command should fail
  * @param fn        Callback action function to invoke for each affected channel
  * @param context   Opaque pointer to pass through to callback (not used in this function)
@@ -216,7 +216,7 @@ CF_DoChanAction(CF_ChannelSelect_t chan_select, const char *errstr, CF_ChanActio
  * @par Assumptions, External Events, and Notes:
  *       context must not be NULL.
  *
- * @param chan_num  channel number
+ * @param chan      channel pointer (must not be NULL)
  * @param arg       context pointer to object, must be CF_ChanAction_BoolArg_t*
  *
  * @returns Always succeeds, so returns CF_ChanAction_Status_SUCCESS.
@@ -380,7 +380,7 @@ CFE_Status_t CF_AbandonCmd(const CF_AbandonCmd_t *msg);
  * @par Assumptions, External Events, and Notes:
  *       context must not be NULL.
  *
- * @param chan_num  channel number
+ * @param chan      channel pointer (must not be NULL)
  * @param arg       context pointer to object, must be CF_ChanAction_BoolArg_t*
  *
  * @returns Always succeeds, so returns CF_ChanAction_Status_SUCCESS.
@@ -414,7 +414,7 @@ CFE_Status_t CF_DisableDequeueCmd(const CF_DisableDequeueCmd_t *msg);
  * @par Assumptions, External Events, and Notes:
  *       context must not be NULL.
  *
- * @param chan_num  channel number
+ * @param chan      channel pointer (must not be NULL)
  * @param arg       context pointer to object, must be CF_ChanAction_BoolMsgArg_t*
  *
  * @returns success/fail status code
@@ -483,7 +483,7 @@ CF_CListTraverse_Status_t CF_PurgeTransaction(CF_CListNode_t *node, void *ignore
  * @par Assumptions, External Events, and Notes:
  *       None
  *
- * @param chan_num  CF channel number
+ * @param chan      CF channel pointer (must not be NULL)
  * @param arg       Pointer to purge queue command
  *
  * @returns integer status code indicating success or failure
@@ -519,7 +519,7 @@ CFE_Status_t CF_WriteQueueCmd(const CF_WriteQueueCmd_t *msg);
  *       None
  *
  * @param val       Size of chunk to test
- * @param chan_num  Ignored by this implementation
+ * @param chan      Ignored by this implementation
  *
  * @returns status code indicating if check passed
  * @retval CF_ChanAction_Status_SUCCESS if successful (val is less than or equal to max PDU)
@@ -535,7 +535,7 @@ CF_ChanAction_Status_t CF_ValidateChunkSizeCmd(CF_ChunkSize_t val, CF_Channel_t 
  *       None
  *
  * @param val       Number to test
- * @param chan_num  CF channel number
+ * @param chan      CF channel pointer
  *
  * @returns status code indicating if check passed
  * @retval CF_ChanAction_Status_SUCCESS if successful (val is allowable as max packets per wakeup)
@@ -559,7 +559,7 @@ CF_ChanAction_Status_t CF_ValidateMaxOutgoingCmd(uint32 val, CF_Channel_t *chan)
  * @param is_set    Whether to get (false) or set (true)
  * @param param_id  Parameter ID
  * @param value     Value to get/set
- * @param chan_num  Channel number to operate on
+ * @param chan_num  Channel selector from original command (Validated within this function)
  *
  */
 void CF_GetSetParamCmd(bool is_set, CF_GetSet_ValueID_t param_id, uint32 value, CF_ChannelSelect_t chan_num);

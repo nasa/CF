@@ -137,27 +137,21 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_ReturnsNot_CFE_SUCCESS_Or_CFE
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
 }
 
-void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS(void)
+void Test_CF_CheckTables_CallTo_CFE_TBL_Manage_Returns_CFE_SUCCESS(void)
 {
-    CF_ConfigTable_t ut_config;
-    void            *TablePtr = &ut_config;
-
-    memset(&ut_config, 0, sizeof(ut_config));
-
-    UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_Manage), CFE_TBL_INFO_UPDATED);
-    UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
+    UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_Manage), CFE_SUCCESS);
 
     /* Act */
     CF_CheckTables();
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_TBL_ReleaseAddress, 1);
+    UtAssert_STUB_COUNT(CFE_TBL_ReleaseAddress, 0);
     UtAssert_STUB_COUNT(CFE_TBL_Manage, 1);
-    UtAssert_STUB_COUNT(CFE_TBL_GetAddress, 1);
+    UtAssert_STUB_COUNT(CFE_TBL_GetAddress, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 }
 
-void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED(void)
+void Test_CF_CheckTables_CallTo_CFE_TBL_Manage_Returns_CFE_TBL_INFO_UPDATED(void)
 {
     CF_ConfigTable_t ut_config;
     void            *TablePtr = &ut_config;
@@ -636,14 +630,14 @@ void add_CF_CheckTables_tests(void)
         Setup_cf_config_table_tests,
         CF_App_Tests_Teardown,
         "Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_ReturnsNot_CFE_SUCCESS_Or_CFE_TBL_INFO_UPDATED_SendEvent");
-    UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS,
+    UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_Manage_Returns_CFE_SUCCESS,
                Setup_cf_config_table_tests,
                CF_App_Tests_Teardown,
-               "Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS");
-    UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED,
+               "Test_CF_CheckTables_CallTo_CFE_TBL_Manage_Returns_CFE_SUCCESS");
+    UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_Manage_Returns_CFE_TBL_INFO_UPDATED,
                Setup_cf_config_table_tests,
                CF_App_Tests_Teardown,
-               "Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED");
+               "Test_CF_CheckTables_CallTo_CFE_TBL_Manage_Returns_CFE_TBL_INFO_UPDATED");
 }
 
 void add_CF_ValidateConfigTable_tests(void)
