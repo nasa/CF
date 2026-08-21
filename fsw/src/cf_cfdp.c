@@ -1255,6 +1255,18 @@ static int32 CF_CFDP_DoEngineChannelInit(CF_Engine_t *engine_ptr, CF_Channel_t *
     char                  nbuf[64];
     CFE_Status_t          ret = CFE_SUCCESS;
 
+    /* selectively wipe data within the channel struct -
+     * note this struct also contains the config which is already
+     * populated and needs to be preserved */
+
+    memset(chan->qs, 0, sizeof(chan->qs));
+    memset(chan->cs, 0, sizeof(chan->cs));
+    memset(&chan->stat, 0, sizeof(chan->stat));
+
+    chan->pipe        = CFE_SB_INVALID_PIPE;
+    chan->sem_id      = OS_OBJECT_ID_UNDEFINED;
+    chan->tick_resume = NULL;
+
     snprintf(nbuf, sizeof(nbuf) - 1, "%s%d", CF_CHANNEL_PIPE_PREFIX, chan_num);
     ret = CFE_SB_CreatePipe(&chan->pipe, chan->config.pipe_depth_input, nbuf);
     if (ret != CFE_SUCCESS)
@@ -1356,10 +1368,19 @@ CFE_Status_t CF_CFDP_InitEngine(CF_Engine_t *engine_ptr)
     CFE_Status_t         ret;
     CF_EngineInitState_t state;
 
-    /* NOTE: Not clearing the engine global struct here.
-     * It was already cleared at the beginning of CF_AppInit(), and
-     * since then the configuration was imported from the table.  Clearing
-     * the global would wipe that configuration data. */
+    /* NOTE: Selectively clearing members so we do not
+     * wipe the configuration data which is also stored here. */
+
+    engine_ptr->seq_num = 0;
+    engine_ptr->enabled = false;
+
+    memset(&engine_ptr->out, 0, sizeof(engine_ptr->out));
+    memset(&engine_ptr->in, 0, sizeof(engine_ptr->in));
+
+    memset(engine_ptr->transactions, 0, sizeof(engine_ptr->transactions));
+    memset(engine_ptr->histories, 0, sizeof(engine_ptr->histories));
+    memset(engine_ptr->chunks, 0, sizeof(engine_ptr->chunks));
+    memset(engine_ptr->chunk_mem, 0, sizeof(engine_ptr->chunk_mem));
 
     /* Ensure that the temp directory exists (ignore error if it already exists) */
     OS_mkdir(engine_ptr->config.tmp_dir, 0);
@@ -1412,13 +1433,13 @@ static void CF_CFDP_S_Tick_SendFileData(CF_Transaction_t *txn)
      */
     do
     {
-        last_outgoing_counter = chan->outgoing_counter;
+        last_outgoing_counter = chan->stat.outgoing_counter;
 
         CFE_ES_PerfLogEntry(CF_PERF_ID_PDUSENT(chan_num));
         CF_CFDP_S_SubstateSendFileData(txn);
         CFE_ES_PerfLogExit(CF_PERF_ID_PDUSENT(chan_num));
 
-    } while (last_outgoing_counter != chan->outgoing_counter);
+    } while (last_outgoing_counter != chan->stat.outgoing_counter);
 }
 
 /*----------------------------------------------------------------
@@ -1484,7 +1505,7 @@ CF_CListTraverse_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context)
         /* if args->chan->cur was set to not-NULL above, then exit early */
         /* NOTE: if channel is frozen, then tick processing won't have been entered.
          *     so there is no need to check it here */
-        if (args->chan->tx_blocked)
+        if (args->chan->stat.tx_blocked)
         {
             ret = CF_CLIST_EXIT;
         }
@@ -1505,7 +1526,7 @@ void CF_CFDP_CompleteTick(CF_Transaction_t *txn)
 
     /* check if the TX is now blocked and if so, record this txn as the resume point */
     chan = CF_GetChannelFromTxn(txn);
-    if (chan != NULL && chan->tx_blocked && chan->tick_resume == NULL)
+    if (chan != NULL && chan->stat.tx_blocked && chan->tick_resume == NULL)
     {
         chan->tick_resume = txn;
     }
@@ -1550,7 +1571,7 @@ void CF_CFDP_TickTransactions(CF_Channel_t *chan)
      */
     while (curr_state < CF_TickState_COMPLETE)
     {
-        last_counter = chan->outgoing_counter;
+        last_counter = chan->stat.outgoing_counter;
 
         switch (curr_state)
         {
@@ -1588,7 +1609,7 @@ void CF_CFDP_TickTransactions(CF_Channel_t *chan)
         }
 
         /* If blocked, stop */
-        if (chan->tx_blocked)
+        if (chan->stat.tx_blocked)
         {
             break;
         }
@@ -1599,7 +1620,7 @@ void CF_CFDP_TickTransactions(CF_Channel_t *chan)
             case CF_TickState_TX_NAK:
                 /* This should be repeated so long as something was produced */
                 /* advance state only if the last pass sent nothing */
-                if (last_counter == chan->outgoing_counter)
+                if (last_counter == chan->stat.outgoing_counter)
                 {
                     ++curr_state;
                 }
@@ -1701,7 +1722,7 @@ CFE_Status_t CF_CFDP_TxFile(const char     *src_filename,
 
     CF_TRACE("%s(): start, channel=%d\n", __func__, CF_ChannelSelect_AsInt(CF_GetChannelFromPtr(chan)));
 
-    if (chan->num_cmd_tx < CF_MAX_COMMANDED_PLAYBACK_FILES_PER_CHAN)
+    if (chan->stat.num_cmd_tx < CF_MAX_COMMANDED_PLAYBACK_FILES_PER_CHAN)
     {
         txn = CF_FindUnusedTransaction(chan, CF_Direction_TX);
     }
@@ -1726,7 +1747,7 @@ CFE_Status_t CF_CFDP_TxFile(const char     *src_filename,
         txn->history->fnames.dst_filename[sizeof(txn->history->fnames.dst_filename) - 1] = 0;
         CF_CFDP_TxFile_Initiate(txn, cfdp_class, keep, chan, priority, dest_id);
 
-        ++chan->num_cmd_tx;
+        ++chan->stat.num_cmd_tx;
         txn->flags.tx.cmd_tx = true;
     }
 
@@ -1830,7 +1851,7 @@ CFE_Status_t CF_CFDP_PlaybackDir(const char     *src_filename,
 
     for (i = 0; i < CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN; ++i)
     {
-        pb = &chan->playback[i];
+        pb = &chan->stat.playback[i];
         if (!pb->busy)
         {
             break;
@@ -1964,8 +1985,8 @@ static void CF_CFDP_ProcessPlaybackDirectories(CF_Channel_t *chan)
 
     for (i = 0; i < CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN; ++i)
     {
-        CF_CFDP_ProcessPlaybackDirectory(chan, &chan->playback[i]);
-        CF_CFDP_UpdatePollPbCounted(&chan->playback[i], chan->playback[i].busy, &chan->stat.playback_counter);
+        CF_CFDP_ProcessPlaybackDirectory(chan, &chan->stat.playback[i]);
+        CF_CFDP_UpdatePollPbCounted(&chan->stat.playback[i], chan->stat.playback[i].busy, &chan->stat.playback_counter);
     }
 }
 
@@ -1986,7 +2007,7 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *chan)
 
     for (i = 0; i < CF_MAX_POLLING_DIR_PER_CHAN; ++i)
     {
-        poll        = &chan->poll[i];
+        poll        = &chan->stat.poll[i];
         cc          = &chan->config;
         pd          = &cc->polldir[i];
         count_check = 0;
@@ -2051,8 +2072,8 @@ void CF_CFDP_ProcessPollingDirectories(CF_Channel_t *chan)
  *-----------------------------------------------------------------*/
 static int32 CF_CFDP_DoEngineChannelCycle(CF_Engine_t *engine_ptr, CF_Channel_t *chan, void *arg)
 {
-    chan->outgoing_counter = 0;
-    chan->tx_blocked       = false;
+    chan->stat.outgoing_counter = 0;
+    chan->stat.tx_blocked       = false;
 
     /* consume all received messages, even if channel is frozen */
     CF_CFDP_ReceiveMessage(chan);
@@ -2123,9 +2144,9 @@ void CF_CFDP_FinishTransaction(CF_Transaction_t *txn, bool keep_history)
         /* extra bookkeeping for tx direction only */
         if (txn->history->dir == CF_Direction_TX && txn->flags.tx.cmd_tx)
         {
-            CF_Assert(chan->num_cmd_tx); /* sanity check */
+            CF_Assert(chan->stat.num_cmd_tx); /* sanity check */
 
-            --chan->num_cmd_tx;
+            --chan->stat.num_cmd_tx;
         }
 
         txn->flags.com.keep_history = keep_history;
@@ -2360,17 +2381,17 @@ static int32 CF_CFDP_DoCloseChannel(CF_Engine_t *engine_ptr, CF_Channel_t *chan,
     /* any playback directories need to have their directory ids closed */
     for (j = 0; j < CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN; ++j)
     {
-        if (chan->playback[j].busy)
+        if (chan->stat.playback[j].busy)
         {
-            OS_DirectoryClose(chan->playback[j].dir_id);
+            OS_DirectoryClose(chan->stat.playback[j].dir_id);
         }
     }
 
     for (j = 0; j < CF_MAX_POLLING_DIR_PER_CHAN; ++j)
     {
-        if (chan->poll[j].pb.busy)
+        if (chan->stat.poll[j].pb.busy)
         {
-            OS_DirectoryClose(chan->poll[j].pb.dir_id);
+            OS_DirectoryClose(chan->stat.poll[j].pb.dir_id);
         }
     }
 

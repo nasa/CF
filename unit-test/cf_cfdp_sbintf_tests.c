@@ -126,9 +126,9 @@ static void UT_CFDP_SetupBasicTestState(UT_CF_Setup_t            setup,
     ut_transaction.history  = &ut_history;
     ut_transaction.chan_ptr = local_channel_p;
 
-    local_channel_p->outgoing_counter = 0;
-    local_channel_p->num_cmd_tx       = 0;
-    local_channel_p->tx_blocked       = 0;
+    local_channel_p->stat.outgoing_counter = 0;
+    local_channel_p->stat.num_cmd_tx       = 0;
+    local_channel_p->stat.tx_blocked       = 0;
 
     if (pdu_buffer_p)
     {
@@ -295,11 +295,11 @@ void Test_CF_CFDP_MsgOutGet(void)
     /* test the various throttling mechanisms */
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, &config);
     chan->config.max_outgoing_messages_per_wakeup = 3;
-    chan->outgoing_counter                        = 2;
+    chan->stat.outgoing_counter                   = 2;
     UtAssert_NOT_NULL(CF_CFDP_MsgOutGet(txn, false));
-    UtAssert_BOOL_FALSE(chan->tx_blocked);
+    UtAssert_BOOL_FALSE(chan->stat.tx_blocked);
     UtAssert_NULL(CF_CFDP_MsgOutGet(txn, false));
-    UtAssert_BOOL_TRUE(chan->tx_blocked);
+    UtAssert_BOOL_TRUE(chan->stat.tx_blocked);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_TX, NULL, &chan, NULL, &txn, NULL);

@@ -442,6 +442,14 @@ typedef struct CF_LocalChanStat
     uint8           poll_counter;            /**< \brief Number of active polling directories */
     uint8           playback_counter;        /**< \brief Number of active playback directories */
     bool            frozen;                  /**< \brief Frozen state: 0 == not frozen, else frozen */
+    bool            tx_blocked;              /**< Set true if PDU transmission was blocked due to limits */
+
+    uint32 num_cmd_tx;
+    uint32 outgoing_counter;
+
+    CF_Playback_t playback[CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN];
+    CF_Poll_t     poll[CF_MAX_POLLING_DIR_PER_CHAN];
+
 } CF_LocalChanStat_t;
 
 /**
@@ -459,17 +467,7 @@ struct CF_Channel
     CF_CListNode_t *cs[CF_Direction_NUM];
 
     CFE_SB_PipeId_t pipe;
-
-    uint32 num_cmd_tx;
-
-    CF_Playback_t playback[CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN];
-
-    /* For polling directories, the configuration data is in a table. */
-    CF_Poll_t poll[CF_MAX_POLLING_DIR_PER_CHAN];
-
-    osal_id_t sem_id; /**< \brief semaphore id for output pipe */
-
-    uint32 outgoing_counter;
+    osal_id_t       sem_id; /**< \brief semaphore id for output pipe */
 
     /* If tick processing gets blocked due to TX limits (i.e. tx_blocked gets set during
      * tick processing) then this captures where the tick processing left off.
@@ -477,8 +475,6 @@ struct CF_Channel
      * first item(s) in the queue to consume all the bandwidth and never let the later
      * items get ticked. */
     const CF_Transaction_t *tick_resume;
-
-    bool tx_blocked; /**< Set true if PDU transmission was blocked due to limits */
 
     CF_LocalChanConfig_t config;
     CF_LocalChanStat_t   stat;

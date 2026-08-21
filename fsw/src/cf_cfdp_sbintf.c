@@ -78,7 +78,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool sile
     }
 
     if (chan->config.max_outgoing_messages_per_wakeup
-        && (chan->outgoing_counter >= chan->config.max_outgoing_messages_per_wakeup))
+        && (chan->stat.outgoing_counter >= chan->config.max_outgoing_messages_per_wakeup))
     {
         /* no more messages this wakeup allowed */
         success = false;
@@ -119,7 +119,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool sile
             CFE_MSG_Init(&engine_ptr->out.msg->Msg,
                          CFE_SB_ValueToMsgId(chan->config.mid_output),
                          offsetof(CF_PduTlmMsg_t, ph));
-            ++chan->outgoing_counter; /* even if max_outgoing_messages_per_wakeup is 0 (unlimited), it's ok
+            ++chan->stat.outgoing_counter; /* even if max_outgoing_messages_per_wakeup is 0 (unlimited), it's ok
                                                     to inc this */
 
             /* prepare for encoding - the "tx_pdudata" is what serves as the temporary holding area for content */
@@ -132,7 +132,7 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool sile
     if (ret == NULL)
     {
         /* stop trying to send anything until next wake up */
-        chan->tx_blocked = true;
+        chan->stat.tx_blocked = true;
     }
     else
     {
