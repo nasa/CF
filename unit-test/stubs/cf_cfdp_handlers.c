@@ -80,7 +80,7 @@ void UT_DefaultHandler_CF_CFDP_TxFile(void *UserObj, UT_EntryKey_t FuncKey, cons
         strncpy(ctxt->dst_filename, ptr, sizeof(ctxt->dst_filename));
         ctxt->cfdp_class = UT_Hook_GetArgValueByName(Context, "cfdp_class", CF_CFDP_Class_t);
         ctxt->keep       = UT_Hook_GetArgValueByName(Context, "keep", uint8);
-        ctxt->chan       = UT_Hook_GetArgValueByName(Context, "chan", uint8);
+        ctxt->chan       = UT_Hook_GetArgValueByName(Context, "chan", CF_Channel_t *);
         ctxt->priority   = UT_Hook_GetArgValueByName(Context, "priority", uint8);
         ctxt->dest_id    = UT_Hook_GetArgValueByName(Context, "dest_id", CF_EntityId_t);
     }
@@ -105,7 +105,7 @@ void UT_DefaultHandler_CF_CFDP_PlaybackDir(void *UserObj, UT_EntryKey_t FuncKey,
         strncpy(ctxt->dst_filename, ptr, sizeof(ctxt->dst_filename));
         ctxt->cfdp_class = UT_Hook_GetArgValueByName(Context, "cfdp_class", CF_CFDP_Class_t);
         ctxt->keep       = UT_Hook_GetArgValueByName(Context, "keep", uint8);
-        ctxt->chan       = UT_Hook_GetArgValueByName(Context, "chan", uint8);
+        ctxt->chan       = UT_Hook_GetArgValueByName(Context, "chan", CF_Channel_t *);
         ctxt->priority   = UT_Hook_GetArgValueByName(Context, "priority", uint8);
         ctxt->dest_id    = UT_Hook_GetArgValueByName(Context, "dest_id", uint16);
     }

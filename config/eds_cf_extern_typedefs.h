@@ -33,16 +33,19 @@
 #include "cf_eds_typedefs.h"
 
 /* Define type mappings for CF-specific types */
-typedef CF_QueueIdx_Enum_t CF_QueueIdx_t;
 
 #define CF_QueueIdx_NUM       (1 + EdsDataType_EdsEnum_CF_QueueIdx_t_MAX)
 #define CF_GetSet_ValueID_MAX (1 + EdsDataType_EdsEnum_CF_GetSet_ValueID_t_MAX)
 
-typedef CF_EntityId_Atom_t       CF_EntityId_t;
-typedef CF_TransactionSeq_Atom_t CF_TransactionSeq_t;
+typedef EdsDataType_CF_EntityId_t       CF_EntityId_t;
+typedef EdsDataType_CF_TransactionSeq_t CF_TransactionSeq_t;
 
-typedef CF_CFDP_Enum_t           CF_CFDP_Class_t;
-typedef CF_GetSet_ValueID_Enum_t CF_GetSet_ValueID_t;
+typedef enum EdsEnum_CF_QueueIdx       CF_QueueIdx_t;
+typedef enum EdsEnum_CF_CFDP_Class     CF_CFDP_Class_t;
+typedef enum EdsEnum_CF_GetSet_ValueID CF_GetSet_ValueID_t;
+
+typedef EdsDataType_CF_PollIdxSelect_t CF_PollIdxSelect_t;
+typedef EdsDataType_CF_ChannelSelect_t CF_ChannelSelect_t;
 
 typedef EdsDataType_BASE_TYPES_PathName_t CF_PathName_t;
 typedef EdsDataType_BASE_TYPES_FileName_t CF_FileName_t;

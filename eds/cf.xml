@@ -72,15 +72,35 @@
        </Range>
      </IntegerDataType>
 
-<!--
-     <AliasDataType name="PathName" type="BASE_TYPES/PathName" />
-     <AliasDataType name="FileName" type="BASE_TYPES/FileName" />
--->
+     <!-- This is similar to ChannelId but allows special values for e.g. ALL (255) -->
+     <IntegerDataType name="ChannelSelect" shortDescription="Channel Selector Value">
+       <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+       <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255"/>
+       </Range>
+     </IntegerDataType>
 
-     <EnumeratedDataType name="CFDP">
+     <IntegerDataType name="PollIdxSelect" shortDescription="Polling Dir Selector Value">
+       <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+       <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255"/>
+       </Range>
+     </IntegerDataType>
+
+     <EnumeratedDataType name="QueueSelect">
           <EnumerationList>
-            <Enumeration label="CLASS_1" value="0" shortDescription="CFDP class 1 - Unreliable transfer" />
-            <Enumeration label="CLASS_2" value="1" shortDescription="CFDP class 2 - Reliable transfer" />
+            <Enumeration label="Pending" value="0" shortDescription="Pending Queue" />
+            <Enumeration label="Active" value="1" shortDescription="Active Queue" />
+            <Enumeration label="History" value="2" shortDescription="History Queue" />
+            <Enumeration label="All" value="3" shortDescription="All Queues" />
+          </EnumerationList>
+       <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+     </EnumeratedDataType>
+
+     <EnumeratedDataType name="CFDP_Class">
+          <EnumerationList>
+            <Enumeration label="1" value="0" shortDescription="CFDP class 1 - Unreliable transfer" />
+            <Enumeration label="2" value="1" shortDescription="CFDP class 2 - Reliable transfer" />
           </EnumerationList>
        <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
      </EnumeratedDataType>
@@ -121,7 +141,7 @@
        <EntryList>
          <Entry type="BASE_TYPES/uint32" name="interval_sec" shortDescription="number of seconds to wait before trying a new directory" />
          <Entry type="BASE_TYPES/uint8" name="priority" shortDescription="priority to use when placing transactions on the pending queue" />
-         <Entry type="CFDP" name="cfdp_class" shortDescription="the CFDP class to send" />
+         <Entry type="CFDP_Class" name="cfdp_class" shortDescription="the CFDP class to send" />
          <Entry type="EntityId" name="dest_eid" shortDescription="destination entity id" />
          <Entry type="BASE_TYPES/PathName" name="src_dir" shortDescription="path to source dir" />
          <Entry type="BASE_TYPES/PathName" name="dst_dir" shortDescription="path to destination dir" />
@@ -184,7 +204,7 @@
 
       <ContainerDataType name="WakeupCmd" baseType="CFE_HDR/CommandHeader" shortDescription="Send Wake Up command" />
 
-      <ContainerDataType name="HKCommandCounters" shortDescription="Housekeeping command counters">
+      <ContainerDataType name="HkCmdCounters" shortDescription="Housekeeping command counters">
         <EntryList>
           <Entry name="cmd" type="BASE_TYPES/uint16" shortDescription="Command success counter" />
           <Entry name="err" type="BASE_TYPES/uint16"  shortDescription="Command error counter" />
@@ -236,7 +256,7 @@
         </EntryList>
       </ContainerDataType>
 
-     <EnumeratedDataType name="QueueIdx" ShortDescription="Identifies the entry type in a filesystem monitor report">
+     <EnumeratedDataType name="QueueIdx" ShortDescription="Identifies the queue index">
           <EnumerationList>
             <Enumeration label="PEND" value="0" />
             <Enumeration label="TX" value="1" />
@@ -275,7 +295,7 @@
 
       <ContainerDataType name="HkPacket_Payload">
         <EntryList>
-          <Entry name="counters" type="HKCommandCounters" />
+          <Entry name="counters" type="HkCmdCounters" />
           <PaddingEntry sizeInBits="32" shortDescription="Padding for 32-bit alignment"/>
           <Entry name="channel_hk" type="Channel_Hk" />
         </EntryList>
@@ -315,30 +335,65 @@
         </EntryList>
       </ContainerDataType>
 
-      <!-- change descriptions starts here -->
-
-      <ArrayDataType name="Hword" dataTypeRef="BASE_TYPES/uint16">
-        <DimensionList>
-           <Dimension size="2"/>
-        </DimensionList>
-      </ArrayDataType>
-
-      <ArrayDataType name="Byte" dataTypeRef="BASE_TYPES/uint8">
-        <DimensionList>
-           <Dimension size="4"/>
-        </DimensionList>
-      </ArrayDataType>
-
-      <ContainerDataType name="UnionArgs_Payload" shortDescription="Wrapper around 4 bytes">
+      <ContainerDataType name="ResetCountersCmd_Payload" shortDescription="Reset command structure">
         <EntryList>
-          <Entry name="byte" type="Byte" shortDescription="Generic uint8 array of arguments" />
+          <Entry name="ResetType" type="Reset" shortDescription="What to reset" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="ChannelSelect_Payload" shortDescription="Single byte channel selector payload">
+        <LongDescription>
+          Single byte channel selector payload
+           - 255 = all channels
+           - else = single channel
+        </LongDescription>
+        <EntryList>
+          <Entry name="ChannelSelect" type="ChannelSelect" shortDescription="Channel to operate on" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="PollDirSelect_Payload" shortDescription="Single byte poll directory selector payload">
+        <LongDescription>
+           Polling directory selector payload
+
+           Single byte channel selector
+                 - 255 = all channels
+                 - else = single channel
+
+           Single byte polling directory index
+                 - 255 = all polling directories
+                 - else = single polling directory index
+        </LongDescription>
+        <EntryList>
+          <Entry name="ChannelSelect" type="ChannelSelect" shortDescription="Channel to operate on" />
+          <Entry name="PollDirIndx" type="PollIdxSelect" shortDescription="Index of polling directory" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="QueueSelect_Payload" shortDescription="Queue selector payload">
+        <LongDescription>
+              Queue selector payload
+
+              Single byte channel selector
+              - 255 = all channels
+              - else = single channel
+
+              Single byte queue selection enum
+              Values indicated by #CF_QueueSelect enum
+              - 0 = Pending queue
+              - 1 = History queue
+              - 2 = Both pending and history queue
+        </LongDescription>
+        <EntryList>
+          <Entry name="ChannelSelect" type="ChannelSelect" shortDescription="Channel to operate on" />
+          <Entry name="QueueSelect" type="QueueSelect" shortDescription="Queue to operate on" />
         </EntryList>
       </ContainerDataType>
 
       <ContainerDataType name="GetParam_Payload" shortDescription="Get parameter command structure">
         <EntryList>
           <Entry name="key" type="GetSet_ValueID" shortDescription="Parameter key, see #CF_GetSet_ValueID_t" />
-          <Entry name="chan_num" type="ChannelId" shortDescription="Channel number" />
+          <Entry name="chan_num" type="ChannelSelect" shortDescription="Channel number" />
         </EntryList>
       </ContainerDataType>
 
@@ -346,16 +401,16 @@
         <EntryList>
           <Entry name="value" type="BASE_TYPES/uint32" shortDescription="Parameter value to set" />
           <Entry name="key" type="GetSet_ValueID" shortDescription="Parameter key, see #CF_GetSet_ValueID_t" />
-          <Entry name="chan_num" type="ChannelId" shortDescription="Channel number" />
+          <Entry name="chan_num" type="ChannelSelect" shortDescription="Channel number" />
           <PaddingEntry sizeInBits="16" shortDescription="Alignment spare, uint32 multiple"/>
         </EntryList>
       </ContainerDataType>
 
       <ContainerDataType name="TxFile_Payload" shortDescription="Transmit file command structure">
         <EntryList>
-          <Entry name="cfdp_class" type="CFDP" shortDescription="CFDP class: 0=class 1, 1=class 2" />
+          <Entry name="cfdp_class" type="CFDP_Class" shortDescription="CFDP class: 0=class 1, 1=class 2" />
           <Entry name="keep" type="EnableFlag" shortDescription="Keep file flag: 1=keep, else delete" />
-          <Entry name="chan_num" type="ChannelId" shortDescription="Channel number" />
+          <Entry name="chan_num" type="ChannelSelect" shortDescription="Channel number" />
           <Entry name="priority" type="BASE_TYPES/uint8" shortDescription="Priority: 0=highest priority" />
           <Entry name="dest_id" type="BASE_TYPES/uint32" shortDescription="Destination entity id" />
           <Entry name="src_filename" type="BASE_TYPES/PathName" shortDescription="Source filename" />
@@ -386,7 +441,7 @@
      <ContainerDataType name="WriteQueue_Payload" shortDescription="Write Queue command structure">
         <EntryList>
           <Entry name="type" type="Type" shortDescription="Transaction direction: all=0, up=1, down=2" />
-          <Entry name="chan" type="ChannelId" shortDescription="Channel number" />
+          <Entry name="chan" type="ChannelSelect" shortDescription="Channel number" />
           <Entry name="queue" type="Queue" shortDescription="Queue type: 0=pending, 1=active, 2=history, 3=all" />
           <PaddingEntry sizeInBits="8" shortDescription="Alignment spare, puts filename on 32-bit boundary"/>
           <Entry name="filename" type="BASE_TYPES/PathName" shortDescription="Filename written to" />
@@ -397,7 +452,7 @@
         <EntryList>
           <Entry name="ts" type="BASE_TYPES/uint32" shortDescription="Transaction sequence number" />
           <Entry name="eid" type="BASE_TYPES/uint32" shortDescription="Entity id" />
-          <Entry name="chan" type="BASE_TYPES/uint8" shortDescription="Channel number: 254=use ts, 255=all channels, else channel" />
+          <Entry name="chan_num" type="ChannelSelect" shortDescription="Channel number: 254=use ts, 255=all channels, else channel" />
           <PaddingEntry sizeInBits="24" shortDescription="Alignment spare for 32-bit multiple"/>
         </EntryList>
       </ContainerDataType>
@@ -474,7 +529,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="1" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="ResetCountersCmd_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 
@@ -593,7 +648,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="4" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="ChannelSelect_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 
@@ -634,7 +689,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="5" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="ChannelSelect_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 
@@ -962,7 +1017,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="16" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="ChannelSelect_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 
@@ -1002,7 +1057,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="17" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="ChannelSelect_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 
@@ -1049,7 +1104,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="18" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="PollDirSelect_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 
@@ -1096,7 +1151,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="19" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="PollDirSelect_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 
@@ -1144,7 +1199,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="21" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="QueueSelect_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 

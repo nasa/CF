@@ -74,7 +74,7 @@ void Test_CF_ProcessGroundCommand_When_cmd_EqTo_CF_NUM_COMMANDS_FailAndSendEvent
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_CC_ERR_EID);
     /* Assert for incremented counter */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 1);
+    UtAssert_UINT32_EQ(CF_AppData.counters.err, 1);
 }
 
 void Test_CF_ProcessGroundCommand_When_cmd_GreaterThan_CF_NUM_COMMANDS_FailAndSendEvent(void)
@@ -100,7 +100,7 @@ void Test_CF_ProcessGroundCommand_When_cmd_GreaterThan_CF_NUM_COMMANDS_FailAndSe
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_CC_ERR_EID);
     /* Assert for incremented counter */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 1);
+    UtAssert_UINT32_EQ(CF_AppData.counters.err, 1);
 }
 
 void Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForThatCommandSendEventAndFailure(void)
@@ -130,7 +130,7 @@ void Test_CF_ProcessGroundCommand_Receives_cmd_AndLengthDoesNotMatchExpectedForT
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_CMD_LEN_ERR_EID);
     /* Assert for incremented counter */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 1);
+    UtAssert_UINT32_EQ(CF_AppData.counters.err, 1);
 }
 
 void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x00_AndCall_CF_NoopCmd_With_msg(void)
@@ -186,8 +186,8 @@ void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_1
     UtAssert_STUB_COUNT(CFE_MSG_GetSize, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
     /* Assert for incremented counter */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, 0);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 0);
+    UtAssert_UINT32_EQ(CF_AppData.counters.cmd, 0);
+    UtAssert_UINT32_EQ(CF_AppData.counters.err, 0);
 }
 
 /*******************************************************************************
@@ -227,8 +227,8 @@ void Test_CF_AppPipe_ProcessGroundCommand(void)
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
 
     /* Assert for incremented counter */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.cmd, 0);
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 1);
+    UtAssert_UINT32_EQ(CF_AppData.counters.cmd, 0);
+    UtAssert_UINT32_EQ(CF_AppData.counters.err, 1);
 }
 
 void Test_CF_AppPipe_WakeUp(void)
@@ -280,7 +280,7 @@ void Test_CF_AppPipe_UnrecognizedCommandEnterDefaultPath(void)
     CF_AppPipe(arg_msg);
 
     /* Assert */
-    UtAssert_UINT32_EQ(CF_AppData.hk.Payload.counters.err, 1);
+    UtAssert_UINT32_EQ(CF_AppData.counters.err, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     UT_CF_AssertEventID(CF_MID_ERR_EID);
 }

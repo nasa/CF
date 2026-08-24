@@ -53,7 +53,7 @@ void CF_AppPipe(const CFE_SB_Buffer_t *BufPtr)
     if (status != CFE_SUCCESS)
     {
         CFE_MSG_GetMsgId(&BufPtr->Msg, &MsgId);
-        ++CF_AppData.hk.Payload.counters.err;
+        ++CF_AppData.counters.err;
 
         if (status == CFE_STATUS_UNKNOWN_MSG_ID)
         {

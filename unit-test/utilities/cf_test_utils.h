@@ -45,7 +45,9 @@
 #define RANDOM_VALUES_SEED 0
 #endif /* !RANDOM_VALUES_SEED */
 
-#define UT_CFDP_CHANNEL 0
+#define UT_CFDP_CHANNEL_IDX 0
+#define UT_CFDP_CHANNEL     CF_ChannelSelect_FromInt(UT_CFDP_CHANNEL_IDX)
+#define UT_CFDP_CHANNEL_PTR CF_GetChannelPtr(UT_CFDP_CHANNEL)
 
 typedef enum
 {
@@ -67,9 +69,9 @@ typedef struct
 {
     char            src_filename[CF_FILENAME_MAX_LEN];
     char            dst_filename[CF_FILENAME_MAX_LEN];
+    CF_Channel_t   *chan;
     CF_CFDP_Class_t cfdp_class;
     uint8           keep;
-    uint8           chan;
     uint8           priority;
     CF_EntityId_t   dest_id;
 } CF_CFDP_TxFile_context_t;
@@ -78,9 +80,9 @@ typedef struct
 {
     char            src_filename[CF_FILENAME_MAX_LEN];
     char            dst_filename[CF_FILENAME_MAX_LEN];
+    CF_Channel_t   *chan;
     CF_CFDP_Class_t cfdp_class;
     uint8           keep;
-    uint8           chan;
     uint8           priority;
     CF_EntityId_t   dest_id;
 } CF_CFDP_PlaybackDir_context_t;
@@ -252,6 +254,6 @@ int          Any_int_Positive(void);
 char        *AnyRandomStringOfLettersOfLength(size_t length);
 void         AnyRandomStringOfLettersOfLengthCopy(char *random_string, size_t length);
 
-uint8 Any_cf_chan_num(void);
+CF_ChannelSelect_t Any_cf_chan_num(void);
 
 #endif

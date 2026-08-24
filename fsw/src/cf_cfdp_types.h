@@ -170,12 +170,26 @@ typedef enum
     CF_TxnStatus_MAX = 24
 } CF_TxnStatus_t;
 
+/*
+ * Forward typedef declarations
+ *
+ * These are needed as some of these structures that reference
+ * each other.  Typedefs are created early, then the content
+ * is defined below.
+ */
+typedef struct CF_Channel      CF_Channel_t;
+typedef struct CF_Transaction  CF_Transaction_t;
+typedef struct CF_History      CF_History_t;
+typedef struct CF_ChunkWrapper CF_ChunkWrapper_t;
+typedef struct CF_Playback     CF_Playback_t;
+typedef struct CF_Poll         CF_Poll_t;
+
 /**
  * @brief CF History entry
  *
  * Records CF app operations for future reference
  */
-typedef struct CF_History
+struct CF_History
 {
     CF_TxnFilenames_t   fnames;   /**< \brief file names associated with this history entry */
     CF_CListNode_t      cl_node;  /**< \brief for connection to a CList */
@@ -184,25 +198,25 @@ typedef struct CF_History
     CF_EntityId_t       src_eid;  /**< \brief the source eid of the transaction */
     CF_EntityId_t       peer_eid; /**< \brief peer_eid is always the "other guy", same src_eid for RX */
     CF_TransactionSeq_t seq_num;  /**< \brief transaction identifier, stays constant for entire transfer */
-} CF_History_t;
+};
 
 /**
  * @brief Wrapper around a CF_ChunkList_t object
  *
  * This allows a CF_ChunkList_t to be stored within a CList data storage structure
  */
-typedef struct CF_ChunkWrapper
+struct CF_ChunkWrapper
 {
     CF_ChunkList_t chunks;
     CF_CListNode_t cl_node;
-} CF_ChunkWrapper_t;
+};
 
 /**
  * @brief CF Playback entry
  *
  * Keeps the state of CF playback requests
  */
-typedef struct CF_Playback
+struct CF_Playback
 {
     osal_id_t         dir_id;
     CF_CFDP_Class_t   cfdp_class;
@@ -216,19 +230,19 @@ typedef struct CF_Playback
     bool diropen;
     bool keep;
     bool counted;
-} CF_Playback_t;
+};
 
 /**
  * @brief CF Poll entry
  *
  * Keeps the state of CF directory polling
  */
-typedef struct CF_Poll
+struct CF_Poll
 {
     CF_Playback_t pb;
     CF_Timer_t    interval_timer;
     bool          timer_set;
-} CF_Poll_t;
+};
 
 /**
  * @brief Data that applies to all types of transactions
@@ -317,12 +331,13 @@ typedef struct CF_StateData
  *
  * This keeps the state of CF file transactions
  */
-typedef struct CF_Transaction
+struct CF_Transaction
 {
     CF_TxnState_t state; /**< \brief each engine is commanded to do something, which is the overall state */
 
     CF_History_t      *history;          /**< \brief weird, holds active filenames and possibly other info */
     CF_ChunkWrapper_t *chunks;           /**< \brief for gap tracking, only used on class 2 */
+    CF_Channel_t      *chan_ptr;         /**< \brief reference to the CF channel for this transaction */
     CF_Timer_t         inactivity_timer; /**< \brief set to the overall inactivity timer of a remote */
     CF_Timer_t         ack_timer;        /**< \brief called ack_timer, but is also nak_timer */
 
@@ -334,7 +349,6 @@ typedef struct CF_Transaction
 
     bool  reliable_mode; /**< Set true if class 2, false in class 1 */
     uint8 keep;
-    uint8 chan_num; /**< \brief if ever more than one engine, this may need to change to pointer */
     uint8 priority;
 
     CF_CListNode_t cl_node;
@@ -352,7 +366,7 @@ typedef struct CF_Transaction
      * Please ignore the duplicate declarations of the "all" flags.
      */
     CF_StateFlags_t flags;
-} CF_Transaction_t;
+};
 
 /**
  * @brief Identifies the type of timer tick being processed
@@ -370,6 +384,75 @@ typedef enum
 } CF_TickState_t;
 
 /**
+ * \brief Configuration entry for directory polling
+ *
+ * This is a mirror of what came from the configuration table, stored locally in the app global
+ */
+typedef struct CF_LocalPdConfig
+{
+    bool  enabled;  /**< \brief Enabled flag */
+    uint8 priority; /**< \brief priority to use when placing transactions on the pending queue */
+
+    uint32 interval_sec; /**< \brief number of seconds to wait before trying a new directory */
+
+    CF_CFDP_Class_t cfdp_class; /**< \brief the CFDP class to send */
+    CF_EntityId_t   dest_eid;   /**< \brief destination entity id */
+
+    char src_dir[OS_MAX_PATH_LEN]; /**< \brief path to source dir */
+    char dst_dir[OS_MAX_PATH_LEN]; /**< \brief path to destination dir */
+
+} CF_LocalPdConfig_t;
+
+/**
+ * \brief Configuration entry for channel config
+ *
+ * This is a mirror of what came from the configuration table, stored locally in the app global
+ */
+typedef struct CF_LocalChanConfig
+{
+    uint32 max_outgoing_messages_per_wakeup; /**< \brief max number of messages to send per wakeup (0 - unlimited) */
+    uint32 rx_max_messages_per_wakeup;       /**< \brief max number of rx messages to process per wakeup */
+
+    uint32 ack_timer_s;        /**< \brief Acknowledge timer in seconds */
+    uint32 nak_timer_s;        /**< \brief Non-acknowledge timer in seconds */
+    uint32 inactivity_timer_s; /**< \brief Inactivity timer in seconds */
+
+    bool  dequeue_enabled; /**< \brief if 1, then the channel will make pending transactions active */
+    uint8 ack_limit;       /**< number of times to retry ACK (for ex, send FIN and wait for fin-ack) */
+    uint8 nak_limit;       /**< number of times to retry NAK before giving up (resets on a single response */
+
+    CFE_SB_MsgId_Atom_t mid_input;  /**< \brief msgid integer value for incoming messages */
+    CFE_SB_MsgId_Atom_t mid_output; /**< \brief msgid integer value for outgoing messages */
+
+    uint16 pipe_depth_input; /**< \brief depth of pipe to receive incoming PDU */
+
+    CF_LocalPdConfig_t polldir[CF_MAX_POLLING_DIR_PER_CHAN]; /**< \brief Configuration for polled directories */
+
+    char sem_name[OS_MAX_API_NAME]; /**< \brief name of throttling semaphore in TO */
+    char move_dir[OS_MAX_PATH_LEN]; /**< \brief Move directory if not empty */
+} CF_LocalChanConfig_t;
+
+/**
+ * \brief Housekeeping channel data
+ */
+typedef struct CF_LocalChanStat
+{
+    CF_HkCounters_t counters;                /**< \brief Counters */
+    uint16          q_size[CF_QueueIdx_NUM]; /**< \brief Queue sizes */
+    uint8           poll_counter;            /**< \brief Number of active polling directories */
+    uint8           playback_counter;        /**< \brief Number of active playback directories */
+    bool            frozen;                  /**< \brief Frozen state: 0 == not frozen, else frozen */
+    bool            tx_blocked;              /**< Set true if PDU transmission was blocked due to limits */
+
+    uint32 num_cmd_tx;
+    uint32 outgoing_counter;
+
+    CF_Playback_t playback[CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN];
+    CF_Poll_t     poll[CF_MAX_POLLING_DIR_PER_CHAN];
+
+} CF_LocalChanStat_t;
+
+/**
  * @brief Channel state object
  *
  * This keeps the state of CF channels
@@ -378,23 +461,13 @@ typedef enum
  * and poll state, as well as separate addresses on the underlying message
  * transport (e.g. SB).
  */
-typedef struct CF_Channel
+struct CF_Channel
 {
     CF_CListNode_t *qs[CF_QueueIdx_NUM];
     CF_CListNode_t *cs[CF_Direction_NUM];
 
     CFE_SB_PipeId_t pipe;
-
-    uint32 num_cmd_tx;
-
-    CF_Playback_t playback[CF_MAX_COMMANDED_PLAYBACK_DIRECTORIES_PER_CHAN];
-
-    /* For polling directories, the configuration data is in a table. */
-    CF_Poll_t poll[CF_MAX_POLLING_DIR_PER_CHAN];
-
-    osal_id_t sem_id; /**< \brief semaphore id for output pipe */
-
-    uint32 outgoing_counter;
+    osal_id_t       sem_id; /**< \brief semaphore id for output pipe */
 
     /* If tick processing gets blocked due to TX limits (i.e. tx_blocked gets set during
      * tick processing) then this captures where the tick processing left off.
@@ -403,9 +476,9 @@ typedef struct CF_Channel
      * items get ticked. */
     const CF_Transaction_t *tick_resume;
 
-    bool tx_blocked; /**< Set true if PDU transmission was blocked due to limits */
-
-} CF_Channel_t;
+    CF_LocalChanConfig_t config;
+    CF_LocalChanStat_t   stat;
+};
 
 /**
  * @brief CF engine output state
@@ -431,6 +504,21 @@ typedef struct CF_Input
     CF_Logical_PduBuffer_t rx_pdudata; /**< \brief Rx PDU logical values */
 } CF_Input_t;
 
+typedef struct CF_EngineConfig
+{
+    uint32 ticks_per_second;             /**< \brief expected ticks per second to CFDP app */
+    uint32 rx_crc_calc_bytes_per_wakeup; /**< \brief max number of bytes per wakeup to calculate
+                                          * r2 CRC for recvd file (must be 1024-byte aligned)
+                                          */
+
+    CF_EntityId_t local_eid; /**< \brief the local entity ID of the CF app */
+
+    uint16 outgoing_file_chunk_size;  /**< \brief maximum size of outgoing file data chunk in a PDU.
+                                       *   Limited by CF_MAX_PDU_SIZE minus the PDU header(s) */
+    char   tmp_dir[OS_MAX_PATH_LEN];  /**< \brief directory to put temp files */
+    char   fail_dir[OS_MAX_PATH_LEN]; /**< \brief fail directory */
+} CF_EngineConfig_t;
+
 /**
  * @brief An engine represents a pairing to a local EID
  *
@@ -442,6 +530,8 @@ typedef struct CF_Engine
 
     CF_Output_t out;
     CF_Input_t  in;
+
+    CF_EngineConfig_t config;
 
     /* NOTE: could have separate array of transactions as part of channel? */
     CF_Transaction_t transactions[CF_NUM_TRANSACTIONS];

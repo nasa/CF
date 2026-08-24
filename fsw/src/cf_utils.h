@@ -110,6 +110,28 @@ typedef struct CF_Traverse_PriorityArg
     uint8             priority; /**< \brief seeking this priority */
 } CF_Traverse_PriorityArg_t;
 
+/** @brief Function declaration to use with CF_ForEachChannel()
+ *
+ * @returns CFE_SUCCESS if completed successfully, otherwise error code
+ */
+typedef int32 (*CF_ChannelFunc_t)(CF_Engine_t *, CF_Channel_t *, void *);
+
+/************************************************************************/
+/** @brief Gets the associated channel struct from a transaction
+ *
+ * @par Assumptions, External Events, and Notes:
+ *       txn must not be null, and the chan_num must be set
+ *
+ * @param txn   Transaction
+ *
+ * @returns Pointer to CF_Channel_t struct associated with the transaction
+ * @retval NULL if reference is invalid
+ */
+static inline CF_Channel_t *CF_GetChannelFromTxn(const CF_Transaction_t *txn)
+{
+    return txn->chan_ptr;
+}
+
 /* free a transaction from the queue it's on.
  * NOTE: this leaves the transaction in a bad state,
  * so it must be followed by placing the transaction on
@@ -121,41 +143,46 @@ typedef struct CF_Traverse_PriorityArg
  * pointing to an invalid node */
 static inline void CF_DequeueTransaction(CF_Transaction_t *txn)
 {
-    CF_Assert(txn && (txn->chan_num < CF_NUM_CHANNELS));
-    CF_CList_Remove(&CF_AppData.engine.channels[txn->chan_num].qs[txn->flags.com.q_index], &txn->cl_node);
-    CF_Assert(CF_AppData.hk.Payload.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index]); /* sanity check */
-    --CF_AppData.hk.Payload.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index];
+    CF_Channel_t *chan = CF_GetChannelFromTxn(txn);
+
+    CF_Assert(chan->stat.q_size[txn->flags.com.q_index]); /* sanity check */
+
+    CF_CList_Remove(&chan->qs[txn->flags.com.q_index], &txn->cl_node);
+    --chan->stat.q_size[txn->flags.com.q_index];
 }
 
 static inline void CF_MoveTransaction(CF_Transaction_t *txn, CF_QueueIdx_t queue)
 {
-    CF_Assert(txn && (txn->chan_num < CF_NUM_CHANNELS));
-    CF_CList_Remove(&CF_AppData.engine.channels[txn->chan_num].qs[txn->flags.com.q_index], &txn->cl_node);
-    CF_Assert(CF_AppData.hk.Payload.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index]); /* sanity check */
-    --CF_AppData.hk.Payload.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index];
-    CF_CList_InsertBack(&CF_AppData.engine.channels[txn->chan_num].qs[queue], &txn->cl_node);
+    CF_Channel_t *chan = CF_GetChannelFromTxn(txn);
+
+    CF_Assert(chan->stat.q_size[txn->flags.com.q_index]); /* sanity check */
+
+    CF_CList_Remove(&chan->qs[txn->flags.com.q_index], &txn->cl_node);
+    --chan->stat.q_size[txn->flags.com.q_index];
+    CF_CList_InsertBack(&chan->qs[queue], &txn->cl_node);
     txn->flags.com.q_index = queue;
-    ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].q_size[txn->flags.com.q_index];
+    ++chan->stat.q_size[txn->flags.com.q_index];
 }
 
 static inline void CF_CList_Remove_Ex(CF_Channel_t *chan, CF_QueueIdx_t queueidx, CF_CListNode_t *node)
 {
+    CF_Assert(chan->stat.q_size[queueidx]); /* sanity check */
+
     CF_CList_Remove(&chan->qs[queueidx], node);
-    CF_Assert(CF_AppData.hk.Payload.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx]); /* sanity check */
-    --CF_AppData.hk.Payload.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx];
+    --chan->stat.q_size[queueidx];
 }
 
 static inline void
 CF_CList_InsertAfter_Ex(CF_Channel_t *chan, CF_QueueIdx_t queueidx, CF_CListNode_t *start, CF_CListNode_t *after)
 {
     CF_CList_InsertAfter(&chan->qs[queueidx], start, after);
-    ++CF_AppData.hk.Payload.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx];
+    ++chan->stat.q_size[queueidx];
 }
 
 static inline void CF_CList_InsertBack_Ex(CF_Channel_t *chan, CF_QueueIdx_t queueidx, CF_CListNode_t *node)
 {
     CF_CList_InsertBack(&chan->qs[queueidx], node);
-    ++CF_AppData.hk.Payload.channel_hk[chan - CF_AppData.engine.channels].q_size[queueidx];
+    ++chan->stat.q_size[queueidx];
 }
 
 /************************************************************************/
@@ -194,9 +221,8 @@ void CF_ResetHistory(CF_Channel_t *chan, CF_History_t *history);
  *       txn must not be NULL.
  *
  * @param txn Pointer to the transaction object
- * @param chan The channel number which this transaction is associated with
  */
-void CF_FreeTransaction(CF_Transaction_t *txn, uint8 chan);
+void CF_FreeTransaction(CF_Transaction_t *txn);
 
 /************************************************************************/
 /** @brief Finds an active transaction by sequence number.
@@ -527,19 +553,6 @@ static inline bool CF_TxnStatus_IsError(CF_TxnStatus_t txn_stat)
 }
 
 /************************************************************************/
-/** @brief Gets the associated channel struct from a transaction
- *
- * @par Assumptions, External Events, and Notes:
- *       txn must not be null, and the chan_num must be set
- *
- * @param txn   Transaction
- *
- * @returns Pointer to CF_Channel_t struct associated with the transaction
- * @retval NULL if checks failed
- */
-CF_Channel_t *CF_GetChannelFromTxn(CF_Transaction_t *txn);
-
-/************************************************************************/
 /** @brief Gets the head of the chunk list for the given channel + direction
  *
  * The chunk list contains structs that are available for tracking the chunks
@@ -564,5 +577,18 @@ CF_CListNode_t **CF_GetChunkListHead(CF_Channel_t *chan, uint8 direction);
  * @returns CF_CFDP_AckTxnStatus_t value corresponding to transaction
  */
 CF_CFDP_AckTxnStatus_t CF_CFDP_GetAckTxnStatus(CF_Transaction_t *txn);
+
+/************************************************************************/
+/** @brief Invokes the given function on every channel in the engine
+ *
+ * Loops through all channels and calls the function.  Stops when any
+ * of the function calls return non-CFE_SUCCESS.
+ *
+ * @param engine_ptr  Engine pointer
+ * @param fn          Function to call
+ * @param arg         Opaque arg passed to function
+ * @returns CFE_SUCCESS if completed successfully, otherwise error code
+ */
+int32 CF_ForEachChannel(CF_Engine_t *engine_ptr, CF_ChannelFunc_t fn, void *arg);
 
 #endif /* !CF_UTILS_H */
