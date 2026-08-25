@@ -575,7 +575,7 @@ void CF_GetSetParamCmd(bool is_set, CF_GetSet_ValueID_t param_id, uint32 value, 
 CFE_Status_t CF_SetParamCmd(const CF_SetParamCmd_t *msg);
 
 /************************************************************************/
-/** @brief Ground command to set a configuration parameter.
+/** @brief Ground command to get a configuration parameter.
  *
  * @par Assumptions, External Events, and Notes:
  *       msg must not be NULL.
