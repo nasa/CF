@@ -277,6 +277,7 @@ void Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_up_AndResetAllHkRecvCountS
     chan->stat.counters.recv.dropped              = Any_uint16_Except(0);
     chan->stat.counters.recv.nak_segment_requests = Any_uint32_Except(0);
     chan->stat.counters.recv.files_recv           = Any_uint32_Except(0);
+    chan->stat.counters.recv.files_started        = Any_uint32_Except(0);
 
     CF_AppData.counters.cmd = initial_hk_cmd_counter;
 
@@ -295,6 +296,7 @@ void Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_up_AndResetAllHkRecvCountS
     UtAssert_ZERO(chan->stat.counters.recv.pdu);
     UtAssert_ZERO(chan->stat.counters.recv.nak_segment_requests);
     UtAssert_ZERO(chan->stat.counters.recv.files_recv);
+    UtAssert_ZERO(chan->stat.counters.recv.files_started);
     UtAssert_MemCmpValue(&chan->stat.counters.recv,
                          0,
                          sizeof(chan->stat.counters.recv),
@@ -319,6 +321,7 @@ void Test_CF_ResetCountersCmd_tests_SWhenCommandByteIs_down_AndResetAllHkSentCou
     chan->stat.counters.sent.nak_segment_requests = Any_uint32_Except(0);
     chan->stat.counters.sent.pdu                  = Any_uint32_Except(0);
     chan->stat.counters.sent.files_sent           = Any_uint32_Except(0);
+    chan->stat.counters.sent.files_started        = Any_uint32_Except(0);
 
     CF_AppData.counters.cmd = initial_hk_cmd_counter;
 
@@ -334,6 +337,7 @@ void Test_CF_ResetCountersCmd_tests_SWhenCommandByteIs_down_AndResetAllHkSentCou
     UtAssert_ZERO(chan->stat.counters.sent.nak_segment_requests);
     UtAssert_ZERO(chan->stat.counters.sent.pdu);
     UtAssert_ZERO(chan->stat.counters.sent.files_sent);
+    UtAssert_ZERO(chan->stat.counters.sent.files_started);
     UtAssert_MemCmpValue(&chan->stat.counters.sent,
                          0,
                          sizeof(chan->stat.counters.sent),
@@ -375,11 +379,13 @@ void Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_all_AndResetAllMemValuesSe
     chan->stat.counters.recv.dropped              = Any_uint16_Except(0);
     chan->stat.counters.recv.nak_segment_requests = Any_uint32_Except(0);
     chan->stat.counters.recv.files_recv           = Any_uint32_Except(0);
+    chan->stat.counters.recv.files_started        = Any_uint32_Except(0);
 
     chan->stat.counters.sent.file_data_bytes      = Any_uint64_Except(0);
     chan->stat.counters.sent.nak_segment_requests = Any_uint32_Except(0);
     chan->stat.counters.sent.pdu                  = Any_uint32_Except(0);
     chan->stat.counters.sent.files_sent           = Any_uint32_Except(0);
+    chan->stat.counters.sent.files_started        = Any_uint32_Except(0);
 
     /* Act */
     CF_ResetCountersCmd(&utbuf);
