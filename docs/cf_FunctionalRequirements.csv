@@ -159,7 +159,9 @@ CF: Housekeeping Message,CF6000,"The CF Housekeeping message shall include
 25. Number of ACK Limit Exceeded Faults
 26. Number of Inactivity Timer Limit Exceeded Faults
 27. Number of Files Successfully Sent
-28. Number of Files Successfully Received",Operator interface that provides detailed status on operational state
+28. Number of Files Successfully Received
+29. Number of Files Initialized To Be Sent
+30. Number of Files Initialized To Be Received",Operator interface that provides detailed status on operational state
 CF: End Of Transaction Message,CF6001,"The CF End of Transaction message shall include
 1. Transaction identifier
 2. Channel number

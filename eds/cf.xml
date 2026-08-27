@@ -217,7 +217,7 @@
           <Entry name="pdu" type="BASE_TYPES/uint32"  shortDescription="Sent PDUs counter" />
           <Entry name="nak_segment_requests" type="BASE_TYPES/uint32"  shortDescription="Sent NAK segment requests counter" />
           <Entry name="files_sent" type="BASE_TYPES/uint32"  shortDescription="Files successfully sent counter" />
-          <PaddingEntry sizeInBits="32" shortDescription="Spare bytes for alignment"/>
+          <Entry name="files_started" type="BASE_TYPES/uint32"  shortDescription="Files initialized to be sent counter" />
         </EntryList>
       </ContainerDataType>
 
@@ -231,7 +231,7 @@
           <Entry name="dropped" type="BASE_TYPES/uint16"  shortDescription="Received PDUs dropped due to a transaction error" />
           <Entry name="nak_segment_requests" type="BASE_TYPES/uint32"  shortDescription="Received NAK segment requests counter" />
           <Entry name="files_recv" type="BASE_TYPES/uint32"  shortDescription="Files successfully received counter" />
-          <PaddingEntry sizeInBits="32" shortDescription="Spare bytes for alignment"/>
+          <Entry name="files_started" type="BASE_TYPES/uint32"  shortDescription="Files initialized to be received counter" />
         </EntryList>
       </ContainerDataType>
 
