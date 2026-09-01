@@ -1136,6 +1136,12 @@ void CF_CFDP_SetupTxTransaction(CF_Transaction_t *txn)
  *-----------------------------------------------------------------*/
 void CF_CFDP_SetupRxTransaction(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
+    CF_Channel_t *chan = CF_GetChannelFromTxn(txn);
+
+    /* this is only reached for a brand-new RX transaction, so the file is now set up
+     * for reception, whether or not it ultimately succeeds */
+    ++chan->stat.counters.recv.files_started;
+
     /* only RX transactions dare tread here */
     txn->history->seq_num = ph->pdu_header.sequence_num;
 
@@ -1688,6 +1694,9 @@ static void CF_CFDP_TxFile_Initiate(CF_Transaction_t *txn,
                       txn->history->fnames.dst_filename);
 
     CF_CFDP_InitTxnTxFile(txn, cfdp_class, keep, chan, priority);
+
+    /* the file is now set up for transmission, whether or not it ultimately succeeds */
+    ++chan->stat.counters.sent.files_started;
 
     /* Increment sequence number for new transaction */
     ++engine_ptr->seq_num;

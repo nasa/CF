@@ -1158,6 +1158,7 @@ void Test_CF_CFDP_R_CheckState_FINACK(void)
      * void CF_CFDP_R_CheckState(CF_Transaction_t *txn)
      */
     CF_Transaction_t *txn;
+    CF_Channel_t     *chan;
 
     /* FINACK state, R1, fin pending */
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
@@ -1214,30 +1215,36 @@ void Test_CF_CFDP_R_CheckState_FINACK(void)
 
     /* FINACK state, R2, fin sent, not acked, timer expired, over limit */
     UT_ResetState(0);
-    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, &txn, NULL);
     txn->reliable_mode             = true;
     txn->flags.rx.finack_recv      = false;
     txn->flags.rx.send_fin         = false;
     txn->flags.com.ack_timer_armed = false;
     txn->state_data.sub_state      = CF_RxSubState_FINACK;
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_CheckAckNakCount), 1, false);
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_TxnIsOK), true);
     UtAssert_VOIDCALL(CF_CFDP_R_CheckState(txn));
     UtAssert_UINT8_EQ(txn->state_data.sub_state, CF_RxSubState_COMPLETE);
     UtAssert_BOOL_FALSE(txn->flags.rx.send_fin);
     UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1);
+    /* the fin-ack never arrived but the file itself was received without error */
+    UtAssert_UINT32_EQ(chan->stat.counters.recv.files_recv, 1);
 
     /* FINACK state, R2, fin sent, not acked, inactivity reached */
     UT_ResetState(0);
-    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, &txn, NULL);
     txn->reliable_mode              = true;
     txn->flags.rx.finack_recv       = false;
     txn->flags.rx.send_fin          = false;
     txn->flags.com.inactivity_fired = true;
     txn->state_data.sub_state       = CF_RxSubState_FINACK;
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_TxnIsOK), false);
     UtAssert_VOIDCALL(CF_CFDP_R_CheckState(txn));
     UtAssert_UINT8_EQ(txn->state_data.sub_state, CF_RxSubState_COMPLETE);
     UtAssert_BOOL_FALSE(txn->flags.rx.send_fin);
     UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1);
+    /* inactivity is a failure, so the count must remain at the 1 from the prior case */
+    UtAssert_UINT32_EQ(chan->stat.counters.recv.files_recv, 1);
 }
 
 void Test_CF_CFDP_R_CheckState_COMPLETE(void)

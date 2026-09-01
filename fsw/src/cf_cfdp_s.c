@@ -827,6 +827,7 @@ CF_TxSubState_t CF_CFDP_S_CheckState_FILESTORE(CF_Transaction_t *txn)
 void CF_CFDP_S_CheckState(CF_Transaction_t *txn)
 {
     CF_TxSubState_t next_state = txn->state_data.sub_state;
+    CF_Channel_t   *chan       = CF_GetChannelFromTxn(txn);
 
     /* State transitions are done here */
     switch (txn->state_data.sub_state)
@@ -871,6 +872,11 @@ void CF_CFDP_S_CheckState(CF_Transaction_t *txn)
                 txn->flags.tx.send_eof      = true;
                 break;
             case CF_TxSubState_COMPLETE:
+                /* only a transaction that reached this point without error sent a complete file */
+                if (CF_CFDP_TxnIsOK(txn))
+                {
+                    ++chan->stat.counters.sent.files_sent;
+                }
                 /* This changes the txn state such that this function is no longer called. */
                 CF_CFDP_FinishTransaction(txn, true);
                 break;

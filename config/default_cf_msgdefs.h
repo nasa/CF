@@ -110,6 +110,8 @@ typedef struct CF_HkSent
     uint64 file_data_bytes;      /**< \brief Sent File data bytes */
     uint32 pdu;                  /**< \brief Sent PDUs counter */
     uint32 nak_segment_requests; /**< \brief Sent NAK segment requests counter */
+    uint32 files_sent;           /**< \brief Files successfully sent counter */
+    uint32 files_started;        /**< \brief Files initialized to be sent counter */
 } CF_HkSent_t;
 
 /**
@@ -126,6 +128,8 @@ typedef struct CF_HkRecv
                                   */
     uint16 dropped;              /**< \brief Received PDUs dropped due to a transaction error */
     uint32 nak_segment_requests; /**< \brief Received NAK segment requests counter */
+    uint32 files_recv;           /**< \brief Files successfully received counter */
+    uint32 files_started;        /**< \brief Files initialized to be received counter */
 } CF_HkRecv_t;
 
 /**

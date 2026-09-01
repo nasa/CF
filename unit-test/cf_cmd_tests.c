@@ -252,7 +252,7 @@ void Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_fault_ResetAllHkFaultCount
     UtAssert_ZERO(chan->stat.counters.fault.inactivity_timer);
     UtAssert_MemCmpValue(&chan->stat.counters.fault,
                          0,
-                         sizeof(&chan->stat.counters.fault),
+                         sizeof(chan->stat.counters.fault),
                          "fault channel was completely cleared to 0");
     /* Assert to show counter incremented */
     UtAssert_UINT32_EQ(CF_AppData.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -276,6 +276,8 @@ void Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_up_AndResetAllHkRecvCountS
     chan->stat.counters.recv.spurious             = Any_uint16_Except(0);
     chan->stat.counters.recv.dropped              = Any_uint16_Except(0);
     chan->stat.counters.recv.nak_segment_requests = Any_uint32_Except(0);
+    chan->stat.counters.recv.files_recv           = Any_uint32_Except(0);
+    chan->stat.counters.recv.files_started        = Any_uint32_Except(0);
 
     CF_AppData.counters.cmd = initial_hk_cmd_counter;
 
@@ -293,9 +295,11 @@ void Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_up_AndResetAllHkRecvCountS
     UtAssert_ZERO(chan->stat.counters.recv.spurious);
     UtAssert_ZERO(chan->stat.counters.recv.pdu);
     UtAssert_ZERO(chan->stat.counters.recv.nak_segment_requests);
+    UtAssert_ZERO(chan->stat.counters.recv.files_recv);
+    UtAssert_ZERO(chan->stat.counters.recv.files_started);
     UtAssert_MemCmpValue(&chan->stat.counters.recv,
                          0,
-                         sizeof(&chan->stat.counters.recv),
+                         sizeof(chan->stat.counters.recv),
                          "recv channel was completely cleared to 0");
     /* Assert to show counter incremented */
     UtAssert_UINT32_EQ(CF_AppData.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -316,6 +320,8 @@ void Test_CF_ResetCountersCmd_tests_SWhenCommandByteIs_down_AndResetAllHkSentCou
     chan->stat.counters.sent.file_data_bytes      = Any_uint64_Except(0);
     chan->stat.counters.sent.nak_segment_requests = Any_uint32_Except(0);
     chan->stat.counters.sent.pdu                  = Any_uint32_Except(0);
+    chan->stat.counters.sent.files_sent           = Any_uint32_Except(0);
+    chan->stat.counters.sent.files_started        = Any_uint32_Except(0);
 
     CF_AppData.counters.cmd = initial_hk_cmd_counter;
 
@@ -330,9 +336,11 @@ void Test_CF_ResetCountersCmd_tests_SWhenCommandByteIs_down_AndResetAllHkSentCou
     UtAssert_ZERO(chan->stat.counters.sent.file_data_bytes);
     UtAssert_ZERO(chan->stat.counters.sent.nak_segment_requests);
     UtAssert_ZERO(chan->stat.counters.sent.pdu);
+    UtAssert_ZERO(chan->stat.counters.sent.files_sent);
+    UtAssert_ZERO(chan->stat.counters.sent.files_started);
     UtAssert_MemCmpValue(&chan->stat.counters.sent,
                          0,
-                         sizeof(&chan->stat.counters.sent),
+                         sizeof(chan->stat.counters.sent),
                          "sent channel was completely cleared to 0");
     /* Assert to show counter incremented */
     UtAssert_UINT32_EQ(CF_AppData.counters.cmd, (initial_hk_cmd_counter + 1) & 0xFFFF);
@@ -370,10 +378,14 @@ void Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_all_AndResetAllMemValuesSe
     chan->stat.counters.recv.spurious             = Any_uint16_Except(0);
     chan->stat.counters.recv.dropped              = Any_uint16_Except(0);
     chan->stat.counters.recv.nak_segment_requests = Any_uint32_Except(0);
+    chan->stat.counters.recv.files_recv           = Any_uint32_Except(0);
+    chan->stat.counters.recv.files_started        = Any_uint32_Except(0);
 
     chan->stat.counters.sent.file_data_bytes      = Any_uint64_Except(0);
     chan->stat.counters.sent.nak_segment_requests = Any_uint32_Except(0);
     chan->stat.counters.sent.pdu                  = Any_uint32_Except(0);
+    chan->stat.counters.sent.files_sent           = Any_uint32_Except(0);
+    chan->stat.counters.sent.files_started        = Any_uint32_Except(0);
 
     /* Act */
     CF_ResetCountersCmd(&utbuf);
@@ -387,15 +399,15 @@ void Test_CF_ResetCountersCmd_tests_WhenCommandByteIs_all_AndResetAllMemValuesSe
     UtAssert_ZERO(CF_AppData.counters.err);
     UtAssert_MemCmpValue(&chan->stat.counters.fault,
                          0,
-                         sizeof(&chan->stat.counters.fault),
+                         sizeof(chan->stat.counters.fault),
                          "fault channel was completely cleared to 0");
     UtAssert_MemCmpValue(&chan->stat.counters.recv,
                          0,
-                         sizeof(&chan->stat.counters.recv),
+                         sizeof(chan->stat.counters.recv),
                          "recv channel was completely cleared to 0");
     UtAssert_MemCmpValue(&chan->stat.counters.sent,
                          0,
-                         sizeof(&chan->stat.counters.sent),
+                         sizeof(chan->stat.counters.sent),
                          "sent channel was completely cleared to 0");
 }
 

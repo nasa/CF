@@ -1011,6 +1011,7 @@ CF_RxSubState_t CF_CFDP_R_CheckState_FINACK(CF_Transaction_t *txn)
 void CF_CFDP_R_CheckState(CF_Transaction_t *txn)
 {
     CF_RxSubState_t next_state = txn->state_data.sub_state;
+    CF_Channel_t   *chan       = CF_GetChannelFromTxn(txn);
 
     /* State transitions are done here */
     switch (txn->state_data.sub_state)
@@ -1074,6 +1075,11 @@ void CF_CFDP_R_CheckState(CF_Transaction_t *txn)
                 txn->flags.rx.send_fin       = true;
                 break;
             case CF_RxSubState_COMPLETE:
+                /* only a transaction that reached this point without error received a complete file */
+                if (CF_CFDP_TxnIsOK(txn))
+                {
+                    ++chan->stat.counters.recv.files_recv;
+                }
                 /* This changes the txn state such that this function is no longer called. */
                 CF_CFDP_FinishTransaction(txn, true);
                 break;

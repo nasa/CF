@@ -932,6 +932,7 @@ void Test_CF_CFDP_TxFile(void)
     UtAssert_STRINGBUF_EQ(dest, -1, history->fnames.dst_filename, sizeof(history->fnames.dst_filename));
     UtAssert_STRINGBUF_EQ(src, -1, history->fnames.src_filename, sizeof(history->fnames.src_filename));
     UtAssert_UINT32_EQ(chan->stat.num_cmd_tx, 1);
+    UtAssert_UINT32_EQ(chan->stat.counters.sent.files_started, 1);
     UT_CF_AssertEventID(CF_CFDP_S_START_SEND_INF_EID);
 
     /* same but for class 2 (for branch coverage) */
@@ -943,6 +944,7 @@ void Test_CF_CFDP_TxFile(void)
     UtAssert_STRINGBUF_EQ(dest, -1, history->fnames.dst_filename, sizeof(history->fnames.dst_filename));
     UtAssert_STRINGBUF_EQ(src, -1, history->fnames.src_filename, sizeof(history->fnames.src_filename));
     UtAssert_UINT32_EQ(chan->stat.num_cmd_tx, 2);
+    UtAssert_UINT32_EQ(chan->stat.counters.sent.files_started, 2);
     UT_CF_AssertEventID(CF_CFDP_S_START_SEND_INF_EID);
 
     /* max TX */
@@ -950,6 +952,8 @@ void Test_CF_CFDP_TxFile(void)
     chan->stat.num_cmd_tx = CF_MAX_COMMANDED_PLAYBACK_FILES_PER_CHAN;
     UtAssert_INT32_EQ(CF_CFDP_TxFile(src, dest, CF_CFDP_Class_1, 1, UT_CFDP_CHANNEL_PTR, 0, 1), -1);
     UT_CF_AssertEventID(CF_CFDP_MAX_CMD_TX_ERR_EID);
+    /* rejected before initiation, so the count must remain at the 2 from the prior cases */
+    UtAssert_UINT32_EQ(chan->stat.counters.sent.files_started, 2);
 }
 
 void Test_CF_CFDP_StartRxTransaction(void)
@@ -1254,6 +1258,8 @@ void Test_CF_CFDP_ProcessPlaybackDirectory(void)
     UtAssert_STRINGBUF_EQ(history->fnames.dst_filename, sizeof(history->fnames.dst_filename), "/ut", -1);
     UtAssert_STRINGBUF_EQ(pb.pending_file, sizeof(pb.pending_file), "", -1);
     UT_CF_AssertEventID(CF_CFDP_S_START_SEND_INF_EID);
+    /* playback-initiated transfers count as started, same as commanded ones */
+    UtAssert_UINT32_EQ(chan->stat.counters.sent.files_started, 1);
 }
 
 static int32
@@ -1742,6 +1748,8 @@ void Test_CF_CFDP_SetupRxTransaction(void)
     UtAssert_VOIDCALL(CF_CFDP_SetupRxTransaction(&txn, &ph));
     UtAssert_NULL(txn.chunks);
     UtAssert_UINT32_EQ(txn.state, CF_TxnState_HOLD);
+    /* a transaction that immediately goes to holdover was still initialized for reception */
+    UtAssert_UINT32_EQ(chan->stat.counters.recv.files_started, 1);
 
     memset(&txn, 0, sizeof(txn));
     memset(&hist, 0, sizeof(hist));
@@ -1754,6 +1762,7 @@ void Test_CF_CFDP_SetupRxTransaction(void)
     UtAssert_VOIDCALL(CF_CFDP_SetupRxTransaction(&txn, &ph));
     UtAssert_UINT32_EQ(txn.state, CF_TxnState_R1);
     UtAssert_STUB_COUNT(CF_CFDP_R_Init, 1);
+    UtAssert_UINT32_EQ(chan->stat.counters.recv.files_started, 2);
 
     memset(&txn, 0, sizeof(txn));
     memset(&hist, 0, sizeof(hist));
@@ -1766,6 +1775,7 @@ void Test_CF_CFDP_SetupRxTransaction(void)
     UtAssert_VOIDCALL(CF_CFDP_SetupRxTransaction(&txn, &ph));
     UtAssert_UINT32_EQ(txn.state, CF_TxnState_R2);
     UtAssert_STUB_COUNT(CF_CFDP_R_Init, 2);
+    UtAssert_UINT32_EQ(chan->stat.counters.recv.files_started, 3);
 }
 
 void Test_CF_CFDP_ReceivePdu(void)

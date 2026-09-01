@@ -1072,12 +1072,27 @@ void Test_CF_CFDP_S_CheckState_FILESTORE(void)
      * void CF_CFDP_S_CheckState(CF_Transaction_t *txn)
      */
     CF_Transaction_t *txn;
+    CF_Channel_t     *chan;
 
-    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_NONE, NULL, NULL, NULL, &txn, NULL);
+    /* nominal, transaction reached the end without error */
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, &txn, NULL);
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_TxnIsOK), true);
     txn->state_data.sub_state = CF_TxSubState_FILESTORE;
     UtAssert_VOIDCALL(CF_CFDP_S_CheckState(txn));
     UtAssert_UINT8_EQ(txn->state_data.sub_state, CF_TxSubState_COMPLETE);
     UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1);
+    UtAssert_UINT32_EQ(chan->stat.counters.sent.files_sent, 1);
+
+    /* transaction reached the end in an error state, so no file was successfully sent */
+    UT_ResetState(0);
+    UT_CFDP_S_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, &txn, NULL);
+    UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_TxnIsOK), false);
+    txn->state_data.sub_state = CF_TxSubState_FILESTORE;
+    UtAssert_VOIDCALL(CF_CFDP_S_CheckState(txn));
+    UtAssert_UINT8_EQ(txn->state_data.sub_state, CF_TxSubState_COMPLETE);
+    UtAssert_STUB_COUNT(CF_CFDP_FinishTransaction, 1);
+    /* the error case must not count, so the total remains at the 1 from the prior case */
+    UtAssert_UINT32_EQ(chan->stat.counters.sent.files_sent, 1);
 }
 
 void Test_CF_CFDP_S_CheckState_COMPLETE(void)
