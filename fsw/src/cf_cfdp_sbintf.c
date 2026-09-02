@@ -186,7 +186,7 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *chan)
 {
     uint32                  count = 0;
     int32                   status;
-    const int               chan_num = CF_ChannelSelect_AsInt(CF_GetChannelFromPtr(chan)); /* for perf log */
+    const int               chan_idx = CF_ChannelSelect_AsIndex(CF_GetChannelFromPtr(chan)); /* for perf log */
     CFE_SB_Buffer_t        *bufptr;
     CFE_MSG_Size_t          msg_size;
     CFE_MSG_Type_t          msg_type;
@@ -205,7 +205,7 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *chan)
         }
 
         ph = &engine_ptr->in.rx_pdudata;
-        CFE_ES_PerfLogEntry(CF_PERF_ID_PDURCVD(chan_num));
+        CFE_ES_PerfLogEntry(CF_PERF_ID_PDURCVD(chan_idx));
         CFE_MSG_GetSize(&bufptr->Msg, &msg_size);
         CFE_MSG_GetType(&bufptr->Msg, &msg_type);
         if (msg_size > CF_PDU_ENCAPSULATION_EXTRA_TRAILING_BYTES)
@@ -230,6 +230,6 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *chan)
         /* Identify and dispatch this PDU */
         CF_CFDP_ReceivePdu(chan, ph);
 
-        CFE_ES_PerfLogExit(CF_PERF_ID_PDURCVD(chan_num));
+        CFE_ES_PerfLogExit(CF_PERF_ID_PDURCVD(chan_idx));
     }
 }

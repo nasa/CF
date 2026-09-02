@@ -50,8 +50,8 @@ CF_AppData_t CF_AppData;
 static int32 CF_DoChannelConfig(CF_Engine_t *engine_ptr, CF_Channel_t *chan, void *arg)
 {
     const CF_ConfigTable_t   *config      = arg;
-    const int                 chan_num    = CF_ChannelSelect_AsInt(CF_GetChannelFromPtr(chan));
-    const CF_ChannelConfig_t *chan_config = &config->chan[chan_num];
+    const int                 chan_idx    = CF_ChannelSelect_AsIndex(CF_GetChannelFromPtr(chan));
+    const CF_ChannelConfig_t *chan_config = &config->chan[chan_idx];
     const CF_PollDir_t       *tbl_pd_config;
     CF_LocalPdConfig_t       *pd_config;
     int                       pd;

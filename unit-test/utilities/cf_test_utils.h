@@ -45,9 +45,10 @@
 #define RANDOM_VALUES_SEED 0
 #endif /* !RANDOM_VALUES_SEED */
 
-#define UT_CFDP_CHANNEL_IDX 0
-#define UT_CFDP_CHANNEL     CF_ChannelSelect_FromInt(UT_CFDP_CHANNEL_IDX)
-#define UT_CFDP_CHANNEL_PTR CF_GetChannelPtr(UT_CFDP_CHANNEL)
+#define UT_CFDP_CHANNEL_IDX     1
+#define UT_CFDP_CHANNEL         CF_ChannelSelect_FromInt(UT_CFDP_CHANNEL_IDX)
+#define UT_CFDP_CHANNEL_PTR     CF_GetChannelPtr(UT_CFDP_CHANNEL)
+#define UT_CFDP_INVALID_CHANNEL CF_ChannelSelect_FromInt(CF_NUM_CHANNELS + 1)
 
 typedef enum
 {
@@ -86,21 +87,6 @@ typedef struct
     uint8           priority;
     CF_EntityId_t   dest_id;
 } CF_CFDP_PlaybackDir_context_t;
-
-typedef struct
-{
-    CF_Channel_t       *chan;
-    CF_TransactionSeq_t transaction_sequence_number;
-    CF_EntityId_t       src_eid;
-    CF_Transaction_t   *forced_return;
-} CF_FindTransactionBySequenceNumber_context_t;
-
-typedef struct
-{
-    CF_TraverseAllTransactions_fn_t fn;
-    void                           *context;
-    int                             forced_return;
-} CF_TraverseAllTransactions_All_Channels_context_t;
 
 typedef struct
 {
