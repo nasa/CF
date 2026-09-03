@@ -39,4 +39,14 @@ void UT_AltHandler_GenericPointerReturn(void *UserObj, UT_EntryKey_t FuncKey, co
 
 void UT_AltHandler_CaptureTransactionStatus(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context);
 
+void UT_AltHandler_CF_TraverseAllTransactions_InvokeCb(void                   *UserObj,
+                                                       UT_EntryKey_t           FuncKey,
+                                                       const UT_StubContext_t *Context);
+
+void UT_AltHandler_CF_FindTransactionBySequenceNumber(void                   *UserObj,
+                                                      UT_EntryKey_t           FuncKey,
+                                                      const UT_StubContext_t *Context);
+
+void UT_AltHandler_CF_CList_Traverse_InvokeCb(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context);
+
 #endif /* CF_TEST_ALT_HANDLER_H */

@@ -34,8 +34,16 @@
 
 /* Define type mappings for CF-specific types */
 
-#define CF_QueueIdx_NUM       (1 + EdsDataType_EdsEnum_CF_QueueIdx_t_MAX)
-#define CF_GetSet_ValueID_MAX (1 + EdsDataType_EdsEnum_CF_GetSet_ValueID_t_MAX)
+/* Define additional enum mappings based on EDS defines */
+/* This is done as an enum so these values have to be fixed integers */
+enum
+{
+    CF_QueueSelect_MAX    = (1 + EdsDataType_EdsEnum_CF_QueueSelect_t_MAX),
+    CF_DirectionType_MAX  = (1 + EdsDataType_EdsEnum_CF_DirectionType_t_MAX),
+    CF_QueueIdx_NUM       = (1 + EdsDataType_EdsEnum_CF_QueueIdx_t_MAX),
+    CF_GetSet_ValueID_MAX = (1 + EdsDataType_EdsEnum_CF_GetSet_ValueID_t_MAX),
+    CF_Reset_MAX          = (1 + EdsDataType_EdsEnum_CF_Reset_t_MAX),
+};
 
 typedef EdsDataType_CF_EntityId_t       CF_EntityId_t;
 typedef EdsDataType_CF_TransactionSeq_t CF_TransactionSeq_t;

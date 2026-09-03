@@ -48,7 +48,7 @@ typedef struct CF_PollDir
     char src_dir[CF_FILENAME_MAX_PATH]; /**< \brief path to source dir */
     char dst_dir[CF_FILENAME_MAX_PATH]; /**< \brief path to destination dir */
 
-    uint8 enabled; /**< \brief Enabled flag */
+    CF_EnableFlag_Enum_t enabled; /**< \brief Enabled flag */
 } CF_PollDir_t;
 
 /**
@@ -73,9 +73,9 @@ typedef struct CF_ChannelConfig
 
     CF_PollDir_t polldir[CF_MAX_POLLING_DIR_PER_CHAN]; /**< \brief Configuration for polled directories */
 
-    char  sem_name[OS_MAX_API_NAME]; /**< \brief name of throttling semaphore in TO */
-    uint8 dequeue_enabled;           /**< \brief if 1, then the channel will make pending transactions active */
-    char  move_dir[OS_MAX_PATH_LEN]; /**< \brief Move directory if not empty */
+    char                 sem_name[OS_MAX_API_NAME]; /**< \brief name of throttling semaphore in TO */
+    CF_EnableFlag_Enum_t dequeue_enabled; /**< \brief if 1, then the channel will make pending transactions active */
+    char                 move_dir[OS_MAX_PATH_LEN]; /**< \brief Move directory if not empty */
 } CF_ChannelConfig_t;
 
 /*
