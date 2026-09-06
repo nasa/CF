@@ -163,6 +163,30 @@ void Test_CF_Chunk_CreateAddReset(void)
     UtAssert_UINT32_EQ(clist.count, 3);
 }
 
+/* Cover add of an empty range, which covers no data and must not be stored */
+void Test_CF_Chunk_AddEmpty(void)
+{
+    CF_ChunkList_t clist;
+    CF_Chunk_t     chunks[3];
+
+    CF_ChunkListInit(&clist, sizeof(chunks) / sizeof(chunks[0]), chunks);
+
+    /* Empty range on an empty list */
+    UtAssert_VOIDCALL(CF_ChunkListAdd(&clist, 100, 0));
+    UtAssert_UINT32_EQ(clist.count, 0);
+
+    /* Empty range between two tracked chunks leaves the list and the gaps alone */
+    CF_ChunkListAdd(&clist, 0, 10);
+    CF_ChunkListAdd(&clist, 100, 10);
+    UtAssert_VOIDCALL(CF_ChunkListAdd(&clist, 50, 0));
+    UtAssert_UINT32_EQ(clist.chunks[0].offset, 0);
+    UtAssert_UINT32_EQ(clist.chunks[0].size, 10);
+    UtAssert_UINT32_EQ(clist.chunks[1].offset, 100);
+    UtAssert_UINT32_EQ(clist.chunks[1].size, 10);
+    UtAssert_UINT32_EQ(clist.count, 2);
+    UtAssert_UINT32_EQ(CF_ChunkList_ComputeGaps(&clist, TEST_CF_MAX_GAPS, 200, 0, NULL, NULL), 2);
+}
+
 /* Cover combination cases */
 void Test_CF_Chunk_Combine(void)
 {
@@ -360,6 +384,7 @@ void UtTest_Setup(void)
 {
     /* Full coverage with just this section of tests */
     TEST_CF_ADD(Test_CF_Chunk_CreateAddReset);
+    TEST_CF_ADD(Test_CF_Chunk_AddEmpty);
     TEST_CF_ADD(Test_CF_Chunk_Combine);
     TEST_CF_ADD(Test_CF_Chunk_GetRmFirst);
     TEST_CF_ADD(Test_CF_Chunk_ComputeGaps);
