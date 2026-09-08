@@ -62,9 +62,9 @@ void CF_CFDP_ReceiveMessage(CF_Channel_t *chan)
  * Generated stub function for CF_CFDP_Send()
  * ----------------------------------------------------
  */
-void CF_CFDP_Send(CF_Channel_t *chan_ptr, const CF_Logical_PduBuffer_t *ph)
+void CF_CFDP_Send(CF_Channel_t *chan, const CF_Logical_PduBuffer_t *ph)
 {
-    UT_GenStub_AddParam(CF_CFDP_Send, CF_Channel_t *, chan_ptr);
+    UT_GenStub_AddParam(CF_CFDP_Send, CF_Channel_t *, chan);
     UT_GenStub_AddParam(CF_CFDP_Send, const CF_Logical_PduBuffer_t *, ph);
 
     UT_GenStub_Execute(CF_CFDP_Send, Basic, NULL);

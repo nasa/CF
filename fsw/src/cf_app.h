@@ -165,43 +165,7 @@ static inline bool CF_IsValidClass(CF_CFDP_Class_Enum_t cv)
  */
 static inline bool CF_IsValidChannel(CF_ChannelSelect_t cs)
 {
-    return (cs < CF_NUM_CHANNELS);
-}
-
-/************************************************************************/
-/**
- * @brief Checks if a channel identifier represents "all channels"
- *
- * @par Description
- *      checks if the given channel number matches the special all channels value
- *
- * @par Assumptions, External Events, and Notes:
- *      This only checks if it matches all channels.
- *
- * @retval true if value is valid/acceptable
- * @retval false if value is invalid
- */
-static inline bool CF_IsAllChannels(CF_ChannelSelect_t cs)
-{
-    return (cs == CF_ALL_CHANNELS);
-}
-
-/************************************************************************/
-/**
- * @brief Checks if a channel identifier represents "all channels"
- *
- * @par Description
- *      checks if the given channel number matches the special all channels value
- *
- * @par Assumptions, External Events, and Notes:
- *      This only checks if it matches all channels.
- *
- * @retval true if value is valid/acceptable
- * @retval false if value is invalid
- */
-static inline bool CF_IsCompoundKey(CF_ChannelSelect_t cs)
-{
-    return (cs == CF_COMPOUND_KEY);
+    return (cs > 0 && cs <= CF_NUM_CHANNELS);
 }
 
 /************************************************************************/
@@ -224,6 +188,24 @@ static inline int CF_ChannelSelect_AsInt(CF_ChannelSelect_t cs)
 
 /************************************************************************/
 /**
+ * @brief Gets the channel number as an array index (0-based)
+ *
+ * @par Description
+ *      For use when indexing the channel number in a another array such
+ *      as configuration tables or performance logs, requiriing a 0-based index.
+ *
+ * @par Assumptions, External Events, and Notes:
+ *      Format log messages with printf "%d" conversion
+ *
+ * @returns channel number represented as "int" type
+ */
+static inline int CF_ChannelSelect_AsIndex(CF_ChannelSelect_t cs)
+{
+    return CF_ChannelSelect_AsInt(cs) - 1;
+}
+
+/************************************************************************/
+/**
  * @brief Gets the channel number from integer
  *
  * @par Description
@@ -238,7 +220,25 @@ static inline int CF_ChannelSelect_AsInt(CF_ChannelSelect_t cs)
  */
 static inline CF_ChannelSelect_t CF_ChannelSelect_FromInt(int c)
 {
-    return (c);
+    return (CF_ChannelSelect_t) { c };
+}
+
+/************************************************************************/
+/**
+ * @brief Checks if a channel identifier represents "all channels"
+ *
+ * @par Description
+ *      checks if the given channel number matches the special all channels value
+ *
+ * @par Assumptions, External Events, and Notes:
+ *      This only checks if it matches all channels.
+ *
+ * @retval true if value is valid/acceptable
+ * @retval false if value is invalid
+ */
+static inline bool CF_IsAllChannels(CF_ChannelSelect_t cs)
+{
+    return (cs == CF_ALL_CHANNELS);
 }
 
 /************************************************************************/
@@ -258,7 +258,8 @@ static inline CF_Channel_t *CF_GetChannelPtr(CF_ChannelSelect_t cs)
 {
     if (CF_IsValidChannel(cs))
     {
-        return &CF_GetEngine()->channels[cs];
+        /* the channel value from user interface should be 1-based */
+        return &CF_GetEngine()->channels[CF_ChannelSelect_AsIndex(cs)];
     }
     else
     {
@@ -281,7 +282,8 @@ static inline CF_Channel_t *CF_GetChannelPtr(CF_ChannelSelect_t cs)
 static inline CF_ChannelSelect_t CF_GetChannelFromPtr(const CF_Channel_t *ChanPtr)
 {
     CF_Engine_t *engine_ptr = CF_GetEngine();
-    return (CF_ChannelSelect_t) { (ChanPtr - engine_ptr->channels) };
+    /* the channel value to user interface should be 1-based */
+    return (CF_ChannelSelect_t) { 1 + (ChanPtr - engine_ptr->channels) };
 }
 
 /************************************************************************/

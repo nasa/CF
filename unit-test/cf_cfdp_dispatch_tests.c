@@ -44,7 +44,7 @@ static void UT_CFDP_Dispatch_SetupBasicTestState(UT_CF_Setup_t            setup,
     static CF_Transaction_t       ut_transaction;
 
     CF_Engine_t  *engine_ptr      = CF_GetEngine();
-    CF_Channel_t *local_channel_p = &engine_ptr->channels[UT_CFDP_CHANNEL_IDX];
+    CF_Channel_t *local_channel_p = UT_CFDP_CHANNEL_PTR;
 
     /*
      * always clear all objects, regardless of what was asked for.

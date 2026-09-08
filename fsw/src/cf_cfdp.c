@@ -1257,7 +1257,7 @@ static int32 CF_CFDP_DoEngineChannelInit(CF_Engine_t *engine_ptr, CF_Channel_t *
     CF_CListNode_t      **list_head;
     int                   j;
     int                   k;
-    const int             chan_num = CF_ChannelSelect_AsInt(CF_GetChannelFromPtr(chan));
+    const int             chan_idx = CF_ChannelSelect_AsIndex(CF_GetChannelFromPtr(chan));
     char                  nbuf[64];
     CFE_Status_t          ret = CFE_SUCCESS;
 
@@ -1273,7 +1273,7 @@ static int32 CF_CFDP_DoEngineChannelInit(CF_Engine_t *engine_ptr, CF_Channel_t *
     chan->sem_id      = OS_OBJECT_ID_UNDEFINED;
     chan->tick_resume = NULL;
 
-    snprintf(nbuf, sizeof(nbuf) - 1, "%s%d", CF_CHANNEL_PIPE_PREFIX, chan_num);
+    snprintf(nbuf, sizeof(nbuf) - 1, "%s%d", CF_CHANNEL_PIPE_PREFIX, chan_idx);
     ret = CFE_SB_CreatePipe(&chan->pipe, chan->config.pipe_depth_input, nbuf);
     if (ret != CFE_SUCCESS)
     {
@@ -1342,9 +1342,9 @@ static int32 CF_CFDP_DoEngineChannelInit(CF_Engine_t *engine_ptr, CF_Channel_t *
             list_head = CF_GetChunkListHead(chan, k);
 
             CF_ChunkListInit(&state->cw->chunks,
-                             CF_DIR_MAX_CHUNKS[k][chan_num],
+                             CF_DIR_MAX_CHUNKS[k][chan_idx],
                              &engine_ptr->chunk_mem[state->chunk_mem_offset]);
-            state->chunk_mem_offset += CF_DIR_MAX_CHUNKS[k][chan_num];
+            state->chunk_mem_offset += CF_DIR_MAX_CHUNKS[k][chan_idx];
             CF_CList_InitNode(&state->cw->cl_node);
             CF_CList_InsertBack(list_head, &state->cw->cl_node);
 
@@ -1417,7 +1417,7 @@ CFE_Status_t CF_CFDP_InitEngine(CF_Engine_t *engine_ptr)
 static void CF_CFDP_S_Tick_SendFileData(CF_Transaction_t *txn)
 {
     CF_Channel_t *chan     = CF_GetChannelFromTxn(txn);
-    const int     chan_num = CF_ChannelSelect_AsInt(CF_GetChannelFromPtr(chan)); /* for perf log */
+    const int     chan_idx = CF_ChannelSelect_AsIndex(CF_GetChannelFromPtr(chan)); /* for perf log */
     uint32        last_outgoing_counter;
 
     CF_Assert(chan);
@@ -1441,9 +1441,9 @@ static void CF_CFDP_S_Tick_SendFileData(CF_Transaction_t *txn)
     {
         last_outgoing_counter = chan->stat.outgoing_counter;
 
-        CFE_ES_PerfLogEntry(CF_PERF_ID_PDUSENT(chan_num));
+        CFE_ES_PerfLogEntry(CF_PERF_ID_PDUSENT(chan_idx));
         CF_CFDP_S_SubstateSendFileData(txn);
-        CFE_ES_PerfLogExit(CF_PERF_ID_PDUSENT(chan_num));
+        CFE_ES_PerfLogExit(CF_PERF_ID_PDUSENT(chan_idx));
 
     } while (last_outgoing_counter != chan->stat.outgoing_counter);
 }
@@ -2297,7 +2297,7 @@ void CF_CFDP_SendEotPkt(CF_Transaction_t *txn)
 
         CFE_MSG_Init(CFE_MSG_PTR(EotPktPtr->TelemetryHeader), CFE_SB_ValueToMsgId(CF_EOT_TLM_MID), sizeof(*EotPktPtr));
 
-        EotPktPtr->Payload.channel    = CF_GetChannelFromPtr(CF_GetChannelFromTxn(txn));
+        EotPktPtr->Payload.channel    = CF_ChannelSelect_AsInt(CF_GetChannelFromPtr(CF_GetChannelFromTxn(txn)));
         EotPktPtr->Payload.direction  = txn->history->dir;
         EotPktPtr->Payload.fnames     = txn->history->fnames;
         EotPktPtr->Payload.state      = txn->state;
