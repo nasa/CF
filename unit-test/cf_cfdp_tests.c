@@ -1920,9 +1920,33 @@ void Test_CF_CFDP_GetMoveTarget(void)
      */
     char FileNameBuf[6];
 
+    /* No destination capacity must not return an uninitialized string. */
+    memset(FileNameBuf, 'X', sizeof(FileNameBuf));
+    UtAssert_NULL(CF_CFDP_GetMoveTarget("d", "ut", FileNameBuf, 0));
+    UtAssert_True(memcmp(FileNameBuf, "XXXXXX", sizeof(FileNameBuf)) == 0, "Zero-capacity output remains untouched");
+
     /* nominal, no dest dir */
     UtAssert_NULL(CF_CFDP_GetMoveTarget(NULL, "ut", FileNameBuf, sizeof(FileNameBuf)));
     UtAssert_NULL(CF_CFDP_GetMoveTarget("", "ut", FileNameBuf, sizeof(FileNameBuf)));
+
+    /* Missing storage is invalid regardless of its reported capacity. */
+    UtAssert_NULL(CF_CFDP_GetMoveTarget("d", "ut", NULL, 0));
+    UtAssert_NULL(CF_CFDP_GetMoveTarget("d", "ut", NULL, sizeof(FileNameBuf)));
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
+
+    /* One byte holds the terminator, and must not touch the following bytes. */
+    UtAssert_True(CF_CFDP_GetMoveTarget("d", "ut", FileNameBuf, 1) == FileNameBuf,
+                  "One-byte destination returns the supplied buffer");
+    UtAssert_ZERO(FileNameBuf[0]);
+    UtAssert_True(memcmp(FileNameBuf + 1, "XXXXX", sizeof(FileNameBuf) - 1) == 0, "Only the available byte is written");
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
+
+    /* An exact fit preserves the complete path and the following byte. */
+    UtAssert_True(CF_CFDP_GetMoveTarget("d", "ut", FileNameBuf, 5) == FileNameBuf,
+                  "Exact-fit destination returns the supplied buffer");
+    UtAssert_STRINGBUF_EQ(FileNameBuf, 5, "d/ut", -1);
+    UtAssert_INT32_EQ(FileNameBuf[5], 'X');
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 
     /* nominal with dest dir */
     UtAssert_NOT_NULL(CF_CFDP_GetMoveTarget("d", "ut", FileNameBuf, sizeof(FileNameBuf)));
