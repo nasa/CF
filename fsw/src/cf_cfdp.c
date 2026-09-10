@@ -2459,6 +2459,12 @@ const char *CF_CFDP_GetMoveTarget(const char *dest_dir, const char *subject_file
     const char *filename;
     int         dest_path_len;
 
+    /* A returned destination must have space for its string terminator. */
+    if (dest_buf == NULL || dest_size == 0)
+    {
+        return NULL;
+    }
+
     result = NULL;
     if (dest_dir != NULL && dest_dir[0] != 0)
     {
