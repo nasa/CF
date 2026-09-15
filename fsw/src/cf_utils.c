@@ -480,42 +480,6 @@ int32 CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransactions_
 
 /*----------------------------------------------------------------
  *
- * Local helper function
- * Invokes CF_TraverseAllTransactions() for a single channel within the CFDP engine
- * Compatible with CF_ForEachChannel()
- *
- *-----------------------------------------------------------------*/
-static int32 CF_DoTraverseAllTransactions(CF_Engine_t *engine_ptr, CF_Channel_t *chan, void *arg)
-{
-    CF_TraverseAllTransactions_State_t *state = arg;
-
-    state->ret += CF_TraverseAllTransactions(chan, state->fn, state->context);
-
-    return CFE_SUCCESS;
-}
-
-/*----------------------------------------------------------------
- *
- * Application-scope internal function
- * See description in cf_utils.h for argument/return detail
- *
- *-----------------------------------------------------------------*/
-int32 CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context)
-{
-    CF_TraverseAllTransactions_State_t state;
-
-    memset(&state, 0, sizeof(state));
-
-    state.fn      = fn;
-    state.context = context;
-
-    CF_ForEachChannel(CF_GetEngine(), CF_DoTraverseAllTransactions, &state);
-
-    return state.ret;
-}
-
-/*----------------------------------------------------------------
- *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
  *
@@ -607,6 +571,12 @@ CFE_Status_t CF_WrappedLseek(osal_id_t fd, off_t offset, int mode)
  *
  * Application-scope internal function
  * See description in cf_utils.h for argument/return detail
+ *
+ * NOTE: this function ranks high on the cyclic complexity scale
+ * simply due to its use of a switch/case statement with a fairly
+ * high number of cases. But there are only 3 distinct actions
+ * in the switch, but the scoring is based on the number of cases,
+ * not the number of different actions.
  *
  *-----------------------------------------------------------------*/
 CF_CFDP_ConditionCode_t CF_TxnStatus_To_ConditionCode(CF_TxnStatus_t txn_stat)

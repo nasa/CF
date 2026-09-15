@@ -35,7 +35,7 @@
 
 #define CF_CCVAL(x) CF_FunctionCode_##x
 
-enum CF_FunctionCode_
+enum CF_FunctionCode
 {
     CF_FunctionCode_NOOP                = 0,
     CF_FunctionCode_RESET_COUNTERS      = 1,

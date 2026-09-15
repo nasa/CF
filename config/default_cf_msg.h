@@ -37,8 +37,7 @@
 #include "cf_msgdefs.h"
 #include "cf_msgstruct.h"
 
-#define CF_COMPOUND_KEY (254)
-#define CF_ALL_CHANNELS (255)
-#define CF_ALL_POLLDIRS (CF_ALL_CHANNELS)
+#define CF_ALL_CHANNELS CF_ChannelSelect_FromInt(0)
+#define CF_ALL_POLLDIRS (0)
 
 #endif

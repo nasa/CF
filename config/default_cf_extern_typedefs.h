@@ -53,6 +53,14 @@ enum CF_CFDP_Class
 typedef uint8 CF_CFDP_Class_Enum_t;
 
 /**
+ * @brief A simple boolean for enable/disable switches
+ *
+ * This is fixed as an 8-bit unsigned value in commands
+ * and telemetry where 0=false/off and 1=true/on
+ */
+typedef uint8 CF_EnableFlag_Enum_t;
+
+/**
  * @brief CF queue identifiers
  */
 typedef enum

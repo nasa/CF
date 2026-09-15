@@ -38,10 +38,11 @@
  */
 typedef enum CF_Type
 {
-    CF_Type_all  = 0, /**< \brief Type all */
-    CF_Type_up   = 1, /**< \brief Type up */
-    CF_Type_down = 2  /**< \brief Type down */
-} CF_Type_t;
+    CF_DirectionType_all  = 0, /**< \brief Unspecified - Select all types */
+    CF_DirectionType_up   = 1, /**< \brief Type up */
+    CF_DirectionType_down = 2, /**< \brief Type down */
+    CF_DirectionType_MAX  = 3  /**< \brief Limit - All valid values are less than this */
+} CF_DirectionType_t;
 
 /**
  * @brief External type to use for CFDP queue type
@@ -49,7 +50,7 @@ typedef enum CF_Type
  * This uses the labels defined in enum CF_Type
  * but maps to a fixed-width type for use in CMD/TLM/Tables
  */
-typedef uint8 CF_Type_Enum_t;
+typedef uint8 CF_DirectionType_Enum_t;
 
 /**
  * @brief Standardized type used for channel selection in commands
@@ -72,10 +73,11 @@ typedef uint8 CF_PollIdxSelect_t;
  */
 enum CF_QueueSelect
 {
-    CF_QueueSelect_Pending = 0, /**< \brief Pending Queue */
-    CF_QueueSelect_Active  = 1, /**< \brief Active Queue */
-    CF_QueueSelect_History = 2, /**< \brief History Queue */
-    CF_QueueSelect_All     = 3, /**< \brief All queues */
+    CF_QueueSelect_All     = 0, /**< \brief Unspecified - Select all queues */
+    CF_QueueSelect_Pending = 1, /**< \brief Pending Queue */
+    CF_QueueSelect_Active  = 2, /**< \brief Active Queue */
+    CF_QueueSelect_History = 3, /**< \brief History Queue */
+    CF_QueueSelect_MAX     = 4  /**< \brief Limit - All valid values are less than this */
 };
 
 /**
@@ -166,12 +168,12 @@ typedef struct CF_HkCounters
  */
 typedef struct CF_HkChannel_Data
 {
-    CF_HkCounters_t counters;                /**< \brief Counters */
-    uint16          q_size[CF_QueueIdx_NUM]; /**< \brief Queue sizes */
-    uint8           poll_counter;            /**< \brief Number of active polling directories */
-    uint8           playback_counter;        /**< \brief Number of active playback directories */
-    uint8           frozen;                  /**< \brief Frozen state: 0 == not frozen, else frozen */
-    uint8           spare;                   /**< \brief Alignment spare (uint64 values in the counters) */
+    CF_HkCounters_t      counters;                /**< \brief Counters */
+    uint16               q_size[CF_QueueIdx_NUM]; /**< \brief Queue sizes */
+    uint8                poll_counter;            /**< \brief Number of active polling directories */
+    uint8                playback_counter;        /**< \brief Number of active playback directories */
+    CF_EnableFlag_Enum_t frozen;                  /**< \brief Frozen state: 0 == not frozen, else frozen */
+    uint8                spare;                   /**< \brief Alignment spare (uint64 values in the counters) */
 } CF_HkChannel_Data_t;
 
 /**
@@ -218,7 +220,8 @@ enum CF_Reset
     CF_Reset_command = 1, /**< \brief Reset command */
     CF_Reset_fault   = 2, /**< \brief Reset fault */
     CF_Reset_up      = 3, /**< \brief Reset up */
-    CF_Reset_down    = 4  /**< \brief Reset down */
+    CF_Reset_down    = 4, /**< \brief Reset down */
+    CF_Reset_MAX     = 5  /**< \brief Limit - All valid values are less than this */
 };
 
 /**
@@ -243,8 +246,8 @@ typedef struct CF_ResetCountersCmd_Payload
  * \brief Single byte channel selector payload
  *
  * Used in all commands needing only a channel selection
- *       - 255 = all channels
- *       - else = single channel
+ *       - 0 = unspecified/all channels
+ *       - else = single channel, 1-based
  */
 typedef struct CF_ChannelSelect_Payload
 {
@@ -257,12 +260,12 @@ typedef struct CF_ChannelSelect_Payload
  * Used in all commands needing a polldir selection
  *
  * Single byte channel selector
- *       - 255 = all channels
- *       - else = single channel
+ *       - 0 = unspecified/all channels
+ *       - else = single channel, 1-based
  *
  * Single byte polling directory index
- *       - 255 = all polling directories
- *       - else = single polling directory index
+ *       - 0 = unspecified/all polling directories
+ *       - else = single polling directory index, 1-based
  */
 typedef struct CF_PollDirSelect_Payload
 {
@@ -281,9 +284,10 @@ typedef struct CF_PollDirSelect_Payload
  *
  *       Single byte queue selection enum
  *       Values indicated by #CF_QueueSelect enum
- *       - 0 = Pending queue
- *       - 1 = History queue
- *       - 2 = Both pending and history queue
+ *       - 0 = Unspecified/all valid queues
+ *       - 1 = Pending queue
+ *       - 2 = Active queue (if applicable; not valid for all commands)
+ *       - 3 = History queue
  */
 typedef struct CF_QueueSelect_Payload
 {
@@ -299,17 +303,17 @@ typedef struct CF_QueueSelect_Payload
  */
 enum CF_GetSet_ValueID
 {
-    CF_GetSet_ValueID_ticks_per_second,                      /**< \brief Ticks per second key */
-    CF_GetSet_ValueID_rx_crc_calc_bytes_per_wakeup,          /**< \brief Receive CRC calculated bytes per wake-up key */
-    CF_GetSet_ValueID_ack_timer_s,                           /**< \brief ACK timer in seconds key */
-    CF_GetSet_ValueID_nak_timer_s,                           /**< \brief NAK timer in seconds key */
-    CF_GetSet_ValueID_inactivity_timer_s,                    /**< \brief Inactivity timer in seconds key */
-    CF_GetSet_ValueID_outgoing_file_chunk_size,              /**< \brief Outgoing file chunk size key */
-    CF_GetSet_ValueID_ack_limit,                             /**< \brief ACK retry limit key */
-    CF_GetSet_ValueID_nak_limit,                             /**< \brief NAK retry limit key */
-    CF_GetSet_ValueID_local_eid,                             /**< \brief Local entity id key */
-    CF_GetSet_ValueID_chan_max_outgoing_messages_per_wakeup, /**< \brief Max outgoing messages per wake-up key */
-    CF_GetSet_ValueID_MAX                                    /**< \brief Key limit used for validity check */
+    CF_GetSet_ValueID_ticks_per_second             = 1, /**< \brief Ticks per second key */
+    CF_GetSet_ValueID_rx_crc_calc_bytes_per_wakeup = 2, /**< \brief Receive CRC calculated bytes per wake-up key */
+    CF_GetSet_ValueID_ack_timer_s                  = 3, /**< \brief ACK timer in seconds key */
+    CF_GetSet_ValueID_nak_timer_s                  = 4, /**< \brief NAK timer in seconds key */
+    CF_GetSet_ValueID_inactivity_timer_s           = 5, /**< \brief Inactivity timer in seconds key */
+    CF_GetSet_ValueID_outgoing_file_chunk_size     = 6, /**< \brief Outgoing file chunk size key */
+    CF_GetSet_ValueID_ack_limit                    = 7, /**< \brief ACK retry limit key */
+    CF_GetSet_ValueID_nak_limit                    = 8, /**< \brief NAK retry limit key */
+    CF_GetSet_ValueID_local_eid                    = 9, /**< \brief Local entity id key */
+    CF_GetSet_ValueID_chan_max_outgoing_messages_per_wakeup = 10, /**< \brief Max outgoing messages per wake-up key */
+    CF_GetSet_ValueID_MAX                                   = 11  /**< \brief Key limit used for validity check */
 };
 
 /**
@@ -352,7 +356,7 @@ typedef struct CF_SetParam_Payload
 typedef struct CF_TxFile_Payload
 {
     CF_CFDP_Class_Enum_t cfdp_class;                        /**< \brief CFDP class: 0=class 1, 1=class 2 */
-    uint8                keep;                              /**< \brief Keep file flag: 1=keep, else delete */
+    CF_EnableFlag_Enum_t keep;                              /**< \brief Keep file flag: 1=keep, else delete */
     CF_ChannelSelect_t   chan_num;                          /**< \brief Channel number */
     uint8                priority;                          /**< \brief Priority: 0=highest priority */
     CF_EntityId_t        dest_id;                           /**< \brief Destination entity id */
@@ -367,10 +371,10 @@ typedef struct CF_TxFile_Payload
  */
 typedef struct CF_WriteQueue_Payload
 {
-    CF_Type_Enum_t        type;  /**< \brief Transaction direction: all=0, up=1, down=2 */
-    CF_ChannelSelect_t    chan;  /**< \brief Channel number */
-    CF_QueueSelect_Enum_t queue; /**< \brief Queue type: 0=pending, 1=active, 2=history, 3=all */
-    uint8                 spare; /**< \brief Alignment spare, puts filename on 32-bit boundary */
+    CF_DirectionType_Enum_t dir_type; /**< \brief Transaction direction: all=0, up=1, down=2 */
+    CF_ChannelSelect_t      chan_num; /**< \brief Channel number */
+    CF_QueueSelect_Enum_t   queue;    /**< \brief Queue type */
+    uint8                   spare;    /**< \brief Alignment spare, puts filename on 32-bit boundary */
 
     char filename[CF_FILENAME_MAX_LEN]; /**< \brief Filename written to */
 } CF_WriteQueue_Payload_t;
@@ -384,8 +388,10 @@ typedef struct CF_Transaction_Payload
 {
     CF_TransactionSeq_t ts;       /**< \brief Transaction sequence number */
     CF_EntityId_t       eid;      /**< \brief Entity id */
-    CF_ChannelSelect_t  chan_num; /**< \brief Channel number: 254=use ts, 255=all channels, else channel */
-    uint8               spare[3]; /**< \brief Alignment spare for 32-bit multiple */
+    CF_ChannelSelect_t  chan_num; /**< \brief Channel number: 0=all channels, else 1-based channel */
+    CF_EnableFlag_Enum_t
+          use_ts_eid; /**< \brief If true, apply to transactions matching ts+eid, else all transactions */
+    uint8 spare[2];   /**< \brief Alignment spare for 32-bit multiple */
 } CF_Transaction_Payload_t;
 
 /**\}*/

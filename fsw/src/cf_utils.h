@@ -343,19 +343,6 @@ void CF_InsertSortPrio(CF_Transaction_t *txn, CF_QueueIdx_t queue);
 int32 CF_TraverseAllTransactions(CF_Channel_t *chan, CF_TraverseAllTransactions_fn_t fn, void *context);
 
 /************************************************************************/
-/** @brief Traverses all transactions on all channels and performs an operation on them.
- *
- * @par Assumptions, External Events, and Notes:
- *       fn must be a valid function. context must not be NULL.
- *
- * @param fn      Callback to invoke for all traversed transactions
- * @param context Opaque object to pass to all callbacks
- *
- * @returns Number of transactions traversed
- */
-int32 CF_TraverseAllTransactions_All_Channels(CF_TraverseAllTransactions_fn_t fn, void *context);
-
-/************************************************************************/
 /** @brief List traversal function performs operation on every active transaction.
  *
  * @par Description

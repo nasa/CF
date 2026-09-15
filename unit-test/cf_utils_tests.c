@@ -985,27 +985,6 @@ void Test_CF_TraverseAllTransactions_CallOtherFunction_CF_Q_RX_TimesAndReturn_ar
 
 /*******************************************************************************
 **
-**  CF_TraverseAllTransactions_All_Channels tests
-**
-*******************************************************************************/
-
-void Test_CF_TraverseAllTransactions_All_Channels_ReturnTotalTraversals(void)
-{
-    /* Arrange */
-    int   context;
-    void *arg_context       = &context;
-    uint8 per_channel_count = CF_QueueIdx_RX - CF_QueueIdx_PEND + 1;
-    int   expected_result   = per_channel_count * CF_NUM_CHANNELS;
-
-    CF_TraverseAllTransactions_fn_t arg_fn = NULL;
-    UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_TRAVERSE_ALL_ARGS_T, NULL);
-
-    /* Act */
-    UtAssert_INT32_EQ(CF_TraverseAllTransactions_All_Channels(arg_fn, arg_context), expected_result);
-}
-
-/*******************************************************************************
-**
 **  CF_WrappedOpen tests
 **
 *******************************************************************************/
@@ -1374,14 +1353,6 @@ void add_CF_TraverseAllTransactions_tests(void)
                "Test_CF_TraverseAllTransactions_CallOtherFunction_CF_Q_RX_TimesAndReturn_args_counter");
 }
 
-void add_CF_TraverseAllTransactions_All_Channels_tests(void)
-{
-    UtTest_Add(Test_CF_TraverseAllTransactions_All_Channels_ReturnTotalTraversals,
-               cf_utils_tests_Setup,
-               cf_utils_tests_Teardown,
-               "Test_CF_TraverseAllTransactions_All_Channels_ReturnTotalTraversals");
-}
-
 void add_CF_WrappedOpen_tests(void)
 {
     UtTest_Add(Test_CF_WrappedOpen_Call_OS_OpenCreate_WithGivenArgumentsAndReturnItsReturnValue,
@@ -1453,8 +1424,6 @@ void UtTest_Setup(void)
     add_CF_TraverseAllTransactions_Impl_tests();
 
     add_CF_TraverseAllTransactions_tests();
-
-    add_CF_TraverseAllTransactions_All_Channels_tests();
 
     add_CF_WrappedOpen_tests();
 

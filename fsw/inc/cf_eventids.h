@@ -1170,16 +1170,10 @@
  */
 #define CF_CMD_TRANS_NOT_FOUND_ERR_EID 131
 
-/**
- * \brief CF Command All Transaction Channel Invalid Event ID
- *
- *  \par Type: ERROR
- *
- *  \par Cause:
- *
- *  Command received to act on all transactions with invalid channel
+/*
+ * Note: CF_CMD_TSN_CHAN_INVALID_ERR_EID (132) removed, now uses
+ * common handling and sends CF_CMD_CHAN_PARAM_ERR_EID
  */
-#define CF_CMD_TSN_CHAN_INVALID_ERR_EID 132
 
 /**
  * \brief CF Suspend/Resume Command For Single Transaction State Unchanged Event ID
@@ -1225,16 +1219,10 @@
  */
 #define CF_CMD_PURGE_ARG_ERR_EID 136
 
-/**
- * \brief CF Write Queue Command Invalid Channel Event ID
- *
- *  \par Type: ERROR
- *
- *  \par Cause:
- *
- *  Write Queue command received with invalid channel argument
+/*
+ * Note: CF_CMD_WQ_CHAN_ERR_EID (137) removed, now uses
+ * common handling and sends CF_CMD_CHAN_PARAM_ERR_EID
  */
-#define CF_CMD_WQ_CHAN_ERR_EID 137
 
 /**
  * \brief CF Write Queue Command Invalid Queue Event ID
@@ -1335,16 +1323,10 @@
  */
 #define CF_CMD_GETSET_PARAM_ERR_EID 146
 
-/**
- * \brief CF Set/Get Parameter Command Invalid Channel Event ID
- *
- *  \par Type: ERROR
- *
- *  \par Cause:
- *
- *  Invalid channel value received in set or get parameter command
+/*
+ * Note: CF_CMD_GETSET_CHAN_ERR_EID (147) removed, now uses
+ * common handling and sends CF_CMD_CHAN_PARAM_ERR_EID
  */
-#define CF_CMD_GETSET_CHAN_ERR_EID 147
 
 /**
  * \brief CF Enable Engine Command Failed Event ID

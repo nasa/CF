@@ -255,7 +255,7 @@
  *       This command may fail for the following reason(s):
  *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
  *       - Transaction not found using compound key, #CF_CMD_TRANS_NOT_FOUND_ERR_EID
- *       - Invalid channel number, #CF_CMD_TSN_CHAN_INVALID_ERR_EID
+ *       - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
  *       - No matching transaction, #CF_CMD_SUSPRES_CHAN_ERR_EID
  *
  *  \par Evidence of failure may be found in the following telemetry:
@@ -291,7 +291,7 @@
  *       This command may fail for the following reason(s):
  *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
  *       - Transaction not found using compound key, #CF_CMD_TRANS_NOT_FOUND_ERR_EID
- *       - Invalid channel number, #CF_CMD_TSN_CHAN_INVALID_ERR_EID
+ *       - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
  *       - No matching transaction, #CF_CMD_SUSPRES_CHAN_ERR_EID
  *
  *  \par Evidence of failure may be found in the following telemetry:
@@ -325,7 +325,7 @@
  *       This command may fail for the following reason(s):
  *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
  *       - Transaction not found using compound key, #CF_CMD_TRANS_NOT_FOUND_ERR_EID
- *       - Invalid channel number, #CF_CMD_TSN_CHAN_INVALID_ERR_EID
+ *       - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
  *       - No matching transaction, #CF_CMD_CANCEL_CHAN_ERR_EID
  *
  *  \par Evidence of failure may be found in the following telemetry:
@@ -359,7 +359,7 @@
  *       This command may fail for the following reason(s):
  *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
  *       - Transaction not found using compound key, #CF_CMD_TRANS_NOT_FOUND_ERR_EID
- *       - Invalid channel number, #CF_CMD_TSN_CHAN_INVALID_ERR_EID
+ *       - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
  *       - No matching transaction, #CF_CMD_ABANDON_CHAN_ERR_EID
  *
  *  \par Evidence of failure may be found in the following telemetry:
@@ -391,7 +391,7 @@
  *       This command may fail for the following reason(s):
  *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
  *       - Invalid configuration parameter key, #CF_CMD_GETSET_PARAM_ERR_EID
- *       - Invalid channel number, #CF_CMD_GETSET_CHAN_ERR_EID
+ *       - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
  *       - Parameter value failed validation, #CF_CMD_GETSET_VALIDATE_ERR_EID
  *
  *  \par Evidence of failure may be found in the following telemetry:
@@ -423,7 +423,7 @@
  *       This command may fail for the following reason(s):
  *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
  *       - Invalid configuration parameter key, #CF_CMD_GETSET_PARAM_ERR_EID
- *       - Invalid channel number, #CF_CMD_GETSET_CHAN_ERR_EID
+ *       - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
  *
  *  \par Evidence of failure may be found in the following telemetry:
  *       - #CF_HkPacket_Payload_t.counters #CF_HkCmdCounters_t.err will increment
@@ -454,7 +454,7 @@
  *       This command may fail for the following reason(s):
  *       - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
  *       - Invalid parameter combination, #CF_CMD_WQ_ARGS_ERR_EID
- *       - Invalid channel number, #CF_CMD_WQ_CHAN_ERR_EID
+ *       - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
  *       - Open file to write failed, #CF_CMD_WQ_OPEN_ERR_EID
  *       - Write RX data failed, #CF_CMD_WQ_WRITEQ_RX_ERR_EID
  *       - Write RX history data failed, #CF_CMD_WQ_WRITEHIST_RX_ERR_EID
