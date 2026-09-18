@@ -34,10 +34,7 @@
 # All "stubs" files in here should be auto-generated using UtAssert generate_stubs.pl tool
 # From the top-level directory of CF these can be regenerated with a command like:
 #   ../../osal/ut_assert/scripts/generate_stubs.pl ./unit-test/stubs fsw/src/*.h
-add_cfe_coverage_stubs(cf_internal
-  utilities/cf_test_utils.c
-  utilities/cf_test_alt_handler.c
-
+set(CF_UT_STUB_SRC_LIST
   stubs/cf_app_global.c
   stubs/cf_app_stubs.c
   stubs/cf_cfdp_handlers.c
@@ -61,6 +58,18 @@ add_cfe_coverage_stubs(cf_internal
   stubs/cf_utils_stubs.c
 )
 
+# cmd compatibility shim only enabled in non-EDS build
+if (NOT CFE_EDS_ENABLED)
+  list(APPEND CF_UT_STUB_SRC_LIST stubs/cf_cmd_compat_stubs.c)
+endif()
+
+add_cfe_coverage_stubs(cf_internal
+  utilities/cf_test_utils.c
+  utilities/cf_test_alt_handler.c
+  ${CF_UT_STUB_SRC_LIST}
+)
+
+
 target_link_libraries(coverage-cf_internal-stubs ut_core_api_stubs ut_assert)
 target_include_directories(coverage-cf_internal-stubs PUBLIC utilities)
 target_include_directories(coverage-cf_internal-stubs PUBLIC ../fsw/inc)
@@ -75,17 +84,20 @@ foreach(SRCFILE ${APP_SRC_FILES})
     # extension, this will be used as the base name of the unit test file.
     get_filename_component(UNIT_NAME "${SRCFILE}" NAME_WE)
 
-    # Use the module name to make the tests' name by adding _tests to the end
-    set(TESTS_NAME "${UNIT_NAME}_tests")
+    # Skip UT for compatibility shims.  These are deprecated.
+    if (NOT UNIT_NAME MATCHES "compat$")
+      # Use the module name to make the tests' name by adding _tests to the end
+      set(TESTS_NAME "${UNIT_NAME}_tests")
 
-    # Get the tests' sourcefile name with unit test path and extension
-    set(TESTS_SOURCE_FILE "${PROJECT_SOURCE_DIR}/unit-test/${TESTS_NAME}.c")
+      # Get the tests' sourcefile name with unit test path and extension
+      set(TESTS_SOURCE_FILE "${PROJECT_SOURCE_DIR}/unit-test/${TESTS_NAME}.c")
 
-    # Create the coverage test executable
-    # Note: This renders a target named "coverage-cf-${UNIT_NAME}-testrunner"
-    add_cfe_coverage_test(cf "${UNIT_NAME}" "${TESTS_SOURCE_FILE}" "${CFS_CF_SOURCE_DIR}/${SRCFILE}")
+      # Create the coverage test executable
+      # Note: This renders a target named "coverage-cf-${UNIT_NAME}-testrunner"
+      add_cfe_coverage_test(cf "${UNIT_NAME}" "${TESTS_SOURCE_FILE}" "${CFS_CF_SOURCE_DIR}/${SRCFILE}")
 
-    # CF test cases should be linked with stubs for other internal CF units
-    add_cfe_coverage_dependency(cf "${UNIT_NAME}" cf_internal)
+      # CF test cases should be linked with stubs for other internal CF units
+      add_cfe_coverage_dependency(cf "${UNIT_NAME}" cf_internal)
+    endif()
 
 endforeach()
