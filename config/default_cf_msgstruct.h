@@ -108,6 +108,17 @@ typedef struct CF_ResetCountersCmd
 } CF_ResetCountersCmd_t;
 
 /**
+ * \brief Reset command structure
+ *
+ * For command details see #CF_RESET_CC
+ */
+typedef struct CF_ResetCountersCompatCmd
+{
+    CFE_MSG_CommandHeader_t      CommandHeader; /**< \brief Command header */
+    CF_UnionArgs_CompatPayload_t Payload;       /**< \brief Generic command arguments */
+} CF_ResetCountersCompatCmd_t;
+
+/**
  * \brief Freeze command structure
  *
  * For command details see #CF_FREEZE_CC
@@ -117,6 +128,17 @@ typedef struct CF_FreezeCmd
     CFE_MSG_CommandHeader_t    CommandHeader; /**< \brief Command header */
     CF_ChannelSelect_Payload_t Payload;       /**< \brief Command arguments */
 } CF_FreezeCmd_t;
+
+/**
+ * \brief Freeze command structure
+ *
+ * For command details see #CF_FREEZE_CC
+ */
+typedef struct CF_FreezeCompatCmd
+{
+    CFE_MSG_CommandHeader_t      CommandHeader; /**< \brief Command header */
+    CF_UnionArgs_CompatPayload_t Payload;       /**< \brief Generic command arguments */
+} CF_FreezeCompatCmd_t;
 
 /**
  * \brief Thaw command structure
@@ -130,6 +152,17 @@ typedef struct CF_ThawCmd
 } CF_ThawCmd_t;
 
 /**
+ * \brief Thaw command structure
+ *
+ * For command details see #CF_THAW_CC
+ */
+typedef struct CF_ThawCompatCmd
+{
+    CFE_MSG_CommandHeader_t      CommandHeader; /**< \brief Command header */
+    CF_UnionArgs_CompatPayload_t Payload;       /**< \brief Generic command arguments */
+} CF_ThawCompatCmd_t;
+
+/**
  * \brief EnableDequeue command structure
  *
  * For command details see #CF_ENABLE_DEQUEUE_CC
@@ -139,6 +172,17 @@ typedef struct CF_EnableDequeueCmd
     CFE_MSG_CommandHeader_t    CommandHeader; /**< \brief Command header */
     CF_ChannelSelect_Payload_t Payload;       /**< \brief Command arguments */
 } CF_EnableDequeueCmd_t;
+
+/**
+ * \brief EnableDequeue command structure
+ *
+ * For command details see #CF_ENABLE_DEQUEUE_CC
+ */
+typedef struct CF_EnableDequeueCompatCmd
+{
+    CFE_MSG_CommandHeader_t      CommandHeader; /**< \brief Command header */
+    CF_UnionArgs_CompatPayload_t Payload;       /**< \brief Generic command arguments */
+} CF_EnableDequeueCompatCmd_t;
 
 /**
  * \brief DisableDequeue command structure
@@ -152,6 +196,17 @@ typedef struct CF_DisableDequeueCmd
 } CF_DisableDequeueCmd_t;
 
 /**
+ * \brief DisableDequeue command structure
+ *
+ * For command details see #CF_DISABLE_DEQUEUE_CC
+ */
+typedef struct CF_DisableDequeueCompatCmd
+{
+    CFE_MSG_CommandHeader_t      CommandHeader; /**< \brief Command header */
+    CF_UnionArgs_CompatPayload_t Payload;       /**< \brief Generic command arguments */
+} CF_DisableDequeueCompatCmd_t;
+
+/**
  * \brief EnableDirPolling command structure
  *
  * For command details see #CF_ENABLE_DIR_POLLING_CC
@@ -161,6 +216,17 @@ typedef struct CF_EnableDirPollingCmd
     CFE_MSG_CommandHeader_t    CommandHeader; /**< \brief Command header */
     CF_PollDirSelect_Payload_t Payload;       /**< \brief Command arguments */
 } CF_EnableDirPollingCmd_t;
+
+/**
+ * \brief EnableDirPolling command structure
+ *
+ * For command details see #CF_ENABLE_DIR_POLLING_CC
+ */
+typedef struct CF_EnableDirPollingCompatCmd
+{
+    CFE_MSG_CommandHeader_t      CommandHeader; /**< \brief Command header */
+    CF_UnionArgs_CompatPayload_t Payload;       /**< \brief Generic command arguments */
+} CF_EnableDirPollingCompatCmd_t;
 
 /**
  * \brief DisableDirPolling command structure
@@ -174,6 +240,17 @@ typedef struct CF_DisableDirPollingCmd
 } CF_DisableDirPollingCmd_t;
 
 /**
+ * \brief DisableDirPolling command structure
+ *
+ * For command details see #CF_DISABLE_DIR_POLLING_CC
+ */
+typedef struct CF_DisableDirPollingCompatCmd
+{
+    CFE_MSG_CommandHeader_t      CommandHeader; /**< \brief Command header */
+    CF_UnionArgs_CompatPayload_t Payload;       /**< \brief Generic command arguments */
+} CF_DisableDirPollingCompatCmd_t;
+
+/**
  * \brief PurgeQueue command structure
  *
  * For command details see #CF_PURGE_QUEUE_CC
@@ -183,6 +260,17 @@ typedef struct CF_PurgeQueueCmd
     CFE_MSG_CommandHeader_t  CommandHeader; /**< \brief Command header */
     CF_QueueSelect_Payload_t Payload;       /**< \brief Command arguments */
 } CF_PurgeQueueCmd_t;
+
+/**
+ * \brief PurgeQueue command structure
+ *
+ * For command details see #CF_PURGE_QUEUE_CC
+ */
+typedef struct CF_PurgeQueueCompatCmd
+{
+    CFE_MSG_CommandHeader_t      CommandHeader; /**< \brief Command header */
+    CF_UnionArgs_CompatPayload_t Payload;       /**< \brief Generic command arguments */
+} CF_PurgeQueueCompatCmd_t;
 
 /**
  * \brief Get parameter command structure
@@ -196,6 +284,17 @@ typedef struct CF_GetParamCmd
 } CF_GetParamCmd_t;
 
 /**
+ * \brief Get parameter command structure
+ *
+ * For command details see #CF_GET_PARAM_CC
+ */
+typedef struct CF_GetParamCompatCmd
+{
+    CFE_MSG_CommandHeader_t     CommandHeader; /**< \brief Command header */
+    CF_GetParam_CompatPayload_t Payload;
+} CF_GetParamCompatCmd_t;
+
+/**
  * \brief Set parameter command structure
  *
  * For command details see #CF_SET_PARAM_CC
@@ -205,6 +304,17 @@ typedef struct CF_SetParamCmd
     CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
     CF_SetParam_Payload_t   Payload;
 } CF_SetParamCmd_t;
+
+/**
+ * \brief Set parameter command structure
+ *
+ * For command details see #CF_SET_PARAM_CC
+ */
+typedef struct CF_SetParamCompatCmd
+{
+    CFE_MSG_CommandHeader_t     CommandHeader; /**< \brief Command header */
+    CF_SetParam_CompatPayload_t Payload;
+} CF_SetParamCompatCmd_t;
 
 /**
  * \brief Transmit file command structure
@@ -218,6 +328,17 @@ typedef struct CF_TxFileCmd
 } CF_TxFileCmd_t;
 
 /**
+ * \brief Transmit file command structure
+ *
+ * For command details see #CF_TX_FILE_CC
+ */
+typedef struct CF_TxFileCompatCmd
+{
+    CFE_MSG_CommandHeader_t   CommandHeader; /**< \brief Command header */
+    CF_TxFile_CompatPayload_t Payload;
+} CF_TxFileCompatCmd_t;
+
+/**
  * \brief Write Queue command structure
  *
  * For command details see #CF_WRITE_QUEUE_CC
@@ -227,6 +348,17 @@ typedef struct CF_WriteQueueCmd
     CFE_MSG_CommandHeader_t CommandHeader; /**< \brief Command header */
     CF_WriteQueue_Payload_t Payload;
 } CF_WriteQueueCmd_t;
+
+/**
+ * \brief Write Queue command structure
+ *
+ * For command details see #CF_WRITE_QUEUE_CC
+ */
+typedef struct CF_WriteQueueCompatCmd
+{
+    CFE_MSG_CommandHeader_t       CommandHeader; /**< \brief Command header */
+    CF_WriteQueue_CompatPayload_t Payload;
+} CF_WriteQueueCompatCmd_t;
 
 /**
  * \brief Playback directory command structure
@@ -240,6 +372,17 @@ typedef struct CF_PlaybackDirCmd
 } CF_PlaybackDirCmd_t;
 
 /**
+ * \brief Playback directory command structure
+ *
+ * For command details see #CF_PLAYBACK_DIR_CC
+ */
+typedef struct CF_PlaybackDirCompatCmd
+{
+    CFE_MSG_CommandHeader_t   CommandHeader; /**< \brief Command header */
+    CF_TxFile_CompatPayload_t Payload;
+} CF_PlaybackDirCompatCmd_t;
+
+/**
  * \brief Suspend command structure
  *
  * For command details see #CF_SUSPEND_CC
@@ -249,6 +392,17 @@ typedef struct CF_SuspendCmd
     CFE_MSG_CommandHeader_t  CommandHeader; /**< \brief Command header */
     CF_Transaction_Payload_t Payload;
 } CF_SuspendCmd_t;
+
+/**
+ * \brief Suspend command structure
+ *
+ * For command details see #CF_SUSPEND_CC
+ */
+typedef struct CF_SuspendCompatCmd
+{
+    CFE_MSG_CommandHeader_t        CommandHeader; /**< \brief Command header */
+    CF_Transaction_CompatPayload_t Payload;
+} CF_SuspendCompatCmd_t;
 
 /**
  * \brief Resume command structure
@@ -262,6 +416,17 @@ typedef struct CF_ResumeCmd
 } CF_ResumeCmd_t;
 
 /**
+ * \brief Resume command structure
+ *
+ * For command details see #CF_RESUME_CC
+ */
+typedef struct CF_ResumeCompatCmd
+{
+    CFE_MSG_CommandHeader_t        CommandHeader; /**< \brief Command header */
+    CF_Transaction_CompatPayload_t Payload;
+} CF_ResumeCompatCmd_t;
+
+/**
  * \brief Cancel command structure
  *
  * For command details see #CF_CANCEL_CC
@@ -273,6 +438,17 @@ typedef struct CF_CancelCmd
 } CF_CancelCmd_t;
 
 /**
+ * \brief Cancel command structure
+ *
+ * For command details see #CF_CANCEL_CC
+ */
+typedef struct CF_CancelCompatCmd
+{
+    CFE_MSG_CommandHeader_t        CommandHeader; /**< \brief Command header */
+    CF_Transaction_CompatPayload_t Payload;
+} CF_CancelCompatCmd_t;
+
+/**
  * \brief Abandon command structure
  *
  * For command details see #CF_ABANDON_CC
@@ -282,6 +458,17 @@ typedef struct CF_AbandonCmd
     CFE_MSG_CommandHeader_t  CommandHeader; /**< \brief Command header */
     CF_Transaction_Payload_t Payload;
 } CF_AbandonCmd_t;
+
+/**
+ * \brief Abandon command structure
+ *
+ * For command details see #CF_ABANDON_CC
+ */
+typedef struct CF_AbandonCompatCmd
+{
+    CFE_MSG_CommandHeader_t        CommandHeader; /**< \brief Command header */
+    CF_Transaction_CompatPayload_t Payload;
+} CF_AbandonCompatCmd_t;
 
 /**
  * \brief Send Housekeeping Command

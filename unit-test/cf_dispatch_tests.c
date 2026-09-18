@@ -183,11 +183,10 @@ void Test_CF_ProcessGroundCommand_ReceivesCmdCode_0x0C_AndDoNothingBecause_fns_1
 
     /* Assert */
     UtAssert_STUB_COUNT(CFE_MSG_GetFcnCode, 1);
-    UtAssert_STUB_COUNT(CFE_MSG_GetSize, 1);
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
+    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
     /* Assert for incremented counter */
     UtAssert_UINT32_EQ(CF_AppData.counters.cmd, 0);
-    UtAssert_UINT32_EQ(CF_AppData.counters.err, 0);
+    UtAssert_UINT32_EQ(CF_AppData.counters.err, 1);
 }
 
 /*******************************************************************************
