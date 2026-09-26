@@ -34,16 +34,6 @@
 
 #include "cf_assert.h"
 
-/*
- * Local type to support CF_DoTraverseAllTransactions
- */
-typedef struct
-{
-    CF_TraverseAllTransactions_fn_t fn;
-    void                           *context;
-    int32                           ret;
-} CF_TraverseAllTransactions_State_t;
-
 /*----------------------------------------------------------------
  *
  * Application-scope internal function
