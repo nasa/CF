@@ -33,7 +33,7 @@
 
 #define CF_CMD_COMPAT_COMPOUND_KEY (254)
 #define CF_CMD_COMPAT_ALL_CHANNELS (255)
-#define CF_CMD_COMPAT_ALL_POLLDIRS (CF_ALL_CHANNELS)
+#define CF_CMD_COMPAT_ALL_POLLDIRS (CF_CMD_COMPAT_ALL_CHANNELS)
 
 /*----------------------------------------------------------------
  *
