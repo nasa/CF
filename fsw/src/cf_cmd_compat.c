@@ -43,7 +43,7 @@
  *-----------------------------------------------------------------*/
 static CF_ChannelSelect_t CF_Translate_CompatChannel(uint8 input)
 {
-    if (input == CF_CMD_COMPAT_COMPOUND_KEY || input == CF_CMD_COMPAT_ALL_CHANNELS)
+    if (input == CF_CMD_COMPAT_ALL_CHANNELS)
     {
         return CF_ALL_CHANNELS;
     }
