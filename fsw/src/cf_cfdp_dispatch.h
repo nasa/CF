@@ -53,18 +53,6 @@ typedef void (*CF_CFDP_StateSendFunc_t)(CF_Transaction_t *txn);
 typedef void (*CF_CFDP_StateRecvFunc_t)(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
 
 /**
- * @brief A table of transmit handler functions based on transaction state
- *
- * This reflects the main dispatch table for the transmit side of a transaction.
- * Each possible state has a corresponding function pointer in the table to implement
- * the PDU transmit action(s) associated with that state.
- */
-typedef struct
-{
-    CF_CFDP_StateSendFunc_t tx[CF_TxnState_INVALID]; /**< \brief Transmit handler function */
-} CF_CFDP_TxnSendDispatchTable_t;
-
-/**
  * @brief A table of receive handler functions based on transaction state
  *
  * This reflects the main dispatch table for the receive side of a transaction.

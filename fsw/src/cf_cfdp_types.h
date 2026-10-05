@@ -371,7 +371,7 @@ struct CF_Transaction
 /**
  * @brief Identifies the type of timer tick being processed
  */
-typedef enum
+enum CF_TickState
 {
     CF_TickState_INIT,
     CF_TickState_RX_STATE,
@@ -381,7 +381,7 @@ typedef enum
     CF_TickState_TX_PEND,
     CF_TickState_COMPLETE,
     CF_TickState_NUM_TYPES
-} CF_TickState_t;
+};
 
 /**
  * \brief Configuration entry for directory polling
