@@ -98,7 +98,8 @@
  *  \par Criticality
  *       None
  */
-#define CF_RESET_CC CF_CCVAL(RESET_COUNTERS)
+#define CF_RESET_CC        CF_CCVAL(RESET_COUNTERS)
+#define CF_RESET_COMPAT_CC CF_CCVAL(RESET_COUNTERS_COMPAT)
 
 /**
  * \brief Transmit file
@@ -129,7 +130,8 @@
  *
  *  \sa #CF_PLAYBACK_DIR_CC
  */
-#define CF_TX_FILE_CC CF_CCVAL(TX_FILE)
+#define CF_TX_FILE_CC        CF_CCVAL(TX_FILE)
+#define CF_TX_FILE_COMPAT_CC CF_CCVAL(TX_FILE_COMPAT)
 
 /**
  * \brief Playback a directory
@@ -161,7 +163,8 @@
  *
  *  \sa #CF_TX_FILE_CC
  */
-#define CF_PLAYBACK_DIR_CC CF_CCVAL(PLAYBACK_DIR)
+#define CF_PLAYBACK_DIR_CC        CF_CCVAL(PLAYBACK_DIR)
+#define CF_PLAYBACK_DIR_COMPAT_CC CF_CCVAL(PLAYBACK_DIR_COMPAT)
 
 /**
  * \brief Freeze a channel
@@ -196,7 +199,8 @@
  *
  *  \sa #CF_THAW_CC
  */
-#define CF_FREEZE_CC CF_CCVAL(FREEZE)
+#define CF_FREEZE_CC        CF_CCVAL(FREEZE)
+#define CF_FREEZE_COMPAT_CC CF_CCVAL(FREEZE_COMPAT)
 
 /**
  * \brief Thaw a channel
@@ -230,7 +234,8 @@
  *
  *  \sa #CF_FREEZE_CC
  */
-#define CF_THAW_CC CF_CCVAL(THAW)
+#define CF_THAW_CC        CF_CCVAL(THAW)
+#define CF_THAW_COMPAT_CC CF_CCVAL(THAW_COMPAT)
 
 /**
  * \brief Suspend a transaction
@@ -266,7 +271,8 @@
  *
  *  \sa #CF_RESUME_CC, #CF_CANCEL_CC, #CF_ABANDON_CC
  */
-#define CF_SUSPEND_CC CF_CCVAL(SUSPEND)
+#define CF_SUSPEND_CC        CF_CCVAL(SUSPEND)
+#define CF_SUSPEND_COMPAT_CC CF_CCVAL(SUSPEND_COMPAT)
 
 /**
  * \brief Resume a transaction
@@ -302,7 +308,8 @@
  *
  *  \sa #CF_SUSPEND_CC, #CF_CANCEL_CC, #CF_ABANDON_CC
  */
-#define CF_RESUME_CC CF_CCVAL(RESUME)
+#define CF_RESUME_CC        CF_CCVAL(RESUME)
+#define CF_RESUME_COMPAT_CC CF_CCVAL(RESUME_COMPAT)
 
 /**
  * \brief Cancel a transaction
@@ -336,7 +343,8 @@
  *
  *  \sa #CF_SUSPEND_CC, #CF_RESUME_CC, #CF_ABANDON_CC
  */
-#define CF_CANCEL_CC CF_CCVAL(CANCEL)
+#define CF_CANCEL_CC        CF_CCVAL(CANCEL)
+#define CF_CANCEL_COMPAT_CC CF_CCVAL(CANCEL_COMPAT)
 
 /**
  * \brief Abandon a transaction
@@ -370,7 +378,8 @@
  *
  *  \sa #CF_SUSPEND_CC, #CF_RESUME_CC, #CF_CANCEL_CC
  */
-#define CF_ABANDON_CC CF_CCVAL(ABANDON)
+#define CF_ABANDON_CC        CF_CCVAL(ABANDON)
+#define CF_ABANDON_COMPAT_CC CF_CCVAL(ABANDON_COMPAT)
 
 /**
  * \brief Set parameter
@@ -402,7 +411,8 @@
  *
  *  \sa #CF_GET_PARAM_CC
  */
-#define CF_SET_PARAM_CC CF_CCVAL(SET_PARAM)
+#define CF_SET_PARAM_CC        CF_CCVAL(SET_PARAM)
+#define CF_SET_PARAM_COMPAT_CC CF_CCVAL(SET_PARAM_COMPAT)
 
 /**
  * \brief Get parameter
@@ -433,7 +443,8 @@
  *
  *  \sa #CF_SET_PARAM_CC
  */
-#define CF_GET_PARAM_CC CF_CCVAL(GET_PARAM)
+#define CF_GET_PARAM_CC        CF_CCVAL(GET_PARAM)
+#define CF_GET_PARAM_COMPAT_CC CF_CCVAL(GET_PARAM_COMPAT)
 
 /**
  * \brief Write queue
@@ -469,7 +480,8 @@
  *
  *  \sa #CF_PURGE_QUEUE_CC
  */
-#define CF_WRITE_QUEUE_CC CF_CCVAL(WRITE_QUEUE)
+#define CF_WRITE_QUEUE_CC        CF_CCVAL(WRITE_QUEUE)
+#define CF_WRITE_QUEUE_COMPAT_CC CF_CCVAL(WRITE_QUEUE_COMPAT)
 
 /**
  * \brief Enable dequeue
@@ -502,7 +514,8 @@
  *
  *  \sa #CF_DISABLE_DEQUEUE_CC
  */
-#define CF_ENABLE_DEQUEUE_CC CF_CCVAL(ENABLE_DEQUEUE)
+#define CF_ENABLE_DEQUEUE_CC        CF_CCVAL(ENABLE_DEQUEUE)
+#define CF_ENABLE_DEQUEUE_COMPAT_CC CF_CCVAL(ENABLE_DEQUEUE_COMPAT)
 
 /**
  * \brief Disable dequeue
@@ -535,7 +548,8 @@
  *
  *  \sa #CF_ENABLE_DEQUEUE_CC
  */
-#define CF_DISABLE_DEQUEUE_CC CF_CCVAL(DISABLE_DEQUEUE)
+#define CF_DISABLE_DEQUEUE_CC        CF_CCVAL(DISABLE_DEQUEUE)
+#define CF_DISABLE_DEQUEUE_COMPAT_CC CF_CCVAL(DISABLE_DEQUEUE_COMPAT)
 
 /**
  * \brief Enable directory polling
@@ -574,7 +588,8 @@
  *
  *  \sa #CF_DISABLE_DIR_POLLING_CC
  */
-#define CF_ENABLE_DIR_POLLING_CC CF_CCVAL(ENABLE_DIR_POLLING)
+#define CF_ENABLE_DIR_POLLING_CC        CF_CCVAL(ENABLE_DIR_POLLING)
+#define CF_ENABLE_DIR_POLLING_COMPAT_CC CF_CCVAL(ENABLE_DIR_POLLING_COMPAT)
 
 /**
  * \brief Disable directory polling
@@ -613,7 +628,8 @@
  *
  *  \sa #CF_ENABLE_DIR_POLLING_CC
  */
-#define CF_DISABLE_DIR_POLLING_CC CF_CCVAL(DISABLE_DIR_POLLING)
+#define CF_DISABLE_DIR_POLLING_CC        CF_CCVAL(DISABLE_DIR_POLLING)
+#define CF_DISABLE_DIR_POLLING_COMPAT_CC CF_CCVAL(DISABLE_DIR_POLLING_COMPAT)
 
 /**
  * \brief Purge queue
@@ -653,7 +669,8 @@
  *
  *  \sa #CF_WRITE_QUEUE_CC
  */
-#define CF_PURGE_QUEUE_CC CF_CCVAL(PURGE_QUEUE)
+#define CF_PURGE_QUEUE_CC        CF_CCVAL(PURGE_QUEUE)
+#define CF_PURGE_QUEUE_COMPAT_CC CF_CCVAL(PURGE_QUEUE_COMPAT)
 
 /**
  * \brief Enable engine
@@ -685,7 +702,8 @@
  *
  *  \sa #CF_DISABLE_ENGINE_CC
  */
-#define CF_ENABLE_ENGINE_CC CF_CCVAL(ENABLE_ENGINE)
+#define CF_ENABLE_ENGINE_CC        CF_CCVAL(ENABLE_ENGINE)
+#define CF_ENABLE_ENGINE_COMPAT_CC CF_CCVAL(ENABLE_ENGINE_COMPAT)
 
 /**
  * \brief Disable engine
@@ -717,7 +735,8 @@
  *
  *  \sa #CF_DISABLE_ENGINE_CC
  */
-#define CF_DISABLE_ENGINE_CC CF_CCVAL(DISABLE_ENGINE)
+#define CF_DISABLE_ENGINE_CC        CF_CCVAL(DISABLE_ENGINE)
+#define CF_DISABLE_ENGINE_COMPAT_CC CF_CCVAL(DISABLE_ENGINE_COMPAT)
 
 /** \brief Command code limit used for validity check and array sizing */
 #define CF_NUM_COMMANDS 24

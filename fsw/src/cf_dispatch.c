@@ -29,6 +29,7 @@
 #include "cf_app.h"
 #include "cf_eventids.h"
 #include "cf_cmd.h"
+#include "cf_cmd_compat.h"
 
 #include "cfe.h"
 #include <string.h>
@@ -44,49 +45,83 @@ void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *BufPtr)
     typedef void (*const handler_fn_t)(const void *);
 
     static handler_fn_t fns[] = {
-        [CF_NOOP_CC]                = (handler_fn_t)CF_NoopCmd,
-        [CF_RESET_CC]               = (handler_fn_t)CF_ResetCountersCmd,
-        [CF_TX_FILE_CC]             = (handler_fn_t)CF_TxFileCmd,
-        [CF_PLAYBACK_DIR_CC]        = (handler_fn_t)CF_PlaybackDirCmd,
-        [CF_FREEZE_CC]              = (handler_fn_t)CF_FreezeCmd,
-        [CF_THAW_CC]                = (handler_fn_t)CF_ThawCmd,
-        [CF_SUSPEND_CC]             = (handler_fn_t)CF_SuspendCmd,
-        [CF_RESUME_CC]              = (handler_fn_t)CF_ResumeCmd,
-        [CF_CANCEL_CC]              = (handler_fn_t)CF_CancelCmd,
-        [CF_ABANDON_CC]             = (handler_fn_t)CF_AbandonCmd,
-        [CF_SET_PARAM_CC]           = (handler_fn_t)CF_SetParamCmd,
-        [CF_GET_PARAM_CC]           = (handler_fn_t)CF_GetParamCmd,
-        [CF_WRITE_QUEUE_CC]         = (handler_fn_t)CF_WriteQueueCmd,
-        [CF_ENABLE_DEQUEUE_CC]      = (handler_fn_t)CF_EnableDequeueCmd,
-        [CF_DISABLE_DEQUEUE_CC]     = (handler_fn_t)CF_DisableDequeueCmd,
-        [CF_ENABLE_DIR_POLLING_CC]  = (handler_fn_t)CF_EnableDirPollingCmd,
-        [CF_DISABLE_DIR_POLLING_CC] = (handler_fn_t)CF_DisableDirPollingCmd,
-        [CF_PURGE_QUEUE_CC]         = (handler_fn_t)CF_PurgeQueueCmd,
-        [CF_ENABLE_ENGINE_CC]       = (handler_fn_t)CF_EnableEngineCmd,
-        [CF_DISABLE_ENGINE_CC]      = (handler_fn_t)CF_DisableEngineCmd,
+        [CF_NOOP_CC]                       = (handler_fn_t)CF_NoopCmd,
+        [CF_RESET_COMPAT_CC]               = (handler_fn_t)CF_ResetCountersCompatCmd,
+        [CF_TX_FILE_COMPAT_CC]             = (handler_fn_t)CF_TxFileCompatCmd,
+        [CF_PLAYBACK_DIR_COMPAT_CC]        = (handler_fn_t)CF_PlaybackDirCompatCmd,
+        [CF_FREEZE_COMPAT_CC]              = (handler_fn_t)CF_FreezeCompatCmd,
+        [CF_THAW_COMPAT_CC]                = (handler_fn_t)CF_ThawCompatCmd,
+        [CF_SUSPEND_COMPAT_CC]             = (handler_fn_t)CF_SuspendCompatCmd,
+        [CF_RESUME_COMPAT_CC]              = (handler_fn_t)CF_ResumeCompatCmd,
+        [CF_CANCEL_COMPAT_CC]              = (handler_fn_t)CF_CancelCompatCmd,
+        [CF_ABANDON_COMPAT_CC]             = (handler_fn_t)CF_AbandonCompatCmd,
+        [CF_SET_PARAM_COMPAT_CC]           = (handler_fn_t)CF_SetParamCompatCmd,
+        [CF_GET_PARAM_COMPAT_CC]           = (handler_fn_t)CF_GetParamCompatCmd,
+        [CF_WRITE_QUEUE_COMPAT_CC]         = (handler_fn_t)CF_WriteQueueCompatCmd,
+        [CF_ENABLE_DEQUEUE_COMPAT_CC]      = (handler_fn_t)CF_EnableDequeueCompatCmd,
+        [CF_DISABLE_DEQUEUE_COMPAT_CC]     = (handler_fn_t)CF_DisableDequeueCompatCmd,
+        [CF_ENABLE_DIR_POLLING_COMPAT_CC]  = (handler_fn_t)CF_EnableDirPollingCompatCmd,
+        [CF_DISABLE_DIR_POLLING_COMPAT_CC] = (handler_fn_t)CF_DisableDirPollingCompatCmd,
+        [CF_PURGE_QUEUE_COMPAT_CC]         = (handler_fn_t)CF_PurgeQueueCompatCmd,
+        [CF_ENABLE_ENGINE_CC]              = (handler_fn_t)CF_EnableEngineCmd,
+        [CF_DISABLE_ENGINE_CC]             = (handler_fn_t)CF_DisableEngineCmd,
+        [CF_RESET_CC]                      = (handler_fn_t)CF_ResetCountersCmd,
+        [CF_TX_FILE_CC]                    = (handler_fn_t)CF_TxFileCmd,
+        [CF_PLAYBACK_DIR_CC]               = (handler_fn_t)CF_PlaybackDirCmd,
+        [CF_FREEZE_CC]                     = (handler_fn_t)CF_FreezeCmd,
+        [CF_THAW_CC]                       = (handler_fn_t)CF_ThawCmd,
+        [CF_SUSPEND_CC]                    = (handler_fn_t)CF_SuspendCmd,
+        [CF_RESUME_CC]                     = (handler_fn_t)CF_ResumeCmd,
+        [CF_CANCEL_CC]                     = (handler_fn_t)CF_CancelCmd,
+        [CF_ABANDON_CC]                    = (handler_fn_t)CF_AbandonCmd,
+        [CF_SET_PARAM_CC]                  = (handler_fn_t)CF_SetParamCmd,
+        [CF_GET_PARAM_CC]                  = (handler_fn_t)CF_GetParamCmd,
+        [CF_WRITE_QUEUE_CC]                = (handler_fn_t)CF_WriteQueueCmd,
+        [CF_ENABLE_DEQUEUE_CC]             = (handler_fn_t)CF_EnableDequeueCmd,
+        [CF_DISABLE_DEQUEUE_CC]            = (handler_fn_t)CF_DisableDequeueCmd,
+        [CF_ENABLE_DIR_POLLING_CC]         = (handler_fn_t)CF_EnableDirPollingCmd,
+        [CF_DISABLE_DIR_POLLING_CC]        = (handler_fn_t)CF_DisableDirPollingCmd,
+        [CF_PURGE_QUEUE_CC]                = (handler_fn_t)CF_PurgeQueueCmd,
     };
 
     static const uint16 expected_lengths[] = {
-        [CF_NOOP_CC]                = sizeof(CF_NoopCmd_t),
-        [CF_RESET_CC]               = sizeof(CF_ResetCountersCmd_t),
-        [CF_TX_FILE_CC]             = sizeof(CF_TxFileCmd_t),
-        [CF_PLAYBACK_DIR_CC]        = sizeof(CF_PlaybackDirCmd_t),
-        [CF_FREEZE_CC]              = sizeof(CF_FreezeCmd_t),
-        [CF_THAW_CC]                = sizeof(CF_ThawCmd_t),
-        [CF_SUSPEND_CC]             = sizeof(CF_SuspendCmd_t),
-        [CF_RESUME_CC]              = sizeof(CF_ResumeCmd_t),
-        [CF_CANCEL_CC]              = sizeof(CF_CancelCmd_t),
-        [CF_ABANDON_CC]             = sizeof(CF_AbandonCmd_t),
-        [CF_SET_PARAM_CC]           = sizeof(CF_SetParamCmd_t),
-        [CF_GET_PARAM_CC]           = sizeof(CF_GetParamCmd_t),
-        [CF_WRITE_QUEUE_CC]         = sizeof(CF_WriteQueueCmd_t),
-        [CF_ENABLE_DEQUEUE_CC]      = sizeof(CF_EnableDequeueCmd_t),
-        [CF_DISABLE_DEQUEUE_CC]     = sizeof(CF_DisableDequeueCmd_t),
-        [CF_ENABLE_DIR_POLLING_CC]  = sizeof(CF_EnableDirPollingCmd_t),
-        [CF_DISABLE_DIR_POLLING_CC] = sizeof(CF_DisableDirPollingCmd_t),
-        [CF_PURGE_QUEUE_CC]         = sizeof(CF_PurgeQueueCmd_t),
-        [CF_ENABLE_ENGINE_CC]       = sizeof(CF_EnableEngineCmd_t),
-        [CF_DISABLE_ENGINE_CC]      = sizeof(CF_DisableEngineCmd_t),
+        [CF_NOOP_CC]                       = sizeof(CF_NoopCmd_t),
+        [CF_RESET_COMPAT_CC]               = sizeof(CF_ResetCountersCompatCmd_t),
+        [CF_TX_FILE_COMPAT_CC]             = sizeof(CF_TxFileCompatCmd_t),
+        [CF_PLAYBACK_DIR_COMPAT_CC]        = sizeof(CF_PlaybackDirCompatCmd_t),
+        [CF_FREEZE_COMPAT_CC]              = sizeof(CF_FreezeCompatCmd_t),
+        [CF_THAW_COMPAT_CC]                = sizeof(CF_ThawCompatCmd_t),
+        [CF_SUSPEND_COMPAT_CC]             = sizeof(CF_SuspendCompatCmd_t),
+        [CF_RESUME_COMPAT_CC]              = sizeof(CF_ResumeCompatCmd_t),
+        [CF_CANCEL_COMPAT_CC]              = sizeof(CF_CancelCompatCmd_t),
+        [CF_ABANDON_COMPAT_CC]             = sizeof(CF_AbandonCompatCmd_t),
+        [CF_SET_PARAM_COMPAT_CC]           = sizeof(CF_SetParamCompatCmd_t),
+        [CF_GET_PARAM_COMPAT_CC]           = sizeof(CF_GetParamCompatCmd_t),
+        [CF_WRITE_QUEUE_COMPAT_CC]         = sizeof(CF_WriteQueueCompatCmd_t),
+        [CF_ENABLE_DEQUEUE_COMPAT_CC]      = sizeof(CF_EnableDequeueCompatCmd_t),
+        [CF_DISABLE_DEQUEUE_COMPAT_CC]     = sizeof(CF_DisableDequeueCompatCmd_t),
+        [CF_ENABLE_DIR_POLLING_COMPAT_CC]  = sizeof(CF_EnableDirPollingCompatCmd_t),
+        [CF_DISABLE_DIR_POLLING_COMPAT_CC] = sizeof(CF_DisableDirPollingCompatCmd_t),
+        [CF_PURGE_QUEUE_COMPAT_CC]         = sizeof(CF_PurgeQueueCompatCmd_t),
+        [CF_ENABLE_ENGINE_CC]              = sizeof(CF_EnableEngineCmd_t),
+        [CF_DISABLE_ENGINE_CC]             = sizeof(CF_DisableEngineCmd_t),
+        [CF_RESET_CC]                      = sizeof(CF_ResetCountersCmd_t),
+        [CF_TX_FILE_CC]                    = sizeof(CF_TxFileCmd_t),
+        [CF_PLAYBACK_DIR_CC]               = sizeof(CF_PlaybackDirCmd_t),
+        [CF_FREEZE_CC]                     = sizeof(CF_FreezeCmd_t),
+        [CF_THAW_CC]                       = sizeof(CF_ThawCmd_t),
+        [CF_SUSPEND_CC]                    = sizeof(CF_SuspendCmd_t),
+        [CF_RESUME_CC]                     = sizeof(CF_ResumeCmd_t),
+        [CF_CANCEL_CC]                     = sizeof(CF_CancelCmd_t),
+        [CF_ABANDON_CC]                    = sizeof(CF_AbandonCmd_t),
+        [CF_SET_PARAM_CC]                  = sizeof(CF_SetParamCmd_t),
+        [CF_GET_PARAM_CC]                  = sizeof(CF_GetParamCmd_t),
+        [CF_WRITE_QUEUE_CC]                = sizeof(CF_WriteQueueCmd_t),
+        [CF_ENABLE_DEQUEUE_CC]             = sizeof(CF_EnableDequeueCmd_t),
+        [CF_DISABLE_DEQUEUE_CC]            = sizeof(CF_DisableDequeueCmd_t),
+        [CF_ENABLE_DIR_POLLING_CC]         = sizeof(CF_EnableDirPollingCmd_t),
+        [CF_DISABLE_DIR_POLLING_CC]        = sizeof(CF_DisableDirPollingCmd_t),
+        [CF_PURGE_QUEUE_CC]                = sizeof(CF_PurgeQueueCmd_t),
     };
 
     CFE_MSG_FcnCode_t cmd = 0;
@@ -94,7 +129,7 @@ void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *BufPtr)
 
     CFE_MSG_GetFcnCode(&BufPtr->Msg, &cmd);
 
-    if (cmd < (sizeof(expected_lengths) / sizeof(expected_lengths[0])))
+    if (cmd < (sizeof(expected_lengths) / sizeof(expected_lengths[0])) && fns[cmd] != NULL)
     {
         CFE_MSG_GetSize(&BufPtr->Msg, &len);
 
@@ -102,10 +137,7 @@ void CF_ProcessGroundCommand(const CFE_SB_Buffer_t *BufPtr)
         if (len == expected_lengths[cmd])
         {
             /* if valid, process command */
-            if (fns[cmd])
-            {
-                fns[cmd](BufPtr);
-            }
+            fns[cmd](BufPtr);
         }
         else
         {

@@ -35,28 +35,55 @@
 
 #define CF_CCVAL(x) CF_FunctionCode_##x
 
+/*
+ * For the interim release, the pre-existing function codes will point
+ * to the compatibility shim for CF commands.  This shim will convert the
+ * arguments into the new form and invoke the new command.  The new commands
+ * have the command code shifted up by 30.
+ */
 enum CF_FunctionCode
 {
-    CF_FunctionCode_NOOP                = 0,
-    CF_FunctionCode_RESET_COUNTERS      = 1,
-    CF_FunctionCode_TX_FILE             = 2,
-    CF_FunctionCode_PLAYBACK_DIR        = 3,
-    CF_FunctionCode_FREEZE              = 4,
-    CF_FunctionCode_THAW                = 5,
-    CF_FunctionCode_SUSPEND             = 6,
-    CF_FunctionCode_RESUME              = 7,
-    CF_FunctionCode_CANCEL              = 8,
-    CF_FunctionCode_ABANDON             = 9,
-    CF_FunctionCode_SET_PARAM           = 10,
-    CF_FunctionCode_GET_PARAM           = 11,
-    CF_FunctionCode_WRITE_QUEUE         = 15,
-    CF_FunctionCode_ENABLE_DEQUEUE      = 16,
-    CF_FunctionCode_DISABLE_DEQUEUE     = 17,
-    CF_FunctionCode_ENABLE_DIR_POLLING  = 18,
-    CF_FunctionCode_DISABLE_DIR_POLLING = 19,
-    CF_FunctionCode_PURGE_QUEUE         = 21,
-    CF_FunctionCode_ENABLE_ENGINE       = 22,
-    CF_FunctionCode_DISABLE_ENGINE      = 23,
+    CF_FunctionCode_NOOP                       = 0,
+    CF_FunctionCode_RESET_COUNTERS_COMPAT      = 1,
+    CF_FunctionCode_TX_FILE_COMPAT             = 2,
+    CF_FunctionCode_PLAYBACK_DIR_COMPAT        = 3,
+    CF_FunctionCode_FREEZE_COMPAT              = 4,
+    CF_FunctionCode_THAW_COMPAT                = 5,
+    CF_FunctionCode_SUSPEND_COMPAT             = 6,
+    CF_FunctionCode_RESUME_COMPAT              = 7,
+    CF_FunctionCode_CANCEL_COMPAT              = 8,
+    CF_FunctionCode_ABANDON_COMPAT             = 9,
+    CF_FunctionCode_SET_PARAM_COMPAT           = 10,
+    CF_FunctionCode_GET_PARAM_COMPAT           = 11,
+    CF_FunctionCode_WRITE_QUEUE_COMPAT         = 15,
+    CF_FunctionCode_ENABLE_DEQUEUE_COMPAT      = 16,
+    CF_FunctionCode_DISABLE_DEQUEUE_COMPAT     = 17,
+    CF_FunctionCode_ENABLE_DIR_POLLING_COMPAT  = 18,
+    CF_FunctionCode_DISABLE_DIR_POLLING_COMPAT = 19,
+    CF_FunctionCode_PURGE_QUEUE_COMPAT         = 21,
+
+    /* NOTE: these commands did not change (they have no args) */
+    CF_FunctionCode_ENABLE_ENGINE  = 22,
+    CF_FunctionCode_DISABLE_ENGINE = 23,
+
+    CF_FunctionCode_RESET_COUNTERS      = 31,
+    CF_FunctionCode_TX_FILE             = 32,
+    CF_FunctionCode_PLAYBACK_DIR        = 33,
+    CF_FunctionCode_FREEZE              = 34,
+    CF_FunctionCode_THAW                = 35,
+    CF_FunctionCode_SUSPEND             = 36,
+    CF_FunctionCode_RESUME              = 37,
+    CF_FunctionCode_CANCEL              = 38,
+    CF_FunctionCode_ABANDON             = 39,
+    CF_FunctionCode_SET_PARAM           = 40,
+    CF_FunctionCode_GET_PARAM           = 41,
+    CF_FunctionCode_WRITE_QUEUE         = 45,
+    CF_FunctionCode_ENABLE_DEQUEUE      = 46,
+    CF_FunctionCode_DISABLE_DEQUEUE     = 47,
+    CF_FunctionCode_ENABLE_DIR_POLLING  = 48,
+    CF_FunctionCode_DISABLE_DIR_POLLING = 49,
+    CF_FunctionCode_PURGE_QUEUE         = 51,
+
 };
 
 #endif

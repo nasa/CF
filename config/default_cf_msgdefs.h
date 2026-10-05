@@ -212,6 +212,16 @@ typedef struct CF_EotPacket_Payload
  */
 
 /**
+ * \brief Command payload argument union to support 4 uint8's, 2 uint16's or 1 uint32
+ */
+typedef union CF_UnionArgs_CompatPayload
+{
+    uint32 dword;    /**< \brief Generic uint32 argument */
+    uint16 hword[2]; /**< \brief Generic uint16 array of arguments */
+    uint8  byte[4];  /**< \brief Generic uint8 array of arguments */
+} CF_UnionArgs_CompatPayload_t;
+
+/**
  * \brief Enum labels for use for Reset cmd
  */
 enum CF_Reset
@@ -336,6 +346,17 @@ typedef struct CF_GetParam_Payload
 } CF_GetParam_Payload_t;
 
 /**
+ * \brief Get parameter command structure
+ *
+ * For command details see #CF_GET_PARAM_CC
+ */
+typedef struct CF_GetParam_CompatPayload
+{
+    uint8 key;      /**< \brief Parameter key, see #CF_GetSet_ValueID_t */
+    uint8 chan_num; /**< \brief Channel number */
+} CF_GetParam_CompatPayload_t;
+
+/**
  * \brief Set parameter command structure
  *
  * For command details see #CF_SET_PARAM_CC
@@ -347,6 +368,19 @@ typedef struct CF_SetParam_Payload
     CF_ChannelSelect_t       chan_num; /**< \brief Channel number */
     uint8                    spare[2]; /**< \brief Alignment spare, uint32 multiple */
 } CF_SetParam_Payload_t;
+
+/**
+ * \brief Set parameter command structure
+ *
+ * For command details see #CF_SET_PARAM_CC
+ */
+typedef struct CF_SetParam_CompatPayload
+{
+    uint32 value;    /**< \brief Parameter value to set */
+    uint8  key;      /**< \brief Parameter key, see #CF_GetSet_ValueID_t */
+    uint8  chan_num; /**< \brief Channel number */
+    uint8  spare[2]; /**< \brief Alignment spare, uint32 multiple */
+} CF_SetParam_CompatPayload_t;
 
 /**
  * \brief Transmit file command structure
@@ -365,6 +399,22 @@ typedef struct CF_TxFile_Payload
 } CF_TxFile_Payload_t;
 
 /**
+ * \brief Transmit file command structure
+ *
+ * For command details see #CF_TX_FILE_CC
+ */
+typedef struct CF_TxFile_CompatPayload
+{
+    uint8         cfdp_class;                        /**< \brief CFDP class: 0=class 1, 1=class 2 */
+    uint8         keep;                              /**< \brief Keep file flag: 1=keep, else delete */
+    uint8         chan_num;                          /**< \brief Channel number */
+    uint8         priority;                          /**< \brief Priority: 0=highest priority */
+    CF_EntityId_t dest_id;                           /**< \brief Destination entity id */
+    char          src_filename[CF_FILENAME_MAX_LEN]; /**< \brief Source file/directory name */
+    char          dst_filename[CF_FILENAME_MAX_LEN]; /**< \brief Destination file/directory name */
+} CF_TxFile_CompatPayload_t;
+
+/**
  * \brief Write Queue command structure
  *
  * For command details see #CF_WRITE_QUEUE_CC
@@ -380,6 +430,21 @@ typedef struct CF_WriteQueue_Payload
 } CF_WriteQueue_Payload_t;
 
 /**
+ * \brief Write Queue command structure
+ *
+ * For command details see #CF_WRITE_QUEUE_CC
+ */
+typedef struct CF_WriteQueue_CompatPayload
+{
+    uint8 type;  /**< \brief Transaction direction: all=0, up=1, down=2 */
+    uint8 chan;  /**< \brief Channel number */
+    uint8 queue; /**< \brief Queue type: 0=pending, 1=active, 2=history, 3=all */
+    uint8 spare; /**< \brief Alignment spare, puts filename on 32-bit boundary */
+
+    char filename[CF_FILENAME_MAX_LEN]; /**< \brief Filename written to */
+} CF_WriteQueue_CompatPayload_t;
+
+/**
  * \brief Transaction command structure
  *
  * For command details see #CF_SUSPEND_CC, #CF_RESUME_CC, #CF_CANCEL_CC, #CF_ABANDON_CC
@@ -393,6 +458,19 @@ typedef struct CF_Transaction_Payload
           use_ts_eid; /**< \brief If true, apply to transactions matching ts+eid, else all transactions */
     uint8 spare[2];   /**< \brief Alignment spare for 32-bit multiple */
 } CF_Transaction_Payload_t;
+
+/**
+ * \brief Transaction command structure
+ *
+ * For command details see #CF_SUSPEND_CC, #CF_RESUME_CC, #CF_CANCEL_CC, #CF_ABANDON_CC
+ */
+typedef struct CF_Transaction_CompatPayload
+{
+    CF_TransactionSeq_t ts;       /**< \brief Transaction sequence number */
+    CF_EntityId_t       eid;      /**< \brief Entity id */
+    uint8               chan;     /**< \brief Channel number: 254=use ts, 255=all channels, else channel */
+    uint8               spare[3]; /**< \brief Alignment spare for 32-bit multiple */
+} CF_Transaction_CompatPayload_t;
 
 /**\}*/
 
