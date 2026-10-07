@@ -532,9 +532,6 @@ void Test_CF_CFDP_RecvInit(void)
 
 void Test_CF_CFDP_CopyStringFromLV(void)
 {
-    /* Test case for:
-     * int CF_CFDP_CopyStringFromLV(char *buf, size_t buf_maxsz, const CF_Logical_Lv_t *src_lv)
-     */
     char            buf[20];
     const char      refstr[] = "refstr";
     CF_Logical_Lv_t input;
@@ -542,8 +539,38 @@ void Test_CF_CFDP_CopyStringFromLV(void)
     input.data_ptr = refstr;
     input.length   = sizeof(refstr) - 1;
 
-    /* nominal call */
-    UtAssert_INT32_EQ(CF_CFDP_CopyStringFromLV(buf, sizeof(buf), &input), input.length);
+    /* Nominal case */
+    UtAssert_INT32_EQ(
+        CF_CFDP_CopyStringFromLV(buf, sizeof(buf), &input),
+        input.length);
+
+    /* Buffer too small */
+    UtAssert_INT32_EQ(
+        CF_CFDP_CopyStringFromLV(buf, 3, &input),
+        CF_ERROR);
+
+    /* NULL source LV */
+    UtAssert_INT32_EQ(
+        CF_CFDP_CopyStringFromLV(buf, sizeof(buf), NULL),
+        CF_ERROR);
+
+    /* NULL destination buffer */
+    UtAssert_INT32_EQ(
+        CF_CFDP_CopyStringFromLV(NULL, sizeof(buf), &input),
+        CF_ERROR);
+
+    /* Zero buffer size */
+    UtAssert_INT32_EQ(
+        CF_CFDP_CopyStringFromLV(buf, 0, &input),
+        CF_ERROR);
+
+    /* NULL data pointer */
+    input.data_ptr = NULL;
+    input.length   = 5;
+
+    UtAssert_INT32_EQ(
+        CF_CFDP_CopyStringFromLV(buf, sizeof(buf), &input),
+        CF_ERROR);
 }
 
 void Test_CF_CFDP_ConstructPduHeader(void)
