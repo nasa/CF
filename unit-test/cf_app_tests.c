@@ -69,20 +69,26 @@ void UT_UpdatedDefaultHandler_CFE_SB_ReceiveBuffer(void                   *UserO
 
 void Test_CF_CheckTables_DoNotReleaseAddressBecauseEngineIsEnabled(void)
 {
+    CF_Engine_t *engine_ptr = CF_GetEngine();
+
     /* Arrange */
-    CF_AppData.engine.enabled = true;
+    engine_ptr->enabled = true;
 
     /* Act */
     CF_CheckTables();
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_TBL_ReleaseAddress, 0);
+    UtAssert_STUB_COUNT(CFE_TBL_Manage, 0);
 }
 
 void Test_CF_CheckTables_CallTo_CFE_TBL_ReleaseAddress_ReturnsNot_CFE_SUCCESS_SendEvent(void)
 {
-    void *TablePtr = NULL;
+    CF_ConfigTable_t ut_config;
+    void            *TablePtr = &ut_config;
 
+    memset(&ut_config, 0, sizeof(ut_config));
+
+    UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_Manage), CFE_TBL_INFO_UPDATED);
     UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_ReleaseAddress), CFE_STATUS_EXTERNAL_RESOURCE_FAIL);
 
@@ -90,60 +96,68 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_ReleaseAddress_ReturnsNot_CFE_SUCCESS_Se
     CF_CheckTables();
 
     /* Assert */
+    UtAssert_STUB_COUNT(CFE_TBL_Manage, 1);
+    UtAssert_STUB_COUNT(CFE_TBL_GetAddress, 1);
     UtAssert_STUB_COUNT(CFE_TBL_ReleaseAddress, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
 }
 
 void Test_CF_CheckTables_CallTo_CFE_TBL_Manage_ReturnsNot_CFE_SUCCESS_SendEvent(void)
 {
-    void *TablePtr = NULL;
+    CF_ConfigTable_t ut_config;
+    void            *TablePtr = &ut_config;
 
-    UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
+    memset(&ut_config, 0, sizeof(ut_config));
+
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_Manage), CFE_STATUS_EXTERNAL_RESOURCE_FAIL);
+    UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
 
     /* Act */
     CF_CheckTables();
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_TBL_ReleaseAddress, 1);
+    UtAssert_STUB_COUNT(CFE_TBL_GetAddress, 0);
+    UtAssert_STUB_COUNT(CFE_TBL_ReleaseAddress, 0);
     UtAssert_STUB_COUNT(CFE_TBL_Manage, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
 }
 
 void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_ReturnsNot_CFE_SUCCESS_Or_CFE_TBL_INFO_UPDATED_SendEvent(void)
 {
+    UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_Manage), CFE_TBL_INFO_UPDATED);
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_GetAddress), CFE_STATUS_EXTERNAL_RESOURCE_FAIL);
 
     /* Act */
     CF_CheckTables();
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_TBL_ReleaseAddress, 1);
+    UtAssert_STUB_COUNT(CFE_TBL_ReleaseAddress, 0);
     UtAssert_STUB_COUNT(CFE_TBL_Manage, 1);
     UtAssert_STUB_COUNT(CFE_TBL_GetAddress, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 1);
 }
 
-void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS(void)
+void Test_CF_CheckTables_CallTo_CFE_TBL_Manage_Returns_CFE_SUCCESS(void)
 {
-    void *TablePtr = NULL;
-
-    UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
+    UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_Manage), CFE_SUCCESS);
 
     /* Act */
     CF_CheckTables();
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_TBL_ReleaseAddress, 1);
+    UtAssert_STUB_COUNT(CFE_TBL_ReleaseAddress, 0);
     UtAssert_STUB_COUNT(CFE_TBL_Manage, 1);
-    UtAssert_STUB_COUNT(CFE_TBL_GetAddress, 1);
+    UtAssert_STUB_COUNT(CFE_TBL_GetAddress, 0);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 }
 
-void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED(void)
+void Test_CF_CheckTables_CallTo_CFE_TBL_Manage_Returns_CFE_TBL_INFO_UPDATED(void)
 {
-    void *TablePtr = NULL;
+    CF_ConfigTable_t ut_config;
+    void            *TablePtr = &ut_config;
 
+    memset(&ut_config, 0, sizeof(ut_config));
+    UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_Manage), CFE_TBL_INFO_UPDATED);
     UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
     UT_SetDefaultReturnValue(UT_KEY(CFE_TBL_GetAddress), CFE_TBL_INFO_UPDATED);
 
@@ -154,6 +168,7 @@ void Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED(
     UtAssert_STUB_COUNT(CFE_TBL_ReleaseAddress, 1);
     UtAssert_STUB_COUNT(CFE_TBL_Manage, 1);
     UtAssert_STUB_COUNT(CFE_TBL_GetAddress, 1);
+    UtAssert_STUB_COUNT(CF_ForEachChannel, 1);
     UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
 }
 
@@ -338,7 +353,10 @@ void Test_CF_TableInit_FailBecause_CFE_TBL_GetAddress_DidNotReturnSuccess(void)
 
 void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_SUCCESS_SuccessAndDoNotSendEvent(void)
 {
-    void *TablePtr = NULL;
+    CF_ConfigTable_t ut_config;
+    void            *TablePtr = &ut_config;
+
+    memset(&ut_config, 0, sizeof(ut_config));
 
     UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
 
@@ -351,7 +369,10 @@ void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_SUCCESS_SuccessAndDoN
 
 void Test_CF_TableInit_When_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED_SuccessAndDoNotSendEvent(void)
 {
-    void *TablePtr = NULL;
+    CF_ConfigTable_t ut_config;
+    void            *TablePtr = &ut_config;
+
+    memset(&ut_config, 0, sizeof(ut_config));
 
     UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
     /* Arrange */
@@ -380,7 +401,6 @@ void Test_CF_AppInit_CallTo_CFE_EVS_Register_ReturnsNot_CFE_SUCCESS_Call_CFE_ES_
     UtAssert_INT32_EQ(CF_AppInit(), result);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
     UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
     UtAssert_STUB_COUNT(CFE_ES_WriteToSysLog, 1);
 }
@@ -396,7 +416,6 @@ void Test_CF_AppInit_CallTo_CFE_SB_CreatePipe_ReturnsNot_CFE_SUCCESS_Return_Pipe
     UtAssert_INT32_EQ(CF_AppInit(), result);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
     UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
     UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
     UT_CF_AssertEventID(CF_CR_PIPE_ERR_EID);
@@ -414,7 +433,6 @@ void Test_CF_AppInit_FirstCallTo_CFE_SB_Subscribe_ReturnsNot_CFE_SUCCESS_Call_CF
     UtAssert_INT32_EQ(CF_AppInit(), result);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
     UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
     UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
     UtAssert_STUB_COUNT(CFE_SB_Subscribe, 1);
@@ -435,7 +453,6 @@ void Test_CF_AppInit_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatu
     UtAssert_INT32_EQ(CF_AppInit(), result);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
     UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
     UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
     UtAssert_STUB_COUNT(CFE_SB_Subscribe, 3);
@@ -445,8 +462,11 @@ void Test_CF_AppInit_CallTo_CF_TableInit_ReturnsNot_CFE_SUCCESS_ReturnErrorStatu
 void Test_CF_AppInit_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErrorStatus(void)
 {
     /* Arrange */
-    int32 result   = -1;
-    void *TablePtr = NULL;
+    int32            result = -1;
+    CF_ConfigTable_t ut_config;
+    void            *TablePtr = &ut_config;
+
+    memset(&ut_config, 0, sizeof(ut_config));
 
     UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
     UT_SetDefaultReturnValue(UT_KEY(CF_CFDP_InitEngine), result);
@@ -455,7 +475,6 @@ void Test_CF_AppInit_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErro
     UtAssert_INT32_EQ(CF_AppInit(), result);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
     UtAssert_STUB_COUNT(CFE_EVS_Register, 1);
     UtAssert_STUB_COUNT(CFE_SB_CreatePipe, 1);
     UtAssert_STUB_COUNT(CFE_SB_Subscribe, 3);
@@ -464,7 +483,10 @@ void Test_CF_AppInit_CallTo_CF_CFDP_InitEngine_ReturnsNot_CFE_SUCCESS_ReturnErro
 
 void Test_CF_AppInit_Success(void)
 {
-    void *TablePtr = NULL;
+    CF_ConfigTable_t ut_config;
+    void            *TablePtr = &ut_config;
+
+    memset(&ut_config, 0, sizeof(ut_config));
 
     UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
 
@@ -472,7 +494,7 @@ void Test_CF_AppInit_Success(void)
     UtAssert_INT32_EQ(CF_AppInit(), CFE_SUCCESS);
 
     /* Assert */
-    UtAssert_STUB_COUNT(CFE_MSG_Init, 1);
+    UtAssert_STUB_COUNT(CF_CFDP_InitEngine, 1);
 }
 
 /*******************************************************************************
@@ -503,8 +525,10 @@ void Test_CF_AppMain_CFE_SB_ReceiveBuffer_Cases(void)
 {
     CFE_SB_Buffer_t  sbbuf;
     CFE_SB_Buffer_t *sbbufptr;
-    void            *TablePtr = NULL;
+    CF_ConfigTable_t ut_config;
+    void            *TablePtr = &ut_config;
 
+    memset(&ut_config, 0, sizeof(ut_config));
     memset(&sbbuf, 0, sizeof(sbbuf));
 
     /* Run loop once */
@@ -553,8 +577,11 @@ void Test_CF_AppMain_RunLoopCallTo_CFE_SB_ReceiveBuffer_Returns_CFE_SUCCESS_AndV
     /* Arrange */
     CFE_SB_MsgId_t   forced_MsgID = CFE_SB_INVALID_MSG_ID;
     CFE_SB_Buffer_t  fake_msg;
-    CFE_SB_Buffer_t *BufPtr   = &fake_msg;
-    void            *TablePtr = NULL;
+    CFE_SB_Buffer_t *BufPtr = &fake_msg;
+    CF_ConfigTable_t ut_config;
+    void            *TablePtr = &ut_config;
+
+    memset(&ut_config, 0, sizeof(ut_config));
 
     UT_SetDataBuffer(UT_KEY(CFE_TBL_GetAddress), &TablePtr, sizeof(TablePtr), false);
 
@@ -603,14 +630,14 @@ void add_CF_CheckTables_tests(void)
         Setup_cf_config_table_tests,
         CF_App_Tests_Teardown,
         "Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_ReturnsNot_CFE_SUCCESS_Or_CFE_TBL_INFO_UPDATED_SendEvent");
-    UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS,
+    UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_Manage_Returns_CFE_SUCCESS,
                Setup_cf_config_table_tests,
                CF_App_Tests_Teardown,
-               "Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_SUCCESS");
-    UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED,
+               "Test_CF_CheckTables_CallTo_CFE_TBL_Manage_Returns_CFE_SUCCESS");
+    UtTest_Add(Test_CF_CheckTables_CallTo_CFE_TBL_Manage_Returns_CFE_TBL_INFO_UPDATED,
                Setup_cf_config_table_tests,
                CF_App_Tests_Teardown,
-               "Test_CF_CheckTables_CallTo_CFE_TBL_GetAddress_Returns_CFE_TBL_INFO_UPDATED");
+               "Test_CF_CheckTables_CallTo_CFE_TBL_Manage_Returns_CFE_TBL_INFO_UPDATED");
 }
 
 void add_CF_ValidateConfigTable_tests(void)

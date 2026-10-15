@@ -42,7 +42,8 @@
  *-----------------------------------------------------------------*/
 uint32 CF_Timer_Sec2Ticks(CF_Timer_Seconds_t sec)
 {
-    return sec * CF_AppData.config_table->ticks_per_second;
+    CF_Engine_t *engine_ptr = CF_GetEngine();
+    return sec * engine_ptr->config.ticks_per_second;
 }
 
 /*----------------------------------------------------------------

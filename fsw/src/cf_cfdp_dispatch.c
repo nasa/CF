@@ -44,6 +44,7 @@ void CF_CFDP_R_DispatchRecv(CF_Transaction_t                        *txn,
 {
     CF_CFDP_StateRecvFunc_t              selected_handler;
     CF_Logical_PduFileDirectiveHeader_t *fdh;
+    CF_Channel_t                        *chan = CF_GetChannelFromTxn(txn);
 
     selected_handler = NULL;
 
@@ -60,7 +61,7 @@ void CF_CFDP_R_DispatchRecv(CF_Transaction_t                        *txn,
         }
         else
         {
-            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.spurious;
+            ++chan->stat.counters.recv.spurious;
             CFE_EVS_SendEvent(CF_CFDP_R_DC_INV_ERR_EID,
                               CFE_EVS_EventType_ERROR,
                               "CF R%d(%lu:%lu): received PDU with invalid directive code %d for sub-state %d",
@@ -79,7 +80,7 @@ void CF_CFDP_R_DispatchRecv(CF_Transaction_t                        *txn,
         }
         else
         {
-            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.dropped;
+            ++chan->stat.counters.recv.dropped;
         }
     }
 
@@ -106,6 +107,7 @@ void CF_CFDP_S_DispatchRecv(CF_Transaction_t                            *txn,
     const CF_CFDP_FileDirectiveDispatchTable_t *substate_tbl;
     CF_CFDP_StateRecvFunc_t                     selected_handler;
     CF_Logical_PduFileDirectiveHeader_t        *fdh;
+    CF_Channel_t                               *chan = CF_GetChannelFromTxn(txn);
 
     /* send state, so we only care about file directive PDU */
     selected_handler = NULL;
@@ -123,7 +125,7 @@ void CF_CFDP_S_DispatchRecv(CF_Transaction_t                            *txn,
         }
         else
         {
-            ++CF_AppData.hk.Payload.channel_hk[txn->chan_num].counters.recv.spurious;
+            ++chan->stat.counters.recv.spurious;
             CFE_EVS_SendEvent(CF_CFDP_S_DC_INV_ERR_EID,
                               CFE_EVS_EventType_ERROR,
                               "CF S%d(%lu:%lu): received PDU with invalid directive code %d for sub-state %d",

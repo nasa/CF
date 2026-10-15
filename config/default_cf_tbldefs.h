@@ -41,14 +41,14 @@ typedef struct CF_PollDir
 {
     uint32 interval_sec; /**< \brief number of seconds to wait before trying a new directory */
 
-    uint8           priority;   /**< \brief priority to use when placing transactions on the pending queue */
-    CF_CFDP_Class_t cfdp_class; /**< \brief the CFDP class to send */
-    CF_EntityId_t   dest_eid;   /**< \brief destination entity id */
+    uint8                priority;   /**< \brief priority to use when placing transactions on the pending queue */
+    CF_CFDP_Class_Enum_t cfdp_class; /**< \brief the CFDP class to send */
+    CF_EntityId_t        dest_eid;   /**< \brief destination entity id */
 
     char src_dir[CF_FILENAME_MAX_PATH]; /**< \brief path to source dir */
     char dst_dir[CF_FILENAME_MAX_PATH]; /**< \brief path to destination dir */
 
-    uint8 enabled; /**< \brief Enabled flag */
+    CF_EnableFlag_Enum_t enabled; /**< \brief Enabled flag */
 } CF_PollDir_t;
 
 /**
@@ -73,9 +73,9 @@ typedef struct CF_ChannelConfig
 
     CF_PollDir_t polldir[CF_MAX_POLLING_DIR_PER_CHAN]; /**< \brief Configuration for polled directories */
 
-    char  sem_name[OS_MAX_API_NAME]; /**< \brief name of throttling semaphore in TO */
-    uint8 dequeue_enabled;           /**< \brief if 1, then the channel will make pending transactions active */
-    char  move_dir[OS_MAX_PATH_LEN]; /**< \brief Move directory if not empty */
+    char                 sem_name[OS_MAX_API_NAME]; /**< \brief name of throttling semaphore in TO */
+    CF_EnableFlag_Enum_t dequeue_enabled; /**< \brief if 1, then the channel will make pending transactions active */
+    char                 move_dir[OS_MAX_PATH_LEN]; /**< \brief Move directory if not empty */
 } CF_ChannelConfig_t;
 
 /*
@@ -83,7 +83,15 @@ typedef struct CF_ChannelConfig
  * For backward compatibility with existing CF table definitions, include the other part here.
  */
 #ifndef CF_OMIT_DEPRECATED
+
 #include "cf_tblstruct.h"
+
+/*
+ * Preserve compatibility with table definitions that specify the class using these terms
+ */
+#define CF_CFDP_CLASS_1 CF_CFDP_Class_1
+#define CF_CFDP_CLASS_2 CF_CFDP_Class_2
+
 #endif
 
 #endif

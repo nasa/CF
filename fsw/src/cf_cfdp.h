@@ -225,11 +225,12 @@ void CF_CFDP_CompleteTick(CF_Transaction_t *txn);
  * @par Assumptions, External Events, and Notes:
  *       Only called once.
  *
+ * @param engine_ptr          CF engine pointer (must not be NULL)
  * @retval #CFE_SUCCESS \copydoc CFE_SUCCESS
  * @returns anything else on error.
  *
  */
-CFE_Status_t CF_CFDP_InitEngine(void);
+CFE_Status_t CF_CFDP_InitEngine(CF_Engine_t *engine_ptr);
 
 /************************************************************************/
 /** @brief Cycle the engine. Called once per wakeup.
@@ -263,7 +264,7 @@ void CF_CFDP_DisableEngine(void);
  * @param dst_filename  Remote filename
  * @param cfdp_class    Whether to perform a class 1 or class 2 transfer
  * @param keep          Whether to keep or delete the local file after completion
- * @param chan          CF channel number to use
+ * @param chan          CF channel pointer (must not be NULL)
  * @param priority      CF priority level
  * @param dest_id       Entity ID of remote receiver
  *
@@ -274,7 +275,7 @@ CFE_Status_t CF_CFDP_TxFile(const char     *src_filename,
                             const char     *dst_filename,
                             CF_CFDP_Class_t cfdp_class,
                             uint8           keep,
-                            uint8           chan,
+                            CF_Channel_t   *chan,
                             uint8           priority,
                             CF_EntityId_t   dest_id);
 
@@ -292,7 +293,7 @@ CFE_Status_t CF_CFDP_TxFile(const char     *src_filename,
  * @param dst_filename  Remote filename
  * @param cfdp_class    Whether to perform a class 1 or class 2 transfer
  * @param keep          Whether to keep or delete the local file after completion
- * @param chan          CF channel number to use
+ * @param chan          CF channel pointer (must not be NULL)
  * @param priority      CF priority level
  * @param dest_id       Entity ID of remote receiver
  *
@@ -303,7 +304,7 @@ CFE_Status_t CF_CFDP_PlaybackDir(const char     *src_filename,
                                  const char     *dst_filename,
                                  CF_CFDP_Class_t cfdp_class,
                                  uint8           keep,
-                                 uint8           chan,
+                                 CF_Channel_t   *chan,
                                  uint8           priority,
                                  uint16          dest_id);
 
@@ -453,7 +454,7 @@ void CF_CFDP_AppendTlv(CF_Logical_TlvList_t *ptlv_list, CF_CFDP_TlvType_t tlv_ty
  * @par Assumptions, External Events, and Notes:
  *       A new message has been received.
  *
- * @param chan_num The channel number for statistics purposes
+ * @param chan     CF channel pointer (must not be NULL)
  * @param ph       The logical PDU buffer being received
  *
  * @returns integer status code
@@ -461,7 +462,7 @@ void CF_CFDP_AppendTlv(CF_Logical_TlvList_t *ptlv_list, CF_CFDP_TlvType_t tlv_ty
  * @retval CF_ERROR for general errors
  * @retval CF_SHORT_PDU_ERROR if PDU too short
  */
-CFE_Status_t CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph);
+CFE_Status_t CF_CFDP_RecvPh(CF_Channel_t *chan, CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief Unpack a metadata PDU from a received message.
@@ -610,11 +611,15 @@ void CF_CFDP_CancelTransaction(CF_Transaction_t *txn);
  * @param txn          Pointer to the transaction state
  * @param cfdp_class Set to class 1 or class 2
  * @param keep       Whether to keep the local file
- * @param chan       CF channel number
+ * @param chan          CF channel pointer (must not be NULL)
  * @param priority   Priority of transfer
  *
  */
-void CF_CFDP_InitTxnTxFile(CF_Transaction_t *txn, CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority);
+void CF_CFDP_InitTxnTxFile(CF_Transaction_t *txn,
+                           CF_CFDP_Class_t   cfdp_class,
+                           uint8             keep,
+                           CF_Channel_t     *chan,
+                           uint8             priority);
 
 /************************************************************************/
 /** @brief Helper function to start a new RX transaction
@@ -626,11 +631,11 @@ void CF_CFDP_InitTxnTxFile(CF_Transaction_t *txn, CF_CFDP_Class_t cfdp_class, ui
  *
  * If there is no capacity for another RX transaction, this returns NULL.
  *
- * @param chan_num       CF channel number
+ * @param chan          CF channel pointer (must not be NULL)
  * @returns Pointer to new transaction
  *
  */
-CF_Transaction_t *CF_CFDP_StartRxTransaction(uint8 chan_num);
+CF_Transaction_t *CF_CFDP_StartRxTransaction(CF_Channel_t *chan);
 
 /* functions to handle LVs (length-value, CFDP spec) */
 /* returns number of bytes copied, or -1 on error */

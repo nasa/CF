@@ -72,15 +72,35 @@
        </Range>
      </IntegerDataType>
 
-<!--
-     <AliasDataType name="PathName" type="BASE_TYPES/PathName" />
-     <AliasDataType name="FileName" type="BASE_TYPES/FileName" />
--->
+     <!-- This is similar to ChannelId but allows special values for e.g. ALL (255) -->
+     <IntegerDataType name="ChannelSelect" shortDescription="Channel Selector Value">
+       <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+       <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255"/>
+       </Range>
+     </IntegerDataType>
 
-     <EnumeratedDataType name="CFDP">
+     <IntegerDataType name="PollIdxSelect" shortDescription="Polling Dir Selector Value">
+       <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+       <Range>
+          <MinMaxRange rangeType="inclusiveMinInclusiveMax" min="0" max="255"/>
+       </Range>
+     </IntegerDataType>
+
+     <EnumeratedDataType name="QueueSelect">
           <EnumerationList>
-            <Enumeration label="CLASS_1" value="0" shortDescription="CFDP class 1 - Unreliable transfer" />
-            <Enumeration label="CLASS_2" value="1" shortDescription="CFDP class 2 - Reliable transfer" />
+            <Enumeration label="All" value="0" shortDescription="Unspecified / selects all queues" />
+            <Enumeration label="Pending" value="1" shortDescription="Pending Queue" />
+            <Enumeration label="Active" value="2" shortDescription="Active Queue" />
+            <Enumeration label="History" value="3" shortDescription="History Queue" />
+          </EnumerationList>
+       <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
+     </EnumeratedDataType>
+
+     <EnumeratedDataType name="CFDP_Class">
+          <EnumerationList>
+            <Enumeration label="1" value="0" shortDescription="CFDP class 1 - Unreliable transfer" />
+            <Enumeration label="2" value="1" shortDescription="CFDP class 2 - Reliable transfer" />
           </EnumerationList>
        <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
      </EnumeratedDataType>
@@ -91,23 +111,23 @@
                CF_SetParamCmd_t message structures.
           </LongDescription>
           <EnumerationList>
-               <Enumeration label="ticks_per_second"                      shortDescription="Ticks per second key" />
-               <Enumeration label="rx_crc_calc_bytes_per_wakeup"          shortDescription="Receive CRC calculated bytes per wake-up key" />
-               <Enumeration label="ack_timer_s"                           shortDescription="ACK timer in seconds key" />
-               <Enumeration label="nak_timer_s"                           shortDescription="NAK timer in seconds key" />
-               <Enumeration label="inactivity_timer_s"                    shortDescription="Inactivity timer in seconds key" />
-               <Enumeration label="outgoing_file_chunk_size"              shortDescription="Outgoing file chunk size key" />
-               <Enumeration label="ack_limit"                             shortDescription="ACK retry limit key" />
-               <Enumeration label="nak_limit"                             shortDescription="NAK retry limit key" />
-               <Enumeration label="local_eid"                             shortDescription="Local entity id key" />
-               <Enumeration label="chan_max_outgoing_messages_per_wakeup" shortDescription="Max outgoing messages per wake-up key" />
+               <Enumeration label="ticks_per_second" value="1" shortDescription="Ticks per second key" />
+               <Enumeration label="rx_crc_calc_bytes_per_wakeup" value="2" shortDescription="Receive CRC calculated bytes per wake-up key" />
+               <Enumeration label="ack_timer_s" value="3" shortDescription="ACK timer in seconds key" />
+               <Enumeration label="nak_timer_s" value="4" shortDescription="NAK timer in seconds key" />
+               <Enumeration label="inactivity_timer_s" value="5" shortDescription="Inactivity timer in seconds key" />
+               <Enumeration label="outgoing_file_chunk_size" value="6" shortDescription="Outgoing file chunk size key" />
+               <Enumeration label="ack_limit" value="7" shortDescription="ACK retry limit key" />
+               <Enumeration label="nak_limit" value="8" shortDescription="NAK retry limit key" />
+               <Enumeration label="local_eid" value="9" shortDescription="Local entity id key" />
+               <Enumeration label="chan_max_outgoing_messages_per_wakeup" value="10" shortDescription="Max outgoing messages per wake-up key" />
           </EnumerationList>
        <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
      </EnumeratedDataType>
 
      <EnumeratedDataType name="Reset" shortDescription="IDs for use for Reset cmd" >
           <EnumerationList>
-               <Enumeration label="all" value="0" shortDescription="Reset all" />
+               <Enumeration label="all" value="0" shortDescription="Unspecified/Reset all values" />
                <Enumeration label="command" value="1" shortDescription="Reset command" />
                <Enumeration label="fault" value="2" shortDescription="Reset fault" />
                <Enumeration label="up" value="3" shortDescription="Reset up" />
@@ -121,7 +141,7 @@
        <EntryList>
          <Entry type="BASE_TYPES/uint32" name="interval_sec" shortDescription="number of seconds to wait before trying a new directory" />
          <Entry type="BASE_TYPES/uint8" name="priority" shortDescription="priority to use when placing transactions on the pending queue" />
-         <Entry type="CFDP" name="cfdp_class" shortDescription="the CFDP class to send" />
+         <Entry type="CFDP_Class" name="cfdp_class" shortDescription="the CFDP class to send" />
          <Entry type="EntityId" name="dest_eid" shortDescription="destination entity id" />
          <Entry type="BASE_TYPES/PathName" name="src_dir" shortDescription="path to source dir" />
          <Entry type="BASE_TYPES/PathName" name="dst_dir" shortDescription="path to destination dir" />
@@ -184,10 +204,10 @@
 
       <ContainerDataType name="WakeupCmd" baseType="CFE_HDR/CommandHeader" shortDescription="Send Wake Up command" />
 
-      <ContainerDataType name="HKCommandCounters" shortDescription="Housekeeping command counters">
+      <ContainerDataType name="HkCmdCounters" shortDescription="Housekeeping command counters">
         <EntryList>
           <Entry name="cmd" type="BASE_TYPES/uint16" shortDescription="Command success counter" />
-          <Entry name="err" type="BASE_TYPES/uint16"  shortDescription="Command error counter" />
+          <Entry name="err" type="BASE_TYPES/uint16" shortDescription="Command error counter" />
         </EntryList>
       </ContainerDataType>
 
@@ -196,34 +216,38 @@
           <Entry name="file_data_bytes" type="BASE_TYPES/uint64" shortDescription="Sent file data bytes" />
           <Entry name="pdu" type="BASE_TYPES/uint32"  shortDescription="Sent PDUs counter" />
           <Entry name="nak_segment_requests" type="BASE_TYPES/uint32"  shortDescription="Sent NAK segment requests counter" />
+          <Entry name="files_sent" type="BASE_TYPES/uint32"  shortDescription="Files successfully sent counter" />
+          <Entry name="files_started" type="BASE_TYPES/uint32"  shortDescription="Files initialized to be sent counter" />
         </EntryList>
       </ContainerDataType>
 
       <ContainerDataType name="HkRecv" shortDescription="Housekeeping received counters">
         <EntryList>
           <Entry name="file_data_bytes" type="BASE_TYPES/uint64" shortDescription="Sent file data bytes" />
-          <Entry name="pdu" type="BASE_TYPES/uint32"  shortDescription="Sent PDUs with valid header counter" />
-          <Entry name="error" type="BASE_TYPES/uint32"  shortDescription="Sent PDUs with error counter" />
-          <Entry name="spurious" type="BASE_TYPES/uint16"  shortDescription="Received PDUs with invalid directive code for current context or
+          <Entry name="pdu" type="BASE_TYPES/uint32" shortDescription="Sent PDUs with valid header counter" />
+          <Entry name="error" type="BASE_TYPES/uint32" shortDescription="Sent PDUs with error counter" />
+          <Entry name="spurious" type="BASE_TYPES/uint16" shortDescription="Received PDUs with invalid directive code for current context or
                                                            file directive FIN without matching active transaction counter" />
           <Entry name="dropped" type="BASE_TYPES/uint16"  shortDescription="Received PDUs dropped due to a transaction error" />
           <Entry name="nak_segment_requests" type="BASE_TYPES/uint32"  shortDescription="Received NAK segment requests counter" />
+          <Entry name="files_recv" type="BASE_TYPES/uint32"  shortDescription="Files successfully received counter" />
+          <Entry name="files_started" type="BASE_TYPES/uint32"  shortDescription="Files initialized to be received counter" />
         </EntryList>
       </ContainerDataType>
 
       <ContainerDataType name="HkFault" shortDescription="Housekeeping fault counters">
         <EntryList>
           <Entry name="file_open" type="BASE_TYPES/uint16" shortDescription="File open fault counter" />
-          <Entry name="file_read" type="BASE_TYPES/uint16"  shortDescription="File read fault counter" />
-          <Entry name="file_seek" type="BASE_TYPES/uint16"  shortDescription="File seek fault counter" />
-          <Entry name="file_write" type="BASE_TYPES/uint16"  shortDescription="File write fault counter" />
-          <Entry name="file_rename" type="BASE_TYPES/uint16"  shortDescription="File rename fault counter" />
-          <Entry name="directory_read" type="BASE_TYPES/uint16"  shortDescription="Directory read fault counter" />
-          <Entry name="crc_mismatch" type="BASE_TYPES/uint16"  shortDescription="CRC mismatch fault counter" />
-          <Entry name="file_size_mismatch" type="BASE_TYPES/uint16"  shortDescription="File size mismatch fault counter" />
-          <Entry name="nak_limit" type="BASE_TYPES/uint16"  shortDescription="NAK limit exceeded fault counter" />
-          <Entry name="ack_limit" type="BASE_TYPES/uint16"  shortDescription="ACK limit exceeded fault counter" />
-          <Entry name="inactivity_timer" type="BASE_TYPES/uint16"  shortDescription="Inactivity timer exceeded counter" />
+          <Entry name="file_read" type="BASE_TYPES/uint16" shortDescription="File read fault counter" />
+          <Entry name="file_seek" type="BASE_TYPES/uint16" shortDescription="File seek fault counter" />
+          <Entry name="file_write" type="BASE_TYPES/uint16" shortDescription="File write fault counter" />
+          <Entry name="file_rename" type="BASE_TYPES/uint16" shortDescription="File rename fault counter" />
+          <Entry name="directory_read" type="BASE_TYPES/uint16" shortDescription="Directory read fault counter" />
+          <Entry name="crc_mismatch" type="BASE_TYPES/uint16" shortDescription="CRC mismatch fault counter" />
+          <Entry name="file_size_mismatch" type="BASE_TYPES/uint16" shortDescription="File size mismatch fault counter" />
+          <Entry name="nak_limit" type="BASE_TYPES/uint16" shortDescription="NAK limit exceeded fault counter" />
+          <Entry name="ack_limit" type="BASE_TYPES/uint16" shortDescription="ACK limit exceeded fault counter" />
+          <Entry name="inactivity_timer" type="BASE_TYPES/uint16" shortDescription="Inactivity timer exceeded counter" />
           <PaddingEntry sizeInBits="16" shortDescription="Spare bytes for alignment"/>
         </EntryList>
       </ContainerDataType>
@@ -236,7 +260,7 @@
         </EntryList>
       </ContainerDataType>
 
-     <EnumeratedDataType name="QueueIdx" ShortDescription="Identifies the entry type in a filesystem monitor report">
+     <EnumeratedDataType name="QueueIdx" ShortDescription="Identifies the queue index">
           <EnumerationList>
             <Enumeration label="PEND" value="0" />
             <Enumeration label="TX" value="1" />
@@ -275,7 +299,7 @@
 
       <ContainerDataType name="HkPacket_Payload">
         <EntryList>
-          <Entry name="counters" type="HKCommandCounters" />
+          <Entry name="counters" type="HkCmdCounters" />
           <PaddingEntry sizeInBits="32" shortDescription="Padding for 32-bit alignment"/>
           <Entry name="channel_hk" type="Channel_Hk" />
         </EntryList>
@@ -315,30 +339,62 @@
         </EntryList>
       </ContainerDataType>
 
-      <!-- change descriptions starts here -->
-
-      <ArrayDataType name="Hword" dataTypeRef="BASE_TYPES/uint16">
-        <DimensionList>
-           <Dimension size="2"/>
-        </DimensionList>
-      </ArrayDataType>
-
-      <ArrayDataType name="Byte" dataTypeRef="BASE_TYPES/uint8">
-        <DimensionList>
-           <Dimension size="4"/>
-        </DimensionList>
-      </ArrayDataType>
-
-      <ContainerDataType name="UnionArgs_Payload" shortDescription="Wrapper around 4 bytes">
+      <ContainerDataType name="ResetCountersCmd_Payload" shortDescription="Reset command structure">
         <EntryList>
-          <Entry name="byte" type="Byte" shortDescription="Generic uint8 array of arguments" />
+          <Entry name="ResetType" type="Reset" shortDescription="What to reset" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="ChannelSelect_Payload" shortDescription="Single byte channel selector payload">
+        <LongDescription>
+          Single byte channel selector payload
+           - 0 = unspecified / all channels
+           - else = single channel, 1-based
+        </LongDescription>
+        <EntryList>
+          <Entry name="ChannelSelect" type="ChannelSelect" shortDescription="Channel to operate on" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="PollDirSelect_Payload" shortDescription="Single byte poll directory selector payload">
+        <LongDescription>
+           Polling directory selector payload
+
+           Single byte channel selector
+            - 0 = unspecified / all channels
+            - else = single channel, 1-based
+
+           Single byte polling directory index
+            - 0 = unspecified / all polling directories
+            - else = single polling directory index, 1-based
+        </LongDescription>
+        <EntryList>
+          <Entry name="ChannelSelect" type="ChannelSelect" shortDescription="Channel to operate on" />
+          <Entry name="PollDirIndx" type="PollIdxSelect" shortDescription="Index of polling directory" />
+        </EntryList>
+      </ContainerDataType>
+
+      <ContainerDataType name="QueueSelect_Payload" shortDescription="Queue selector payload">
+        <LongDescription>
+           Queue selector payload
+
+           Single byte channel selector
+            - 0 = unspecified / all channels
+            - else = single channel, 1-based
+
+           Single byte queue selection enum
+              Values indicated by #CF_QueueSelect enum
+        </LongDescription>
+        <EntryList>
+          <Entry name="ChannelSelect" type="ChannelSelect" shortDescription="Channel to operate on" />
+          <Entry name="QueueSelect" type="QueueSelect" shortDescription="Queue to operate on" />
         </EntryList>
       </ContainerDataType>
 
       <ContainerDataType name="GetParam_Payload" shortDescription="Get parameter command structure">
         <EntryList>
           <Entry name="key" type="GetSet_ValueID" shortDescription="Parameter key, see #CF_GetSet_ValueID_t" />
-          <Entry name="chan_num" type="ChannelId" shortDescription="Channel number" />
+          <Entry name="chan_num" type="ChannelSelect" shortDescription="Channel number" />
         </EntryList>
       </ContainerDataType>
 
@@ -346,16 +402,16 @@
         <EntryList>
           <Entry name="value" type="BASE_TYPES/uint32" shortDescription="Parameter value to set" />
           <Entry name="key" type="GetSet_ValueID" shortDescription="Parameter key, see #CF_GetSet_ValueID_t" />
-          <Entry name="chan_num" type="ChannelId" shortDescription="Channel number" />
+          <Entry name="chan_num" type="ChannelSelect" shortDescription="Channel number" />
           <PaddingEntry sizeInBits="16" shortDescription="Alignment spare, uint32 multiple"/>
         </EntryList>
       </ContainerDataType>
 
       <ContainerDataType name="TxFile_Payload" shortDescription="Transmit file command structure">
         <EntryList>
-          <Entry name="cfdp_class" type="CFDP" shortDescription="CFDP class: 0=class 1, 1=class 2" />
+          <Entry name="cfdp_class" type="CFDP_Class" shortDescription="CFDP class: 0=class 1, 1=class 2" />
           <Entry name="keep" type="EnableFlag" shortDescription="Keep file flag: 1=keep, else delete" />
-          <Entry name="chan_num" type="ChannelId" shortDescription="Channel number" />
+          <Entry name="chan_num" type="ChannelSelect" shortDescription="Channel number" />
           <Entry name="priority" type="BASE_TYPES/uint8" shortDescription="Priority: 0=highest priority" />
           <Entry name="dest_id" type="BASE_TYPES/uint32" shortDescription="Destination entity id" />
           <Entry name="src_filename" type="BASE_TYPES/PathName" shortDescription="Source filename" />
@@ -363,7 +419,7 @@
         </EntryList>
       </ContainerDataType>
 
-     <EnumeratedDataType name="Type" ShortDescription="Type IDs for use for Write Queue cmd">
+     <EnumeratedDataType name="DirectionType" ShortDescription="Direction indicators for use for Write Queue cmd">
           <EnumerationList>
                <Enumeration label="all" value="0" />
                <Enumeration label="up" value="1" />
@@ -372,22 +428,12 @@
        <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
      </EnumeratedDataType>
 
-     <EnumeratedDataType name="Queue" ShortDescription="Queue IDs for use for Write Queue cmd">
-          <EnumerationList>
-               <Enumeration label="pend" value="0" />
-               <Enumeration label="active" value="1" />
-               <Enumeration label="history" value="2" />
-               <Enumeration label="all" value="3" />
-          </EnumerationList>
-       <IntegerDataEncoding sizeInBits="8" encoding="unsigned" />
-     </EnumeratedDataType>
-
 
      <ContainerDataType name="WriteQueue_Payload" shortDescription="Write Queue command structure">
         <EntryList>
-          <Entry name="type" type="Type" shortDescription="Transaction direction: all=0, up=1, down=2" />
-          <Entry name="chan" type="ChannelId" shortDescription="Channel number" />
-          <Entry name="queue" type="Queue" shortDescription="Queue type: 0=pending, 1=active, 2=history, 3=all" />
+          <Entry name="dir_type" type="DirectionType" shortDescription="Transaction direction: all=0, up=1, down=2" />
+          <Entry name="chan_num" type="ChannelSelect" shortDescription="Channel number" />
+          <Entry name="queue" type="QueueSelect" shortDescription="Queue selector" />
           <PaddingEntry sizeInBits="8" shortDescription="Alignment spare, puts filename on 32-bit boundary"/>
           <Entry name="filename" type="BASE_TYPES/PathName" shortDescription="Filename written to" />
         </EntryList>
@@ -395,10 +441,11 @@
 
       <ContainerDataType name="Transaction_Payload" shortDescription="Transaction command structure">
         <EntryList>
-          <Entry name="ts" type="BASE_TYPES/uint32" shortDescription="Transaction sequence number" />
-          <Entry name="eid" type="BASE_TYPES/uint32" shortDescription="Entity id" />
-          <Entry name="chan" type="BASE_TYPES/uint8" shortDescription="Channel number: 254=use ts, 255=all channels, else channel" />
-          <PaddingEntry sizeInBits="24" shortDescription="Alignment spare for 32-bit multiple"/>
+          <Entry name="ts" type="TransactionSeq" shortDescription="Transaction sequence number" />
+          <Entry name="eid" type="EntityId" shortDescription="Entity id" />
+          <Entry name="chan_num" type="ChannelSelect" shortDescription="Channel number: 0=all channels, else channel 1-based" />
+          <Entry name="use_ts_eid" type="EnableFlag" shortDescription="Filter by ts+eid if true, else do all transactions" />
+          <PaddingEntry sizeInBits="16" shortDescription="Alignment spare for 32-bit multiple"/>
         </EntryList>
       </ContainerDataType>
 
@@ -474,7 +521,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="1" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="ResetCountersCmd_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 
@@ -593,7 +640,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="4" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="ChannelSelect_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 
@@ -634,7 +681,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="5" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="ChannelSelect_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 
@@ -661,7 +708,7 @@
             This command may fail for the following reason(s):
             - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
             - Transaction not found using compound key, #CF_CMD_TRANS_NOT_FOUND_ERR_EID
-            - Invalid channel number, #CF_CMD_TSN_CHAN_INVALID_ERR_EID
+            - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
             - Already in requested state, #CF_CMD_SUSPRES_SAME_ERR_EID
             - No matching transaction, #CF_CMD_SUSPRES_CHAN_ERR_EID
 
@@ -704,7 +751,7 @@
             This command may fail for the following reason(s):
             - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
             - Transaction not found using compound key, #CF_CMD_TRANS_NOT_FOUND_ERR_EID
-            - Invalid channel number, #CF_CMD_TSN_CHAN_INVALID_ERR_EID
+            - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
             - Already in requested state, #CF_CMD_SUSPRES_SAME_ERR_EID
             - No matching transaction, #CF_CMD_SUSPRES_CHAN_ERR_EID
 
@@ -746,7 +793,7 @@
             This command may fail for the following reason(s):
             - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
             - Transaction not found using compound key, #CF_CMD_TRANS_NOT_FOUND_ERR_EID
-            - Invalid channel number, #CF_CMD_TSN_CHAN_INVALID_ERR_EID
+            - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
             - No matching transaction, #CF_CMD_CANCEL_CHAN_ERR_EID
 
        \par Evidence of failure may be found in the following telemetry:
@@ -787,7 +834,7 @@
             This command may fail for the following reason(s):
             - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
             - Transaction not found using compound key, #CF_CMD_TRANS_NOT_FOUND_ERR_EID
-            - Invalid channel number, #CF_CMD_TSN_CHAN_INVALID_ERR_EID
+            - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
             - No matching transaction, #CF_CMD_ABANDON_CHAN_ERR_EID
 
        \par Evidence of failure may be found in the following telemetry:
@@ -826,7 +873,7 @@
             This command may fail for the following reason(s):
             - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
             - Invalid configuration parameter key, #CF_CMD_GETSET_PARAM_ERR_EID
-            - Invalid channel number, #CF_CMD_GETSET_CHAN_ERR_EID
+            - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
             - Parameter value failed validation, #CF_CMD_GETSET_VALIDATE_ERR_EID
 
        \par Evidence of failure may be found in the following telemetry:
@@ -865,7 +912,7 @@
             This command may fail for the following reason(s):
             - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
             - Invalid configuration parameter key, #CF_CMD_GETSET_PARAM_ERR_EID
-            - Invalid channel number, #CF_CMD_GETSET_CHAN_ERR_EID
+            - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
 
        \par Evidence of failure may be found in the following telemetry:
             - #CF_HkPacket_t.counters #CF_HkCmdCounters_t.err will increment
@@ -903,7 +950,7 @@
             This command may fail for the following reason(s):
             - Command packet length not as expected, #CF_CMD_LEN_ERR_EID
             - Invalid parameter combination, #CF_CMD_WQ_ARGS_ERR_EID
-            - Invalid channel number, #CF_CMD_WQ_CHAN_ERR_EID
+            - Invalid channel number, #CF_CMD_CHAN_PARAM_ERR_EID
             - Open file to write failed, #CF_CMD_WQ_OPEN_ERR_EID
             - Write RX data failed, #CF_CMD_WQ_WRITEQ_RX_ERR_EID
             - Write RX history data failed, #CF_CMD_WQ_WRITEHIST_RX_ERR_EID
@@ -962,7 +1009,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="16" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="ChannelSelect_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 
@@ -1002,7 +1049,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="17" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="ChannelSelect_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 
@@ -1049,7 +1096,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="18" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="PollDirSelect_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 
@@ -1096,7 +1143,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="19" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="PollDirSelect_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 
@@ -1144,7 +1191,7 @@
           <ValueConstraint entry="Sec.FunctionCode" value="21" />
         </ConstraintSet>
         <EntryList>
-          <Entry type="UnionArgs_Payload" name="Payload" />
+          <Entry type="QueueSelect_Payload" name="Payload" />
         </EntryList>
       </ContainerDataType>
 

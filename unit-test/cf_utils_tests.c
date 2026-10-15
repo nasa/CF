@@ -59,17 +59,6 @@ CF_QueueIdx_t Any_cf_queue_index_t(void)
     return (CF_QueueIdx_t)Any_uint16_LessThan(CF_QueueIdx_NUM);
 }
 
-CF_Direction_t Any_direction_t(void)
-{
-    return (CF_Direction_t)Any_uint8_LessThan(CF_Direction_NUM);
-}
-
-CF_CFDP_ConditionCode_t Any_condition_code_t(void)
-{
-    uint8 codes[13] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15 };
-    return (CF_CFDP_ConditionCode_t)Any_uint8_FromThese(codes, sizeof(codes) / sizeof(codes[0]));
-}
-
 void local_handler_OS_close(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
     int32 status;
@@ -124,14 +113,15 @@ void Test_CF_ResetHistory(void)
     /* Test case for:
      * void CF_ResetHistory(CF_Channel_t *chan, CF_History_t *history)
      */
-    CF_History_t history;
+    CF_History_t  history;
+    CF_Channel_t *chan = UT_CFDP_CHANNEL_PTR;
 
     memset(&history, 0, sizeof(history));
 
-    CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_HIST] = 4;
+    chan->stat.q_size[CF_QueueIdx_HIST] = 4;
 
     /* nominal call */
-    UtAssert_VOIDCALL(CF_ResetHistory(&CF_AppData.engine.channels[UT_CFDP_CHANNEL], &history));
+    UtAssert_VOIDCALL(CF_ResetHistory(chan, &history));
 }
 
 void Test_CF_FindUnusedTransaction(void)
@@ -146,10 +136,10 @@ void Test_CF_FindUnusedTransaction(void)
     memset(&hist, 0, sizeof(hist));
     memset(&txn, 0, sizeof(txn));
     memset(&CF_AppData, 0, sizeof(CF_AppData));
-    chan = &CF_AppData.engine.channels[UT_CFDP_CHANNEL];
-    CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_FREE]      = 2;
-    CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_HIST_FREE] = 1;
-    CF_AppData.hk.Payload.channel_hk[UT_CFDP_CHANNEL].q_size[CF_QueueIdx_HIST]      = 1;
+    chan                                     = UT_CFDP_CHANNEL_PTR;
+    chan->stat.q_size[CF_QueueIdx_FREE]      = 2;
+    chan->stat.q_size[CF_QueueIdx_HIST_FREE] = 1;
+    chan->stat.q_size[CF_QueueIdx_HIST]      = 1;
 
     UtAssert_NULL(CF_FindUnusedTransaction(chan, 0));
 
@@ -172,15 +162,17 @@ void Test_CF_FreeTransaction(void)
      * void CF_FreeTransaction(CF_Transaction_t *txn, uint8 chan)
      */
     CF_Transaction_t *txn;
+    CF_Engine_t      *engine_ptr = CF_GetEngine();
 
     memset(&CF_AppData, 0, sizeof(CF_AppData));
-    txn                    = &CF_AppData.engine.transactions[UT_CFDP_CHANNEL];
+    txn                    = &engine_ptr->transactions[0];
     txn->flags.com.q_index = CF_QueueIdx_RX;
+    txn->chan_ptr          = UT_CFDP_CHANNEL_PTR;
 
-    UtAssert_VOIDCALL(CF_FreeTransaction(txn, UT_CFDP_CHANNEL));
+    UtAssert_VOIDCALL(CF_FreeTransaction(txn));
 
     UtAssert_UINT32_EQ(txn->state, CF_TxnState_UNDEF);
-    UtAssert_UINT8_EQ(txn->chan_num, UT_CFDP_CHANNEL);
+    UtAssert_ADDRESS_EQ(CF_GetChannelFromTxn(txn), UT_CFDP_CHANNEL_PTR);
     UtAssert_STUB_COUNT(CF_CList_InsertBack, 1);
 }
 
@@ -197,7 +189,8 @@ void Test_CF_FindTransactionBySequenceNumber_Impl(void)
     memset(&hist, 0, sizeof(hist));
     memset(&ctxt, 0, sizeof(ctxt));
 
-    txn.history = &hist;
+    txn.history  = &hist;
+    txn.chan_ptr = UT_CFDP_CHANNEL_PTR;
 
     /* non-matching eid and non-matching sequence */
     hist.src_eid                     = 12;
@@ -241,14 +234,15 @@ void Test_CF_FindTransactionBySequenceNumber(void)
 
     CF_Transaction_t *txn;
     CF_Channel_t     *chan;
+    CF_Engine_t      *engine_ptr = CF_GetEngine();
 
     memset(&CF_AppData, 0, sizeof(CF_AppData));
-    chan = &CF_AppData.engine.channels[UT_CFDP_CHANNEL];
+    chan = UT_CFDP_CHANNEL_PTR;
 
     UtAssert_NULL(CF_FindTransactionBySequenceNumber(chan, 12, 34));
     UtAssert_STUB_COUNT(CF_CList_Traverse, 3); /* this checks 3 different queues: RX, TX, PEND */
 
-    txn = &CF_AppData.engine.transactions[UT_CFDP_CHANNEL];
+    txn = &engine_ptr->transactions[0];
     UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_SeqArg_SetTxn, txn);
     UtAssert_ADDRESS_EQ(CF_FindTransactionBySequenceNumber(chan, 12, 34), txn);
 }
@@ -262,9 +256,10 @@ void Test_CF_GetChannelFromTxn(void)
 
     memset(&txn, 0, sizeof(txn));
 
+    txn.chan_ptr = UT_CFDP_CHANNEL_PTR;
     UtAssert_NOT_NULL(CF_GetChannelFromTxn(&txn));
 
-    txn.chan_num = CF_NUM_CHANNELS + 1;
+    txn.chan_ptr = NULL;
     UtAssert_NULL(CF_GetChannelFromTxn(&txn));
 }
 
@@ -273,7 +268,7 @@ void Test_CF_GetChunkListHead(void)
     /* Test case for:
      * CF_CListNode_t **CF_GetChunkListHead(CF_Channel_t *chan, uint8 direction)
      */
-    CF_Channel_t *chan = CF_AppData.engine.channels;
+    CF_Channel_t *chan = UT_CFDP_CHANNEL_PTR;
 
     UtAssert_NULL(CF_GetChunkListHead(NULL, CF_Direction_RX));
     UtAssert_NULL(CF_GetChunkListHead(chan, CF_Direction_NUM));
@@ -315,12 +310,13 @@ void Test_CF_CFDP_GetTxnStatus(void)
 void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
 {
     /* Arrange */
-    CF_Transaction_t arg_t;
-    uint8            chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
-    CF_CListNode_t **expected_head;
-    CF_CListNode_t  *expected_cl_node;
-    uint16           initial_q_size = Any_uint16_Except(0); /* 0 will CF_Assert */
-    uint16           updated_q_size;
+    CF_Transaction_t   arg_t;
+    CF_ChannelSelect_t chan_num = Any_cf_chan_num();
+    CF_Channel_t      *chan     = CF_GetChannelPtr(chan_num);
+    CF_CListNode_t   **expected_head;
+    CF_CListNode_t    *expected_cl_node;
+    uint16             initial_q_size = Any_uint16_Except(0); /* 0 will CF_Assert */
+    uint16             updated_q_size;
 
     CF_CList_Remove_context_t context_clist_remove;
 
@@ -328,16 +324,16 @@ void Test_cf_dequeue_transaction_Call_CF_CList_Remove_AndDecrement_q_size(void)
 
     UT_SetDataBuffer(UT_KEY(CF_CList_Remove), &context_clist_remove, sizeof(context_clist_remove), false);
 
-    arg_t.chan_num   = chan_num;
-    expected_head    = &CF_AppData.engine.channels[arg_t.chan_num].qs[arg_t.flags.com.q_index];
+    arg_t.chan_ptr   = chan;
+    expected_head    = &chan->qs[arg_t.flags.com.q_index];
     expected_cl_node = &arg_t.cl_node;
 
-    CF_AppData.hk.Payload.channel_hk[arg_t.chan_num].q_size[arg_t.flags.com.q_index] = initial_q_size;
+    chan->stat.q_size[arg_t.flags.com.q_index] = initial_q_size;
 
     /* Act */
     CF_DequeueTransaction(&arg_t);
 
-    updated_q_size = CF_AppData.hk.Payload.channel_hk[arg_t.chan_num].q_size[arg_t.flags.com.q_index];
+    updated_q_size = chan->stat.q_size[arg_t.flags.com.q_index];
 
     /* Assert */
     UtAssert_ADDRESS_EQ(context_clist_remove.head, expected_head);
@@ -355,7 +351,8 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
     /* Arrange */
     CF_Transaction_t              txn;
     CF_Transaction_t             *arg_t    = &txn;
-    uint8                         chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    CF_ChannelSelect_t            chan_num = Any_cf_chan_num();
+    CF_Channel_t                 *chan     = CF_GetChannelPtr(chan_num);
     CF_CListNode_t              **expected_remove_head;
     CF_CListNode_t               *expected_remove_node;
     CF_CListNode_t              **expected_insert_back_head;
@@ -366,20 +363,20 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
 
     memset(&txn, 0, sizeof(txn));
 
-    arg_t->chan_num = chan_num;
+    arg_t->chan_ptr = chan;
 
     UT_SetDataBuffer(UT_KEY(CF_CList_Remove), &context_clist_remove, sizeof(context_clist_remove), false);
 
-    expected_remove_head = &CF_AppData.engine.channels[arg_t->chan_num].qs[arg_t->flags.com.q_index];
+    expected_remove_head = &chan->qs[arg_t->flags.com.q_index];
     expected_remove_node = &arg_t->cl_node;
 
     UT_SetDataBuffer(UT_KEY(CF_CList_InsertBack), &context_clist_insert_back, sizeof(context_clist_insert_back), false);
 
-    expected_insert_back_head = &CF_AppData.engine.channels[arg_t->chan_num].qs[arg_q];
+    expected_insert_back_head = &chan->qs[arg_q];
     expected_insert_back_node = &arg_t->cl_node;
 
     /* Queue size needs to be >= 1 */
-    CF_AppData.hk.Payload.channel_hk[arg_t->chan_num].q_size[arg_t->flags.com.q_index] = 1;
+    chan->stat.q_size[arg_t->flags.com.q_index] = 1;
 
     /* Act */
     CF_MoveTransaction(arg_t, arg_q);
@@ -402,14 +399,15 @@ void Test_cf_move_transaction_Call_CF_CList_InsertBack_AndSet_q_index_ToGiven_q(
 void Test_CF_CList_Remove_Ex_Call_CF_CList_Remove_AndDecrement_q_size(void)
 {
     /* Arrange */
-    CF_Channel_t    *arg_c     = &CF_AppData.engine.channels[Any_uint32_LessThan(CF_NUM_CHANNELS)];
-    CF_QueueIdx_t    arg_index = Any_cf_queue_index_t();
-    CF_CListNode_t   node;
-    CF_CListNode_t  *arg_node = &node;
-    CF_CListNode_t **expected_remove_head;
-    CF_CListNode_t  *expected_remove_node;
-    uint16           initial_q_size = Any_uint16_Except(0);
-    uint16           updated_q_size;
+    CF_ChannelSelect_t chan_num  = Any_cf_chan_num();
+    CF_Channel_t      *arg_c     = CF_GetChannelPtr(chan_num);
+    CF_QueueIdx_t      arg_index = Any_cf_queue_index_t();
+    CF_CListNode_t     node;
+    CF_CListNode_t    *arg_node = &node;
+    CF_CListNode_t   **expected_remove_head;
+    CF_CListNode_t    *expected_remove_node;
+    uint16             initial_q_size = Any_uint16_Except(0);
+    uint16             updated_q_size;
 
     CF_CList_Remove_context_t context_clist_remove;
 
@@ -418,12 +416,12 @@ void Test_CF_CList_Remove_Ex_Call_CF_CList_Remove_AndDecrement_q_size(void)
     expected_remove_head = &arg_c->qs[arg_index];
     expected_remove_node = arg_node;
 
-    CF_AppData.hk.Payload.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index] = initial_q_size;
+    arg_c->stat.q_size[arg_index] = initial_q_size;
 
     /* Act */
     CF_CList_Remove_Ex(arg_c, arg_index, arg_node);
 
-    updated_q_size = CF_AppData.hk.Payload.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
+    updated_q_size = arg_c->stat.q_size[arg_index];
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CList_Remove, 1);
@@ -440,15 +438,16 @@ void Test_CF_CList_Remove_Ex_Call_CF_CList_Remove_AndDecrement_q_size(void)
 void Test_CF_CList_InsertAfter_Ex_Call_CF_CList_InsertAfter_AndIncrement_q_size(void)
 {
     /* Arrange */
-    CF_Channel_t    *arg_c     = &CF_AppData.engine.channels[Any_uint32_LessThan(CF_NUM_CHANNELS)];
-    CF_QueueIdx_t    arg_index = Any_cf_queue_index_t();
-    CF_CListNode_t   start;
-    CF_CListNode_t  *arg_start = &start;
-    CF_CListNode_t   after;
-    CF_CListNode_t  *arg_after                  = &after;
-    CF_CListNode_t **expected_insert_after_head = &arg_c->qs[arg_index];
-    uint16           initial_q_size             = Any_uint16();
-    uint16           updated_q_size;
+    CF_ChannelSelect_t chan_num  = Any_cf_chan_num();
+    CF_Channel_t      *arg_c     = CF_GetChannelPtr(chan_num);
+    CF_QueueIdx_t      arg_index = Any_cf_queue_index_t();
+    CF_CListNode_t     start;
+    CF_CListNode_t    *arg_start = &start;
+    CF_CListNode_t     after;
+    CF_CListNode_t    *arg_after                  = &after;
+    CF_CListNode_t   **expected_insert_after_head = &arg_c->qs[arg_index];
+    uint16             initial_q_size             = Any_uint16();
+    uint16             updated_q_size;
 
     CF_CList_InsertAfter_context_t context_CF_CList_InsertAfter;
 
@@ -457,12 +456,12 @@ void Test_CF_CList_InsertAfter_Ex_Call_CF_CList_InsertAfter_AndIncrement_q_size(
                      sizeof(context_CF_CList_InsertAfter),
                      false);
 
-    CF_AppData.hk.Payload.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index] = initial_q_size;
+    arg_c->stat.q_size[arg_index] = initial_q_size;
 
     /* Act */
     CF_CList_InsertAfter_Ex(arg_c, arg_index, arg_start, arg_after);
 
-    updated_q_size = CF_AppData.hk.Payload.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
+    updated_q_size = arg_c->stat.q_size[arg_index];
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CList_InsertAfter, 1);
@@ -480,14 +479,15 @@ void Test_CF_CList_InsertAfter_Ex_Call_CF_CList_InsertAfter_AndIncrement_q_size(
 void Test_CF_CList_InsertBack_Ex_Call_CF_CList_InsertBack_AndIncrement_q_size(void)
 {
     /* Arrange */
-    CF_Channel_t    *arg_c     = &CF_AppData.engine.channels[Any_uint32_LessThan(CF_NUM_CHANNELS)];
-    CF_QueueIdx_t    arg_index = Any_cf_queue_index_t();
-    CF_CListNode_t   node;
-    CF_CListNode_t  *arg_node       = &node;
-    uint16           initial_q_size = Any_uint16();
-    CF_CListNode_t **expected_insert_back_head;
-    CF_CListNode_t  *expected_insert_back_node;
-    uint16           updated_q_size;
+    CF_ChannelSelect_t chan_num  = Any_cf_chan_num();
+    CF_Channel_t      *arg_c     = CF_GetChannelPtr(chan_num);
+    CF_QueueIdx_t      arg_index = Any_cf_queue_index_t();
+    CF_CListNode_t     node;
+    CF_CListNode_t    *arg_node       = &node;
+    uint16             initial_q_size = Any_uint16();
+    CF_CListNode_t   **expected_insert_back_head;
+    CF_CListNode_t    *expected_insert_back_node;
+    uint16             updated_q_size;
 
     CF_CList_InsertBack_context_t context_clist_insert_back;
     UT_SetDataBuffer(UT_KEY(CF_CList_InsertBack), &context_clist_insert_back, sizeof(context_clist_insert_back), false);
@@ -495,12 +495,12 @@ void Test_CF_CList_InsertBack_Ex_Call_CF_CList_InsertBack_AndIncrement_q_size(vo
     expected_insert_back_head = &arg_c->qs[arg_index];
     expected_insert_back_node = arg_node;
 
-    CF_AppData.hk.Payload.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index] = initial_q_size;
+    arg_c->stat.q_size[arg_index] = initial_q_size;
 
     /* Act */
     CF_CList_InsertBack_Ex(arg_c, arg_index, arg_node);
 
-    updated_q_size = CF_AppData.hk.Payload.channel_hk[arg_c - CF_AppData.engine.channels].q_size[arg_index];
+    updated_q_size = arg_c->stat.q_size[arg_index];
 
     /* Assert */
     UtAssert_STUB_COUNT(CF_CList_InsertBack, 1);
@@ -589,38 +589,6 @@ void Test_CF_Traverse_WriteTxnQueueEntryToFile(void)
     UtAssert_INT32_EQ(CF_Traverse_WriteTxnQueueEntryToFile(&txn.cl_node, &args), CF_CLIST_EXIT);
     UtAssert_UINT32_EQ(args.counter, 1); /* no increment */
     UtAssert_BOOL_TRUE(args.error);
-}
-
-/*******************************************************************************
-**
-**  CF_WriteHistoryEntryToFile tests
-**
-*******************************************************************************/
-
-void Test_CF_WriteHistoryEntryToFile(void)
-{
-    /* Test case for:
-     * int CF_WriteHistoryEntryToFile(osal_id_t fd, const CF_History_t *history)
-     */
-    osal_id_t    arg_fd = OS_ObjectIdFromInteger(1);
-    CF_History_t history;
-
-    memset(&history, 0, sizeof(history));
-    strcpy(history.fnames.src_filename, "sf");
-    strcpy(history.fnames.dst_filename, "df");
-
-    /* Successful write - need to set up for 3 successful calls to OS_write() */
-    UT_SetDeferredRetcode(UT_KEY(OS_write), 1, 44);
-    UT_SetDeferredRetcode(UT_KEY(OS_write), 1, strlen(history.fnames.src_filename) + 6);
-    UT_SetDeferredRetcode(UT_KEY(OS_write), 1, strlen(history.fnames.dst_filename) + 6);
-    UtAssert_INT32_EQ(CF_WriteHistoryEntryToFile(arg_fd, &history), 0);
-    UtAssert_STUB_COUNT(CFE_EVS_SendEvent, 0);
-
-    /* Unsuccessful write */
-    UT_CF_ResetEventCapture();
-    UT_SetDeferredRetcode(UT_KEY(OS_write), 1, -1);
-    UtAssert_INT32_EQ(CF_WriteHistoryEntryToFile(arg_fd, &history), -1);
-    UT_CF_AssertEventID(CF_CMD_WHIST_WRITE_ERR_EID);
 }
 
 /*******************************************************************************
@@ -753,24 +721,24 @@ void Test_CF_PrioSearch_When_t_PrioIsLessThanContextPrio_Set_context_t_To_t_AndR
 void Test_CF_InsertSortPrio_Call_CF_CList_InsertBack_Ex_ListIsEmpty_AndSet_q_index_To_q(void)
 {
     /* Arrange */
-    CF_Transaction_t  txn;
-    CF_Transaction_t *arg_t = &txn;
-    CF_QueueIdx_t     arg_q = Any_cf_queue_index_t();
-    CF_Channel_t     *chan;
-    CF_CListNode_t  **expected_insert_back_head;
-    CF_CListNode_t   *expected_insert_back_node;
+    CF_Transaction_t   txn;
+    CF_Transaction_t  *arg_t    = &txn;
+    CF_QueueIdx_t      arg_q    = Any_cf_queue_index_t();
+    CF_ChannelSelect_t chan_num = Any_cf_chan_num();
+    CF_Channel_t      *chan     = CF_GetChannelPtr(chan_num);
+    CF_CListNode_t   **expected_insert_back_head;
+    CF_CListNode_t    *expected_insert_back_node;
 
     CF_CList_InsertBack_context_t context_clist_insert_back;
 
     /* txn settings to bypass CF_Assert */
-    txn.chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    txn.chan_ptr = chan;
     txn.state    = Any_uint8_Except(CF_TxnState_INIT);
 
     UT_SetDataBuffer(UT_KEY(CF_CList_InsertBack), &context_clist_insert_back, sizeof(context_clist_insert_back), false);
 
-    /* setting (&CF_AppData.engine.channels[arg_t->chan_num])->qs[arg_q] to NULL
+    /* setting (&engine_ptr->channels[arg_t->chan_num])->qs[arg_q] to NULL
      * makes the list empty */
-    chan            = &CF_AppData.engine.channels[arg_t->chan_num];
     chan->qs[arg_q] = NULL;
 
     expected_insert_back_head = &chan->qs[arg_q];
@@ -792,17 +760,18 @@ void Test_CF_InsertSortPrio_Call_CF_CList_InsertBack_Ex_ListIsEmpty_AndSet_q_ind
 void Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q(void)
 {
     /* Arrange */
-    CF_Transaction_t  p_t;
-    CF_Transaction_t  txn;
-    CF_Transaction_t *arg_t = &txn;
-    CF_QueueIdx_t     arg_q = Any_cf_queue_index_t();
-    CF_CListNode_t   *qs;
-    CF_Channel_t     *chan;
-    CF_CListNode_t   *expected_end;
-    CF_CListFn_t      expected_fn;
-    CF_CListNode_t  **expected_insert_after_head;
-    CF_CListNode_t  **expected_insert_after_start;
-    CF_CListNode_t  **expected_insert_after_after;
+    CF_Transaction_t   p_t;
+    CF_Transaction_t   txn;
+    CF_Transaction_t  *arg_t = &txn;
+    CF_QueueIdx_t      arg_q = Any_cf_queue_index_t();
+    CF_CListNode_t    *qs;
+    CF_ChannelSelect_t chan_num = Any_cf_chan_num();
+    CF_Channel_t      *chan     = CF_GetChannelPtr(chan_num);
+    CF_CListNode_t    *expected_end;
+    CF_CListFn_t       expected_fn;
+    CF_CListNode_t   **expected_insert_after_head;
+    CF_CListNode_t   **expected_insert_after_start;
+    CF_CListNode_t   **expected_insert_after_after;
 
     CF_CList_Traverse_R_context_t  context_cf_clist_traverse_r;
     CF_CList_InsertAfter_context_t context_CF_CList_InsertAfter;
@@ -812,12 +781,11 @@ void Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q(voi
                           &context_cf_clist_traverse_r);
 
     /* txn settings to bypass CF_Assert */
-    txn.chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    txn.chan_ptr = chan;
     txn.state    = Any_uint8_Except(CF_TxnState_INIT);
 
-    /* setting (&CF_AppData.engine.channels[arg_t->chan_num])->qs[arg_q] to
+    /* setting (&engine_ptr->channels[arg_t->chan_num])->qs[arg_q] to
      * &qs makes the list NOT empty */
-    chan            = &CF_AppData.engine.channels[arg_t->chan_num];
     chan->qs[arg_q] = (CF_CListNode_t *)&qs;
 
     /* setup CF_Traverse_PriorityArg_t altered value */
@@ -856,15 +824,16 @@ void Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q(voi
 void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
 {
     /* Arrange */
-    CF_Transaction_t  txn;
-    CF_Transaction_t *arg_t = &txn;
-    CF_QueueIdx_t     arg_q = Any_cf_queue_index_t();
-    CF_CListNode_t   *qs;
-    CF_Channel_t     *chan;
-    CF_CListNode_t   *expected_end;
-    CF_CListFn_t      expected_fn;
-    CF_CListNode_t  **expected_insert_back_head;
-    CF_CListNode_t   *expected_insert_back_node;
+    CF_Transaction_t   txn;
+    CF_Transaction_t  *arg_t = &txn;
+    CF_QueueIdx_t      arg_q = Any_cf_queue_index_t();
+    CF_CListNode_t    *qs;
+    CF_ChannelSelect_t chan_num = Any_cf_chan_num();
+    CF_Channel_t      *chan     = CF_GetChannelPtr(chan_num);
+    CF_CListNode_t    *expected_end;
+    CF_CListFn_t       expected_fn;
+    CF_CListNode_t   **expected_insert_back_head;
+    CF_CListNode_t    *expected_insert_back_node;
 
     CF_CList_Traverse_R_context_t context_cf_clist_traverse_r;
     CF_CList_InsertBack_context_t context_clist_insert_back;
@@ -875,12 +844,11 @@ void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
                      false);
 
     /* txn settings to bypass CF_Assert */
-    txn.chan_num = Any_uint8_LessThan(CF_NUM_CHANNELS);
+    txn.chan_ptr = chan;
     txn.state    = Any_uint8_Except(CF_TxnState_INIT);
 
-    /* setting (&CF_AppData.engine.channels[arg_t->chan_num])->qs[arg_q] to
+    /* setting (&engine_ptr->channels[arg_t->chan_num])->qs[arg_q] to
      * &qs makes the list NOT empty */
-    chan            = &CF_AppData.engine.channels[arg_t->chan_num];
     chan->qs[arg_q] = (CF_CListNode_t *)&qs;
 
     /* setup CF_Traverse_PriorityArg_t altered value */
@@ -1013,27 +981,6 @@ void Test_CF_TraverseAllTransactions_CallOtherFunction_CF_Q_RX_TimesAndReturn_ar
                       contexts_cf_clist_traverse[i].context_counter,
                       i + 1);
     }
-}
-
-/*******************************************************************************
-**
-**  CF_TraverseAllTransactions_All_Channels tests
-**
-*******************************************************************************/
-
-void Test_CF_TraverseAllTransactions_All_Channels_ReturnTotalTraversals(void)
-{
-    /* Arrange */
-    int   context;
-    void *arg_context       = &context;
-    uint8 per_channel_count = CF_QueueIdx_RX - CF_QueueIdx_PEND + 1;
-    int   expected_result   = per_channel_count * CF_NUM_CHANNELS;
-
-    CF_TraverseAllTransactions_fn_t arg_fn = NULL;
-    UT_SetHandlerFunction(UT_KEY(CF_CList_Traverse), UT_AltHandler_CF_CList_Traverse_TRAVERSE_ALL_ARGS_T, NULL);
-
-    /* Act */
-    UtAssert_INT32_EQ(CF_TraverseAllTransactions_All_Channels(arg_fn, arg_context), expected_result);
 }
 
 /*******************************************************************************
@@ -1227,6 +1174,33 @@ void Test_CF_TxnStatus_From_ConditionCode(void)
     }
 }
 
+static int32 CF_UT_ChannelFunc(CF_Engine_t *engine_ptr, CF_Channel_t *chan, void *arg)
+{
+    return UT_DEFAULT_IMPL(CF_UT_ChannelFunc);
+}
+
+void Test_CF_ForEachChannel(void)
+{
+    /* Test function for:
+     * int32 CF_ForEachChannel(CF_Engine_t *engine_ptr, CF_ChannelFunc_t fn, void *arg)
+     */
+    CF_Engine_t *engine_ptr = CF_GetEngine();
+
+    UT_ResetState(UT_KEY(CF_UT_ChannelFunc));
+    UtAssert_INT32_EQ(CF_ForEachChannel(engine_ptr, CF_UT_ChannelFunc, NULL), CFE_SUCCESS);
+    UtAssert_STUB_COUNT(CF_UT_ChannelFunc, CF_NUM_CHANNELS);
+
+    UT_ResetState(UT_KEY(CF_UT_ChannelFunc));
+    UT_SetDeferredRetcode(UT_KEY(CF_UT_ChannelFunc), 1, -1);
+    UtAssert_INT32_EQ(CF_ForEachChannel(engine_ptr, CF_UT_ChannelFunc, NULL), -1);
+    UtAssert_STUB_COUNT(CF_UT_ChannelFunc, 1);
+
+    UT_ResetState(UT_KEY(CF_UT_ChannelFunc));
+    UT_SetDeferredRetcode(UT_KEY(CF_UT_ChannelFunc), CF_NUM_CHANNELS, -1);
+    UtAssert_INT32_EQ(CF_ForEachChannel(engine_ptr, CF_UT_ChannelFunc, NULL), -1);
+    UtAssert_STUB_COUNT(CF_UT_ChannelFunc, CF_NUM_CHANNELS);
+}
+
 /*******************************************************************************
 **
 **  cf_utils_tests UtTest_Add groups
@@ -1379,14 +1353,6 @@ void add_CF_TraverseAllTransactions_tests(void)
                "Test_CF_TraverseAllTransactions_CallOtherFunction_CF_Q_RX_TimesAndReturn_args_counter");
 }
 
-void add_CF_TraverseAllTransactions_All_Channels_tests(void)
-{
-    UtTest_Add(Test_CF_TraverseAllTransactions_All_Channels_ReturnTotalTraversals,
-               cf_utils_tests_Setup,
-               cf_utils_tests_Teardown,
-               "Test_CF_TraverseAllTransactions_All_Channels_ReturnTotalTraversals");
-}
-
 void add_CF_WrappedOpen_tests(void)
 {
     UtTest_Add(Test_CF_WrappedOpen_Call_OS_OpenCreate_WithGivenArgumentsAndReturnItsReturnValue,
@@ -1459,8 +1425,6 @@ void UtTest_Setup(void)
 
     add_CF_TraverseAllTransactions_tests();
 
-    add_CF_TraverseAllTransactions_All_Channels_tests();
-
     add_CF_WrappedOpen_tests();
 
     add_CF_WrappedClose_tests();
@@ -1470,4 +1434,6 @@ void UtTest_Setup(void)
     add_CF_WrappedWrite_tests();
 
     add_CF_WrappedLseek_tests();
+
+    UtTest_Add(Test_CF_ForEachChannel, cf_utils_tests_Setup, cf_utils_tests_Teardown, "Test_CF_ForEachChannel");
 }

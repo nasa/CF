@@ -22,6 +22,7 @@ if (CFE_EDS_ENABLED)
   list(APPEND APP_SRC_FILES fsw/src/cf_eds_dispatch.c)
 else()
   list(APPEND APP_SRC_FILES fsw/src/cf_dispatch.c)
+  list(APPEND APP_SRC_FILES fsw/src/cf_cmd_compat.c)
 endif()
 
 # Create the app module

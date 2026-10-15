@@ -48,10 +48,9 @@ void Test_CF_Timer_Sec2Ticks_ReturnExpectedValue(void)
     /* Arrange */
     CF_Timer_Seconds_t arg_sec          = Any_uint32();
     uint32             ticks_per_second = Any_uint32();
-    CF_ConfigTable_t   config_table;
+    CF_Engine_t       *engine_ptr       = CF_GetEngine();
 
-    CF_AppData.config_table                   = &config_table;
-    CF_AppData.config_table->ticks_per_second = ticks_per_second;
+    engine_ptr->config.ticks_per_second = ticks_per_second;
 
     /* Act */
     UtAssert_UINT32_EQ(CF_Timer_Sec2Ticks(arg_sec), arg_sec * ticks_per_second);
@@ -66,16 +65,15 @@ void Test_CF_Timer_Sec2Ticks_ReturnExpectedValue(void)
 void Test_CF_Timer_InitRelSec_ReceiveExpectedValue(void)
 {
     /* Arrange */
-    uint32      arg_rel_sec = Any_uint32();
-    CF_Timer_t  timer;
-    CF_Timer_t *arg_t = &timer;
+    uint32       arg_rel_sec = Any_uint32();
+    CF_Timer_t   timer;
+    CF_Timer_t  *arg_t      = &timer;
+    CF_Engine_t *engine_ptr = CF_GetEngine();
 
     /* Arrange unstubbalbe: CF_Timer_Sec2Ticks in same file */
-    uint32           ticks_per_second = Any_uint32();
-    CF_ConfigTable_t config_table;
+    uint32 ticks_per_second = Any_uint32();
 
-    CF_AppData.config_table                   = &config_table;
-    CF_AppData.config_table->ticks_per_second = ticks_per_second;
+    engine_ptr->config.ticks_per_second = ticks_per_second;
 
     arg_t->tick = ticks_per_second;
 

@@ -132,26 +132,6 @@ void UT_AltHandler_CF_CList_Traverse_R_PRIO(void *UserObj, UT_EntryKey_t FuncKey
 
 /*----------------------------------------------------------------
  *
- * A handler for CF_TraverseAllTransactions which _sets_ the opaque context
- * pointer as an int* object.  The value is taken from the UserObj opaque pointer.
- *
- *-----------------------------------------------------------------*/
-void UT_AltHandler_CF_TraverseAllTransactions_All_Channels_Set_Context(void                   *UserObj,
-                                                                       UT_EntryKey_t           FuncKey,
-                                                                       const UT_StubContext_t *Context)
-{
-    int *call_context = UT_Hook_GetArgValueByName(Context, "context", int *);
-    int *req_context  = UserObj;
-    int  forced_return;
-
-    *call_context = *req_context;
-    forced_return = -1;
-
-    UT_Stub_SetReturnValue(FuncKey, forced_return);
-}
-
-/*----------------------------------------------------------------
- *
  * A simple handler that can be used for any stub that returns a pointer.
  * it just forces the return value to be the object passed in as UserObj.
  *
@@ -175,4 +155,81 @@ void UT_AltHandler_CaptureTransactionStatus(void *UserObj, UT_EntryKey_t FuncKey
     CF_TxnStatus_t  in_stat    = UT_Hook_GetArgValueByName(Context, "txn_stat", CF_TxnStatus_t);
 
     *p_txn_stat = in_stat;
+}
+
+/*----------------------------------------------------------------
+ *
+ * Function: UT_AltHandler_CF_TraverseAllTransactions_InvokeCb
+ *
+ * A handler for CF_TraverseAllTransactions() which invokes the callback
+ * with the given UserObj for the transaction
+ *
+ *-----------------------------------------------------------------*/
+void UT_AltHandler_CF_TraverseAllTransactions_InvokeCb(void                   *UserObj,
+                                                       UT_EntryKey_t           FuncKey,
+                                                       const UT_StubContext_t *Context)
+{
+    CF_Channel_t                   *chan    = UT_Hook_GetArgValueByName(Context, "chan", CF_Channel_t *);
+    CF_TraverseAllTransactions_fn_t fn      = UT_Hook_GetArgValueByName(Context, "fn", CF_TraverseAllTransactions_fn_t);
+    void                           *context = UT_Hook_GetArgValueByName(Context, "context", void *);
+    CF_Transaction_t               *txn     = UserObj;
+    int32                           RetVal;
+
+    if (fn == NULL || txn == NULL)
+    {
+        RetVal = 0;
+    }
+    else
+    {
+        txn->chan_ptr = chan;
+        fn(UserObj, context);
+        RetVal = 1;
+    }
+
+    UT_Stub_SetReturnValue(FuncKey, RetVal);
+}
+
+/*----------------------------------------------------------------
+ *
+ * Function: UT_AltHandler_CF_FindTransactionBySequenceNumber
+ *
+ * Similar to the basic pointer return but ensures the chan_ptr
+ * in the transaction points to a valid channel
+ *
+ *-----------------------------------------------------------------*/
+void UT_AltHandler_CF_FindTransactionBySequenceNumber(void                   *UserObj,
+                                                      UT_EntryKey_t           FuncKey,
+                                                      const UT_StubContext_t *Context)
+{
+    CF_Channel_t     *chan          = UT_Hook_GetArgValueByName(Context, "chan", CF_Channel_t *);
+    CF_Transaction_t *forced_return = UserObj;
+
+    if (forced_return != NULL)
+    {
+        forced_return->chan_ptr = chan;
+    }
+
+    UT_Stub_SetReturnValue(FuncKey, forced_return);
+}
+
+/*----------------------------------------------------------------
+ *
+ * Function: UT_AltHandler_CF_CList_Traverse_InvokeCb
+ *
+ * Similar to the basic pointer return but ensures the chan_ptr
+ * in the transaction points to a valid channel
+ *
+ * A handler for CF_CList_Traverse() which invokes the callback
+ *
+ *-----------------------------------------------------------------*/
+void UT_AltHandler_CF_CList_Traverse_InvokeCb(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
+{
+    CF_CListNode_t *start   = UT_Hook_GetArgValueByName(Context, "start", CF_CListNode_t *);
+    CF_CListFn_t    fn      = UT_Hook_GetArgValueByName(Context, "fn", CF_CListFn_t);
+    void           *context = UT_Hook_GetArgValueByName(Context, "context", void *);
+
+    if (fn != NULL)
+    {
+        fn(start, context);
+    }
 }

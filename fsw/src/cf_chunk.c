@@ -281,8 +281,18 @@ void CF_Chunks_Insert(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t 
  *-----------------------------------------------------------------*/
 void CF_ChunkListAdd(CF_ChunkList_t *chunks, CF_ChunkOffset_t offset, CF_ChunkSize_t size)
 {
-    const CF_Chunk_t    chunk = { offset, size };
-    const CF_ChunkIdx_t i     = CF_Chunks_FindInsertPosition(chunks, &chunk);
+    const CF_Chunk_t chunk = { offset, size };
+    CF_ChunkIdx_t    i;
+
+    /* An empty range covers no data, so there is nothing to track.  Storing it would
+     * consume a list entry and split a surrounding gap in two, and CF_Chunks_CombineNext
+     * asserts that the chunk end is past its offset. */
+    if (size == 0)
+    {
+        return;
+    }
+
+    i = CF_Chunks_FindInsertPosition(chunks, &chunk);
 
     /* PTFO: files won't be so big we need to gracefully handle overflow,
      * and in that case the user should change everything in chunks

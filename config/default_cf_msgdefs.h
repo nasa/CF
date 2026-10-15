@@ -29,6 +29,68 @@
 #include "cf_extern_typedefs.h"
 
 /**
+ * \defgroup cfscfmsgtypes Typedefs used in CFS CFDP Commands and Telemetry
+ * \{
+ */
+
+/**
+ * \brief Type IDs for use for Write Queue cmd
+ */
+typedef enum CF_Type
+{
+    CF_DirectionType_all  = 0, /**< \brief Unspecified - Select all types */
+    CF_DirectionType_up   = 1, /**< \brief Type up */
+    CF_DirectionType_down = 2, /**< \brief Type down */
+    CF_DirectionType_MAX  = 3  /**< \brief Limit - All valid values are less than this */
+} CF_DirectionType_t;
+
+/**
+ * @brief External type to use for CFDP queue type
+ *
+ * This uses the labels defined in enum CF_Type
+ * but maps to a fixed-width type for use in CMD/TLM/Tables
+ */
+typedef uint8 CF_DirectionType_Enum_t;
+
+/**
+ * @brief Standardized type used for channel selection in commands
+ *
+ * 255 = all channels (if applicable; not all commands allow all channels)
+ * 0-X = single channel number
+ */
+typedef uint8 CF_ChannelSelect_t;
+
+/**
+ * Standardized type used for polling directory selection in commands
+ *
+ * 255 = all polling directory indices (if applicable)
+ * 0-X = single polling directory index number
+ */
+typedef uint8 CF_PollIdxSelect_t;
+
+/**
+ * \brief Enum labels for use for queue selection
+ */
+enum CF_QueueSelect
+{
+    CF_QueueSelect_All     = 0, /**< \brief Unspecified - Select all queues */
+    CF_QueueSelect_Pending = 1, /**< \brief Pending Queue */
+    CF_QueueSelect_Active  = 2, /**< \brief Active Queue */
+    CF_QueueSelect_History = 3, /**< \brief History Queue */
+    CF_QueueSelect_MAX     = 4  /**< \brief Limit - All valid values are less than this */
+};
+
+/**
+ * @brief External type to use for CFDP queue select
+ *
+ * This uses the labels defined in enum CF_QueueSelect
+ * but maps to a fixed-width type for use in CMD/TLM/Tables
+ */
+typedef uint8 CF_QueueSelect_Enum_t;
+
+/** \} */
+
+/**
  * \defgroup cfscftlm CFS CFDP Telemetry
  * \{
  */
@@ -50,6 +112,8 @@ typedef struct CF_HkSent
     uint64 file_data_bytes;      /**< \brief Sent File data bytes */
     uint32 pdu;                  /**< \brief Sent PDUs counter */
     uint32 nak_segment_requests; /**< \brief Sent NAK segment requests counter */
+    uint32 files_sent;           /**< \brief Files successfully sent counter */
+    uint32 files_started;        /**< \brief Files initialized to be sent counter */
 } CF_HkSent_t;
 
 /**
@@ -66,6 +130,8 @@ typedef struct CF_HkRecv
                                   */
     uint16 dropped;              /**< \brief Received PDUs dropped due to a transaction error */
     uint32 nak_segment_requests; /**< \brief Received NAK segment requests counter */
+    uint32 files_recv;           /**< \brief Files successfully received counter */
+    uint32 files_started;        /**< \brief Files initialized to be received counter */
 } CF_HkRecv_t;
 
 /**
@@ -102,12 +168,12 @@ typedef struct CF_HkCounters
  */
 typedef struct CF_HkChannel_Data
 {
-    CF_HkCounters_t counters;                /**< \brief Counters */
-    uint16          q_size[CF_QueueIdx_NUM]; /**< \brief Queue sizes */
-    uint8           poll_counter;            /**< \brief Number of active polling directories */
-    uint8           playback_counter;        /**< \brief Number of active playback directories */
-    uint8           frozen;                  /**< \brief Frozen state: 0 == not frozen, else frozen */
-    uint8           spare;                   /**< \brief Alignment spare (uint64 values in the counters) */
+    CF_HkCounters_t      counters;                /**< \brief Counters */
+    uint16               q_size[CF_QueueIdx_NUM]; /**< \brief Queue sizes */
+    uint8                poll_counter;            /**< \brief Number of active polling directories */
+    uint8                playback_counter;        /**< \brief Number of active playback directories */
+    CF_EnableFlag_Enum_t frozen;                  /**< \brief Frozen state: 0 == not frozen, else frozen */
+    uint8                spare;                   /**< \brief Alignment spare (uint64 values in the counters) */
 } CF_HkChannel_Data_t;
 
 /**
@@ -148,45 +214,96 @@ typedef struct CF_EotPacket_Payload
 /**
  * \brief Command payload argument union to support 4 uint8's, 2 uint16's or 1 uint32
  */
-typedef union CF_UnionArgs_Payload
+typedef union CF_UnionArgs_CompatPayload
 {
     uint32 dword;    /**< \brief Generic uint32 argument */
     uint16 hword[2]; /**< \brief Generic uint16 array of arguments */
     uint8  byte[4];  /**< \brief Generic uint8 array of arguments */
-} CF_UnionArgs_Payload_t;
+} CF_UnionArgs_CompatPayload_t;
 
 /**
- * \brief IDs for use for Reset cmd
+ * \brief Enum labels for use for Reset cmd
  */
-typedef enum
+enum CF_Reset
 {
     CF_Reset_all     = 0, /**< \brief Reset all */
     CF_Reset_command = 1, /**< \brief Reset command */
     CF_Reset_fault   = 2, /**< \brief Reset fault */
     CF_Reset_up      = 3, /**< \brief Reset up */
-    CF_Reset_down    = 4  /**< \brief Reset down */
-} CF_Reset_t;
+    CF_Reset_down    = 4, /**< \brief Reset down */
+    CF_Reset_MAX     = 5  /**< \brief Limit - All valid values are less than this */
+};
 
 /**
- * \brief Type IDs for use for Write Queue cmd
+ * @brief External type to use for Reset command
+ *
+ * This uses the labels defined in enum CF_Reset
+ * but maps to a fixed-width type for use in CMD/TLM/Tables
  */
-typedef enum
-{
-    CF_Type_all  = 0, /**< \brief Type all */
-    CF_Type_up   = 1, /**< \brief Type up */
-    CF_Type_down = 2  /**< \brief Type down */
-} CF_Type_t;
+typedef uint8 CF_Reset_Enum_t;
 
 /**
- * \brief Queue IDs for use for Write Queue cmd
+ * \brief Reset command payload
+ *
+ * For command details see #CF_RESET_CC
  */
-typedef enum
+typedef struct CF_ResetCountersCmd_Payload
 {
-    CF_Queue_pend    = 0, /**< \brief Queue pending */
-    CF_Queue_active  = 1, /**< \brief Queue active */
-    CF_Queue_history = 2, /**< \brief Queue history */
-    CF_Queue_all     = 3  /**< \brief Queue all */
-} CF_Queue_t;
+    CF_Reset_Enum_t ResetType;
+} CF_ResetCountersCmd_Payload_t;
+
+/**
+ * \brief Single byte channel selector payload
+ *
+ * Used in all commands needing only a channel selection
+ *       - 0 = unspecified/all channels
+ *       - else = single channel, 1-based
+ */
+typedef struct CF_ChannelSelect_Payload
+{
+    CF_ChannelSelect_t ChannelSelect;
+} CF_ChannelSelect_Payload_t;
+
+/**
+ * \brief Polling directory selector payload
+ *
+ * Used in all commands needing a polldir selection
+ *
+ * Single byte channel selector
+ *       - 0 = unspecified/all channels
+ *       - else = single channel, 1-based
+ *
+ * Single byte polling directory index
+ *       - 0 = unspecified/all polling directories
+ *       - else = single polling directory index, 1-based
+ */
+typedef struct CF_PollDirSelect_Payload
+{
+    CF_ChannelSelect_t ChannelSelect;
+    CF_PollIdxSelect_t PollDirIndx;
+} CF_PollDirSelect_Payload_t;
+
+/**
+ * \brief Queue selector payload
+ *
+ * Used in all commands needing a queue selection
+ *
+ *       Single byte channel selector
+ *       - 255 = all channels
+ *       - else = single channel
+ *
+ *       Single byte queue selection enum
+ *       Values indicated by #CF_QueueSelect enum
+ *       - 0 = Unspecified/all valid queues
+ *       - 1 = Pending queue
+ *       - 2 = Active queue (if applicable; not valid for all commands)
+ *       - 3 = History queue
+ */
+typedef struct CF_QueueSelect_Payload
+{
+    CF_ChannelSelect_t    ChannelSelect;
+    CF_QueueSelect_Enum_t QueueSelect;
+} CF_QueueSelect_Payload_t;
 
 /**
  * \brief Parameter IDs for use with Get/Set parameter messages
@@ -194,20 +311,28 @@ typedef enum
  * Specifically these are used for the "key" field within CF_GetParamCmd_t and
  * CF_SetParamCmd_t message structures.
  */
-typedef enum
+enum CF_GetSet_ValueID
 {
-    CF_GetSet_ValueID_ticks_per_second,                      /**< \brief Ticks per second key */
-    CF_GetSet_ValueID_rx_crc_calc_bytes_per_wakeup,          /**< \brief Receive CRC calculated bytes per wake-up key */
-    CF_GetSet_ValueID_ack_timer_s,                           /**< \brief ACK timer in seconds key */
-    CF_GetSet_ValueID_nak_timer_s,                           /**< \brief NAK timer in seconds key */
-    CF_GetSet_ValueID_inactivity_timer_s,                    /**< \brief Inactivity timer in seconds key */
-    CF_GetSet_ValueID_outgoing_file_chunk_size,              /**< \brief Outgoing file chunk size key */
-    CF_GetSet_ValueID_ack_limit,                             /**< \brief ACK retry limit key */
-    CF_GetSet_ValueID_nak_limit,                             /**< \brief NAK retry limit key */
-    CF_GetSet_ValueID_local_eid,                             /**< \brief Local entity id key */
-    CF_GetSet_ValueID_chan_max_outgoing_messages_per_wakeup, /**< \brief Max outgoing messages per wake-up key */
-    CF_GetSet_ValueID_MAX                                    /**< \brief Key limit used for validity check */
-} CF_GetSet_ValueID_t;
+    CF_GetSet_ValueID_ticks_per_second             = 1, /**< \brief Ticks per second key */
+    CF_GetSet_ValueID_rx_crc_calc_bytes_per_wakeup = 2, /**< \brief Receive CRC calculated bytes per wake-up key */
+    CF_GetSet_ValueID_ack_timer_s                  = 3, /**< \brief ACK timer in seconds key */
+    CF_GetSet_ValueID_nak_timer_s                  = 4, /**< \brief NAK timer in seconds key */
+    CF_GetSet_ValueID_inactivity_timer_s           = 5, /**< \brief Inactivity timer in seconds key */
+    CF_GetSet_ValueID_outgoing_file_chunk_size     = 6, /**< \brief Outgoing file chunk size key */
+    CF_GetSet_ValueID_ack_limit                    = 7, /**< \brief ACK retry limit key */
+    CF_GetSet_ValueID_nak_limit                    = 8, /**< \brief NAK retry limit key */
+    CF_GetSet_ValueID_local_eid                    = 9, /**< \brief Local entity id key */
+    CF_GetSet_ValueID_chan_max_outgoing_messages_per_wakeup = 10, /**< \brief Max outgoing messages per wake-up key */
+    CF_GetSet_ValueID_MAX                                   = 11  /**< \brief Key limit used for validity check */
+};
+
+/**
+ * @brief External type to use for CF_GetSet_ValueID
+ *
+ * This uses the labels defined in enum CF_GetSet_ValueID
+ * but maps to a fixed-width type for use in CMD/TLM/Tables
+ */
+typedef uint8 CF_GetSet_ValueID_Enum_t;
 
 /**
  * \brief Get parameter command structure
@@ -216,9 +341,20 @@ typedef enum
  */
 typedef struct CF_GetParam_Payload
 {
+    CF_GetSet_ValueID_Enum_t key;      /**< \brief Parameter key, see #CF_GetSet_ValueID_t */
+    CF_ChannelSelect_t       chan_num; /**< \brief Channel number */
+} CF_GetParam_Payload_t;
+
+/**
+ * \brief Get parameter command structure
+ *
+ * For command details see #CF_GET_PARAM_CC
+ */
+typedef struct CF_GetParam_CompatPayload
+{
     uint8 key;      /**< \brief Parameter key, see #CF_GetSet_ValueID_t */
     uint8 chan_num; /**< \brief Channel number */
-} CF_GetParam_Payload_t;
+} CF_GetParam_CompatPayload_t;
 
 /**
  * \brief Set parameter command structure
@@ -227,11 +363,24 @@ typedef struct CF_GetParam_Payload
  */
 typedef struct CF_SetParam_Payload
 {
+    uint32                   value;    /**< \brief Parameter value to set */
+    CF_GetSet_ValueID_Enum_t key;      /**< \brief Parameter key, see #CF_GetSet_ValueID_t */
+    CF_ChannelSelect_t       chan_num; /**< \brief Channel number */
+    uint8                    spare[2]; /**< \brief Alignment spare, uint32 multiple */
+} CF_SetParam_Payload_t;
+
+/**
+ * \brief Set parameter command structure
+ *
+ * For command details see #CF_SET_PARAM_CC
+ */
+typedef struct CF_SetParam_CompatPayload
+{
     uint32 value;    /**< \brief Parameter value to set */
     uint8  key;      /**< \brief Parameter key, see #CF_GetSet_ValueID_t */
     uint8  chan_num; /**< \brief Channel number */
     uint8  spare[2]; /**< \brief Alignment spare, uint32 multiple */
-} CF_SetParam_Payload_t;
+} CF_SetParam_CompatPayload_t;
 
 /**
  * \brief Transmit file command structure
@@ -240,6 +389,22 @@ typedef struct CF_SetParam_Payload
  */
 typedef struct CF_TxFile_Payload
 {
+    CF_CFDP_Class_Enum_t cfdp_class;                        /**< \brief CFDP class: 0=class 1, 1=class 2 */
+    CF_EnableFlag_Enum_t keep;                              /**< \brief Keep file flag: 1=keep, else delete */
+    CF_ChannelSelect_t   chan_num;                          /**< \brief Channel number */
+    uint8                priority;                          /**< \brief Priority: 0=highest priority */
+    CF_EntityId_t        dest_id;                           /**< \brief Destination entity id */
+    char                 src_filename[CF_FILENAME_MAX_LEN]; /**< \brief Source file/directory name */
+    char                 dst_filename[CF_FILENAME_MAX_LEN]; /**< \brief Destination file/directory name */
+} CF_TxFile_Payload_t;
+
+/**
+ * \brief Transmit file command structure
+ *
+ * For command details see #CF_TX_FILE_CC
+ */
+typedef struct CF_TxFile_CompatPayload
+{
     uint8         cfdp_class;                        /**< \brief CFDP class: 0=class 1, 1=class 2 */
     uint8         keep;                              /**< \brief Keep file flag: 1=keep, else delete */
     uint8         chan_num;                          /**< \brief Channel number */
@@ -247,7 +412,7 @@ typedef struct CF_TxFile_Payload
     CF_EntityId_t dest_id;                           /**< \brief Destination entity id */
     char          src_filename[CF_FILENAME_MAX_LEN]; /**< \brief Source file/directory name */
     char          dst_filename[CF_FILENAME_MAX_LEN]; /**< \brief Destination file/directory name */
-} CF_TxFile_Payload_t;
+} CF_TxFile_CompatPayload_t;
 
 /**
  * \brief Write Queue command structure
@@ -256,13 +421,28 @@ typedef struct CF_TxFile_Payload
  */
 typedef struct CF_WriteQueue_Payload
 {
+    CF_DirectionType_Enum_t dir_type; /**< \brief Transaction direction: all=0, up=1, down=2 */
+    CF_ChannelSelect_t      chan_num; /**< \brief Channel number */
+    CF_QueueSelect_Enum_t   queue;    /**< \brief Queue type */
+    uint8                   spare;    /**< \brief Alignment spare, puts filename on 32-bit boundary */
+
+    char filename[CF_FILENAME_MAX_LEN]; /**< \brief Filename written to */
+} CF_WriteQueue_Payload_t;
+
+/**
+ * \brief Write Queue command structure
+ *
+ * For command details see #CF_WRITE_QUEUE_CC
+ */
+typedef struct CF_WriteQueue_CompatPayload
+{
     uint8 type;  /**< \brief Transaction direction: all=0, up=1, down=2 */
     uint8 chan;  /**< \brief Channel number */
     uint8 queue; /**< \brief Queue type: 0=pending, 1=active, 2=history, 3=all */
     uint8 spare; /**< \brief Alignment spare, puts filename on 32-bit boundary */
 
     char filename[CF_FILENAME_MAX_LEN]; /**< \brief Filename written to */
-} CF_WriteQueue_Payload_t;
+} CF_WriteQueue_CompatPayload_t;
 
 /**
  * \brief Transaction command structure
@@ -273,10 +453,47 @@ typedef struct CF_Transaction_Payload
 {
     CF_TransactionSeq_t ts;       /**< \brief Transaction sequence number */
     CF_EntityId_t       eid;      /**< \brief Entity id */
-    uint8               chan;     /**< \brief Channel number: 254=use ts, 255=all channels, else channel */
-    uint8               spare[3]; /**< \brief Alignment spare for 32-bit multiple */
+    CF_ChannelSelect_t  chan_num; /**< \brief Channel number: 0=all channels, else 1-based channel */
+    CF_EnableFlag_Enum_t
+          use_ts_eid; /**< \brief If true, apply to transactions matching ts+eid, else all transactions */
+    uint8 spare[2];   /**< \brief Alignment spare for 32-bit multiple */
 } CF_Transaction_Payload_t;
 
+/**
+ * \brief Transaction command structure
+ *
+ * For command details see #CF_SUSPEND_CC, #CF_RESUME_CC, #CF_CANCEL_CC, #CF_ABANDON_CC
+ */
+typedef struct CF_Transaction_CompatPayload
+{
+    CF_TransactionSeq_t ts;       /**< \brief Transaction sequence number */
+    CF_EntityId_t       eid;      /**< \brief Entity id */
+    uint8               chan;     /**< \brief Channel number: 254=use ts, 255=all channels, else channel */
+    uint8               spare[3]; /**< \brief Alignment spare for 32-bit multiple */
+} CF_Transaction_CompatPayload_t;
+
 /**\}*/
+
+/**
+ * @brief Internal type (enum) for the CFDP class.
+ *
+ * This typedef should only be used internally but the same labels/values
+ * apply externally as well.  Notably this is a native-width type, and for
+ * external cmd/tlm use it needs to be a fixed-width type.
+ *
+ * @sa #CF_CFDP_Class_Enum_t
+ */
+typedef enum CF_CFDP_Class CF_CFDP_Class_t;
+
+/**
+ * @brief Internal type (enum) for the CFDP value identifier.
+ *
+ * This typedef should only be used internally but the same labels/values
+ * apply externally as well.  Notably this is a native-width type, and for
+ * external cmd/tlm use it needs to be a fixed-width type.
+ *
+ * @sa #CF_GetSet_ValueID_Enum_t
+ */
+typedef enum CF_GetSet_ValueID CF_GetSet_ValueID_t;
 
 #endif

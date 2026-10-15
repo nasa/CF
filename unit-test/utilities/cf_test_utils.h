@@ -45,7 +45,10 @@
 #define RANDOM_VALUES_SEED 0
 #endif /* !RANDOM_VALUES_SEED */
 
-#define UT_CFDP_CHANNEL 0
+#define UT_CFDP_CHANNEL_IDX     1
+#define UT_CFDP_CHANNEL         CF_ChannelSelect_FromInt(UT_CFDP_CHANNEL_IDX)
+#define UT_CFDP_CHANNEL_PTR     CF_GetChannelPtr(UT_CFDP_CHANNEL)
+#define UT_CFDP_INVALID_CHANNEL CF_ChannelSelect_FromInt(CF_NUM_CHANNELS + 1)
 
 typedef enum
 {
@@ -67,9 +70,9 @@ typedef struct
 {
     char            src_filename[CF_FILENAME_MAX_LEN];
     char            dst_filename[CF_FILENAME_MAX_LEN];
+    CF_Channel_t   *chan;
     CF_CFDP_Class_t cfdp_class;
     uint8           keep;
-    uint8           chan;
     uint8           priority;
     CF_EntityId_t   dest_id;
 } CF_CFDP_TxFile_context_t;
@@ -78,27 +81,12 @@ typedef struct
 {
     char            src_filename[CF_FILENAME_MAX_LEN];
     char            dst_filename[CF_FILENAME_MAX_LEN];
+    CF_Channel_t   *chan;
     CF_CFDP_Class_t cfdp_class;
     uint8           keep;
-    uint8           chan;
     uint8           priority;
     CF_EntityId_t   dest_id;
 } CF_CFDP_PlaybackDir_context_t;
-
-typedef struct
-{
-    CF_Channel_t       *chan;
-    CF_TransactionSeq_t transaction_sequence_number;
-    CF_EntityId_t       src_eid;
-    CF_Transaction_t   *forced_return;
-} CF_FindTransactionBySequenceNumber_context_t;
-
-typedef struct
-{
-    CF_TraverseAllTransactions_fn_t fn;
-    void                           *context;
-    int                             forced_return;
-} CF_TraverseAllTransactions_All_Channels_context_t;
 
 typedef struct
 {
@@ -225,37 +213,23 @@ void TestUtil_InitializeRandomSeed(void);
 
 unsigned int AnyCoinFlip(void);
 
-bool         Any_bool(void);
-void         AnyBufferOf_uint8_WithSize(uint8 *buffer, size_t size);
-char         Any_char(void);
-uint8        Any_0_or_1(void);
 uint8        Any_uint8(void);
 uint8        Any_uint8_BetweenExcludeMax(uint8 floor, uint8 ceiling);
 uint8        Any_uint8_BetweenInclusive(uint8 floor, uint8 ceiling);
-uint8        Any_uint8_ExceptSetBits(uint8 mask);
-uint8        Any_uint8_ExceptUnsetBits(uint8 mask);
-uint8        Any_uint8_FromThese(uint8 values[], uint8 num_values);
 uint8        Any_uint8_LessThan(uint8 ceiling);
 uint8        Any_uint8_GreaterThan(uint8 floor);
 uint8        Any_uint8_GreaterThan_or_EqualTo(uint8 floor);
 uint8        Any_uint8_Except(uint8 exception);
 uint16       Any_uint16(void);
-uint16       Any_uint16_BetweenExcludeMax(uint16 floor, uint16 ceiling);
 uint16       Any_uint16_Except(uint16 exception);
-uint16       Any_uint16_GreaterThan(uint16 floor);
 uint16       Any_uint16_LessThan(uint16 ceiling);
 uint32       Any_uint32(void);
-uint32       Any_uint32_BetweenInclusive(uint32 min, uint32 max);
-uint32       Any_uint32_BetweenExcludeMax(uint32 min, uint32 max);
 uint32       Any_uint32_Except(uint32 exception);
 uint32       Any_uint32_GreaterThan(uint32 floor);
 uint32       Any_uint32_LessThan(uint32 ceiling);
 uint32       Any_uint32_LessThan_or_EqualTo(uint32 max);
 int32        Any_int32(void);
 int32        Any_int32_Except(int32 exception);
-int32        Any_int32_LessThan(int32 ceiling);
-int32        Any_int32_Negative(void);
-int32        Any_int32_ZeroOrPositive(void);
 uint64       Any_uint64(void);
 uint64       Any_uint64_Except(uint64 exception);
 unsigned int Any_unsigned_int(void);
@@ -263,17 +237,9 @@ int          Any_int(void);
 int          Any_int_Except(int exception);
 int          Any_int_Negative(void);
 int          Any_int_Positive(void);
-int          Any_int_PositiveExcept(int exception);
-int          Any_int_ZeroOrPositiveLessThan(int ceiling);
-char        *AnyFilenameOfLength(size_t length);
-char        *AnyRandomStringOfTextOfLength(size_t stringLength);
 char        *AnyRandomStringOfLettersOfLength(size_t length);
 void         AnyRandomStringOfLettersOfLengthCopy(char *random_string, size_t length);
 
-uint8 Any_cf_chan_num(void);
-
-void         Any_CFE_TIME_SysTime_Set(CFE_TIME_SysTime_t *fake_time);
-CFE_Status_t Any_CFE_Status_t_Negative(void);
-CFE_Status_t Any_CFE_Status_t_Except(CFE_Status_t exception);
+CF_ChannelSelect_t Any_cf_chan_num(void);
 
 #endif

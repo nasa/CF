@@ -341,9 +341,11 @@ CF_TxnStatus_t CF_CFDP_GetTxnStatus(const CF_Transaction_t *txn)
  * Generated stub function for CF_CFDP_InitEngine()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_CFDP_InitEngine(void)
+CFE_Status_t CF_CFDP_InitEngine(CF_Engine_t *engine_ptr)
 {
     UT_GenStub_SetupReturnBuffer(CF_CFDP_InitEngine, CFE_Status_t);
+
+    UT_GenStub_AddParam(CF_CFDP_InitEngine, CF_Engine_t *, engine_ptr);
 
     UT_GenStub_Execute(CF_CFDP_InitEngine, Basic, NULL);
 
@@ -355,12 +357,16 @@ CFE_Status_t CF_CFDP_InitEngine(void)
  * Generated stub function for CF_CFDP_InitTxnTxFile()
  * ----------------------------------------------------
  */
-void CF_CFDP_InitTxnTxFile(CF_Transaction_t *txn, CF_CFDP_Class_t cfdp_class, uint8 keep, uint8 chan, uint8 priority)
+void CF_CFDP_InitTxnTxFile(CF_Transaction_t *txn,
+                           CF_CFDP_Class_t   cfdp_class,
+                           uint8             keep,
+                           CF_Channel_t     *chan,
+                           uint8             priority)
 {
     UT_GenStub_AddParam(CF_CFDP_InitTxnTxFile, CF_Transaction_t *, txn);
     UT_GenStub_AddParam(CF_CFDP_InitTxnTxFile, CF_CFDP_Class_t, cfdp_class);
     UT_GenStub_AddParam(CF_CFDP_InitTxnTxFile, uint8, keep);
-    UT_GenStub_AddParam(CF_CFDP_InitTxnTxFile, uint8, chan);
+    UT_GenStub_AddParam(CF_CFDP_InitTxnTxFile, CF_Channel_t *, chan);
     UT_GenStub_AddParam(CF_CFDP_InitTxnTxFile, uint8, priority);
 
     UT_GenStub_Execute(CF_CFDP_InitTxnTxFile, Basic, NULL);
@@ -375,7 +381,7 @@ CFE_Status_t CF_CFDP_PlaybackDir(const char     *src_filename,
                                  const char     *dst_filename,
                                  CF_CFDP_Class_t cfdp_class,
                                  uint8           keep,
-                                 uint8           chan,
+                                 CF_Channel_t   *chan,
                                  uint8           priority,
                                  uint16          dest_id)
 {
@@ -385,7 +391,7 @@ CFE_Status_t CF_CFDP_PlaybackDir(const char     *src_filename,
     UT_GenStub_AddParam(CF_CFDP_PlaybackDir, const char *, dst_filename);
     UT_GenStub_AddParam(CF_CFDP_PlaybackDir, CF_CFDP_Class_t, cfdp_class);
     UT_GenStub_AddParam(CF_CFDP_PlaybackDir, uint8, keep);
-    UT_GenStub_AddParam(CF_CFDP_PlaybackDir, uint8, chan);
+    UT_GenStub_AddParam(CF_CFDP_PlaybackDir, CF_Channel_t *, chan);
     UT_GenStub_AddParam(CF_CFDP_PlaybackDir, uint8, priority);
     UT_GenStub_AddParam(CF_CFDP_PlaybackDir, uint16, dest_id);
 
@@ -578,11 +584,11 @@ CFE_Status_t CF_CFDP_RecvNak(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
  * Generated stub function for CF_CFDP_RecvPh()
  * ----------------------------------------------------
  */
-CFE_Status_t CF_CFDP_RecvPh(uint8 chan_num, CF_Logical_PduBuffer_t *ph)
+CFE_Status_t CF_CFDP_RecvPh(CF_Channel_t *chan, CF_Logical_PduBuffer_t *ph)
 {
     UT_GenStub_SetupReturnBuffer(CF_CFDP_RecvPh, CFE_Status_t);
 
-    UT_GenStub_AddParam(CF_CFDP_RecvPh, uint8, chan_num);
+    UT_GenStub_AddParam(CF_CFDP_RecvPh, CF_Channel_t *, chan);
     UT_GenStub_AddParam(CF_CFDP_RecvPh, CF_Logical_PduBuffer_t *, ph);
 
     UT_GenStub_Execute(CF_CFDP_RecvPh, Basic, NULL);
@@ -780,11 +786,11 @@ bool CF_CFDP_StartFirstPending(CF_Channel_t *chan)
  * Generated stub function for CF_CFDP_StartRxTransaction()
  * ----------------------------------------------------
  */
-CF_Transaction_t *CF_CFDP_StartRxTransaction(uint8 chan_num)
+CF_Transaction_t *CF_CFDP_StartRxTransaction(CF_Channel_t *chan)
 {
     UT_GenStub_SetupReturnBuffer(CF_CFDP_StartRxTransaction, CF_Transaction_t *);
 
-    UT_GenStub_AddParam(CF_CFDP_StartRxTransaction, uint8, chan_num);
+    UT_GenStub_AddParam(CF_CFDP_StartRxTransaction, CF_Channel_t *, chan);
 
     UT_GenStub_Execute(CF_CFDP_StartRxTransaction, Basic, NULL);
 
@@ -812,7 +818,7 @@ CFE_Status_t CF_CFDP_TxFile(const char     *src_filename,
                             const char     *dst_filename,
                             CF_CFDP_Class_t cfdp_class,
                             uint8           keep,
-                            uint8           chan,
+                            CF_Channel_t   *chan,
                             uint8           priority,
                             CF_EntityId_t   dest_id)
 {
@@ -822,7 +828,7 @@ CFE_Status_t CF_CFDP_TxFile(const char     *src_filename,
     UT_GenStub_AddParam(CF_CFDP_TxFile, const char *, dst_filename);
     UT_GenStub_AddParam(CF_CFDP_TxFile, CF_CFDP_Class_t, cfdp_class);
     UT_GenStub_AddParam(CF_CFDP_TxFile, uint8, keep);
-    UT_GenStub_AddParam(CF_CFDP_TxFile, uint8, chan);
+    UT_GenStub_AddParam(CF_CFDP_TxFile, CF_Channel_t *, chan);
     UT_GenStub_AddParam(CF_CFDP_TxFile, uint8, priority);
     UT_GenStub_AddParam(CF_CFDP_TxFile, CF_EntityId_t, dest_id);
 

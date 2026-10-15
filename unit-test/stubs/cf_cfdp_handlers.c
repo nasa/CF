@@ -80,7 +80,7 @@ void UT_DefaultHandler_CF_CFDP_TxFile(void *UserObj, UT_EntryKey_t FuncKey, cons
         strncpy(ctxt->dst_filename, ptr, sizeof(ctxt->dst_filename));
         ctxt->cfdp_class = UT_Hook_GetArgValueByName(Context, "cfdp_class", CF_CFDP_Class_t);
         ctxt->keep       = UT_Hook_GetArgValueByName(Context, "keep", uint8);
-        ctxt->chan       = UT_Hook_GetArgValueByName(Context, "chan", uint8);
+        ctxt->chan       = UT_Hook_GetArgValueByName(Context, "chan", CF_Channel_t *);
         ctxt->priority   = UT_Hook_GetArgValueByName(Context, "priority", uint8);
         ctxt->dest_id    = UT_Hook_GetArgValueByName(Context, "dest_id", CF_EntityId_t);
     }
@@ -105,26 +105,9 @@ void UT_DefaultHandler_CF_CFDP_PlaybackDir(void *UserObj, UT_EntryKey_t FuncKey,
         strncpy(ctxt->dst_filename, ptr, sizeof(ctxt->dst_filename));
         ctxt->cfdp_class = UT_Hook_GetArgValueByName(Context, "cfdp_class", CF_CFDP_Class_t);
         ctxt->keep       = UT_Hook_GetArgValueByName(Context, "keep", uint8);
-        ctxt->chan       = UT_Hook_GetArgValueByName(Context, "chan", uint8);
+        ctxt->chan       = UT_Hook_GetArgValueByName(Context, "chan", CF_Channel_t *);
         ctxt->priority   = UT_Hook_GetArgValueByName(Context, "priority", uint8);
         ctxt->dest_id    = UT_Hook_GetArgValueByName(Context, "dest_id", uint16);
-    }
-}
-
-/*----------------------------------------------------------------
- *
- * For compatibility with other tests, this has a mechanism to save its
- * arguments to a test-provided context capture buffer.
- *
- *-----------------------------------------------------------------*/
-void UT_DefaultHandler_CF_CFDP_ResetTransaction(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
-{
-    CF_CFDP_ResetTransaction_context_t *ctxt = UT_CF_GetContextBuffer(FuncKey, CF_CFDP_ResetTransaction_context_t);
-
-    if (ctxt)
-    {
-        ctxt->txn          = UT_Hook_GetArgValueByName(Context, "txn", CF_Transaction_t *);
-        ctxt->keep_history = UT_Hook_GetArgValueByName(Context, "keep_history", bool);
     }
 }
 

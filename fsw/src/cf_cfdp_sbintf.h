@@ -91,11 +91,11 @@ CF_Logical_PduBuffer_t *CF_CFDP_MsgOutGet(const CF_Transaction_t *txn, bool sile
  * @par Assumptions, External Events, and Notes:
  *       The PDU in the output buffer is ready to transmit.
  *
- * @param chan_num Channel number for statistics/accounting purposes
+ * @param chan     CF channel pointer (must not be NULL)
  * @param ph       Pointer to PDU buffer to send
  *
  */
-void CF_CFDP_Send(uint8 chan_num, const CF_Logical_PduBuffer_t *ph);
+void CF_CFDP_Send(CF_Channel_t *chan, const CF_Logical_PduBuffer_t *ph);
 
 /************************************************************************/
 /** @brief Process received message on channel PDU input pipe.

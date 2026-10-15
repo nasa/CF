@@ -63,51 +63,6 @@ void UT_DefaultHandler_CF_ResetHistory(void *UserObj, UT_EntryKey_t FuncKey, con
  * arguments to a test-provided context capture buffer.
  *
  *-----------------------------------------------------------------*/
-void UT_DefaultHandler_CF_FindTransactionBySequenceNumber(void                   *UserObj,
-                                                          UT_EntryKey_t           FuncKey,
-                                                          const UT_StubContext_t *Context)
-{
-    CF_FindTransactionBySequenceNumber_context_t *ctxt =
-        UT_CF_GetContextBuffer(FuncKey, CF_FindTransactionBySequenceNumber_context_t);
-    CF_Transaction_t *forced_return;
-
-    if (ctxt)
-    {
-        ctxt->chan = UT_Hook_GetArgValueByName(Context, "chan", CF_Channel_t *);
-        ctxt->transaction_sequence_number =
-            UT_Hook_GetArgValueByName(Context, "transaction_sequence_number", CF_TransactionSeq_t);
-        ctxt->src_eid = UT_Hook_GetArgValueByName(Context, "src_eid", CF_EntityId_t);
-
-        forced_return = ctxt->forced_return;
-    }
-    else
-    {
-        forced_return = NULL;
-    }
-
-    UT_Stub_SetReturnValue(FuncKey, forced_return);
-}
-
-/*----------------------------------------------------------------
- *
- * Default always returns NULL, an alt handler can be registered for other pointer returns
- *
- *-----------------------------------------------------------------*/
-void UT_DefaultHandler_CF_FindUnusedTransaction(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
-{
-    CF_Transaction_t *forced_return;
-
-    forced_return = NULL;
-
-    UT_Stub_SetReturnValue(FuncKey, forced_return);
-}
-
-/*----------------------------------------------------------------
- *
- * For compatibility with other tests, this has a mechanism to save its
- * arguments to a test-provided context capture buffer.
- *
- *-----------------------------------------------------------------*/
 void UT_DefaultHandler_CF_WriteTxnQueueDataToFile(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
     CF_WriteTxnQueueDataToFile_context_t *ctxt = UT_CF_GetContextBuffer(FuncKey, CF_WriteTxnQueueDataToFile_context_t);
@@ -165,28 +120,6 @@ void UT_DefaultHandler_CF_TraverseAllTransactions(void *UserObj, UT_EntryKey_t F
  * arguments to a test-provided context capture buffer.
  *
  *-----------------------------------------------------------------*/
-void UT_DefaultHandler_CF_TraverseAllTransactions_All_Channels(void                   *UserObj,
-                                                               UT_EntryKey_t           FuncKey,
-                                                               const UT_StubContext_t *Context)
-{
-    CF_TraverseAllTransactions_All_Channels_context_t *ctxt =
-        UT_CF_GetContextBuffer(FuncKey, CF_TraverseAllTransactions_All_Channels_context_t);
-
-    if (ctxt)
-    {
-        ctxt->fn      = UT_Hook_GetArgValueByName(Context, "fn", CF_TraverseAllTransactions_fn_t);
-        ctxt->context = UT_Hook_GetArgValueByName(Context, "context", void *);
-
-        UT_Stub_SetReturnValue(FuncKey, ctxt->forced_return);
-    }
-}
-
-/*----------------------------------------------------------------
- *
- * For compatibility with other tests, this has a mechanism to save its
- * arguments to a test-provided context capture buffer.
- *
- *-----------------------------------------------------------------*/
 void UT_DefaultHandler_CF_WrappedOpenCreate(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
     CF_WrappedOpenCreate_context_t *ctxt = UT_CF_GetContextBuffer(FuncKey, CF_WrappedOpenCreate_context_t);
@@ -204,16 +137,34 @@ void UT_DefaultHandler_CF_WrappedOpenCreate(void *UserObj, UT_EntryKey_t FuncKey
 
 /*----------------------------------------------------------------
  *
- * Function: UT_DefaultHandler_CF_TxnStatus_IsError
+ * Function: UT_DefaultHandler_CF_ForEachChannel
  *
- * Translate the return value to a "bool"
+ * Invokes the passed-in, as this is usually required for correct operation
  *
  *-----------------------------------------------------------------*/
-void UT_DefaultHandler_CF_TxnStatus_IsError(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
+void UT_DefaultHandler_CF_ForEachChannel(void *UserObj, UT_EntryKey_t FuncKey, const UT_StubContext_t *Context)
 {
-    bool result;
+    CF_Engine_t     *engine_ptr = UT_Hook_GetArgValueByName(Context, "engine_ptr", CF_Engine_t *);
+    CF_ChannelFunc_t fn         = UT_Hook_GetArgValueByName(Context, "fn", CF_ChannelFunc_t);
+    void            *arg        = UT_Hook_GetArgValueByName(Context, "arg", void *);
+    int32            ret;
+    CF_Channel_t    *chan;
 
-    result = (bool)Context->Int32StatusCode;
+    /* this permits this handler to be configured for something other than UT_CFDP_CHANNEL_PTR if needed */
+    chan = UserObj;
+    if (chan == NULL)
+    {
+        chan = UT_CFDP_CHANNEL_PTR;
+    }
 
-    UT_Stub_SetReturnValue(FuncKey, result);
+    if (fn)
+    {
+        ret = fn(engine_ptr, chan, arg);
+    }
+    else
+    {
+        ret = CFE_SUCCESS;
+    }
+
+    UT_Stub_SetReturnValue(FuncKey, ret);
 }

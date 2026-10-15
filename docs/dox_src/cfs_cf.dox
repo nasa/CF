@@ -398,23 +398,23 @@
   When files are found in a polling directory that is enabled, the files are
   automatically queued by CF for output. The polling rate is configurable and
   each channel has a configurable number of polling directories.  Each polling
-  directory has an enable, a class setting, a priority setting, a destination 
-  directory. When enabled, CF will periodically check the polling directories 
-  for files. When a file is found, CF will place the file information on the 
-  pending queue if it is closed and not already on the queue and not currently 
-  active. All polling directories are checked at the same frequency which is 
-  defined by the table parameter NumWakeupsPerPollDirChk. Setting this parameter 
-  to one will cause CF to check the polling directories at the fastest possible 
-  rate, every time it receives a 'wake-up' command. Checking polling directories 
-  is a processor-intensive effort, it is best to keep the polling rate as low as 
+  directory has an enable, a class setting, a priority setting, a destination
+  directory. When enabled, CF will periodically check the polling directories
+  for files. When a file is found, CF will place the file information on the
+  pending queue if it is closed and not already on the queue and not currently
+  active. All polling directories are checked at the same frequency which is
+  defined by the table parameter NumWakeupsPerPollDirChk. Setting this parameter
+  to one will cause CF to check the polling directories at the fastest possible
+  rate, every time it receives a 'wake-up' command. Checking polling directories
+  is a processor-intensive effort, it is best to keep the polling rate as low as
   possible.
 
   <H2> Failed Transmit and directory use </H2>
-   
-  Currently, the fail directory is used only to store class 2 TX files that failed 
-  during transmission from a polling directory. When a file fails during transmission 
-  from a polling directory, it is deleted from the polling directory to prevent an 
-  infinite loop and moved to the fail directory. However, if a file fails during a 
+
+  Currently, the fail directory is used only to store class 2 TX files that failed
+  during transmission from a polling directory. When a file fails during transmission
+  from a polling directory, it is deleted from the polling directory to prevent an
+  infinite loop and moved to the fail directory. However, if a file fails during a
   class 2 TX outside of a polling directory, the file will not be deleted.
 
   <H2> Efficiency </H2>
@@ -612,19 +612,11 @@
 
   \verbatim
      *  \par Command Structure
-     *       #CF_UnionArgs_Payload_t where byte[0] specifies the counters type, byte[1-3] don't care:
      *       - 0 = all counters
      *       - 1 = command counters
      *       - 2 = fault counters
      *       - 3 = up counters
      *       - 4 = down counters
-     typedef union CF_UnionArgs_Payload
-     {
-         uint32 dword;
-         uint16 hword[2];
-         uint8  byte[4];
-     }
-CF_UnionArgs_Payload_t;
 \endverbatim
 
     The command parameter byte[0] identifies which category of counters to
@@ -653,8 +645,8 @@ CF_UnionArgs_Payload_t;
   and an event will be generated.
 
   If the command is not successful, the command error counter will increment and
-  an error event will be generated indicating the reason for failure. File will 
-  not be deleted if the 'transmit' failed (unless in an polling directories). 
+  an error event will be generated indicating the reason for failure. File will
+  not be deleted if the 'transmit' failed (unless in an polling directories).
 
   \verbatim
   typedef struct CF_TxFileCmd
@@ -671,7 +663,7 @@ CF_UnionArgs_Payload_t;
   \endverbatim
 
   The first parameter, \c cfdp_class, identifies whether the file will be transferred
-  using #CF_CFDP_CLASS_1 or #CF_CFDP_CLASS_2. For Class 1 transfers, CF will send the data
+  using #CF_CFDP_Class_1 or #CF_CFDP_Class_2. For Class 1 transfers, CF will send the data
   once and expect no feedback from the peer. Class 2 transfers are more reliable
   and attempt to fill in data that may have been dropped on the first attempt.
 
@@ -741,7 +733,7 @@ CF_UnionArgs_Payload_t;
   \endverbatim
 
   The first parameter, \c cfdp_class, identifies whether the files will be
-  transferred using #CF_CFDP_CLASS_1 or #CF_CFDP_CLASS_2. For Class 1 transfers, CF will
+  transferred using #CF_CFDP_Class_1 or #CF_CFDP_Class_2. For Class 1 transfers, CF will
   send the data once and expect no feedback from the peer. Class 2 transfers are
   more reliable and attempt to fill in data that may have been dropped on the
   first attempt.
@@ -1109,15 +1101,9 @@ CF_UnionArgs_Payload_t;
 
   \verbatim
        *       Command Structure
-       *       #CF_UnionArgs_Payload_t where byte[0] specifies the channel number or all channels
-       *       - 255 = all channels
+       *       Single byte channel selector
+       *       - 255 (0xFF) = all channels
        *       - else = single channel
-       typedef union CF_UnionArgs_Payload
-  {
-      uint32 dword;
-      uint16 hword[2];
-      uint8  byte[4];
-  } CF_UnionArgs_Payload_t;
   \endverbatim
 
   The first and only parameter, \c byte[0], specifies which pending queue to enable.
@@ -1147,16 +1133,9 @@ CF_UnionArgs_Payload_t;
 
   \verbatim
        *       Command Structure
-       *       #CF_UnionArgs_Payload_t where byte[0] specifies the channel number or all channels
+       *       Single byte channel selector
        *       - 255 = all channels
        *       - else = single channel
-
-       typedef union CF_UnionArgs_Payload
-  {
-      uint32 dword;
-      uint16 hword[2];
-      uint8  byte[4];
-  } CF_UnionArgs_Payload_t;
   \endverbatim
 
   The first and only parameter, \c byte[0], specifies which pending queue to enable.
@@ -1185,23 +1164,14 @@ CF_UnionArgs_Payload_t;
 
   \verbatim
      *       Command Structure
-     *       #CF_UnionArgs_Payload_t
-     *
-     *       byte[0] specifies the channel number or all channels
+     *       Single byte channel selector
      *       - 255 = all channels
      *       - else = single channel
      *
-     *       byte[1] specifies the polling directory index
+     *       Single byte polling directory index
      *       - 255 = all polling directories
      *       - else = single polling directory index
      *
-
-     typedef union CF_UnionArgs_Payload
-  {
-      uint32 dword;
-      uint16 hword[2];
-      uint8  byte[4];
-  } CF_UnionArgs_Payload_t;
   \endverbatim
 
   The first parameter, \c byte[0], specifies which channel contains the polling
@@ -1237,23 +1207,13 @@ CF_UnionArgs_Payload_t;
 
   \verbatim
      *       Command Structure
-     *       #CF_UnionArgs_Payload_t
-     *
-     *       byte[0] specifies the channel number or all channels
+     *       Single byte channel selector
      *       - 255 = all channels
      *       - else = single channel
      *
-     *       byte[1] specifies the polling directory index
+     *       Single byte polling directory index
      *       - 255 = all polling directories
      *       - else = single polling directory index
-     *
-
-     typedef union CF_UnionArgs_Payload
-  {
-      uint32 dword;
-      uint16 hword[2];
-      uint8  byte[4];
-  } CF_UnionArgs_Payload_t;
   \endverbatim
 
   The first parameter, \c byte[0], specifies which channel contains the polling
@@ -1285,24 +1245,14 @@ CF_UnionArgs_Payload_t;
 
   \verbatim
      *       Command Structure
-     *       #CF_UnionArgs_Payload_t
-     *
-     *       byte[0] specifies the channel number or all channels
+     *       Single byte channel selector
      *       - 255 = all channels
      *       - else = single channel
      *
-     *       byte[1] specifies the queue
+     *       Single byte queue index
      *       - 0 = Pending queue
      *       - 1 = History queue
      *       - 2 = Both pending and history queue
-     *
-
-     typedef union CF_UnionArgs_Payload
-  {
-      uint32 dword;
-      uint16 hword[2];
-      uint8  byte[4];
-  } CF_UnionArgs_Payload_t;
   \endverbatim
 
   The first parameter, \c byte[0], specifies a single channel id or a value
