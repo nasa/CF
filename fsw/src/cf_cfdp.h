@@ -840,8 +840,8 @@ CF_CListTraverse_Status_t CF_CFDP_DoTick(CF_CListNode_t *node, void *context);
  * @param dest_buf     Buffer to store result
  * @param dest_size    Size of result buffer
  *
- * @retval NULL if the result is not valid (i.e. dest_dir not set)
- * @retval dest_buf if result is valid
+ * @retval NULL if dest_dir is not set, dest_buf is NULL, or dest_size is zero
+ * @retval dest_buf if result is a valid NUL-terminated string
  */
 const char *CF_CFDP_GetMoveTarget(const char *dest_dir, const char *subject_file, char *dest_buf, size_t dest_size);
 
