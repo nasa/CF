@@ -48,7 +48,7 @@
  *-----------------------------------------------------------------*/
 CFE_Status_t CF_CFDP_S_SendFileData(CF_Transaction_t *txn, uint32 foffs, uint32 bytes_to_read, uint8 calc_crc)
 {
-    int32                           status = 0;
+    int32                           status;
     CFE_Status_t                    ret;
     CF_Engine_t                    *engine_ptr = CF_GetEngine();
     CF_Logical_PduBuffer_t         *ph         = CF_CFDP_ConstructPduHeader(txn,
@@ -808,7 +808,7 @@ CF_TxSubState_t CF_CFDP_S_CheckState_DATA_EOF(CF_Transaction_t *txn)
  *-----------------------------------------------------------------*/
 CF_TxSubState_t CF_CFDP_S_CheckState_FILESTORE(CF_Transaction_t *txn)
 {
-    CF_TxSubState_t next_state = txn->state_data.sub_state;
+    CF_TxSubState_t next_state;
 
     /* This applies the retention policy based on whether the transaction was successful */
     /* It uses data received in the FIN */
@@ -826,8 +826,8 @@ CF_TxSubState_t CF_CFDP_S_CheckState_FILESTORE(CF_Transaction_t *txn)
  *-----------------------------------------------------------------*/
 void CF_CFDP_S_CheckState(CF_Transaction_t *txn)
 {
-    CF_TxSubState_t next_state = txn->state_data.sub_state;
-    CF_Channel_t   *chan       = CF_GetChannelFromTxn(txn);
+    CF_TxSubState_t next_state;
+    CF_Channel_t   *chan = CF_GetChannelFromTxn(txn);
 
     /* State transitions are done here */
     switch (txn->state_data.sub_state)
