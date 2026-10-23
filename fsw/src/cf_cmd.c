@@ -1719,8 +1719,7 @@ static CFE_Status_t CF_GetSet_DoParam(CF_GetSetParam_Context_t *ctxt,
     uint16             event_id;
     char               msg_buffer[32];
 
-    saved_value = 0;
-    chan_num    = CF_GetChannelFromPtr(chan);
+    chan_num = CF_GetChannelFromPtr(chan);
 
     switch (param_sz)
     {

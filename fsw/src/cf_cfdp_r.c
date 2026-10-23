@@ -185,7 +185,7 @@ CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *
  *-----------------------------------------------------------------*/
 void CF_CFDP_R_SubstateRecvEof(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
-    CFE_Status_t               ret = CFE_SUCCESS;
+    CFE_Status_t               ret;
     const CF_Logical_PduEof_t *eof;
     CF_Channel_t              *chan = CF_GetChannelFromTxn(txn);
 
@@ -947,7 +947,7 @@ CF_RxSubState_t CF_CFDP_R_CheckState_VALIDATE(CF_Transaction_t *txn)
  *-----------------------------------------------------------------*/
 CF_RxSubState_t CF_CFDP_R_CheckState_FILESTORE(CF_Transaction_t *txn)
 {
-    CF_RxSubState_t next_state = txn->state_data.sub_state;
+    CF_RxSubState_t next_state;
 
     /* This applies the retention policy based on whether the transaction was successful */
     /* It sets flags in the txn state if it fails (which will then be sent in the FIN) */
@@ -1010,8 +1010,8 @@ CF_RxSubState_t CF_CFDP_R_CheckState_FINACK(CF_Transaction_t *txn)
  *-----------------------------------------------------------------*/
 void CF_CFDP_R_CheckState(CF_Transaction_t *txn)
 {
-    CF_RxSubState_t next_state = txn->state_data.sub_state;
-    CF_Channel_t   *chan       = CF_GetChannelFromTxn(txn);
+    CF_RxSubState_t next_state;
+    CF_Channel_t   *chan = CF_GetChannelFromTxn(txn);
 
     /* State transitions are done here */
     switch (txn->state_data.sub_state)

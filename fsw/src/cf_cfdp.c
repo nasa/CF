@@ -213,7 +213,6 @@ bool CF_CFDP_CheckAckNakCount(CF_Transaction_t *txn, uint8 *counter)
     uint16        Event;
 
     /* Check limit and handle if needed */
-    Event = 0;
     is_ok = (*counter < chan->config.ack_limit);
 
     if (is_ok)
@@ -1259,7 +1258,7 @@ static int32 CF_CFDP_DoEngineChannelInit(CF_Engine_t *engine_ptr, CF_Channel_t *
     int                   k;
     const int             chan_idx = CF_ChannelSelect_AsIndex(CF_GetChannelFromPtr(chan));
     char                  nbuf[64];
-    CFE_Status_t          ret = CFE_SUCCESS;
+    CFE_Status_t          ret;
 
     /* selectively wipe data within the channel struct -
      * note this struct also contains the config which is already
