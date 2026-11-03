@@ -36,13 +36,13 @@
 /**
  * \brief Type IDs for use for Write Queue cmd
  */
-typedef enum CF_Type
+enum CF_Type
 {
     CF_DirectionType_all  = 0, /**< \brief Unspecified - Select all types */
     CF_DirectionType_up   = 1, /**< \brief Type up */
     CF_DirectionType_down = 2, /**< \brief Type down */
     CF_DirectionType_MAX  = 3  /**< \brief Limit - All valid values are less than this */
-} CF_DirectionType_t;
+};
 
 /**
  * @brief External type to use for CFDP queue type
