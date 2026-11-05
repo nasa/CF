@@ -124,7 +124,28 @@ CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *
      * adjustments here, just write it.
      */
 
-    if (txn->state_data.cached_pos != fd->offset)
+    /*
+     * Reject file data that would extend the file past the size declared in the MD PDU.
+     * The size is only known once the MD PDU has been received; file data may legitimately
+     * arrive before it, and in that case this cannot be checked here.  Written as a
+     * subtraction so the sum cannot wrap when CF_FileSize_t and size_t are the same width.
+     */
+    if (txn->flags.rx.md_recv && (fd->offset > txn->fsize || fd->data_len > txn->fsize - fd->offset))
+    {
+        CFE_EVS_SendEvent(CF_CFDP_R_FD_SIZE_ERR_EID,
+                          CFE_EVS_EventType_ERROR,
+                          "CF R%d(%lu:%lu): file data past end of file, offset %lu len %lu size %lu",
+                          CF_CFDP_GetPrintClass(txn),
+                          (unsigned long)txn->history->src_eid,
+                          (unsigned long)txn->history->seq_num,
+                          (unsigned long)fd->offset,
+                          (unsigned long)fd->data_len,
+                          (unsigned long)txn->fsize);
+        CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILE_SIZE_ERROR);
+        ++chan->stat.counters.fault.file_size_mismatch;
+        ret = CF_ERROR; /* connection will reset in caller */
+    }
+    else if (txn->state_data.cached_pos != fd->offset)
     {
         fret = CF_WrappedLseek(txn->fd, fd->offset, OS_SEEK_SET);
         if (fret != fd->offset)
@@ -168,6 +189,22 @@ CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *
         {
             txn->state_data.cached_pos                = fd->data_len + fd->offset;
             chan->stat.counters.recv.file_data_bytes += fd->data_len;
+
+            /*
+             * Remember the highest end-of-data offset written, so CF_CFDP_R_SubstateRecvMd() can
+             * apply the same bound to data that arrived before the MD PDU.  Not derived from the
+             * chunk list, because CF_ChunkListAdd() drops entries once the list is full.  An end
+             * that does not fit in CF_FileSize_t saturates rather than wrapping, which can only
+             * over-report and never hide an overrun.
+             */
+            if (fd->data_len > (size_t)((CF_FileSize_t)-1 - fd->offset))
+            {
+                txn->state_data.recv_top = (CF_FileSize_t)-1;
+            }
+            else if ((fd->offset + fd->data_len) > txn->state_data.recv_top)
+            {
+                txn->state_data.recv_top = fd->offset + fd->data_len;
+            }
 
             /* insert gap data in chunks */
             CF_ChunkListAdd(&txn->chunks->chunks, fd->offset, fd->data_len);
@@ -612,7 +649,8 @@ void CF_CFDP_R2_SubstateRecvFinAck(CF_Transaction_t *txn, CF_Logical_PduBuffer_t
  *-----------------------------------------------------------------*/
 void CF_CFDP_R_SubstateRecvMd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
 {
-    CFE_Status_t status;
+    CFE_Status_t  status;
+    CF_Channel_t *chan = CF_GetChannelFromTxn(txn);
 
     if (!txn->flags.rx.md_recv)
     {
@@ -620,6 +658,26 @@ void CF_CFDP_R_SubstateRecvMd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph)
         if (status == CFE_SUCCESS)
         {
             txn->flags.rx.md_recv = true;
+
+            /*
+             * A peer controls PDU order, so file data may already have been written at an offset
+             * past the size this MD PDU declares.  CF_CFDP_R_ProcessFd() had no declared size to
+             * bound it against at the time, so apply the same bound now that the size is known,
+             * otherwise sending the out-of-range file data first bypasses the check entirely.
+             */
+            if (txn->state_data.recv_top > txn->fsize)
+            {
+                CFE_EVS_SendEvent(CF_CFDP_R_FD_SIZE_ERR_EID,
+                                  CFE_EVS_EventType_ERROR,
+                                  "CF R%d(%lu:%lu): file data past end of file, wrote %lu size %lu",
+                                  CF_CFDP_GetPrintClass(txn),
+                                  (unsigned long)txn->history->src_eid,
+                                  (unsigned long)txn->history->seq_num,
+                                  (unsigned long)txn->state_data.recv_top,
+                                  (unsigned long)txn->fsize);
+                CF_CFDP_SetTxnStatus(txn, CF_TxnStatus_FILE_SIZE_ERROR);
+                ++chan->stat.counters.fault.file_size_mismatch;
+            }
         }
     }
 }

@@ -1537,6 +1537,19 @@
  */
 #define CF_EID_INF_CFDP_BUF_EXCEED 166
 
+/**
+ * \brief CF RX File Data PDU Exceeds Declared File Size Event ID
+ *
+ *  \par Type: ERROR
+ *
+ *  \par Cause:
+ *
+ *  A received file data PDU would write past the file size declared in the
+ *  Metadata PDU for the transaction, or a Metadata PDU declared a file size
+ *  smaller than the file data already written for the transaction
+ */
+#define CF_CFDP_R_FD_SIZE_ERR_EID 167
+
 /**\}*/
 
 #endif /* !CF_EVENTIDS_H */

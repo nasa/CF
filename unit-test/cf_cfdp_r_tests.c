@@ -504,6 +504,100 @@ void Test_CF_CFDP_R_ProcessFd(void)
     UtAssert_UINT32_EQ(chan->stat.counters.fault.file_seek, 1);
 }
 
+void Test_CF_CFDP_R_ProcessFd_FileSizeBound(void)
+{
+    /* Test case for:
+     * CFE_Status_t CF_CFDP_R_ProcessFd(CF_Transaction_t *txn, CF_Logical_PduBuffer_t *ph);
+     *
+     * Specifically the bound of offset + data_len against the file size declared in the MD PDU
+     */
+    CF_Transaction_t               *txn;
+    CF_Logical_PduBuffer_t         *ph;
+    CF_Logical_PduFileDataHeader_t *fd;
+    CF_Channel_t                   *chan;
+
+    /* file size not known yet (no MD PDU received), so the bound cannot be applied here, but the
+     * high-water mark is recorded so CF_CFDP_R_SubstateRecvMd() can apply it later */
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
+    fd                         = &ph->int_header.fd;
+    fd->offset                 = 0;
+    fd->data_len               = 100;
+    txn->fsize                 = 4;
+    txn->state_data.cached_pos = 0;
+    UT_SetDefaultReturnValue(UT_KEY(CF_WrappedWrite), fd->data_len);
+    UtAssert_INT32_EQ(CF_CFDP_R_ProcessFd(txn, ph), CFE_SUCCESS);
+    UtAssert_UINT32_EQ(chan->stat.counters.fault.file_size_mismatch, 0);
+    UtAssert_UINT32_EQ(txn->state_data.recv_top, 100);
+    UtAssert_STUB_COUNT(CF_WrappedWrite, 1);
+
+    /* offset entirely beyond the declared file size */
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
+    fd                    = &ph->int_header.fd;
+    fd->offset            = 200;
+    fd->data_len          = 4;
+    txn->fsize            = 100;
+    txn->flags.rx.md_recv = true;
+    UtAssert_INT32_EQ(CF_CFDP_R_ProcessFd(txn, ph), CF_ERROR);
+    UT_CF_AssertEventID(CF_CFDP_R_FD_SIZE_ERR_EID);
+    UtAssert_INT32_EQ(txn->history->txn_stat, CF_TxnStatus_FILE_SIZE_ERROR);
+    UtAssert_UINT32_EQ(chan->stat.counters.fault.file_size_mismatch, 1);
+    UtAssert_STUB_COUNT(CF_WrappedLseek, 0);
+    UtAssert_STUB_COUNT(CF_WrappedWrite, 1);
+
+    /* offset within the declared file size, but the data extends past the end */
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
+    fd                    = &ph->int_header.fd;
+    fd->offset            = 96;
+    fd->data_len          = 8;
+    txn->fsize            = 100;
+    txn->flags.rx.md_recv = true;
+    UtAssert_INT32_EQ(CF_CFDP_R_ProcessFd(txn, ph), CF_ERROR);
+    UT_CF_AssertEventID(CF_CFDP_R_FD_SIZE_ERR_EID);
+    UtAssert_INT32_EQ(txn->history->txn_stat, CF_TxnStatus_FILE_SIZE_ERROR);
+    UtAssert_UINT32_EQ(chan->stat.counters.fault.file_size_mismatch, 2);
+    UtAssert_STUB_COUNT(CF_WrappedLseek, 0);
+    UtAssert_STUB_COUNT(CF_WrappedWrite, 1);
+
+    /* data ending exactly at the declared file size is accepted */
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
+    fd                         = &ph->int_header.fd;
+    fd->offset                 = 96;
+    fd->data_len               = 4;
+    txn->fsize                 = 100;
+    txn->flags.rx.md_recv      = true;
+    txn->state_data.cached_pos = 96;
+    UT_SetDefaultReturnValue(UT_KEY(CF_WrappedWrite), fd->data_len);
+    UtAssert_INT32_EQ(CF_CFDP_R_ProcessFd(txn, ph), CFE_SUCCESS);
+    UtAssert_UINT32_EQ(txn->state_data.cached_pos, 100);
+    UtAssert_UINT32_EQ(chan->stat.counters.fault.file_size_mismatch, 2);
+    UtAssert_STUB_COUNT(CF_WrappedWrite, 2);
+
+    /* a later write that ends lower does not lower the high-water mark */
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
+    fd                         = &ph->int_header.fd;
+    fd->offset                 = 0;
+    fd->data_len               = 100;
+    txn->state_data.cached_pos = 0;
+    UT_SetDefaultReturnValue(UT_KEY(CF_WrappedWrite), fd->data_len);
+    UtAssert_INT32_EQ(CF_CFDP_R_ProcessFd(txn, ph), CFE_SUCCESS);
+    UtAssert_UINT32_EQ(txn->state_data.recv_top, 100);
+    fd->data_len               = 4;
+    txn->state_data.cached_pos = 0;
+    UT_SetDefaultReturnValue(UT_KEY(CF_WrappedWrite), fd->data_len);
+    UtAssert_INT32_EQ(CF_CFDP_R_ProcessFd(txn, ph), CFE_SUCCESS);
+    UtAssert_UINT32_EQ(txn->state_data.recv_top, 100);
+
+    /* a high-water mark that does not fit in CF_FileSize_t saturates rather than wrapping */
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
+    fd                         = &ph->int_header.fd;
+    fd->offset                 = (CF_FileSize_t)-4;
+    fd->data_len               = 8;
+    txn->state_data.cached_pos = fd->offset;
+    UT_SetDefaultReturnValue(UT_KEY(CF_WrappedWrite), fd->data_len);
+    UtAssert_INT32_EQ(CF_CFDP_R_ProcessFd(txn, ph), CFE_SUCCESS);
+    UtAssert_UINT32_EQ(txn->state_data.recv_top, (CF_FileSize_t)-1);
+}
+
 void Test_CF_CFDP_R_SubstateRecvEof(void)
 {
     /* Test case for:
@@ -843,6 +937,7 @@ void Test_CF_CFDP_R_SubstateRecvMd(void)
      */
     CF_Transaction_t       *txn;
     CF_Logical_PduBuffer_t *ph;
+    CF_Channel_t           *chan;
 
     UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, NULL, NULL, &txn, NULL);
     UtAssert_VOIDCALL(CF_CFDP_R_SubstateRecvMd(txn, ph));
@@ -858,6 +953,25 @@ void Test_CF_CFDP_R_SubstateRecvMd(void)
     UT_SetDeferredRetcode(UT_KEY(CF_CFDP_RecvMd), 1, -1);
     UtAssert_VOIDCALL(CF_CFDP_R_SubstateRecvMd(txn, ph));
     UtAssert_BOOL_FALSE(txn->flags.rx.md_recv);
+
+    /* file data already written past the size this MD PDU declares */
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
+    txn->state_data.recv_top = 100;
+    txn->fsize               = 4;
+    UtAssert_VOIDCALL(CF_CFDP_R_SubstateRecvMd(txn, ph));
+    UtAssert_BOOL_TRUE(txn->flags.rx.md_recv);
+    UT_CF_AssertEventID(CF_CFDP_R_FD_SIZE_ERR_EID);
+    UtAssert_INT32_EQ(txn->history->txn_stat, CF_TxnStatus_FILE_SIZE_ERROR);
+    UtAssert_UINT32_EQ(chan->stat.counters.fault.file_size_mismatch, 1);
+
+    /* file data already written ending exactly at the declared size is accepted */
+    UT_CFDP_R_SetupBasicTestState(UT_CF_Setup_RX, &ph, &chan, NULL, &txn, NULL);
+    txn->state_data.recv_top = 4;
+    txn->fsize               = 4;
+    UtAssert_VOIDCALL(CF_CFDP_R_SubstateRecvMd(txn, ph));
+    UtAssert_BOOL_TRUE(txn->flags.rx.md_recv);
+    UtAssert_INT32_EQ(txn->history->txn_stat, CF_TxnStatus_NO_ERROR);
+    UtAssert_UINT32_EQ(chan->stat.counters.fault.file_size_mismatch, 1);
 }
 
 void Test_CF_CFDP_R_HandleFileRetention(void)
@@ -1310,6 +1424,10 @@ void UtTest_Setup(void)
     UtTest_Add(Test_CF_CFDP_R_Init, cf_cfdp_r_tests_Setup, cf_cfdp_r_tests_Teardown, "CF_CFDP_R_Init");
     UtTest_Add(Test_CF_CFDP_R_CheckCrc, cf_cfdp_r_tests_Setup, cf_cfdp_r_tests_Teardown, "CF_CFDP_R_CheckCrc");
     UtTest_Add(Test_CF_CFDP_R_ProcessFd, cf_cfdp_r_tests_Setup, cf_cfdp_r_tests_Teardown, "CF_CFDP_R_ProcessFd");
+    UtTest_Add(Test_CF_CFDP_R_ProcessFd_FileSizeBound,
+               cf_cfdp_r_tests_Setup,
+               cf_cfdp_r_tests_Teardown,
+               "CF_CFDP_R_ProcessFd_FileSizeBound");
     UtTest_Add(Test_CF_CFDP_R_SubstateRecvEof,
                cf_cfdp_r_tests_Setup,
                cf_cfdp_r_tests_Teardown,

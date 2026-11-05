@@ -321,6 +321,7 @@ typedef struct CF_StateData
     uint8 fin_fs;  /**< \brief the fs in FIN PDU */
 
     CF_FileSize_t cached_pos;
+    CF_FileSize_t recv_top; /**< \brief highest end-of-data offset written from received file data  */
     uint32        eof_crc;  /**< \brief remember the crc in the received EOF PDU  */
     CF_FileSize_t eof_size; /**< \brief remember the size in the received EOF PDU  */
 
