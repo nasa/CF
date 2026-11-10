@@ -163,6 +163,46 @@ void Test_CF_Chunk_CreateAddReset(void)
     UtAssert_UINT32_EQ(clist.count, 3);
 }
 
+/*
+ * Cover a full list receiving a chunk past every tracked chunk that is smaller than
+ * the smallest tracked chunk (the first PDU after a new gap in a sequential transfer):
+ * it must replace the smallest chunk, and later contiguous data must extend it.
+ * Also confirm a small chunk inside the tracked range is still dropped.
+ */
+void Test_CF_Chunk_AddFullKeepsLeadingEdge(void)
+{
+    CF_ChunkList_t clist;
+    CF_Chunk_t     chunks[3];
+
+    UtAssert_VOIDCALL(CF_ChunkListInit(&clist, sizeof(chunks) / sizeof(chunks[0]), chunks));
+    UtAssert_VOIDCALL(CF_ChunkListAdd(&clist, 0, 100));
+    UtAssert_VOIDCALL(CF_ChunkListAdd(&clist, 200, 50));
+    UtAssert_VOIDCALL(CF_ChunkListAdd(&clist, 300, 100));
+    UtAssert_UINT32_EQ(clist.count, 3);
+
+    /* Small chunk inside the tracked range: dropped, list unchanged */
+    UtAssert_VOIDCALL(CF_ChunkListAdd(&clist, 150, 10));
+    UtAssert_UINT32_EQ(clist.count, 3);
+    UtAssert_UINT32_EQ(clist.chunks[1].offset, 200);
+    UtAssert_UINT32_EQ(clist.chunks[1].size, 50);
+
+    /* Small chunk past every tracked chunk: replaces the smallest (200, 50) */
+    UtAssert_VOIDCALL(CF_ChunkListAdd(&clist, 500, 10));
+    UtAssert_UINT32_EQ(clist.count, 3);
+    UtAssert_UINT32_EQ(clist.chunks[0].offset, 0);
+    UtAssert_UINT32_EQ(clist.chunks[0].size, 100);
+    UtAssert_UINT32_EQ(clist.chunks[1].offset, 300);
+    UtAssert_UINT32_EQ(clist.chunks[1].size, 100);
+    UtAssert_UINT32_EQ(clist.chunks[2].offset, 500);
+    UtAssert_UINT32_EQ(clist.chunks[2].size, 10);
+
+    /* Contiguous data extends the leading edge */
+    UtAssert_VOIDCALL(CF_ChunkListAdd(&clist, 510, 10));
+    UtAssert_UINT32_EQ(clist.count, 3);
+    UtAssert_UINT32_EQ(clist.chunks[2].offset, 500);
+    UtAssert_UINT32_EQ(clist.chunks[2].size, 20);
+}
+
 /* Cover add of an empty range, which covers no data and must not be stored */
 void Test_CF_Chunk_AddEmpty(void)
 {
@@ -384,6 +424,7 @@ void UtTest_Setup(void)
 {
     /* Full coverage with just this section of tests */
     TEST_CF_ADD(Test_CF_Chunk_CreateAddReset);
+    TEST_CF_ADD(Test_CF_Chunk_AddFullKeepsLeadingEdge);
     TEST_CF_ADD(Test_CF_Chunk_AddEmpty);
     TEST_CF_ADD(Test_CF_Chunk_Combine);
     TEST_CF_ADD(Test_CF_Chunk_GetRmFirst);

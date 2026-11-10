@@ -263,7 +263,13 @@ void CF_Chunks_Insert(CF_ChunkList_t *chunks, CF_ChunkIdx_t i, const CF_Chunk_t 
             {
                 smallest_i = CF_Chunks_FindSmallestSize(chunks);
                 smallest_c = &chunks->chunks[smallest_i];
-                if (smallest_c->size < chunk->size)
+
+                /*
+                 * A chunk past every tracked chunk is the leading edge of a sequential
+                 * transfer, and later data extends it. Keep it at the cost of the smallest
+                 * tracked chunk; dropping it would leave all later data untracked.
+                 */
+                if ((smallest_c->size < chunk->size) || (i == chunks->count))
                 {
                     CF_Chunks_EraseChunk(chunks, smallest_i);
                     CF_Chunks_InsertChunk(chunks, CF_Chunks_FindInsertPosition(chunks, chunk), chunk);
