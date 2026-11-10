@@ -436,7 +436,8 @@ void CF_InsertSortPrio(CF_Transaction_t *txn, CF_QueueIdx_t queue)
         }
         else
         {
-            insert_back = true;
+            /* every queued transaction has a lower priority (higher number), so this one goes first */
+            CF_CList_InsertFront_Ex(chan, queue, &txn->cl_node);
         }
     }
 
