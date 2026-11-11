@@ -29,6 +29,7 @@
 void UT_DefaultHandler_CF_CList_InitNode(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_CList_InsertAfter(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_CList_InsertBack(void *, UT_EntryKey_t, const UT_StubContext_t *);
+void UT_DefaultHandler_CF_CList_InsertFront(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_CList_Remove(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_CList_Traverse(void *, UT_EntryKey_t, const UT_StubContext_t *);
 void UT_DefaultHandler_CF_CList_Traverse_R(void *, UT_EntryKey_t, const UT_StubContext_t *);
@@ -82,7 +83,7 @@ void CF_CList_InsertFront(CF_CListNode_t **head, CF_CListNode_t *node)
     UT_GenStub_AddParam(CF_CList_InsertFront, CF_CListNode_t **, head);
     UT_GenStub_AddParam(CF_CList_InsertFront, CF_CListNode_t *, node);
 
-    UT_GenStub_Execute(CF_CList_InsertFront, Basic, NULL);
+    UT_GenStub_Execute(CF_CList_InsertFront, Basic, UT_DefaultHandler_CF_CList_InsertFront);
 }
 
 /*

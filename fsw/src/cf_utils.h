@@ -185,6 +185,12 @@ static inline void CF_CList_InsertBack_Ex(CF_Channel_t *chan, CF_QueueIdx_t queu
     ++chan->stat.q_size[queueidx];
 }
 
+static inline void CF_CList_InsertFront_Ex(CF_Channel_t *chan, CF_QueueIdx_t queueidx, CF_CListNode_t *node)
+{
+    CF_CList_InsertFront(&chan->qs[queueidx], node);
+    ++chan->stat.q_size[queueidx];
+}
+
 /************************************************************************/
 /** @brief Find an unused transaction on a channel.
  *

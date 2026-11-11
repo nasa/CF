@@ -821,7 +821,7 @@ void Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q(voi
                   arg_q);
 }
 
-void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
+void Test_CF_InsertSortPrio_When_No_Equal_Or_Higher_Priority_Found_Call_CF_CList_InsertFront_Ex(void)
 {
     /* Arrange */
     CF_Transaction_t   txn;
@@ -832,11 +832,11 @@ void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
     CF_Channel_t      *chan     = CF_GetChannelPtr(chan_num);
     CF_CListNode_t    *expected_end;
     CF_CListFn_t       expected_fn;
-    CF_CListNode_t   **expected_insert_back_head;
-    CF_CListNode_t    *expected_insert_back_node;
+    CF_CListNode_t   **expected_insert_front_head;
+    CF_CListNode_t    *expected_insert_front_node;
 
-    CF_CList_Traverse_R_context_t context_cf_clist_traverse_r;
-    CF_CList_InsertBack_context_t context_clist_insert_back;
+    CF_CList_Traverse_R_context_t  context_cf_clist_traverse_r;
+    CF_CList_InsertFront_context_t context_clist_insert_front;
 
     UT_SetDataBuffer(UT_KEY(CF_CList_Traverse_R),
                      &context_cf_clist_traverse_r,
@@ -851,17 +851,21 @@ void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
      * &qs makes the list NOT empty */
     chan->qs[arg_q] = (CF_CListNode_t *)&qs;
 
-    /* setup CF_Traverse_PriorityArg_t altered value */
+    /* No queued transaction has an equal or higher priority (lower or equal number), so the
+     * search finds nothing and the new transaction must go to the front of the queue (#442) */
     context_cf_clist_traverse_r.context_t = NULL;
 
     /* set expected values */
-    expected_end              = chan->qs[arg_q];
-    expected_fn               = CF_PrioSearch;
-    expected_insert_back_head = &chan->qs[arg_q];
-    expected_insert_back_node = &arg_t->cl_node;
+    expected_end               = chan->qs[arg_q];
+    expected_fn                = CF_PrioSearch;
+    expected_insert_front_head = &chan->qs[arg_q];
+    expected_insert_front_node = &arg_t->cl_node;
 
-    /* Arrange for CF_CList_InsertBack_Ex */
-    UT_SetDataBuffer(UT_KEY(CF_CList_InsertBack), &context_clist_insert_back, sizeof(context_clist_insert_back), false);
+    /* Arrange for CF_CList_InsertFront_Ex */
+    UT_SetDataBuffer(UT_KEY(CF_CList_InsertFront),
+                     &context_clist_insert_front,
+                     sizeof(context_clist_insert_front),
+                     false);
 
     /* Act */
     CF_InsertSortPrio(arg_t, arg_q);
@@ -871,9 +875,10 @@ void Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex(void)
     UtAssert_ADDRESS_EQ(context_cf_clist_traverse_r.end, expected_end);
     UtAssert_True(context_cf_clist_traverse_r.fn == expected_fn, "context_cf_clist_traverse_r.fn ==  expected_fn");
     UtAssert_STUB_COUNT(CF_CList_InsertAfter, 0);
-    UtAssert_STUB_COUNT(CF_CList_InsertBack, 1);
-    UtAssert_ADDRESS_EQ(context_clist_insert_back.head, expected_insert_back_head);
-    UtAssert_ADDRESS_EQ(context_clist_insert_back.node, expected_insert_back_node);
+    UtAssert_STUB_COUNT(CF_CList_InsertBack, 0);
+    UtAssert_STUB_COUNT(CF_CList_InsertFront, 1);
+    UtAssert_ADDRESS_EQ(context_clist_insert_front.head, expected_insert_front_head);
+    UtAssert_ADDRESS_EQ(context_clist_insert_front.node, expected_insert_front_node);
     UtAssert_True(arg_t->flags.com.q_index == arg_q,
                   "txn->flags.com.q_index is %u and should be %u (q)",
                   arg_t->flags.com.q_index,
@@ -1331,10 +1336,10 @@ void add_CF_InsertSortPrio_tests(void)
                cf_utils_tests_Setup,
                cf_utils_tests_Teardown,
                "Test_CF_InsertSortPrio_Call_CF_CList_InsertAfter_Ex_AndSet_q_index_To_q");
-    UtTest_Add(Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex,
+    UtTest_Add(Test_CF_InsertSortPrio_When_No_Equal_Or_Higher_Priority_Found_Call_CF_CList_InsertFront_Ex,
                cf_utils_tests_Setup,
                cf_utils_tests_Teardown,
-               "Test_CF_InsertSortPrio_When_p_t_Is_NULL_Call_CF_CList_InsertBack_Ex");
+               "Test_CF_InsertSortPrio_When_No_Equal_Or_Higher_Priority_Found_Call_CF_CList_InsertFront_Ex");
 }
 
 void add_CF_TraverseAllTransactions_Impl_tests(void)
