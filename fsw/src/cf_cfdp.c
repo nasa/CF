@@ -1472,6 +1472,12 @@ bool CF_CFDP_StartFirstPending(CF_Channel_t *chan)
 {
     CF_Transaction_t *txn;
 
+    if (!chan->config.dequeue_enabled)
+    {
+        /* dequeue is disabled on this channel, leave pending transactions on the PEND queue */
+        return false;
+    }
+
     if (chan->qs[CF_QueueIdx_PEND] == NULL)
     {
         /* nothing pending */

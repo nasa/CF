@@ -1848,14 +1848,21 @@ void Test_CF_CFDP_StartFirstPending(void)
     UT_CFDP_SetupBasicTestState(UT_CF_Setup_NONE, NULL, &chan, NULL, &txn, NULL);
 
     /* nothing pending */
+    chan->config.dequeue_enabled = true;
     UtAssert_BOOL_FALSE(CF_CFDP_StartFirstPending(chan));
 
-    txn->flags.com.q_index     = CF_QueueIdx_PEND;
-    chan->qs[CF_QueueIdx_PEND] = &txn->cl_node;
-
-    /* this dequeues */
+    txn->flags.com.q_index                    = CF_QueueIdx_PEND;
+    chan->qs[CF_QueueIdx_PEND]                = &txn->cl_node;
     chan->stat.q_size[txn->flags.com.q_index] = 1;
 
+    /* dequeue disabled, the transaction must stay on the PEND queue */
+    chan->config.dequeue_enabled = false;
+    UtAssert_BOOL_FALSE(CF_CFDP_StartFirstPending(chan));
+    UtAssert_ADDRESS_EQ(chan->qs[CF_QueueIdx_PEND], &txn->cl_node);
+    UtAssert_UINT32_EQ(txn->flags.com.q_index, CF_QueueIdx_PEND);
+
+    /* this dequeues */
+    chan->config.dequeue_enabled = true;
     UtAssert_BOOL_TRUE(CF_CFDP_StartFirstPending(chan));
 }
 

@@ -917,8 +917,13 @@ void CF_CFDP_SetupTxTransaction(CF_Transaction_t *txn);
  * and prepares for it to be activated.
  *
  * @par Assumptions, External Events, and Notes:
+ *      Nothing is pulled while dequeue is disabled on the channel.  Transactions
+ *      that are already active are not affected.
  *
  * @param chan             Channel pointer
+ *
+ * @retval true if a pending transaction was started
+ * @retval false if dequeue is disabled or the PEND queue is empty
  */
 bool CF_CFDP_StartFirstPending(CF_Channel_t *chan);
 
